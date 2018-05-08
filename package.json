@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "NODE_ENV=development; LOG_LEVEL=error; JASMINE_CONFIG_PATH=src/test/app/jasmine.json jasmine",
-    "test:health": "node test-health.js",
+    "test:health": "node src/test/ci/test-health.js",
     "start": "NODE_ENV=production node --use-strict dist/server.js",
     "watch": "export LOG_LEVEL=debug; nodemon src/app/cluster.js --ignore 'src/public/**/*' --ignore 'src/test/**/*'",
     "grunt": "grunt dist",
@@ -34,6 +34,7 @@
     "morgan": "1.9.0",
     "nunjucks": "3.1.2",
     "raven": "2.6.0",
+    "request": "2.85.0",
     "winston": "2.4.2"
   },
   "devDependencies": {
