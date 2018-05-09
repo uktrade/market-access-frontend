@@ -30,11 +30,15 @@
   "homepage": "https://github.com/uktrade/market-access-frontend#readme",
   "dependencies": {
     "compression": "1.7.2",
+    "connect-redis": "3.3.3",
     "express": "4.16.3",
+    "express-session": "1.15.6",
     "morgan": "1.9.0",
     "nunjucks": "3.1.2",
     "raven": "2.6.0",
+    "redis": "2.8.0",
     "request": "2.85.0",
+    "uuid": "3.2.1",
     "winston": "2.4.2"
   },
   "devDependencies": {
@@ -50,8 +54,8 @@
     "grunt-usemin": "3.1.1",
     "jasmine": "3.1.0",
     "jasmine-core": "3.1.0",
-    "load-grunt-tasks": "3.5.2",
-    "nodemon": "1.17.3",
+    "load-grunt-tasks": "4.0.0",
+    "nodemon": "1.17.4",
     "proxyquire": "2.0.1",
     "supertest": "3.0.0"
   }
