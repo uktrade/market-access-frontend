@@ -119,6 +119,8 @@ module.exports = {
 
 			if( data.access_token ){
 
+				logger.debug( 'access_token: ' + data.access_token );
+
 				req.session.ssoToken = data.access_token;
 				delete req.session.oauthStateId;
 

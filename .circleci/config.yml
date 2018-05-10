@@ -6,6 +6,7 @@ jobs:
       - image: circleci/node:8.11
         environment:
           SERVER_WORKERS: 2
+          BACKEND_URL: 'http://localhost:8000'
           SESSION_SECRET: abcdef123
           SSO_DOMAIN: localhost
           SSO_CLIENT: abc123
@@ -22,6 +23,7 @@ jobs:
           key: node-modules-{{ arch }}-{{ checksum "package-lock.json" }}
       - run: npm install
       - run: npm test
+      - run: npm run coverage
       - run: npm run build:dist
       - save_cache:
           key: node-modules-{{ arch }}-{{ checksum "package-lock.json" }}
