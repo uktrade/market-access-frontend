@@ -3,7 +3,6 @@ jobs:
   build:
     working_directory: ~/app
     docker:
-      - image: redis:3
       - image: circleci/node:8.11
         environment:
           SERVER_WORKERS: 2
@@ -15,6 +14,7 @@ jobs:
           SSO_PATH_TOKEN: /a/token/
           SSO_PATH_INTROSPECT: /a/introspect/
           SSO_REDIRECT_URI: localhost
+      - image: redis:3
     steps:
       - checkout
       - restore_cache:
