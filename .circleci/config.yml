@@ -6,6 +6,14 @@ jobs:
       - image: circleci/node:8.11
         environment:
           SERVER_WORKERS: 2
+          SESSION_SECRET: abcdef123
+          SSO_DOMAIN: localhost
+          SSO_CLIENT: abc123
+          SSO_SECRET: def567
+          SSO_PATH_AUTH: /a/path/
+          SSO_PATH_TOKEN: /a/token/
+          SSO_PATH_INTROSPECT: /a/introspect/
+          SSO_REDIRECT_URI: localhost
     steps:
       - checkout
       - restore_cache:
