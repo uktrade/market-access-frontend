@@ -6,7 +6,7 @@ jobs:
       - image: circleci/node:8.11
         environment:
           SERVER_WORKERS: 2
-          BACKEND_URL: 'localhost:8000'
+          BACKEND_URL: 'http://localhost:8000'
           SESSION_SECRET: abcdef123
           SSO_DOMAIN: localhost
           SSO_CLIENT: abc123
