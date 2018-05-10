@@ -1,6 +1,6 @@
 {
   "name": "market-access-frontend",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A front end for Market Access",
   "main": "server.js",
   "engines": {
@@ -11,6 +11,7 @@
     "preversion": "npm test",
     "postversion": "git push && git push --tags",
     "start": "NODE_ENV=production node --use-strict dist/server.js",
+    "tag-master": "git tag v${npm_package_version}-master && git push --tags",
     "coverage": "NODE_ENV=development; LOG_LEVEL=error; SSO_BYPASS=true; JASMINE_CONFIG_PATH=src/test/app/jasmine.json nyc jasmine",
     "test": "NODE_ENV=development; LOG_LEVEL=error; SSO_BYPASS=true; JASMINE_CONFIG_PATH=src/test/app/jasmine.json jasmine",
     "test:health": "node src/test/ci/test-health.js",
