@@ -14,6 +14,9 @@ const ping = require( './middleware/ping' );
 const forceHttps = require( './middleware/force-https' );
 const headers = require( './middleware/headers' );
 const errors = require( './middleware/errors' );
+const sessionStore = require( './middleware/session-store' );
+const auth = require( './middleware/auth' );
+const ssoBypass = require( './middleware/sso-bypass' );
 
 module.exports = {
 
@@ -46,6 +49,10 @@ module.exports = {
 		app.use( morganLogger( ( isDev ? 'dev' : 'combined' ) ) );
 		app.use( headers( isDev ) );
 		app.use( ping );
+
+		app.use( sessionStore.create() );
+		if( isDev ){ app.use( ssoBypass ); }
+		app.use( auth );
 
 		routes( express, app );
 
