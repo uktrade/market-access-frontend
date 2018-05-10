@@ -59,6 +59,9 @@ let config = {
 	views: {
 		cache: bool( 'CACHE_VIEWS', true )
 	},
+	backend: {
+		url: requiredEnv( 'BACKEND_URL' )
+	},
 	server: {
 		host: env( 'SERVER_HOST', 'localhost' ),
 		port: number( 'SERVER_PORT', number( 'PORT', 8080 ) ),

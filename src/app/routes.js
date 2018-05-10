@@ -1,9 +1,11 @@
 const ssoController = require( './controllers/sso' );
+const backend = require( './lib/backend-service' );
 
 module.exports = function( express, app ){
 
-	app.get( '/', ( req, res ) => {
-		res.render( 'index' );
+	app.get( '/', async ( req, res ) => {
+		const data = await backend.getUser();
+		res.render( 'index', { data: data.body } );
 	} );
 
 	app.get( '/login/', ssoController.authRedirect );
