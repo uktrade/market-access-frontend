@@ -1,0 +1,22 @@
+{
+	"check-coverage": true,
+	"lines": 100,
+	"statements": 100,
+	"functions": 100,
+	"branches": 100,
+	"include": [
+		"src/app/**/*.js"
+	],
+	"exclude": [
+		"src/app/app.js",
+		"src/app/cluster.js",
+		"src/app/config.js"
+	],
+	"reporter": [
+		"lcov",
+		"text"
+	],
+	"cache": true,
+	"all": true,
+	"report-dir": "./coverage"
+}

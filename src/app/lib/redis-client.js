@@ -15,7 +15,7 @@ for( let name of [ 'host', 'port', 'password', 'url' ] ){
 
 if( config.redis.tls ){
 
-	options.tls = { rejectUnauthorized: !!config.redis.tls };
+	options.tls = { rejectUnauthorized: true };
 }
 
 let client;

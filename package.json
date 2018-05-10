@@ -8,9 +8,10 @@
     "npm": "5.6.0"
   },
   "scripts": {
-    "test": "NODE_ENV=development; LOG_LEVEL=error; JASMINE_CONFIG_PATH=src/test/app/jasmine.json jasmine",
-    "test:health": "node src/test/ci/test-health.js",
     "start": "NODE_ENV=production node --use-strict dist/server.js",
+    "coverage": "NODE_ENV=development; LOG_LEVEL=error; SSO_BYPASS=true; JASMINE_CONFIG_PATH=src/test/app/jasmine.json nyc jasmine",
+    "test": "NODE_ENV=development; LOG_LEVEL=error; SSO_BYPASS=true; JASMINE_CONFIG_PATH=src/test/app/jasmine.json jasmine",
+    "test:health": "node src/test/ci/test-health.js",
     "watch": "export LOG_LEVEL=debug; nodemon src/app/cluster.js --ignore 'src/public/**/*' --ignore 'src/test/**/*'",
     "grunt": "grunt dist",
     "build:dist": "grunt dist && npm run dist-install",
@@ -56,6 +57,7 @@
     "jasmine-core": "3.1.0",
     "load-grunt-tasks": "4.0.0",
     "nodemon": "1.17.4",
+    "nyc": "11.7.3",
     "proxyquire": "2.0.1",
     "supertest": "3.0.0"
   }

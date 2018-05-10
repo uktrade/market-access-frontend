@@ -24,6 +24,7 @@ function startApp(){
 		}
 
 		messages.push( `App running in ${env} mode, workers: ${ config.server.workers }, available: ${ config.server.cpus }` );
+		messages.push( `SSO bypass: ${ config.sso.bypass }` );
 		messages.push( `Listening at http://${serverConfig.host}:${serverConfig.port}` );
 
 		logger.info( messages.join( '   ' ) );
