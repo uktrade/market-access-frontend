@@ -2,5 +2,5 @@ const backend = require( './backend-request' );
 
 module.exports = {
 
-	getUser: ( token ) => backend.get( '/whoami/', token )
+	getUser: ( req ) => backend.get( '/whoami/', req.session.ssoToken )
 };
