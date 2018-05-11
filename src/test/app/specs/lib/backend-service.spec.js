@@ -7,10 +7,12 @@ describe( 'Backend Service', () => {
 	let token;
 	let backend;
 	let service;
+	let req;
 
 	beforeEach( () => {
 	
 		token = uuid();
+		req = { session: { ssoToken: token} };
 		backend = {
 			get: jasmine.createSpy( 'backend.get' )
 		};
@@ -24,7 +26,7 @@ describe( 'Backend Service', () => {
 	
 		it( 'Should call the correct path', () => {
 	
-			service.getUser( token );
+			service.getUser( req );
 
 			expect( backend.get ).toHaveBeenCalledWith( '/whoami/', token );
 		} );
