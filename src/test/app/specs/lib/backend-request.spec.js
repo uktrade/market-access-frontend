@@ -50,6 +50,33 @@ describe( 'Backend Request', () => {
 		} );
 	} );
 
+	describe( 'Missing parameters', () => {
+	
+		describe( 'Without a path', () => {
+		
+			it( 'Should throw an error', () => {
+			
+				expect( () => {
+
+					backend.get();
+
+				} ).toThrow( new Error( 'Path is required' ) );
+			} );
+		} );
+
+		describe( 'Without a token', () => {
+		
+			it( 'Should throw an error', () => {
+			
+				expect( () => {
+
+					backend.get( '/' );
+
+				} ).toThrow( new Error( 'Token is required' ) );
+			} );
+		} );
+	} );
+
 	describe( 'Without an error', () => {
 	
 		describe( 'get', () => {

@@ -6,6 +6,14 @@ const GET = 'GET';
 
 function makeRequest( path, method, token ){
 
+	if( !path ){
+		throw new Error( 'Path is required' );
+	}
+
+	if( !token ){
+		throw new Error( 'Token is required' );
+	}
+
 	const uri = ( config.backend.url + path );
 
 	const requestOptions = {
