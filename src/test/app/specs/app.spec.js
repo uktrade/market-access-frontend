@@ -65,7 +65,7 @@ describe( 'App', function(){
 				app.get( '/' ).end( ( err, res ) => {
 
 					checkResponse( res, 200 );
-					expect( getTitle( res ) ).toEqual( 'Department for International Trade' );
+					expect( getTitle( res ) ).toEqual( 'Market Access :: Homepage' );
 					done();
 				} );
 			} );

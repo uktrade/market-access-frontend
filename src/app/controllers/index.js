@@ -11,6 +11,6 @@ module.exports = async ( req, res ) => {
 	} catch( e ){
 
 		logger.error( e );
-		res.render( 'index', { data: 'No backend available' } );
+		res.render( 'index', { error: 'No backend available' } );
 	}
 };
