@@ -16,7 +16,7 @@ module.exports = {
 	fetch: ( path ) => {
 
 		const url = ( config.baseUrl + path );
-		//console.log( `Fetching url: ${ url }` );
+		console.log( `Fetching url: ${ url }` );
 		return driver.get( url );
 	},
 
