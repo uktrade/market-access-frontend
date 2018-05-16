@@ -24,5 +24,5 @@ module.exports = {
 	seleniumServerUrl: `http://${ seleniumServer }:${ seleniumServerPort }/wd/hub`,
 	screenshotDir: path.resolve( __dirname, 'output/screenshots' ),
 	accessibilityReportDir: path.resolve( __dirname, 'output/accessibility-reports' ),
-	backendUrl: appConfig.backend.href
+	backendUrl: appConfig.backend.url
 };

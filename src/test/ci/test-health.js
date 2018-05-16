@@ -1,22 +1,32 @@
 /* eslint no-console: 0 */
+const config = require( './test-config' );
 const EndpointCheck = require( './helpers/EndpointCheck' );
 
-const host = 'localhost';
-const port = ( process.env.SERVER_PORT || 8080 );
-const path = '/ping/';
+const appUrl = `${ config.baseUrl }/ping/`;
+const backendUrl = `${ config.backendUrl }/ping.xml`;
 
-const appUrl = `http://${ host }:${ port }${ path }`;
-
-new EndpointCheck( appUrl, ( err ) => {
+new EndpointCheck( backendUrl, ( err ) => {
 
 	if( err ){
 
-		console.log( 'Could not connect to app:' );
+		console.log( 'Could not connect to backend:' );
 		console.log( err );
 		process.exit( 1 );
 
 	} else {
 
-		process.exit();
+		new EndpointCheck( appUrl, ( err ) => {
+
+			if( err ){
+
+				console.log( 'Could not connect to app:' );
+				console.log( err );
+				process.exit( 1 );
+
+			} else {
+
+				process.exit();
+			}
+		} );
 	}
 } );

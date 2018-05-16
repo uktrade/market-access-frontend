@@ -85,6 +85,7 @@ module.exports = {
 
 		if( !stateId ){
 
+			console.log( 'No stateId in session, sending back to login' );
 			return res.redirect( urls.login() );
 		}
 
