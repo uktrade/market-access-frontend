@@ -30,18 +30,18 @@ describe( 'force-https middleware', function(){
 		};
 	} );
 
-	describe( 'In dev mode', function(){
+	describe( 'NOT in secure mode mode', function(){
 
 		it( 'Should call next', function(){
 
-			const middleware = forceHttps( true );
+			const middleware = forceHttps( false );
 			middleware( req, res, next );
 
 			expect( next ).toHaveBeenCalled();
 		} );
 	} );
 
-	describe( 'Not in dev mode', function(){
+	describe( 'In secure mode', function(){
 
 		describe( 'When the header is defined', function(){
 
@@ -49,7 +49,7 @@ describe( 'force-https middleware', function(){
 
 				it( 'Should redirect to https', function(){
 
-					const middleware = forceHttps( false );
+					const middleware = forceHttps( true );
 					req.headers[ forwardHeader ] = 'http';
 					middleware( req, res, next );
 					expect( res.redirect ).toHaveBeenCalledWith( 'https://test.com/test/' );
@@ -60,7 +60,7 @@ describe( 'force-https middleware', function(){
 
 				it( 'Should call next', function(){
 
-					const middleware = forceHttps( false );
+					const middleware = forceHttps( true );
 					req.headers[ forwardHeader ] = 'https';
 					middleware( req, res, next );
 					expect( next ).toHaveBeenCalled();
@@ -72,7 +72,7 @@ describe( 'force-https middleware', function(){
 
 			it( 'Should call next', function(){
 
-				const middleware = forceHttps( false );
+				const middleware = forceHttps( true );
 				middleware( req, res, next );
 				expect( next ).toHaveBeenCalled();
 			} );

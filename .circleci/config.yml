@@ -8,15 +8,38 @@ jobs:
           SERVER_WORKERS: 2
           BACKEND_URL: 'http://localhost:8000'
           SESSION_SECRET: abcdef123
+          SSO_PROTOCOL: http
           SSO_DOMAIN: localhost
+          SSO_PORT: 5000
           SSO_CLIENT: abc123
           SSO_SECRET: def567
-          SSO_PATH_AUTH: /a/path/
-          SSO_PATH_TOKEN: /a/token/
-          SSO_PATH_INTROSPECT: /a/introspect/
-          SSO_REDIRECT_URI: localhost
+          SSO_PATH_AUTH: /o/authorize/
+          SSO_PATH_TOKEN: /o/token/
+          SSO_PATH_INTROSPECT: /o/introspect/
+          SSO_REDIRECT_URI: 'http://localhost:8080/login/callback/'
           SSO_BYPASS: true
+          SSO_MOCK_CODE: abc-def-ghi
+          CI: true
       - image: redis:3
+      - image: ukti/mock-sso
+        environment:
+          MOCK_SSO_PORT: 5000
+          MOCK_SSO_USERNAME: test-user
+      - image: postgres:9
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ""
+          POSTGRES_DB: market_access
+      - image: ukti/market-access-api
+        environment:
+          DEBUG: 'True'
+          SECRET_KEY: abc-123-456
+          SSO_ENABLED: 'True'
+          DATABASE_URL: 'postgres://postgres@localhost/market_access'
+          RESOURCE_SERVER_INTROSPECTION_URL: 'http://localhost:5000/o/introspect/'
+          RESOURCE_SERVER_AUTH_TOKEN: abc123
+        command: ./start-wait-for-db.sh
+      - image: selenium/standalone-chrome:3
     steps:
       - checkout
       - restore_cache:
@@ -34,3 +57,13 @@ jobs:
           command: npm start
           background: true
       - run: npm run test:health
+      - run: TEST_BROWSER=chrome npm run test:features
+      - store_artifacts:
+          path: src/test/ci/output/screenshots
+          destination: screenshots
+      - store_artifacts:
+          path: src/test/ci/output/accessibility-reports
+          destination: accessibility-reports
+      - store_artifacts:
+          path: coverage
+          destination: coverage

@@ -12,7 +12,6 @@ function startApp(){
 
 	const app = createApp();
 	const env = app.get( 'env' );
-	const isDev = ( 'development' === env );
 
 	app.listen( serverConfig.port, function(){
 
@@ -30,7 +29,7 @@ function startApp(){
 		logger.info( messages.join( '   ' ) );
 	});
 
-	if( isDev && isClustered ){
+	if( isClustered && config.isDev ){
 
 		app.use( function( req, res, next ){
 

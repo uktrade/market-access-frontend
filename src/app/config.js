@@ -47,9 +47,11 @@ function checkRequiredEnvs(){
 
 const cpus = ( os.cpus().length || 1 );
 const isDev = ( ( process.env.NODE_ENV || 'development' ) === 'development' );
+const isCi = bool( 'CI', false );
 
 let config = {
 	isDev,
+	isCi,
 	showErrors: isDev,
 	version: env( 'npm_package_version', 'unknown' ),
 	logLevel: env( 'LOG_LEVEL', 'warn' ),
@@ -63,6 +65,7 @@ let config = {
 		url: requiredEnv( 'BACKEND_URL' )
 	},
 	server: {
+		secure: !( isDev || isCi ),
 		host: env( 'SERVER_HOST', 'localhost' ),
 		port: number( 'SERVER_PORT', number( 'PORT', 8080 ) ),
 		cpus,

@@ -57,7 +57,7 @@ describe( 'Index controller', () => {
 			process.nextTick( () => {
 
 				expect( logger.error ).toHaveBeenCalledWith( err );
-				expect( res.render ).toHaveBeenCalledWith( 'index', { data: 'No backend available' } );
+				expect( res.render ).toHaveBeenCalledWith( 'index', { error: 'No backend available' } );
 			} );
 		} );
 	} );

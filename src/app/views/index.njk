@@ -1,5 +1,20 @@
 {% extends 'layout.njk' %}
 
+{% block page_title %}Market Access :: Homepage{% endblock %}
+
 {% block page_content %}
-	Index page {{ data | dump }}
+
+	<main>
+		<h1>Market Access Homepage</h1>
+
+		{% if error %}
+
+			{{ error }}
+
+		{% else %}
+
+			Welcome {{ data.username }}
+
+		{% endif %}
+	</main>
 {% endblock %}
