@@ -9,6 +9,15 @@ const driver = new webdriver.Builder()
 						.usingServer( config.seleniumServerUrl )
 						.build();
 
+/*
+async function logCookies(){
+
+	const cookies = await driver.manage().getCookies();
+
+	console.log( cookies );
+}
+*/
+
 module.exports = {
 
 	getInstance: () => driver,
@@ -16,11 +25,12 @@ module.exports = {
 	fetch: async ( path ) => {
 
 		const url = ( config.baseUrl + path );
-		console.log( `Fetching url: ${ url }` );
+		//console.log( `Fetching url: ${ url }` );
 		await driver.get( url );
 
 		return driver.wait( () => driver.getTitle(), 5000 );
 	},
+
 
 	takeScreenshot: async ( name ) => {
 

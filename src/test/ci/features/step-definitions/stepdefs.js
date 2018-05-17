@@ -5,10 +5,6 @@ const driver = require( '../../helpers/driver' );
 Given( 'I\'m on the homepage', async () => {
 	
 	await driver.fetch( '/' );
-	const manage = driver.getInstance().manage();
-	const cookies = await manage.getCookies();
-
-	console.log( cookies );
 
 	this.driver = driver.getInstance();
 });

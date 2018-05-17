@@ -71,7 +71,7 @@ module.exports = {
 
 			if( err ){ throw err; }
 
-			logger.info( 'Session saved to redis' );
+			logger.debug( 'Session saved to redis' );
 			res.redirect( `${ ssoUrls.auth }?${ stringify( urlParams ) }` );
 		} );
 	},
@@ -85,7 +85,7 @@ module.exports = {
 
 		if( !stateId ){
 
-			console.log( 'No stateId in session, sending back to login' );
+			logger.debug( 'No stateId in session, sending back to login' );
 			return res.redirect( urls.login() );
 		}
 
