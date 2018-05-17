@@ -44,7 +44,7 @@ module.exports = {
 		reporter.setup( app );
 
 		if( !isDev ){ app.use( compression() ); }
-		app.use( forceHttps( isDev ) );
+		app.use( forceHttps( config.server.secure ) );
 		app.use( '/public', express.static( pathToPublic, { maxAge: staticMaxAge } ) );
 		app.use( morganLogger( ( isDev ? 'dev' : 'combined' ) ) );
 		app.use( headers( isDev ) );

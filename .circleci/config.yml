@@ -19,6 +19,7 @@ jobs:
           SSO_REDIRECT_URI: 'http://localhost:8080/login/callback/'
           SSO_BYPASS: true
           SSO_MOCK_CODE: abc-def-ghi
+          CI: true
       - image: redis:3
       - image: ukti/mock-sso
         environment:

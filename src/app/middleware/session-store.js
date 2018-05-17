@@ -17,7 +17,7 @@ module.exports = {
 			} ),
 			proxy: !config.isDev, //prod uses a proxy and we need to trust it to set cookies
 			cookie: {
-				secure: !config.isDev,
+				secure: config.server.secure,
 				maxAge: config.session.ttl,
 			},
 			rolling: true,
