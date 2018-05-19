@@ -91,7 +91,7 @@ module.exports = function( grunt ){
 			'useminPrepare',
 			'concat:generated',
 			'cssmin:generated',
-			//'uglify:generated',
+			'uglify:generated',
 			'filerev',
 			'usemin'
 		]);

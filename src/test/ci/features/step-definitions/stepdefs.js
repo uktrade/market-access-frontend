@@ -9,7 +9,7 @@ Given( 'I\'m on the homepage', async () => {
 	this.driver = driver.getInstance();
 });
 
-Then( /^the title should be ([a-z :]+)$/i, async ( title ) => {
+Then( /^the title should be (.+)$/i, async ( title ) => {
 
 	const pageTitle = await this.driver.getTitle();
 	await driver.takeScreenshot( 'homepage' );

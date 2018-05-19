@@ -1,10 +1,8 @@
 {% extends 'layout.njk' %}
 
-{% block page_title %}Market Access :: Homepage{% endblock %}
+{% block page_title %}{{ super() }} - Homepage{% endblock %}
 
 {% block page_content %}
-
-	<main>
 		<h1>Market Access Homepage</h1>
 
 		{% if error %}
@@ -16,5 +14,4 @@
 			Welcome {{ data.username }}
 
 		{% endif %}
-	</main>
 {% endblock %}
