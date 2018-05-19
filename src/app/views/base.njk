@@ -3,7 +3,7 @@
 	<!--[if gt IE 8]><!--><html lang="en"><!--<![endif]-->
 	<head>
 		<meta charset="utf-8">
-		<title></title>
+		<title>{% block page_title %}Market Access{% endblock %}</title>
 
 		<!--[if gt IE 8]><!--><link rel="stylesheet" media="screen" href="/public/css/layout/govuk-template.css"><!--<![endif]-->
 		<!--[if IE 6]><link rel="stylesheet" media="screen" href="/public/css/layout/govuk-template.ie6.css"><![endif]-->
@@ -25,14 +25,16 @@
 
 		<div id="skiplink-container">
 			<div>
-				<a href="#content" class="skiplink"></a>
+				<a href="#content" class="skiplink">Skip to main content</a>
 			</div>
-		</div>
-		<div id="global-cookie-message">	
-				<p>GOV.UK uses cookies to make the site simpler. <a href="https://www.gov.uk/help/cookies">Find out more about cookies</a></p>
 		</div>
 
 		<header role="banner" id="global-header" class="with-proposition">
+			<div id="global-cookie-message">
+				<p>
+					GOV.UK uses cookies to make the site simpler. <a href="https://www.gov.uk/help/cookies">Find out more about cookies</a>
+				</p>
+			</div>
 			<div class="header-wrapper">
 				<div class="header-global">
 					<div class="header-logo">

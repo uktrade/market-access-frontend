@@ -65,7 +65,7 @@ describe( 'App', function(){
 				app.get( '/' ).end( ( err, res ) => {
 
 					checkResponse( res, 200 );
-					expect( getTitle( res ) ).toEqual( 'Market Access :: Homepage' );
+					expect( getTitle( res ) ).toEqual( 'Market Access - Homepage' );
 					done();
 				} );
 			} );
@@ -78,7 +78,7 @@ describe( 'App', function(){
 				app.get( '/abc123' ).end( ( err, res ) => {
 
 					checkResponse( res, 404 );
-					expect( getTitle( res ) ).toEqual( 'Department for International Trade - Not found' );
+					expect( getTitle( res ) ).toEqual( 'Market Access - Not found' );
 					done();
 				} );
 			} );
