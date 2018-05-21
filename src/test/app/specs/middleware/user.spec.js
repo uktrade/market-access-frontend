@@ -1,7 +1,7 @@
 const proxyquire = require( 'proxyquire' );
 const modulePath = '../../../../app/middleware/user';
 
-fdescribe( 'user middleware', () => {
+describe( 'user middleware', () => {
 
 	let req;
 	let res;
@@ -29,7 +29,7 @@ fdescribe( 'user middleware', () => {
 		it( 'Should fetch the info and store in the session', ( done ) => {
 
 			const userMock = { username: 'mock-user' };
-			const promise = new Promise( ( resolve ) => resolve( userMock ) );
+			const promise = new Promise( ( resolve ) => resolve( { response: {}, body: userMock } ) );
 
 			backend.getUser.and.callFake( () => promise );
 			

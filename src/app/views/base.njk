@@ -60,7 +60,9 @@
 					<div class='content'>
 						<a href='/' id='proposition-name'>Market access barriers</a>
 						<a role='button' href='#proposition-links' class='js-header-toggle menu' aria-controls='navigation' aria-label='Show or hide Top Level Navigation'>Menu</a>
-						<span class="user-info">Name here <a href="logout">Logout</a></span>
+						{% if user %}
+						<span class="user-info">{{ user.username }} <a href="logout">Logout</a></span>
+						{% endif %}
 						<nav id='proposition-menu'>
 							<ul id='proposition-links' aria-label='Top Level Navigation'>
 								<li><a href='#' class='active'>Dashboard</a></li>

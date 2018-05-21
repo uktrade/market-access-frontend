@@ -17,6 +17,7 @@ const errors = require( './middleware/errors' );
 const sessionStore = require( './middleware/session-store' );
 const auth = require( './middleware/auth' );
 const ssoBypass = require( './middleware/sso-bypass' );
+const user = require( './middleware/user' );
 
 module.exports = {
 
@@ -54,6 +55,7 @@ module.exports = {
 		app.use( sessionStore.create() );
 		if( isDev ){ app.use( ssoBypass ); }
 		app.use( auth );
+		app.use( user );
 
 		routes( express, app );
 
