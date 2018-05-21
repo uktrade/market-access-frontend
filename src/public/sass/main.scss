@@ -1,0 +1,77 @@
+$govuk-font-stack: Arial,"Helvetica Neue",Helvetica,sans-serif;
+$govuk-font-stack-tabular: Arial,"Helvetica Neue",Helvetica,sans-serif;
+
+@import "frontend/helpers/all";
+@import "frontend/settings/all";
+@import "frontend/tools/all";
+@import "frontend/core/typography";
+@import "frontend/objects/width-container";
+@import 'frontend/components/footer/footer';
+
+.user-info {
+	color: white;
+	float: right;
+	font-weight: bold;
+	line-height: 1.7;
+	margin-left: 2em;
+}
+
+.user-info a {
+	font-weight: normal;
+	color: white;
+	text-decoration: none;
+}
+
+.user-info a:hover {
+	text-decoration: underline;
+}
+
+@media (min-width: 372px) {
+
+	.user-info {
+		margin: 0 1em;
+	}
+}
+
+@media (min-width: 641px) {
+	.user-info {
+		font-size: 16px;
+		line-height: 2;
+	}
+}
+
+@media (min-width: 769px) {
+	.user-info {
+		line-height: 2.1;
+		margin-right: 0;
+	}
+}
+
+.header-bar {
+	@include govuk-font-regular-14;
+	background-color: $govuk-orange;
+	padding: govuk-em( 10, 14 ) 0;
+	color: $govuk-black;
+	margin-bottom: govuk-em( 45, 14 );
+
+	a {
+		color: $govuk-black;
+	}
+}
+
+.footer-bar {
+	@include govuk-font-regular-14;
+	margin-top: govuk-em( 45, 14 );
+	border-bottom: 10px solid $govuk-orange
+}
+
+.footer-bar__content {
+	background-color: $govuk-orange;
+	color: $govuk-black;
+	box-sizing: border-box;
+	padding: govuk-em( 10, 14 ) govuk-em( 10, 14 ) govuk-em( 5, 14 ) govuk-em( 10, 14 );
+
+	a {
+		color: $govuk-black;
+	}
+}

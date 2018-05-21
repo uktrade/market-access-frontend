@@ -28,7 +28,8 @@ module.exports = {
 		const staticMaxAge = ( isDev ? 0 : '2y' );
 
 		const nunjucksEnv = nunjucks.configure( [
-				`${__dirname}/views`
+				`${__dirname}/views`,
+				path.resolve( __dirname, '../@govuk-frontend' )
 			], {
 			autoescape: true,
 			watch: isDev,
