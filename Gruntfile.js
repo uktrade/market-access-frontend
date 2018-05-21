@@ -47,6 +47,18 @@ module.exports = function( grunt ){
 						dest: 'dist/'
 					}
 				]
+			},
+
+			//while the new frontend is in beta, copy the files
+			govuk: {
+				files: [
+					{
+						expand: true,
+						cwd: 'src/',
+						src: [ '@govuk-frontend/**/*' ],
+						dest: 'dist/'
+					}
+				]
 			}
 		},
 
@@ -74,7 +86,7 @@ module.exports = function( grunt ){
 				length: 8
 			},
 			pub: {
-				src: [ 'dist/public/**/*', '!dist/**/apple-touch-icon*' ]
+				src: [ 'dist/public/**/*' ]
 			}
 		}
 	});

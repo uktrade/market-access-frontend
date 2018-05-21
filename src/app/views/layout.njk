@@ -1,3 +1,5 @@
+{% from 'frontend/components/footer/macro.njk' import govukFooter %}
+
 {% extends 'base.njk' %}
 
 {% block head_content %}
@@ -13,4 +15,44 @@
 	<main class="page-content" id="content">
 		{% block page_content %}{% endblock %}
 	</main>
+
+	<div class="footer-bar" role="complementary" aria-labelledby="footer-title">
+		<p class="footer-bar__content govuk-width-container">
+			<strong id="footer-title">Is there anything wrong with this page?</strong>
+			Complete a quick feedback form to <a href="#">help us improve this service</a>.
+		</p>
+	</div>
+
+	{{- govukFooter({
+		"navigation": [
+			{
+				"title": "Data Hub",
+				"items": [
+					{
+						"href": "#",
+						"text": "View Data Hub"
+					}
+				]
+			},
+			{
+				"title": "Market access barriers",
+				"items": [
+					{
+						"href": "#",
+						"text": "Dashboard"
+					},{
+						"href": "#",
+						"text": "Report a barrier"
+					},{
+						"href": "#",
+						"text": "Find a barrier"
+					},{
+						"href": "#",
+						"text": "What is a barrier?"
+					}
+				]
+			}
+		]
+	}) }}
+
 {% endblock %}
