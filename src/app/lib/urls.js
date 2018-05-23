@@ -1,3 +1,7 @@
 module.exports = {
-	login: () => '/login/'
+	index: () => '/',
+	login: () => '/login/',
+	report: {
+		index: () => '/report/'
+	}
 };

@@ -1,0 +1,39 @@
+{% macro taskList( name, items ) %}
+
+<ol class="task-list">
+	{%- for taskItem in items %}
+	{% set taskIndex = loop.index -%}
+	<li>
+		<h2 class="task-list__section-heading">
+			<span class="task-list__section-number">{{ taskIndex }}. </span> {{ taskItem.name }}
+		</h2>
+		<ul class="task-list__items">
+			{%- for item in taskItem.items %}
+			{%- set id = '' %}
+			{%- set nameElem = 'span' %}
+			{%- if item.complete %}
+				{%- set id %}{{ name }}-{{ taskIndex }}-{{ loop.index }}{% endset %}
+			{%- endif %}
+			{%- if item.href %}
+				{%- set nameElem = 'a' %}
+			{%- endif %}
+			<li class="task-list__item">
+				{%- if taskItem.number %}
+				<span class="task-list__item__number">{{ taskIndex }}.{{ loop.index }}</span>
+				{% endif -%}
+
+				<{{ nameElem }} class="task-list__item__name"{% if item.href %} href="{{ item.href }}"{% endif %}{% if id %} aria-describedby="{{ id }}"{% endif %}>
+					{{ item.name }}
+				</{{ nameElem }}>
+
+				{%- if id %}
+				<strong class="task-list__item__completed" id="{{ id }}">Completed</strong>
+				{%- endif %}
+			</li>
+			{%- endfor %}
+		</ul>
+	</li>
+	{%- endfor %}
+</ol>
+
+{% endmacro %}

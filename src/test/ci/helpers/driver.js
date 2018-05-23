@@ -4,6 +4,8 @@ const config = require( '../test-config' );
 const writeImage = require( './write-image' );
 const writeReport = require( './write-report' );
 
+const By = webdriver.By;
+
 const driver = new webdriver.Builder()
 						.forBrowser( config.browser )
 						.usingServer( config.seleniumServerUrl )
@@ -31,6 +33,16 @@ module.exports = {
 		return driver.wait( () => driver.getTitle(), 5000 );
 	},
 
+	to: ( path ) => async () => {
+		await driver.navigate().to( ( config.baseUrl + path ) );
+		await driver.sleep( 10000 );
+		return driver.wait( driver.findElement( By.css( 'h1' ) ), 5000 );
+	},
+
+	byClass: ( className ) => driver.findElement( By.className( className ) ),
+	
+	allByCss: ( selector ) => driver.findElements( By.css( selector ) ),
+	byCss: ( selector ) => driver.findElement( By.css( selector ) ),
 
 	takeScreenshot: async ( name ) => {
 

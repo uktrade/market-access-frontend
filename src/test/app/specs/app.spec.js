@@ -71,6 +71,19 @@ describe( 'App', function(){
 			} );
 		} );
 
+		describe( 'Report a barrier page', () => {
+		
+			it( 'Should render the index page', ( done ) => {
+		
+				app.get( '/report/' ).end( ( err, res ) => {
+
+					checkResponse( res, 200 );
+					expect( getTitle( res ) ).toEqual( 'Market Access - Report a barrier' );
+					done();
+				} );
+			} );
+		} );
+
 		describe( '404 page', function(){
 
 			it( 'Should render the 404 page', function( done ){
