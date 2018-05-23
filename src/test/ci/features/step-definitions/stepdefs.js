@@ -9,6 +9,7 @@ function getPath( href ){
 Given( 'I\'m on the homepage', async () => {
 
 	await driver.fetch( '/' );
+	await driver.takeScreenshot( 'homepage' );
 
 	this.driver = driver.getInstance();
 });
@@ -16,6 +17,7 @@ Given( 'I\'m on the homepage', async () => {
 Given( 'I\'m on the report a barrier page', async () => {
 	
 	await driver.fetch( '/report/' );
+	await driver.takeScreenshot( 'report-a-barrier' );
 
 	this.driver = driver.getInstance();
 });
@@ -29,7 +31,6 @@ When( 'I navigate to the report a barrier page', async () => {
 Then( /^the title should be (.+)$/i, async ( title ) => {
 
 	const pageTitle = await this.driver.getTitle();
-	await driver.takeScreenshot( 'homepage' );
 
 	assert.equal( title, pageTitle );
 });
