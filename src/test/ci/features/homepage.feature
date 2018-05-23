@@ -4,11 +4,11 @@ Feature: Market Access Homepage
 	Scenario: Default homepage
 		Given I'm on the homepage
 		Then the title should be Market Access - Homepage
-		Then the page should not have any accessibility violations
-		Then there should be a link to report a barrier
-		Then the active heading link should be Dashboard
-		Then the main heading should be Market access barriers Dashboard
-		Then the footer links should be present
+		And the page should not have any accessibility violations
+		And there should be a link to report a barrier
+		And the active heading link should be Dashboard
+		And the main heading should be Market access barriers Dashboard
+		And the footer links should be present
 
 	Scenario: Navigate to Report a barrier
 		Given I'm on the homepage

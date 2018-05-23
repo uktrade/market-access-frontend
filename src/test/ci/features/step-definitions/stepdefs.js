@@ -91,3 +91,20 @@ Then( 'the footer links should be present', async () => {
 		assert.equal( getPath( href ), infoPath );
 	}
 } );
+
+Then( 'there should be a start banner with a start button', async () => {
+
+	const banner = await driver.allByCss( '.start-banner' );
+	const bannerButton = await driver.byCss( '.start-banner__button' );
+	const buttonText = await bannerButton.getText();
+
+	assert.equal( banner.length, 1 );
+	assert.equal( buttonText, 'Start now' );
+} );
+
+Then( /^a task list with ([0-9]+) items?$/, async ( items ) => {
+
+	const tasks = await driver.allByCss( '.task-list__item' );
+
+	assert.equal( tasks.length, items );
+} );

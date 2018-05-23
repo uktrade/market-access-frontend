@@ -9,9 +9,16 @@ $govuk-global-images: "/public/govuk/images/";
 @import "frontend/objects/width-container";
 @import 'frontend/components/footer/footer';
 @import 'frontend/components/button/button';
+@import 'frontend/components/tag/tag';
+@import 'frontend/core/lists';
 
 @import 'components/dash-button';
+@import 'components/task-list';
 @import 'pages/report-a-barrier';
+
+.restrict-width {
+	max-width: govuk-em( 750, 16 );
+}
 
 .user-info {
 	color: white;
