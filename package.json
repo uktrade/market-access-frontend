@@ -8,7 +8,7 @@
     "npm": "5.6.0"
   },
   "scripts": {
-    "preversion": "npm test",
+    "preversion": "npm test && npm run coverage",
     "postversion": "git push && git push --tags",
     "start": "NODE_ENV=production node --use-strict dist/server.js",
     "tag-master": "git tag v${npm_package_version}-master && git push --tags",

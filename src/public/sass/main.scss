@@ -1,12 +1,16 @@
 $govuk-font-stack: Arial,"Helvetica Neue",Helvetica,sans-serif;
 $govuk-font-stack-tabular: Arial,"Helvetica Neue",Helvetica,sans-serif;
+$govuk-global-images: "/public/govuk/images/";
 
-@import "frontend/helpers/all";
 @import "frontend/settings/all";
+@import "frontend/helpers/all";
 @import "frontend/tools/all";
 @import "frontend/core/typography";
 @import "frontend/objects/width-container";
 @import 'frontend/components/footer/footer';
+@import 'frontend/components/button/button';
+
+@import 'components/dash-button';
 
 .user-info {
 	color: white;

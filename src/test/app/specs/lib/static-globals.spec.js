@@ -7,17 +7,19 @@ describe( 'Static globals', function(){
 
 	let calls;
 	let staticGlobals;
+	let urls;
 
 	beforeEach( function(){
 
-		const stubs = {
+		urls = { mySpy: true };
+
+		staticGlobals = proxyquire( '../../../../app/lib/static-globals', {
 			'../config': {
 				analyticsId,
 				datahubDomain
-			}
-		};
-
-		staticGlobals = proxyquire( '../../../../app/lib/static-globals', stubs );
+			},
+			'./urls': urls
+		} );
 
 		const env = {
 			addGlobal: jasmine.createSpy( 'env.addGlobal' )
@@ -57,5 +59,13 @@ describe( 'Static globals', function(){
 
 		expect( args[ 0 ] ).toEqual( 'profileLink' );
 		expect( args[ 1 ] ).toEqual( `${ datahubDomain }/profile` );
+	} );
+
+	it( 'Should add the urls', () => {
+	
+		const args = calls.argsFor( 4 );
+
+		expect( args[ 0 ] ).toEqual( 'urls' );
+		expect( args[ 1 ] ).toEqual( urls );
 	} );
 } );
