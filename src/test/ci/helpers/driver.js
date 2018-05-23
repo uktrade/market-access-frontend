@@ -27,7 +27,7 @@ module.exports = {
 	fetch: async ( path ) => {
 
 		const url = ( config.baseUrl + path );
-		console.log( `Fetching url: ${ url }` );
+		//console.log( `Fetching url: ${ url }` );
 		await driver.get( url );
 
 		return driver.wait( () => driver.getTitle(), 5000 );
