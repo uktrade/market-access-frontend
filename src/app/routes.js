@@ -12,5 +12,6 @@ module.exports = function( express, app ){
 	app.use( user );
 	
 	app.get( '/', headerNav( { isDashboard: true } ), indexController );
-	app.get( '/report', headerNav( { isReport: true } ), reportController.start );
+	app.get( '/report/', headerNav( { isReport: true } ), reportController.index );
+	app.get( '/report/start/', headerNav( { isReport: true } ), reportController.start );
 };

@@ -28,6 +28,12 @@ When( 'I navigate to the report a barrier page', async () => {
 	await button.click();
 });
 
+When( 'I navigate to the start page', async () => {
+
+	const button = await driver.byCss( '.start-banner__button' );
+	await button.click();
+} );
+
 Then( /^the title should be (.+)$/i, async ( title ) => {
 
 	const pageTitle = await this.driver.getTitle();

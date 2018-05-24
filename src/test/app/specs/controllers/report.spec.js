@@ -13,10 +13,23 @@ describe( 'Report controller', () => {
 		};
 	} );
 
-	it( 'Should render the report page', () => {
+	describe( 'Index', () => {
+	
+		it( 'Should render the report page', () => {
 
-		controller.start( req, res );
+			controller.index( req, res );
 
-		expect( res.render ).toHaveBeenCalledWith( 'report/index' );
+			expect( res.render ).toHaveBeenCalledWith( 'report/index' );
+		} );
+	} );
+
+	describe( 'Start', () => {
+	
+		it( 'Should render the start page', () => {
+	
+			controller.start( req, res );
+
+			expect( res.render ).toHaveBeenCalledWith( 'report/start' );
+		} );
 	} );
 } );

@@ -27,5 +27,13 @@ describe( 'URLs', () => {
 				expect( urls.report.index() ).toEqual( '/report/' );
 			} );
 		} );
+
+		describe( 'start', () => {
+		
+			it( 'Should return the correct path', () => {
+		
+				expect( urls.report.start() ).toEqual( '/report/start/' );
+			} );
+		} );
 	} );
 } );

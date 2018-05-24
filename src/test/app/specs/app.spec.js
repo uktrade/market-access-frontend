@@ -71,15 +71,31 @@ describe( 'App', function(){
 			} );
 		} );
 
-		describe( 'Report a barrier page', () => {
-		
-			it( 'Should render the index page', ( done ) => {
-		
-				app.get( '/report/' ).end( ( err, res ) => {
+		describe( 'Report a barrier', () => {
 
-					checkResponse( res, 200 );
-					expect( getTitle( res ) ).toEqual( 'Market Access - Report a barrier' );
-					done();
+			describe( 'Index page', () => {
+			
+				it( 'Should render the index page', ( done ) => {
+			
+					app.get( '/report/' ).end( ( err, res ) => {
+
+						checkResponse( res, 200 );
+						expect( getTitle( res ) ).toEqual( 'Market Access - Report a barrier' );
+						done();
+					} );
+				} );
+			} );
+		
+			describe( 'Start page', () => {
+			
+				it( 'Should render the start page', ( done ) => {
+			
+					app.get( '/report/start/' ).end( ( err, res ) => {
+
+						checkResponse( res, 200 );
+						expect( getTitle( res ) ).toEqual( 'Market Access - Report - Status of the problem' );
+						done();
+					} );
 				} );
 			} );
 		} );
