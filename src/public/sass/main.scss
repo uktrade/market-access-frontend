@@ -6,18 +6,29 @@ $govuk-global-images: "/public/govuk/images/";
 @import "frontend/helpers/all";
 @import "frontend/tools/all";
 @import "frontend/core/typography";
+@import 'frontend/core/lists';
 @import "frontend/objects/width-container";
+@import "frontend/objects/form-group";
 @import 'frontend/components/footer/footer';
 @import 'frontend/components/button/button';
 @import 'frontend/components/tag/tag';
-@import 'frontend/core/lists';
+@import 'frontend/components/error-message/error-message';
+@import 'frontend/components/fieldset/fieldset';
+@import 'frontend/components/label/label';
+@import 'frontend/components/hint/hint';
+@import 'frontend/components/radios/radios';
 
 @import 'components/dash-button';
 @import 'components/task-list';
-@import 'pages/report-a-barrier';
+@import 'pages/report/index';
+@import 'pages/report/start';
 
 .restrict-width {
 	max-width: govuk-em( 750, 16 );
+}
+
+.paragraph-width {
+	max-width: govuk-em( 600, 16 );
 }
 
 .user-info {

@@ -1,3 +1,5 @@
+{% from 'frontend/components/radios/macro.njk' import govukRadios %}
+
 {% extends 'layout.njk' %}
 
 {% block page_title %}{{ super() }} - Report - Status of the problem{% endblock %}
@@ -7,4 +9,61 @@
 	<h1 class="govuk-heading-l">
 		<span class="govuk-caption-m">Report a barrier</span> Status of the problem
 	</h1>
+
+	<form action="#">
+
+		{{ govukRadios({
+			'name': 'status',
+			'classes': 'problem-status',
+			'fieldset': {
+				'legend': {
+					'text': 'What is the current status of the problem?',
+					'classes': 'govuk-fieldset__legend--m'
+				}
+			},
+			'items': [
+				{
+					'value': '1',
+					'text': "It hasn't happened yet"
+				},
+				{
+					'value': '2',
+					'text': "It's happening now"
+				},
+				{
+					'value': '3',
+					'text': "It happened in the past"
+				}
+			]
+		}) }}
+
+		<div class="report-barrier-emergency paragraph-width" id="report-barrier-emergency">
+			
+			{{ govukRadios({
+				'name': 'emergency',
+				'classes': 'govuk-radios--inline',
+				'fieldset': {
+					'legend': {
+						'text': 'Is this an emergency?',
+						'classes': 'govuk-fieldset__legend--m'
+					}
+				},
+				'hint': {
+					'text': 'Is an export facing significant and imminent financial or other loss and does government need to take action urgently?'
+				},
+				'items': [
+					{
+						'value': 'yes',
+						'text': "Yes"
+					},
+					{
+						'value': 'no',
+						'text': "No"
+					}
+				]
+			}) }}
+		</div>
+
+		<input type="submit" value="Continue" class="govuk-button">
+	</form>
 {% endblock %}

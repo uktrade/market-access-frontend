@@ -1,6 +1,7 @@
 const assert = require( 'assert' );
 const { Given, When, Then } = require( 'cucumber' );
 const driver = require( '../../helpers/driver' );
+const urls = require( '../../../../app/lib/urls' );
 
 function getPath( href ){
 	return href.replace( /^http:\/\/.+?(\/.*)$/, '$1' );
@@ -8,7 +9,7 @@ function getPath( href ){
 
 Given( 'I\'m on the homepage', async () => {
 
-	await driver.fetch( '/' );
+	await driver.fetch( urls.index() );
 	await driver.takeScreenshot( 'homepage' );
 
 	this.driver = driver.getInstance();
@@ -16,11 +17,19 @@ Given( 'I\'m on the homepage', async () => {
 
 Given( 'I\'m on the report a barrier page', async () => {
 	
-	await driver.fetch( '/report/' );
+	await driver.fetch( urls.report.index() );
 	await driver.takeScreenshot( 'report-a-barrier' );
 
 	this.driver = driver.getInstance();
 });
+
+Given( 'I\'m on the start a report page', async () => {
+
+	await driver.fetch( urls.report.start() );
+	await driver.takeScreenshot( 'report-a-barrier_start' );
+
+	this.driver = driver.getInstance();
+} );
 
 When( 'I navigate to the report a barrier page', async () => {
 
@@ -114,4 +123,37 @@ Then( /^a task list with ([0-9]+) items?$/, async ( items ) => {
 	const tasks = await driver.allByCss( '.task-list__item' );
 
 	assert.equal( tasks.length, items );
+} );
+
+Then( /^there should be a ([a-zA-Z]+) button$/, async( text ) => {
+
+	const button = await driver.byCss( '.govuk-button' );
+	const buttonText = await button.getAttribute( 'value' );
+
+	assert.equal( buttonText, text );
+} );
+
+Then( /^it should (reveal|hide) the emergency question$/, async ( state ) => {
+
+	const isHidden = ( state === 'hide' );
+	const emergencyElem = await driver.byCss( '.report-barrier-emergency' );
+	const classes = await emergencyElem.getAttribute( 'class' );
+	const ariaHidden = await emergencyElem.getAttribute( 'aria-hidden' );
+
+	assert.equal( !!~classes.indexOf( ' visually-hidden' ), isHidden );
+	assert.equal( ariaHidden, '' + isHidden );
+} );
+
+When( /^I click the ([a-z]+) status radio$/, async ( position ) => {
+
+	const radioMap = {
+		first: 0,
+		second: 1,
+		third: 2
+	};
+
+	const radios = await driver.allByCss( '.problem-status .govuk-radios__input' );
+	const radioIndex = radioMap[ position ];
+	const radio = radios[ radioIndex ];
+	await radio.click();
 } );
