@@ -16,18 +16,43 @@ describe( 'SSO bypass', () => {
 
 	describe( 'When bypass is true', () => {
 
-		it( 'Should add an ssoToken and call next', () => {
+		describe( 'When a datahub dev token is provided', () => {
+		
+			it( 'Should use the dev token', () => {
+		
+				const myToken = 'abc-123';
+				const ssoBypass = proxyquire( modulePath, {
+					'../config': {
+						sso: { bypass: true },
+						datahub: {
+							token: myToken
+						}
+					}
+				} );
 
-			const ssoBypass = proxyquire( modulePath, {
-				'../config': {
-					sso: { bypass: true }
-				}
+				ssoBypass( req, res, next );
+
+				expect( req.session.ssoToken ).toEqual( myToken );
+				expect( next ).toHaveBeenCalled();
 			} );
+		} );
 
-			ssoBypass( req, res, next );
+		describe( 'When a token is not provided', () => {
+		
+			it( 'Should add an ssoToken and call next', () => {
 
-			expect( req.session.ssoToken ).toEqual( 'ssobypass' );
-			expect( next ).toHaveBeenCalled();
+				const ssoBypass = proxyquire( modulePath, {
+					'../config': {
+						sso: { bypass: true },
+						datahub: { token: '' }
+					}
+				} );
+
+				ssoBypass( req, res, next );
+
+				expect( req.session.ssoToken ).toEqual( 'ssobypass' );
+				expect( next ).toHaveBeenCalled();
+			} );
 		} );
 	} );
 

@@ -6,7 +6,7 @@ module.exports = function( req, res, next ){
 	if( config.sso.bypass ){
 
 		logger.debug( 'Bypassing SSO' );
-		req.session.ssoToken = 'ssobypass';
+		req.session.ssoToken = ( config.datahub.token || 'ssobypass' );
 	}
 
 	next();
