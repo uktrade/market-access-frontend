@@ -1,5 +1,21 @@
 {% extends 'layout.njk' %}
 
 {% block page_content %}
-	Default error
+
+	<h1 class="error-heading">Unexpected error</h1>
+
+	{% if showErrors %}
+
+		{% if error.code %}
+
+		<h2 class="error-heading">
+			Code: {{ error.code }}
+		</h2>
+
+		{% endif %}
+
+		<p class="stack-trace">
+			{{ error.stack }}
+		</p>
+	{% endif %}
 {% endblock %}

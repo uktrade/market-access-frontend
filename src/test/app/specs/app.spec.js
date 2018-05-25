@@ -2,6 +2,7 @@ const supertest = require( 'supertest' );
 const proxyquire = require( 'proxyquire' );
 const winston = require( 'winston' );
 
+const urls = require( '../../../app/lib/urls' );
 const logger = require( '../../../app/lib/logger' );
 const modulePath = '../../../app/app';
 
@@ -62,7 +63,7 @@ describe( 'App', function(){
 
 			it( 'Should render the index page', function( done ){
 
-				app.get( '/' ).end( ( err, res ) => {
+				app.get( urls.index() ).end( ( err, res ) => {
 
 					checkResponse( res, 200 );
 					expect( getTitle( res ) ).toEqual( 'Market Access - Homepage' );
@@ -77,7 +78,7 @@ describe( 'App', function(){
 			
 				it( 'Should render the index page', ( done ) => {
 			
-					app.get( '/report/' ).end( ( err, res ) => {
+					app.get( urls.report.index() ).end( ( err, res ) => {
 
 						checkResponse( res, 200 );
 						expect( getTitle( res ) ).toEqual( 'Market Access - Report a barrier' );
@@ -90,10 +91,23 @@ describe( 'App', function(){
 			
 				it( 'Should render the start page', ( done ) => {
 			
-					app.get( '/report/start/' ).end( ( err, res ) => {
+					app.get( urls.report.start() ).end( ( err, res ) => {
 
 						checkResponse( res, 200 );
 						expect( getTitle( res ) ).toEqual( 'Market Access - Report - Status of the problem' );
+						done();
+					} );
+				} );
+			} );
+
+			describe( 'Company search page', () => {
+			
+				it( 'Should render the company search page', ( done ) => {
+			
+					app.get( urls.report.company() ).end( ( err, res ) => {
+
+						checkResponse( res, 200 );
+						expect( getTitle( res ) ).toEqual( 'Market Access - Report - Search for company' );
 						done();
 					} );
 				} );
@@ -129,7 +143,7 @@ describe( 'App', function(){
 		
 			it( 'Should redirect to the sso page', ( done ) => {
 		
-				app.get( '/login/' ).end( ( err, res ) => {
+				app.get( urls.login() ).end( ( err, res ) => {
 
 					checkResponse( res, 302 );
 					expect( res.headers.location ).toBeDefined();

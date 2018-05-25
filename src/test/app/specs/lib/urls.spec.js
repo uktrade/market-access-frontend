@@ -35,5 +35,13 @@ describe( 'URLs', () => {
 				expect( urls.report.start() ).toEqual( '/report/start/' );
 			} );
 		} );
+
+		describe( 'company', () => {
+		
+			it( 'Should return the correct path', () => {
+		
+				expect( urls.report.company() ).toEqual( '/report/company/' );
+			} );
+		} );
 	} );
 } );

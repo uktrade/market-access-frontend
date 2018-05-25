@@ -9,6 +9,8 @@ $govuk-global-images: "/public/govuk/images/";
 @import 'frontend/core/lists';
 @import "frontend/objects/width-container";
 @import "frontend/objects/form-group";
+@import "frontend/overrides/typography";
+
 @import 'frontend/components/footer/footer';
 @import 'frontend/components/button/button';
 @import 'frontend/components/tag/tag';
@@ -17,7 +19,9 @@ $govuk-global-images: "/public/govuk/images/";
 @import 'frontend/components/label/label';
 @import 'frontend/components/hint/hint';
 @import 'frontend/components/radios/radios';
+@import 'frontend/components/input/input';
 
+@import 'error';
 @import 'components/dash-button';
 @import 'components/task-list';
 @import 'pages/report/index';
@@ -29,6 +33,21 @@ $govuk-global-images: "/public/govuk/images/";
 
 .paragraph-width {
 	max-width: govuk-em( 600, 16 );
+}
+
+.results-count {
+	@include govuk-font-regular-19;
+	border-bottom: 5px solid $govuk-black;
+	padding-bottom: govuk-em( 5, 19 );
+}
+
+.results-count__number {
+	@include govuk-font-bold-36;
+}
+
+.highlight {
+	background-color: $govuk-yellow-25;
+	outline: 2px solid $govuk-yellow-25;
 }
 
 .user-info {

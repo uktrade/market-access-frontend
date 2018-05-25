@@ -20,15 +20,11 @@ describe( 'Backend Request', () => {
 		const requestOptions = {
 			uri,
 			method,
-			json: true
-		};
-
-		if( opts.token ){
-
-			requestOptions.headers = {
+			json: true,
+			headers: {
 				Authorization: `Bearer ${ opts.token }`
-			};
-		}
+			}
+		};
 
 		expect( request.calls.argsFor( 0 )[ 0 ] ).toEqual( requestOptions );
 	}

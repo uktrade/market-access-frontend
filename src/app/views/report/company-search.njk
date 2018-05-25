@@ -1,0 +1,52 @@
+{% from "frontend/components/input/macro.njk" import govukInput %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Report - Search for company{% endblock %}
+
+{% block page_content %}
+
+		<h1 class="govuk-heading-l">
+			<span class="govuk-caption-m">Report a barrier</span> Export company affected
+		</h1>
+
+		<section class="restrict-width">
+				
+			<form action="" method="POST">
+
+				{{ govukInput({
+					'label': {
+						'text': "Find the reporter's company record",
+						'classes': 'govuk-!-f-24 govuk-!-w-bold'
+					},
+					'hint': {
+						'html': 'Search for the registered company name, company number or address'
+					},
+					'id': 'company',
+					'name': 'query',
+					'value': query,
+					'classes': 'govuk-input--width-20'
+				}) }}
+
+				<input type="submit" value="Search" class="govuk-button">
+			</form>
+
+
+			{% if results %}
+
+				<h2 class="results-count">
+					<span class="results-count__number">{{ results.count }}</span>
+					companies match <span class="highlight">{{ query }}</span>
+				</h2>
+
+				<ul>
+				{% for company in results.results %}
+					<li>
+						{{ company.name }}						
+					</li>	
+				{% endfor %}
+				</ul>
+			{% endif %}
+		</section>
+		
+{% endblock %}
