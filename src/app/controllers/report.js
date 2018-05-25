@@ -1,3 +1,4 @@
 module.exports = {
-	start: ( req, res ) => res.render( 'report/index' )
+	index: ( req, res ) => res.render( 'report/index' ),
+	start: ( req, res ) => res.render( 'report/start' )
 };

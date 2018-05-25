@@ -89,5 +89,13 @@
 		<script src="/public/js/layout/govuk-template.js"></script>
 		<!-- endbuild -->
 		<script>if (typeof window.GOVUK === 'undefined') document.body.className = document.body.className.replace('js-enabled', '');</script>
+
+		<!-- build:js(src) /public/js/vendor.min.js -->
+		<script src="/public/js/vendor/jessie.js"></script>
+		<!-- endbuild -->
+		<!-- build:js(src) /public/js/app.min.js -->
+		<script src="/public/js/pages/report/start.js"></script>
+		<!-- endbuild -->
+		{% block body_script %}{% endblock %}
 	</body>
 </html>
