@@ -1,4 +1,5 @@
-const datahub = require( './datahub-request' );
+const config = require( '../config' );
+const datahub = config.datahub.stub ? require( './datahub-request.stub' ) : require( './datahub-request' );
 //const urlParams = require( './url-params' );
 
 module.exports = {
