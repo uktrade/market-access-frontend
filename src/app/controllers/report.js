@@ -1,36 +1,47 @@
+const urls = require( '../lib/urls' );
 const datahub = require( '../lib/datahub-service' );
 
 module.exports = {
-	index: ( req, res ) => res.render( 'report/index' ),
-	start: ( req, res ) => res.render( 'report/start' ),
-	companySearch: async ( req, res, next ) => {
 
-		const data = {};
+	index: ( req, res ) => res.render( 'report/index' ),
+	start: ( req, res ) => {
 
 		if( req.method === 'POST' ){
 
-			const query = ( req.body && req.body.query );
+			res.redirect( urls.report.company() );
 
-			if( query ){
+		} else {
 
-				data.query = query;
+			res.render( 'report/start' );
+		}
+	},
 
-				try {
+	companySearch: async ( req, res, next ) => {
 
-					const { response, body } = await datahub.searchCompany( req, query );
+		const query = req.query.q;
+		const data = {};
 
-					if( response.isSuccess ){
+		if( query ){
 
-						data.results = body;
-					}
+			data.query = query;
 
-				} catch ( e ){
+			try {
 
-					return next( e );
+				const { response, body } = await datahub.searchCompany( req, query );
+
+				if( response.isSuccess ){
+
+					data.results = body;
 				}
+
+			} catch ( e ){
+
+				return next( e );
 			}
 		}
 
 		res.render( 'report/company-search', data );
-	}
+	},
+
+	companyDetails: async ( req, res ) => res.render( 'report/company-details' )
 };

@@ -1,0 +1,53 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Details of a company",
+
+	"type": "object",
+	"required": [ "id", "name", "sector", "registered_address_1", "registered_address_town", "registered_address_county", "registered_address_postcode", "registered_address_country" ],
+	"properties": {
+		"id": {
+			"type": "string",
+			"faker": "random.uuid"
+		},
+		"name": {
+			"type": "string",
+			"faker": "lorem.words"
+		},
+		"sector": {
+			"type": "object",
+			"required": [ "name" ],
+			"properties": {
+				"name": {
+					"type": "string",
+					"faker": "lorem.words"
+				}
+			}
+		},
+		"registered_address_1": {
+			"type": "string",
+			"faker": "address.streetName"
+		},
+		"registered_address_town": {
+			"type": "string",
+			"faker": "address.city"
+		},
+		"registered_address_county": {
+			"type": "string",
+			"faker": "address.county"
+		},
+		"registered_address_country": {
+			"type": "object",
+			"required": [ "name" ],
+			"properties": {
+				"name": {
+					"type": "string",
+					"faker": "address.country"
+				}
+			}
+		},
+		"registered_address_postcode": {
+			"type": "string",
+			"faker": "address.zipCode"
+		}
+	}
+}

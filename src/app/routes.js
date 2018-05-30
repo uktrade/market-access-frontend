@@ -4,15 +4,26 @@ const reportController = require( './controllers/report' );
 const headerNav = require( './middleware/header-nav' );
 const user = require( './middleware/user' );
 const urls = require( './lib/urls' );
+const datahub =require( './lib/datahub-service' );
 
 const reportHeaderNav = headerNav( { isReport: true } );
 
 module.exports = function( express, app ){
 
-	const companySearchBodyParser = express.urlencoded( {
-		extended: false,
-		limit: '0.5kb', // ~500 characters
-		parameterLimit: 2 // q and csrftoken
+	app.param( 'companyId', async ( req, res, next, id ) => {
+
+		try{
+
+			const { body } = await datahub.getCompany( req, id );
+
+			res.locals.company = body;
+
+			next();
+
+		} catch( e ){
+			
+			next( e );
+		}
 	} );
 
 	app.get( '/login/', ssoController.authRedirect );
@@ -25,6 +36,5 @@ module.exports = function( express, app ){
 	app.get( urls.report.start(), reportHeaderNav, reportController.start );
 	app.post( urls.report.start(), reportHeaderNav, reportController.start );
 	app.get( urls.report.company(), reportHeaderNav, reportController.companySearch );
-	// TODO: Add csrftoken
-	app.post( urls.report.company(), reportHeaderNav, companySearchBodyParser, reportController.companySearch );
+	app.get( urls.report.company() + ':companyId', reportHeaderNav, reportController.companyDetails );
 };

@@ -8,7 +8,8 @@ const today = new Date();
 const folderSuffix = [ today.getFullYear(), today.getMonth() + 1, today.getDate(), today.toLocaleTimeString( 'en-US', { hour12: false } ) ].join( '-' );
 
 const stubs = [
-	[ 'search/company', '/v3/search/company', { name: 'testbirds', offset: 0, limit: 20 } ]
+	[ 'search/company', '/v3/search/company', { name: 'testbirds', offset: 0, limit: 20 } ],
+	[ 'company/details', '/v3/company/00ca9155-a098-e211-a939-e4115bead28a' ]
 ];
 
 function mkdirp( filePath ){

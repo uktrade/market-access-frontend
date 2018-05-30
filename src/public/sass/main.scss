@@ -24,6 +24,8 @@ $govuk-global-images: "/public/govuk/images/";
 @import 'error';
 @import 'components/dash-button';
 @import 'components/task-list';
+@import 'components/company-details';
+@import 'components/company-card';
 @import 'pages/report/index';
 @import 'pages/report/start';
 
@@ -47,7 +49,28 @@ $govuk-global-images: "/public/govuk/images/";
 
 .highlight {
 	background-color: $govuk-yellow-25;
-	outline: 2px solid $govuk-yellow-25;
+	outline: 1px solid $govuk-yellow-25;
+	border-top: 2px solid $govuk-yellow-25;
+	border-bottom: 2px solid $govuk-yellow-25;
+}
+
+.button--secondary {
+
+	background-color: $govuk-grey-3;
+	box-shadow: 0 2px 0 $govuk-grey-1;
+	color: $govuk-grey-1;
+
+	&:link,
+	&:visited,
+	&:active,
+	&:hover {
+		color: $govuk-grey-1;
+	}
+
+	&:focus,
+	&:hover {
+		background-color: $govuk-grey-4;
+	}
 }
 
 .user-info {
@@ -91,29 +114,29 @@ $govuk-global-images: "/public/govuk/images/";
 
 .header-bar {
 	@include govuk-font-regular-14;
-	background-color: $govuk-orange;
+	background-color: $govuk-fuchsia;
 	padding: govuk-em( 10, 14 ) 0;
-	color: $govuk-black;
+	color: $govuk-white;
 	margin-bottom: govuk-em( 45, 14 );
 
 	a {
-		color: $govuk-black;
+		color: $govuk-white;
 	}
 }
 
 .footer-bar {
 	@include govuk-font-regular-14;
 	margin-top: govuk-em( 45, 14 );
-	border-bottom: 10px solid $govuk-orange
+	border-bottom: 10px solid $govuk-fuchsia
 }
 
 .footer-bar__content {
-	background-color: $govuk-orange;
-	color: $govuk-black;
+	background-color: $govuk-fuchsia;
+	color: $govuk-white;
 	box-sizing: border-box;
 	padding: govuk-em( 10, 14 ) govuk-em( 10, 14 ) govuk-em( 5, 14 ) govuk-em( 10, 14 );
 
 	a {
-		color: $govuk-black;
+		color: $govuk-white;
 	}
 }

@@ -46,3 +46,4 @@ src/test/ci/output
 *.map
 src/public/css/main.css
 src/data/stubs
+src/data/faker/output

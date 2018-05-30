@@ -1,10 +1,14 @@
 const supertest = require( 'supertest' );
 const proxyquire = require( 'proxyquire' );
 const winston = require( 'winston' );
+const nock = require( 'nock' );
 
+const config = require( '../../../app/config' );
 const urls = require( '../../../app/lib/urls' );
 const logger = require( '../../../app/lib/logger' );
 const modulePath = '../../../app/app';
+
+const getFakeData = require( '../helpers/get-fake-data' );
 
 function getTitle( res ){
 
@@ -20,6 +24,10 @@ function getTitle( res ){
 function checkResponse( res, statusCode ){
 
 	const headers = res.headers;
+
+	if( res.statusCode != statusCode ){
+		console.log( res.text );
+	}
 
 	expect( res.statusCode ).toEqual( statusCode );
 	expect( headers[ 'x-download-options' ] ).toBeDefined();
@@ -112,6 +120,35 @@ describe( 'App', function(){
 					} );
 				} );
 			} );
+
+			describe( 'Company detail', () => {
+
+				let companyId;
+
+				beforeEach( () => {
+				
+					companyId = 'd829a9c6-cffb-4d6a-953b-3e02a2b33028';
+
+					nock( config.datahub.url )
+						.get( `/v3/company/${ companyId }` )
+						.reply( 200, getFakeData( '/datahub/company/detail' ) );
+				} );
+
+				afterEach( () => {
+				
+					expect( nock.isDone() ).toEqual( true );
+				} );
+			
+				it( 'Should render the details of a company', ( done ) => {
+			
+					app.get( urls.report.company( companyId ) ).end( ( err, res ) => {
+
+						checkResponse( res, 200 );
+						expect( getTitle( res ) ).toEqual( 'Market Access - Report - Company details' );
+						done();
+					} );
+				} );
+			} );
 		} );
 
 		describe( '404 page', function(){
@@ -191,6 +228,7 @@ describe( 'App', function(){
 					set: jasmine.createSpy( 'app.set' ),
 					get: jasmine.createSpy( 'app.get' ),
 					post: jasmine.createSpy( 'app.post' ),
+					param: jasmine.createSpy( 'app.param' )
 				};
 			};
 		} );

@@ -16,7 +16,8 @@ const response = { statusCode: 200, isSuccess: true, elapsedTime: 0 };
 
 const stubs = [
 
-	[ /^\/v3\/search\/company$/, 'search/company' ]
+	[ /^\/v3\/search\/company$/, 'search/company' ],
+	[ /^\/v3\/company\/[a-z0-9-]+$/, 'company/details' ]
 ];
 
 //ensure that we don't return a modified response
@@ -70,5 +71,6 @@ function get( url ){
 
 module.exports = {
 
+	get: ( path/*, token */ ) => get( path ),
 	post: ( path, token, body ) => get( path, body )
 };

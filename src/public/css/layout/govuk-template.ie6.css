@@ -418,7 +418,7 @@ button:focus {
           text-decoration: underline; }
         #global-header .header-proposition #proposition-link a.active,
         #global-header .header-proposition #proposition-links a.active {
-          color: #F47738; }
+          color: #c994c3; }
         #global-header .header-proposition #proposition-link a:focus,
         #global-header .header-proposition #proposition-links a:focus {
           color: #0b0c0c; }
@@ -432,7 +432,7 @@ button:focus {
 /* Global header bar */
 #global-header-bar {
   height: 10px;
-  background-color: #F47738;
+  background-color: #c994c3;
   font-size: 0; }
 
 /* Global cookie message */

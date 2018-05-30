@@ -6,6 +6,6 @@ module.exports = {
 	report: {
 		index: () => '/report/',
 		start: () => '/report/start/',
-		company: () => '/report/company/'
+		company: ( id ) => `/report/company/${ id ? id + '/' : '' }`,
 	}
 };

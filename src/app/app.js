@@ -9,6 +9,7 @@ const config = require( './config' );
 
 const reporter = require( './lib/reporter' );
 const staticGlobals = require( './lib/static-globals' );
+const nunjucksFilters = require( './lib/nunjucks-filters' );
 
 const ping = require( './middleware/ping' );
 const forceHttps = require( './middleware/force-https' );
@@ -42,6 +43,7 @@ module.exports = {
 		app.disable( 'x-powered-by' );
 
 		staticGlobals( nunjucksEnv );
+		nunjucksFilters( nunjucksEnv );
 		reporter.setup( app );
 
 		if( !isDev ){ app.use( compression() ); }

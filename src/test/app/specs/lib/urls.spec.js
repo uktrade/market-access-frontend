@@ -37,10 +37,22 @@ describe( 'URLs', () => {
 		} );
 
 		describe( 'company', () => {
+
+			describe( 'Without a company id', () => {
+			
+				it( 'Should return the correct path', () => {
+			
+					expect( urls.report.company() ).toEqual( '/report/company/' );
+				} );
+			} );
 		
-			it( 'Should return the correct path', () => {
-		
-				expect( urls.report.company() ).toEqual( '/report/company/' );
+			describe( 'With a company id', () => {
+			
+				it( 'Should return the correct path', () => {
+			
+					const id = 'abc-123';
+					expect( urls.report.company( id ) ).toEqual( `/report/company/${ id }/` );
+				} );
 			} );
 		} );
 	} );
