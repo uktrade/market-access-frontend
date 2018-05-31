@@ -10,7 +10,8 @@
 	"exclude": [
 		"src/app/app.js",
 		"src/app/cluster.js",
-		"src/app/config.js"
+		"src/app/config.js",
+		"src/app/lib/datahub-request.stub.js"
 	],
 	"reporter": [
 		"lcov",

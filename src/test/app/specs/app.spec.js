@@ -46,7 +46,7 @@ describe( 'App', function(){
 
 		logger.remove( winston.transports.Console );
 		oldTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-		jasmine.DEFAULT_TIMEOUT_INTERVAL = 500;
+		jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000;
 	} );
 
 	afterAll( function(){
@@ -83,9 +83,9 @@ describe( 'App', function(){
 		describe( 'Report a barrier', () => {
 
 			describe( 'Index page', () => {
-			
+
 				it( 'Should render the index page', ( done ) => {
-			
+
 					app.get( urls.report.index() ).end( ( err, res ) => {
 
 						checkResponse( res, 200 );
@@ -94,11 +94,11 @@ describe( 'App', function(){
 					} );
 				} );
 			} );
-		
+
 			describe( 'Start page', () => {
-			
+
 				it( 'Should render the start page', ( done ) => {
-			
+
 					app.get( urls.report.start() ).end( ( err, res ) => {
 
 						checkResponse( res, 200 );
@@ -109,9 +109,9 @@ describe( 'App', function(){
 			} );
 
 			describe( 'Company search page', () => {
-			
+
 				it( 'Should render the company search page', ( done ) => {
-			
+
 					app.get( urls.report.company() ).end( ( err, res ) => {
 
 						checkResponse( res, 200 );
@@ -126,26 +126,46 @@ describe( 'App', function(){
 				let companyId;
 
 				beforeEach( () => {
-				
-					companyId = 'd829a9c6-cffb-4d6a-953b-3e02a2b33028';
 
-					nock( config.datahub.url )
-						.get( `/v3/company/${ companyId }` )
-						.reply( 200, getFakeData( '/datahub/company/detail' ) );
+					companyId = 'd829a9c6-cffb-4d6a-953b-3e02a2b33028';
 				} );
 
 				afterEach( () => {
-				
+
 					expect( nock.isDone() ).toEqual( true );
 				} );
-			
-				it( 'Should render the details of a company', ( done ) => {
-			
-					app.get( urls.report.company( companyId ) ).end( ( err, res ) => {
 
-						checkResponse( res, 200 );
-						expect( getTitle( res ) ).toEqual( 'Market Access - Report - Company details' );
-						done();
+				describe( 'With a success', () => {
+
+					it( 'Should render the details of a company', ( done ) => {
+
+						nock( config.datahub.url )
+							.get( `/v3/company/${ companyId }` )
+							.reply( 200, getFakeData( '/datahub/company/detail' ) );
+
+						app.get( urls.report.company( companyId ) ).end( ( err, res ) => {
+
+							checkResponse( res, 200 );
+							expect( getTitle( res ) ).toEqual( 'Market Access - Report - Company details' );
+							done();
+						} );
+					} );
+				} );
+
+				describe( 'With an error', () => {
+
+					it( 'Should render the error page', ( done ) => {
+
+						nock( config.datahub.url )
+							.get( `/v3/company/${ companyId }` )
+							.reply( 500, {} );
+
+						app.get( urls.report.company( companyId ) ).end( ( err, res ) => {
+
+							checkResponse( res, 500 );
+							expect( getTitle( res ) ).toEqual( 'Market Access - Error' );
+							done();
+						} );
 					} );
 				} );
 			} );
@@ -177,9 +197,9 @@ describe( 'App', function(){
 		} );
 
 		describe( 'Login', () => {
-		
+
 			it( 'Should redirect to the sso page', ( done ) => {
-		
+
 				app.get( urls.login() ).end( ( err, res ) => {
 
 					checkResponse( res, 302 );
@@ -190,9 +210,9 @@ describe( 'App', function(){
 		} );
 
 		describe( 'Login callback', () => {
-		
+
 			it( 'Should redirect to the login page', ( done ) => {
-		
+
 				app.get( '/login/callback/' ).end( ( err, res ) => {
 
 					checkResponse( res, 302 );

@@ -45,7 +45,7 @@ function makeRequest( path, method, token, opts = {} ){
 
 				response.isSuccess = ( response.statusCode >= 200 && response.statusCode <= 300 );
 
-				if( response.isSuccess ){
+				if( response.isSuccess || response.statusCode === 404 ){
 
 					resolve( { response, body } );
 

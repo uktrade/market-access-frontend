@@ -32,6 +32,14 @@ module.exports = {
 				if( response.isSuccess ){
 
 					data.results = body;
+
+				} else if( response.statusCode === 404 ){
+
+					data.error = 'No company found';
+
+				} else {
+
+					data.error = 'There was an error finding the company';
 				}
 
 			} catch ( e ){

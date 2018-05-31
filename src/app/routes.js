@@ -12,7 +12,7 @@ module.exports = function( express, app ){
 
 	app.param( 'companyId', async ( req, res, next, id ) => {
 
-		try{
+		try {
 
 			const { body } = await datahub.getCompany( req, id );
 

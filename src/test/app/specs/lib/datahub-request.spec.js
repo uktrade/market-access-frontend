@@ -36,7 +36,7 @@ describe( 'datahub Request', () => {
 	}
 
 	beforeEach( () => {
-	
+
 		request = jasmine.createSpy( 'request' );
 		token = uuid();
 		mockResponse = {
@@ -53,11 +53,11 @@ describe( 'datahub Request', () => {
 	} );
 
 	describe( 'Missing parameters', () => {
-	
+
 		describe( 'Without a path', () => {
-		
+
 			it( 'Should throw an error', () => {
-			
+
 				expect( () => {
 
 					datahub.get();
@@ -67,9 +67,9 @@ describe( 'datahub Request', () => {
 		} );
 
 		describe( 'Without a token', () => {
-		
+
 			it( 'Should throw an error', () => {
-			
+
 				expect( () => {
 
 					datahub.get( '/' );
@@ -80,31 +80,73 @@ describe( 'datahub Request', () => {
 	} );
 
 	describe( 'Without an error', () => {
-	
+
 		describe( 'get', () => {
-		
-			it( 'Should make a GET request', ( done ) => {
-		
-				const path = '/whoami/';
 
-				datahub.get( path, token ).then( ( { response, body } ) => {
+			describe( 'With a 200 statusCode', () => {
 
-					expect( response ).toEqual( mockResponse );
-					expect( body ).toEqual( mockBody );
-					done();
-				});
+				it( 'Should resolve', ( done ) => {
 
-				request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
-				checkRequest( path, GET );
+					const path = '/whoami/';
+
+					datahub.get( path, token ).then( ( { response, body } ) => {
+
+						expect( response ).toEqual( mockResponse );
+						expect( body ).toEqual( mockBody );
+						done();
+					});
+
+					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
+					checkRequest( path, GET );
+				} );
+			} );
+
+			describe( 'With a 404 statusCode', () => {
+
+				it( 'Should resolve', ( done ) => {
+
+					const path = '/whoami/';
+
+					mockResponse.statusCode = 404;
+
+					datahub.get( path, token ).then( ( { response, body } ) => {
+
+						expect( response ).toEqual( mockResponse );
+						expect( body ).toEqual( mockBody );
+						done();
+					});
+
+					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
+					checkRequest( path, GET );
+				} );
+			} );
+
+			describe( 'With a 400 statusCode', () => {
+
+				it( 'Should reject', ( done ) => {
+
+					const path = '/whoami/';
+
+					mockResponse.statusCode = 400;
+
+					datahub.get( path, token ).then( done.fail ).catch( ( err ) => {
+
+						expect( err ).toEqual( new Error( `Got at ${ mockResponse.statusCode } response code from datahub` ) );
+						done();
+					});
+
+					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
+					checkRequest( path, GET );
+				} );
 			} );
 		} );
 
 		describe( 'post', () => {
 
 			describe( 'With a body', () => {
-			
+
 				it( 'Should make a POST request with a body', ( done ) => {
-			
+
 					const path = '/test/';
 					const requestBody = { test: 'my-body' };
 
@@ -123,20 +165,20 @@ describe( 'datahub Request', () => {
 	} );
 
 	describe( 'With an error', () => {
-	
+
 		describe( 'get', () => {
-		
+
 			it( 'Should reject with the error', ( done ) => {
 
 				const mockError = new Error( 'Broken' );
-		
+
 				datahub.get( '/test/', token ).then( done.fail ).catch( ( err ) => {
 
 					expect( err ).toEqual( mockError );
 					done();
 				} );
 
-				request.calls.argsFor( 0 )[ 1 ]( mockError );
+				request.calls.argsFor( 0 )[ 1 ]( mockError, { statusCode: 400 } );
 			} );
 		} );
 	} );

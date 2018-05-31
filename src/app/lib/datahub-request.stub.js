@@ -23,9 +23,7 @@ const stubs = [
 //ensure that we don't return a modified response
 function getStub( path ){
 
-	const json = JSON.stringify( require( path ) );
-
-	return JSON.parse( json );
+	return JSON.parse( JSON.stringify( require( path ) ) );
 }
 
 function get( url ){
@@ -55,7 +53,7 @@ function get( url ){
 	}
 
 	return new Promise( ( resolve, reject ) => {
-	
+
 		if( data ){
 
 			logger.debug( 'Stub response for: %s, with stub: %s', url, stub );
