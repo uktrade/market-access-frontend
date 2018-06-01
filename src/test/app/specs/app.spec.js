@@ -8,7 +8,7 @@ const urls = require( '../../../app/lib/urls' );
 const logger = require( '../../../app/lib/logger' );
 const modulePath = '../../../app/app';
 
-const getFakeData = require( '../helpers/get-fake-data' );
+const intercept = require( '../helpers/intercept' );
 
 function getTitle( res ){
 
@@ -46,7 +46,12 @@ describe( 'App', function(){
 
 		logger.remove( winston.transports.Console );
 		oldTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-		jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000;
+		jasmine.DEFAULT_TIMEOUT_INTERVAL = 3000;
+
+		intercept.backend()
+			.persist()
+			.get( '/whoami/' )
+			.reply( 200, {} );
 	} );
 
 	afterAll( function(){
@@ -57,14 +62,20 @@ describe( 'App', function(){
 
 	describe( 'Pages', function(){
 
-		beforeAll( function(){
+		beforeAll( async () => {
 
-			app = supertest( proxyquire( modulePath, {
-				'morgan': function(){ return function ( req, res, next ){ next(); }; },
+			intercept.backend()
+				.get( '/metadata/' )
+				.reply( 200, intercept.stub( '/backend/metadata/' ) );
+
+			const _app = proxyquire( modulePath, {
+				'morgan': () => ( req, res, next ) => next(),
 				'./config': {
 					isDev: true
 				}
-			} ).create() );
+			} );
+
+			app = supertest( await _app.create() );
 		} );
 
 		describe( 'index page', function(){
@@ -139,9 +150,9 @@ describe( 'App', function(){
 
 					it( 'Should render the details of a company', ( done ) => {
 
-						nock( config.datahub.url )
+						intercept.datahub()
 							.get( `/v3/company/${ companyId }` )
-							.reply( 200, getFakeData( '/datahub/company/detail' ) );
+							.reply( 200, intercept.stub( '/datahub/company/detail' ) );
 
 						app.get( urls.report.company( companyId ) ).end( ( err, res ) => {
 
@@ -251,6 +262,10 @@ describe( 'App', function(){
 					param: jasmine.createSpy( 'app.param' )
 				};
 			};
+
+			intercept.backend()
+				.get( '/metadata/' )
+				.reply( 200, intercept.stub( '/backend/metadata/' ) );
 		} );
 
 		function usesMiddleware( fn ){
@@ -269,9 +284,9 @@ describe( 'App', function(){
 			return false;
 		}
 
-		describe( 'Dev mode', function(){
+		describe( 'Dev mode', () => {
 
-			it( 'Should setup the app in dev mode', function(){
+			it( 'Should setup the app in dev mode', async () => {
 
 				const app = proxyquire( modulePath, {
 					'./config': { isDev: true },
@@ -282,7 +297,7 @@ describe( 'App', function(){
 					'./middleware/auth': auth
 				} );
 
-				app.create();
+				await app.create();
 
 				expect( morgan ).toHaveBeenCalledWith( 'dev' );
 				expect( compression ).not.toHaveBeenCalled();
@@ -292,9 +307,9 @@ describe( 'App', function(){
 			} );
 		} );
 
-		describe( 'Prod mode', function(){
+		describe( 'Prod mode', () => {
 
-			it( 'Should setup the app in prod mode', function(){
+			it( 'Should setup the app in prod mode', async () => {
 
 				const app = proxyquire( modulePath, {
 					'./config': { isDev: false },
@@ -304,7 +319,7 @@ describe( 'App', function(){
 					'./middleware/auth': auth
 				} );
 
-				app.create();
+				await app.create();
 
 				expect( morgan ).toHaveBeenCalledWith( 'combined' );
 				expect( compression ).toHaveBeenCalled();

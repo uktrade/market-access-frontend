@@ -4,14 +4,10 @@ const logger = require( './logger' );
 
 const GET = 'GET';
 
-function makeRequest( path, method, token ){
+function makeRequest( method, path, opts = {} ){
 
 	if( !path ){
 		throw new Error( 'Path is required' );
-	}
-
-	if( !token ){
-		throw new Error( 'Token is required' );
 	}
 
 	const uri = ( config.backend.url + path );
@@ -19,16 +15,18 @@ function makeRequest( path, method, token ){
 	const requestOptions = {
 		uri,
 		method,
-		json: true,
-		headers: {
-			Authorization: `Bearer ${ token }`
-		}
+		json: true
 	};
+
+	if( opts.token ){
+
+		requestOptions.headers = { Authorization: `Bearer ${ opts.token }` };
+	}
 
 	return new Promise( ( resolve, reject ) => {
 
 		logger.debug( `Sending ${ method } request to: ${ uri }` );
-	
+
 		request( requestOptions, ( err, response, body ) => {
 
 			if( err ){
@@ -37,7 +35,16 @@ function makeRequest( path, method, token ){
 
 			} else {
 
-				resolve( { response, body } );
+				response.isSuccess = ( response.statusCode >= 200 && response.statusCode <= 300 );
+
+				if( response.isSuccess || response.statusCode === 404 ){
+
+					resolve( { response, body } );
+
+				} else {
+
+					reject( new Error( `Got at ${ response.statusCode } response code from backend` ) );
+				}
 			}
 		} );
 	} );
@@ -45,5 +52,5 @@ function makeRequest( path, method, token ){
 
 module.exports = {
 
-	get: ( path, token ) => makeRequest( path, GET, token )
+	get: ( path, token ) => makeRequest( GET, path, { token } )
 };

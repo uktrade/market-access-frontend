@@ -5,7 +5,7 @@ const logger = require( './logger' );
 const GET = 'GET';
 const POST = 'POST';
 
-function makeRequest( path, method, token, opts = {} ){
+function makeRequest( method, path, token, opts = {} ){
 
 	if( !path ){
 		throw new Error( 'Path is required' );
@@ -34,7 +34,7 @@ function makeRequest( path, method, token, opts = {} ){
 	return new Promise( ( resolve, reject ) => {
 
 		logger.debug( `Sending ${ method } request to: ${ uri }` );
-	
+
 		request( requestOptions, ( err, response, body ) => {
 
 			if( err ){
@@ -60,6 +60,6 @@ function makeRequest( path, method, token, opts = {} ){
 
 module.exports = {
 
-	get: ( path, token ) => makeRequest( path, GET, token ),
-	post: ( path, token, body ) => makeRequest( path, POST, token, { body } )
+	get: ( path, token ) => makeRequest( GET, path, token ),
+	post: ( path, token, body ) => makeRequest( POST, path, token, { body } )
 };

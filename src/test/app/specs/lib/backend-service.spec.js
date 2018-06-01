@@ -10,7 +10,7 @@ describe( 'Backend Service', () => {
 	let req;
 
 	beforeEach( () => {
-	
+
 		token = uuid();
 		req = { session: { ssoToken: token} };
 		backend = {
@@ -23,12 +23,22 @@ describe( 'Backend Service', () => {
 	} );
 
 	describe( 'getUser', () => {
-	
+
 		it( 'Should call the correct path', () => {
-	
+
 			service.getUser( req );
 
 			expect( backend.get ).toHaveBeenCalledWith( '/whoami/', token );
+		} );
+	} );
+
+	describe( 'getMetadata', () => {
+
+		it( 'Should call the correct path', () => {
+
+			service.getMetadata();
+
+			expect( backend.get ).toHaveBeenCalledWith( '/metadata/' );
 		} );
 	} );
 } );
