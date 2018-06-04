@@ -18,7 +18,7 @@ module.exports = {
 
 		} else {
 
-			res.render( 'report/start', viewModel() );
+			res.render( 'report/start', viewModel( req.session.startFormValues ) );
 		}
 	},
 

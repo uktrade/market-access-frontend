@@ -11,20 +11,24 @@ const viewModelResponse = {
 	statusTypes: [
 		{
 			value: 'type1',
-			text: 'a type'
+			text: 'a type',
+			checked: false
 		},{
 			value: 'type2',
-			text: 'another type'
+			text: 'another type',
+			checked: false
 		}
 	],
 	emergencyTypes: [
 		{
-			'value': 'yes',
-			'text': "Yes"
+			value: 'yes',
+			text: 'Yes',
+			checked: false
 		},
 		{
-			'value': 'no',
-			'text': "No"
+			value: 'no',
+			text: 'No',
+			checked: false
 		}
 	]
 };
@@ -47,30 +51,59 @@ describe( 'Start form view model', () => {
 		} );
 	} );
 
-	describe( 'The first call for the view model', () => {
+	describe( 'Without any session values', () => {
 
-		it( 'Should get data and return a view model', () => {
+		describe( 'The first call for the view model', () => {
 
-			const model = viewModel();
+			it( 'Should get data and return a view model', () => {
 
-			expect( metadata.getStatusTypes ).toHaveBeenCalled();
-			expect( model ).toEqual( viewModelResponse );
+				const model = viewModel();
+
+				expect( metadata.getStatusTypes ).toHaveBeenCalled();
+				expect( model ).toEqual( viewModelResponse );
+			} );
+		} );
+
+		describe( 'After the first call', () => {
+
+			it( 'Should return the view model without fetching data', () => {
+
+				let model = viewModel();
+
+				expect( metadata.getStatusTypes.calls.count() ).toEqual( 1 );
+				expect( model ).toEqual( viewModelResponse );
+
+				model = viewModel();
+
+				expect( metadata.getStatusTypes.calls.count() ).toEqual( 1 );
+				expect( model ).toEqual( viewModelResponse );
+			} );
 		} );
 	} );
 
-	describe( 'After the first call', () => {
 
-		it( 'Should return the view model without fetching data', () => {
+	describe( 'With session values', () => {
 
-			let model = viewModel();
+		describe( 'With a session value', () => {
 
-			expect( metadata.getStatusTypes.calls.count() ).toEqual( 1 );
-			expect( model ).toEqual( viewModelResponse );
+			it( 'Should mark the correct one as checked', () => {
 
-			model = viewModel();
+				let model = viewModel( { status: 'type2' } );
 
-			expect( metadata.getStatusTypes.calls.count() ).toEqual( 1 );
-			expect( model ).toEqual( viewModelResponse );
+				expect( model.statusTypes[ 0 ].checked ).toEqual( false );
+				expect( model.statusTypes[ 1 ].checked ).toEqual( true );
+			} );
+		} );
+
+		describe( 'With an emergency value', () => {
+
+			it( 'Should mark the correct one as checked', () => {
+
+				let model = viewModel( { emergency: 'no' } );
+
+				expect( model.emergencyTypes[ 0 ].checked ).toEqual( false );
+				expect( model.emergencyTypes[ 1 ].checked ).toEqual( true );
+			} );
 		} );
 	} );
 } );

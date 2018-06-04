@@ -13,7 +13,17 @@ const emergencyTypes = [
 	}
 ];
 
-module.exports = () => {
+function isMatching( sessionValue ){
+
+	return ( item ) => {
+
+		item.checked = ( sessionValue == item.value );
+
+		return item;
+	};
+}
+
+module.exports = ( sessionValues = {} ) => {
 
 	if( !statusTypes.length ){
 
@@ -28,7 +38,7 @@ module.exports = () => {
 
 	return {
 
-		statusTypes,
-		emergencyTypes
+		statusTypes: statusTypes.map( isMatching( sessionValues.status ) ),
+		emergencyTypes: emergencyTypes.map( isMatching( sessionValues.emergency ) )
 	};
 };

@@ -4,7 +4,7 @@ module.exports = ( req, res, next ) => {
 
 	const startFormValues = req.session.startFormValues;
 
-	if( startFormValues && startFormValues.status && startFormValues.emergency ){
+	if( startFormValues ){
 
 		next();
 

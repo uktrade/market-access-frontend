@@ -47,6 +47,11 @@ describe( 'Report controller', () => {
 
 	describe( 'Start', () => {
 
+		beforeEach( () => {
+
+			req.session = {};
+		} );
+
 		describe( 'When it is a POST', () => {
 
 			describe( 'When the input values are valid', () => {
@@ -59,7 +64,6 @@ describe( 'Report controller', () => {
 
 					req.method = 'POST';
 					req.body = { status, emergency };
-					req.session = {};
 
 					urls.report.company.and.callFake( () => companyUrl );
 
