@@ -25,5 +25,5 @@ module.exports = {
 		}
 	},
 
-	get: () => data
+	getStatusTypes: () => data.status_types
 };

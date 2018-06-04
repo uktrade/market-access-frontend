@@ -1,5 +1,6 @@
 const urls = require( '../lib/urls' );
 const datahub = require( '../lib/datahub-service' );
+const viewModel = require( '../lib/view-models/report/start-form' );
 
 module.exports = {
 
@@ -12,7 +13,7 @@ module.exports = {
 
 		} else {
 
-			res.render( 'report/start' );
+			res.render( 'report/start', viewModel() );
 		}
 	},
 

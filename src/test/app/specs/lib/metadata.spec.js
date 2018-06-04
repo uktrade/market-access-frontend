@@ -74,11 +74,12 @@ describe( 'metadata', () => {
 		} );
 	} );
 
-	describe( 'get', () => {
+	describe( 'getStatusTypes', () => {
 
 		it( 'Should return the data', async () => {
 
-			const theData = { some: 'data' };
+			const statusTypes = { statusType1: 'status-data', statusType2: 'status-data' };
+			const theData = { some: 'data', status_types: statusTypes };
 
 			backend.getMetadata.and.callFake( () => Promise.resolve( {
 				response: { isSuccess: true },
@@ -87,7 +88,7 @@ describe( 'metadata', () => {
 
 			await metadata.fetch();
 
-			expect( metadata.get() ).toEqual( theData );
+			expect( metadata.getStatusTypes() ).toEqual( statusTypes );
 		} );
 	} );
 } );

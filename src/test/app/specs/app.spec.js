@@ -68,7 +68,7 @@ describe( 'App', function(){
 				.get( '/metadata/' )
 				.reply( 200, intercept.stub( '/backend/metadata/' ) );
 
-			const _app = proxyquire( modulePath, {
+			const _app =  await proxyquire( modulePath, {
 				'morgan': () => ( req, res, next ) => next(),
 				'./config': {
 					isDev: true

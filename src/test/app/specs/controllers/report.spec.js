@@ -9,6 +9,7 @@ describe( 'Report controller', () => {
 	let res;
 	let datahub;
 	let urls;
+	let startFormViewModel;
 
 	beforeEach( () => {
 
@@ -25,10 +26,12 @@ describe( 'Report controller', () => {
 				company: jasmine.createSpy( 'urls.report.company' )
 			}
 		};
+		startFormViewModel = jasmine.createSpy( 'startFormViewModel' );
 
 		controller = proxyquire( modulePath, {
 			'../lib/datahub-service': datahub,
-			'../lib/urls': urls
+			'../lib/urls': urls,
+			'../lib/view-models/report/start-form': startFormViewModel
 		} );
 	} );
 
@@ -62,11 +65,16 @@ describe( 'Report controller', () => {
 
 		describe( 'When it is a GET', () => {
 
-			it( 'Should render the start page', () => {
+			it( 'Should get the status types and render the start page', () => {
+
+				const startFormViewModelResponse = { status1: true, status2: true };
+
+				startFormViewModel.and.callFake( () => startFormViewModelResponse );
 
 				controller.start( req, res );
 
-				expect( res.render ).toHaveBeenCalledWith( 'report/start' );
+				expect( startFormViewModel ).toHaveBeenCalled();
+				expect( res.render ).toHaveBeenCalledWith( 'report/start', startFormViewModelResponse );
 			} );
 		} );
 
