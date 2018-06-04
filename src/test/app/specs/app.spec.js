@@ -41,6 +41,7 @@ describe( 'App', function(){
 
 	let app;
 	let oldTimeout;
+	let appModule;
 
 	beforeAll( function(){
 
@@ -65,17 +66,18 @@ describe( 'App', function(){
 		beforeAll( async () => {
 
 			intercept.backend()
+				.persist()
 				.get( '/metadata/' )
 				.reply( 200, intercept.stub( '/backend/metadata/' ) );
 
-			const _app =  await proxyquire( modulePath, {
+			appModule =  proxyquire( modulePath, {
 				'morgan': () => ( req, res, next ) => next(),
 				'./config': {
 					isDev: true
 				}
 			} );
 
-			app = supertest( await _app.create() );
+			app = supertest( await appModule.create() );
 		} );
 
 		describe( 'index page', function(){
@@ -121,9 +123,23 @@ describe( 'App', function(){
 
 			describe( 'Company search page', () => {
 
+				let agent;
+
+				beforeAll( async () => {
+
+					agent = supertest.agent( await appModule.create() );
+				} );
+
+				it( 'Should save the status values', ( done ) => {
+
+					agent.post( urls.report.start() )
+						.send( 'status=1&emergency=2' )
+						.expect( 302, done );
+				} );
+
 				it( 'Should render the company search page', ( done ) => {
 
-					app.get( urls.report.company() ).end( ( err, res ) => {
+					agent.get( urls.report.company() ).end( ( err, res ) => {
 
 						checkResponse( res, 200 );
 						expect( getTitle( res ) ).toEqual( 'Market Access - Report - Search for company' );
@@ -135,10 +151,17 @@ describe( 'App', function(){
 			describe( 'Company detail', () => {
 
 				let companyId;
+				let agent;
 
-				beforeEach( () => {
+				beforeEach( async ( done ) => {
 
 					companyId = 'd829a9c6-cffb-4d6a-953b-3e02a2b33028';
+
+					agent = supertest.agent( await appModule.create() );
+
+					agent.post( urls.report.start() )
+						.send( 'status=1&emergency=2' )
+						.expect( 302, done );
 				} );
 
 				afterEach( () => {
@@ -154,7 +177,8 @@ describe( 'App', function(){
 							.get( `/v3/company/${ companyId }` )
 							.reply( 200, intercept.stub( '/datahub/company/detail' ) );
 
-						app.get( urls.report.company( companyId ) ).end( ( err, res ) => {
+						agent.get( urls.report.company( companyId ) )
+							.end( ( err, res ) => {
 
 							checkResponse( res, 200 );
 							expect( getTitle( res ) ).toEqual( 'Market Access - Report - Company details' );

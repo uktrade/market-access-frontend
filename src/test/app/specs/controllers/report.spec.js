@@ -49,17 +49,25 @@ describe( 'Report controller', () => {
 
 		describe( 'When it is a POST', () => {
 
-			it( 'Should redirect to the next step', () => {
+			describe( 'When the input values are valid', () => {
 
-				const companyUrl = 'my-url';
+				it( 'Should save the values and redirect to the next step', () => {
 
-				req.method = 'POST';
+					const companyUrl = 'my-url';
+					const status = '123';
+					const emergency = '456';
 
-				urls.report.company.and.callFake( () => companyUrl );
+					req.method = 'POST';
+					req.body = { status, emergency };
+					req.session = {};
 
-				controller.start( req, res );
+					urls.report.company.and.callFake( () => companyUrl );
 
-				expect( res.redirect ).toHaveBeenCalledWith( companyUrl );
+					controller.start( req, res );
+
+					expect( req.session.startFormValues ).toEqual( { status, emergency } );
+					expect( res.redirect ).toHaveBeenCalledWith( companyUrl );
+				} );
 			} );
 		} );
 

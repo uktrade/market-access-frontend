@@ -1,4 +1,3 @@
-
 const forceHttps = require( '../../../../app/middleware/force-https' );
 
 const forwardHeader = 'x-forwarded-proto';

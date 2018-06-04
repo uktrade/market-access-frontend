@@ -9,6 +9,11 @@ module.exports = {
 
 		if( req.method === 'POST' ){
 
+			const { status, emergency } = req.body;
+
+			//TODO: validate input
+			req.session.startFormValues = { status, emergency };
+
 			res.redirect( urls.report.company() );
 
 		} else {

@@ -1,4 +1,5 @@
 const proxyquire = require( 'proxyquire' );
+const modulePath = '../../../../app/middleware/errors';
 
 describe( 'errors middleware', function(){
 
@@ -27,7 +28,7 @@ describe( 'errors middleware', function(){
 			error: jasmine.createSpy( 'logger.error' )
 		};
 
-		middleware = proxyquire( '../../../../app/middleware/errors', {
+		middleware = proxyquire( modulePath, {
 			'../config': config,
 			'../lib/logger': logger
 		} );
