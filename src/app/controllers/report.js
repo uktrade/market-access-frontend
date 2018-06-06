@@ -1,6 +1,6 @@
 const urls = require( '../lib/urls' );
 const datahub = require( '../lib/datahub-service' );
-const viewModel = require( '../lib/view-models/report/start-form' );
+const startFormViewModel = require( '../lib/view-models/report/start-form' );
 
 module.exports = {
 
@@ -18,7 +18,7 @@ module.exports = {
 
 		} else {
 
-			res.render( 'report/start', viewModel( req.session.startFormValues ) );
+			res.render( 'report/start', startFormViewModel( req.csrfToken(), req.session.startFormValues ) );
 		}
 	},
 
@@ -26,6 +26,8 @@ module.exports = {
 
 		const query = req.query.q;
 		const data = {};
+
+		//TODO: Validate search term
 
 		if( query ){
 
@@ -57,5 +59,17 @@ module.exports = {
 		res.render( 'report/company-search', data );
 	},
 
-	companyDetails: async ( req, res ) => res.render( 'report/company-details' )
+	companyDetails: async ( req, res ) => res.render( 'report/company-details', {
+		csrfToken: req.csrfToken(),
+		companyId: req.params.companyId
+	} ),
+
+	saveCompany: ( req, res ) => {
+
+		//const companyId = req.body.companyId;
+
+		//TODO: Validate company id
+
+		res.redirect( urls.index() );
+	}
 };

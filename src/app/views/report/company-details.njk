@@ -9,7 +9,7 @@
 		</h1>
 
 		<section class="restrict-width">
-				
+
 			<h2 class="govuk-heading-m">Company summary</h2>
 
 			<dl class="company-details">
@@ -27,11 +27,11 @@
 					<dt class="company-details__key">Primary address</dt>
 					<dd class="company-details__value">
 						{{ [
-							company.registered_address_1, 
-							company.registered_address_2, 
-							company.registered_address_town, 
-							company.registered_address_county, 
-							company.registered_address_postcode, 
+							company.registered_address_1,
+							company.registered_address_2,
+							company.registered_address_town,
+							company.registered_address_county,
+							company.registered_address_postcode,
 							company.registered_address_country.name
 						] | removeEmpty | join( ', ' ) }}
 					</dd>
@@ -65,7 +65,11 @@
 				</div>
 			</dl>
 
-			<a href="#" class="govuk-button">Save and continue</a>
+			<form action="{{ urls.report.company() }}" method="POST">
+				<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+				<input type="hidden" name="companyId" value="{{ companyId }}">
+				<input type="submit" class="govuk-button" value="Save and continue">
+			</form>
 			<a href="#" class="govuk-button button--secondary">Save and exit</a>
 
 		</section>
@@ -73,5 +77,5 @@
 		<span class="govuk-heading-s">Or</span>
 
 		<a href="{{ urls.report.company() }}">Search again</a>
-		
+
 {% endblock %}

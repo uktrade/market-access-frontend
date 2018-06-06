@@ -23,7 +23,7 @@ function isMatching( sessionValue ){
 	};
 }
 
-module.exports = ( sessionValues = {} ) => {
+module.exports = ( csrfToken, sessionValues = {} ) => {
 
 	if( !statusTypes.length ){
 
@@ -37,7 +37,7 @@ module.exports = ( sessionValues = {} ) => {
 	}
 
 	return {
-
+		csrfToken,
 		statusTypes: statusTypes.map( isMatching( sessionValues.status ) ),
 		emergencyTypes: emergencyTypes.map( isMatching( sessionValues.emergency ) )
 	};

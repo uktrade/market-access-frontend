@@ -9,6 +9,7 @@ const logger = require( '../../../app/lib/logger' );
 const modulePath = '../../../app/app';
 
 const intercept = require( '../helpers/intercept' );
+const getCsrfToken = require( '../helpers/get-csrf-token' );
 
 function getTitle( res ){
 
@@ -124,16 +125,27 @@ describe( 'App', function(){
 			describe( 'Company search page', () => {
 
 				let agent;
+				let token;
 
 				beforeAll( async () => {
 
 					agent = supertest.agent( await appModule.create() );
 				} );
 
+				it( 'Should get the form and save the token', ( done ) => {
+
+					agent.get( urls.report.start() )
+						.end( ( err, res ) => {
+
+							token = getCsrfToken( res, done );
+							done();
+						} );
+				} );
+
 				it( 'Should save the status values', ( done ) => {
 
 					agent.post( urls.report.start() )
-						.send( 'status=1&emergency=2' )
+						.send( `_csrf=${ token }&status=1&emergency=2` )
 						.expect( 302, done );
 				} );
 
@@ -159,9 +171,15 @@ describe( 'App', function(){
 
 					agent = supertest.agent( await appModule.create() );
 
-					agent.post( urls.report.start() )
-						.send( 'status=1&emergency=2' )
-						.expect( 302, done );
+					agent.get( urls.report.start() )
+						.end( ( err, res ) => {
+
+							const token = getCsrfToken( res, done );
+
+							agent.post( urls.report.start() )
+								.send( `_csrf=${ token }&status=1&emergency=2` )
+								.expect( 302, done );
+						} );
 				} );
 
 				afterEach( () => {

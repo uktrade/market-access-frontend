@@ -5,6 +5,8 @@ const logger = require( './logger' );
 const GET = 'GET';
 const POST = 'POST';
 
+const datahubToken = config.datahub.token;
+
 function makeRequest( method, path, token, opts = {} ){
 
 	if( !path ){
@@ -16,6 +18,12 @@ function makeRequest( method, path, token, opts = {} ){
 	}
 
 	const uri = ( config.datahub.url + path );
+
+	// Temporary workaround to specify a known token
+	if( datahubToken ){
+
+		token = datahubToken;
+	}
 
 	const requestOptions = {
 		uri,

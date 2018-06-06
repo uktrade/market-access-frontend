@@ -1,4 +1,5 @@
 const proxyquire = require( 'proxyquire' );
+const uuid = require( 'uuid/v4' );
 
 const modulePath = '../../../../app/controllers/report';
 
@@ -10,10 +11,16 @@ describe( 'Report controller', () => {
 	let datahub;
 	let urls;
 	let startFormViewModel;
+	let csrfToken;
 
 	beforeEach( () => {
 
-		req = { query: {} };
+		csrfToken = uuid();
+
+		req = {
+			query: {},
+			csrfToken: () => csrfToken
+		};
 		res = {
 			render: jasmine.createSpy( 'res.render' ),
 			redirect: jasmine.createSpy( 'res.redirect' )
@@ -47,9 +54,12 @@ describe( 'Report controller', () => {
 
 	describe( 'Start', () => {
 
+		let ssoToken;
+
 		beforeEach( () => {
 
-			req.session = {};
+			ssoToken = uuid();
+			req.session = { ssoToken };
 		} );
 
 		describe( 'When it is a POST', () => {
@@ -79,13 +89,15 @@ describe( 'Report controller', () => {
 
 			it( 'Should get the status types and render the start page', () => {
 
+				const sessionValues = { status: 1, emergency: 2 };
 				const startFormViewModelResponse = { status1: true, status2: true };
 
 				startFormViewModel.and.callFake( () => startFormViewModelResponse );
+				req.session.startFormValues = sessionValues;
 
 				controller.start( req, res );
 
-				expect( startFormViewModel ).toHaveBeenCalled();
+				expect( startFormViewModel ).toHaveBeenCalledWith( csrfToken, sessionValues );
 				expect( res.render ).toHaveBeenCalledWith( 'report/start', startFormViewModelResponse );
 			} );
 		} );
@@ -94,11 +106,15 @@ describe( 'Report controller', () => {
 
 	describe( 'Company details', () => {
 
-		it( 'SHould render the details page', () => {
+		it( 'Should render the details page', () => {
+
+			const companyId = 1234;
+
+			req.params = { companyId };
 
 			controller.companyDetails( req, res );
 
-			expect( res.render ).toHaveBeenCalledWith( 'report/company-details' );
+			expect( res.render ).toHaveBeenCalledWith( 'report/company-details', { csrfToken, companyId } );
 		} );
 	} );
 

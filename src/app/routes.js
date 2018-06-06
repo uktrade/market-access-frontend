@@ -1,3 +1,5 @@
+const csurf = require( 'csurf' );
+
 const ssoController = require( './controllers/sso' );
 const indexController = require( './controllers/index' );
 const reportController = require( './controllers/report' );
@@ -9,9 +11,12 @@ const hasStartFormValues = require( './middleware/has-start-form-values' );
 const urls = require( './lib/urls' );
 const datahub =require( './lib/datahub-service' );
 
+const csrfProtection = csurf();
 const reportHeaderNav = headerNav( { isReport: true } );
 
 module.exports = function( express, app ){
+
+	const parseBody = express.urlencoded( { extended: false } );
 
 	app.param( 'companyId', async ( req, res, next, id ) => {
 
@@ -36,8 +41,9 @@ module.exports = function( express, app ){
 
 	app.get( urls.index(), headerNav( { isDashboard: true } ), indexController );
 	app.get( urls.report.index(), reportHeaderNav, reportController.index );
-	app.get( urls.report.start(), reportHeaderNav, reportController.start );
-	app.post( urls.report.start(), express.urlencoded( { extended: false } ), reportHeaderNav, reportController.start );
+	app.get( urls.report.start(), reportHeaderNav, csrfProtection, reportController.start );
+	app.post( urls.report.start(), parseBody, reportHeaderNav, csrfProtection, reportController.start );
 	app.get( urls.report.company(), reportHeaderNav, hasStartFormValues, reportController.companySearch );
-	app.get( urls.report.company() + ':companyId', reportHeaderNav, hasStartFormValues, reportController.companyDetails );
+	app.get( urls.report.company() + ':companyId', reportHeaderNav, hasStartFormValues, csrfProtection, reportController.companyDetails );
+	app.post( urls.report.company(), reportHeaderNav, hasStartFormValues, parseBody, csrfProtection, reportController.saveCompany );
 };

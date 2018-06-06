@@ -1,4 +1,5 @@
 const proxyquire = require( 'proxyquire' );
+const uuid = require( 'uuid/v4' );
 const modulePath = '../../../../../../app/lib/view-models/report/start-form';
 
 const metadataStatusTypes = {
@@ -6,8 +7,10 @@ const metadataStatusTypes = {
 	type2: 'another type'
 };
 
-const viewModelResponse = {
+const csrfToken = uuid();
 
+const viewModelResponse = {
+	csrfToken,
 	statusTypes: [
 		{
 			value: 'type1',
@@ -57,7 +60,7 @@ describe( 'Start form view model', () => {
 
 			it( 'Should get data and return a view model', () => {
 
-				const model = viewModel();
+				const model = viewModel( csrfToken );
 
 				expect( metadata.getStatusTypes ).toHaveBeenCalled();
 				expect( model ).toEqual( viewModelResponse );
@@ -68,12 +71,12 @@ describe( 'Start form view model', () => {
 
 			it( 'Should return the view model without fetching data', () => {
 
-				let model = viewModel();
+				let model = viewModel( csrfToken );
 
 				expect( metadata.getStatusTypes.calls.count() ).toEqual( 1 );
 				expect( model ).toEqual( viewModelResponse );
 
-				model = viewModel();
+				model = viewModel( csrfToken );
 
 				expect( metadata.getStatusTypes.calls.count() ).toEqual( 1 );
 				expect( model ).toEqual( viewModelResponse );
@@ -88,7 +91,7 @@ describe( 'Start form view model', () => {
 
 			it( 'Should mark the correct one as checked', () => {
 
-				let model = viewModel( { status: 'type2' } );
+				let model = viewModel( csrfToken, { status: 'type2' } );
 
 				expect( model.statusTypes[ 0 ].checked ).toEqual( false );
 				expect( model.statusTypes[ 1 ].checked ).toEqual( true );
@@ -99,7 +102,7 @@ describe( 'Start form view model', () => {
 
 			it( 'Should mark the correct one as checked', () => {
 
-				let model = viewModel( { emergency: 'no' } );
+				let model = viewModel( csrfToken, { emergency: 'no' } );
 
 				expect( model.emergencyTypes[ 0 ].checked ).toEqual( false );
 				expect( model.emergencyTypes[ 1 ].checked ).toEqual( true );
