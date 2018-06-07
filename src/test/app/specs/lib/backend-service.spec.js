@@ -14,7 +14,8 @@ describe( 'Backend Service', () => {
 		token = uuid();
 		req = { session: { ssoToken: token} };
 		backend = {
-			get: jasmine.createSpy( 'backend.get' )
+			get: jasmine.createSpy( 'backend.get' ),
+			post: jasmine.createSpy( 'backend.post' )
 		};
 
 		service = proxyquire( modulePath, {
@@ -39,6 +40,24 @@ describe( 'Backend Service', () => {
 			service.getMetadata();
 
 			expect( backend.get ).toHaveBeenCalledWith( '/metadata/' );
+		} );
+	} );
+
+	describe( 'saveNewReport', () => {
+
+		it( 'Should POST to the correct path', () => {
+
+			const status = 1;
+			const emergency = 2;
+			const companyId = 3;
+
+			service.saveNewReport( req, { status, emergency }, companyId );
+
+			expect( backend.post ).toHaveBeenCalledWith( '/barriers/', token, {
+				problem_status: status,
+				is_emergency: emergency,
+				company_id: companyId
+			} );
 		} );
 	} );
 } );

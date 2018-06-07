@@ -2,9 +2,6 @@ const request = require( 'request' );
 const config = require( '../config' );
 const logger = require( './logger' );
 
-const GET = 'GET';
-const POST = 'POST';
-
 const datahubToken = config.datahub.token;
 
 function makeRequest( method, path, token, opts = {} ){
@@ -68,6 +65,6 @@ function makeRequest( method, path, token, opts = {} ){
 
 module.exports = {
 
-	get: ( path, token ) => makeRequest( GET, path, token ),
-	post: ( path, token, body ) => makeRequest( POST, path, token, { body } )
+	get: ( path, token ) => makeRequest( 'GET', path, token ),
+	post: ( path, token, body ) => makeRequest( 'POST', path, token, { body } )
 };

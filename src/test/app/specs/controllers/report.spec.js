@@ -9,6 +9,7 @@ describe( 'Report controller', () => {
 	let req;
 	let res;
 	let datahub;
+	let backend;
 	let urls;
 	let startFormViewModel;
 	let csrfToken;
@@ -25,10 +26,14 @@ describe( 'Report controller', () => {
 			render: jasmine.createSpy( 'res.render' ),
 			redirect: jasmine.createSpy( 'res.redirect' )
 		};
+		backend = {
+			saveNewReport: jasmine.createSpy( 'backend.saveNewReport' )
+		};
 		datahub = {
 			searchCompany: jasmine.createSpy( 'datahub.searchCompany' )
 		};
 		urls = {
+			index: jasmine.createSpy( 'urls.index' ),
 			report: {
 				company: jasmine.createSpy( 'urls.report.company' )
 			}
@@ -36,6 +41,7 @@ describe( 'Report controller', () => {
 		startFormViewModel = jasmine.createSpy( 'startFormViewModel' );
 
 		controller = proxyquire( modulePath, {
+			'../lib/backend-service': backend,
 			'../lib/datahub-service': datahub,
 			'../lib/urls': urls,
 			'../lib/view-models/report/start-form': startFormViewModel
@@ -237,6 +243,75 @@ describe( 'Report controller', () => {
 						done();
 					} );
 				} );
+			} );
+		} );
+	} );
+
+	describe( 'Save new', () => {
+
+		let sessionValues;
+		let companyId;
+
+		beforeEach( () => {
+
+			sessionValues = { status: 1, emergency: 2 };
+			companyId = '123-456';
+
+			req.session = { startFormValues: sessionValues };
+			req.body = { companyId };
+		} );
+
+		describe( 'When the response is a success', () => {
+
+			it( 'Should delete the session values and redirect to the dashboard', async ( done ) => {
+
+				const indexResponse = '/index';
+
+				const promise = Promise.resolve( { response: { isSuccess: true } } );
+
+				backend.saveNewReport.and.callFake( () => promise );
+				urls.index.and.callFake( () => indexResponse );
+
+				await controller.saveNew( req, res, done.fail );
+
+				promise.then( () => {
+
+					expect( backend.saveNewReport ).toHaveBeenCalledWith( req, sessionValues, companyId );
+					expect( typeof req.session.startFormValues ).toEqual( 'undefined' );
+					expect( res.redirect ).toHaveBeenCalledWith( indexResponse );
+					done();
+				} );
+			} );
+		} );
+
+		describe( 'When the response is a 500', () => {
+
+			it( 'Should call next with an error', async () => {
+
+				const statusCode = 500;
+				const next = jasmine.createSpy( 'next' );
+				const promise = Promise.resolve( { response: { isSuccess: false, statusCode } } );
+
+				backend.saveNewReport.and.callFake( () => promise );
+
+				await controller.saveNew( req, res, next );
+
+				expect( next ).toHaveBeenCalledWith( new Error( `Unable to save report, got ${ statusCode } response code` ) );
+			} );
+		} );
+
+		describe( 'When an error is thrown', () => {
+
+			it( 'Should call next with the error', async () => {
+
+				const err = new Error( 'Some backend error' );
+				const next = jasmine.createSpy( 'next' );
+
+				backend.saveNewReport.and.callFake( () => Promise.reject( err ) );
+
+				await controller.saveNew( req, res, next );
+
+				expect( next ).toHaveBeenCalledWith( err );
 			} );
 		} );
 	} );

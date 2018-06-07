@@ -2,8 +2,6 @@ const request = require( 'request' );
 const config = require( '../config' );
 const logger = require( './logger' );
 
-const GET = 'GET';
-
 function makeRequest( method, path, opts = {} ){
 
 	if( !path ){
@@ -21,6 +19,11 @@ function makeRequest( method, path, opts = {} ){
 	if( opts.token ){
 
 		requestOptions.headers = { Authorization: `Bearer ${ opts.token }` };
+	}
+
+	if( opts.body ){
+
+		requestOptions.body = opts.body;
 	}
 
 	return new Promise( ( resolve, reject ) => {
@@ -52,5 +55,6 @@ function makeRequest( method, path, opts = {} ){
 
 module.exports = {
 
-	get: ( path, token ) => makeRequest( GET, path, { token } )
+	get: ( path, token ) => makeRequest( 'GET', path, { token } ),
+	post: ( path, token, body ) => makeRequest( 'POST', path, { token, body } )
 };

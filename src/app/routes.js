@@ -45,5 +45,5 @@ module.exports = function( express, app ){
 	app.post( urls.report.start(), parseBody, reportHeaderNav, csrfProtection, reportController.start );
 	app.get( urls.report.company(), reportHeaderNav, hasStartFormValues, reportController.companySearch );
 	app.get( urls.report.company() + ':companyId', reportHeaderNav, hasStartFormValues, csrfProtection, reportController.companyDetails );
-	app.post( urls.report.company(), reportHeaderNav, hasStartFormValues, parseBody, csrfProtection, reportController.saveCompany );
+	app.post( urls.report.saveNew(), reportHeaderNav, hasStartFormValues, parseBody, csrfProtection, reportController.saveNew );
 };

@@ -65,7 +65,7 @@
 				</div>
 			</dl>
 
-			<form action="{{ urls.report.company() }}" method="POST">
+			<form action="{{ urls.report.saveNew() }}" method="POST">
 				<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 				<input type="hidden" name="companyId" value="{{ companyId }}">
 				<input type="submit" class="govuk-button" value="Save and continue">

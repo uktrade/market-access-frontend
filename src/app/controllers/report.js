@@ -1,4 +1,5 @@
 const urls = require( '../lib/urls' );
+const backend = require( '../lib/backend-service' );
 const datahub = require( '../lib/datahub-service' );
 const startFormViewModel = require( '../lib/view-models/report/start-form' );
 
@@ -59,17 +60,33 @@ module.exports = {
 		res.render( 'report/company-search', data );
 	},
 
-	companyDetails: async ( req, res ) => res.render( 'report/company-details', {
+	companyDetails: ( req, res ) => res.render( 'report/company-details', {
 		csrfToken: req.csrfToken(),
 		companyId: req.params.companyId
 	} ),
 
-	saveCompany: ( req, res ) => {
+	saveNew: async ( req, res, next ) => {
 
-		//const companyId = req.body.companyId;
-
+		const companyId = req.body.companyId;
 		//TODO: Validate company id
 
-		res.redirect( urls.index() );
+		try {
+
+			const { response, body } = await backend.saveNewReport( req, req.session.startFormValues, companyId );
+
+			if( response.isSuccess ){
+
+				delete req.session.startFormValues;
+				res.redirect( urls.index() );
+
+			} else {
+
+				next( new Error( `Unable to save report, got ${ response.statusCode } response code` ) );
+			}
+
+		} catch( e ){
+
+			next( e );
+		}
 	}
 };
