@@ -29,6 +29,13 @@ $govuk-global-images: "/public/govuk/images/";
 @import 'pages/report/index';
 @import 'pages/report/start';
 
+.govuk-tag--ma {
+	position: relative;
+	top: -2px;
+	padding-top: 4px;
+	padding-bottom: 2px;
+}
+
 .restrict-width {
 	max-width: govuk-em( 750, 16 );
 }
