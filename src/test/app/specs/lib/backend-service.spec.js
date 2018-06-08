@@ -49,14 +49,15 @@ describe( 'Backend Service', () => {
 
 			const status = 1;
 			const emergency = 2;
-			const companyId = 3;
+			const company = { id: 3, name: 'test company' };
 
-			service.saveNewReport( req, { status, emergency }, companyId );
+			service.saveNewReport( req, { status, emergency }, company );
 
 			expect( backend.post ).toHaveBeenCalledWith( '/barriers/', token, {
 				problem_status: status,
 				is_emergency: emergency,
-				company_id: companyId
+				company_id: company.id,
+				company_name: company.name
 			} );
 		} );
 	} );

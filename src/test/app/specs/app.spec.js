@@ -222,6 +222,26 @@ describe( 'App', function(){
 					} );
 				} );
 			} );
+
+			describe( 'Company contacts', () => {
+
+				it( 'Should render the contacts page', ( done ) => {
+
+					const companyId = 'abc-123';
+
+					intercept.datahub()
+						.get( `/v3/company/${ companyId }` )
+						.reply( 200, intercept.stub( '/datahub/company/detail' ) );
+
+					app.get( urls.report.contacts( companyId ) )
+							.end( ( err, res ) => {
+
+							checkResponse( res, 200 );
+							expect( getTitle( res ) ).toEqual( 'Market Access - Report - Company contacts' );
+							done();
+						} );
+				} );
+			} );
 		} );
 
 		describe( '404 page', function(){

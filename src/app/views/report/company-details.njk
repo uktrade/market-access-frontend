@@ -67,10 +67,15 @@
 
 			<form action="{{ urls.report.saveNew() }}" method="POST">
 				<input type="hidden" name="_csrf" value="{{ csrfToken }}">
-				<input type="hidden" name="companyId" value="{{ companyId }}">
+				<input type="hidden" name="companyId" value="{{ company.id }}">
 				<input type="submit" class="govuk-button" value="Save and continue">
 			</form>
-			<a href="#" class="govuk-button button--secondary">Save and exit</a>
+			<form action="{{ urls.report.saveNew() }}" method="POST">
+				<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+				<input type="hidden" name="companyId" value="{{ company.id }}">
+				<input type="hidden" name="action" value="exit">
+				<input type="submit" class="govuk-button button--secondary" value="Save and exit">
+			</form>
 
 		</section>
 

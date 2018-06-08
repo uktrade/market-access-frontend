@@ -63,5 +63,15 @@ describe( 'URLs', () => {
 				expect( urls.report.saveNew() ).toEqual( '/report/new/' );
 			} );
 		} );
+
+		describe( 'Company contacts', () => {
+
+			it( 'Should return the correct path', () => {
+
+				const id = 'abc-124';
+
+				expect( urls.report.contacts( id ) ).toEqual( `/report/company/${ id }/contacts/` );
+			} );
+		} );
 	} );
 } );
