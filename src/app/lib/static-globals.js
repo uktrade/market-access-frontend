@@ -8,4 +8,5 @@ module.exports = function( env ){
 	env.addGlobal( 'headerLink', `${ config.datahubDomain }/` );
 	env.addGlobal( 'profileLink', `${ config.datahubDomain }/profile` );
 	env.addGlobal( 'urls', urls );
+	env.addGlobal( 'showErrors', config.isDev );
 };

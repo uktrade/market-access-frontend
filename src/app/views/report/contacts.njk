@@ -1,0 +1,16 @@
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Report - Company contacts{% endblock %}
+
+{% block page_content %}
+
+	<h1 class="govuk-heading-l">
+		<span class="govuk-caption-m">Report a barrier</span> About the reporter
+	</h1>
+
+	Contacts:
+	<pre>
+		{{ company.contacts | dump( 2 ) }}
+	</pre>
+
+{% endblock %}

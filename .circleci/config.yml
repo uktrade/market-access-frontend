@@ -19,12 +19,14 @@ jobs:
           SSO_REDIRECT_URI: 'http://localhost:8080/login/callback/'
           SSO_BYPASS: true
           SSO_MOCK_CODE: abc-def-ghi
+          DATAHUB_URL: 'http://localhost.datahub'
           CI: true
       - image: redis:3
       - image: ukti/mock-sso
         environment:
           MOCK_SSO_PORT: 5000
           MOCK_SSO_USERNAME: test-user
+          MOCK_SSO_SCOPE: test
       - image: postgres:9
         environment:
           POSTGRES_USER: postgres

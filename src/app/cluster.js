@@ -8,9 +8,28 @@ const serverConfig = config.server;
 const numberOfWorkers = serverConfig.workers;
 const isClustered = ( numberOfWorkers > 1 );
 
-function startApp(){
+async function startApp(){
 
-	const app = createApp();
+	let app;
+
+	try {
+
+		app = await createApp();
+
+	} catch( e ){
+
+		console.error( 'Caught error when trying to create app' );
+		console.error( e );
+		process.exit( 1 );
+		return;
+	}
+
+	if( !app ){
+
+		console.error( 'Unable to create app' );
+		return;
+	}
+
 	const env = app.get( 'env' );
 
 	app.listen( serverConfig.port, function(){
@@ -19,10 +38,10 @@ function startApp(){
 
 		if( isClustered ){
 
-			messages.push( `Worker ${cluster.worker.id} created` );
+			messages.push( `Worker ${ cluster.worker.id } created` );
 		}
 
-		messages.push( `App running in ${env} mode, workers: ${ config.server.workers }, available: ${ config.server.cpus }` );
+		messages.push( `App running in ${ env } mode, workers: ${ config.server.workers }, available: ${ config.server.cpus }` );
 		messages.push( `SSO bypass: ${ config.sso.bypass }` );
 		messages.push( `Listening at http://${serverConfig.host}:${serverConfig.port}` );
 

@@ -1,0 +1,81 @@
+{% from "frontend/components/input/macro.njk" import govukInput %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Report - Search for company{% endblock %}
+
+{% block page_content %}
+
+		<h1 class="govuk-heading-l">
+			<span class="govuk-caption-m">Report a barrier</span> Export company affected
+		</h1>
+
+		<section class="restrict-width">
+				
+			<form action="" method="GET">
+
+				{{ govukInput({
+					'label': {
+						'text': "Find the reporter's company record",
+						'classes': 'govuk-!-f-24 govuk-!-w-bold'
+					},
+					'hint': {
+						'html': 'Search for the registered company name, company number or address'
+					},
+					'id': 'company',
+					'name': 'q',
+					'value': query,
+					'classes': 'govuk-input--width-20'
+				}) }}
+
+				<input type="submit" value="Search" class="govuk-button">
+			</form>
+
+
+			{% if results %}
+
+				<h2 class="results-count">
+					<span class="results-count__number">{{ results.count }}</span>
+					companies match <span class="highlight">{{ query }}</span>
+				</h2>
+
+				<ul class="company-card-list">
+				{% for company in results.results %}
+					<li class="company-card">
+						<a href="{{ urls.report.company( company.id ) }}" class="company-card__link">
+							
+							<h3 class="company-card__heading">{{ company.name | highlight( query ) | safe }}</h3>
+							<dl class="company-card__values">
+								<dt class="company-card__values__key">Companies house no.</dt>
+								<dd class="company-card__values__value">{{ company.company_number | highlight( query ) | safe }}</dd>
+
+								<dt class="company-card__values__key">Type</dt>
+								<dd class="company-card__values__value">{{ company.headquarter_type | highlight( query ) | safe }}</dd>
+
+								<dt class="company-card__values__key">Sector</dt>
+								<dd class="company-card__values__value">{{ company.sector.name | highlight( query ) | safe }}</dd>
+
+								<dt class="company-card__values__key">Incorporated on</dt>
+								<dd class="company-card__values__value">{{ company.created_on | dateOnly }}</dd>
+
+								<dt class="company-card__values__key">Primary address</dt>
+								<dd class="company-card__values__value">
+									{{ [
+										company.registered_address_1 | highlight( query ),  
+										company.registered_address_2  | highlight( query ),
+										company.registered_address_town  | highlight( query ),
+										company.registered_address_county | highlight( query ),
+										company.registered_address_postcode | highlight( query ),
+										company.registered_address_country.name | highlight( query )
+									] | removeEmpty | join( ', ' ) | safe }}
+								</dd>
+							</dl>
+
+						</a>
+					</li>	
+				{% endfor %}
+				</ul>
+			{% endif %}
+		</section>
+		
+{% endblock %}

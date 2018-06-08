@@ -1,4 +1,3 @@
-
 const createMiddleware = require( '../../../../app/middleware/headers' );
 
 describe( 'headers middleware', function(){

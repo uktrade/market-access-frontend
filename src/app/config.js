@@ -64,6 +64,11 @@ let config = {
 	backend: {
 		url: requiredEnv( 'BACKEND_URL' )
 	},
+	datahub: {
+		url: requiredEnv( 'DATAHUB_URL' ),
+		token: env( 'DATAHUB_DEV_TOKEN' ),
+		stub: bool( 'DATAHUB_STUB' )
+	},
 	server: {
 		secure: !( isDev || isCi ),
 		host: env( 'SERVER_HOST', 'localhost' ),

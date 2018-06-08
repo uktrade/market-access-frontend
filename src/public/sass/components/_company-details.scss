@@ -1,0 +1,23 @@
+.company-details {
+	display: table;
+	width: 100%;
+	border-top: 1px solid $govuk-grey-2;
+}
+
+.company-details__group {
+
+	display: table-row;
+	
+	&:nth-of-type( odd ){
+		background-color: $govuk-grey-4;
+	}
+}
+
+.company-details__key,
+.company-details__value {
+	display: table-cell;
+	width: 50%;
+	padding: govuk-em( 10, 16 );
+	margin: 0;
+	border-bottom: 1px solid $govuk-grey-2;
+}

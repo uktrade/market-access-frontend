@@ -1,7 +1,9 @@
 const assert = require( 'assert' );
-const { Given, When, Then } = require( 'cucumber' );
+const { Given, When, Then, setDefaultTimeout } = require( 'cucumber' );
 const driver = require( '../../helpers/driver' );
 const urls = require( '../../../../app/lib/urls' );
+
+setDefaultTimeout( 10000 );
 
 function getPath( href ){
 	return href.replace( /^http:\/\/.+?(\/.*)$/, '$1' );
@@ -16,7 +18,7 @@ Given( 'I\'m on the homepage', async () => {
 });
 
 Given( 'I\'m on the report a barrier page', async () => {
-	
+
 	await driver.fetch( urls.report.index() );
 	await driver.takeScreenshot( 'report-a-barrier' );
 

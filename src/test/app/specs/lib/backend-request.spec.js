@@ -4,6 +4,7 @@ const modulePath = '../../../../app/lib/backend-request';
 
 const backendUrl = 'http://some.domain.com';
 const GET = 'GET';
+const POST = 'POST'
 
 describe( 'Backend Request', () => {
 
@@ -13,7 +14,7 @@ describe( 'Backend Request', () => {
 	let mockResponse;
 	let mockBody;
 
-	function checkRequest( path, method, opts ){
+	function checkRequest( method, path, opts = {} ){
 
 		const uri = ( backendUrl + path );
 
@@ -25,16 +26,19 @@ describe( 'Backend Request', () => {
 
 		if( opts.token ){
 
-			requestOptions.headers = {
-				Authorization: `Bearer ${ opts.token }`
-			};
+			requestOptions.headers = { Authorization: `Bearer ${ opts.token }` };
+		}
+
+		if( opts.body ){
+
+			requestOptions.body = opts.body;
 		}
 
 		expect( request.calls.argsFor( 0 )[ 0 ] ).toEqual( requestOptions );
 	}
 
 	beforeEach( () => {
-	
+
 		request = jasmine.createSpy( 'request' );
 		token = uuid();
 		mockResponse = {
@@ -50,70 +54,150 @@ describe( 'Backend Request', () => {
 		} );
 	} );
 
-	describe( 'Missing parameters', () => {
-	
-		describe( 'Without a path', () => {
-		
-			it( 'Should throw an error', () => {
-			
-				expect( () => {
+	describe( 'get', () => {
 
-					backend.get();
+		describe( 'Missing parameters', () => {
 
-				} ).toThrow( new Error( 'Path is required' ) );
+			describe( 'Without a path', () => {
+
+				it( 'Should throw an error', () => {
+
+					expect( () => {
+
+						backend.get();
+
+					} ).toThrow( new Error( 'Path is required' ) );
+				} );
 			} );
+
 		} );
 
-		describe( 'Without a token', () => {
-		
-			it( 'Should throw an error', () => {
-			
-				expect( () => {
+		describe( 'Without an error', () => {
 
-					backend.get( '/' );
+			describe( 'get', () => {
 
-				} ).toThrow( new Error( 'Token is required' ) );
-			} );
-		} );
-	} );
+				describe( 'With a 200 response', () => {
 
-	describe( 'Without an error', () => {
-	
-		describe( 'get', () => {
-		
-			it( 'Should make a GET request', ( done ) => {
-		
-				const path = '/whoami/';
+					it( 'Should return the response', ( done ) => {
 
-				backend.get( path, token ).then( ( { response, body } ) => {
+						const path = '/whoami/';
 
-					expect( response ).toEqual( mockResponse );
-					expect( body ).toEqual( mockBody );
-					done();
-				});
+						backend.get( path, token ).then( ( { response, body } ) => {
 
-				request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
-				checkRequest( path, GET, { token } );
-			} );
-		} );
-	} );
+							expect( response.isSuccess ).toEqual( true );
+							expect( response ).toEqual( mockResponse );
+							expect( body ).toEqual( mockBody );
+							done();
+						});
 
-	describe( 'With an error', () => {
-	
-		describe( 'get', () => {
-		
-			it( 'Should reject with the error', ( done ) => {
-
-				const mockError = new Error( 'Broken' );
-		
-				backend.get( '/test/', token ).then( done.fail ).catch( ( err ) => {
-
-					expect( err ).toEqual( mockError );
-					done();
+						request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
+						checkRequest( GET, path, { token } );
+					} );
 				} );
 
-				request.calls.argsFor( 0 )[ 1 ]( mockError );
+				describe( 'With a 500 response', () => {
+
+					it( 'Should throw an error', ( done ) => {
+
+						const path = '/whoami/';
+
+						mockResponse.statusCode = 500;
+
+						backend.get( path, token ).then( done.fail ).catch( ( e ) => {
+
+							expect( e ).toEqual( new Error( `Got at ${ mockResponse.statusCode } response code from backend` ) );
+							done();
+						});
+
+						request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
+						checkRequest( GET, path, { token } );
+					} );
+				} );
 			} );
 		} );
+
+		describe( 'With an error', () => {
+
+			describe( 'get', () => {
+
+				it( 'Should reject with the error', ( done ) => {
+
+					const mockError = new Error( 'Broken' );
+
+					backend.get( '/test/', token ).then( done.fail ).catch( ( err ) => {
+
+						expect( err ).toEqual( mockError );
+						done();
+					} );
+
+					request.calls.argsFor( 0 )[ 1 ]( mockError );
+				} );
+			} );
+		} );
+	} );
+
+	describe( 'post', () => {
+
+		describe( 'With a 200 response', () => {
+
+			describe( 'Without a token or body', () => {
+
+				it( 'Should create the correct options', ( done ) => {
+
+					const path = '/a-test';
+
+					backend.post( path ).then( ( { response, body } ) => {
+
+						expect( response.isSuccess ).toEqual( true );
+						expect( response ).toEqual( mockResponse );
+						expect( body ).toEqual( mockBody );
+						done();
+					} );
+
+					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
+					checkRequest( POST, path );
+				} );
+			} );
+
+			describe( 'Wtih a token but no body', () => {
+
+				it( 'Should create the correct options', ( done ) => {
+
+					const path = '/a-test';
+
+					backend.post( path, token ).then( ( { response, body } ) => {
+
+						expect( response.isSuccess ).toEqual( true );
+						expect( response ).toEqual( mockResponse );
+						expect( body ).toEqual( mockBody );
+						done();
+					} );
+
+					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
+					checkRequest( POST, path, { token } );
+				} );
+			} );
+
+			describe( 'Wtih a token and body', () => {
+
+				it( 'Should create the correct options', ( done ) => {
+
+					const path = '/a-test';
+					const body = { some: 'body' };
+
+					backend.post( path, token, body ).then( ( { response, body } )=> {
+
+						expect( response.isSuccess ).toEqual( true );
+						expect( response ).toEqual( mockResponse );
+						expect( body ).toEqual( mockBody );
+						done();
+					} );
+
+					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
+					checkRequest( POST, path, { token, body } );
+				} );
+			} );
+		} );
+
 	} );
 } );

@@ -16,18 +16,22 @@ describe( 'SSO bypass', () => {
 
 	describe( 'When bypass is true', () => {
 
-		it( 'Should add an ssoToken and call next', () => {
+		describe( 'When a token is not provided', () => {
 
-			const ssoBypass = proxyquire( modulePath, {
-				'../config': {
-					sso: { bypass: true }
-				}
+			it( 'Should add an ssoToken and call next', () => {
+
+				const ssoBypass = proxyquire( modulePath, {
+					'../config': {
+						sso: { bypass: true },
+						datahub: { token: '' }
+					}
+				} );
+
+				ssoBypass( req, res, next );
+
+				expect( req.session.ssoToken ).toEqual( 'ssobypass' );
+				expect( next ).toHaveBeenCalled();
 			} );
-
-			ssoBypass( req, res, next );
-
-			expect( req.session.ssoToken ).toEqual( 'ssobypass' );
-			expect( next ).toHaveBeenCalled();
 		} );
 	} );
 

@@ -1,9 +1,15 @@
 const supertest = require( 'supertest' );
 const proxyquire = require( 'proxyquire' );
 const winston = require( 'winston' );
+const nock = require( 'nock' );
 
+const config = require( '../../../app/config' );
+const urls = require( '../../../app/lib/urls' );
 const logger = require( '../../../app/lib/logger' );
 const modulePath = '../../../app/app';
+
+const intercept = require( '../helpers/intercept' );
+const getCsrfToken = require( '../helpers/get-csrf-token' );
 
 function getTitle( res ){
 
@@ -20,6 +26,10 @@ function checkResponse( res, statusCode ){
 
 	const headers = res.headers;
 
+	if( res.statusCode != statusCode ){
+		console.log( res.text );
+	}
+
 	expect( res.statusCode ).toEqual( statusCode );
 	expect( headers[ 'x-download-options' ] ).toBeDefined();
 	expect( headers[ 'x-xss-protection' ] ).toBeDefined();
@@ -32,12 +42,18 @@ describe( 'App', function(){
 
 	let app;
 	let oldTimeout;
+	let appModule;
 
 	beforeAll( function(){
 
 		logger.remove( winston.transports.Console );
 		oldTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-		jasmine.DEFAULT_TIMEOUT_INTERVAL = 500;
+		jasmine.DEFAULT_TIMEOUT_INTERVAL = 3000;
+
+		intercept.backend()
+			.persist()
+			.get( '/whoami/' )
+			.reply( 200, {} );
 	} );
 
 	afterAll( function(){
@@ -48,21 +64,28 @@ describe( 'App', function(){
 
 	describe( 'Pages', function(){
 
-		beforeAll( function(){
+		beforeAll( async () => {
 
-			app = supertest( proxyquire( modulePath, {
-				'morgan': function(){ return function ( req, res, next ){ next(); }; },
+			intercept.backend()
+				.persist()
+				.get( '/metadata/' )
+				.reply( 200, intercept.stub( '/backend/metadata/' ) );
+
+			appModule =  proxyquire( modulePath, {
+				'morgan': () => ( req, res, next ) => next(),
 				'./config': {
 					isDev: true
 				}
-			} ).create() );
+			} );
+
+			app = supertest( await appModule.create() );
 		} );
 
 		describe( 'index page', function(){
 
 			it( 'Should render the index page', function( done ){
 
-				app.get( '/' ).end( ( err, res ) => {
+				app.get( urls.index() ).end( ( err, res ) => {
 
 					checkResponse( res, 200 );
 					expect( getTitle( res ) ).toEqual( 'Market Access - Homepage' );
@@ -74,10 +97,10 @@ describe( 'App', function(){
 		describe( 'Report a barrier', () => {
 
 			describe( 'Index page', () => {
-			
+
 				it( 'Should render the index page', ( done ) => {
-			
-					app.get( '/report/' ).end( ( err, res ) => {
+
+					app.get( urls.report.index() ).end( ( err, res ) => {
 
 						checkResponse( res, 200 );
 						expect( getTitle( res ) ).toEqual( 'Market Access - Report a barrier' );
@@ -85,17 +108,138 @@ describe( 'App', function(){
 					} );
 				} );
 			} );
-		
+
 			describe( 'Start page', () => {
-			
+
 				it( 'Should render the start page', ( done ) => {
-			
-					app.get( '/report/start/' ).end( ( err, res ) => {
+
+					app.get( urls.report.start() ).end( ( err, res ) => {
 
 						checkResponse( res, 200 );
 						expect( getTitle( res ) ).toEqual( 'Market Access - Report - Status of the problem' );
 						done();
 					} );
+				} );
+			} );
+
+			describe( 'Company search page', () => {
+
+				let agent;
+				let token;
+
+				beforeAll( async () => {
+
+					agent = supertest.agent( await appModule.create() );
+				} );
+
+				it( 'Should get the form and save the token', ( done ) => {
+
+					agent.get( urls.report.start() )
+						.end( ( err, res ) => {
+
+							token = getCsrfToken( res, done );
+							done();
+						} );
+				} );
+
+				it( 'Should save the status values', ( done ) => {
+
+					agent.post( urls.report.start() )
+						.send( `_csrf=${ token }&status=1&emergency=2` )
+						.expect( 302, done );
+				} );
+
+				it( 'Should render the company search page', ( done ) => {
+
+					agent.get( urls.report.company() ).end( ( err, res ) => {
+
+						checkResponse( res, 200 );
+						expect( getTitle( res ) ).toEqual( 'Market Access - Report - Search for company' );
+						done();
+					} );
+				} );
+			} );
+
+			describe( 'Company detail', () => {
+
+				let companyId;
+				let agent;
+
+				beforeEach( async ( done ) => {
+
+					companyId = 'd829a9c6-cffb-4d6a-953b-3e02a2b33028';
+
+					agent = supertest.agent( await appModule.create() );
+
+					agent.get( urls.report.start() )
+						.end( ( err, res ) => {
+
+							const token = getCsrfToken( res, done );
+
+							agent.post( urls.report.start() )
+								.send( `_csrf=${ token }&status=1&emergency=2` )
+								.expect( 302, done );
+						} );
+				} );
+
+				afterEach( () => {
+
+					expect( nock.isDone() ).toEqual( true );
+				} );
+
+				describe( 'With a success', () => {
+
+					it( 'Should render the details of a company', ( done ) => {
+
+						intercept.datahub()
+							.get( `/v3/company/${ companyId }` )
+							.reply( 200, intercept.stub( '/datahub/company/detail' ) );
+
+						agent.get( urls.report.company( companyId ) )
+							.end( ( err, res ) => {
+
+							checkResponse( res, 200 );
+							expect( getTitle( res ) ).toEqual( 'Market Access - Report - Company details' );
+							done();
+						} );
+					} );
+				} );
+
+				describe( 'With an error', () => {
+
+					it( 'Should render the error page', ( done ) => {
+
+						nock( config.datahub.url )
+							.get( `/v3/company/${ companyId }` )
+							.reply( 500, {} );
+
+						app.get( urls.report.company( companyId ) ).end( ( err, res ) => {
+
+							checkResponse( res, 500 );
+							expect( getTitle( res ) ).toEqual( 'Market Access - Error' );
+							done();
+						} );
+					} );
+				} );
+			} );
+
+			describe( 'Company contacts', () => {
+
+				it( 'Should render the contacts page', ( done ) => {
+
+					const companyId = 'abc-123';
+
+					intercept.datahub()
+						.get( `/v3/company/${ companyId }` )
+						.reply( 200, intercept.stub( '/datahub/company/detail' ) );
+
+					app.get( urls.report.contacts( companyId ) )
+							.end( ( err, res ) => {
+
+							checkResponse( res, 200 );
+							expect( getTitle( res ) ).toEqual( 'Market Access - Report - Company contacts' );
+							done();
+						} );
 				} );
 			} );
 		} );
@@ -126,10 +270,10 @@ describe( 'App', function(){
 		} );
 
 		describe( 'Login', () => {
-		
+
 			it( 'Should redirect to the sso page', ( done ) => {
-		
-				app.get( '/login/' ).end( ( err, res ) => {
+
+				app.get( urls.login() ).end( ( err, res ) => {
 
 					checkResponse( res, 302 );
 					expect( res.headers.location ).toBeDefined();
@@ -139,9 +283,9 @@ describe( 'App', function(){
 		} );
 
 		describe( 'Login callback', () => {
-		
+
 			it( 'Should redirect to the login page', ( done ) => {
-		
+
 				app.get( '/login/callback/' ).end( ( err, res ) => {
 
 					checkResponse( res, 302 );
@@ -177,8 +321,13 @@ describe( 'App', function(){
 					set: jasmine.createSpy( 'app.set' ),
 					get: jasmine.createSpy( 'app.get' ),
 					post: jasmine.createSpy( 'app.post' ),
+					param: jasmine.createSpy( 'app.param' )
 				};
 			};
+
+			intercept.backend()
+				.get( '/metadata/' )
+				.reply( 200, intercept.stub( '/backend/metadata/' ) );
 		} );
 
 		function usesMiddleware( fn ){
@@ -197,9 +346,9 @@ describe( 'App', function(){
 			return false;
 		}
 
-		describe( 'Dev mode', function(){
+		describe( 'Dev mode', () => {
 
-			it( 'Should setup the app in dev mode', function(){
+			it( 'Should setup the app in dev mode', async () => {
 
 				const app = proxyquire( modulePath, {
 					'./config': { isDev: true },
@@ -210,7 +359,7 @@ describe( 'App', function(){
 					'./middleware/auth': auth
 				} );
 
-				app.create();
+				await app.create();
 
 				expect( morgan ).toHaveBeenCalledWith( 'dev' );
 				expect( compression ).not.toHaveBeenCalled();
@@ -220,9 +369,9 @@ describe( 'App', function(){
 			} );
 		} );
 
-		describe( 'Prod mode', function(){
+		describe( 'Prod mode', () => {
 
-			it( 'Should setup the app in prod mode', function(){
+			it( 'Should setup the app in prod mode', async () => {
 
 				const app = proxyquire( modulePath, {
 					'./config': { isDev: false },
@@ -232,7 +381,7 @@ describe( 'App', function(){
 					'./middleware/auth': auth
 				} );
 
-				app.create();
+				await app.create();
 
 				expect( morgan ).toHaveBeenCalledWith( 'combined' );
 				expect( compression ).toHaveBeenCalled();

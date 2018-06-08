@@ -9,6 +9,8 @@ const config = require( './config' );
 
 const reporter = require( './lib/reporter' );
 const staticGlobals = require( './lib/static-globals' );
+const nunjucksFilters = require( './lib/nunjucks-filters' );
+const metatdata = require( './lib/metadata' );
 
 const ping = require( './middleware/ping' );
 const forceHttps = require( './middleware/force-https' );
@@ -20,7 +22,7 @@ const ssoBypass = require( './middleware/sso-bypass' );
 
 module.exports = {
 
-	create: function(){
+	create: async () => {
 
 		const app = express();
 		const isDev = config.isDev;
@@ -37,11 +39,21 @@ module.exports = {
 			express: app
 		} );
 
+		try {
+
+			await metatdata.fetch();
+
+		} catch ( e ) {
+
+			throw e;
+		}
+
 		app.set( 'view engine', 'njk' );
 		app.set( 'view cache', config.views.cache );
 		app.disable( 'x-powered-by' );
 
 		staticGlobals( nunjucksEnv );
+		nunjucksFilters( nunjucksEnv );
 		reporter.setup( app );
 
 		if( !isDev ){ app.use( compression() ); }

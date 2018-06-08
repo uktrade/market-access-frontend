@@ -30,7 +30,7 @@
 		<link rel="apple-touch-icon" href="/public/img/apple-touch-icon.png">
 		<meta name="theme-color" content="#0b0c0c">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		{% block head_content %}{% endblock %}   
+		{% block head_content %}{% endblock %}
 	</head>
 
 	<body class="{% block body_classes %}{% endblock %}">
@@ -58,7 +58,7 @@
 				</div>
 				<div class='header-proposition'>
 					<div class='content'>
-						<a href='/' id='proposition-name'>Market access barriers</a>
+						<a href='/' id='proposition-name'>Market access barriers <strong class="govuk-tag govuk-tag--ma">BETA</strong></a>
 						<a role='button' href='#proposition-links' class='js-header-toggle menu' aria-controls='navigation' aria-label='Show or hide Top Level Navigation'>Menu</a>
 						{% if user %}
 						<span class="user-info">{{ user.username }} <a href="logout">Logout</a></span>
@@ -73,7 +73,7 @@
 					</div>
 				</div>
 			</div>
-		</header>	
+		</header>
 
 		<div class="header-bar" role="complementary" aria-labelledby="header-title">
 			<p class="govuk-width-container">

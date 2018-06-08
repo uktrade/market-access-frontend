@@ -1,0 +1,86 @@
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Report - Company details{% endblock %}
+
+{% block page_content %}
+
+		<h1 class="govuk-heading-l">
+			<span class="govuk-caption-m">Report a barrier</span> Export company affected
+		</h1>
+
+		<section class="restrict-width">
+
+			<h2 class="govuk-heading-m">Company summary</h2>
+
+			<dl class="company-details">
+				<div class="company-details__group">
+					<dt class="company-details__key">Registered name</dt>
+					<dd class="company-details__value">{{ company.name }}</dd>
+				</div>
+
+				<div class="company-details__group">
+					<dt class="company-details__key">Companies house no.</dt>
+					<dd class="company-details__value">{{ company.company_number }}</dd>
+				</div>
+
+				<div class="company-details__group">
+					<dt class="company-details__key">Primary address</dt>
+					<dd class="company-details__value">
+						{{ [
+							company.registered_address_1,
+							company.registered_address_2,
+							company.registered_address_town,
+							company.registered_address_county,
+							company.registered_address_postcode,
+							company.registered_address_country.name
+						] | removeEmpty | join( ', ' ) }}
+					</dd>
+				</div>
+
+				<div class="company-details__group">
+					<dt class="company-details__key">Sector</dt>
+					<dd class="company-details__value">{{ company.sector.name }}</dd>
+				</div>
+
+				<div class="company-details__group">
+					<dt class="company-details__key">Incorporated on</dt>
+					<dd class="company-details__value">
+						{{ company.created_on | dateOnly }}
+					</dd>
+				</div>
+
+				<div class="company-details__group">
+					<dt class="company-details__key">Type</dt>
+					<dd class="company-details__value">{{ company.headquarter_type }}</dd>
+				</div>
+
+				<div class="company-details__group">
+					<dt class="company-details__key">Scale of company</dt>
+					<dd class="company-details__value">{{ company.turnover_range }}</dd>
+				</div>
+
+				<div class="company-details__group">
+					<dt class="company-details__key">Number of employees</dt>
+					<dd class="company-details__value">{{ company.employee_range }}</dd>
+				</div>
+			</dl>
+
+			<form action="{{ urls.report.saveNew() }}" method="POST">
+				<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+				<input type="hidden" name="companyId" value="{{ company.id }}">
+				<input type="submit" class="govuk-button" value="Save and continue">
+			</form>
+			<form action="{{ urls.report.saveNew() }}" method="POST">
+				<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+				<input type="hidden" name="companyId" value="{{ company.id }}">
+				<input type="hidden" name="action" value="exit">
+				<input type="submit" class="govuk-button button--secondary" value="Save and exit">
+			</form>
+
+		</section>
+
+		<span class="govuk-heading-s">Or</span>
+
+		<a href="{{ urls.report.company() }}">Search again</a>
+
+{% endblock %}

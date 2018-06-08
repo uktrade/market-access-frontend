@@ -11,6 +11,7 @@
 	</h1>
 
 	<form action="" method="POST">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
 		{{ govukRadios({
 			'name': 'status',
@@ -21,24 +22,11 @@
 					'classes': 'govuk-fieldset__legend--m'
 				}
 			},
-			'items': [
-				{
-					'value': '1',
-					'text': "It hasn't happened yet"
-				},
-				{
-					'value': '2',
-					'text': "It's happening now"
-				},
-				{
-					'value': '3',
-					'text': "It happened in the past"
-				}
-			]
+			'items': statusTypes
 		}) }}
 
 		<div class="report-barrier-emergency paragraph-width" id="report-barrier-emergency">
-			
+
 			{{ govukRadios({
 				'name': 'emergency',
 				'classes': 'govuk-radios--inline',
@@ -51,16 +39,7 @@
 				'hint': {
 					'text': 'Is an export facing significant and imminent financial or other loss and does government need to take action urgently?'
 				},
-				'items': [
-					{
-						'value': 'yes',
-						'text': "Yes"
-					},
-					{
-						'value': 'no',
-						'text': "No"
-					}
-				]
+				'items': emergencyTypes
 			}) }}
 		</div>
 

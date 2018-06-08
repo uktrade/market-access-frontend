@@ -1,0 +1,39 @@
+.company-card-list {
+	padding: 0;
+}
+
+.company-card {
+	border: 1px solid $govuk-grey-2;
+	list-style: none;
+	padding: govuk-em( 15, 16 ) govuk-em( 15, 16 ) 0 govuk-em( 15, 16 );
+	margin-bottom: govuk-em( 15, 16 );
+}
+
+.company-card__heading {
+	@include govuk-font-bold-19;
+}
+
+.company-card__values {
+	color: $govuk-black;
+	@include govuk-font-regular-14;
+}
+
+.company-card__values__key {
+	color: $govuk-grey-1;
+	display: inline-block;
+	padding: govuk-em( 5, 14 ) 0 govuk-em( 5, 14 ) 0;
+}
+
+.company-card__values__value {
+	margin: 0 0 govuk-em( 10, 14 ) 0;
+	display: inline;
+
+	&:after {
+		content: '';
+		display: block;
+	}
+}
+
+.company-card__link {
+	text-decoration: none;
+}
