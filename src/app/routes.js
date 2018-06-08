@@ -7,9 +7,9 @@ const reportController = require( './controllers/report' );
 const headerNav = require( './middleware/header-nav' );
 const user = require( './middleware/user' );
 const hasStartFormValues = require( './middleware/has-start-form-values' );
+const companyId = require( './middleware/params/company-id' );
 
 const urls = require( './lib/urls' );
-const datahub =require( './lib/datahub-service' );
 
 const csrfProtection = csurf();
 const reportHeaderNav = headerNav( { isReport: true } );
@@ -18,26 +18,11 @@ module.exports = function( express, app ){
 
 	const parseBody = express.urlencoded( { extended: false } );
 
-	app.param( 'companyId', async ( req, res, next, id ) => {
-
-		try {
-
-			const { body } = await datahub.getCompany( req, id );
-
-			res.locals.company = body;
-
-			next();
-
-		} catch( e ){
-
-			next( e );
-		}
-	} );
-
 	app.get( '/login/', ssoController.authRedirect );
 	app.get( '/login/callback/', ssoController.callback );
 
 	app.use( user );
+	app.param( 'companyId', companyId );
 
 	app.get( urls.index(), headerNav( { isDashboard: true } ), indexController );
 	app.get( urls.report.index(), reportHeaderNav, reportController.index );
