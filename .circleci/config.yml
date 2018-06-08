@@ -26,6 +26,7 @@ jobs:
         environment:
           MOCK_SSO_PORT: 5000
           MOCK_SSO_USERNAME: test-user
+          MOCK_SSO_SCOPE: test
       - image: postgres:9
         environment:
           POSTGRES_USER: postgres
