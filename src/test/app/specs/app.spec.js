@@ -85,6 +85,10 @@ describe( 'App', function(){
 
 			it( 'Should render the index page', function( done ){
 
+				intercept.backend()
+					.get( '/barriers/' )
+					.reply( 200, intercept.stub( '/backend/barriers/' ) );
+
 				app.get( urls.index() ).end( ( err, res ) => {
 
 					checkResponse( res, 200 );

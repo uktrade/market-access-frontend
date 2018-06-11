@@ -61,4 +61,14 @@ describe( 'Backend Service', () => {
 			} );
 		} );
 	} );
+
+	describe( 'getBarriers', () => {
+
+		it( 'Should call the correct path', () => {
+
+			service.getBarriers( req );
+
+			expect( backend.get ).toHaveBeenCalledWith( '/barriers/', token );
+		} );
+	} );
 } );

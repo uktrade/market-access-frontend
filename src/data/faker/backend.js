@@ -5,7 +5,8 @@ const generateSchema = require( './_helpers/generate-schema' );
 const OUTPUT_PATH = path.resolve( __dirname, 'output/backend' );
 
 const jsonFiles = {
-	'metadata/index': generateSchema( '/backend/metadata/index' )
+	'metadata/index': generateSchema( '/backend/metadata/index' ),
+	'barriers/index': generateSchema( '/backend/barriers/index' )
 };
 
 writeJsonFiles( OUTPUT_PATH, jsonFiles );

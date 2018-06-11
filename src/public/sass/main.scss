@@ -28,6 +28,7 @@ $govuk-global-images: "/public/govuk/images/";
 @import 'components/company-details';
 @import 'components/company-card';
 @import 'components/search-form';
+@import 'components/table-standard';
 
 @import 'pages/report/index';
 @import 'pages/report/start';
@@ -37,6 +38,10 @@ $govuk-global-images: "/public/govuk/images/";
 	top: -2px;
 	padding-top: 4px;
 	padding-bottom: 2px;
+}
+
+.unknown {
+	color: $govuk-grey-1;
 }
 
 .restrict-width {

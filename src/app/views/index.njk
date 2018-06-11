@@ -20,4 +20,43 @@
 				Report a market access barrier that is emerging, ongoing or has been resolved.
 			</span>
 		</a>
+
+		<div class="inline-tabs">
+
+			<div class="inline-tabs__content" id="inline-tab-1">
+
+				<table class="standard-table">
+					<thead>
+						<tr class="standard-table__heading-row">
+							<th class="standard-table__heading">Company affected</th>
+							<th class="standard-table__heading">Problem status</th>
+							<th class="standard-table__heading">Report started by</th>
+							<th class="standard-table__heading standard-table__heading--active">Report started</th>
+							<th class="standard-table__heading">Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for barrier in barriers %}
+						<tr class="standard-table__row">
+							<td class="standard-table__cell">
+								{{ barrier.company_name or ( '<span class="unknown">unknown</span>' | safe ) }}
+							</td>
+							<td class="standard-table__cell">
+								{{ barrier.problem_status or ( '<span class="unknown">unknown</span>' | safe ) }}
+							</td>
+							<td class="standard-table__cell">
+								{{ barrier.report_started_by or ( '<span class="unknown">unknown</span>' | safe ) }}
+							</td>
+							<td class="standard-table__cell">
+								{{ barrier.report_start_date or ( '<span class="unknown">unknown</span>' | safe ) }}
+							</td>
+							<td class="standard-table__cell">
+								Continue
+							</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
 {% endblock %}
