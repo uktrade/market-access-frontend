@@ -19,7 +19,7 @@
 				type="text"
 				value="{{ opts.input.value }}"
 				placeholder="{{ opts.input.placeholder }}"
-				autofocus
+				{{ 'autofocus' if not opts.input.value.length }}
 				aria-describedby="{{ opts.input.id }}-hint">
 			<button type="submit" class="search-form__button"><span class="visually-hidden">Search</span></button>
 		</div>
