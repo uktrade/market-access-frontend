@@ -1,5 +1,4 @@
-{% from "frontend/components/input/macro.njk" import govukInput %}
-
+{% from "../components/search-form.njk" import searchForm %}
 {% extends 'layout.njk' %}
 
 {% block page_title %}{{ super() }} - Report - Search for company{% endblock %}
@@ -11,26 +10,21 @@
 		</h1>
 
 		<section class="restrict-width">
-				
-			<form action="" method="GET">
 
-				{{ govukInput({
-					'label': {
-						'text': "Find the reporter's company record",
-						'classes': 'govuk-!-f-24 govuk-!-w-bold'
-					},
-					'hint': {
-						'html': 'Search for the registered company name, company number or address'
-					},
+			{{ searchForm({
+				'label': {
+					'text': "Find the reporter's company record"
+				},
+				'hint': {
+					'text': 'Search for the registered company name, company number or address'
+				},
+				'input' : {
 					'id': 'company',
 					'name': 'q',
 					'value': query,
-					'classes': 'govuk-input--width-20'
-				}) }}
-
-				<input type="submit" value="Search" class="govuk-button">
-			</form>
-
+					'placeholder': 'Search for company'
+				}
+			}) }}
 
 			{% if results %}
 
@@ -43,7 +37,7 @@
 				{% for company in results.results %}
 					<li class="company-card">
 						<a href="{{ urls.report.company( company.id ) }}" class="company-card__link">
-							
+
 							<h3 class="company-card__heading">{{ company.name | highlight( query ) | safe }}</h3>
 							<dl class="company-card__values">
 								<dt class="company-card__values__key">Companies house no.</dt>
@@ -61,7 +55,7 @@
 								<dt class="company-card__values__key">Primary address</dt>
 								<dd class="company-card__values__value">
 									{{ [
-										company.registered_address_1 | highlight( query ),  
+										company.registered_address_1 | highlight( query ),
 										company.registered_address_2  | highlight( query ),
 										company.registered_address_town  | highlight( query ),
 										company.registered_address_county | highlight( query ),
@@ -72,10 +66,10 @@
 							</dl>
 
 						</a>
-					</li>	
+					</li>
 				{% endfor %}
 				</ul>
 			{% endif %}
 		</section>
-		
+
 {% endblock %}

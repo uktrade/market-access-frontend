@@ -1,0 +1,30 @@
+{% macro searchForm( opts ) -%}
+
+<form action="{{ opts.action }}" method="GET" role="search" class="search-form">
+
+	<div class="govuk-form-group">
+		<label class="govuk-label govuk-!-f-24 govuk-!-w-bold" for="{{ opts.input.id }}">
+			{{ opts.label.text }}
+		</label>
+
+		<span id="{{ opts.input.id }}-hint" class="govuk-hint">
+			{{ opts.hint.text }}
+		</span>
+
+		<div class="search-form__input-group">
+			<input
+				class="govuk-input search-form__input"
+				id="{{ opts.input.id }}"
+				name="{{ opts.input.name }}"
+				type="text"
+				value="{{ opts.input.value }}"
+				placeholder="{{ opts.input.placeholder }}"
+				autofocus
+				aria-describedby="{{ opts.input.id }}-hint">
+			<button type="submit" class="search-form__button"><span class="visually-hidden">Search</span></button>
+		</div>
+	</div>
+
+</form>
+
+{%- endmacro %}
