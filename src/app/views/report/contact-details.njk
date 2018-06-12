@@ -1,0 +1,59 @@
+{% from "components/details-list.njk" import detailsList %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Report - Contact details{% endblock %}
+
+{% block page_content %}
+
+		<h1 class="govuk-heading-l">
+			<span class="govuk-caption-m">Report a barrier</span> About the reporter
+		</h1>
+
+		<section class="restrict-width">
+
+			<h2 class="govuk-heading-m">Contact summary</h2>
+
+			{{ detailsList( [
+				{
+					'key': 'Name',
+					'value': contact.name
+				},{
+					'key': 'Job title',
+					'value': contact.job_title
+				},{
+					'key': 'Country',
+					'value': contact.address_country.name
+				},{
+					'key': 'Phone number',
+					'value': contact.telephone_number
+				},{
+					'key': 'Email',
+					'value': contact.email
+				}
+			] ) }}
+{#
+			<pre>
+				{{ contact | dump( 2 ) }}
+			</pre>
+#}
+
+			<form action="{{ urls.report.saveContact() }}" method="POST">
+				<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+				<input type="hidden" name="contactId" value="{{ contact.id }}">
+				<input type="submit" class="govuk-button" value="Save and continue">
+			</form>
+			<form action="{{ urls.report.saveContact() }}" method="POST">
+				<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+				<input type="hidden" name="contactId" value="{{ contact.id }}">
+				<input type="hidden" name="action" value="exit">
+				<input type="submit" class="govuk-button button--secondary" value="Save and exit">
+			</form>
+
+		</section>
+
+		<span class="govuk-heading-s">Or</span>
+
+		<a href="{{ urls.report.contacts( contact.company.id ) }}">Choose another contact</a>
+
+{% endblock %}

@@ -73,5 +73,23 @@ describe( 'URLs', () => {
 				expect( urls.report.contacts( id ) ).toEqual( `/report/company/${ id }/contacts/` );
 			} );
 		} );
+
+		describe( 'View contact', () => {
+
+			it( 'Should return the correct path', () => {
+
+				const id = 'xyz-789';
+
+				expect( urls.report.viewContact( id ) ).toEqual( `/report/contact/${ id }/` );
+			} );
+		} );
+
+		describe( 'View contact', () => {
+
+			it( 'Should return the correct path', () => {
+
+				expect( urls.report.saveContact() ).toEqual( '/report/save/contact/' );
+			} );
+		} );
 	} );
 } );

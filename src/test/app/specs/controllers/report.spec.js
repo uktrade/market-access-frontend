@@ -250,7 +250,7 @@ describe( 'Report controller', () => {
 			controller.companyDetails( req, res );
 
 			expect( req.session.reportCompany ).toEqual( { id: company.id, name: company.name } );
-			expect( res.render ).toHaveBeenCalledWith( 'report/company-details', { csrfToken, company } );
+			expect( res.render ).toHaveBeenCalledWith( 'report/company-details', { csrfToken } );
 		} );
 	} );
 
@@ -395,6 +395,73 @@ describe( 'Report controller', () => {
 						expect( next ).toHaveBeenCalledWith( err );
 					} );
 				} );
+			} );
+		} );
+	} );
+
+	describe( 'contacts', () => {
+
+		it( 'Should render the contact page', () => {
+
+			controller.contacts( req, res );
+
+			expect( res.render ).toHaveBeenCalledWith( 'report/contacts' );
+		} );
+	} );
+
+	describe( 'Contact details', () => {
+
+		it( 'Should save the company name and id in the session and render the details page', () => {
+
+			const contact = {
+				id: 'abc-123',
+				name: 'a contact name',
+				something: 'else',
+				another: 'thing'
+			};
+
+			req.contact = contact;
+			controller.contactDetails( req, res );
+
+			expect( req.session.reportContact ).toEqual( contact.id );
+			expect( res.render ).toHaveBeenCalledWith( 'report/contact-details', { csrfToken } );
+		} );
+	} );
+
+	describe( 'saveContact', () => {
+
+		let next;
+
+		beforeEach( () => {
+
+			next = jasmine.createSpy( 'next' );
+			req.body = {};
+		} );
+
+		describe( 'When there is not a contact in the session', () => {
+
+			it( 'Should redirect to the index page', () => {
+
+				const indexResponse = '/index';
+
+				urls.index.and.callFake( () => indexResponse );
+
+				controller.saveContact( req, res, next );
+
+				expect( res.redirect ).toHaveBeenCalledWith( indexResponse );
+			} );
+		} );
+
+		describe( 'When the POSTed contactId doesn\'t match the session', () => {
+
+			it( 'Should call next with an error', () => {
+
+				req.body.contactId = 'abc-123';
+				req.session.reportContact = 'def-123';
+
+				controller.saveContact( req, res, next );
+
+				expect( next ).toHaveBeenCalledWith( new Error( 'Contact id doesn\'t match session' ) );
 			} );
 		} );
 	} );

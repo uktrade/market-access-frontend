@@ -66,15 +66,14 @@ module.exports = {
 		req.session.reportCompany = { id, name };
 
 		res.render( 'report/company-details', {
-			csrfToken: req.csrfToken(),
-			company: req.company
+			csrfToken: req.csrfToken()
 		} );
 	},
 
 	saveNew: async ( req, res, next ) => {
 
 		const companyId = req.body.companyId;
-		let sessionCompany = req.session.reportCompany;
+		const sessionCompany = req.session.reportCompany;
 		//TODO: Validate company id
 
 		if( !sessionCompany ){
@@ -89,7 +88,7 @@ module.exports = {
 
 		try {
 
-			const { response, body } = await backend.saveNewReport( req, req.session.startFormValues, sessionCompany );
+			const { response } = await backend.saveNewReport( req, req.session.startFormValues, sessionCompany );
 			const isExit = ( req.body.action === 'exit' );
 
 			if( response.isSuccess ){
@@ -108,7 +107,26 @@ module.exports = {
 		}
 	},
 
-	contacts: ( req, res ) => {
-		res.render( 'report/contacts', { company: req.company } );
+	contacts: async ( req, res ) => res.render( 'report/contacts' ),
+
+	contactDetails: ( req, res ) => {
+		req.session.reportContact = req.contact.id;
+		res.render( 'report/contact-details', { csrfToken: req.csrfToken() } );
+	},
+
+	saveContact: async ( req, res, next ) => {
+
+		const contactId = req.body.contactId;
+		const sessionContact = req.session.reportContact;
+
+		if( !sessionContact ){ return res.redirect( urls.index() ); }
+
+		if( contactId !== sessionContact ){
+			return next( new Error( 'Contact id doesn\'t match session' ) );
+		}
+
+		delete req.session.reportContact;
+
+		res.redirect( urls.index() );
 	}
 };

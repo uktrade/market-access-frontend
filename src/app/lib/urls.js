@@ -8,6 +8,8 @@ module.exports = {
 		start: () => '/report/start/',
 		company: ( id ) => `/report/company/${ id ? id + '/' : '' }`,
 		saveNew: () => '/report/new/',
-		contacts: ( id ) => `/report/company/${ id }/contacts/`
+		contacts: ( id ) => `/report/company/${ id }/contacts/`,
+		viewContact: ( id ) => `/report/contact/${ id }/`,
+		saveContact: () => '/report/save/contact/'
 	}
 };

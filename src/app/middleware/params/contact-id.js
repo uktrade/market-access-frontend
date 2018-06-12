@@ -7,12 +7,12 @@ module.exports = async ( req, res, next, id ) => {
 
 		try {
 
-			const { response, body } = await datahub.getCompany( req, id );
+			const { response, body } = await datahub.getContact( req, id );
 
 			if( response.isSuccess ){
 
-				req.company = body;
-				res.locals.company = body;
+				req.contact = body;
+				res.locals.contact = body;
 
 				next();
 
@@ -28,6 +28,6 @@ module.exports = async ( req, res, next, id ) => {
 
 	} else {
 
-		next( new Error( 'Invalid company id' ) );
+		next( new Error( 'Invalid contact id' ) );
 	}
 };

@@ -10,6 +10,7 @@ $govuk-global-images: "/public/govuk/images/";
 @import "frontend/objects/width-container";
 @import "frontend/objects/form-group";
 @import "frontend/overrides/typography";
+@import "frontend/overrides/spacing";
 
 @import 'frontend/components/footer/footer';
 @import 'frontend/components/button/button';
@@ -20,15 +21,17 @@ $govuk-global-images: "/public/govuk/images/";
 @import 'frontend/components/hint/hint';
 @import 'frontend/components/radios/radios';
 @import 'frontend/components/input/input';
+@import 'frontend/components/warning-text/warning-text';
 
 @import 'error';
 
 @import 'components/dash-button';
 @import 'components/task-list';
-@import 'components/company-details';
+@import 'components/details-list';
 @import 'components/company-card';
 @import 'components/search-form';
 @import 'components/table-standard';
+@import 'components/contact-list';
 
 @import 'pages/report/index';
 @import 'pages/report/start';
@@ -42,6 +45,11 @@ $govuk-global-images: "/public/govuk/images/";
 
 .unknown {
 	color: $govuk-grey-1;
+}
+
+.message-panel {
+	border: 3px solid $govuk-grey-3;
+	padding: govuk-em( 30, 16 );
 }
 
 .restrict-width {

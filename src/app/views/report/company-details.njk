@@ -1,3 +1,5 @@
+{% from "components/details-list.njk" import detailsList %}
+
 {% extends 'layout.njk' %}
 
 {% block page_title %}{{ super() }} - Report - Company details{% endblock %}
@@ -12,58 +14,40 @@
 
 			<h2 class="govuk-heading-m">Company summary</h2>
 
-			<dl class="company-details">
-				<div class="company-details__group">
-					<dt class="company-details__key">Registered name</dt>
-					<dd class="company-details__value">{{ company.name }}</dd>
-				</div>
-
-				<div class="company-details__group">
-					<dt class="company-details__key">Companies house no.</dt>
-					<dd class="company-details__value">{{ company.company_number }}</dd>
-				</div>
-
-				<div class="company-details__group">
-					<dt class="company-details__key">Primary address</dt>
-					<dd class="company-details__value">
-						{{ [
+			{{ detailsList( [
+				{
+					'key': 'Registered name',
+					'value': company.name
+				},{
+					'key': 'Companies house no.',
+					'value': company.company_number
+				},{
+					'key': 'Primary address',
+					'value': [
 							company.registered_address_1,
 							company.registered_address_2,
 							company.registered_address_town,
 							company.registered_address_county,
 							company.registered_address_postcode,
 							company.registered_address_country.name
-						] | removeEmpty | join( ', ' ) }}
-					</dd>
-				</div>
-
-				<div class="company-details__group">
-					<dt class="company-details__key">Sector</dt>
-					<dd class="company-details__value">{{ company.sector.name }}</dd>
-				</div>
-
-				<div class="company-details__group">
-					<dt class="company-details__key">Incorporated on</dt>
-					<dd class="company-details__value">
-						{{ company.created_on | dateOnly }}
-					</dd>
-				</div>
-
-				<div class="company-details__group">
-					<dt class="company-details__key">Type</dt>
-					<dd class="company-details__value">{{ company.headquarter_type }}</dd>
-				</div>
-
-				<div class="company-details__group">
-					<dt class="company-details__key">Scale of company</dt>
-					<dd class="company-details__value">{{ company.turnover_range }}</dd>
-				</div>
-
-				<div class="company-details__group">
-					<dt class="company-details__key">Number of employees</dt>
-					<dd class="company-details__value">{{ company.employee_range }}</dd>
-				</div>
-			</dl>
+						] | removeEmpty | join( ', ' )
+				},{
+					'key': 'Sector',
+					'value': company.sector.name
+				},{
+					'key': 'Incorporated on',
+					'value': company.created_on | dateOnly
+				},{
+					'key': 'Type',
+					'value': company.headquarter_type
+				},{
+					'key': 'Scale of company',
+					'value': company.turnover_range
+				},{
+					'key': 'Number of employees',
+					'value': company.employee_range
+				}
+			] ) }}
 
 			<form action="{{ urls.report.saveNew() }}" method="POST">
 				<input type="hidden" name="_csrf" value="{{ csrfToken }}">

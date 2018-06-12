@@ -10,5 +10,5 @@ module.exports = {
 		company_id: company.id,
 		company_name: company.name
 	} ),
-	getBarriers: ( req, res ) => backend.get( '/barriers/', req.session.ssoToken )
+	getBarriers: ( req ) => backend.get( '/barriers/', req.session.ssoToken )
 };

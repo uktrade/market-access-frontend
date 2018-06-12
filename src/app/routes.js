@@ -7,7 +7,9 @@ const reportController = require( './controllers/report' );
 const headerNav = require( './middleware/header-nav' );
 const user = require( './middleware/user' );
 const hasStartFormValues = require( './middleware/has-start-form-values' );
+
 const companyId = require( './middleware/params/company-id' );
+const contactId = require( './middleware/params/contact-id' );
 
 const urls = require( './lib/urls' );
 
@@ -23,6 +25,7 @@ module.exports = function( express, app ){
 
 	app.use( user );
 	app.param( 'companyId', companyId );
+	app.param( 'contactId', contactId );
 
 	app.get( urls.index(), headerNav( { isDashboard: true } ), indexController );
 	app.get( urls.report.index(), reportHeaderNav, reportController.index );
@@ -32,4 +35,6 @@ module.exports = function( express, app ){
 	app.get( urls.report.company() + ':companyId', reportHeaderNav, hasStartFormValues, csrfProtection, reportController.companyDetails );
 	app.post( urls.report.saveNew(), reportHeaderNav, hasStartFormValues, parseBody, csrfProtection, reportController.saveNew );
 	app.get( urls.report.company() + ':companyId/contacts/', reportHeaderNav, reportController.contacts );
+	app.get( '/report/contact/:contactId', reportHeaderNav, csrfProtection, reportController.contactDetails );
+	app.post( urls.report.saveContact(), reportHeaderNav, parseBody, csrfProtection, reportController.saveContact );
 };

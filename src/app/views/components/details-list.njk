@@ -1,0 +1,12 @@
+{% macro detailsList( items ) %}
+<dl class="details-list">
+	{% for item in items %}
+	{% if item.value %}
+	<div class="details-list__group">
+		<dt class="details-list__key">{{ item.key }}</dt>
+		<dd class="details-list__value">{{ item.value }}</dd>
+	</div>
+	{% endif %}
+	{% endfor %}
+</dl>
+{% endmacro %}

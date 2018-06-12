@@ -108,5 +108,17 @@ describe( 'Datahub Service', () => {
 				} );
 			} );
 		} );
+
+		describe( 'getContact', () => {
+
+			it( 'Should call the correct path', () => {
+
+				const id = '123-456';
+
+				service.getContact( req, id );
+
+				expect( datahub.get ).toHaveBeenCalledWith( `/v3/contact/${ encodeURIComponent( id ) }`, req.session.ssoToken );
+			} );
+		} );
 	} );
 } );
