@@ -30,7 +30,6 @@ describe( 'force-https middleware', function(){
 	} );
 
 	describe( 'NOT in secure mode mode', function(){
-
 		it( 'Should call next', function(){
 
 			const middleware = forceHttps( false );
@@ -41,11 +40,8 @@ describe( 'force-https middleware', function(){
 	} );
 
 	describe( 'In secure mode', function(){
-
 		describe( 'When the header is defined', function(){
-
 			describe( 'When the header is http', function(){
-
 				it( 'Should redirect to https', function(){
 
 					const middleware = forceHttps( true );
@@ -56,7 +52,6 @@ describe( 'force-https middleware', function(){
 			} );
 
 			describe( 'When the header is https', function(){
-
 				it( 'Should call next', function(){
 
 					const middleware = forceHttps( true );
@@ -68,7 +63,6 @@ describe( 'force-https middleware', function(){
 		} );
 
 		describe( 'When the header is not defined', function(){
-
 			it( 'Should call next', function(){
 
 				const middleware = forceHttps( true );

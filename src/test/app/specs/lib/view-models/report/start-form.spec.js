@@ -55,9 +55,7 @@ describe( 'Start form view model', () => {
 	} );
 
 	describe( 'Without any session values', () => {
-
 		describe( 'The first call for the view model', () => {
-
 			it( 'Should get data and return a view model', () => {
 
 				const model = viewModel( csrfToken );
@@ -68,7 +66,6 @@ describe( 'Start form view model', () => {
 		} );
 
 		describe( 'After the first call', () => {
-
 			it( 'Should return the view model without fetching data', () => {
 
 				let model = viewModel( csrfToken );
@@ -86,9 +83,7 @@ describe( 'Start form view model', () => {
 
 
 	describe( 'With session values', () => {
-
 		describe( 'With a session value', () => {
-
 			it( 'Should mark the correct one as checked', () => {
 
 				let model = viewModel( csrfToken, { status: 'type2' } );
@@ -99,7 +94,6 @@ describe( 'Start form view model', () => {
 		} );
 
 		describe( 'With an emergency value', () => {
-
 			it( 'Should mark the correct one as checked', () => {
 
 				let model = viewModel( csrfToken, { emergency: 'no' } );

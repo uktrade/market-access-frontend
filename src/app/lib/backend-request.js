@@ -56,5 +56,6 @@ function makeRequest( method, path, opts = {} ){
 module.exports = {
 
 	get: ( path, token ) => makeRequest( 'GET', path, { token } ),
-	post: ( path, token, body ) => makeRequest( 'POST', path, { token, body } )
+	post: ( path, token, body ) => makeRequest( 'POST', path, { token, body } ),
+	put: ( path, token, body ) => makeRequest( 'PUT', path, { token, body } )
 };

@@ -55,11 +55,8 @@ describe( 'Backend Request', () => {
 	} );
 
 	describe( 'get', () => {
-
 		describe( 'Missing parameters', () => {
-
 			describe( 'Without a path', () => {
-
 				it( 'Should throw an error', () => {
 
 					expect( () => {
@@ -73,11 +70,8 @@ describe( 'Backend Request', () => {
 		} );
 
 		describe( 'Without an error', () => {
-
 			describe( 'get', () => {
-
 				describe( 'With a 200 response', () => {
-
 					it( 'Should return the response', ( done ) => {
 
 						const path = '/whoami/';
@@ -96,7 +90,6 @@ describe( 'Backend Request', () => {
 				} );
 
 				describe( 'With a 500 response', () => {
-
 					it( 'Should throw an error', ( done ) => {
 
 						const path = '/whoami/';
@@ -117,9 +110,7 @@ describe( 'Backend Request', () => {
 		} );
 
 		describe( 'With an error', () => {
-
 			describe( 'get', () => {
-
 				it( 'Should reject with the error', ( done ) => {
 
 					const mockError = new Error( 'Broken' );
@@ -137,11 +128,8 @@ describe( 'Backend Request', () => {
 	} );
 
 	describe( 'post', () => {
-
 		describe( 'With a 200 response', () => {
-
 			describe( 'Without a token or body', () => {
-
 				it( 'Should create the correct options', ( done ) => {
 
 					const path = '/a-test';
@@ -160,7 +148,6 @@ describe( 'Backend Request', () => {
 			} );
 
 			describe( 'Wtih a token but no body', () => {
-
 				it( 'Should create the correct options', ( done ) => {
 
 					const path = '/a-test';
@@ -179,7 +166,6 @@ describe( 'Backend Request', () => {
 			} );
 
 			describe( 'Wtih a token and body', () => {
-
 				it( 'Should create the correct options', ( done ) => {
 
 					const path = '/a-test';
@@ -198,6 +184,5 @@ describe( 'Backend Request', () => {
 				} );
 			} );
 		} );
-
 	} );
 } );

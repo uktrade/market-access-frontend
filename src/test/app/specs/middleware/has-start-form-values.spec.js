@@ -28,7 +28,6 @@ describe( 'hasStartFormValues middleware', () => {
 	} );
 
 	describe( 'When there is a startFormValues object in the session', () => {
-
 		it( 'Should call next', () => {
 
 			req.session.startFormValues = {
@@ -43,7 +42,6 @@ describe( 'hasStartFormValues middleware', () => {
 	} );
 
 	describe( 'When there is not a startFormValues object in the session', () => {
-
 		it( 'Should redirect to the start page', () => {
 
 			middleware( req, res, next );

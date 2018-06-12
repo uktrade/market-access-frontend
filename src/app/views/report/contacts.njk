@@ -30,7 +30,7 @@
 	<ul class="contact-list">
 		{% for contact in company.contacts %}
 			<li class="contact-list__item">
-				<a href="{{ urls.report.viewContact( contact.id ) }}" class="contact-list__item__link">
+				<a href="{{ urls.report.viewContact( barrierId, contact.id ) }}" class="contact-list__item__link">
 					<span class="contact-list__item__name">{{ contact.name }}</span>
 					<span class="contact-list__item__sub-key">Job title: </span><span class="contact-list__item__sub-value">{{ contact.job_title }}</span>
 				</a>

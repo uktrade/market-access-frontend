@@ -42,7 +42,6 @@ describe( 'Error reporter', function(){
 		} );
 
 		describe( 'On load of module', function(){
-
 			it( 'Should setup and install raven', function(){
 
 				expect( raven.config ).toHaveBeenCalledWith( dsn, { release: version } );
@@ -51,7 +50,6 @@ describe( 'Error reporter', function(){
 		} );
 
 		describe( 'Setup', function(){
-
 			it( 'Should invoke the responseHandler', function(){
 
 				const appStub = {
@@ -66,7 +64,6 @@ describe( 'Error reporter', function(){
 		} );
 
 		describe( 'handleErrors', function(){
-
 			it( 'Should invoke the errorHandler', function(){
 
 				const appStub = {
@@ -81,7 +78,6 @@ describe( 'Error reporter', function(){
 		} );
 
 		describe( 'A message', function(){
-
 			it( 'It should send the message to sentry', function(){
 
 				const msg = 'Test';
@@ -101,7 +97,6 @@ describe( 'Error reporter', function(){
 		} );
 
 		describe( 'captureException', function(){
-
 			it( 'Should raise an exception', function(){
 
 				const err = new Error( 'test exception' );
@@ -121,7 +116,6 @@ describe( 'Error reporter', function(){
 		} );
 
 		describe( 'On load of the module', function(){
-
 			it( 'Should not setup or install raven', function(){
 
 				expect( raven.config ).not.toHaveBeenCalled();
@@ -130,7 +124,6 @@ describe( 'Error reporter', function(){
 		} );
 
 		describe( 'Setup', function(){
-
 			it( 'Should not invoke the responseHandler', function(){
 
 				const appStub = {
@@ -145,7 +138,6 @@ describe( 'Error reporter', function(){
 		} );
 
 		describe( 'handleErrors', function(){
-
 			it( 'Should not invoke the errorHandler', function(){
 
 				const appStub = {
@@ -160,7 +152,6 @@ describe( 'Error reporter', function(){
 		} );
 
 		describe( 'A message', function(){
-
 			it( 'Should log the error to the logger', function(){
 
 				const msg = 'Test logger';
@@ -178,7 +169,6 @@ describe( 'Error reporter', function(){
 		} );
 
 		describe( 'captureException', function(){
-
 			it( 'Should log the error with the logger', function(){
 
 				const err = new Error( 'Test exception' );

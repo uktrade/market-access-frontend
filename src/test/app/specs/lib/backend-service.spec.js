@@ -24,7 +24,6 @@ describe( 'Backend Service', () => {
 	} );
 
 	describe( 'getUser', () => {
-
 		it( 'Should call the correct path', () => {
 
 			service.getUser( req );
@@ -34,7 +33,6 @@ describe( 'Backend Service', () => {
 	} );
 
 	describe( 'getMetadata', () => {
-
 		it( 'Should call the correct path', () => {
 
 			service.getMetadata();
@@ -44,7 +42,6 @@ describe( 'Backend Service', () => {
 	} );
 
 	describe( 'saveNewReport', () => {
-
 		it( 'Should POST to the correct path', () => {
 
 			const status = 1;
@@ -63,7 +60,6 @@ describe( 'Backend Service', () => {
 	} );
 
 	describe( 'getBarriers', () => {
-
 		it( 'Should call the correct path', () => {
 
 			service.getBarriers( req );

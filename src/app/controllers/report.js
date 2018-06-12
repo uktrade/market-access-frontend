@@ -88,13 +88,13 @@ module.exports = {
 
 		try {
 
-			const { response } = await backend.saveNewReport( req, req.session.startFormValues, sessionCompany );
+			const { response, body } = await backend.saveNewReport( req, req.session.startFormValues, sessionCompany );
 			const isExit = ( req.body.action === 'exit' );
 
 			if( response.isSuccess ){
 
 				delete req.session.startFormValues;
-				res.redirect( isExit ? urls.index() : urls.report.contacts( companyId ) );
+				res.redirect( isExit ? urls.index() : urls.report.contacts( body.id, companyId ) );
 
 			} else {
 
@@ -116,10 +116,11 @@ module.exports = {
 
 	saveContact: async ( req, res, next ) => {
 
+		const barrierId = req.params.barrierId;
 		const contactId = req.body.contactId;
 		const sessionContact = req.session.reportContact;
 
-		if( !sessionContact ){ return res.redirect( urls.index() ); }
+		if( !barrierId || !sessionContact ){ return res.redirect( urls.index() ); }
 
 		if( contactId !== sessionContact ){
 			return next( new Error( 'Contact id doesn\'t match session' ) );
@@ -127,6 +128,26 @@ module.exports = {
 
 		delete req.session.reportContact;
 
-		res.redirect( urls.index() );
-	}
+		try {
+
+			const { response } = await backend.saveContact( req, barrierId, sessionContact );
+			const isExit = ( req.body.action === 'exit' );
+
+			if( response.isSuccess ){
+
+				delete req.session.reportContact;
+				res.redirect( isExit ? urls.index() : urls.report.aboutProblem( barrierId ) );
+
+			} else {
+
+				next( new Error( `Unable to save contact, got ${ response.statusCode } response code` ) );
+			}
+
+		} catch( e ){
+
+			next( e );
+		}
+	},
+
+	aboutProblem: ( req, res ) => res.render( 'report/about-problem' )
 };

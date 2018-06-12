@@ -10,5 +10,8 @@ module.exports = {
 		company_id: company.id,
 		company_name: company.name
 	} ),
-	getBarriers: ( req ) => backend.get( '/barriers/', req.session.ssoToken )
+	getBarriers: ( req ) => backend.get( '/barriers/', req.session.ssoToken ),
+	saveContact: ( req, barrierId, contactId ) => backend.put( `/barriers/${ barrierId }/`, req.session.ssoToken, {
+		contact_id: contactId
+	} )
 };

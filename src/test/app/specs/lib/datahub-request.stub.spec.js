@@ -11,11 +11,8 @@ const getStub = require( '../../helpers/get-stub' );
 const stub = require( '../../../../app/lib/datahub-request.stub' );
 
 describe( 'Datahub request stub', () => {
-
 	describe( 'get', () => {
-
 		describe( 'company details', () => {
-
 			it( 'Should match and return the stub', async () => {
 
 				const data = await stub.get( '/v3/company/abc-123' );
@@ -26,9 +23,7 @@ describe( 'Datahub request stub', () => {
 	} );
 
 	describe( 'post', () => {
-
 		describe( 'company search', () => {
-
 			it( 'Should match and return a stub', async () => {
 
 				const data = await stub.post( '/v3/search/company' );

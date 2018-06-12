@@ -33,7 +33,6 @@ describe( 'Contact Id param middleware', () => {
 		} );
 
 		describe( 'When the response is a success', () => {
-
 			it( 'Should add the contact to the req and locals', async () => {
 
 				const contact = { name: 'test', id };
@@ -51,7 +50,6 @@ describe( 'Contact Id param middleware', () => {
 		} );
 
 		describe( 'When the response is NOT a success', () => {
-
 			it( 'Should call next with an error', async () => {
 
 				const promise = Promise.resolve( { response: { isSuccess: false }, body: {} } );
@@ -68,7 +66,6 @@ describe( 'Contact Id param middleware', () => {
 		} );
 
 		describe( 'When the call errors', () => {
-
 			it( 'Should call next with the error', async () => {
 
 				const err = new Error( 'a datahub error' );
@@ -85,7 +82,6 @@ describe( 'Contact Id param middleware', () => {
 	} );
 
 	describe( 'When the id is invalid', () => {
-
 		it( 'Should call next with the err', async () => {
 
 			id = '<abc';

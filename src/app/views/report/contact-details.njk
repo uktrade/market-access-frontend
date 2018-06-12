@@ -38,12 +38,12 @@
 			</pre>
 #}
 
-			<form action="{{ urls.report.saveContact() }}" method="POST">
+			<form action="{{ urls.report.saveContact( barrierId ) }}" method="POST">
 				<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 				<input type="hidden" name="contactId" value="{{ contact.id }}">
 				<input type="submit" class="govuk-button" value="Save and continue">
 			</form>
-			<form action="{{ urls.report.saveContact() }}" method="POST">
+			<form action="{{ urls.report.saveContact( barrierId ) }}" method="POST">
 				<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 				<input type="hidden" name="contactId" value="{{ contact.id }}">
 				<input type="hidden" name="action" value="exit">
@@ -54,6 +54,6 @@
 
 		<span class="govuk-heading-s">Or</span>
 
-		<a href="{{ urls.report.contacts( contact.company.id ) }}">Choose another contact</a>
+		<a href="{{ urls.report.contacts( barrierId, contact.company.id ) }}">Choose another contact</a>
 
 {% endblock %}

@@ -6,10 +6,11 @@ module.exports = {
 	report: {
 		index: () => '/report/',
 		start: () => '/report/start/',
-		company: ( id ) => `/report/company/${ id ? id + '/' : '' }`,
+		company: ( companyId ) => `/report/company/${ companyId ? companyId + '/' : '' }`,
 		saveNew: () => '/report/new/',
-		contacts: ( id ) => `/report/company/${ id }/contacts/`,
-		viewContact: ( id ) => `/report/contact/${ id }/`,
-		saveContact: () => '/report/save/contact/'
+		contacts: ( barrierId, companyId ) => `/report/${ barrierId }/company/${ companyId }/contacts/`,
+		viewContact: ( barrierId, contactId ) => `/report/${ barrierId }/contact/${ contactId }/`,
+		saveContact: ( barrierId ) => `/report/${ barrierId }/save/contact/`,
+		aboutProblem: ( barrierId ) => `/report/${ barrierId }/problem/`
 	}
 };

@@ -82,7 +82,6 @@ describe( 'App', function(){
 		} );
 
 		describe( 'index page', function(){
-
 			it( 'Should render the index page', function( done ){
 
 				intercept.backend()
@@ -99,9 +98,7 @@ describe( 'App', function(){
 		} );
 
 		describe( 'Report a barrier', () => {
-
 			describe( 'Index page', () => {
-
 				it( 'Should render the index page', ( done ) => {
 
 					app.get( urls.report.index() ).end( ( err, res ) => {
@@ -114,7 +111,6 @@ describe( 'App', function(){
 			} );
 
 			describe( 'Start page', () => {
-
 				it( 'Should render the start page', ( done ) => {
 
 					app.get( urls.report.start() ).end( ( err, res ) => {
@@ -192,7 +188,6 @@ describe( 'App', function(){
 				} );
 
 				describe( 'With a success', () => {
-
 					it( 'Should render the details of a company', ( done ) => {
 
 						intercept.datahub()
@@ -210,7 +205,6 @@ describe( 'App', function(){
 				} );
 
 				describe( 'With an error', () => {
-
 					it( 'Should render the error page', ( done ) => {
 
 						nock( config.datahub.url )
@@ -228,7 +222,6 @@ describe( 'App', function(){
 			} );
 
 			describe( 'Company contacts', () => {
-
 				it( 'Should render the contacts page', ( done ) => {
 
 					const companyId = 'abc-123';
@@ -237,7 +230,7 @@ describe( 'App', function(){
 						.get( `/v3/company/${ companyId }` )
 						.reply( 200, intercept.stub( '/datahub/company/detail' ) );
 
-					app.get( urls.report.contacts( companyId ) )
+					app.get( urls.report.contacts( '1', companyId ) )
 							.end( ( err, res ) => {
 
 							checkResponse( res, 200 );
@@ -249,7 +242,6 @@ describe( 'App', function(){
 		} );
 
 		describe( '404 page', function(){
-
 			it( 'Should render the 404 page', function( done ){
 
 				app.get( '/abc123' ).end( ( err, res ) => {
@@ -262,7 +254,6 @@ describe( 'App', function(){
 		} );
 
 		describe( 'Ping', function(){
-
 			it( 'Should return a status of 200', function( done ){
 
 				app.get( '/ping/' ).end( ( err, res ) => {
@@ -274,7 +265,6 @@ describe( 'App', function(){
 		} );
 
 		describe( 'Login', () => {
-
 			it( 'Should redirect to the sso page', ( done ) => {
 
 				app.get( urls.login() ).end( ( err, res ) => {
@@ -287,7 +277,6 @@ describe( 'App', function(){
 		} );
 
 		describe( 'Login callback', () => {
-
 			it( 'Should redirect to the login page', ( done ) => {
 
 				app.get( '/login/callback/' ).end( ( err, res ) => {
@@ -351,7 +340,6 @@ describe( 'App', function(){
 		}
 
 		describe( 'Dev mode', () => {
-
 			it( 'Should setup the app in dev mode', async () => {
 
 				const app = proxyquire( modulePath, {
@@ -374,7 +362,6 @@ describe( 'App', function(){
 		} );
 
 		describe( 'Prod mode', () => {
-
 			it( 'Should setup the app in prod mode', async () => {
 
 				const app = proxyquire( modulePath, {

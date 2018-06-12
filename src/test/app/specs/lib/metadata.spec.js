@@ -18,11 +18,8 @@ describe( 'metadata', () => {
 	} );
 
 	describe( 'fetch', () => {
-
 		describe( 'Without an error', () => {
-
 			describe( 'A successful response', () => {
-
 				it( 'Should report no errors', async () => {
 
 					backend.getMetadata.and.callFake( () => Promise.resolve( {
@@ -35,7 +32,6 @@ describe( 'metadata', () => {
 			} );
 
 			describe( 'An unsuccessful response', () => {
-
 				it( 'Should throw an error', async () => {
 
 					backend.getMetadata.and.callFake( () => Promise.resolve( {
@@ -55,7 +51,6 @@ describe( 'metadata', () => {
 		} );
 
 		describe( 'With an error', () => {
-
 			it( 'Should throw the error', async () => {
 
 				const theErr = new Error( 'test' );
@@ -75,7 +70,6 @@ describe( 'metadata', () => {
 	} );
 
 	describe( 'getStatusTypes', () => {
-
 		it( 'Should return the data', async () => {
 
 			const statusTypes = { statusType1: 'status-data', statusType2: 'status-data' };

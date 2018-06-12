@@ -314,7 +314,7 @@ describe( 'Report controller', () => {
 
 					beforeEach( () => {
 
-						const promise = Promise.resolve( { response: { isSuccess: true } } );
+						const promise = Promise.resolve( { response: { isSuccess: true }, body: { id: 1 } } );
 
 						backend.saveNewReport.and.callFake( () => promise );
 					} );
@@ -436,9 +436,10 @@ describe( 'Report controller', () => {
 
 			next = jasmine.createSpy( 'next' );
 			req.body = {};
+			req.params = {};
 		} );
 
-		describe( 'When there is not a contact in the session', () => {
+		describe( 'When there is not a barrierId in the params', () => {
 
 			it( 'Should redirect to the index page', () => {
 
@@ -452,16 +453,60 @@ describe( 'Report controller', () => {
 			} );
 		} );
 
-		describe( 'When the POSTed contactId doesn\'t match the session', () => {
+		describe( 'When there is a barrierId in the params', () => {
 
-			it( 'Should call next with an error', () => {
+			beforeEach( () => {
 
-				req.body.contactId = 'abc-123';
-				req.session.reportContact = 'def-123';
+				req.params.barrierId = '2';
+			} );
 
-				controller.saveContact( req, res, next );
+			describe( 'When there is not a contact in the session', () => {
 
-				expect( next ).toHaveBeenCalledWith( new Error( 'Contact id doesn\'t match session' ) );
+				it( 'Should redirect to the index page', () => {
+
+					const indexResponse = '/index';
+
+					urls.index.and.callFake( () => indexResponse );
+
+					controller.saveContact( req, res, next );
+
+					expect( res.redirect ).toHaveBeenCalledWith( indexResponse );
+				} );
+			} );
+
+			describe( 'When there is a contactId in the session', () => {
+
+				beforeEach( () => {
+
+					req.session.reportContact = 'def-123';
+				} );
+
+				describe( 'When the POSTed contactId doesn\'t match the session', () => {
+
+					it( 'Should call next with an error', () => {
+
+						req.body.contactId = 'abc-123';
+
+						controller.saveContact( req, res, next );
+
+						expect( next ).toHaveBeenCalledWith( new Error( 'Contact id doesn\'t match session' ) );
+					} );
+				} );
+
+				describe( 'When the POSTed contactId metches the session', () => {
+
+					beforeEach( () => {
+
+						req.body.contactId = req.session.reportContact;
+					} );
+
+					it( 'Should delete the session contact', () => {
+
+						controller.saveContact( req, res, next );
+
+						expect( req.session.reportContact ).not.toBeDefined();
+					} );
+				} );
 			} );
 		} );
 	} );
