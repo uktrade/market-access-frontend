@@ -25,5 +25,7 @@ module.exports = {
 		}
 	},
 
-	getStatusTypes: () => data.status_types
+	getStatusTypes: () => data.status_types,
+	getLossScale: () => data.loss_range,
+	getBoolScale: () => data.adv_boolean
 };

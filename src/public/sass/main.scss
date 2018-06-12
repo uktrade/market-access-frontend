@@ -22,6 +22,7 @@ $govuk-global-images: "/public/govuk/images/";
 @import 'frontend/components/radios/radios';
 @import 'frontend/components/input/input';
 @import 'frontend/components/warning-text/warning-text';
+@import 'frontend/components/textarea/textarea';
 
 @import 'error';
 
@@ -82,6 +83,7 @@ $govuk-global-images: "/public/govuk/images/";
 	background-color: $govuk-grey-3;
 	box-shadow: 0 2px 0 $govuk-grey-1;
 	color: $govuk-grey-1;
+	display: block;
 
 	&:link,
 	&:visited,

@@ -38,5 +38,5 @@ module.exports = function( express, app ){
 	app.get( '/report/:barrierId/company/:companyId/contacts/', reportHeaderNav, reportController.contacts );
 	app.get( '/report/:barrierId/contact/:contactId', reportHeaderNav, csrfProtection, reportController.contactDetails );
 	app.post( '/report/:barrierId/save/contact/', reportHeaderNav, parseBody, csrfProtection, reportController.saveContact );
-	app.get( '/report/:barrierId/problem/', reportHeaderNav, reportController.aboutProblem );
+	app.get( '/report/:barrierId/problem/', reportHeaderNav, csrfProtection, reportController.aboutProblem );
 };

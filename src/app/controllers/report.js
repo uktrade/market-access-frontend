@@ -2,6 +2,7 @@ const urls = require( '../lib/urls' );
 const backend = require( '../lib/backend-service' );
 const datahub = require( '../lib/datahub-service' );
 const startFormViewModel = require( '../lib/view-models/report/start-form' );
+const aboutProblemViewModel = require( '../lib/view-models/report/about-problem' );
 
 module.exports = {
 
@@ -149,5 +150,5 @@ module.exports = {
 		}
 	},
 
-	aboutProblem: ( req, res ) => res.render( 'report/about-problem' )
+	aboutProblem: ( req, res ) => res.render( 'report/about-problem', aboutProblemViewModel( req.csrfToken() ) )
 };

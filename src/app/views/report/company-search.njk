@@ -1,4 +1,4 @@
-{% from "components/search-form.njk" import searchForm %}
+{% from 'components/search-form.njk' import searchForm %}
 {% extends 'layout.njk' %}
 
 {% block page_title %}{{ super() }} - Report - Search for company{% endblock %}
@@ -11,20 +11,21 @@
 
 		<section class="restrict-width">
 
-			{{ searchForm({
-				'label': {
-					'text': "Find the reporter's company record"
-				},
-				'hint': {
-					'text': 'Search for the registered company name, company number or address'
-				},
-				'input' : {
-					'id': 'company',
-					'name': 'q',
-					'value': query,
-					'placeholder': 'Search for company'
-				}
-			}) }}
+			{{ searchForm( {
+					label: {
+						text: "Find the reporter's company record"
+					},
+					hint: {
+						text: 'Search for the registered company name, company number or address'
+					},
+					input: {
+						id: 'company',
+						name: 'q',
+						value: query,
+						placeholder: 'Search for company'
+					}
+				} )
+			}}
 
 			{% if results %}
 
