@@ -27,7 +27,7 @@
 		</div>
 
 	{% else %}
-	<ul class="contact-list">
+	<ul class="contact-list restrict-width">
 		{% for contact in company.contacts %}
 			<li class="contact-list__item">
 				<a href="{{ urls.report.viewContact( barrierId, contact.id ) }}" class="contact-list__item__link">

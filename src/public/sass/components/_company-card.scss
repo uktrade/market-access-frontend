@@ -40,6 +40,7 @@
 	border: 1px solid $govuk-grey-2;
 	padding: govuk-em( 15, 16 ) govuk-em( 15, 16 ) 0 govuk-em( 15, 16 );
 	width: 100%;
+	box-sizing: border-box;
 
 	&:focus {
 		background-color: $govuk-grey-4;
