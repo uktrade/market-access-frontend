@@ -1,31 +1,24 @@
 const backend = require( './backend-service' );
 
-let data;
+module.exports.fetch = async () => {
 
-module.exports = {
+	try {
 
-	fetch: async () => {
+		const { response, body } = await backend.getMetadata();
 
-		try {
+		if( response.isSuccess ){
 
-			const { response, body } = await backend.getMetadata();
+			module.exports.statusTypes = body.status_types;
+			module.exports.lossScale = body.loss_range;
+			module.exports.boolScale = body.adv_boolean;
 
-			if( response.isSuccess ){
+		} else {
 
-				data = body;
-
-			} else {
-
-				throw new Error( 'Unable to fetch metadata' );
-			}
-
-		} catch( e ){
-
-			throw e;
+			throw new Error( 'Unable to fetch metadata' );
 		}
-	},
 
-	getStatusTypes: () => data.status_types,
-	getLossScale: () => data.loss_range,
-	getBoolScale: () => data.adv_boolean
+	} catch( e ){
+
+		throw e;
+	}
 };

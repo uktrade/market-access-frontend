@@ -9,7 +9,8 @@ const folderSuffix = [ today.getFullYear(), today.getMonth() + 1, today.getDate(
 
 const stubs = [
 	[ 'search/company', '/v3/search/company', { name: 'testbirds', offset: 0, limit: 20 } ],
-	[ 'company/details', '/v3/company/00ca9155-a098-e211-a939-e4115bead28a' ]
+	[ 'company/details', '/v3/company/00ca9155-a098-e211-a939-e4115bead28a' ],
+	[ 'contact/details', '/v3/contact/4807e86d-4702-42bf-ade0-7c62991a2985' ]
 ];
 
 function mkdirp( filePath ){
@@ -39,8 +40,6 @@ function fetch( file, urlPath, urlBody ){
 	if( urlBody ){
 		requestOptions.body = urlBody;
 	}
-
-	console.log( requestOptions );
 
 	const fileWithPath = path.resolve( __dirname, `stubs/datahub_${ folderSuffix }/`, `${ file }.json` );
 

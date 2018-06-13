@@ -1,7 +1,18 @@
 {
    "status_types": {
-      "NOT_STARTED": "illo sapiente quia",
-      "ACTIVE": "laudantium in alias",
-      "COMPLETE": "quia a et"
+      "NOT_STARTED": "eos optio autem",
+      "ACTIVE": "magni ipsum quas",
+      "COMPLETE": "aliquid perferendis facere"
+   },
+   "loss_range": {
+      "1": "ut vel et",
+      "2": "dolores quia iste",
+      "3": "qui incidunt explicabo",
+      "4": "velit error blanditiis"
+   },
+   "adv_boolean": {
+      "1": "Yes",
+      "2": "No",
+      "3": "Don't know"
    }
 }

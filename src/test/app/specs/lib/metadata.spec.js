@@ -69,7 +69,7 @@ describe( 'metadata', () => {
 		} );
 	} );
 
-	describe( 'getStatusTypes', () => {
+	describe( 'statusTypes', () => {
 		it( 'Should return the data', async () => {
 
 			const statusTypes = { statusType1: 'status-data', statusType2: 'status-data' };
@@ -82,7 +82,41 @@ describe( 'metadata', () => {
 
 			await metadata.fetch();
 
-			expect( metadata.getStatusTypes() ).toEqual( statusTypes );
+			expect( metadata.statusTypes ).toEqual( statusTypes );
+		} );
+	} );
+
+	describe( 'lossScale', () => {
+		it( 'Should return the data', async () => {
+
+			const lossScale = { '1': 'test', '2': 'tester' };
+			const theData = { some: 'data', loss_range: lossScale };
+
+			backend.getMetadata.and.callFake( () => Promise.resolve( {
+				response: { isSuccess: true },
+				body: theData
+			} ) );
+
+			await metadata.fetch();
+
+			expect( metadata.lossScale ).toEqual( lossScale );
+		} );
+	} );
+
+	describe( 'boolScale', () => {
+		it( 'Should return the data', async () => {
+
+			const boolScale = { '1': 'test', '2': 'tester' };
+			const theData = { some: 'data', adv_boolean: boolScale };
+
+			backend.getMetadata.and.callFake( () => Promise.resolve( {
+				response: { isSuccess: true },
+				body: theData
+			} ) );
+
+			await metadata.fetch();
+
+			expect( metadata.boolScale ).toEqual( boolScale );
 		} );
 	} );
 } );

@@ -1,0 +1,52 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Details of a contact",
+
+	"type": "object",
+	"required": [ "id", "first_name", "last_name", "name", "address_1", "address_town", "address_county", "address_postcode", "address_country" ],
+	"properties": {
+		"id": {
+			"type": "string",
+			"faker": "random.uuid"
+		},
+		"first_name": {
+			"type": "string",
+			"faker": "name.firstName"
+		},
+		"last_name": {
+			"type": "string",
+			"faker": "name.lastName"
+		},
+		"name": {
+			"type": "string",
+			"faker": "name.findName"
+		},
+		"address_1": {
+			"type": "string",
+			"faker": "address.streetName"
+		},
+		"address_town": {
+			"type": "string",
+			"faker": "address.city"
+		},
+		"address_county": {
+			"type": "string",
+			"faker": "address.county"
+		},
+		"address_country": {
+			"type": "object",
+			"required": [ "id", "name" ],
+			"properties": {
+				"id": { "$ref": "$refs/common.json#/uuid" },
+				"name": {
+					"type": "string",
+					"faker": "address.country"
+				}
+			}
+		},
+		"address_postcode": {
+			"type": "string",
+			"faker": "address.zipCode"
+		}
+	}
+}

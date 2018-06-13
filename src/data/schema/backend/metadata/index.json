@@ -3,7 +3,7 @@
 	"title": "Metadata",
 
 	"type": "object",
-	"required": [ "status_types" ],
+	"required": [ "status_types", "loss_range", "adv_boolean" ],
 	"properties": {
 
 		"status_types": {
@@ -11,15 +11,38 @@
 			"required": [ "NOT_STARTED", "ACTIVE", "COMPLETE" ],
 			"properties": {
 
-				"NOT_STARTED": { "$ref": "#/refs/status" },
-				"ACTIVE": { "$ref": "#/refs/status" },
-				"COMPLETE": { "$ref": "#/refs/status" }
+				"NOT_STARTED": { "$ref": "#/refs/string" },
+				"ACTIVE": { "$ref": "#/refs/string" },
+				"COMPLETE": { "$ref": "#/refs/string" }
+			}
+		},
+
+		"loss_range": {
+			"type": "object",
+			"required": [ "1", "2", "3", "4" ],
+			"properties": {
+
+				"1": { "$ref": "#/refs/string" },
+				"2": { "$ref": "#/refs/string" },
+				"3": { "$ref": "#/refs/string" },
+				"4": { "$ref": "#/refs/string" }
+			}
+		},
+
+		"adv_boolean": {
+			"type": "object",
+			"required": [ "1", "2", "3" ],
+			"properties": {
+
+				"1": "Yes",
+				"2": "No",
+				"3": "Don't know"
 			}
 		}
 	},
 
 	"refs": {
-		"status": {
+		"string": {
 			"type": "string",
 			"faker": "lorem.words"
 		}

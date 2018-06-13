@@ -28,7 +28,7 @@ module.exports = ( csrfToken, sessionValues = {} ) => {
 
 	if( !statusTypes ){
 
-		statusTypes = radioItemsFromObj( metadata.getStatusTypes() );
+		statusTypes = radioItemsFromObj( metadata.statusTypes );
 	}
 
 	return {

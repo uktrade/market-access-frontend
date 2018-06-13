@@ -42,7 +42,7 @@
 								{{ barrier.company_name or ( '<span class="unknown">unknown</span>' | safe ) }}
 							</td>
 							<td class="standard-table__cell">
-								{{ barrier.problem_status or ( '<span class="unknown">unknown</span>' | safe ) }}
+								{{ barrier.problem_status.name or ( '<span class="unknown">unknown</span>' | safe ) }}
 							</td>
 							<td class="standard-table__cell">
 								{{ barrier.created_by or ( '<span class="unknown">unknown</span>' | safe ) }}

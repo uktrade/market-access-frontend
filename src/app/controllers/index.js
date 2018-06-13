@@ -1,12 +1,20 @@
 const backend = require( '../lib/backend-service' );
+const dashboardViewModel = require( '../lib/view-models/dashboard' );
 
 module.exports = async ( req, res, next ) => {
 
 	try {
 
-		const { body } = await backend.getBarriers( req );
+		const { response, body } = await backend.getBarriers( req );
 
-		res.render( 'index', { barriers: body.results } );
+		if( response.isSuccess ){
+
+			res.render( 'index', dashboardViewModel( body.results ) );
+
+		} else {
+
+			throw new Error( `Got ${ response.statusCode } response from backend` );
+		}
 
 	} catch( e ){
 

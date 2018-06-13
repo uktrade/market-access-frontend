@@ -16,12 +16,12 @@ function isMatching( sessionValue ){
 
 module.exports = ( csrfToken, sessionValues = {} ) => {
 
-	if( !lossScale ){ lossScale = radioItemsFromObj( metadata.getLossScale() ); }
-	if( !boolScale ){ boolScale = radioItemsFromObj( metadata.getBoolScale() ); }
+	if( !lossScale ){ lossScale = radioItemsFromObj( metadata.lossScale ); }
+	if( !boolScale ){ boolScale = radioItemsFromObj( metadata.boolScale ); }
 
 	return {
 		csrfToken,
-		losses: lossScale.map( isMatching( sessionValues.status ) ),
-		otherCompanies: boolScale.map( isMatching( sessionValues.emergency ) )
+		losses: metadata.lossScale.map( isMatching( sessionValues.status ) ),
+		otherCompanies: metadata.boolScale.map( isMatching( sessionValues.emergency ) )
 	};
 };

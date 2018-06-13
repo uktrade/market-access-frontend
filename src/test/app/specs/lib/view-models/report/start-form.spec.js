@@ -2,12 +2,11 @@ const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
 const modulePath = '../../../../../../app/lib/view-models/report/start-form';
 
-const metadataStatusTypes = {
-	type1: 'a type',
-	type2: 'another type'
-};
-
 const csrfToken = uuid();
+const radioItemsResponse = [
+	{ value: 'type1', text: 'a type' },
+	{ value: 'type2', text: 'another type' }
+];
 
 const viewModelResponse = {
 	csrfToken,
@@ -40,44 +39,30 @@ describe( 'Start form view model', () => {
 
 	let viewModel;
 	let metadata;
+	let radioItemsFromObject;
 
 	beforeEach( () => {
 
 		metadata = {
-			getStatusTypes: jasmine.createSpy( 'metadata.getStatusTypes' )
+			statusTypes: [ { '1': 'status' } ]
 		};
 
-		metadata.getStatusTypes.and.callFake( () => metadataStatusTypes );
+		radioItemsFromObject = jasmine.createSpy( 'radioItemsFromObject' );
+
+		radioItemsFromObject.and.callFake( () => radioItemsResponse );
 
 		viewModel = proxyquire( modulePath, {
-			'../../metadata': metadata
+			'../../metadata': metadata,
+			'../../radio-items-from-object': radioItemsFromObject
 		} );
 	} );
 
 	describe( 'Without any session values', () => {
-		describe( 'The first call for the view model', () => {
-			it( 'Should get data and return a view model', () => {
+		it( 'Should get data and return a view model', () => {
 
-				const model = viewModel( csrfToken );
+			const model = viewModel( csrfToken );
 
-				expect( metadata.getStatusTypes ).toHaveBeenCalled();
-				expect( model ).toEqual( viewModelResponse );
-			} );
-		} );
-
-		describe( 'After the first call', () => {
-			it( 'Should return the view model without fetching data', () => {
-
-				let model = viewModel( csrfToken );
-
-				expect( metadata.getStatusTypes.calls.count() ).toEqual( 1 );
-				expect( model ).toEqual( viewModelResponse );
-
-				model = viewModel( csrfToken );
-
-				expect( metadata.getStatusTypes.calls.count() ).toEqual( 1 );
-				expect( model ).toEqual( viewModelResponse );
-			} );
+			expect( model ).toEqual( viewModelResponse );
 		} );
 	} );
 

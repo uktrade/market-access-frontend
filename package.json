@@ -28,7 +28,10 @@
     "heroku-postbuild": "npm run build:dist",
     "watch:sass": "npm run sass:dev && node-sass src/public/sass/main.scss src/public/css/main.css --source-map src/public/css/main.css.map --source-map-contents --include-path ./src/public/sass/ --include-path './src/@govuk-frontend/' -w -r",
     "sass:dev": "node-sass src/public/sass/main.scss src/public/css/main.css --source-map src/public/css/main.css.map --source-map-contents --include-path ./src/public/sass/ --include-path './src/@govuk-frontend/'",
-    "sass:prod": "node-sass src/public/sass/main.scss src/public/css/main.css --include-path ./src/public/sass/ --include-path './src/@govuk-frontend/' -x --output-style compressed"
+    "sass:prod": "node-sass src/public/sass/main.scss src/public/css/main.css --include-path ./src/public/sass/ --include-path './src/@govuk-frontend/' -x --output-style compressed",
+    "generate-data": "run-p generate:*",
+    "generate:backend": "node src/data/faker/backend.js",
+    "generate:datahub": "node src/data/faker/datahub.js"
   },
   "repository": {
     "type": "git",

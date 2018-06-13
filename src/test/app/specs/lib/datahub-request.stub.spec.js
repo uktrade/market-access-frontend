@@ -20,6 +20,15 @@ describe( 'Datahub request stub', () => {
 				expect( data.response.isSuccess ).toEqual( true );
 			} );
 		} );
+
+		describe( 'getContact', () => {
+			it( 'Should match and return the stub', async () => {
+
+				const data = await stub.get( '/v3/contact/abc-123' );
+				expect( data.body ).toEqual( getStub( '/datahub/contact/details' ));
+				expect( data.response.isSuccess ).toEqual( true );
+			} );
+		} );
 	} );
 
 	describe( 'post', () => {
