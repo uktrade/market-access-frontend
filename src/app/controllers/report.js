@@ -132,10 +132,10 @@ module.exports = {
 		try {
 
 			const { response } = await backend.saveContact( req, barrierId, sessionContact );
-			const isExit = ( req.body.action === 'exit' );
 
 			if( response.isSuccess ){
 
+				const isExit = ( req.body.action === 'exit' );
 				delete req.session.reportContact;
 				res.redirect( isExit ? urls.index() : urls.report.aboutProblem( barrierId ) );
 

@@ -13,6 +13,7 @@ describe( 'Report controller', () => {
 	let urls;
 	let startFormViewModel;
 	let csrfToken;
+	let aboutProblemViewModel;
 
 	beforeEach( () => {
 
@@ -37,21 +38,23 @@ describe( 'Report controller', () => {
 			index: jasmine.createSpy( 'urls.index' ),
 			report: {
 				company: jasmine.createSpy( 'urls.report.company' ),
-				contacts: jasmine.createSpy( 'urls.report.contacts' )
+				contacts: jasmine.createSpy( 'urls.report.contacts' ),
+				aboutProblem: jasmine.createSpy( 'urls.report.aboutProblem' )
 			}
 		};
 		startFormViewModel = jasmine.createSpy( 'startFormViewModel' );
+		aboutProblemViewModel = jasmine.createSpy( 'aboutProblemViewModel' );
 
 		controller = proxyquire( modulePath, {
 			'../lib/backend-service': backend,
 			'../lib/datahub-service': datahub,
 			'../lib/urls': urls,
-			'../lib/view-models/report/start-form': startFormViewModel
+			'../lib/view-models/report/start-form': startFormViewModel,
+			'../lib/view-models/report/about-problem': aboutProblemViewModel
 		} );
 	} );
 
 	describe( 'Index', () => {
-
 		it( 'Should render the report page', () => {
 
 			controller.index( req, res );
@@ -71,7 +74,6 @@ describe( 'Report controller', () => {
 		} );
 
 		describe( 'When it is a POST', () => {
-
 			describe( 'When the input values are valid', () => {
 
 				it( 'Should save the values and redirect to the next step', () => {
@@ -94,7 +96,6 @@ describe( 'Report controller', () => {
 		} );
 
 		describe( 'When it is a GET', () => {
-
 			it( 'Should get the status types and render the start page', () => {
 
 				const sessionValues = { status: 1, emergency: 2 };
@@ -109,7 +110,6 @@ describe( 'Report controller', () => {
 				expect( res.render ).toHaveBeenCalledWith( 'report/start', startFormViewModelResponse );
 			} );
 		} );
-
 	} );
 
 	describe( 'Company Search', () => {
@@ -123,7 +123,6 @@ describe( 'Report controller', () => {
 		} );
 
 		describe( 'Without a query', () => {
-
 			it( 'Should render the search page', () => {
 
 				controller.companySearch( req, res, next );
@@ -143,9 +142,7 @@ describe( 'Report controller', () => {
 			} );
 
 			describe( 'When there is not an error', () => {
-
 				describe( 'When a company is found', () => {
-
 					it( 'Should render the results', ( done ) => {
 
 						const body = {	some: 'data' };
@@ -168,7 +165,6 @@ describe( 'Report controller', () => {
 				} );
 
 				describe( 'When a company is not found', () => {
-
 					it( 'Should render an error message', ( done ) => {
 
 						const promise = new Promise( ( resolve ) => {
@@ -189,7 +185,6 @@ describe( 'Report controller', () => {
 				} );
 
 				describe( 'When there is an error with the request', () => {
-
 					it( 'Should render an error message', ( done ) => {
 
 						const promise = new Promise( ( resolve ) => {
@@ -211,7 +206,6 @@ describe( 'Report controller', () => {
 			} );
 
 			describe( 'When there is an error', () => {
-
 				it( 'Should pass the error on', ( done ) => {
 
 					const err = new Error( 'some error state' );
@@ -236,7 +230,6 @@ describe( 'Report controller', () => {
 	} );
 
 	describe( 'Company details', () => {
-
 		it( 'Should save the company name and id in the session and render the details page', () => {
 
 			const company = {
@@ -271,7 +264,6 @@ describe( 'Report controller', () => {
 		} );
 
 		describe( 'When the reportCompany doesn\'t exist in the session', () => {
-
 			it( 'Should redirect to the search page', async () => {
 
 				const reportCompanyUrlResponse = '/some-url';
@@ -297,7 +289,6 @@ describe( 'Report controller', () => {
 			} );
 
 			describe( 'When the POSTed companyId does\'t match the session', () => {
-
 				it( 'Should call next with an error', async () => {
 
 					req.session.reportCompany.id = '789-012';
@@ -309,7 +300,6 @@ describe( 'Report controller', () => {
 			} );
 
 			describe( 'When the POSTed company matches the session', () => {
-
 				describe( 'When the response is a success', () => {
 
 					beforeEach( () => {
@@ -320,7 +310,6 @@ describe( 'Report controller', () => {
 					} );
 
 					describe( 'When the action is exit', () => {
-
 						it( 'Should delete the session values and redirect to the dashboard', async ( done ) => {
 
 							const indexResponse = '/index';
@@ -343,7 +332,6 @@ describe( 'Report controller', () => {
 					} );
 
 					describe( 'When the action is not specified', () => {
-
 						it( 'Should delete the session values and redirect to the next step', async ( done ) => {
 
 							const contactResponse = '/index';
@@ -366,7 +354,6 @@ describe( 'Report controller', () => {
 				} );
 
 				describe( 'When the response is a 500', () => {
-
 					it( 'Should call next with an error', async () => {
 
 						const statusCode = 500;
@@ -382,7 +369,6 @@ describe( 'Report controller', () => {
 				} );
 
 				describe( 'When an error is thrown', () => {
-
 					it( 'Should call next with the error', async () => {
 
 						const err = new Error( 'Some backend error' );
@@ -400,7 +386,6 @@ describe( 'Report controller', () => {
 	} );
 
 	describe( 'contacts', () => {
-
 		it( 'Should render the contact page', () => {
 
 			controller.contacts( req, res );
@@ -410,7 +395,6 @@ describe( 'Report controller', () => {
 	} );
 
 	describe( 'Contact details', () => {
-
 		it( 'Should save the company name and id in the session and render the details page', () => {
 
 			const contact = {
@@ -440,7 +424,6 @@ describe( 'Report controller', () => {
 		} );
 
 		describe( 'When there is not a barrierId in the params', () => {
-
 			it( 'Should redirect to the index page', () => {
 
 				const indexResponse = '/index';
@@ -461,7 +444,6 @@ describe( 'Report controller', () => {
 			} );
 
 			describe( 'When there is not a contact in the session', () => {
-
 				it( 'Should redirect to the index page', () => {
 
 					const indexResponse = '/index';
@@ -482,7 +464,6 @@ describe( 'Report controller', () => {
 				} );
 
 				describe( 'When the POSTed contactId doesn\'t match the session', () => {
-
 					it( 'Should call next with an error', () => {
 
 						req.body.contactId = 'abc-123';
@@ -498,16 +479,97 @@ describe( 'Report controller', () => {
 					beforeEach( () => {
 
 						req.body.contactId = req.session.reportContact;
+						backend.saveContact = jasmine.createSpy( 'backend.saveContact' );
 					} );
 
-					it( 'Should delete the session contact', () => {
+					describe( 'When the response is a success', () => {
 
-						controller.saveContact( req, res, next );
+						beforeEach( () => {
 
-						expect( req.session.reportContact ).not.toBeDefined();
+							backend.saveContact.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+						} );
+
+						it( 'Should delete the session contact', async () => {
+
+							await controller.saveContact( req, res, next );
+
+							expect( req.session.reportContact ).not.toBeDefined();
+						} );
+
+						describe( 'When there is an action param set to exit', () => {
+							it( 'Should redirect to the index page', async () => {
+
+								const indexResponse = '/test';
+
+								req.body.action = 'exit';
+								urls.index.and.callFake( () => indexResponse );
+
+								await controller.saveContact( req, res, next );
+
+								expect( urls.index ).toHaveBeenCalledWith();
+								expect( res.redirect ).toHaveBeenCalledWith( indexResponse );
+							} );
+						} );
+
+						describe( 'When there is NOT an action param set', () => {
+							it( 'Should redirect to the index page', async () => {
+
+								const problemResponse = '/a-problem';
+
+								urls.report.aboutProblem.and.callFake( () => problemResponse );
+
+								await controller.saveContact( req, res, next );
+
+								expect( urls.report.aboutProblem ).toHaveBeenCalledWith( req.params.barrierId );
+								expect( res.redirect ).toHaveBeenCalledWith( problemResponse );
+							} );
+						} );
+					} );
+
+					describe( 'When the response is not a success', () => {
+
+						it( 'Should call next with an error', async () => {
+
+							const response = { isSuccess: false, statusCode: 500 };
+
+							backend.saveContact.and.callFake( () => Promise.resolve( { response } ) );
+
+							await controller.saveContact( req, res, next );
+
+							expect( next ).toHaveBeenCalledWith( new Error( `Unable to save contact, got ${ response.statusCode } response code` ) );
+						} );
+					} );
+
+					describe( 'When an error is thrown', () => {
+
+						it( 'Should call next with the error', async () => {
+
+							const err = new Error( 'Something is broken' );
+
+							backend.saveContact.and.callFake( () => Promise.reject( err ) );
+
+							await controller.saveContact( req, res, next );
+
+							expect( next ).toHaveBeenCalledWith( err );
+						} );
 					} );
 				} );
 			} );
+		} );
+	} );
+
+	describe( 'aboutProblem', () => {
+
+		it( 'Should render the view with the viewModel', () => {
+
+			const aboutProblemViewModelResponse = { some: 'data' };
+
+			aboutProblemViewModel.and.callFake( () => aboutProblemViewModelResponse );
+
+			controller.aboutProblem( req, res );
+
+			expect( aboutProblemViewModel ).toHaveBeenCalledWith( csrfToken );
+			expect( res.render ).toHaveBeenCalledWith( 'report/about-problem', aboutProblemViewModelResponse );
 		} );
 	} );
 } );
