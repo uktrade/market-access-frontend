@@ -4,7 +4,8 @@ const modulePath = '../../../../app/lib/backend-request';
 
 const backendUrl = 'http://some.domain.com';
 const GET = 'GET';
-const POST = 'POST'
+const POST = 'POST';
+const PUT = 'PUT';
 
 describe( 'Backend Request', () => {
 
@@ -181,6 +182,65 @@ describe( 'Backend Request', () => {
 
 					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
 					checkRequest( POST, path, { token, body } );
+				} );
+			} );
+		} );
+	} );
+
+	describe( 'put', () => {
+		describe( 'With a 200 response', () => {
+			describe( 'Without a token or body', () => {
+				it( 'Should create the correct options', ( done ) => {
+
+					const path = '/a-test';
+
+					backend.put( path ).then( ( { response, body } ) => {
+
+						expect( response.isSuccess ).toEqual( true );
+						expect( response ).toEqual( mockResponse );
+						expect( body ).toEqual( mockBody );
+						done();
+					} );
+
+					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
+					checkRequest( PUT, path );
+				} );
+			} );
+
+			describe( 'Wtih a token but no body', () => {
+				it( 'Should create the correct options', ( done ) => {
+
+					const path = '/a-test';
+
+					backend.put( path, token ).then( ( { response, body } ) => {
+
+						expect( response.isSuccess ).toEqual( true );
+						expect( response ).toEqual( mockResponse );
+						expect( body ).toEqual( mockBody );
+						done();
+					} );
+
+					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
+					checkRequest( PUT, path, { token } );
+				} );
+			} );
+
+			describe( 'Wtih a token and body', () => {
+				it( 'Should create the correct options', ( done ) => {
+
+					const path = '/a-test';
+					const body = { some: 'body' };
+
+					backend.put( path, token, body ).then( ( { response, body } )=> {
+
+						expect( response.isSuccess ).toEqual( true );
+						expect( response ).toEqual( mockResponse );
+						expect( body ).toEqual( mockBody );
+						done();
+					} );
+
+					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
+					checkRequest( PUT, path, { token, body } );
 				} );
 			} );
 		} );

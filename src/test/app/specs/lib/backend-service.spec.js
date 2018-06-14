@@ -15,7 +15,8 @@ describe( 'Backend Service', () => {
 		req = { session: { ssoToken: token} };
 		backend = {
 			get: jasmine.createSpy( 'backend.get' ),
-			post: jasmine.createSpy( 'backend.post' )
+			post: jasmine.createSpy( 'backend.post' ),
+			put: jasmine.createSpy( 'backend.put' )
 		};
 
 		service = proxyquire( modulePath, {
@@ -65,6 +66,18 @@ describe( 'Backend Service', () => {
 			service.getBarriers( req );
 
 			expect( backend.get ).toHaveBeenCalledWith( '/barriers/', token );
+		} );
+	} );
+
+	describe( 'saveContact', () => {
+		it( 'Should call the correct path', () => {
+
+			const barrierId = '1';
+			const contactId = uuid();
+
+			service.saveContact( req, barrierId, contactId );
+
+			expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/`, token, { contact_id: contactId } );
 		} );
 	} );
 } );

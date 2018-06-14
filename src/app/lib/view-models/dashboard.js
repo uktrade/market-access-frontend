@@ -7,7 +7,7 @@ function updateStatus( item ){
 	item.problem_status = {
 		id,
 		name: metadata.statusTypes[ id ],
-		isEmergency: ( id === '1' || id === '2' )
+		isEmergency: item.is_emergency
 	};
 
 	return item;
