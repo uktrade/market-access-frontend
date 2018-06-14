@@ -21,7 +21,7 @@ module.exports = ( csrfToken, sessionValues = {} ) => {
 
 	return {
 		csrfToken,
-		losses: metadata.lossScale.map( isMatching( sessionValues.status ) ),
-		otherCompanies: metadata.boolScale.map( isMatching( sessionValues.emergency ) )
+		losses: lossScale.map( isMatching( sessionValues.losses ) ),
+		otherCompanies: boolScale.map( isMatching( sessionValues.otherCompanies ) )
 	};
 };
