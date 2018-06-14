@@ -30,6 +30,10 @@ function makeRequest( method, path, opts = {} ){
 
 		logger.debug( `Sending ${ method } request to: ${ uri }` );
 
+		if( opts.body ){
+			logger.debug( 'With body: ' + JSON.stringify( opts.body, null, 2 ) );
+		}
+
 		request( requestOptions, ( err, response, body ) => {
 
 			if( err ){

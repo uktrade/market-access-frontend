@@ -90,12 +90,20 @@ module.exports = {
 		try {
 
 			const { response, body } = await backend.saveNewReport( req, req.session.startFormValues, sessionCompany );
-			const isExit = ( req.body.action === 'exit' );
 
 			if( response.isSuccess ){
 
 				delete req.session.startFormValues;
-				res.redirect( isExit ? urls.index() : urls.report.contacts( body.id, companyId ) );
+
+				if( !body.id ){
+
+					next( new Error( 'No id created for report' ) );
+
+				} else {
+
+					const isExit = ( req.body.action === 'exit' );
+					res.redirect( isExit ? urls.index() : urls.report.contacts( body.id, companyId ) );
+				}
 
 			} else {
 

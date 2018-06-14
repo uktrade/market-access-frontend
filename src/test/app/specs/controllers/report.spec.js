@@ -300,7 +300,7 @@ describe( 'Report controller', () => {
 			} );
 
 			describe( 'When the POSTed company matches the session', () => {
-				describe( 'When the response is a success', () => {
+				describe( 'When the response is a success and there is an id in the response', () => {
 
 					beforeEach( () => {
 
@@ -310,45 +310,55 @@ describe( 'Report controller', () => {
 					} );
 
 					describe( 'When the action is exit', () => {
-						it( 'Should delete the session values and redirect to the dashboard', async ( done ) => {
+						it( 'Should delete the session values and redirect to the dashboard', async () => {
 
 							const indexResponse = '/index';
 
 							urls.index.and.callFake( () => indexResponse );
 							req.body.action = 'exit';
 
-							await controller.saveNew( req, res, done.fail );
+							await controller.saveNew( req, res, next );
 
-							process.nextTick( () => {
-
-								expect( backend.saveNewReport ).toHaveBeenCalledWith( req, sessionValues, reportCompany );
-								expect( typeof req.session.startFormValues ).toEqual( 'undefined' );
-								expect( typeof req.session.reportCompany ).toEqual( 'undefined' );
-								expect( res.redirect ).toHaveBeenCalledWith( indexResponse );
-								expect( next ).not.toHaveBeenCalled(),
-								done();
-							} );
+							expect( backend.saveNewReport ).toHaveBeenCalledWith( req, sessionValues, reportCompany );
+							expect( typeof req.session.startFormValues ).toEqual( 'undefined' );
+							expect( typeof req.session.reportCompany ).toEqual( 'undefined' );
+							expect( res.redirect ).toHaveBeenCalledWith( indexResponse );
+							expect( next ).not.toHaveBeenCalled();
 						} );
 					} );
 
 					describe( 'When the action is not specified', () => {
-						it( 'Should delete the session values and redirect to the next step', async ( done ) => {
+						describe( 'When there is an id in the response', () => {
+							it( 'Should delete the session values and redirect to the next step', async () => {
 
-							const contactResponse = '/index';
+								const contactResponse = '/index';
 
-							urls.report.contacts.and.callFake( () => contactResponse );
+								urls.report.contacts.and.callFake( () => contactResponse );
 
-							await controller.saveNew( req, res, done.fail );
-
-							process.nextTick( () => {
+								await controller.saveNew( req, res, next );
 
 								expect( backend.saveNewReport ).toHaveBeenCalledWith( req, sessionValues, reportCompany );
 								expect( typeof req.session.startFormValues ).toEqual( 'undefined' );
 								expect( typeof req.session.reportCompany ).toEqual( 'undefined' );
 								expect( res.redirect ).toHaveBeenCalledWith( contactResponse );
-								expect( next ).not.toHaveBeenCalled(),
-								done();
+								expect( next ).not.toHaveBeenCalled();
 							} );
+						} );
+					} );
+
+					describe( 'When there is NOT an id in the response', () => {
+						it( 'Should delete the session values and call next with an error', async () => {
+
+							const promise = Promise.resolve( { response: { isSuccess: true }, body: {} } );
+							backend.saveNewReport.and.callFake( () => promise );
+
+							await controller.saveNew( req, res, next );
+
+							expect( backend.saveNewReport ).toHaveBeenCalledWith( req, sessionValues, reportCompany );
+							expect( typeof req.session.startFormValues ).toEqual( 'undefined' );
+							expect( typeof req.session.reportCompany ).toEqual( 'undefined' );
+							expect( next ).toHaveBeenCalledWith( new Error( 'No id created for report' ) );
+							expect( res.redirect ).not.toHaveBeenCalled();
 						} );
 					} );
 				} );
