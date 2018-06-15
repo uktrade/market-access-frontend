@@ -1,9 +1,13 @@
+{% from 'frontend/components/back-link/macro.njk' import govukBackLink %}
 {% from 'components/search-form.njk' import searchForm %}
+
 {% extends 'layout.njk' %}
 
 {% block page_title %}{{ super() }} - Report - Search for company{% endblock %}
 
 {% block page_content %}
+
+		{{ govukBackLink({ href: urls.report.start( barrier.id ) }) }}
 
 		<h1 class="govuk-heading-l">
 			<span class="govuk-caption-m">Report a barrier</span> Export company affected
@@ -20,7 +24,7 @@
 					},
 					input: {
 						id: 'company',
-						name: 'q',
+						name: 'company',
 						value: query,
 						placeholder: 'Search for company'
 					}
@@ -37,7 +41,7 @@
 				<ul class="company-card-list">
 				{% for company in results.results %}
 					<li class="company-card">
-						<a href="{{ urls.report.company( company.id ) }}" class="company-card__link">
+						<a href="{{ urls.report.companyDetails( company.id, barrier.id ) }}" class="company-card__link">
 
 							<h3 class="company-card__heading">{{ company.name | highlight( query ) | safe }}</h3>
 							<dl class="company-card__values">

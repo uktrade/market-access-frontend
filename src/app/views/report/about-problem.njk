@@ -1,12 +1,15 @@
 {% from 'frontend/components/input/macro.njk' import govukInput %}
 {% from 'frontend/components/textarea/macro.njk' import govukTextarea %}
 {% from 'frontend/components/radios/macro.njk' import govukRadios %}
+{% from 'frontend/components/back-link/macro.njk' import govukBackLink %}
 
 {% extends 'layout.njk' %}
 
 {% block page_title %}{{ super() }} - Report - About the problem{% endblock %}
 
 {% block page_content %}
+
+	{{ govukBackLink({ href: urls.report.contacts( barrier.company_id, barrier.id ) }) }}
 
 	<h1 class="govuk-heading-l">
 		<span class="govuk-caption-m">Report a barrier</span> About the problem

@@ -12,7 +12,7 @@ describe( 'Backend Service', () => {
 	beforeEach( () => {
 
 		token = uuid();
-		req = { session: { ssoToken: token} };
+		req = { session: { ssoToken: token } };
 		backend = {
 			get: jasmine.createSpy( 'backend.get' ),
 			post: jasmine.createSpy( 'backend.post' ),
@@ -42,24 +42,6 @@ describe( 'Backend Service', () => {
 		} );
 	} );
 
-	describe( 'saveNewReport', () => {
-		it( 'Should POST to the correct path', () => {
-
-			const status = 1;
-			const emergency = 2;
-			const company = { id: 3, name: 'test company' };
-
-			service.saveNewReport( req, { status, emergency }, company );
-
-			expect( backend.post ).toHaveBeenCalledWith( '/barriers/', token, {
-				problem_status: status,
-				is_emergency: emergency,
-				company_id: company.id,
-				company_name: company.name
-			} );
-		} );
-	} );
-
 	describe( 'getBarriers', () => {
 		it( 'Should call the correct path', () => {
 
@@ -69,15 +51,55 @@ describe( 'Backend Service', () => {
 		} );
 	} );
 
-	describe( 'saveContact', () => {
+	describe( 'getBarrier', () => {
 		it( 'Should call the correct path', () => {
 
-			const barrierId = '1';
-			const contactId = uuid();
+			const barrierId = 1;
 
-			service.saveContact( req, barrierId, contactId );
+			service.getBarrier( req, barrierId );
 
-			expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/`, token, { contact_id: contactId } );
+			expect( backend.get ).toHaveBeenCalledWith( `/barriers/${ barrierId }/`, token );
+		} );
+	} );
+
+	describe( 'saveNewBarrier', () => {
+		it( 'Should POST to the correct path', () => {
+
+			const status = 1;
+			const emergency = 2;
+			const company = { id: 3, name: 'test company' };
+			const contactId = '123-abc';
+
+			service.saveNewBarrier( req, { status, emergency }, company, contactId );
+
+			expect( backend.post ).toHaveBeenCalledWith( '/barriers/', token, {
+				problem_status: status,
+				is_emergency: emergency,
+				company_id: company.id,
+				company_name: company.name,
+				contact_id: contactId
+			} );
+		} );
+	} );
+
+	describe( 'updateBarrier', () => {
+		it( 'Should POST to the correct path', () => {
+
+			const status = 1;
+			const emergency = 2;
+			const company = { id: 3, name: 'test company' };
+			const contactId = '123-abc';
+			const barrierId = '2';
+
+			service.updateBarrier( req, barrierId, { status, emergency }, company, contactId );
+
+			expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/`, token, {
+				problem_status: status,
+				is_emergency: emergency,
+				company_id: company.id,
+				company_name: company.name,
+				contact_id: contactId
+			} );
 		} );
 	} );
 } );

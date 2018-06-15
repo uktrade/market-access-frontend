@@ -21,6 +21,7 @@
 			</span>
 		</a>
 
+		{% if barriers.length %}
 		<div class="inline-tabs">
 
 			<div class="inline-tabs__content" id="inline-tab-1">
@@ -51,7 +52,7 @@
 								{{ ( barrier.created_on | dateOnly ) or ( '<span class="unknown">unknown</span>' | safe ) }}
 							</td>
 							<td class="standard-table__cell">
-								<a href="{{ urls.report.contacts( barrier.id, barrier.company_id ) }}">Continue</a>
+								<a href="{{ urls.report.contacts( barrier.company_id, barrier.id ) }}">Continue</a>
 							</td>
 						</tr>
 						{% endfor %}
@@ -59,4 +60,5 @@
 				</table>
 			</div>
 		</div>
+		{% endif %}
 {% endblock %}

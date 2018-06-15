@@ -14,7 +14,10 @@ describe( 'hasStartFormValues middleware', () => {
 	beforeEach( () => {
 
 		req = {
-			session: {}
+			session: {},
+			params: {
+				barrierId: '2'
+			}
 		};
 		res = {
 			redirect: jasmine.createSpy( 'res.redirect' )
@@ -47,6 +50,7 @@ describe( 'hasStartFormValues middleware', () => {
 			middleware( req, res, next );
 
 			expect( next ).not.toHaveBeenCalled();
+			expect( start ).toHaveBeenCalledWith( req.params.barrierId );
 			expect( res.redirect ).toHaveBeenCalledWith( startUrlResponse );
 		} );
 	} );

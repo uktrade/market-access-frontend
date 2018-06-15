@@ -7,6 +7,7 @@ const aboutProblemViewModel = require( '../lib/view-models/report/about-problem'
 module.exports = {
 
 	index: ( req, res ) => res.render( 'report/index' ),
+
 	start: ( req, res ) => {
 
 		if( req.method === 'POST' ){
@@ -16,7 +17,7 @@ module.exports = {
 			//TODO: validate input
 			req.session.startFormValues = { status, emergency };
 
-			res.redirect( urls.report.company() );
+			res.redirect( urls.report.companySearch( req.params.barrierId ) );
 
 		} else {
 
@@ -26,7 +27,7 @@ module.exports = {
 
 	companySearch: async ( req, res, next ) => {
 
-		const query = req.query.q;
+		const query = req.query.company;
 		const data = {};
 
 		//TODO: Validate search term
@@ -63,56 +64,28 @@ module.exports = {
 
 	companyDetails: ( req, res ) => {
 
-		const { id, name } = req.company;
-		req.session.reportCompany = { id, name };
+		if( req.method === 'POST' ){
 
-		res.render( 'report/company-details', {
-			csrfToken: req.csrfToken()
-		} );
-	},
+			const companyId = req.body.companyId;
+			const barrierId = req.params.barrierId;
 
-	saveNew: async ( req, res, next ) => {
+			if( companyId === req.session.reportCompany.id ){
 
-		const companyId = req.body.companyId;
-		const sessionCompany = req.session.reportCompany;
-		//TODO: Validate company id
-
-		if( !sessionCompany ){
-			return res.redirect( urls.report.company() );
-		}
-
-		if( companyId !== sessionCompany.id ){
-			return next( new Error( 'Company id does\'t match session' ) );
-		}
-
-		delete req.session.reportCompany;
-
-		try {
-
-			const { response, body } = await backend.saveNewReport( req, req.session.startFormValues, sessionCompany );
-
-			if( response.isSuccess ){
-
-				delete req.session.startFormValues;
-
-				if( !body.id ){
-
-					next( new Error( 'No id created for report' ) );
-
-				} else {
-
-					const isExit = ( req.body.action === 'exit' );
-					res.redirect( isExit ? urls.index() : urls.report.contacts( body.id, companyId ) );
-				}
+				res.redirect( urls.report.contacts( companyId, barrierId ) );
 
 			} else {
 
-				next( new Error( `Unable to save report, got ${ response.statusCode } response code` ) );
+				res.redirect( urls.report.companySearch( barrierId ) );
 			}
 
-		} catch( e ){
+		} else {
 
-			next( e );
+			const { id, name } = req.company;
+			req.session.reportCompany = { id, name };
+
+			res.render( 'report/company-details', {
+				csrfToken: req.csrfToken()
+			} );
 		}
 	},
 
@@ -123,33 +96,51 @@ module.exports = {
 		res.render( 'report/contact-details', { csrfToken: req.csrfToken() } );
 	},
 
-	saveContact: async ( req, res, next ) => {
+	save: async ( req, res, next ) => {
 
-		const barrierId = req.params.barrierId;
 		const contactId = req.body.contactId;
 		const sessionContact = req.session.reportContact;
+		const barrierId = req.params.barrierId;
+		const sessionStartForm = ( req.session.startFormValues || req.barrier && { status: req.barrier.status, emergency: req.barrier.is_emergency } );
+		const sessionCompany =  ( req.session.reportCompany || req.barrier && { id: req.barrier.company_id, name: req.barrier.company_name } );
+		const isBarrier = !!barrierId;
+		//TODO: Validate company id
 
-		if( !barrierId || !sessionContact ){ return res.redirect( urls.index() ); }
+		if( !sessionContact ){ return res.redirect( urls.report.contacts( sessionCompany.id ) ); }
 
 		if( contactId !== sessionContact ){
 			return next( new Error( 'Contact id doesn\'t match session' ) );
 		}
 
-		delete req.session.reportContact;
-
 		try {
 
-			const { response } = await backend.saveContact( req, barrierId, sessionContact );
+			let response;
+			let body;
+
+			if( isBarrier ){
+				({ response, body } = await backend.updateBarrier( req, barrierId, sessionStartForm, sessionCompany, sessionContact ));
+			} else {
+				({ response, body } = await backend.saveNewBarrier( req, sessionStartForm, sessionCompany, sessionContact ));
+			}
+
+			delete req.session.reportCompany;
+			delete req.session.reportContact;
 
 			if( response.isSuccess ){
 
-				const isExit = ( req.body.action === 'exit' );
-				delete req.session.reportContact;
-				res.redirect( isExit ? urls.index() : urls.report.aboutProblem( barrierId ) );
+				if( !isBarrier && !body.id ){
+
+					next( new Error( 'No id created for report' ) );
+
+				} else {
+
+					req.session.barrier = body;
+					res.redirect( urls.report.aboutProblem( body.id ) );
+				}
 
 			} else {
 
-				next( new Error( `Unable to save contact, got ${ response.statusCode } response code` ) );
+				next( new Error( `Unable to ${ isBarrier ? 'update' : 'save' } report, got ${ response.statusCode } response code` ) );
 			}
 
 		} catch( e ){

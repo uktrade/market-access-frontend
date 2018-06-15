@@ -5,12 +5,12 @@ module.exports = {
 
 	report: {
 		index: () => '/report/',
-		start: () => '/report/start/',
-		company: ( companyId ) => `/report/company/${ companyId ? companyId + '/' : '' }`,
-		saveNew: () => '/report/new/',
-		contacts: ( barrierId, companyId ) => `/report/${ barrierId }/company/${ companyId }/contacts/`,
-		viewContact: ( barrierId, contactId ) => `/report/${ barrierId }/contact/${ contactId }/`,
-		saveContact: ( barrierId ) => `/report/${ barrierId }/save/contact/`,
+		start: ( barrierId ) => `/report/${ barrierId ? barrierId + '/' : '' }start/`,
+		companySearch: ( barrierId ) => `/report/${ barrierId ? barrierId + '/' : '' }company/`,
+		companyDetails: ( companyId, barrierId ) => `/report/${ barrierId ? barrierId + '/' : '' }company/${ companyId }/`,
+		contacts: ( companyId, barrierId ) => `/report/${ barrierId ? barrierId + '/' : '' }company/${ companyId }/contacts/`,
+		viewContact: ( contactId, barrierId ) => `/report/${ barrierId ? barrierId + '/' : '' }contact/${ contactId }/`,
+		save: ( barrierId ) => `/report/${ barrierId ? barrierId + '/' : '' }save/`,
 		aboutProblem: ( barrierId ) => `/report/${ barrierId }/problem/`
 	}
 };

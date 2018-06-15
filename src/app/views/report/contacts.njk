@@ -1,3 +1,4 @@
+{% from 'frontend/components/back-link/macro.njk' import govukBackLink %}
 {% from 'frontend/components/warning-text/macro.njk' import govukWarningText %}
 
 {% extends 'layout.njk' %}
@@ -5,6 +6,8 @@
 {% block page_title %}{{ super() }} - Report - Company contacts{% endblock %}
 
 {% block page_content %}
+
+	{{ govukBackLink({ href: urls.report.companySearch( barrier.id ) }) }}
 
 	<h1 class="govuk-heading-l">
 		<span class="govuk-caption-m">Report a barrier</span> About the reporter
@@ -30,7 +33,7 @@
 	<ul class="contact-list restrict-width">
 		{% for contact in company.contacts %}
 			<li class="contact-list__item">
-				<a href="{{ urls.report.viewContact( barrierId, contact.id ) }}" class="contact-list__item__link">
+				<a href="{{ urls.report.viewContact( contact.id, barrier.id ) }}" class="contact-list__item__link">
 					<span class="contact-list__item__name">{{ contact.name }}</span>
 					<span class="contact-list__item__sub-key">Job title: </span><span class="contact-list__item__sub-value">{{ contact.job_title }}</span>
 				</a>

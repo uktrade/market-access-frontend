@@ -1,3 +1,4 @@
+{% from 'frontend/components/back-link/macro.njk' import govukBackLink %}
 {% from 'components/details-list.njk' import detailsList %}
 
 {% extends 'layout.njk' %}
@@ -5,6 +6,8 @@
 {% block page_title %}{{ super() }} - Report - Company details{% endblock %}
 
 {% block page_content %}
+
+		{{ govukBackLink({ href: urls.report.companySearch( barrier.id ) }) }}
 
 		<h1 class="govuk-heading-l">
 			<span class="govuk-caption-m">Report a barrier</span> Export company affected
@@ -49,22 +52,16 @@
 				}
 			] ) }}
 
-			<form action="{{ urls.report.saveNew() }}" method="POST">
+			<form action="{{ urls.report.companySearch( barrier.id ) }}" method="POST">
 				<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 				<input type="hidden" name="companyId" value="{{ company.id }}">
-				<input type="submit" class="govuk-button" value="Save and continue">
-			</form>
-			<form action="{{ urls.report.saveNew() }}" method="POST">
-				<input type="hidden" name="_csrf" value="{{ csrfToken }}">
-				<input type="hidden" name="companyId" value="{{ company.id }}">
-				<input type="hidden" name="action" value="exit">
-				<input type="submit" class="govuk-button button--secondary" value="Save and exit">
+				<input type="submit" class="govuk-button" value="Continue">
 			</form>
 
 		</section>
 
 		<span class="govuk-heading-s">Or</span>
 
-		<a href="{{ urls.report.company() }}">Search again</a>
+		<a href="{{ urls.report.companySearch( barrierId ) }}">Search again</a>
 
 {% endblock %}

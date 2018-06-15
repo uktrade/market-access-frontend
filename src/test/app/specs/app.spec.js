@@ -3,7 +3,6 @@ const proxyquire = require( 'proxyquire' );
 const winston = require( 'winston' );
 const nock = require( 'nock' );
 
-const config = require( '../../../app/config' );
 const urls = require( '../../../app/lib/urls' );
 const logger = require( '../../../app/lib/logger' );
 const modulePath = '../../../app/app';
@@ -111,13 +110,33 @@ describe( 'App', function(){
 			} );
 
 			describe( 'Start page', () => {
-				it( 'Should render the start page', ( done ) => {
+				describe( 'Without a barrierId', () => {
+					it( 'Should render the start page', ( done ) => {
 
-					app.get( urls.report.start() ).end( ( err, res ) => {
+						app.get( urls.report.start() ).end( ( err, res ) => {
 
-						checkResponse( res, 200 );
-						expect( getTitle( res ) ).toEqual( 'Market Access - Report - Status of the problem' );
-						done();
+							checkResponse( res, 200 );
+							expect( getTitle( res ) ).toEqual( 'Market Access - Report - Status of the problem' );
+							done();
+						} );
+					} );
+				} );
+
+				describe( 'With a barrierId', () => {
+					it( 'Should fetch the barrier and render the start page', ( done ) => {
+
+						const barrierId = '1';
+
+						intercept.backend()
+							.get( `/barriers/${ barrierId }/` )
+							.reply( 200, intercept.stub( '/backend/barriers/barrier' ) );
+
+						app.get( urls.report.start( barrierId ) ).end( ( err, res ) => {
+
+							checkResponse( res, 200 );
+							expect( getTitle( res ) ).toEqual( 'Market Access - Report - Status of the problem' );
+							done();
+						} );
 					} );
 				} );
 			} );
@@ -137,7 +156,7 @@ describe( 'App', function(){
 					agent.get( urls.report.start() )
 						.end( ( err, res ) => {
 
-							token = getCsrfToken( res, done );
+							token = getCsrfToken( res, done.fail );
 							done();
 						} );
 				} );
@@ -151,7 +170,7 @@ describe( 'App', function(){
 
 				it( 'Should render the company search page', ( done ) => {
 
-					agent.get( urls.report.company() ).end( ( err, res ) => {
+					agent.get( urls.report.companySearch() ).end( ( err, res ) => {
 
 						checkResponse( res, 200 );
 						expect( getTitle( res ) ).toEqual( 'Market Access - Report - Search for company' );
@@ -174,7 +193,7 @@ describe( 'App', function(){
 					agent.get( urls.report.start() )
 						.end( ( err, res ) => {
 
-							const token = getCsrfToken( res, done );
+							const token = getCsrfToken( res, done.fail );
 
 							agent.post( urls.report.start() )
 								.send( `_csrf=${ token }&status=1&emergency=2` )
@@ -184,7 +203,13 @@ describe( 'App', function(){
 
 				afterEach( () => {
 
-					expect( nock.isDone() ).toEqual( true );
+					const isDone = nock.isDone();
+
+					expect( isDone ).toEqual( true );
+
+					if( !isDone ){
+						console.log( nock.pendingMocks() );
+					}
 				} );
 
 				describe( 'With a success', () => {
@@ -194,7 +219,7 @@ describe( 'App', function(){
 							.get( `/v3/company/${ companyId }` )
 							.reply( 200, intercept.stub( '/datahub/company/detail' ) );
 
-						agent.get( urls.report.company( companyId ) )
+						agent.get( urls.report.companyDetails( companyId ) )
 							.end( ( err, res ) => {
 
 							checkResponse( res, 200 );
@@ -207,11 +232,12 @@ describe( 'App', function(){
 				describe( 'With an error', () => {
 					it( 'Should render the error page', ( done ) => {
 
-						nock( config.datahub.url )
+						intercept.datahub()
 							.get( `/v3/company/${ companyId }` )
 							.reply( 500, {} );
 
-						app.get( urls.report.company( companyId ) ).end( ( err, res ) => {
+						app.get( urls.report.companyDetails( companyId ) )
+							.end( ( err, res ) => {
 
 							checkResponse( res, 500 );
 							expect( getTitle( res ) ).toEqual( 'Market Access - Error' );
@@ -222,15 +248,62 @@ describe( 'App', function(){
 			} );
 
 			describe( 'Company contacts', () => {
-				it( 'Should render the contacts page', ( done ) => {
 
-					const companyId = 'abc-123';
+				let companyId;
+				let agent;
+
+				beforeEach( async ( done ) => {
+
+					companyId = 'd829a9c6-cffb-4d6a-953b-3e02a2b33028';
 
 					intercept.datahub()
 						.get( `/v3/company/${ companyId }` )
 						.reply( 200, intercept.stub( '/datahub/company/detail' ) );
 
-					app.get( urls.report.contacts( '1', companyId ) )
+					agent = supertest.agent( await appModule.create() );
+
+					agent.get( urls.report.start() )
+						.end( ( err, res ) => {
+
+							if( err ){ return done.fail( err ); }
+
+							const token = getCsrfToken( res, done.fail );
+
+							agent.post( urls.report.start() )
+								.send( `_csrf=${ token }&status=1&emergency=2` )
+								.expect( 302 )
+								.end( ( err ) => {
+
+									if( err ){ return done.fail( err ); }
+
+									agent.get( urls.report.companyDetails( companyId ) )
+										.expect( 200 )
+										.end( ( err, res ) => {
+
+											if( err ){ return done.fail( err ); }
+
+											const token = getCsrfToken( res, done.fail );
+
+											agent.post( urls.report.companySearch() )
+												.send( `_csrf=${ token }&companyId=${ companyId }` )
+												.expect( 302, done );
+										} );
+								} );
+						} );
+				} );
+
+				afterEach( () => {
+
+					expect( nock.isDone() ).toEqual( true );
+				} );
+
+				it( 'Should render the contacts page', ( done ) => {
+
+					intercept.datahub()
+						.get( `/v3/company/${ companyId }` )
+						.reply( 200, intercept.stub( '/datahub/company/detail' ) );
+
+					agent.get( urls.report.contacts( companyId ) )
 							.end( ( err, res ) => {
 
 							checkResponse( res, 200 );

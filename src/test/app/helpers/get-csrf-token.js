@@ -1,4 +1,4 @@
-module.exports = ( res, done ) => {
+module.exports = ( res, fail ) => {
 
 	const matches = /"_csrf" value="(.+?)"/.exec( res.text );
 
@@ -8,6 +8,6 @@ module.exports = ( res, done ) => {
 
 	} else {
 
-		done.fail();
+		fail();
 	}
 };

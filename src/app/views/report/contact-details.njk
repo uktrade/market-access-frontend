@@ -1,3 +1,4 @@
+{% from 'frontend/components/back-link/macro.njk' import govukBackLink %}
 {% from 'components/details-list.njk' import detailsList %}
 
 {% extends 'layout.njk' %}
@@ -5,6 +6,8 @@
 {% block page_title %}{{ super() }} - Report - Contact details{% endblock %}
 
 {% block page_content %}
+
+		{{ govukBackLink({ href: urls.report.contacts( contact.company.id, barrier.id ) }) }}
 
 		<h1 class="govuk-heading-l">
 			<span class="govuk-caption-m">Report a barrier</span> About the reporter
@@ -38,16 +41,11 @@
 			</pre>
 #}
 
-			<form action="{{ urls.report.saveContact( barrierId ) }}" method="POST">
+			<form action="{{ urls.report.save( barrier.id ) }}" method="POST">
 				<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 				<input type="hidden" name="contactId" value="{{ contact.id }}">
 				<input type="submit" class="govuk-button" value="Save and continue">
-			</form>
-			<form action="{{ urls.report.saveContact( barrierId ) }}" method="POST">
-				<input type="hidden" name="_csrf" value="{{ csrfToken }}">
-				<input type="hidden" name="contactId" value="{{ contact.id }}">
-				<input type="hidden" name="action" value="exit">
-				<input type="submit" class="govuk-button button--secondary" value="Save and exit">
+				<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>
 			</form>
 
 		</section>

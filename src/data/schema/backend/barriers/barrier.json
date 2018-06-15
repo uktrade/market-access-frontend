@@ -1,0 +1,21 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Detail of a barrier",
+
+	"type": "object",
+	"required": [ "id", "company_name" ],
+	"properties": {
+
+		"id": {
+			"type": "number",
+			"faker": {
+				"finance.amount": [ 0, 100, 0 ]
+			}
+		},
+
+		"company_name": {
+			"type": "string",
+			"faker": "lorem.words"
+		}
+	}
+}
