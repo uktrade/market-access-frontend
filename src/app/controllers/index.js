@@ -1,4 +1,23 @@
-module.exports = async ( req, res ) => {
+const backend = require( '../lib/backend-service' );
+const dashboardViewModel = require( '../lib/view-models/dashboard' );
 
-	res.render( 'index' );
+module.exports = async ( req, res, next ) => {
+
+	try {
+
+		const { response, body } = await backend.getReports( req );
+
+		if( response.isSuccess ){
+
+			res.render( 'index', dashboardViewModel( body.results ) );
+
+		} else {
+
+			throw new Error( `Got ${ response.statusCode } response from backend` );
+		}
+
+	} catch( e ){
+
+		next( e );
+	}
 };

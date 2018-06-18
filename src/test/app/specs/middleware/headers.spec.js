@@ -28,7 +28,6 @@ describe( 'headers middleware', function(){
 		expect( args[ 5 ] ).toEqual( [ 'Cache-Control', 'no-cache, no-store' ] );
 	}
 
-
 	describe( 'Dev mode', function(){
 
 		beforeEach( function(){
@@ -37,7 +36,6 @@ describe( 'headers middleware', function(){
 		} );
 
 		describe( 'All headers', function(){
-
 			it( 'Should add the correct headers for all requests', function(){
 
 				middleware( req, res, next );
@@ -56,7 +54,6 @@ describe( 'headers middleware', function(){
 		} );
 
 		describe( 'All headers', function(){
-
 			it( 'Should add the correct headers for all requests', function(){
 
 				middleware( req, res, next );

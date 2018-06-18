@@ -1,0 +1,35 @@
+.contact-list {
+	list-style: none;
+	padding: 0;
+}
+
+.contact-list__item {
+	margin-bottom: govuk-em( 15, 16 );
+}
+
+.contact-list__item__link {
+
+	padding: govuk-em( 10, 16 );
+	border: 1px solid $govuk-grey-2;
+	display: block;
+	text-decoration: none;
+
+	&:focus {
+		background-color: $govuk-grey-4;
+	}
+}
+
+.contact-list__item__name {
+	display: block;
+	font-weight: bold;
+}
+
+.contact-list__item__sub-key {
+	color: $govuk-grey-1;
+	@include govuk-font-regular-14;
+}
+
+.contact-list__item__sub-value {
+	color: $govuk-black;
+	@include govuk-font-regular-14;
+}

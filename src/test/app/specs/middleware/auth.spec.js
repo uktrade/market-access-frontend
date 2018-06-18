@@ -13,7 +13,6 @@ describe( 'auth middleware', () => {
 	} );
 
 	describe( 'For the index page', () => {
-
 		beforeEach( () => {
 
 			req.url = '/';
@@ -21,7 +20,6 @@ describe( 'auth middleware', () => {
 		} );
 
 		describe( 'When there is an ssoToken in the session', () => {
-
 			it( 'Should call next', () => {
 
 				req.session.ssoToken = 'mytoken';
@@ -32,7 +30,6 @@ describe( 'auth middleware', () => {
 		} );
 
 		describe( 'When there is NOT an ssoToken in the session', () => {
-
 			it( 'Should redirect to the login page', () => {
 
 				auth( req, res, next );
@@ -44,9 +41,7 @@ describe( 'auth middleware', () => {
 	} );
 
 	describe( 'Login paths', () => {
-
 		describe( 'root', () => {
-
 			it( 'Should call next', () => {
 
 				req.url = '/login/';
@@ -57,7 +52,6 @@ describe( 'auth middleware', () => {
 		} );
 
 		describe( 'callback', () => {
-
 			it( 'Should call next', () => {
 
 				req.url = '/login/callback/';
@@ -65,6 +59,6 @@ describe( 'auth middleware', () => {
 
 				expect( next ).toHaveBeenCalled();
 			} );
-		} );		
+		} );
 	} );
 } );

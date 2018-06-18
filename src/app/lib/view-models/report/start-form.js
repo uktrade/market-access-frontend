@@ -1,6 +1,7 @@
 const metadata = require( '../../metadata' );
+const radioItemsFromObj = require( '../../radio-items-from-object' );
 
-const statusTypes = [];
+let statusTypes;
 
 const emergencyTypes = [
 	{
@@ -25,15 +26,9 @@ function isMatching( sessionValue ){
 
 module.exports = ( csrfToken, sessionValues = {} ) => {
 
-	if( !statusTypes.length ){
+	if( !statusTypes ){
 
-		for( let [ key, value ] of Object.entries( metadata.getStatusTypes() ) ){
-
-			statusTypes.push( {
-				value: key,
-				text: value
-			} );
-		}
+		statusTypes = radioItemsFromObj( metadata.statusTypes );
 	}
 
 	return {

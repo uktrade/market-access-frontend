@@ -14,7 +14,10 @@ describe( 'hasStartFormValues middleware', () => {
 	beforeEach( () => {
 
 		req = {
-			session: {}
+			session: {},
+			params: {
+				reportId: '2'
+			}
 		};
 		res = {
 			redirect: jasmine.createSpy( 'res.redirect' )
@@ -28,7 +31,6 @@ describe( 'hasStartFormValues middleware', () => {
 	} );
 
 	describe( 'When there is a startFormValues object in the session', () => {
-
 		it( 'Should call next', () => {
 
 			req.session.startFormValues = {
@@ -43,12 +45,12 @@ describe( 'hasStartFormValues middleware', () => {
 	} );
 
 	describe( 'When there is not a startFormValues object in the session', () => {
-
 		it( 'Should redirect to the start page', () => {
 
 			middleware( req, res, next );
 
 			expect( next ).not.toHaveBeenCalled();
+			expect( start ).toHaveBeenCalledWith( req.params.reportId );
 			expect( res.redirect ).toHaveBeenCalledWith( startUrlResponse );
 		} );
 	} );

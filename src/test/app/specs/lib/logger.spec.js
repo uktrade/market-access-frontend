@@ -27,7 +27,6 @@ function createLogger( isDev = false ){
 }
 
 describe( 'logger', function(){
-
 	it( 'Creates a logger with the correct log level', function(){
 
 		createLogger();
@@ -37,7 +36,6 @@ describe( 'logger', function(){
 	} );
 
 	describe( 'In production', function(){
-
 		it( 'Should set colorize to false', function(){
 
 			createLogger( false );
@@ -47,7 +45,6 @@ describe( 'logger', function(){
 	} );
 
 	describe( 'In development', function(){
-
 		it( 'Should set colorize to true', function(){
 
 			createLogger( true );

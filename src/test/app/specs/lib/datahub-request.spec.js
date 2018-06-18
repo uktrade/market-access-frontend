@@ -53,9 +53,7 @@ describe( 'datahub Request', () => {
 	} );
 
 	describe( 'Missing parameters', () => {
-
 		describe( 'Without a path', () => {
-
 			it( 'Should throw an error', () => {
 
 				expect( () => {
@@ -67,7 +65,6 @@ describe( 'datahub Request', () => {
 		} );
 
 		describe( 'Without a token', () => {
-
 			it( 'Should throw an error', () => {
 
 				expect( () => {
@@ -80,11 +77,8 @@ describe( 'datahub Request', () => {
 	} );
 
 	describe( 'Without an error', () => {
-
 		describe( 'get', () => {
-
 			describe( 'With a 200 statusCode', () => {
-
 				it( 'Should resolve', ( done ) => {
 
 					const path = '/whoami/';
@@ -102,7 +96,6 @@ describe( 'datahub Request', () => {
 			} );
 
 			describe( 'With a 404 statusCode', () => {
-
 				it( 'Should resolve', ( done ) => {
 
 					const path = '/whoami/';
@@ -122,7 +115,6 @@ describe( 'datahub Request', () => {
 			} );
 
 			describe( 'With a 400 statusCode', () => {
-
 				it( 'Should reject', ( done ) => {
 
 					const path = '/whoami/';
@@ -142,9 +134,7 @@ describe( 'datahub Request', () => {
 		} );
 
 		describe( 'post', () => {
-
 			describe( 'With a body', () => {
-
 				it( 'Should make a POST request with a body', ( done ) => {
 
 					const path = '/test/';
@@ -165,9 +155,7 @@ describe( 'datahub Request', () => {
 	} );
 
 	describe( 'With an error', () => {
-
 		describe( 'get', () => {
-
 			it( 'Should reject with the error', ( done ) => {
 
 				const mockError = new Error( 'Broken' );

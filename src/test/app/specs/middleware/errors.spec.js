@@ -35,7 +35,6 @@ describe( 'errors middleware', function(){
 	} );
 
 	describe( 'Errors middleware', function(){
-
 		describe( 'catchAll', function(){
 
 			beforeEach( function(){
@@ -44,7 +43,6 @@ describe( 'errors middleware', function(){
 			} );
 
 			describe( 'When the headers have been sent', function(){
-
 				it( 'Should call the next handler with the error', function(){
 
 					res.headersSent = true;
@@ -59,9 +57,7 @@ describe( 'errors middleware', function(){
 			} );
 
 			describe( 'When the headers have not been sent', function(){
-
 				describe( 'A generic error', function(){
-
 					it( 'Should log the error and send a response with the right status code', function(){
 
 						middleware.catchAll( err, req, res, next );
@@ -74,7 +70,6 @@ describe( 'errors middleware', function(){
 				} );
 
 				describe( 'A TOO_MANY_BYTES error', function(){
-
 					it( 'Should return a 413 status', function(){
 
 						const tooManyBytesError = new Error( 'Too many bytes' );
@@ -90,7 +85,6 @@ describe( 'errors middleware', function(){
 		} );
 
 		describe( '404', function(){
-
 			it( 'Should render the 404 page and send the right status code', function(){
 
 				middleware.handle404( req, res, next );

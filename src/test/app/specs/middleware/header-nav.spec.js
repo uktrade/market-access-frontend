@@ -33,9 +33,7 @@ function checkTypes( name ){
 }
 
 describe( 'Header Nav Middelware', () => {
-
 	describe( 'Calling with no args', () => {
-
 		it( 'Should return false for each item', () => {
 
 			const req = {};
@@ -54,7 +52,6 @@ describe( 'Header Nav Middelware', () => {
 	} );
 
 	describe( 'isDashboard', () => {
-
 		it( 'Should set dashboard to true', () => {
 
 			checkTypes( 'isDashboard' );
@@ -62,7 +59,6 @@ describe( 'Header Nav Middelware', () => {
 	} );
 
 	describe( 'isReport', () => {
-
 		it( 'Should set report to true', () => {
 
 			checkTypes( 'isReport' );
@@ -70,7 +66,6 @@ describe( 'Header Nav Middelware', () => {
 	} );
 
 	describe( 'isFind', () => {
-
 		it( 'Should set find to true', () => {
 
 			checkTypes( 'isFind' );

@@ -1,0 +1,46 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "List of reports",
+
+	"type": "object",
+	"required": [ "count", "results" ],
+	"properties": {
+
+		"count": {
+			"type": "number",
+			"faker": {
+				"finance.amount": [ 1, 10, 0 ]
+			}
+		},
+
+		"results": {
+			"type": "array",
+			"minItems": 1,
+			"maxItems": 5,
+			"items": {
+				"$ref": "#/refs/report"
+			}
+		}
+	},
+
+	"refs": {
+		"report": {
+			"type": "object",
+			"required": [ "id", "company_name" ],
+			"properties": {
+
+				"id": {
+					"type": "number",
+					"faker": {
+						"finance.amount": [ 0, 100, 0 ]
+					}
+				},
+
+				"company_name": {
+					"type": "string",
+					"faker": "lorem.words"
+				}
+			}
+		}
+	}
+}

@@ -1,16 +1,51 @@
+{% from 'frontend/components/back-link/macro.njk' import govukBackLink %}
+{% from 'frontend/components/warning-text/macro.njk' import govukWarningText %}
+
 {% extends 'layout.njk' %}
 
 {% block page_title %}{{ super() }} - Report - Company contacts{% endblock %}
 
 {% block page_content %}
 
+	{{ govukBackLink({ href: urls.report.companySearch( report.id ) }) }}
+
 	<h1 class="govuk-heading-l">
 		<span class="govuk-caption-m">Report a barrier</span> About the reporter
 	</h1>
 
-	Contacts:
+	<h2 class="govuk-heading-s">Who at {{ company.name }} raised the issue?</h2>
+	<p class="govuk-hint govuk-!-mb-r5">
+		Select who you have been in contact with at this company about the barrier
+	</p>
+
+	{% if not company.contacts.length %}
+
+		<div class="message-panel">
+			{{ govukWarningText(
+				{
+					text: "This company doesn't have any contacts yet. Please add one in Data Hub.",
+					iconFallbackText: "Warning"
+				})
+			}}
+		</div>
+
+	{% else %}
+	<ul class="contact-list restrict-width">
+		{% for contact in company.contacts %}
+			<li class="contact-list__item">
+				<a href="{{ urls.report.viewContact( contact.id, report.id ) }}" class="contact-list__item__link">
+					<span class="contact-list__item__name">{{ contact.name }}</span>
+					<span class="contact-list__item__sub-key">Job title: </span><span class="contact-list__item__sub-value">{{ contact.job_title }}</span>
+				</a>
+			</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
+
+{#
 	<pre>
-		{{ company.contacts | dump( 2 ) }}
+		{{ company | dump( 2 ) }}
 	</pre>
+#}
 
 {% endblock %}

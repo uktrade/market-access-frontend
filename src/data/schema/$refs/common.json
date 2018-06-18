@@ -1,0 +1,6 @@
+{
+	"uuid": {
+		"type": "string",
+		"faker": "random.uuid"
+	}
+}

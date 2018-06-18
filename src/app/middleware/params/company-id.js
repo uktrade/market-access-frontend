@@ -7,12 +7,19 @@ module.exports = async ( req, res, next, id ) => {
 
 		try {
 
-			const { body } = await datahub.getCompany( req, id );
+			const { response, body } = await datahub.getCompany( req, id );
 
-			req.company = body;
-			res.locals.company = body;
+			if( response.isSuccess ){
 
-			next();
+				req.company = body;
+				res.locals.company = body;
+
+				next();
+
+			} else {
+
+				throw new Error( 'Not a successful response from datahub' );
+			}
 
 		} catch( e ){
 

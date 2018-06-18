@@ -16,5 +16,8 @@ module.exports = {
 		const url = '/v3/search/company';
 
 		return datahub.post( url, req.session.ssoToken, body );
-	}
+	},
+
+	//getCompanyContacts: ( req, companyId ) => datahub.get( `/v3/contact?company_id=${ encodeURIComponent( companyId ) }`, req.session.ssoToken ),
+	getContact: ( req, contactId ) => datahub.get( `/v3/contact/${ encodeURIComponent( contactId ) }`, req.session.ssoToken )
 };

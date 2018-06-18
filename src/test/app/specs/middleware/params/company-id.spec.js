@@ -33,7 +33,6 @@ describe( 'Company Id param middleware', () => {
 		} );
 
 		describe( 'When the response is a success', () => {
-
 			it( 'Should add the company to the req and locals', async () => {
 
 				const company = { name: 'test', id };
@@ -50,8 +49,23 @@ describe( 'Company Id param middleware', () => {
 			} );
 		} );
 
-		describe( 'When the call errors', () => {
+		describe( 'When the response is NOT a success', () => {
+			it( 'Should call next with an error', async () => {
 
+				const promise = Promise.resolve( { response: { isSuccess: false }, body: {} } );
+
+				datahub.getCompany.and.callFake( () => promise );
+
+				await middleware( req, res, next, id );
+
+				expect( datahub.getCompany ).toHaveBeenCalledWith( req, id );
+				expect( req.company ).not.toBeDefined();
+				expect( res.locals.company ).not.toBeDefined();
+				expect( next ).toHaveBeenCalledWith( new Error( 'Not a successful response from datahub' ) );
+			} );
+		} );
+
+		describe( 'When the call errors', () => {
 			it( 'Should call next with the error', async () => {
 
 				const err = new Error( 'a datahub error' );
@@ -68,7 +82,6 @@ describe( 'Company Id param middleware', () => {
 	} );
 
 	describe( 'When the id is invalid', () => {
-
 		it( 'Should call next with the err', async () => {
 
 			id = '<abc';

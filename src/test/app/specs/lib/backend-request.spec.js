@@ -4,7 +4,8 @@ const modulePath = '../../../../app/lib/backend-request';
 
 const backendUrl = 'http://some.domain.com';
 const GET = 'GET';
-const POST = 'POST'
+const POST = 'POST';
+const PUT = 'PUT';
 
 describe( 'Backend Request', () => {
 
@@ -55,11 +56,8 @@ describe( 'Backend Request', () => {
 	} );
 
 	describe( 'get', () => {
-
 		describe( 'Missing parameters', () => {
-
 			describe( 'Without a path', () => {
-
 				it( 'Should throw an error', () => {
 
 					expect( () => {
@@ -73,11 +71,8 @@ describe( 'Backend Request', () => {
 		} );
 
 		describe( 'Without an error', () => {
-
 			describe( 'get', () => {
-
 				describe( 'With a 200 response', () => {
-
 					it( 'Should return the response', ( done ) => {
 
 						const path = '/whoami/';
@@ -96,7 +91,6 @@ describe( 'Backend Request', () => {
 				} );
 
 				describe( 'With a 500 response', () => {
-
 					it( 'Should throw an error', ( done ) => {
 
 						const path = '/whoami/';
@@ -117,9 +111,7 @@ describe( 'Backend Request', () => {
 		} );
 
 		describe( 'With an error', () => {
-
 			describe( 'get', () => {
-
 				it( 'Should reject with the error', ( done ) => {
 
 					const mockError = new Error( 'Broken' );
@@ -137,11 +129,8 @@ describe( 'Backend Request', () => {
 	} );
 
 	describe( 'post', () => {
-
 		describe( 'With a 200 response', () => {
-
 			describe( 'Without a token or body', () => {
-
 				it( 'Should create the correct options', ( done ) => {
 
 					const path = '/a-test';
@@ -160,7 +149,6 @@ describe( 'Backend Request', () => {
 			} );
 
 			describe( 'Wtih a token but no body', () => {
-
 				it( 'Should create the correct options', ( done ) => {
 
 					const path = '/a-test';
@@ -179,7 +167,6 @@ describe( 'Backend Request', () => {
 			} );
 
 			describe( 'Wtih a token and body', () => {
-
 				it( 'Should create the correct options', ( done ) => {
 
 					const path = '/a-test';
@@ -198,6 +185,64 @@ describe( 'Backend Request', () => {
 				} );
 			} );
 		} );
+	} );
 
+	describe( 'put', () => {
+		describe( 'With a 200 response', () => {
+			describe( 'Without a token or body', () => {
+				it( 'Should create the correct options', ( done ) => {
+
+					const path = '/a-test';
+
+					backend.put( path ).then( ( { response, body } ) => {
+
+						expect( response.isSuccess ).toEqual( true );
+						expect( response ).toEqual( mockResponse );
+						expect( body ).toEqual( mockBody );
+						done();
+					} );
+
+					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
+					checkRequest( PUT, path );
+				} );
+			} );
+
+			describe( 'Wtih a token but no body', () => {
+				it( 'Should create the correct options', ( done ) => {
+
+					const path = '/a-test';
+
+					backend.put( path, token ).then( ( { response, body } ) => {
+
+						expect( response.isSuccess ).toEqual( true );
+						expect( response ).toEqual( mockResponse );
+						expect( body ).toEqual( mockBody );
+						done();
+					} );
+
+					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
+					checkRequest( PUT, path, { token } );
+				} );
+			} );
+
+			describe( 'Wtih a token and body', () => {
+				it( 'Should create the correct options', ( done ) => {
+
+					const path = '/a-test';
+					const body = { some: 'body' };
+
+					backend.put( path, token, body ).then( ( { response, body } )=> {
+
+						expect( response.isSuccess ).toEqual( true );
+						expect( response ).toEqual( mockResponse );
+						expect( body ).toEqual( mockBody );
+						done();
+					} );
+
+					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
+					checkRequest( PUT, path, { token, body } );
+				} );
+			} );
+		} );
 	} );
 } );

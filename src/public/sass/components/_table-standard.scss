@@ -1,0 +1,36 @@
+.standard-table {
+	width: 100%;
+	text-align: left;
+	border-collapse: collapse;
+}
+
+.standard-table__heading-row {
+
+}
+
+.standard-table__heading {
+	padding: govuk-em( 10, 16 );
+	font-weight: normal;
+	color: $govuk-grey-1;
+}
+
+.standard-table__heading--active {
+	font-weight: bold;
+	color: $govuk-black;
+}
+
+.standard-table__row {
+
+	&:nth-of-type( odd ) {
+
+		.standard-table__cell {
+			background-color: $govuk-grey-4;
+		}
+	}
+}
+
+.standard-table__cell {
+
+	padding: govuk-em( 10, 16 );
+	border-bottom: 1px solid $govuk-grey-2;
+}

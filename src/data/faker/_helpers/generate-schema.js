@@ -10,6 +10,7 @@ jsf.extend( 'faker', () => faker );
 module.exports = async function( path ){
 
 	const result = require( SCHEMA_PATH + path );
-	
-	return jsf.resolve( result, REF_PATH );
+	const json = await jsf.resolve( result, REF_PATH );
+
+	return json;
 };

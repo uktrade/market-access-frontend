@@ -30,6 +30,10 @@ function makeRequest( method, path, opts = {} ){
 
 		logger.debug( `Sending ${ method } request to: ${ uri }` );
 
+		if( opts.body ){
+			logger.debug( 'With body: ' + JSON.stringify( opts.body, null, 2 ) );
+		}
+
 		request( requestOptions, ( err, response, body ) => {
 
 			if( err ){
@@ -56,5 +60,6 @@ function makeRequest( method, path, opts = {} ){
 module.exports = {
 
 	get: ( path, token ) => makeRequest( 'GET', path, { token } ),
-	post: ( path, token, body ) => makeRequest( 'POST', path, { token, body } )
+	post: ( path, token, body ) => makeRequest( 'POST', path, { token, body } ),
+	put: ( path, token, body ) => makeRequest( 'PUT', path, { token, body } )
 };

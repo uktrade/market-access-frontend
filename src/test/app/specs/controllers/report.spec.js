@@ -13,6 +13,7 @@ describe( 'Report controller', () => {
 	let urls;
 	let startFormViewModel;
 	let csrfToken;
+	let aboutProblemViewModel;
 
 	beforeEach( () => {
 
@@ -21,14 +22,16 @@ describe( 'Report controller', () => {
 		req = {
 			query: {},
 			csrfToken: () => csrfToken,
-			session: {}
+			session: {},
+			params: {}
 		};
 		res = {
 			render: jasmine.createSpy( 'res.render' ),
 			redirect: jasmine.createSpy( 'res.redirect' )
 		};
 		backend = {
-			saveNewReport: jasmine.createSpy( 'backend.saveNewReport' )
+			saveNewReport: jasmine.createSpy( 'backend.saveNewReport' ),
+			updateReport: jasmine.createSpy( 'backend.updateReport' )
 		};
 		datahub = {
 			searchCompany: jasmine.createSpy( 'datahub.searchCompany' )
@@ -36,22 +39,25 @@ describe( 'Report controller', () => {
 		urls = {
 			index: jasmine.createSpy( 'urls.index' ),
 			report: {
-				company: jasmine.createSpy( 'urls.report.company' ),
-				contacts: jasmine.createSpy( 'urls.report.contacts' )
+				companySearch: jasmine.createSpy( 'urls.report.companySearch' ),
+				companyDetails: jasmine.createSpy( 'urls.report.companyDetails' ),
+				contacts: jasmine.createSpy( 'urls.report.contacts' ),
+				aboutProblem: jasmine.createSpy( 'urls.report.aboutProblem' )
 			}
 		};
 		startFormViewModel = jasmine.createSpy( 'startFormViewModel' );
+		aboutProblemViewModel = jasmine.createSpy( 'aboutProblemViewModel' );
 
 		controller = proxyquire( modulePath, {
 			'../lib/backend-service': backend,
 			'../lib/datahub-service': datahub,
 			'../lib/urls': urls,
-			'../lib/view-models/report/start-form': startFormViewModel
+			'../lib/view-models/report/start-form': startFormViewModel,
+			'../lib/view-models/report/about-problem': aboutProblemViewModel
 		} );
 	} );
 
 	describe( 'Index', () => {
-
 		it( 'Should render the report page', () => {
 
 			controller.index( req, res );
@@ -71,7 +77,6 @@ describe( 'Report controller', () => {
 		} );
 
 		describe( 'When it is a POST', () => {
-
 			describe( 'When the input values are valid', () => {
 
 				it( 'Should save the values and redirect to the next step', () => {
@@ -83,7 +88,7 @@ describe( 'Report controller', () => {
 					req.method = 'POST';
 					req.body = { status, emergency };
 
-					urls.report.company.and.callFake( () => companyUrl );
+					urls.report.companySearch.and.callFake( () => companyUrl );
 
 					controller.start( req, res );
 
@@ -94,7 +99,6 @@ describe( 'Report controller', () => {
 		} );
 
 		describe( 'When it is a GET', () => {
-
 			it( 'Should get the status types and render the start page', () => {
 
 				const sessionValues = { status: 1, emergency: 2 };
@@ -109,7 +113,6 @@ describe( 'Report controller', () => {
 				expect( res.render ).toHaveBeenCalledWith( 'report/start', startFormViewModelResponse );
 			} );
 		} );
-
 	} );
 
 	describe( 'Company Search', () => {
@@ -123,7 +126,6 @@ describe( 'Report controller', () => {
 		} );
 
 		describe( 'Without a query', () => {
-
 			it( 'Should render the search page', () => {
 
 				controller.companySearch( req, res, next );
@@ -139,263 +141,321 @@ describe( 'Report controller', () => {
 
 			beforeEach( () => {
 
-				req.query.q = query;
+				req.query.company = query;
 			} );
 
 			describe( 'When there is not an error', () => {
-
 				describe( 'When a company is found', () => {
-
-					it( 'Should render the results', ( done ) => {
+					it( 'Should render the results', async () => {
 
 						const body = {	some: 'data' };
 
-						const promise = new Promise( ( resolve ) => {
-
-							resolve( { response: { isSuccess: true }, body } );
-						} );
+						const promise = Promise.resolve( { response: { isSuccess: true }, body } );
 
 						datahub.searchCompany.and.callFake( () => promise );
 
-						controller.companySearch( req, res, next );
+						await controller.companySearch( req, res, next );
 
-						promise.then( () => {
-
-							expect( res.render ).toHaveBeenCalledWith( template, { query, results: body } );
-							done();
-						} );
+						expect( res.render ).toHaveBeenCalledWith( template, { query, results: body } );
 					} );
 				} );
 
 				describe( 'When a company is not found', () => {
+					it( 'Should render an error message', async () => {
 
-					it( 'Should render an error message', ( done ) => {
-
-						const promise = new Promise( ( resolve ) => {
-
-							resolve( { response: { isSuccess: false, statusCode: 404 } } );
-						} );
+						const promise = Promise.resolve( { response: { isSuccess: false, statusCode: 404 } } );
 
 						datahub.searchCompany.and.callFake( () => promise );
 
-						controller.companySearch( req, res, next );
+						await controller.companySearch( req, res, next );
 
-						promise.then( () => {
-
-							expect( res.render ).toHaveBeenCalledWith( template, { query, error: 'No company found' } );
-							done();
-						} );
+						expect( res.render ).toHaveBeenCalledWith( template, { query, error: 'No company found' } );
 					} );
 				} );
 
 				describe( 'When there is an error with the request', () => {
+					it( 'Should render an error message', async () => {
 
-					it( 'Should render an error message', ( done ) => {
-
-						const promise = new Promise( ( resolve ) => {
-
-							resolve( { response: { isSuccess: false, statusCode: 400 } } );
-						} );
+						const promise = Promise.resolve( { response: { isSuccess: false, statusCode: 400 } } );
 
 						datahub.searchCompany.and.callFake( () => promise );
 
-						controller.companySearch( req, res, next );
+						await controller.companySearch( req, res, next );
 
-						promise.then( () => {
-
-							expect( res.render ).toHaveBeenCalledWith( template, { query, error: 'There was an error finding the company' } );
-							done();
-						} );
+						expect( res.render ).toHaveBeenCalledWith( template, { query, error: 'There was an error finding the company' } );
 					} );
 				} );
 			} );
 
 			describe( 'When there is an error', () => {
-
-				it( 'Should pass the error on', ( done ) => {
+				it( 'Should pass the error on', async () => {
 
 					const err = new Error( 'some error state' );
 
-					const promise = new Promise( ( resolve, reject ) => {
-
-						reject( err );
-					} );
+					const promise = Promise.reject( err );
 
 					datahub.searchCompany.and.callFake( () => promise );
 
-					controller.companySearch( req, res, next );
+					await controller.companySearch( req, res, next );
 
-					process.nextTick( () => {
-
-						expect( next ).toHaveBeenCalledWith( err );
-						done();
-					} );
+					expect( next ).toHaveBeenCalledWith( err );
 				} );
 			} );
 		} );
 	} );
 
 	describe( 'Company details', () => {
+		describe( 'When it is a POST', () => {
+			describe( 'When the companyId and sessionCompany id match', () => {
+				it( 'Should redirect to the contacts page', () => {
 
-		it( 'Should save the company name and id in the session and render the details page', () => {
+					const companyId = 'abc';
+					const reportId = '1';
+					const contactResponse = '/a-link/';
 
-			const company = {
-				id: 'abc-123',
-				name: 'a company name',
-				something: 'else',
-				another: 'thing'
-			};
+					req.method = 'POST';
+					req.body = { companyId };
+					req.session.reportCompany = { id: companyId };
+					req.params.reportId = reportId;
 
-			req.company = company;
-			controller.companyDetails( req, res );
+					urls.report.contacts.and.callFake( () => contactResponse );
 
-			expect( req.session.reportCompany ).toEqual( { id: company.id, name: company.name } );
-			expect( res.render ).toHaveBeenCalledWith( 'report/company-details', { csrfToken, company } );
+					controller.companyDetails( req, res );
+
+					expect( res.redirect ).toHaveBeenCalledWith( contactResponse );
+					expect( urls.report.contacts ).toHaveBeenCalledWith( companyId, reportId );
+				} );
+			} );
+
+			describe( 'When the ids do not match', () => {
+				it( 'Should redirect to the company search page', () => {
+
+					const reportId = '2';
+					const searchResponse = '/another-link/';
+
+					req.method = 'POST';
+					req.body = { companyId: '123' };
+					req.params.reportId = reportId;
+					req.session.reportCompany = { id: '123-456' };
+
+					urls.report.companySearch.and.callFake( () => searchResponse );
+
+					controller.companyDetails( req, res );
+
+					expect( res.redirect ).toHaveBeenCalledWith( searchResponse );
+					expect( urls.report.companySearch ).toHaveBeenCalledWith( reportId );
+				} );
+			} );
+		} );
+
+		describe( 'When it is a GET', () => {
+			it( 'Should save the company name and id in the session and render the details page', () => {
+
+				const company = {
+					id: 'abc-123',
+					name: 'a company name',
+					something: 'else',
+					another: 'thing'
+				};
+
+				req.company = company;
+				controller.companyDetails( req, res );
+
+				expect( req.session.reportCompany ).toEqual( { id: company.id, name: company.name } );
+				expect( res.render ).toHaveBeenCalledWith( 'report/company-details', { csrfToken } );
+			} );
 		} );
 	} );
 
-	describe( 'Save new', () => {
+	describe( 'Save', () => {
 
-		let sessionValues;
-		let companyId;
 		let next;
 
 		beforeEach( () => {
 
-			sessionValues = { status: 1, emergency: 2 };
-			companyId = '123-456';
-
-			req.body = { companyId };
-
 			next = jasmine.createSpy( 'next' );
+			req.body = {};
 		} );
 
-		describe( 'When the reportCompany doesn\'t exist in the session', () => {
+		describe( 'When there is not a contact in the session', () => {
+			it( 'Should redirect to the contacts page', async () => {
 
-			it( 'Should redirect to the search page', async () => {
+				const contactsResponse = '/contacts';
+				const sessionCompany = { id: '123-456' };
 
-				const reportCompanyUrlResponse = '/some-url';
+				req.session.reportCompany = sessionCompany;
 
-				urls.report.company.and.callFake( () => reportCompanyUrlResponse );
+				urls.report.contacts.and.callFake( () => contactsResponse );
 
-				await controller.saveNew( req, res, next );
+				await controller.save( req, res, next );
 
-				expect( urls.report.company ).toHaveBeenCalledWith();
-				expect( res.redirect ).toHaveBeenCalledWith( reportCompanyUrlResponse );
-				expect( next ).not.toHaveBeenCalled();
+				expect( res.redirect ).toHaveBeenCalledWith( contactsResponse );
+				expect( urls.report.contacts ).toHaveBeenCalledWith( sessionCompany.id );
 			} );
 		} );
 
-		describe( 'When the company exists in the session', () => {
+		describe( 'When the body contactId and session contactId do not match', () => {
+			it( 'Should call next with an error', async () => {
 
-			let reportCompany;
+				req.body.contactId = '123-456';
+				req.session.reportContact = '789';
+				req.session.reportCompany = { id: 1 };
+
+				await controller.save( req, res, next );
+
+				expect( next ).toHaveBeenCalledWith( new Error( "Contact id doesn't match session" ) );
+			} );
+		} );
+
+		describe( 'When the contactIds match', () => {
+
+			let contactId;
 
 			beforeEach( () => {
 
-				reportCompany = { id: companyId, name: '456' };
-				req.session = { startFormValues: sessionValues, reportCompany };
+				contactId = 'abc-123';
+				req.body.contactId = contactId;
+				req.session.reportContact = contactId;
+				req.session.reportCompany = { id: 1 };
 			} );
 
-			describe( 'When the POSTed companyId does\'t match the session', () => {
-
-				it( 'Should call next with an error', async () => {
-
-					req.session.reportCompany.id = '789-012';
-
-					await controller.saveNew( req, res, next );
-
-					expect( next ).toHaveBeenCalledWith( new Error( 'Company id does\'t match session' ) );
-				} );
-			} );
-
-			describe( 'When the POSTed company matches the session', () => {
-
-				describe( 'When the response is a success', () => {
-
-					beforeEach( () => {
-
-						const promise = Promise.resolve( { response: { isSuccess: true } } );
-
-						backend.saveNewReport.and.callFake( () => promise );
-					} );
-
-					describe( 'When the action is exit', () => {
-
-						it( 'Should delete the session values and redirect to the dashboard', async ( done ) => {
-
-							const indexResponse = '/index';
-
-							urls.index.and.callFake( () => indexResponse );
-							req.body.action = 'exit';
-
-							await controller.saveNew( req, res, done.fail );
-
-							process.nextTick( () => {
-
-								expect( backend.saveNewReport ).toHaveBeenCalledWith( req, sessionValues, reportCompany );
-								expect( typeof req.session.startFormValues ).toEqual( 'undefined' );
-								expect( typeof req.session.reportCompany ).toEqual( 'undefined' );
-								expect( res.redirect ).toHaveBeenCalledWith( indexResponse );
-								expect( next ).not.toHaveBeenCalled(),
-								done();
-							} );
-						} );
-					} );
-
-					describe( 'When the action is not specified', () => {
-
-						it( 'Should delete the session values and redirect to the next step', async ( done ) => {
-
-							const contactResponse = '/index';
-
-							urls.report.contacts.and.callFake( () => contactResponse );
-
-							await controller.saveNew( req, res, done.fail );
-
-							process.nextTick( () => {
-
-								expect( backend.saveNewReport ).toHaveBeenCalledWith( req, sessionValues, reportCompany );
-								expect( typeof req.session.startFormValues ).toEqual( 'undefined' );
-								expect( typeof req.session.reportCompany ).toEqual( 'undefined' );
-								expect( res.redirect ).toHaveBeenCalledWith( contactResponse );
-								expect( next ).not.toHaveBeenCalled(),
-								done();
-							} );
-						} );
-					} );
-				} );
-
-				describe( 'When the response is a 500', () => {
-
-					it( 'Should call next with an error', async () => {
-
-						const statusCode = 500;
-						const promise = Promise.resolve( { response: { isSuccess: false, statusCode } } );
-
-						backend.saveNewReport.and.callFake( () => promise );
-
-						await controller.saveNew( req, res, next );
-
-						expect( typeof req.session.reportCompany ).toEqual( 'undefined' );
-						expect( next ).toHaveBeenCalledWith( new Error( `Unable to save report, got ${ statusCode } response code` ) );
-					} );
-				} );
-
-				describe( 'When an error is thrown', () => {
-
+			describe( 'When there is NOT a reportId', () => {
+				describe( 'When there is an error thrown', () => {
 					it( 'Should call next with the error', async () => {
 
-						const err = new Error( 'Some backend error' );
+						const err = new Error( 'tester' );
 
 						backend.saveNewReport.and.callFake( () => Promise.reject( err ) );
 
-						await controller.saveNew( req, res, next );
+						await controller.save( req, res, next );
 
-						expect( typeof req.session.reportCompany ).toEqual( 'undefined' );
 						expect( next ).toHaveBeenCalledWith( err );
 					} );
 				} );
+
+				describe( 'When there is not an error', () => {
+					describe( 'When the response is a success', () => {
+						describe( 'When there is not an id in the body', () => {
+							it( 'Should call next with an error', async () => {
+
+								backend.saveNewReport.and.callFake( () => Promise.resolve( {
+									response: { isSuccess: true },
+									body: {}
+								} ) );
+
+								await controller.save( req, res, next );
+
+								expect( next ).toHaveBeenCalledWith( new Error( 'No id created for report' ) );
+							} );
+						} );
+
+						describe( 'When there is an id in the body', () => {
+							it( 'Should put the body in the session and redirect', async () => {
+
+								const responseBody = { id: 1, name: 2 };
+								const aboutProblemUrl = '/a-test';
+
+								urls.report.aboutProblem.and.callFake( () => aboutProblemUrl );
+								backend.saveNewReport.and.callFake( () => Promise.resolve( {
+									response: { isSuccess: true },
+									body: responseBody
+								} ) );
+
+								await controller.save( req, res, next );
+
+								expect( req.session.report ).toEqual( responseBody );
+								expect( res.redirect ).toHaveBeenCalledWith( aboutProblemUrl );
+								expect( urls.report.aboutProblem ).toHaveBeenCalledWith( responseBody.id );
+							} );
+						} );
+					} );
+
+					describe( 'When the response is not a success', () => {
+						it( 'Should call next with an error', async () => {
+
+							const statusCode = 500;
+
+							backend.saveNewReport.and.callFake( () => Promise.resolve( {
+								response: { isSuccess: false, statusCode }
+							} ) );
+
+							await controller.save( req, res, next );
+
+							const message = `Unable to save report, got ${ statusCode } response code`;
+							expect( next ).toHaveBeenCalledWith( new Error( message ) );
+						} );
+					} );
+				} );
 			} );
+
+			describe( 'When there is a reportId', () => {
+				it( 'Should call the update method', async () => {
+
+					const reportId = '3';
+
+					req.params.reportId = reportId;
+					req.session.reportCompany = null;
+					req.report = {
+						status: 1,
+						is_emergency: 2,
+						company_id: 3,
+						company_name: 'fred'
+					};
+
+					await controller.save( req, res, next );
+
+					expect( backend.updateReport ).toHaveBeenCalled();
+
+					const args = backend.updateReport.calls.argsFor( 0 );
+					expect( args[ 0 ] ).toEqual( req );
+					expect( args[ 1 ] ).toEqual( reportId );
+					expect( args[ 2 ] ).toEqual( { status: req.report.status, emergency: req.report.is_emergency } );
+					expect( args[ 3 ] ).toEqual( { id: req.report.company_id, name: req.report.company_name } );
+					expect( args[ 4 ] ).toEqual( contactId );
+				} );
+			} );
+		} );
+	} );
+
+	describe( 'contacts', () => {
+		it( 'Should render the contact page', () => {
+
+			controller.contacts( req, res );
+
+			expect( res.render ).toHaveBeenCalledWith( 'report/contacts' );
+		} );
+	} );
+
+	describe( 'Contact details', () => {
+		it( 'Should save the company name and id in the session and render the details page', () => {
+
+			const contact = {
+				id: 'abc-123',
+				name: 'a contact name',
+				something: 'else',
+				another: 'thing'
+			};
+
+			req.contact = contact;
+			controller.contactDetails( req, res );
+
+			expect( req.session.reportContact ).toEqual( contact.id );
+			expect( res.render ).toHaveBeenCalledWith( 'report/contact-details', { csrfToken } );
+		} );
+	} );
+
+	describe( 'aboutProblem', () => {
+
+		it( 'Should render the view with the viewModel', () => {
+
+			const aboutProblemViewModelResponse = { some: 'data' };
+
+			aboutProblemViewModel.and.callFake( () => aboutProblemViewModelResponse );
+
+			controller.aboutProblem( req, res );
+
+			expect( aboutProblemViewModel ).toHaveBeenCalledWith( csrfToken );
+			expect( res.render ).toHaveBeenCalledWith( 'report/about-problem', aboutProblemViewModelResponse );
 		} );
 	} );
 } );

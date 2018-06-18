@@ -15,9 +15,7 @@ describe( 'SSO bypass', () => {
 	} );
 
 	describe( 'When bypass is true', () => {
-
 		describe( 'When a token is not provided', () => {
-
 			it( 'Should add an ssoToken and call next', () => {
 
 				const ssoBypass = proxyquire( modulePath, {
@@ -36,7 +34,6 @@ describe( 'SSO bypass', () => {
 	} );
 
 	describe( 'When bypass is false', () => {
-
 		it( 'Should not add an ssoToken and call next', () => {
 
 			const ssoBypass = proxyquire( modulePath, {

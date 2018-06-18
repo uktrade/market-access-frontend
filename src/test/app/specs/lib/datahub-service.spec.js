@@ -30,7 +30,6 @@ describe( 'Datahub Service', () => {
 		} );
 
 		describe( 'getCompany', () => {
-
 			it( 'Should call the correct path', () => {
 
 				const id = '123-456';
@@ -42,9 +41,7 @@ describe( 'Datahub Service', () => {
 		} );
 
 		describe( 'searchCompany', () => {
-
 			describe( 'With just a company name', () => {
-
 				it( 'Should call the correct path', () => {
 
 					const name = 'test-name';
@@ -79,7 +76,6 @@ describe( 'Datahub Service', () => {
 		} );
 
 		describe( 'getCompany', () => {
-
 			it( 'Should call the correct path', () => {
 
 				const id = '123-456';
@@ -91,9 +87,7 @@ describe( 'Datahub Service', () => {
 		} );
 
 		describe( 'searchCompany', () => {
-
 			describe( 'With just a company name', () => {
-
 				it( 'Should call the correct path', () => {
 
 					const name = 'test-name';
@@ -106,6 +100,17 @@ describe( 'Datahub Service', () => {
 						limit: 20
 					} );
 				} );
+			} );
+		} );
+
+		describe( 'getContact', () => {
+			it( 'Should call the correct path', () => {
+
+				const id = '123-456';
+
+				service.getContact( req, id );
+
+				expect( datahub.get ).toHaveBeenCalledWith( `/v3/contact/${ encodeURIComponent( id ) }`, req.session.ssoToken );
 			} );
 		} );
 	} );

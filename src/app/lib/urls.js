@@ -5,9 +5,12 @@ module.exports = {
 
 	report: {
 		index: () => '/report/',
-		start: () => '/report/start/',
-		company: ( id ) => `/report/company/${ id ? id + '/' : '' }`,
-		saveNew: () => '/report/new/',
-		contacts: ( id ) => `/report/company/${ id }/contacts/`
+		start: ( reportId ) => `/report/${ reportId ? reportId + '/' : '' }start/`,
+		companySearch: ( reportId ) => `/report/${ reportId ? reportId + '/' : '' }company/`,
+		companyDetails: ( companyId, reportId ) => `/report/${ reportId ? reportId + '/' : '' }company/${ companyId }/`,
+		contacts: ( companyId, reportId ) => `/report/${ reportId ? reportId + '/' : '' }company/${ companyId }/contacts/`,
+		viewContact: ( contactId, reportId ) => `/report/${ reportId ? reportId + '/' : '' }contact/${ contactId }/`,
+		save: ( reportId ) => `/report/${ reportId ? reportId + '/' : '' }save/`,
+		aboutProblem: ( reportId ) => `/report/${ reportId }/problem/`
 	}
 };

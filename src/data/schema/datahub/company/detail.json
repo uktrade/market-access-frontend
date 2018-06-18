@@ -37,8 +37,12 @@
 		},
 		"registered_address_country": {
 			"type": "object",
-			"required": [ "name" ],
+			"required": [ "id", "name" ],
 			"properties": {
+				"id": {
+					"type": "string",
+					"faker": "random.uuid"
+				},
 				"name": {
 					"type": "string",
 					"faker": "address.country"

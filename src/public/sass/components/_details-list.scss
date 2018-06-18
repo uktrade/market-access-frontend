@@ -1,23 +1,29 @@
-.company-details {
+.details-list {
 	display: table;
 	width: 100%;
 	border-top: 1px solid $govuk-grey-2;
 }
 
-.company-details__group {
+.details-list__group {
 
 	display: table-row;
-	
+	@include govuk-font-regular-14;
+
 	&:nth-of-type( odd ){
 		background-color: $govuk-grey-4;
 	}
 }
 
-.company-details__key,
-.company-details__value {
+
+.details-list__key {
+	font-weight: bold;
+}
+
+.details-list__key,
+.details-list__value {
 	display: table-cell;
 	width: 50%;
-	padding: govuk-em( 10, 16 );
+	padding: govuk-em( 10, 14 );
 	margin: 0;
 	border-bottom: 1px solid $govuk-grey-2;
 }
