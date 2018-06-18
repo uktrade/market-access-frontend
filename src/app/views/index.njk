@@ -49,7 +49,7 @@
 								{{ barrier.created_by or ( '<span class="unknown">unknown</span>' | safe ) }}
 							</td>
 							<td class="standard-table__cell">
-								{{ ( barrier.created_on | dateOnly ) or ( '<span class="unknown">unknown</span>' | safe ) }}
+								{{ ( barrier.created_on | dateWithTime ) or ( '<span class="unknown">unknown</span>' | safe ) }}
 							</td>
 							<td class="standard-table__cell">
 								<a href="{{ urls.report.contacts( barrier.company_id, barrier.id ) }}">Continue</a>
