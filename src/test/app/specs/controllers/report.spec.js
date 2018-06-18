@@ -30,8 +30,8 @@ describe( 'Report controller', () => {
 			redirect: jasmine.createSpy( 'res.redirect' )
 		};
 		backend = {
-			saveNewBarrier: jasmine.createSpy( 'backend.saveNewBarrier' ),
-			updateBarrier: jasmine.createSpy( 'backend.updateBarrier' )
+			saveNewReport: jasmine.createSpy( 'backend.saveNewReport' ),
+			updateReport: jasmine.createSpy( 'backend.updateReport' )
 		};
 		datahub = {
 			searchCompany: jasmine.createSpy( 'datahub.searchCompany' )
@@ -210,32 +210,32 @@ describe( 'Report controller', () => {
 				it( 'Should redirect to the contacts page', () => {
 
 					const companyId = 'abc';
-					const barrierId = '1';
+					const reportId = '1';
 					const contactResponse = '/a-link/';
 
 					req.method = 'POST';
 					req.body = { companyId };
 					req.session.reportCompany = { id: companyId };
-					req.params.barrierId = barrierId;
+					req.params.reportId = reportId;
 
 					urls.report.contacts.and.callFake( () => contactResponse );
 
 					controller.companyDetails( req, res );
 
 					expect( res.redirect ).toHaveBeenCalledWith( contactResponse );
-					expect( urls.report.contacts ).toHaveBeenCalledWith( companyId, barrierId );
+					expect( urls.report.contacts ).toHaveBeenCalledWith( companyId, reportId );
 				} );
 			} );
 
 			describe( 'When the ids do not match', () => {
 				it( 'Should redirect to the company search page', () => {
 
-					const barrierId = '2';
+					const reportId = '2';
 					const searchResponse = '/another-link/';
 
 					req.method = 'POST';
 					req.body = { companyId: '123' };
-					req.params.barrierId = barrierId;
+					req.params.reportId = reportId;
 					req.session.reportCompany = { id: '123-456' };
 
 					urls.report.companySearch.and.callFake( () => searchResponse );
@@ -243,7 +243,7 @@ describe( 'Report controller', () => {
 					controller.companyDetails( req, res );
 
 					expect( res.redirect ).toHaveBeenCalledWith( searchResponse );
-					expect( urls.report.companySearch ).toHaveBeenCalledWith( barrierId );
+					expect( urls.report.companySearch ).toHaveBeenCalledWith( reportId );
 				} );
 			} );
 		} );
@@ -319,13 +319,13 @@ describe( 'Report controller', () => {
 				req.session.reportCompany = { id: 1 };
 			} );
 
-			describe( 'When there is NOT a barrierId', () => {
+			describe( 'When there is NOT a reportId', () => {
 				describe( 'When there is an error thrown', () => {
 					it( 'Should call next with the error', async () => {
 
 						const err = new Error( 'tester' );
 
-						backend.saveNewBarrier.and.callFake( () => Promise.reject( err ) );
+						backend.saveNewReport.and.callFake( () => Promise.reject( err ) );
 
 						await controller.save( req, res, next );
 
@@ -338,7 +338,7 @@ describe( 'Report controller', () => {
 						describe( 'When there is not an id in the body', () => {
 							it( 'Should call next with an error', async () => {
 
-								backend.saveNewBarrier.and.callFake( () => Promise.resolve( {
+								backend.saveNewReport.and.callFake( () => Promise.resolve( {
 									response: { isSuccess: true },
 									body: {}
 								} ) );
@@ -356,14 +356,14 @@ describe( 'Report controller', () => {
 								const aboutProblemUrl = '/a-test';
 
 								urls.report.aboutProblem.and.callFake( () => aboutProblemUrl );
-								backend.saveNewBarrier.and.callFake( () => Promise.resolve( {
+								backend.saveNewReport.and.callFake( () => Promise.resolve( {
 									response: { isSuccess: true },
 									body: responseBody
 								} ) );
 
 								await controller.save( req, res, next );
 
-								expect( req.session.barrier ).toEqual( responseBody );
+								expect( req.session.report ).toEqual( responseBody );
 								expect( res.redirect ).toHaveBeenCalledWith( aboutProblemUrl );
 								expect( urls.report.aboutProblem ).toHaveBeenCalledWith( responseBody.id );
 							} );
@@ -375,7 +375,7 @@ describe( 'Report controller', () => {
 
 							const statusCode = 500;
 
-							backend.saveNewBarrier.and.callFake( () => Promise.resolve( {
+							backend.saveNewReport.and.callFake( () => Promise.resolve( {
 								response: { isSuccess: false, statusCode }
 							} ) );
 
@@ -388,14 +388,14 @@ describe( 'Report controller', () => {
 				} );
 			} );
 
-			describe( 'When there is a barrierId', () => {
+			describe( 'When there is a reportId', () => {
 				it( 'Should call the update method', async () => {
 
-					const barrierId = '3';
+					const reportId = '3';
 
-					req.params.barrierId = barrierId;
+					req.params.reportId = reportId;
 					req.session.reportCompany = null;
-					req.barrier = {
+					req.report = {
 						status: 1,
 						is_emergency: 2,
 						company_id: 3,
@@ -404,13 +404,13 @@ describe( 'Report controller', () => {
 
 					await controller.save( req, res, next );
 
-					expect( backend.updateBarrier ).toHaveBeenCalled();
+					expect( backend.updateReport ).toHaveBeenCalled();
 
-					const args = backend.updateBarrier.calls.argsFor( 0 );
+					const args = backend.updateReport.calls.argsFor( 0 );
 					expect( args[ 0 ] ).toEqual( req );
-					expect( args[ 1 ] ).toEqual( barrierId );
-					expect( args[ 2 ] ).toEqual( { status: req.barrier.status, emergency: req.barrier.is_emergency } );
-					expect( args[ 3 ] ).toEqual( { id: req.barrier.company_id, name: req.barrier.company_name } );
+					expect( args[ 1 ] ).toEqual( reportId );
+					expect( args[ 2 ] ).toEqual( { status: req.report.status, emergency: req.report.is_emergency } );
+					expect( args[ 3 ] ).toEqual( { id: req.report.company_id, name: req.report.company_name } );
 					expect( args[ 4 ] ).toEqual( contactId );
 				} );
 			} );

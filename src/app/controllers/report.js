@@ -17,7 +17,7 @@ module.exports = {
 			//TODO: validate input
 			req.session.startFormValues = { status, emergency };
 
-			res.redirect( urls.report.companySearch( req.params.barrierId ) );
+			res.redirect( urls.report.companySearch( req.params.reportId ) );
 
 		} else {
 
@@ -67,15 +67,15 @@ module.exports = {
 		if( req.method === 'POST' ){
 
 			const companyId = req.body.companyId;
-			const barrierId = req.params.barrierId;
+			const reportId = req.params.reportId;
 
 			if( companyId === req.session.reportCompany.id ){
 
-				res.redirect( urls.report.contacts( companyId, barrierId ) );
+				res.redirect( urls.report.contacts( companyId, reportId ) );
 
 			} else {
 
-				res.redirect( urls.report.companySearch( barrierId ) );
+				res.redirect( urls.report.companySearch( reportId ) );
 			}
 
 		} else {
@@ -100,10 +100,10 @@ module.exports = {
 
 		const contactId = req.body.contactId;
 		const sessionContact = req.session.reportContact;
-		const barrierId = req.params.barrierId;
-		const sessionStartForm = ( req.session.startFormValues || req.barrier && { status: req.barrier.status, emergency: req.barrier.is_emergency } );
-		const sessionCompany =  ( req.session.reportCompany || req.barrier && { id: req.barrier.company_id, name: req.barrier.company_name } );
-		const isBarrier = !!barrierId;
+		const reportId = req.params.reportId;
+		const sessionStartForm = ( req.session.startFormValues || req.report && { status: req.report.status, emergency: req.report.is_emergency } );
+		const sessionCompany =  ( req.session.reportCompany || req.report && { id: req.report.company_id, name: req.report.company_name } );
+		const isUpdate = !!reportId;
 		//TODO: Validate company id
 
 		if( !sessionContact ){ return res.redirect( urls.report.contacts( sessionCompany.id ) ); }
@@ -117,10 +117,10 @@ module.exports = {
 			let response;
 			let body;
 
-			if( isBarrier ){
-				({ response, body } = await backend.updateBarrier( req, barrierId, sessionStartForm, sessionCompany, sessionContact ));
+			if( isUpdate ){
+				({ response, body } = await backend.updateReport( req, reportId, sessionStartForm, sessionCompany, sessionContact ));
 			} else {
-				({ response, body } = await backend.saveNewBarrier( req, sessionStartForm, sessionCompany, sessionContact ));
+				({ response, body } = await backend.saveNewReport( req, sessionStartForm, sessionCompany, sessionContact ));
 			}
 
 			delete req.session.reportCompany;
@@ -128,19 +128,19 @@ module.exports = {
 
 			if( response.isSuccess ){
 
-				if( !isBarrier && !body.id ){
+				if( !isUpdate && !body.id ){
 
 					next( new Error( 'No id created for report' ) );
 
 				} else {
 
-					req.session.barrier = body;
+					req.session.report = body;
 					res.redirect( urls.report.aboutProblem( body.id ) );
 				}
 
 			} else {
 
-				next( new Error( `Unable to ${ isBarrier ? 'update' : 'save' } report, got ${ response.statusCode } response code` ) );
+				next( new Error( `Unable to ${ isUpdate ? 'update' : 'save' } report, got ${ response.statusCode } response code` ) );
 			}
 
 		} catch( e ){

@@ -13,12 +13,12 @@ function updateStatus( item ){
 	return item;
 }
 
-module.exports = ( barriers ) => {
+module.exports = ( reports ) => {
 
-	if( barriers && barriers.length ){
+	if( reports && reports.length ){
 
-		barriers = barriers.map( updateStatus );
+		reports = reports.map( updateStatus );
 	}
 
-	return {	barriers	};
+	return {	reports	};
 };

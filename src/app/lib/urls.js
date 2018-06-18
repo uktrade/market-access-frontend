@@ -5,12 +5,12 @@ module.exports = {
 
 	report: {
 		index: () => '/report/',
-		start: ( barrierId ) => `/report/${ barrierId ? barrierId + '/' : '' }start/`,
-		companySearch: ( barrierId ) => `/report/${ barrierId ? barrierId + '/' : '' }company/`,
-		companyDetails: ( companyId, barrierId ) => `/report/${ barrierId ? barrierId + '/' : '' }company/${ companyId }/`,
-		contacts: ( companyId, barrierId ) => `/report/${ barrierId ? barrierId + '/' : '' }company/${ companyId }/contacts/`,
-		viewContact: ( contactId, barrierId ) => `/report/${ barrierId ? barrierId + '/' : '' }contact/${ contactId }/`,
-		save: ( barrierId ) => `/report/${ barrierId ? barrierId + '/' : '' }save/`,
-		aboutProblem: ( barrierId ) => `/report/${ barrierId }/problem/`
+		start: ( reportId ) => `/report/${ reportId ? reportId + '/' : '' }start/`,
+		companySearch: ( reportId ) => `/report/${ reportId ? reportId + '/' : '' }company/`,
+		companyDetails: ( companyId, reportId ) => `/report/${ reportId ? reportId + '/' : '' }company/${ companyId }/`,
+		contacts: ( companyId, reportId ) => `/report/${ reportId ? reportId + '/' : '' }company/${ companyId }/contacts/`,
+		viewContact: ( contactId, reportId ) => `/report/${ reportId ? reportId + '/' : '' }contact/${ contactId }/`,
+		save: ( reportId ) => `/report/${ reportId ? reportId + '/' : '' }save/`,
+		aboutProblem: ( reportId ) => `/report/${ reportId }/problem/`
 	}
 };

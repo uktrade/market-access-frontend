@@ -2,11 +2,11 @@ const urls = require( '../../../../app/lib/urls' );
 
 describe( 'URLs', () => {
 
-	let barrierId;
+	let reportId;
 
 	beforeEach( () => {
 
-		barrierId = '12';
+		reportId = '12';
 	} );
 
 	describe( 'Index', () => {
@@ -23,7 +23,7 @@ describe( 'URLs', () => {
 		} );
 	} );
 
-	describe( 'Report a barrier', () => {
+	describe( 'Report a report', () => {
 		describe( 'index', () => {
 			it( 'Should return the correct path', () => {
 
@@ -32,13 +32,13 @@ describe( 'URLs', () => {
 		} );
 
 		describe( 'start', () => {
-			describe( 'With a barrierId', () => {
+			describe( 'With a reportId', () => {
 				it( 'Should return the correct path', () => {
 
-					expect( urls.report.start( barrierId ) ).toEqual( `/report/${ barrierId }/start/` );
+					expect( urls.report.start( reportId ) ).toEqual( `/report/${ reportId }/start/` );
 				} );
 			} );
-			describe( 'Without a barrierId', () => {
+			describe( 'Without a reportId', () => {
 
 				it( 'Should return the correct path', () => {
 
@@ -48,14 +48,14 @@ describe( 'URLs', () => {
 		} );
 
 		describe( 'Company Search', () => {
-			describe( 'With a barrierId', () => {
+			describe( 'With a reportId', () => {
 				it( 'Should return the correct path', () => {
 
-					const barrierId = 'abc-123';
-					expect( urls.report.companySearch( barrierId ) ).toEqual( `/report/${ barrierId }/company/` );
+					const reportId = 'abc-123';
+					expect( urls.report.companySearch( reportId ) ).toEqual( `/report/${ reportId }/company/` );
 				} );
 			} );
-			describe( 'Without a barrier id', () => {
+			describe( 'Without a reportId', () => {
 				it( 'Should return the correct path', () => {
 
 					expect( urls.report.companySearch() ).toEqual( '/report/company/' );
@@ -72,18 +72,18 @@ describe( 'URLs', () => {
 				companyId = 'abc-1234';
 			} );
 
-			describe( 'Without a barrier id', () => {
+			describe( 'Without a reportId', () => {
 				it( 'Should return the correct path', () => {
 
 					expect( urls.report.companyDetails( companyId ) ).toEqual( `/report/company/${ companyId }/` );
 				} );
 			} );
 
-			describe( 'With a barrier id', () => {
+			describe( 'With a reportId', () => {
 				it( 'Should return the correct path', () => {
 
-					const barrierId = 'abc-123';
-					expect( urls.report.companyDetails( companyId, barrierId ) ).toEqual( `/report/${ barrierId }/company/${ companyId }/` );
+					const reportId = 'abc-123';
+					expect( urls.report.companyDetails( companyId, reportId ) ).toEqual( `/report/${ reportId }/company/${ companyId }/` );
 				} );
 			} );
 		} );
@@ -97,13 +97,13 @@ describe( 'URLs', () => {
 				companyId = 'abc-124';
 			} );
 
-			describe( 'With a barrierId', () => {
+			describe( 'With a reportId', () => {
 				it( 'Should return the correct path', () => {
 
-					expect( urls.report.contacts( companyId, barrierId ) ).toEqual( `/report/${ barrierId }/company/${ companyId }/contacts/` );
+					expect( urls.report.contacts( companyId, reportId ) ).toEqual( `/report/${ reportId }/company/${ companyId }/contacts/` );
 				} );
 			} );
-			describe( 'Without a barrierId', () => {
+			describe( 'Without a reportId', () => {
 
 				it( 'Should return the correct path', () => {
 
@@ -121,13 +121,13 @@ describe( 'URLs', () => {
 				contactId = 'xyz-789';
 			} );
 
-			describe( 'With a barrierId', () => {
+			describe( 'With a reportId', () => {
 				it( 'Should return the correct path', () => {
 
-					expect( urls.report.viewContact( contactId, barrierId ) ).toEqual( `/report/${ barrierId }/contact/${ contactId }/` );
+					expect( urls.report.viewContact( contactId, reportId ) ).toEqual( `/report/${ reportId }/contact/${ contactId }/` );
 				} );
 			} );
-			describe( 'Without a barrierId', () => {
+			describe( 'Without a reportId', () => {
 
 				it( 'Should return the correct path', () => {
 
@@ -137,13 +137,13 @@ describe( 'URLs', () => {
 		} );
 
 		describe( 'Save', () => {
-			describe( 'With a barrierId', () => {
+			describe( 'With a reportId', () => {
 				it( 'Should return the correct path', () => {
 
-					expect( urls.report.save( barrierId ) ).toEqual( `/report/${ barrierId }/save/` );
+					expect( urls.report.save( reportId ) ).toEqual( `/report/${ reportId }/save/` );
 				} );
 			} );
-			describe( 'Without a barrierId', () => {
+			describe( 'Without a reportId', () => {
 				it( 'Should return the correct path', () => {
 
 					expect( urls.report.save() ).toEqual( '/report/save/' );
@@ -154,9 +154,9 @@ describe( 'URLs', () => {
 		describe( 'About problem', () => {
 			it( 'Should return the correct path', () => {
 
-				const barrierId = '4';
+				const reportId = '4';
 
-				expect( urls.report.aboutProblem( barrierId ) ).toEqual( `/report/${ barrierId }/problem/` );
+				expect( urls.report.aboutProblem( reportId ) ).toEqual( `/report/${ reportId }/problem/` );
 			} );
 		} );
 	} );

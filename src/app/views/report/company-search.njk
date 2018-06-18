@@ -7,7 +7,7 @@
 
 {% block page_content %}
 
-		{{ govukBackLink({ href: urls.report.start( barrier.id ) }) }}
+		{{ govukBackLink({ href: urls.report.start( report.id ) }) }}
 
 		<h1 class="govuk-heading-l">
 			<span class="govuk-caption-m">Report a barrier</span> Export company affected
@@ -41,7 +41,7 @@
 				<ul class="company-card-list">
 				{% for company in results.results %}
 					<li class="company-card">
-						<a href="{{ urls.report.companyDetails( company.id, barrier.id ) }}" class="company-card__link">
+						<a href="{{ urls.report.companyDetails( company.id, report.id ) }}" class="company-card__link">
 
 							<h3 class="company-card__heading">{{ company.name | highlight( query ) | safe }}</h3>
 							<dl class="company-card__values">

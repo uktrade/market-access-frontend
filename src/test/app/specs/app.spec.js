@@ -84,8 +84,8 @@ describe( 'App', function(){
 			it( 'Should render the index page', function( done ){
 
 				intercept.backend()
-					.get( '/barriers/' )
-					.reply( 200, intercept.stub( '/backend/barriers/' ) );
+					.get( '/reports/' )
+					.reply( 200, intercept.stub( '/backend/reports/' ) );
 
 				app.get( urls.index() ).end( ( err, res ) => {
 
@@ -110,7 +110,7 @@ describe( 'App', function(){
 			} );
 
 			describe( 'Start page', () => {
-				describe( 'Without a barrierId', () => {
+				describe( 'Without a reportId', () => {
 					it( 'Should render the start page', ( done ) => {
 
 						app.get( urls.report.start() ).end( ( err, res ) => {
@@ -122,16 +122,16 @@ describe( 'App', function(){
 					} );
 				} );
 
-				describe( 'With a barrierId', () => {
-					it( 'Should fetch the barrier and render the start page', ( done ) => {
+				describe( 'With a reportId', () => {
+					it( 'Should fetch the report and render the start page', ( done ) => {
 
-						const barrierId = '1';
+						const reportId = '1';
 
 						intercept.backend()
-							.get( `/barriers/${ barrierId }/` )
-							.reply( 200, intercept.stub( '/backend/barriers/barrier' ) );
+							.get( `/reports/${ reportId }/` )
+							.reply( 200, intercept.stub( '/backend/reports/report' ) );
 
-						app.get( urls.report.start( barrierId ) ).end( ( err, res ) => {
+						app.get( urls.report.start( reportId ) ).end( ( err, res ) => {
 
 							checkResponse( res, 200 );
 							expect( getTitle( res ) ).toEqual( 'Market Access - Report - Status of the problem' );

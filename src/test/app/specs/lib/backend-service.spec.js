@@ -42,27 +42,27 @@ describe( 'Backend Service', () => {
 		} );
 	} );
 
-	describe( 'getBarriers', () => {
+	describe( 'getReports', () => {
 		it( 'Should call the correct path', () => {
 
-			service.getBarriers( req );
+			service.getReports( req );
 
-			expect( backend.get ).toHaveBeenCalledWith( '/barriers/', token );
+			expect( backend.get ).toHaveBeenCalledWith( '/reports/', token );
 		} );
 	} );
 
-	describe( 'getBarrier', () => {
+	describe( 'getReport', () => {
 		it( 'Should call the correct path', () => {
 
-			const barrierId = 1;
+			const reportId = 1;
 
-			service.getBarrier( req, barrierId );
+			service.getReport( req, reportId );
 
-			expect( backend.get ).toHaveBeenCalledWith( `/barriers/${ barrierId }/`, token );
+			expect( backend.get ).toHaveBeenCalledWith( `/reports/${ reportId }/`, token );
 		} );
 	} );
 
-	describe( 'saveNewBarrier', () => {
+	describe( 'saveNewReport', () => {
 		it( 'Should POST to the correct path', () => {
 
 			const status = 1;
@@ -70,9 +70,9 @@ describe( 'Backend Service', () => {
 			const company = { id: 3, name: 'test company' };
 			const contactId = '123-abc';
 
-			service.saveNewBarrier( req, { status, emergency }, company, contactId );
+			service.saveNewReport( req, { status, emergency }, company, contactId );
 
-			expect( backend.post ).toHaveBeenCalledWith( '/barriers/', token, {
+			expect( backend.post ).toHaveBeenCalledWith( '/reports/', token, {
 				problem_status: status,
 				is_emergency: emergency,
 				company_id: company.id,
@@ -82,18 +82,18 @@ describe( 'Backend Service', () => {
 		} );
 	} );
 
-	describe( 'updateBarrier', () => {
+	describe( 'updateReport', () => {
 		it( 'Should POST to the correct path', () => {
 
 			const status = 1;
 			const emergency = 2;
 			const company = { id: 3, name: 'test company' };
 			const contactId = '123-abc';
-			const barrierId = '2';
+			const reportId = '2';
 
-			service.updateBarrier( req, barrierId, { status, emergency }, company, contactId );
+			service.updateReport( req, reportId, { status, emergency }, company, contactId );
 
-			expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/`, token, {
+			expect( backend.put ).toHaveBeenCalledWith( `/reports/${ reportId }/`, token, {
 				problem_status: status,
 				is_emergency: emergency,
 				company_id: company.id,

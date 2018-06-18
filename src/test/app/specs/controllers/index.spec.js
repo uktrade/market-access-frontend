@@ -15,7 +15,7 @@ describe( 'Index controller', () => {
 
 		ssoToken = 'abc-123';
 		backend = {
-			getBarriers: jasmine.createSpy( 'backend.getBarriers' )
+			getReports: jasmine.createSpy( 'backend.getReports' )
 		};
 		dashboardViewModel = jasmine.createSpy( 'dashboard view model' );
 
@@ -31,9 +31,9 @@ describe( 'Index controller', () => {
 
 	describe( 'Without an error', () => {
 		describe( 'With a success response', () => {
-			it( 'Should get the barriers and render the index page', async () => {
+			it( 'Should get the reports and render the index page', async () => {
 
-				const barrierResponse = {
+				const reportResponse = {
 					response: { isSuccess: true  },
 					body: {
 						results: [ { id: 1 } ]
@@ -42,31 +42,31 @@ describe( 'Index controller', () => {
 				const dashboardViewModelResponse = { dashboard: true };
 
 				dashboardViewModel.and.callFake( () => dashboardViewModelResponse );
-				backend.getBarriers.and.callFake( () => Promise.resolve( barrierResponse ) );
+				backend.getReports.and.callFake( () => Promise.resolve( reportResponse ) );
 
 				await controller( req, res, next );
 
 				expect( next ).not.toHaveBeenCalled();
-				expect( backend.getBarriers ).toHaveBeenCalledWith( req );
-				expect( dashboardViewModel ).toHaveBeenCalledWith( barrierResponse.body.results );
+				expect( backend.getReports ).toHaveBeenCalledWith( req );
+				expect( dashboardViewModel ).toHaveBeenCalledWith( reportResponse.body.results );
 				expect( res.render ).toHaveBeenCalledWith( 'index', dashboardViewModelResponse );
 			} );
 		} );
 
 		describe( 'Without a success response', () => {
-			it( 'Should get the barriers and render the index page', async () => {
+			it( 'Should get the reports and render the index page', async () => {
 
-				const barrierResponse = {
+				const reportResponse = {
 					response: { isSuccess: false  },
 					body: {}
 				};
 
-				backend.getBarriers.and.callFake( () => Promise.resolve( barrierResponse ) );
+				backend.getReports.and.callFake( () => Promise.resolve( reportResponse ) );
 
 				await controller( req, res, next );
 
-				expect( next ).toHaveBeenCalledWith( new Error( `Got ${ barrierResponse.response.statusCode } response from backend` ) );
-				expect( backend.getBarriers ).toHaveBeenCalledWith( req );
+				expect( next ).toHaveBeenCalledWith( new Error( `Got ${ reportResponse.response.statusCode } response from backend` ) );
+				expect( backend.getReports ).toHaveBeenCalledWith( req );
 				expect( res.render ).not.toHaveBeenCalled();
 			} );
 		} );
@@ -77,7 +77,7 @@ describe( 'Index controller', () => {
 
 			const err = new Error( 'issue with backend' );
 
-			backend.getBarriers.and.callFake( () => Promise.reject( err ) );
+			backend.getReports.and.callFake( () => Promise.reject( err ) );
 
 			await controller( req, res, next );
 

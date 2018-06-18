@@ -16,7 +16,7 @@ describe( 'hasCompany middleware', () => {
 		req = {
 			session: {},
 			params: {
-				barrierId: '2'
+				reportId: '2'
 			}
 		};
 		res = {
@@ -30,10 +30,10 @@ describe( 'hasCompany middleware', () => {
 		} );
 	} );
 
-	describe( 'When there is a req.barrier object', () => {
+	describe( 'When there is a req.report object', () => {
 		it( 'Should call next', () => {
 
-			req.barrier = {
+			req.report = {
 				id: 1,
 				state: 2
 			};
@@ -58,13 +58,13 @@ describe( 'hasCompany middleware', () => {
 		} );
 	} );
 
-	describe( 'When there is not a req.barrier object or a reportCompany in the session', () => {
+	describe( 'When there is not a req.report object or a reportCompany in the session', () => {
 		it( 'Should redirect to the company search page', () => {
 
 			middleware( req, res, next );
 
 			expect( next ).not.toHaveBeenCalled();
-			expect( companySearch ).toHaveBeenCalledWith( req.params.barrierId );
+			expect( companySearch ).toHaveBeenCalledWith( req.params.reportId );
 			expect( res.redirect ).toHaveBeenCalledWith( companySearchUrlResponse );
 		} );
 	} );

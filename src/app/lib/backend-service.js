@@ -9,16 +9,16 @@ module.exports = {
 
 	getMetadata: () => backend.get( '/metadata/' ),
 	getUser: ( req ) => backend.get( '/whoami/', getToken( req ) ),
-	getBarriers: ( req ) => backend.get( '/barriers/', getToken( req ) ),
-	getBarrier: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }/`, getToken( req ) ),
-	saveNewBarrier: ( req, { status, emergency }, company, contactId ) => backend.post( '/barriers/', getToken( req ), {
+	getReports: ( req ) => backend.get( '/reports/', getToken( req ) ),
+	getReport: ( req, reportId ) => backend.get( `/reports/${ reportId }/`, getToken( req ) ),
+	saveNewReport: ( req, { status, emergency }, company, contactId ) => backend.post( '/reports/', getToken( req ), {
 		problem_status: status,
 		is_emergency: emergency,
 		company_id: company.id,
 		company_name: company.name,
 		contact_id: contactId
 	} ),
-	updateBarrier: ( req, barrierId, { status, emergency }, company, contactId ) => backend.put( `/barriers/${ barrierId }/`, getToken( req ), {
+	updateReport: ( req, reportId, { status, emergency }, company, contactId ) => backend.put( `/reports/${ reportId }/`, getToken( req ), {
 		problem_status: status,
 		is_emergency: emergency,
 		company_id: company.id,

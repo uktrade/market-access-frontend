@@ -1,6 +1,6 @@
 {
 	"$schema": "http://json-schema.org/draft-04/schema#",
-	"title": "List of barriers",
+	"title": "List of reports",
 
 	"type": "object",
 	"required": [ "count", "results" ],
@@ -18,13 +18,13 @@
 			"minItems": 1,
 			"maxItems": 5,
 			"items": {
-				"$ref": "#/refs/barrier"
+				"$ref": "#/refs/report"
 			}
 		}
 	},
 
 	"refs": {
-		"barrier": {
+		"report": {
 			"type": "object",
 			"required": [ "id", "company_name" ],
 			"properties": {

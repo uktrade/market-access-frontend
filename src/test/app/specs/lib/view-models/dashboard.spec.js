@@ -21,11 +21,11 @@ describe( 'Dashboard view model', () => {
 		} );
 	} );
 
-	describe( 'When there are some barriers', () => {
+	describe( 'When there are some reports', () => {
 
 		it( 'Should transform them', () => {
 
-			const barriers = [
+			const reports = [
 				{
 					problem_status: '1',
 					is_emergency: true
@@ -38,21 +38,21 @@ describe( 'Dashboard view model', () => {
 				}
 			];
 
-			viewModel( barriers );
+			viewModel( reports );
 
-			expect( barriers[ 0 ].problem_status ).toEqual( {
+			expect( reports[ 0 ].problem_status ).toEqual( {
 				id: '1',
 				name: 'test',
 				isEmergency: true
 			} );
 
-			expect( barriers[ 1 ].problem_status ).toEqual( {
+			expect( reports[ 1 ].problem_status ).toEqual( {
 				id: '2',
 				name: 'testing',
 				isEmergency: true
 			} );
 
-			expect( barriers[ 2 ].problem_status ).toEqual( {
+			expect( reports[ 2 ].problem_status ).toEqual( {
 				id: '3',
 				name: 'more tests',
 				isEmergency: false
@@ -60,14 +60,14 @@ describe( 'Dashboard view model', () => {
 		} );
 	} );
 
-	describe( 'When the list of barrier is empty', () => {
+	describe( 'When the list of reports is empty', () => {
 
-		it( 'Should return the barriers', () => {
+		it( 'Should return the reports', () => {
 
 			const input = [];
 			const output = viewModel( input );
 
-			expect( output ).toEqual( { barriers: input } );
+			expect( output ).toEqual( { reports: input } );
 		} );
 	} );
 } );

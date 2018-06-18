@@ -16,7 +16,7 @@ describe( 'hasStartFormValues middleware', () => {
 		req = {
 			session: {},
 			params: {
-				barrierId: '2'
+				reportId: '2'
 			}
 		};
 		res = {
@@ -50,7 +50,7 @@ describe( 'hasStartFormValues middleware', () => {
 			middleware( req, res, next );
 
 			expect( next ).not.toHaveBeenCalled();
-			expect( start ).toHaveBeenCalledWith( req.params.barrierId );
+			expect( start ).toHaveBeenCalledWith( req.params.reportId );
 			expect( res.redirect ).toHaveBeenCalledWith( startUrlResponse );
 		} );
 	} );

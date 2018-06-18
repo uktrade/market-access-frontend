@@ -7,7 +7,7 @@
 
 {% block page_content %}
 
-		{{ govukBackLink({ href: urls.report.contacts( contact.company.id, barrier.id ) }) }}
+		{{ govukBackLink({ href: urls.report.contacts( contact.company.id, report.id ) }) }}
 
 		<h1 class="govuk-heading-l">
 			<span class="govuk-caption-m">Report a barrier</span> About the reporter
@@ -41,7 +41,7 @@
 			</pre>
 #}
 
-			<form action="{{ urls.report.save( barrier.id ) }}" method="POST">
+			<form action="{{ urls.report.save( report.id ) }}" method="POST">
 				<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 				<input type="hidden" name="contactId" value="{{ contact.id }}">
 				<input type="submit" class="govuk-button" value="Save and continue">
@@ -52,6 +52,6 @@
 
 		<span class="govuk-heading-s">Or</span>
 
-		<a href="{{ urls.report.contacts( barrierId, contact.company.id ) }}">Choose another contact</a>
+		<a href="{{ urls.report.contacts( report.id, contact.company.id ) }}">Choose another contact</a>
 
 {% endblock %}

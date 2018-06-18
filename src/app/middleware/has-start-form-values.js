@@ -5,12 +5,12 @@ module.exports = ( req, res, next ) => {
 
 	const startFormValues = req.session.startFormValues;
 
-	if( req.barrier || startFormValues ){
+	if( req.report || startFormValues ){
 
 		next();
 
 	} else {
 		logger.debug( 'No startFormValues in session, redirecting...' );
-		res.redirect( urls.report.start( req.params.barrierId ) );
+		res.redirect( urls.report.start( req.params.reportId ) );
 	}
 };
