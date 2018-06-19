@@ -81,6 +81,20 @@ describe( 'errors middleware', function(){
 						expect( logger.error ).toHaveBeenCalled();
 					} );
 				} );
+
+				describe( 'A EBADCSRFTOKEN error', function(){
+					it( 'Should return a 400 status', function(){
+
+						const invalidCsrfTokenError = new Error( 'Invalid csrf token' );
+						invalidCsrfTokenError.code = 'EBADCSRFTOKEN';
+
+						middleware.catchAll( invalidCsrfTokenError, req, res, next );
+
+						expect( res.status ).toHaveBeenCalledWith( 400 );
+						expect( res.render ).toHaveBeenCalledWith( 'error/invalid-csrf-token' );
+						expect( logger.error ).toHaveBeenCalled();
+					} );
+				} );
 			} );
 		} );
 

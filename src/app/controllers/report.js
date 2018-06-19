@@ -59,12 +59,8 @@ module.exports = {
 
 		//TODO: Validate search term
 		if( hasQueryParam && !query ){
-			data.errors = [
-				{
-					href: '#company',
-					text: 'Please enter a search term'
-				}
-			];
+
+			req.error( 'company', 'Please enter a search term' );
 		}
 
 		if( query ){
