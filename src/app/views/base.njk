@@ -3,7 +3,7 @@
 	<!--[if gt IE 8]><!--><html lang="en"><!--<![endif]-->
 	<head>
 		<meta charset="utf-8">
-		<title>{% block page_title %}Market Access{% endblock %}</title>
+		<title>{{ 'Error: ' if errors.length }}{% block page_title %}Market Access{% endblock %}</title>
 
 		<!-- build:css(src) /public/css/layout/govuk-template.min.css -->
 		<!--[if gt IE 8]><!--><link rel="stylesheet" media="screen" href="/public/css/layout/govuk-template.css"><!--<![endif]-->

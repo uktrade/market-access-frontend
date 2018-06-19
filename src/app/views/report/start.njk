@@ -1,4 +1,5 @@
 {% from 'frontend/components/radios/macro.njk' import govukRadios %}
+{% from 'components/heading.njk' import heading %}
 
 {% extends 'layout.njk' %}
 
@@ -6,40 +7,44 @@
 
 {% block page_content %}
 
-	<h1 class="govuk-heading-l">
-		<span class="govuk-caption-m">Report a barrier</span> Status of the problem
-	</h1>
+	{{ heading({
+		caption: 'Report a barrier',
+		text: 'Status of the problem',
+		errors: errors
+	}) }}
 
 	<form action="" method="POST">
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
 		{{ govukRadios({
-			'name': 'status',
-			'classes': 'problem-status',
-			'fieldset': {
-				'legend': {
-					'text': 'What is the current status of the problem?',
-					'classes': 'govuk-fieldset__legend--s'
+			name: 'status',
+			classes: 'problem-status',
+			fieldset: {
+				legend: {
+					text: 'What is the current status of the problem?',
+					classes: 'govuk-fieldset__legend--s'
 				}
 			},
-			'items': statusTypes
+			items: statusTypes,
+			errorMessage: errors | errorForName( 'status' )
 		}) }}
 
 		<div class="report-barrier-emergency paragraph-width" id="report-barrier-emergency">
 
 			{{ govukRadios({
-				'name': 'emergency',
-				'classes': 'govuk-radios--inline',
-				'fieldset': {
-					'legend': {
-						'text': 'Is this an emergency?',
-						'classes': 'govuk-fieldset__legend--s'
+				name: 'emergency',
+				lasses: 'govuk-radios--inline',
+				fieldset: {
+					legend: {
+						text: 'Is this an emergency?',
+						classes: 'govuk-fieldset__legend--s'
 					}
 				},
-				'hint': {
-					'text': 'Is an export facing significant and imminent financial or other loss and does government need to take action urgently?'
+				hint: {
+					text: 'Is an export facing significant and imminent financial or other loss and does government need to take action urgently?'
 				},
-				'items': emergencyTypes
+				items: emergencyTypes,
+				errorMessage: errors | errorForName( 'emergency' )
 			}) }}
 		</div>
 

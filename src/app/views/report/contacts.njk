@@ -1,5 +1,5 @@
-{% from 'frontend/components/back-link/macro.njk' import govukBackLink %}
 {% from 'frontend/components/warning-text/macro.njk' import govukWarningText %}
+{% from 'components/heading.njk' import heading %}
 
 {% extends 'layout.njk' %}
 
@@ -7,11 +7,11 @@
 
 {% block page_content %}
 
-	{{ govukBackLink({ href: urls.report.companySearch( report.id ) }) }}
-
-	<h1 class="govuk-heading-l">
-		<span class="govuk-caption-m">Report a barrier</span> About the reporter
-	</h1>
+	{{ heading({
+		back: { href: urls.report.companySearch( report.id ) },
+		caption: 'Report a barrier',
+		text: 'About the reporter'
+	}) }}
 
 	<h2 class="govuk-heading-s">Who at {{ company.name }} raised the issue?</h2>
 	<p class="govuk-hint govuk-!-mb-r5">

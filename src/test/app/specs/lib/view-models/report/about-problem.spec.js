@@ -67,7 +67,7 @@ describe( 'Start form view model', () => {
 		} );
 	} );
 
-	describe( 'Without any session values', () => {
+	describe( 'Without any form or session values', () => {
 		it( 'Should get data and return a view model', () => {
 
 			const model = viewModel( csrfToken );
@@ -76,7 +76,7 @@ describe( 'Start form view model', () => {
 		} );
 	} );
 
-	describe( 'With session values', () => {
+	describe( 'With form values', () => {
 		describe( 'With a losses value', () => {
 			it( 'Should mark the correct one as checked', () => {
 

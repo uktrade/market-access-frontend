@@ -8,6 +8,7 @@ const headerNav = require( './middleware/header-nav' );
 const user = require( './middleware/user' );
 const hasStartFormValues = require( './middleware/has-start-form-values' );
 const hasCompany = require( './middleware/has-company' );
+const formErrors = require( './middleware/form-errors' );
 
 const companyId = require( './middleware/params/company-id' );
 const contactId = require( './middleware/params/contact-id' );
@@ -24,6 +25,7 @@ module.exports = function( express, app ){
 	app.get( '/login/callback/', ssoController.callback );
 
 	app.use( user );
+	app.use( formErrors );
 
 	app.param( 'companyId', companyId );
 	app.param( 'contactId', contactId );
@@ -45,4 +47,5 @@ module.exports = function( express, app ){
 	app.post( '/report/:reportId?/save/', reportHeaderNav, hasStartFormValues, hasCompany, parseBody, csrfProtection, reportController.save );
 
 	app.get( '/report/:reportId/problem/', reportHeaderNav, csrfProtection, reportController.aboutProblem );
+	app.post( '/report/:reportId/problem/', reportHeaderNav, parseBody, csrfProtection, reportController.aboutProblem );
 };

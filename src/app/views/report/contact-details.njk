@@ -1,4 +1,4 @@
-{% from 'frontend/components/back-link/macro.njk' import govukBackLink %}
+{% from 'components/heading.njk' import heading %}
 {% from 'components/details-list.njk' import detailsList %}
 
 {% extends 'layout.njk' %}
@@ -7,51 +7,51 @@
 
 {% block page_content %}
 
-		{{ govukBackLink({ href: urls.report.contacts( contact.company.id, report.id ) }) }}
+	{{ heading({
+		back: { href: urls.report.contacts( contact.company.id, report.id ) },
+		caption: 'Report a barrier',
+		text: 'About the reporter'
+	}) }}
 
-		<h1 class="govuk-heading-l">
-			<span class="govuk-caption-m">Report a barrier</span> About the reporter
-		</h1>
+	<section class="restrict-width">
 
-		<section class="restrict-width">
+		<h2 class="govuk-heading-s">Contact summary</h2>
 
-			<h2 class="govuk-heading-s">Contact summary</h2>
-
-			{{ detailsList( [
-				{
-					'key': 'Name',
-					'value': contact.name
-				},{
-					'key': 'Job title',
-					'value': contact.job_title
-				},{
-					'key': 'Country',
-					'value': contact.address_country.name
-				},{
-					'key': 'Phone number',
-					'value': contact.telephone_number
-				},{
-					'key': 'Email',
-					'value': contact.email
-				}
-			] ) }}
+		{{ detailsList( [
+			{
+				'key': 'Name',
+				'value': contact.name
+			},{
+				'key': 'Job title',
+				'value': contact.job_title
+			},{
+				'key': 'Country',
+				'value': contact.address_country.name
+			},{
+				'key': 'Phone number',
+				'value': contact.telephone_number
+			},{
+				'key': 'Email',
+				'value': contact.email
+			}
+		] ) }}
 {#
-			<pre>
-				{{ contact | dump( 2 ) }}
-			</pre>
+		<pre>
+			{{ contact | dump( 2 ) }}
+		</pre>
 #}
 
-			<form action="{{ urls.report.save( report.id ) }}" method="POST">
-				<input type="hidden" name="_csrf" value="{{ csrfToken }}">
-				<input type="hidden" name="contactId" value="{{ contact.id }}">
-				<input type="submit" class="govuk-button" value="Save and continue">
-				<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>
-			</form>
+		<form action="{{ urls.report.save( report.id ) }}" method="POST">
+			<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+			<input type="hidden" name="contactId" value="{{ contact.id }}">
+			<input type="submit" class="govuk-button" value="Save and continue">
+			<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>
+		</form>
 
-		</section>
+	</section>
 
-		<span class="govuk-heading-s">Or</span>
+	<span class="govuk-heading-s">Or</span>
 
-		<a href="{{ urls.report.contacts( report.id, contact.company.id ) }}">Choose another contact</a>
+	<a href="{{ urls.report.contacts( report.id, contact.company.id ) }}">Choose another contact</a>
 
 {% endblock %}

@@ -10,27 +10,58 @@ module.exports = {
 
 	start: ( req, res ) => {
 
-		if( req.method === 'POST' ){
+		const isPost = ( req.method === 'POST' );
+		const { status, emergency } = req.body || {};
+		const formValues = { status, emergency };
 
-			const { status, emergency } = req.body;
+		let hasErrors = false;
+
+		if( isPost ){
+
+			const statusError = ( !status || !status.length );
+
+			if( statusError ){
+
+				hasErrors = true;
+				req.error( 'status', 'Please select the current status of the problem' );
+			}
+
+			if( !statusError ){
+
+				if( ( status === '1' || status === '2' ) && !emergency ){
+
+					hasErrors = true;
+					req.error( 'emergency', 'Please answer if the problem is an emergency' );
+				}
+			}
+
+			delete req.session.startFormValues;
+		}
+
+		if( isPost && !hasErrors ){
 
 			//TODO: validate input
-			req.session.startFormValues = { status, emergency };
+			req.session.startFormValues = formValues;
 
 			res.redirect( urls.report.companySearch( req.params.reportId ) );
 
 		} else {
 
-			res.render( 'report/start', startFormViewModel( req.csrfToken(), req.session.startFormValues ) );
+			res.render( 'report/start', startFormViewModel( req.csrfToken(), formValues, req.session.startFormValues ) );
 		}
 	},
 
 	companySearch: async ( req, res, next ) => {
 
-		const query = req.query.company;
+		const hasQueryParam = ( typeof req.query.company !== 'undefined' );
+		const query = hasQueryParam && req.query.company;
 		const data = {};
 
 		//TODO: Validate search term
+		if( hasQueryParam && !query ){
+
+			req.error( 'company', 'Please enter a search term' );
+		}
 
 		if( query ){
 
@@ -149,5 +180,40 @@ module.exports = {
 		}
 	},
 
-	aboutProblem: ( req, res ) => res.render( 'report/about-problem', aboutProblemViewModel( req.csrfToken() ) )
+	aboutProblem: ( req, res ) => {
+
+		let formValues = {};
+
+		if( req.method === 'POST' ){
+
+			const {
+				item,
+				commodityCode,
+				country,
+				description,
+				impact,
+				losses,
+				otherCompanies
+			} = req.body;
+
+			if( !item ){ req.error( 'item', 'Please enter the product or service being exported' ); }
+			if( !country ){ req.error( 'country', 'Please choose an export country/trading bloc' ); }
+			if( !description ){ req.error( 'description', 'Please enter a brief description of the problem' ); }
+			if( !impact ){ req.error( 'impact', 'Please describe the impact of the problem' ); }
+			if( !losses ){ req.error( 'losses-1', 'Please select the value of losses' ); }
+			if( !otherCompanies ){ req.error( 'other-companies-1', 'Please answer if any other companies are affected' ); }
+
+			formValues = {
+				item,
+				commodityCode,
+				country,
+				description,
+				impact,
+				losses,
+				otherCompanies
+			};
+		}
+
+		res.render( 'report/about-problem', aboutProblemViewModel( req.csrfToken(), formValues ) );
+	}
 };

@@ -1,4 +1,4 @@
-{% from 'frontend/components/back-link/macro.njk' import govukBackLink %}
+{% from 'components/heading.njk' import heading %}
 {% from 'components/details-list.njk' import detailsList %}
 
 {% extends 'layout.njk' %}
@@ -7,11 +7,11 @@
 
 {% block page_content %}
 
-		{{ govukBackLink({ href: urls.report.companySearch( report.id ) }) }}
-
-		<h1 class="govuk-heading-l">
-			<span class="govuk-caption-m">Report a barrier</span> Export company affected
-		</h1>
+		{{ heading({
+			back: { href: urls.report.companySearch( report.id ) },
+			caption: 'Report a barrier',
+			text: 'Export company affected'
+		}) }}
 
 		<section class="restrict-width">
 

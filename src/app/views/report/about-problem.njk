@@ -1,7 +1,7 @@
 {% from 'frontend/components/input/macro.njk' import govukInput %}
 {% from 'frontend/components/textarea/macro.njk' import govukTextarea %}
 {% from 'frontend/components/radios/macro.njk' import govukRadios %}
-{% from 'frontend/components/back-link/macro.njk' import govukBackLink %}
+{% from 'components/heading.njk' import heading %}
 
 {% extends 'layout.njk' %}
 
@@ -9,13 +9,16 @@
 
 {% block page_content %}
 
-	{{ govukBackLink({ href: urls.report.contacts( report.company_id, report.id ) }) }}
+	{{ heading({
+		back: { href: urls.report.contacts( report.company_id, report.id ) },
+		caption: 'Report a barrier',
+		text: 'About the problem',
+		errors: errors
+	}) }}
 
-	<h1 class="govuk-heading-l">
-		<span class="govuk-caption-m">Report a barrier</span> About the problem
-	</h1>
+	<form action="{{ urls.report.aboutProblem( report.id ) }}" method="POST" class="restrict-width">
 
-	<form action="" method="post" class="restrict-width">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
 		{{ govukInput( {
 
@@ -24,7 +27,8 @@
 				classes: 'govuk-label--s'
 			},
 			id: 'item',
-			name: 'item'
+			name: 'item',
+			errorMessage: errors | errorForName( 'item' )
 		} ) }}
 
 		{{ govukInput( {
@@ -34,7 +38,8 @@
 				classes: 'govuk-label--s'
 			},
 			id: 'commodity-code',
-			name: 'commodityCode'
+			name: 'commodityCode',
+			errorMessage: errors | errorForName( 'comodityCode' )
 		} ) }}
 
 		{{ govukInput( {
@@ -44,7 +49,8 @@
 				classes: 'govuk-label--s'
 			},
 			id: 'country',
-			name: 'country'
+			name: 'country',
+			errorMessage: errors | errorForName( 'country' )
 		} ) }}
 
 		{{ govukTextarea( {
@@ -54,7 +60,8 @@
 				classes: 'govuk-label--s'
 			},
 			id: 'description',
-			name: 'description'
+			name: 'description',
+			errorMessage: errors | errorForName( 'description' )
 		} ) }}
 
 		{{ govukTextarea( {
@@ -63,8 +70,9 @@
 				text: "What impact would you expect the problem to have on the company if it is not resolved?",
 				classes: 'govuk-label--s'
 			},
-			id: 'impace',
-			name: 'impact'
+			id: 'impact',
+			name: 'impact',
+			errorMessage: errors | errorForName( 'impact' )
 		} ) }}
 
 		{{ govukRadios( {
@@ -77,7 +85,8 @@
 					classes: 'govuk-fieldset__legend--s'
 				}
 			},
-			items: losses
+			items: losses,
+			errorMessage: errors | errorForName( 'losses-1' )
 			} )
 		}}
 
@@ -91,10 +100,10 @@
 					classes: 'govuk-fieldset__legend--s'
 				}
 			},
-			items: otherCompanies
+			items: otherCompanies,
+			errorMessage: errors | errorForName( 'other-companies-1' )
 			} )
 		}}
-
 
 		<input type="submit" class="govuk-button" value="Save and continue">
 		<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>

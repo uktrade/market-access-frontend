@@ -14,14 +14,14 @@ function isMatching( sessionValue ){
 	};
 }
 
-module.exports = ( csrfToken, sessionValues = {} ) => {
+module.exports = ( csrfToken, formValues = {}, sessionValues = {} ) => {
 
 	if( !lossScale ){ lossScale = radioItemsFromObj( metadata.lossScale ); }
 	if( !boolScale ){ boolScale = radioItemsFromObj( metadata.boolScale ); }
 
 	return {
 		csrfToken,
-		losses: lossScale.map( isMatching( sessionValues.losses ) ),
-		otherCompanies: boolScale.map( isMatching( sessionValues.otherCompanies ) )
+		losses: lossScale.map( isMatching( formValues.losses, sessionValues.losses ) ),
+		otherCompanies: boolScale.map( isMatching( formValues.otherCompanies, sessionValues.otherCompanies ) )
 	};
 };

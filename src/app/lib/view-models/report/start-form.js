@@ -14,17 +14,17 @@ const emergencyTypes = [
 	}
 ];
 
-function isMatching( sessionValue ){
+function isMatching( ...values ){
 
 	return ( item ) => {
 
-		item.checked = ( sessionValue == item.value );
+		item.checked = ( values.includes( item.value ) );
 
 		return item;
 	};
 }
 
-module.exports = ( csrfToken, sessionValues = {} ) => {
+module.exports = ( csrfToken, formValues = {}, sessionValues = {} ) => {
 
 	if( !statusTypes ){
 
@@ -33,7 +33,7 @@ module.exports = ( csrfToken, sessionValues = {} ) => {
 
 	return {
 		csrfToken,
-		statusTypes: statusTypes.map( isMatching( sessionValues.status ) ),
-		emergencyTypes: emergencyTypes.map( isMatching( sessionValues.emergency ) )
+		statusTypes: statusTypes.map( isMatching( formValues.status, sessionValues.status,  ) ),
+		emergencyTypes: emergencyTypes.map( isMatching( formValues.emergency, sessionValues.emergency ) )
 	};
 };
