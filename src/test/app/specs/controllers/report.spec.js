@@ -101,15 +101,17 @@ describe( 'Report controller', () => {
 		describe( 'When it is a GET', () => {
 			it( 'Should get the status types and render the start page', () => {
 
+				let status, emergency;
 				const sessionValues = { status: 1, emergency: 2 };
 				const startFormViewModelResponse = { status1: true, status2: true };
+				const formValues = { status, emergency };
 
 				startFormViewModel.and.callFake( () => startFormViewModelResponse );
 				req.session.startFormValues = sessionValues;
 
 				controller.start( req, res );
 
-				expect( startFormViewModel ).toHaveBeenCalledWith( csrfToken, sessionValues );
+				expect( startFormViewModel ).toHaveBeenCalledWith( csrfToken, formValues, sessionValues );
 				expect( res.render ).toHaveBeenCalledWith( 'report/start', startFormViewModelResponse );
 			} );
 		} );
@@ -454,7 +456,7 @@ describe( 'Report controller', () => {
 
 			controller.aboutProblem( req, res );
 
-			expect( aboutProblemViewModel ).toHaveBeenCalledWith( csrfToken );
+			expect( aboutProblemViewModel ).toHaveBeenCalledWith( csrfToken, {} );
 			expect( res.render ).toHaveBeenCalledWith( 'report/about-problem', aboutProblemViewModelResponse );
 		} );
 	} );

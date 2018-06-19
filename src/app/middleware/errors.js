@@ -21,6 +21,11 @@ module.exports = {
 
 				res.sendStatus( 413 );
 
+			} else if( err.code === 'EBADCSRFTOKEN' ){
+
+				res.status( 400 );
+				res.render( 'error/invalid-csrf-token' );
+
 			} else {
 
 				res.status( 500 );

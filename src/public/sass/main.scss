@@ -24,6 +24,8 @@ $govuk-global-images: "/public/govuk/images/";
 @import 'frontend/components/warning-text/warning-text';
 @import 'frontend/components/textarea/textarea';
 @import 'frontend/components/back-link/back-link';
+@import 'frontend/components/error-summary/error-summary';
+@import 'frontend/components/error-message/error-message';
 
 @import 'error';
 

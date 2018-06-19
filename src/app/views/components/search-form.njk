@@ -1,3 +1,5 @@
+{% from 'frontend/components/error-message/macro.njk' import govukErrorMessage %}
+
 {% macro searchForm( opts ) -%}
 
 <form action="{{ opts.action }}" method="GET" role="search" class="search-form">
@@ -11,6 +13,8 @@
 			{{ opts.hint.text }}
 		</span>
 
+		{{ govukErrorMessage( opts.input.error ) if opts.input.error }}
+
 		<div class="search-form__input-group">
 			<input
 				class="govuk-input search-form__input"
@@ -19,7 +23,7 @@
 				type="text"
 				value="{{ opts.input.value }}"
 				placeholder="{{ opts.input.placeholder }}"
-				{{ 'autofocus' if not opts.input.value.length }}
+				{{ 'autofocus' if not opts.input.value.length and not opts.input.error }}
 				aria-describedby="{{ opts.input.id }}-hint">
 			<button type="submit" class="search-form__button"><span class="visually-hidden">Search</span></button>
 		</div>
