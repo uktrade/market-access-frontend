@@ -13,7 +13,7 @@
 		errors: errors
 	}) }}
 
-	<form action="" method="POST">
+	<form action="{{ urls.report.start( report.id ) }}" method="POST">
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
 		{{ govukRadios({

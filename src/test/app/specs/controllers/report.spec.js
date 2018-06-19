@@ -141,7 +141,7 @@ describe( 'Report controller', () => {
 				it( 'Should add an error', () => {
 
 					controller.start( req, res );
-					checkStartError( 'status' );
+					checkStartError( 'status-1' );
 				} );
 
 				describe( 'When no emergency is given', () => {
@@ -151,7 +151,7 @@ describe( 'Report controller', () => {
 
 							req.body.status = '1';
 							controller.start( req, res );
-							checkStartError( 'emergency' );
+							checkStartError( 'emergency-1' );
 						} );
 					} );
 
@@ -160,7 +160,7 @@ describe( 'Report controller', () => {
 
 							req.body.status = '2';
 							controller.start( req, res );
-							checkStartError( 'emergency' );
+							checkStartError( 'emergency-1' );
 						} );
 					} );
 				} );
@@ -399,9 +399,17 @@ describe( 'Report controller', () => {
 
 				contactId = 'abc-123';
 				req.body.contactId = contactId;
+				req.session.startFormValues = { status: 1 };
 				req.session.reportContact = contactId;
 				req.session.reportCompany = { id: 1 };
 			} );
+
+			function checkSession(){
+
+				expect( req.session.startFormValues ).not.toBeDefined();
+				expect( req.session.reportContact ).not.toBeDefined();
+				expect( req.session.reportCompany ).not.toBeDefined();
+			}
 
 			describe( 'When there is NOT a reportId', () => {
 				describe( 'When there is an error thrown', () => {
@@ -419,6 +427,9 @@ describe( 'Report controller', () => {
 
 				describe( 'When there is not an error', () => {
 					describe( 'When the response is a success', () => {
+
+						afterEach( () => checkSession() );
+
 						describe( 'When there is not an id in the body', () => {
 							it( 'Should call next with an error', async () => {
 
@@ -485,7 +496,9 @@ describe( 'Report controller', () => {
 				describe( 'When the response is a success', () => {
 					it( 'Should call the update method', async () => {
 
-						req.session.reportCompany = null;
+						delete req.session.startFormValues;
+						delete req.session.reportCompany;
+
 						req.report = {
 							status: 1,
 							is_emergency: 2,

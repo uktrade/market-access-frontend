@@ -23,7 +23,7 @@ module.exports = {
 			if( statusError ){
 
 				hasErrors = true;
-				req.error( 'status', 'Please select the current status of the problem' );
+				req.error( 'status-1', 'Please select the current status of the problem' );
 			}
 
 			if( !statusError ){
@@ -31,7 +31,7 @@ module.exports = {
 				if( ( status === '1' || status === '2' ) && !emergency ){
 
 					hasErrors = true;
-					req.error( 'emergency', 'Please answer if the problem is an emergency' );
+					req.error( 'emergency-1', 'Please answer if the problem is an emergency' );
 				}
 			}
 
@@ -130,10 +130,10 @@ module.exports = {
 	save: async ( req, res, next ) => {
 
 		const contactId = req.body.contactId;
-		const sessionContact = req.session.reportContact;
 		const reportId = req.params.reportId;
 		const sessionStartForm = ( req.session.startFormValues || req.report && { status: req.report.status, emergency: req.report.is_emergency } );
 		const sessionCompany =  ( req.session.reportCompany || req.report && { id: req.report.company_id, name: req.report.company_name } );
+		const sessionContact = req.session.reportContact;
 		const isUpdate = !!reportId;
 		//TODO: Validate company id
 
@@ -154,6 +154,7 @@ module.exports = {
 				({ response, body } = await backend.saveNewReport( req, sessionStartForm, sessionCompany, sessionContact ));
 			}
 
+			delete req.session.startFormValues;
 			delete req.session.reportCompany;
 			delete req.session.reportContact;
 
