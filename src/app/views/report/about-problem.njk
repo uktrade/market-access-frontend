@@ -29,6 +29,7 @@
 			},
 			id: 'item',
 			name: 'item',
+			value: item,
 			errorMessage: errors | errorForName( 'item' )
 		} ) }}
 
@@ -40,6 +41,7 @@
 			},
 			id: 'commodity-code',
 			name: 'commodityCode',
+			value: commodityCode,
 			errorMessage: errors | errorForName( 'comodityCode' )
 		} ) }}
 
@@ -51,8 +53,8 @@
 			},
 			id: 'country',
 			name: 'country',
-			errorMessage: errors | errorForName( 'country' ),
-			items: countries
+			items: countries,
+			errorMessage: errors | errorForName( 'country' )
 		} ) }}
 
 		{{ govukTextarea( {
@@ -63,6 +65,7 @@
 			},
 			id: 'description',
 			name: 'description',
+			value: description,
 			errorMessage: errors | errorForName( 'description' )
 		} ) }}
 
@@ -74,6 +77,7 @@
 			},
 			id: 'impact',
 			name: 'impact',
+			value: impact,
 			errorMessage: errors | errorForName( 'impact' )
 		} ) }}
 

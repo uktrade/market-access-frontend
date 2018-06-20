@@ -5,6 +5,10 @@ const modulePath = '../../../../../../app/lib/view-models/report/about-problem';
 const csrfToken = uuid();
 const viewModelResponse = {
 	csrfToken,
+	item: undefined,
+	commodityCode: undefined,
+	description: undefined,
+	impact: undefined,
 	losses: [
 		{
 			value: '1',
@@ -40,10 +44,10 @@ const viewModelResponse = {
 		}
 	],
 	countries: [
-		{ value: '', text: 'Please choose a country' },
-		{ value: 'abc', text: 'a' },
-		{ value: 'def', text: 'b' },
-		{ value: 'ghi', text: 'c' }
+		{ selected: false, value: '', text: 'Please choose a country' },
+		{ selected: false, value: 'abc', text: 'a' },
+		{ selected: false, value: 'def', text: 'b' },
+		{ selected: false, value: 'ghi', text: 'c' }
 	]
 };
 
@@ -116,10 +120,10 @@ describe( 'Start form view model', () => {
 
 				let model = viewModel( csrfToken, { country: 'def' } );
 
-				expect( model.countries[ 0 ].selected ).not.toBeDefined();
-				expect( model.countries[ 1 ].selected ).not.toBeDefined();
+				expect( model.countries[ 0 ].selected ).toEqual( false );
+				expect( model.countries[ 1 ].selected ).toEqual( false );
 				expect( model.countries[ 2 ].selected ).toEqual( true );
-				expect( model.countries[ 3 ].selected ).not.toBeDefined();
+				expect( model.countries[ 3 ].selected ).toEqual( false );
 			} );
 		} );
 	} );

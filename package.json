@@ -8,7 +8,7 @@
     "npm": "5.6.0"
   },
   "scripts": {
-    "preversion": "npm test && npm run coverage",
+    "preversion": "npm run lint:app && npm run lint:public && npm test && npm run coverage",
     "postversion": "git push && git push --tags",
     "start": "NODE_ENV=production node --use-strict dist/server.js",
     "tag-master": "git tag v${npm_package_version}-master && git push --tags",
@@ -31,7 +31,10 @@
     "sass:prod": "node-sass src/public/sass/main.scss src/public/css/main.css --include-path ./src/public/sass/ --include-path './src/@govuk-frontend/' -x --output-style compressed",
     "generate-data": "run-p generate:*",
     "generate:backend": "node src/data/faker/backend.js",
-    "generate:datahub": "node src/data/faker/datahub.js"
+    "generate:datahub": "node src/data/faker/datahub.js",
+    "lint:app": "eslint src/app",
+    "lint:public": "eslint src/public/js --ignore-path src/public/js/.eslintignore",
+    "lint:tests": "eslint src/test/app/specs"
   },
   "repository": {
     "type": "git",

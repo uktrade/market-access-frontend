@@ -5,11 +5,12 @@ let lossScale;
 let boolScale;
 let countries;
 
-function isChecked( formValue, sessionValue ){
+function isChecked( formValue ){
 
 	return ( item ) => {
 
-		item.checked = ( formValue == item.value || sessionValue == item.value );
+		// overwrite property so we don't have to make new objecs
+		item.checked = ( formValue === item.value );
 
 		return item;
 	};
@@ -23,19 +24,18 @@ function selectItems( item ){
 	};
 }
 
-function isSelected( formValue, sessionValue ){
+function isSelected( formValue ){
 
 	return ( item ) => {
 
-		if( formValue === item.value || sessionValue === item.value ){
-			item.selected = true;
-		}
+		// overwrite property so we don't have to make new objecs
+		item.selected = ( !!item.value && formValue === item.value );
 
 		return item;
 	};
 }
 
-module.exports = ( csrfToken, formValues = {}, sessionValues = {} ) => {
+module.exports = ( csrfToken, formValues = {} ) => {
 
 	if( !lossScale ){ lossScale = radioItemsFromObj( metadata.lossScale ); }
 	if( !boolScale ){ boolScale = radioItemsFromObj( metadata.boolScale ); }
@@ -47,8 +47,12 @@ module.exports = ( csrfToken, formValues = {}, sessionValues = {} ) => {
 
 	return {
 		csrfToken,
-		losses: lossScale.map( isChecked( formValues.losses, sessionValues.losses ) ),
-		otherCompanies: boolScale.map( isChecked( formValues.otherCompanies, sessionValues.otherCompanies ) ),
-		countries: countries.map( isSelected( formValues.country, sessionValues.country ) )
+		item: formValues.item,
+		commodityCode: formValues.commodityCode,
+		description: formValues.description,
+		impact: formValues.impact,
+		losses: lossScale.map( isChecked( formValues.losses ) ),
+		otherCompanies: boolScale.map( isChecked( formValues.otherCompanies ) ),
+		countries: countries.map( isSelected( formValues.country ) )
 	};
 };

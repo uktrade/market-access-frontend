@@ -1,4 +1,4 @@
-
+/* eslint no-console: 0 */
 const cluster = require( 'cluster' );
 const config = require( './config' );
 const logger = require( './lib/logger' );
