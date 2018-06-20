@@ -38,6 +38,12 @@ const viewModelResponse = {
 			text: "Don't know",
 			checked: false
 		}
+	],
+	countries: [
+		{ value: '', text: 'Please choose a country' },
+		{ value: 'abc', text: 'a' },
+		{ value: 'def', text: 'b' },
+		{ value: 'ghi', text: 'c' }
 	]
 };
 
@@ -59,7 +65,12 @@ describe( 'Start form view model', () => {
 				"1": "Yes",
 				"2": "No",
 				"3": "Don't know"
-			}
+			},
+			countries: [
+				{ id: 'abc', name: 'a' },
+				{ id: 'def', name: 'b' },
+				{ id: 'ghi', name: 'c' }
+			]
 		};
 
 		viewModel = proxyquire( modulePath, {
@@ -97,6 +108,18 @@ describe( 'Start form view model', () => {
 				expect( model.otherCompanies[ 0 ].checked ).toEqual( false );
 				expect( model.otherCompanies[ 1 ].checked ).toEqual( false );
 				expect( model.otherCompanies[ 2 ].checked ).toEqual( true );
+			} );
+		} );
+
+		describe( 'With a country value', () => {
+			it( 'Should mark the correct one as selected', () => {
+
+				let model = viewModel( csrfToken, { country: 'def' } );
+
+				expect( model.countries[ 0 ].selected ).not.toBeDefined();
+				expect( model.countries[ 1 ].selected ).not.toBeDefined();
+				expect( model.countries[ 2 ].selected ).toEqual( true );
+				expect( model.countries[ 3 ].selected ).not.toBeDefined();
 			} );
 		} );
 	} );

@@ -1,6 +1,7 @@
 {% from 'frontend/components/input/macro.njk' import govukInput %}
 {% from 'frontend/components/textarea/macro.njk' import govukTextarea %}
 {% from 'frontend/components/radios/macro.njk' import govukRadios %}
+{% from 'frontend/components/select/macro.njk' import govukSelect %}
 {% from 'components/heading.njk' import heading %}
 
 {% extends 'layout.njk' %}
@@ -42,7 +43,7 @@
 			errorMessage: errors | errorForName( 'comodityCode' )
 		} ) }}
 
-		{{ govukInput( {
+		{{ govukSelect( {
 
 			label: {
 				text: "Which country/trading bloc are they trying to export to?",
@@ -50,7 +51,8 @@
 			},
 			id: 'country',
 			name: 'country',
-			errorMessage: errors | errorForName( 'country' )
+			errorMessage: errors | errorForName( 'country' ),
+			items: countries
 		} ) }}
 
 		{{ govukTextarea( {
