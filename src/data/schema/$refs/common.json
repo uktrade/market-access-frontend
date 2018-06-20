@@ -2,5 +2,10 @@
 	"uuid": {
 		"type": "string",
 		"faker": "random.uuid"
+	},
+
+	"words": {
+		"type": "string",
+		"faker": "lorem.words"
 	}
 }

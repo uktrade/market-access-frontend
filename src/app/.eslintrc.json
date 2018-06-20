@@ -1,5 +1,10 @@
 {
 	"env": {
 		"es6": true
+	},
+	"rules": {
+		"no-undefined": 0,
+		"no-global-assign": 2,
+		"no-shadow-restricted-names": 2
 	}
 }

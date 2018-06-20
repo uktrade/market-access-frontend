@@ -3,7 +3,7 @@
 	"title": "Metadata",
 
 	"type": "object",
-	"required": [ "status_types", "loss_range", "adv_boolean" ],
+	"required": [ "status_types", "loss_range", "adv_boolean", "countries" ],
 	"properties": {
 
 		"status_types": {
@@ -11,9 +11,9 @@
 			"required": [ "NOT_STARTED", "ACTIVE", "COMPLETE" ],
 			"properties": {
 
-				"NOT_STARTED": { "$ref": "#/refs/string" },
-				"ACTIVE": { "$ref": "#/refs/string" },
-				"COMPLETE": { "$ref": "#/refs/string" }
+				"NOT_STARTED": { "$ref": "$refs/common.json#/words" },
+				"ACTIVE": { "$ref": "$refs/common.json#/words" },
+				"COMPLETE": { "$ref": "$refs/common.json#/words" }
 			}
 		},
 
@@ -22,10 +22,10 @@
 			"required": [ "1", "2", "3", "4" ],
 			"properties": {
 
-				"1": { "$ref": "#/refs/string" },
-				"2": { "$ref": "#/refs/string" },
-				"3": { "$ref": "#/refs/string" },
-				"4": { "$ref": "#/refs/string" }
+				"1": { "$ref": "$refs/common.json#/words" },
+				"2": { "$ref": "$refs/common.json#/words" },
+				"3": { "$ref": "$refs/common.json#/words" },
+				"4": { "$ref": "$refs/common.json#/words" }
 			}
 		},
 
@@ -38,13 +38,41 @@
 				"2": "No",
 				"3": "Don't know"
 			}
+		},
+
+		"countries": {
+			"type": "array",
+			"minItems": 20,
+			"maxItems": 50,
+			"items": {
+				"$ref": "#/refs/country"
+			}
 		}
 	},
 
 	"refs": {
-		"string": {
-			"type": "string",
-			"faker": "lorem.words"
+		"country": {
+			"type": "object",
+			"required": [ "id", "name", "disabled_on" ],
+			"properties": {
+
+				"id": { "$ref": "$refs/common.json#/uuid" },
+
+				"name" : {
+					"type": "string",
+					"faker": "address.country"
+				},
+
+				"disabled_on": {
+					"oneOf": [
+						{ "type": "null" },
+						{
+							"type": "string",
+							"faker": "date.past"
+						}
+					]
+				}
+			}
 		}
 	}
 }

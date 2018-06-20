@@ -5,6 +5,10 @@ const modulePath = '../../../../../../app/lib/view-models/report/about-problem';
 const csrfToken = uuid();
 const viewModelResponse = {
 	csrfToken,
+	item: undefined,
+	commodityCode: undefined,
+	description: undefined,
+	impact: undefined,
 	losses: [
 		{
 			value: '1',
@@ -38,6 +42,12 @@ const viewModelResponse = {
 			text: "Don't know",
 			checked: false
 		}
+	],
+	countries: [
+		{ selected: false, value: '', text: 'Please choose a country' },
+		{ selected: false, value: 'abc', text: 'a' },
+		{ selected: false, value: 'def', text: 'b' },
+		{ selected: false, value: 'ghi', text: 'c' }
 	]
 };
 
@@ -59,7 +69,12 @@ describe( 'Start form view model', () => {
 				"1": "Yes",
 				"2": "No",
 				"3": "Don't know"
-			}
+			},
+			countries: [
+				{ id: 'abc', name: 'a' },
+				{ id: 'def', name: 'b' },
+				{ id: 'ghi', name: 'c' }
+			]
 		};
 
 		viewModel = proxyquire( modulePath, {
@@ -97,6 +112,18 @@ describe( 'Start form view model', () => {
 				expect( model.otherCompanies[ 0 ].checked ).toEqual( false );
 				expect( model.otherCompanies[ 1 ].checked ).toEqual( false );
 				expect( model.otherCompanies[ 2 ].checked ).toEqual( true );
+			} );
+		} );
+
+		describe( 'With a country value', () => {
+			it( 'Should mark the correct one as selected', () => {
+
+				let model = viewModel( csrfToken, { country: 'def' } );
+
+				expect( model.countries[ 0 ].selected ).toEqual( false );
+				expect( model.countries[ 1 ].selected ).toEqual( false );
+				expect( model.countries[ 2 ].selected ).toEqual( true );
+				expect( model.countries[ 3 ].selected ).toEqual( false );
 			} );
 		} );
 	} );

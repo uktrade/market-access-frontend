@@ -1,18 +1,50 @@
 {
    "status_types": {
-      "NOT_STARTED": "eos optio autem",
-      "ACTIVE": "magni ipsum quas",
-      "COMPLETE": "aliquid perferendis facere"
+      "NOT_STARTED": "facilis ab repellendus",
+      "ACTIVE": "sed quas nam",
+      "COMPLETE": "illum fuga rerum"
    },
    "loss_range": {
-      "1": "ut vel et",
-      "2": "dolores quia iste",
-      "3": "qui incidunt explicabo",
-      "4": "velit error blanditiis"
+      "1": "ducimus et aspernatur",
+      "2": "et et voluptas",
+      "3": "non est animi",
+      "4": "et recusandae eum"
    },
    "adv_boolean": {
       "1": "Yes",
       "2": "No",
       "3": "Don't know"
-   }
+   },
+   "countries": [
+      {
+         "id": "88cdc899-d234-43be-9221-bb667ef5a0ed",
+         "name": "San Marino",
+         "disabled_on": null
+      },
+      {
+         "id": "1121a63c-9454-40b4-a181-bbbcc2478197",
+         "name": "Dominican Republic",
+         "disabled_on": null
+      },
+      {
+         "id": "e0c18695-dc72-44cc-9328-838516a96564",
+         "name": "Republic of Korea",
+         "disabled_on": "Fri Mar 23 2018 16:14:57 GMT+0000 (GMT)"
+      },
+      {
+         "id": "1f8b0de3-d621-4300-9859-a2f4448c3dd7",
+         "name": "Niger",
+         "disabled_on": "Sat Jul 01 2017 01:44:54 GMT+0100 (BST)"
+      },
+      {
+         "id": "9c166249-4c40-4e36-b409-b596cbb4d02d",
+         "name": "Tanzania",
+         "disabled_on": null
+      },
+      {
+         "id": "c5fe85d5-39dc-4ece-b7a3-bb5fb99c2b14",
+         "name": "Armenia",
+         "disabled_on": "Sun Jun 03 2018 09:11:22 GMT+0100 (BST)"
+      }
+   ]
 }

@@ -37,6 +37,7 @@ jobs:
           DEBUG: 'True'
           SECRET_KEY: abc-123-456
           SSO_ENABLED: 'True'
+          FAKE_METADATA: 'True'
           DATABASE_URL: 'postgres://postgres@localhost/market_access'
           RESOURCE_SERVER_INTROSPECTION_URL: 'http://localhost:5000/o/introspect/'
           RESOURCE_SERVER_AUTH_TOKEN: abc123
