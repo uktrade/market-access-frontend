@@ -5,8 +5,11 @@ describe( 'metadata', () => {
 
 	let metadata;
 	let backend;
+	let fakeData;
 
 	beforeEach( () => {
+
+		fakeData = jasmine.getFakeData( '/backend/metadata/' );
 
 		backend = {
 			getMetadata: jasmine.createSpy( 'backend.getMetadata' )
@@ -24,7 +27,7 @@ describe( 'metadata', () => {
 
 					backend.getMetadata.and.callFake( () => Promise.resolve( {
 						response: { isSuccess: true },
-						body: { data: true }
+						body: fakeData
 					} ) );
 
 					await metadata.fetch();
@@ -69,54 +72,58 @@ describe( 'metadata', () => {
 		} );
 	} );
 
-	describe( 'statusTypes', () => {
-		it( 'Should return the data', async () => {
+	describe( 'With fakeData', () => {
 
-			const statusTypes = { statusType1: 'status-data', statusType2: 'status-data' };
-			const theData = { some: 'data', status_types: statusTypes };
+		beforeEach( async () => {
 
 			backend.getMetadata.and.callFake( () => Promise.resolve( {
 				response: { isSuccess: true },
-				body: theData
+				body: fakeData
 			} ) );
 
 			await metadata.fetch();
-
-			expect( metadata.statusTypes ).toEqual( statusTypes );
 		} );
-	} );
 
-	describe( 'lossScale', () => {
-		it( 'Should return the data', async () => {
+		describe( 'statusTypes', () => {
+			it( 'Should return the data', () => {
 
-			const lossScale = { '1': 'test', '2': 'tester' };
-			const theData = { some: 'data', loss_range: lossScale };
-
-			backend.getMetadata.and.callFake( () => Promise.resolve( {
-				response: { isSuccess: true },
-				body: theData
-			} ) );
-
-			await metadata.fetch();
-
-			expect( metadata.lossScale ).toEqual( lossScale );
+				expect( metadata.statusTypes ).toEqual( fakeData.status_types );
+			} );
 		} );
-	} );
 
-	describe( 'boolScale', () => {
-		it( 'Should return the data', async () => {
+		describe( 'lossScale', () => {
+			it( 'Should return the data', () => {
 
-			const boolScale = { '1': 'test', '2': 'tester' };
-			const theData = { some: 'data', adv_boolean: boolScale };
+				expect( metadata.lossScale ).toEqual( fakeData.loss_range );
+			} );
+		} );
 
-			backend.getMetadata.and.callFake( () => Promise.resolve( {
-				response: { isSuccess: true },
-				body: theData
-			} ) );
+		describe( 'boolScale', () => {
+			it( 'Should return the data', () => {
 
-			await metadata.fetch();
+				expect( metadata.boolScale ).toEqual( fakeData.adv_boolean );
+			} );
+		} );
 
-			expect( metadata.boolScale ).toEqual( boolScale );
+		describe( 'countries', () => {
+			it( 'Should return the data', () => {
+
+				expect( metadata.countries ).toEqual( [
+					{
+						"id": "88cdc899-d234-43be-9221-bb667ef5a0ed",
+						"name": "San Marino",
+						"disabled_on": null
+					},{
+						"id": "1121a63c-9454-40b4-a181-bbbcc2478197",
+						"name": "Dominican Republic",
+						"disabled_on": null
+					},{
+						"id": "9c166249-4c40-4e36-b409-b596cbb4d02d",
+						"name": "Tanzania",
+						"disabled_on": null
+					}
+				] );
+			} );
 		} );
 	} );
 } );

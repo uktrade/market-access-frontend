@@ -5,10 +5,7 @@
 	"type": "object",
 	"required": [ "id", "first_name", "last_name", "name", "address_1", "address_town", "address_county", "address_postcode", "address_country" ],
 	"properties": {
-		"id": {
-			"type": "string",
-			"faker": "random.uuid"
-		},
+		"id": { "$ref": "$refs/common.json#/uuid" },
 		"first_name": {
 			"type": "string",
 			"faker": "name.firstName"
