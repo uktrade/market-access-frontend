@@ -24,7 +24,8 @@ describe( 'Report controller', () => {
 			csrfToken: () => csrfToken,
 			session: {},
 			params: {},
-			error: jasmine.createSpy( 'req.error' )
+			error: jasmine.createSpy( 'req.error' ),
+			hasErrors: jasmine.createSpy( 'req.hasErrors' )
 		};
 		res = {
 			render: jasmine.createSpy( 'res.render' ),
@@ -32,7 +33,8 @@ describe( 'Report controller', () => {
 		};
 		backend = {
 			saveNewReport: jasmine.createSpy( 'backend.saveNewReport' ),
-			updateReport: jasmine.createSpy( 'backend.updateReport' )
+			updateReport: jasmine.createSpy( 'backend.updateReport' ),
+			saveProblem: jasmine.createSpy( 'backend.saveProblem' )
 		};
 		datahub = {
 			searchCompany: jasmine.createSpy( 'datahub.searchCompany' )
@@ -43,7 +45,8 @@ describe( 'Report controller', () => {
 				companySearch: jasmine.createSpy( 'urls.report.companySearch' ),
 				companyDetails: jasmine.createSpy( 'urls.report.companyDetails' ),
 				contacts: jasmine.createSpy( 'urls.report.contacts' ),
-				aboutProblem: jasmine.createSpy( 'urls.report.aboutProblem' )
+				aboutProblem: jasmine.createSpy( 'urls.report.aboutProblem' ),
+				nextSteps: jasmine.createSpy( 'urls.report.nextSteps' )
 			}
 		};
 		startFormViewModel = jasmine.createSpy( 'startFormViewModel' );
@@ -115,6 +118,7 @@ describe( 'Report controller', () => {
 
 					req.body = { status, emergency };
 
+					req.hasErrors.and.callFake( () => false );
 					urls.report.companySearch.and.callFake( () => companyUrl );
 
 					controller.start( req, res );
@@ -129,6 +133,7 @@ describe( 'Report controller', () => {
 				beforeEach( () => {
 
 					req.session.startFormValues = { test: 1 };
+					req.hasErrors.and.callFake( () => true );
 				} );
 
 				function checkStartError( ...errors ){
@@ -178,10 +183,11 @@ describe( 'Report controller', () => {
 
 				startFormViewModel.and.callFake( () => startFormViewModelResponse );
 				req.session.startFormValues = sessionValues;
+				req.report = { id: 1, test: 2 };
 
 				controller.start( req, res );
 
-				expect( startFormViewModel ).toHaveBeenCalledWith( csrfToken, formValues, sessionValues );
+				expect( startFormViewModel ).toHaveBeenCalledWith( csrfToken, req.report, formValues, sessionValues );
 				expect( res.render ).toHaveBeenCalledWith( 'report/start', startFormViewModelResponse );
 			} );
 		} );
@@ -500,7 +506,7 @@ describe( 'Report controller', () => {
 						delete req.session.reportCompany;
 
 						req.report = {
-							status: 1,
+							problem_status: 1,
 							is_emergency: 2,
 							company_id: 3,
 							company_name: 'fred'
@@ -513,7 +519,7 @@ describe( 'Report controller', () => {
 						const args = backend.updateReport.calls.argsFor( 0 );
 						expect( args[ 0 ] ).toEqual( req );
 						expect( args[ 1 ] ).toEqual( reportId );
-						expect( args[ 2 ] ).toEqual( { status: req.report.status, emergency: req.report.is_emergency } );
+						expect( args[ 2 ] ).toEqual( { status: req.report.problem_status, emergency: ( req.report.is_emergency + '' ) } );
 						expect( args[ 3 ] ).toEqual( { id: req.report.company_id, name: req.report.company_name } );
 						expect( args[ 4 ] ).toEqual( contactId );
 					} );
@@ -566,16 +572,24 @@ describe( 'Report controller', () => {
 	} );
 
 	describe( 'aboutProblem', () => {
+
+		let next;
+
+		beforeEach( () => {
+
+			next = jasmine.createSpy( 'next' );
+		} );
+
 		describe( 'When it is a GET', () => {
-			it( 'Should render the view with the viewModel', () => {
+			it( 'Should render the view with the viewModel', async () => {
 
 				const aboutProblemViewModelResponse = { some: 'data' };
 
 				aboutProblemViewModel.and.callFake( () => aboutProblemViewModelResponse );
 
-				controller.aboutProblem( req, res );
+				await controller.aboutProblem( req, res, next );
 
-				expect( aboutProblemViewModel ).toHaveBeenCalledWith( csrfToken, {} );
+				expect( aboutProblemViewModel ).toHaveBeenCalledWith( csrfToken, req.report, {} );
 				expect( res.render ).toHaveBeenCalledWith( 'report/about-problem', aboutProblemViewModelResponse );
 			} );
 		} );
@@ -589,36 +603,49 @@ describe( 'Report controller', () => {
 			} );
 
 			describe( 'When the required values are empty', () => {
-				it( 'Should add errors', () => {
+				it( 'Should add errors', async () => {
 
-					controller.aboutProblem( req, res );
+					req.hasErrors.and.callFake( () => true );
+
+					await controller.aboutProblem( req, res, next );
 
 					checkFormError( 'item', 'country', 'description', 'impact', 'losses-1', 'other-companies-1' );
 				} );
 			} );
 
 			describe( 'When the required values are filled', () => {
-				it( 'Should render the form with the values', () => {
+				describe( 'When the response is a success', () => {
 
-					const formValues = {
-						item: 'test',
-						commodityCode: 'test',
-						country: 'test',
-						description: 'test',
-						impact: 'test',
-						losses: 'test',
-						otherCompanies: 'test'
-					};
-					const aboutProblemViewModelResponse = { some: 'data' };
+					beforeEach( () => {
 
-					aboutProblemViewModel.and.callFake( () => aboutProblemViewModelResponse );
+						backend.saveProblem.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+					} );
 
-					req.body = formValues;
+					it( 'Should render the form with the values', async () => {
 
-					controller.aboutProblem( req, res );
+						const formValues = {
+							item: 'test',
+							commodityCode: 'test',
+							country: 'test',
+							description: 'test',
+							impact: 'test',
+							losses: 'test',
+							otherCompanies: 'test'
+						};
+						const nextStepsUrlResponse = '/next/';
 
-					expect( aboutProblemViewModel ).toHaveBeenCalledWith( csrfToken, formValues );
-					expect( res.render ).toHaveBeenCalledWith( 'report/about-problem', aboutProblemViewModelResponse );
+						req.report = { id: 1, b: 2 };
+						req.body = formValues;
+						req.hasErrors.and.callFake( () => false );
+						urls.report.nextSteps.and.callFake( () => nextStepsUrlResponse );
+
+						await controller.aboutProblem( req, res, next );
+
+						expect( next ).not.toHaveBeenCalled();
+						expect( backend.saveProblem ).toHaveBeenCalledWith( req, req.report.id, formValues );
+						expect( urls.report.nextSteps ).toHaveBeenCalledWith( req.report.id );
+						expect( res.redirect ).toHaveBeenCalledWith( nextStepsUrlResponse );
+					} );
 				} );
 			} );
 		} );

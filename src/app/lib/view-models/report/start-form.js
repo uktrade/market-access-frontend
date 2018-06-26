@@ -2,38 +2,30 @@ const metadata = require( '../../metadata' );
 const radioItemsFromObj = require( '../../radio-items-from-object' );
 
 let statusTypes;
-
-const emergencyTypes = [
-	{
-		'value': 'yes',
-		'text': "Yes"
-	},
-	{
-		'value': 'no',
-		'text': "No"
-	}
-];
+let emergencyTypes;
 
 function isMatching( ...values ){
 
+	const savedValue = values.find( ( value ) => value != null );
+
 	return ( item ) => {
 
-		item.checked = ( values.includes( item.value ) );
+		// need to use Abstract Equality Comparison
+		// as some values are saved as a string but returned as a number
+		item.checked = ( savedValue == item.value );
 
 		return item;
 	};
 }
 
-module.exports = ( csrfToken, formValues = {}, sessionValues = {} ) => {
+module.exports = ( csrfToken, report = {}, formValues = {}, sessionValues = {} ) => {
 
-	if( !statusTypes ){
-
-		statusTypes = radioItemsFromObj( metadata.statusTypes );
-	}
+	if( !statusTypes ){ statusTypes = radioItemsFromObj( metadata.statusTypes ); }
+	if( !emergencyTypes ){ emergencyTypes = radioItemsFromObj( metadata.bool ); }
 
 	return {
 		csrfToken,
-		statusTypes: statusTypes.map( isMatching( formValues.status, sessionValues.status,  ) ),
-		emergencyTypes: emergencyTypes.map( isMatching( formValues.emergency, sessionValues.emergency ) )
+		statusTypes: statusTypes.map( isMatching( formValues.status, sessionValues.status, report.problem_status ) ),
+		emergencyTypes: emergencyTypes.map( isMatching( formValues.emergency, sessionValues.emergency, ( report.is_emergency + '' ) ) )
 	};
 };

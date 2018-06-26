@@ -24,5 +24,14 @@ module.exports = {
 		company_id: company.id,
 		company_name: company.name,
 		contact_id: contactId
+	} ),
+	saveProblem: ( req, reportId, problem ) => backend.put( `/reports/${ reportId }/`, getToken( req ), {
+		product: problem.item,
+		commodity_codes: problem.commodityCode.split( ', ' ),
+		export_country: problem.country,
+		problem_description: problem.description,
+		problem_impact: problem.impact,
+		estimated_loss_range: problem.losses,
+		other_companies_affected: problem.otherCompanies
 	} )
 };

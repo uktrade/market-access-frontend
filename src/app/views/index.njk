@@ -52,7 +52,7 @@
 								{{ ( report.created_on | dateWithTime ) or ( '<span class="unknown">unknown</span>' | safe ) }}
 							</td>
 							<td class="standard-table__cell">
-								<a href="{{ urls.report.contacts( report.company_id, report.id ) }}">Continue</a>
+								<a href="{{ urls.nextReportStage( report ) }}">Continue</a>
 							</td>
 						</tr>
 						{% endfor %}

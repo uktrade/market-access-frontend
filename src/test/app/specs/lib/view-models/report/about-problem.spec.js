@@ -82,7 +82,7 @@ describe( 'Start form view model', () => {
 		} );
 	} );
 
-	describe( 'Without any form or session values', () => {
+	describe( 'Without a report or form values', () => {
 		it( 'Should get data and return a view model', () => {
 
 			const model = viewModel( csrfToken );
@@ -95,7 +95,7 @@ describe( 'Start form view model', () => {
 		describe( 'With a losses value', () => {
 			it( 'Should mark the correct one as checked', () => {
 
-				let model = viewModel( csrfToken, { losses: '2' } );
+				let model = viewModel( csrfToken, {}, { losses: '2' } );
 
 				expect( model.losses[ 0 ].checked ).toEqual( false );
 				expect( model.losses[ 1 ].checked ).toEqual( true );
@@ -107,7 +107,7 @@ describe( 'Start form view model', () => {
 		describe( 'With an otherCompanies value', () => {
 			it( 'Should mark the correct one as checked', () => {
 
-				let model = viewModel( csrfToken, { otherCompanies: '3' } );
+				let model = viewModel( csrfToken, {}, { otherCompanies: '3' } );
 
 				expect( model.otherCompanies[ 0 ].checked ).toEqual( false );
 				expect( model.otherCompanies[ 1 ].checked ).toEqual( false );
@@ -118,7 +118,7 @@ describe( 'Start form view model', () => {
 		describe( 'With a country value', () => {
 			it( 'Should mark the correct one as selected', () => {
 
-				let model = viewModel( csrfToken, { country: 'def' } );
+				let model = viewModel( csrfToken, {}, { country: 'def' } );
 
 				expect( model.countries[ 0 ].selected ).toEqual( false );
 				expect( model.countries[ 1 ].selected ).toEqual( false );

@@ -3,10 +3,6 @@ const uuid = require( 'uuid/v4' );
 const modulePath = '../../../../../../app/lib/view-models/report/start-form';
 
 const csrfToken = uuid();
-const radioItemsResponse = [
-	{ value: 'type1', text: 'a type' },
-	{ value: 'type2', text: 'another type' }
-];
 
 const viewModelResponse = {
 	csrfToken,
@@ -23,12 +19,12 @@ const viewModelResponse = {
 	],
 	emergencyTypes: [
 		{
-			value: 'yes',
+			value: 'true',
 			text: 'Yes',
 			checked: false
 		},
 		{
-			value: 'no',
+			value: 'false',
 			text: 'No',
 			checked: false
 		}
@@ -39,25 +35,26 @@ describe( 'Start form view model', () => {
 
 	let viewModel;
 	let metadata;
-	let radioItemsFromObject;
 
 	beforeEach( () => {
 
 		metadata = {
-			statusTypes: [ { '1': 'status' } ]
+			statusTypes: {
+				'type1': 'a type',
+				'type2': 'another type'
+			},
+			bool: {
+				'true': 'Yes',
+				'false': 'No'
+			}
 		};
 
-		radioItemsFromObject = jasmine.createSpy( 'radioItemsFromObject' );
-
-		radioItemsFromObject.and.callFake( () => radioItemsResponse );
-
 		viewModel = proxyquire( modulePath, {
-			'../../metadata': metadata,
-			'../../radio-items-from-object': radioItemsFromObject
+			'../../metadata': metadata
 		} );
 	} );
 
-	describe( 'Without any session values', () => {
+	describe( 'Without any values', () => {
 		it( 'Should get data and return a view model', () => {
 
 			const model = viewModel( csrfToken );
@@ -71,7 +68,7 @@ describe( 'Start form view model', () => {
 		describe( 'With a session value', () => {
 			it( 'Should mark the correct one as checked', () => {
 
-				let model = viewModel( csrfToken, { status: 'type2' } );
+				let model = viewModel( csrfToken, {}, { status: 'type2' } );
 
 				expect( model.statusTypes[ 0 ].checked ).toEqual( false );
 				expect( model.statusTypes[ 1 ].checked ).toEqual( true );
@@ -81,7 +78,7 @@ describe( 'Start form view model', () => {
 		describe( 'With an emergency value', () => {
 			it( 'Should mark the correct one as checked', () => {
 
-				let model = viewModel( csrfToken, { emergency: 'no' } );
+				let model = viewModel( csrfToken, {}, { emergency: 'false' } );
 
 				expect( model.emergencyTypes[ 0 ].checked ).toEqual( false );
 				expect( model.emergencyTypes[ 1 ].checked ).toEqual( true );

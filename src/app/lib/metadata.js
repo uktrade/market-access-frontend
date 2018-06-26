@@ -17,6 +17,12 @@ module.exports.fetch = async () => {
 			module.exports.lossScale = body.loss_range;
 			module.exports.boolScale = body.adv_boolean;
 			module.exports.countries = body.countries.filter( notDisabled );
+			module.exports.govResponse = body.govt_response;
+			module.exports.publishResponse = body.publish_response;
+			module.exports.bool = {
+				'true': 'Yes',
+				'false': 'No'
+			};
 
 		} else {
 

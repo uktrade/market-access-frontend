@@ -1,21 +1,107 @@
 {
-   "count": 6,
+   "count": 4,
    "results": [
       {
-         "id": 51,
-         "company_name": "magni exercitationem voluptatem"
+         "id": 68,
+         "company_name": "suscipit cumque ut",
+         "problem_status": 2,
+         "company_id": "88bd47e8-4c59-4ff4-9b89-bc5cf817c61d",
+         "contact_id": "0d90d8a4-4a93-43b6-b081-bb513f391918",
+         "progress": [
+            {
+               "stage_code": "1.4",
+               "stage_desc": "ut maxime quis",
+               "status_id": 1,
+               "status_desc": "IN PROGRESS"
+            },
+            {
+               "stage_code": "1.3",
+               "stage_desc": "temporibus dolores qui",
+               "status_id": 2,
+               "status_desc": "COMPLETED"
+            },
+            {
+               "stage_code": "1.5",
+               "stage_desc": "sit dolor error",
+               "status_id": 1,
+               "status_desc": "COMPLETED"
+            }
+         ]
       },
       {
-         "id": 59,
-         "company_name": "quae autem consequatur"
+         "id": 35,
+         "company_name": "aut culpa ut",
+         "problem_status": 1,
+         "company_id": "0a185e81-0353-4913-9b07-f54a0322a330",
+         "contact_id": "98696cb2-5f78-47e9-994a-3ead6da221e0",
+         "progress": [
+            {
+               "stage_code": "1.3",
+               "stage_desc": "dolore enim sed",
+               "status_id": 2,
+               "status_desc": "IN PROGRESS"
+            },
+            {
+               "stage_code": "2.0",
+               "stage_desc": "necessitatibus ut minus",
+               "status_id": 1,
+               "status_desc": "COMPLETED"
+            }
+         ]
       },
       {
-         "id": 45,
-         "company_name": "occaecati possimus sed"
+         "id": 69,
+         "company_name": "sed aperiam delectus",
+         "problem_status": 2,
+         "company_id": "bac7265e-d7a1-446a-8d90-6543e6a2ff2c",
+         "contact_id": "d579973a-e916-4e05-a1fb-d471d2600f87",
+         "progress": [
+            {
+               "stage_code": "1.4",
+               "stage_desc": "non nesciunt suscipit",
+               "status_id": 1,
+               "status_desc": "IN PROGRESS"
+            },
+            {
+               "stage_code": "2.0",
+               "stage_desc": "aut mollitia deserunt",
+               "status_id": 2,
+               "status_desc": "COMPLETED"
+            },
+            {
+               "stage_code": "2.0",
+               "stage_desc": "optio est voluptas",
+               "status_id": 2,
+               "status_desc": "IN PROGRESS"
+            }
+         ]
       },
       {
-         "id": 19,
-         "company_name": "deleniti impedit voluptatem"
+         "id": 95,
+         "company_name": "dolor iure odit",
+         "problem_status": 2,
+         "company_id": "80ee01c4-e545-4bf1-81be-9a0d25e6a1fc",
+         "contact_id": "4c1fb0dd-a1ff-43d3-bdf9-dc96710fecfa",
+         "progress": [
+            {
+               "stage_code": "3.0",
+               "stage_desc": "commodi officiis ipsa",
+               "status_id": 3,
+               "status_desc": "IN PROGRESS"
+            },
+            {
+               "stage_code": "2.0",
+               "stage_desc": "est voluptatem voluptatem",
+               "status_id": 3,
+               "status_desc": "COMPLETED"
+            },
+            {
+               "stage_code": "1.5",
+               "stage_desc": "iusto perferendis magni",
+               "status_id": 2,
+               "status_desc": "IN PROGRESS"
+            }
+         ]
       }
    ]
 }

@@ -3,6 +3,7 @@ const backend = require( '../lib/backend-service' );
 const datahub = require( '../lib/datahub-service' );
 const startFormViewModel = require( '../lib/view-models/report/start-form' );
 const aboutProblemViewModel = require( '../lib/view-models/report/about-problem' );
+const nextStepsViewModel = require( '../lib/view-models/report/next-steps' );
 
 module.exports = {
 
@@ -14,23 +15,17 @@ module.exports = {
 		const { status, emergency } = req.body || {};
 		const formValues = { status, emergency };
 
-		let hasErrors = false;
-
 		if( isPost ){
 
 			const statusError = ( !status || !status.length );
 
 			if( statusError ){
-
-				hasErrors = true;
 				req.error( 'status-1', 'Please select the current status of the problem' );
 			}
 
 			if( !statusError ){
 
 				if( ( status === '1' || status === '2' ) && !emergency ){
-
-					hasErrors = true;
 					req.error( 'emergency-1', 'Please answer if the problem is an emergency' );
 				}
 			}
@@ -38,7 +33,7 @@ module.exports = {
 			delete req.session.startFormValues;
 		}
 
-		if( isPost && !hasErrors ){
+		if( isPost && !req.hasErrors() ){
 
 			//TODO: validate input
 			req.session.startFormValues = formValues;
@@ -47,7 +42,7 @@ module.exports = {
 
 		} else {
 
-			res.render( 'report/start', startFormViewModel( req.csrfToken(), formValues, req.session.startFormValues ) );
+			res.render( 'report/start', startFormViewModel( req.csrfToken(), ( isPost ? {} : req.report ), formValues, req.session.startFormValues ) );
 		}
 	},
 
@@ -131,11 +126,11 @@ module.exports = {
 
 		const contactId = req.body.contactId;
 		const reportId = req.params.reportId;
-		const sessionStartForm = ( req.session.startFormValues || req.report && { status: req.report.status, emergency: req.report.is_emergency } );
+		const sessionStartForm = ( req.session.startFormValues || req.report && { status: req.report.problem_status, emergency: ( req.report.is_emergency + '' ) } );
 		const sessionCompany =  ( req.session.reportCompany || req.report && { id: req.report.company_id, name: req.report.company_name } );
 		const sessionContact = req.session.reportContact;
 		const isUpdate = !!reportId;
-		//TODO: Validate company id
+		const isExit = req.body.action === 'exit';
 
 		if( !sessionContact ){ return res.redirect( urls.report.contacts( sessionCompany.id ) ); }
 
@@ -167,7 +162,7 @@ module.exports = {
 				} else {
 
 					req.session.report = body;
-					res.redirect( urls.report.aboutProblem( body.id ) );
+					res.redirect( isExit ? urls.index() : urls.report.aboutProblem( body.id ) );
 				}
 
 			} else {
@@ -181,12 +176,14 @@ module.exports = {
 		}
 	},
 
-	aboutProblem: ( req, res ) => {
+	aboutProblem: async ( req, res, next ) => {
 
+		const report = req.report;
 		let formValues = {};
 
 		if( req.method === 'POST' ){
 
+			const isExit = req.body.action === 'exit';
 			const {
 				item,
 				commodityCode,
@@ -213,8 +210,44 @@ module.exports = {
 				losses,
 				otherCompanies
 			};
+
+			if( !req.hasErrors() ){
+
+				try {
+
+					const { response } = await backend.saveProblem( req, report.id, formValues );
+
+					if( response.isSuccess ){
+
+						return res.redirect( isExit ? urls.index() : urls.report.nextSteps( report.id ) );
+
+					} else {
+
+						return next( new Error( `Unable to save report, got ${ response.statusCode } from backend` ) );
+					}
+
+				} catch( e ){
+
+					return next( e );
+				}
+			}
 		}
 
-		res.render( 'report/about-problem', aboutProblemViewModel( req.csrfToken(), formValues ) );
+		res.render( 'report/about-problem', aboutProblemViewModel( req.csrfToken(), req.report, formValues ) );
+	},
+
+	nextSteps: ( req, res ) => {
+
+		if( req.method == 'POST' ){
+
+			const isExit = ( req.body.action === 'exit' );
+
+			if( isExit ){
+
+				return res.redirect( urls.index() );
+			}
+		}
+
+		res.render( 'report/next-steps', nextStepsViewModel( req.csrfToken(), req.report ) );
 	}
 };
