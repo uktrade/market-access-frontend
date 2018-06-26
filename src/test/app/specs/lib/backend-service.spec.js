@@ -45,6 +45,8 @@ describe( 'Backend Service', () => {
 	describe( 'getReports', () => {
 		it( 'Should call the correct path', () => {
 
+			backend.get.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body: {} } ) );
+
 			service.getReports( req );
 
 			expect( backend.get ).toHaveBeenCalledWith( '/reports/', token );
@@ -55,6 +57,8 @@ describe( 'Backend Service', () => {
 		it( 'Should call the correct path', () => {
 
 			const reportId = 1;
+
+			backend.get.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body: {} } ) );
 
 			service.getReport( req, reportId );
 

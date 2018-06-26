@@ -71,10 +71,22 @@ $gutter: 30px;
 	float: left;
 }
 
-.task-list__item__completed {
+.task-list__item__banner {
 
 	@extend .govuk-tag;
 	float: right;
 	margin-right: 0;
 	padding-top: 3px;
+}
+
+.task-list__item__banner--complete {
+	/* default blue provided by govuk-tag */
+}
+
+.task-list__item__banner--in-progress {
+	background-color: $govuk-grey-1;
+}
+
+.task-list__item__banner--not-started {
+	background-color: $govuk-grey-1;
 }

@@ -1,0 +1,21 @@
+{% from 'components/task-list.njk' import taskList %}
+{% from 'components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Report details{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		caption: 'Market access barriers',
+		text: 'Report a barrier'
+	}) }}
+
+	<section class="restrict-width">
+
+		{{ taskList( 'report-list', tasks ) }}
+
+	</section>
+
+{% endblock %}

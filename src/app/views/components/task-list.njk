@@ -11,7 +11,7 @@
 			{%- for item in taskItem.items %}
 			{%- set id = '' %}
 			{%- set nameElem = 'span' %}
-			{%- if item.complete %}
+			{%- if item.complete or item.notStarted or item.inProgress %}
 				{%- set id %}{{ name }}-{{ taskIndex }}-{{ loop.index }}{% endset %}
 			{%- endif %}
 			{%- if item.href %}
@@ -27,7 +27,19 @@
 				</{{ nameElem }}>
 
 				{%- if id %}
-				<strong class="task-list__item__completed" id="{{ id }}">Completed</strong>
+
+					{%- if item.complete %}
+						{% set text='Completed' %}
+						{% set modifyer='complete' %}
+					{% elif item.inProgress %}
+						{% set text='In Progress' %}
+						{% set modifyer='in-progress' %}
+					{% elif item.notStarted %}
+						{% set text='Not Started' %}
+						{% set modifyer='not-started' %}
+					{% endif -%}
+
+				<strong class="task-list__item__banner task-list__item__banner--{{ modifyer }}" id="{{ id }}">{{ text }}</strong>
 				{%- endif %}
 			</li>
 			{%- endfor %}

@@ -4,10 +4,13 @@ const datahub = require( '../lib/datahub-service' );
 const startFormViewModel = require( '../lib/view-models/report/start-form' );
 const aboutProblemViewModel = require( '../lib/view-models/report/about-problem' );
 const nextStepsViewModel = require( '../lib/view-models/report/next-steps' );
+const reportDetailViewModel = require( '../lib/view-models/report/detail' );
 
 module.exports = {
 
 	index: ( req, res ) => res.render( 'report/index' ),
+
+	report: ( req, res ) => res.render( 'report/detail', reportDetailViewModel( req.report ) ),
 
 	start: ( req, res ) => {
 
@@ -161,8 +164,9 @@ module.exports = {
 
 				} else {
 
-					req.session.report = body;
-					res.redirect( isExit ? urls.index() : urls.report.aboutProblem( body.id ) );
+					// TODO: Can this be cached again?
+					//req.session.report = body;
+					res.redirect( isExit ? urls.report.detail( body.id ) : urls.report.aboutProblem( body.id ) );
 				}
 
 			} else {
@@ -219,7 +223,7 @@ module.exports = {
 
 					if( response.isSuccess ){
 
-						return res.redirect( isExit ? urls.index() : urls.report.nextSteps( report.id ) );
+						return res.redirect( isExit ? urls.report.detail( report.id ) : urls.report.nextSteps( report.id ) );
 
 					} else {
 
@@ -244,7 +248,7 @@ module.exports = {
 
 			if( isExit ){
 
-				return res.redirect( urls.index() );
+				return res.redirect( urls.report.detail( req.report.id ) );
 			}
 		}
 

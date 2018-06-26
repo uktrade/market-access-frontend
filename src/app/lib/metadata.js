@@ -19,6 +19,7 @@ module.exports.fetch = async () => {
 			module.exports.countries = body.countries.filter( notDisabled );
 			module.exports.govResponse = body.govt_response;
 			module.exports.publishResponse = body.publish_response;
+			module.exports.reportStages = body.report_stages;
 			module.exports.bool = {
 				'true': 'Yes',
 				'false': 'No'

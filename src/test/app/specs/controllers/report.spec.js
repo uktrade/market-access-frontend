@@ -450,7 +450,7 @@ describe( 'Report controller', () => {
 							} );
 						} );
 
-						describe( 'When there is an id in the body', () => {
+						xdescribe( 'When there is an id in the body', () => {
 							it( 'Should put the body in the session and redirect', async () => {
 
 								const responseBody = { id: 1, name: 2 };
