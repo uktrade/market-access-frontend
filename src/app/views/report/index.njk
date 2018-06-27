@@ -23,39 +23,7 @@
 			<a href="{{ urls.report.start() }}" class="start-banner__button">Start now</a>
 		</div>
 
-		{{ taskList( 'report-list', [
-			{
-				name: 'Report a problem',
-				number: true,
-				items: [
-					{
-						name: 'Status of the problem'
-					},{
-						name: 'Export company affected'
-					},{
-						name: 'About the reporter'
-					},{
-						name: 'About the problem'
-					},{
-						name: 'Next steps the company affected have requested'
-					}
-				]
-			},{
-				name: 'Create a barrier record',
-				items: [
-					{
-						name: 'Name and summarise the barrier'
-					}
-				]
-			},{
-				name: 'Tell us what happens next',
-				items: [
-					{
-						name: 'Describe next steps and what type of support you might need'
-					}
-				]
-			}
-		] ) }}
+		{{ taskList( 'report-list', tasks ) }}
 
 	</section>
 

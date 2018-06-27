@@ -1,6 +1,54 @@
 const proxyquire = require( 'proxyquire' );
 const modulePath = '../../../../../../app/lib/view-models/report/detail';
 
+const reportTaskList = [
+	{
+		"stage": "1.0",
+		"name": "labore ea voluptatem",
+		"items": [
+			{
+				"stage": "1.1",
+				"name": "unde culpa quia"
+			},
+			{
+				"stage": "1.2",
+				"name": "quos sequi commodi"
+			},
+			{
+				"stage": "1.3",
+				"name": "qui aliquid natus"
+			},
+			{
+				"stage": "1.4",
+				"name": "aliquam nisi quibusdam"
+			},
+			{
+				"stage": "1.5",
+				"name": "molestiae minus voluptatem"
+			}
+		],
+		"number": true
+	},{
+		"stage": "2.0",
+		"name": "nam cumque fuga",
+		"items": [
+			{
+				"name": "sed fuga exercitationem"
+			}
+		],
+		"number": false
+	},{
+		"stage": "3.0",
+		"name": "sunt quo sit",
+		"items": [
+			{
+				"name": "non minus necessitatibus"
+			}
+		],
+		"number": false
+	}
+];
+
 describe( 'Report detail view model', () => {
 
 	let viewModel;
@@ -14,18 +62,7 @@ describe( 'Report detail view model', () => {
 
 		viewModel = proxyquire( modulePath, {
 			'../../urls': urls,
-			'../../metadata': {
-				reportStages: {
-					"1.0": "Report a problem",
-					"1.1": "Status of the problem",
-					"1.2": "Export company affected",
-					"1.3": "About the reporter",
-					"1.4": "About the problem",
-					"1.5": "Next steps the company affected have requested",
-					"2.0": "Create a barrier record",
-					"3.0": "Tell us what happens next"
-				}
-			}
+			'../../metadata': { reportTaskList }
 		} );
 	} );
 
@@ -37,19 +74,13 @@ describe( 'Report detail view model', () => {
 				progress: [
 					{
 						"stage_code": "1.1",
-						"stage_desc": "Status of the problem",
-						"status_id": 3,
-						"status_desc": "COMPLETED"
+						"status_id": 3
 					},{
 						"stage_code": "1.2",
-						"stage_desc": "Export company affected",
-						"status_id": 3,
-						"status_desc": "COMPLETED"
+						"status_id": 3
 					},{
 						"stage_code": "1.3",
-						"stage_desc": "About the reporter",
-						"status_id": 3,
-						"status_desc": "COMPLETED"
+						"status_id": 3
 					}
 				]
 			};
@@ -63,57 +94,61 @@ describe( 'Report detail view model', () => {
 			expect( output.tasks ).toEqual( [
 				{
 					stage: '1.0',
-					name: 'Report a problem',
+					name: 'labore ea voluptatem',
 					number: true,
 					items: [
 						{
 							stage: '1.1',
-							name: 'Status of the problem',
+							name: 'unde culpa quia',
 							inProgress: false,
 							complete: true,
 							href: reportStageResponse
 						},{
 							stage: '1.2',
-							name: 'Export company affected',
+							name: 'quos sequi commodi',
 							inProgress: false,
 							complete: true,
 							href: reportStageResponse
 						},{
 							stage: '1.3',
-							name: 'About the reporter',
+							name: 'qui aliquid natus',
 							inProgress: false,
 							complete: true,
 							href: reportStageResponse
 						},{
 							stage: '1.4',
-							name: 'About the problem',
+							name: 'aliquam nisi quibusdam',
 							inProgress: false,
 							complete: false,
 							notStarted: true,
 							href: reportStageResponse
 						},{
 							stage: '1.5',
-							name: 'Next steps the company affected have requested',
+							name: 'molestiae minus voluptatem',
 							inProgress: false,
 							complete: false
 						}
 					]
 				},{
 					stage: '2.0',
-					name: 'Create a barrier record',
+					name: 'nam cumque fuga',
 					number: false,
 					items: [
 						{
-							name: 'Name and summarise the barrier'
+							name: 'sed fuga exercitationem',
+							inProgress: false,
+							complete: false
 						}
 					]
 				},{
 					stage: '3.0',
-					name: 'Tell us what happens next',
+					name: 'sunt quo sit',
 					number: false,
 					items: [
 						{
-							name: 'Describe next steps and what type of support you might need'
+							name: 'non minus necessitatibus',
+							inProgress: false,
+							complete: false
 						}
 					]
 				}

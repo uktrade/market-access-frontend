@@ -14,10 +14,14 @@ describe( 'Report controller', () => {
 	let startFormViewModel;
 	let csrfToken;
 	let aboutProblemViewModel;
+	let metadata;
 
 	beforeEach( () => {
 
 		csrfToken = uuid();
+		metadata = {
+			reportTaskList: [ { a: 1, b: 2 }, { c: 3, d: 4 } ]
+		};
 
 		req = {
 			query: {},
@@ -56,6 +60,7 @@ describe( 'Report controller', () => {
 			'../lib/backend-service': backend,
 			'../lib/datahub-service': datahub,
 			'../lib/urls': urls,
+			'../lib/metadata': metadata,
 			'../lib/view-models/report/start-form': startFormViewModel,
 			'../lib/view-models/report/about-problem': aboutProblemViewModel
 		} );
@@ -86,7 +91,7 @@ describe( 'Report controller', () => {
 
 			controller.index( req, res );
 
-			expect( res.render ).toHaveBeenCalledWith( 'report/index' );
+			expect( res.render ).toHaveBeenCalledWith( 'report/index', { tasks: metadata.reportTaskList } );
 		} );
 	} );
 

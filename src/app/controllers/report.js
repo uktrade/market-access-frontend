@@ -1,4 +1,5 @@
 const urls = require( '../lib/urls' );
+const metadata = require( '../lib/metadata' );
 const backend = require( '../lib/backend-service' );
 const datahub = require( '../lib/datahub-service' );
 const startFormViewModel = require( '../lib/view-models/report/start-form' );
@@ -8,7 +9,7 @@ const reportDetailViewModel = require( '../lib/view-models/report/detail' );
 
 module.exports = {
 
-	index: ( req, res ) => res.render( 'report/index' ),
+	index: ( req, res ) => res.render( 'report/index', { tasks: metadata.reportTaskList } ),
 
 	report: ( req, res ) => res.render( 'report/detail', reportDetailViewModel( req.report ) ),
 
