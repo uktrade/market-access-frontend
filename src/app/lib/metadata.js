@@ -24,12 +24,14 @@ function addMissingItems( tasks ){
 			switch( task.stage ){
 				case '2.0':
 					task.items.push( {
-						name: 'Name and summarise the barrier'
+						name: 'Name and summarise the barrier',
+						stage: task.stage
 					} );
 				break;
 				case '3.0':
 					task.items.push( {
-						name: 'Describe next steps and what type of support you might need'
+						name: 'Describe next steps and what type of support you might need',
+						stage: task.stage
 					} );
 				break;
 			}

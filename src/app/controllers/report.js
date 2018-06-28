@@ -2,6 +2,10 @@ const urls = require( '../lib/urls' );
 const metadata = require( '../lib/metadata' );
 const backend = require( '../lib/backend-service' );
 const datahub = require( '../lib/datahub-service' );
+const Form = require( '../lib/Form' );
+const radioItemsFromObj = require( '../lib/radio-items-from-object' );
+const validators = require( '../lib/validators' );
+
 const startFormViewModel = require( '../lib/view-models/report/start-form' );
 const aboutProblemViewModel = require( '../lib/view-models/report/about-problem' );
 const nextStepsViewModel = require( '../lib/view-models/report/next-steps' );
@@ -241,18 +245,97 @@ module.exports = {
 		res.render( 'report/about-problem', aboutProblemViewModel( req.csrfToken(), req.report, formValues ) );
 	},
 
-	nextSteps: ( req, res ) => {
+	nextSteps: async ( req, res, next ) => {
+
+		const report = req.report;
+		const form = new Form( req, res, {
+
+			response: {
+				type: Form.RADIO,
+				items: radioItemsFromObj( metadata.govResponse ),
+				otherValues: [ req.report.govt_response_requester ],
+				validators: [
+					{
+						fn: validators.isDefined,
+						message: 'Please answer the type of UK goverment response'
+					},{
+						fn: validators.isMetadata( 'govResponse' ),
+						message: 'Please select a valid choice for type of UK goverment response'
+					}
+				]
+			},
+
+			sensitivities: {
+				type: Form.RADIO,
+				items: radioItemsFromObj( metadata.bool ),
+				otherValues: [ report.is_confidential ],
+				validators: [
+					{
+						fn: validators.isDefined,
+						message: 'Please answer if there are any sensitivities'
+					},{
+						fn: validators.isMetadata( 'bool' ),
+						message: 'Please select a valid choice for any sensitivities'
+					}
+				]
+			},
+
+			sensitivitesText: {
+				otherValues: [ report.sensitivity_summary ],
+				conditional: { name: 'sensitivities', value: 'true' },
+				validators: [
+					{
+						fn: validators.isDefined,
+						message: 'Please describe the sensitivities'
+					}
+				]
+			},
+
+			permission: {
+				type: Form.RADIO,
+				items: radioItemsFromObj( metadata.publishResponse ),
+				otherValues: [ report.can_publish ],
+				validators: [
+					{
+						fn: validators.isDefined,
+						message: 'Please answer if we can publish a summary of the barrier'
+					},{
+						fn: validators.isMetadata( 'publishResponse' ),
+						message: 'Please select a valid choice for if we can publish the summary'
+					}
+				]
+			}
+		} );
 
 		if( req.method == 'POST' ){
 
-			const isExit = ( req.body.action === 'exit' );
+			form.validate();
 
-			if( isExit ){
+			if( !form.hasErrors() ){
 
-				return res.redirect( urls.report.detail( req.report.id ) );
+				const isExit = ( req.body.action === 'exit' );
+
+				try {
+
+					const { response } = await backend.saveNextSteps( req, report.id, form.getValues() );
+
+					if( response.isSuccess ){
+
+						return res.redirect( isExit ? urls.report.detail( report.id ) : urls.index() );
+
+					} else {
+
+						return next( new Error( `Unable to save report, got ${ response.statusCode } from backend` ) );
+					}
+
+				} catch( e ){
+
+					return next( e );
+				}
 			}
 		}
 
-		res.render( 'report/next-steps', nextStepsViewModel( req.csrfToken(), req.report ) );
+		res.render( 'report/next-steps', form.getTemplateValues() );
+		//res.render( 'report/next-steps', nextStepsViewModel( req.csrfToken(), req.report ) );
 	}
 };

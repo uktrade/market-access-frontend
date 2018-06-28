@@ -33,7 +33,8 @@ const reportTaskList = [
 		"name": "nam cumque fuga",
 		"items": [
 			{
-				"name": "sed fuga exercitationem"
+				"name": "sed fuga exercitationem",
+				"stage": "2.0"
 			}
 		],
 		"number": false
@@ -42,7 +43,8 @@ const reportTaskList = [
 		"name": "sunt quo sit",
 		"items": [
 			{
-				"name": "non minus necessitatibus"
+				"name": "non minus necessitatibus",
+				"stage": "3.0"
 			}
 		],
 		"number": false
@@ -81,6 +83,18 @@ describe( 'Report detail view model', () => {
 					},{
 						"stage_code": "1.3",
 						"status_id": 3
+					},{
+						"stage_code": "1.4",
+						"status_id": 3
+					},{
+						"stage_code": "1.5",
+						"status_id": 3
+					},{
+						"stage_code": "2.0",
+						"status_id": 1
+					},{
+						"stage_code": "3.0",
+						"status_id": 1
 					}
 				]
 			};
@@ -100,33 +114,38 @@ describe( 'Report detail view model', () => {
 						{
 							stage: '1.1',
 							name: 'unde culpa quia',
+							notStarted: false,
 							inProgress: false,
 							complete: true,
 							href: reportStageResponse
 						},{
 							stage: '1.2',
 							name: 'quos sequi commodi',
+							notStarted: false,
 							inProgress: false,
 							complete: true,
 							href: reportStageResponse
 						},{
 							stage: '1.3',
 							name: 'qui aliquid natus',
+							notStarted: false,
 							inProgress: false,
 							complete: true,
 							href: reportStageResponse
 						},{
 							stage: '1.4',
 							name: 'aliquam nisi quibusdam',
+							notStarted: false,
 							inProgress: false,
-							complete: false,
-							notStarted: true,
+							complete: true,
 							href: reportStageResponse
 						},{
 							stage: '1.5',
 							name: 'molestiae minus voluptatem',
+							notStarted: false,
 							inProgress: false,
-							complete: false
+							complete: true,
+							href: reportStageResponse
 						}
 					]
 				},{
@@ -135,9 +154,12 @@ describe( 'Report detail view model', () => {
 					number: false,
 					items: [
 						{
+							stage: '2.0',
 							name: 'sed fuga exercitationem',
+							notStarted: true,
 							inProgress: false,
-							complete: false
+							complete: false,
+							href: reportStageResponse
 						}
 					]
 				},{
@@ -146,7 +168,9 @@ describe( 'Report detail view model', () => {
 					number: false,
 					items: [
 						{
+							stage: '3.0',
 							name: 'non minus necessitatibus',
+							notStarted: true,
 							inProgress: false,
 							complete: false
 						}

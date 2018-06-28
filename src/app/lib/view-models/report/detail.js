@@ -19,24 +19,34 @@ function getProgress( progress ){
 function addReportData( tasks, report ){
 
 	const reportProgress = getProgress( report.progress );
-	let addedFirstNotStarted = false;
+	//flatten each tasks items into one list
+	const subTasks = tasks.reduce( ( list, task ) => list.concat( task.items ), [] );
+	let hasInProgress = false;
 
-	for( let task of tasks ){
+	for( let subTask of subTasks ){
 
-		for( let subTask of task.items ){
+		const reportStage = reportProgress[ subTask.stage ];
 
-			const reportStage = reportProgress[ subTask.stage ];
+		subTask.notStarted = ( reportStage == 1 );
+		subTask.inProgress = ( reportStage == 2 ),
+		subTask.complete = ( reportStage == 3 );
 
-			subTask.inProgress = ( reportStage == 2 ),
-			subTask.complete = ( reportStage == 3 );
+		if( !hasInProgress && subTask.inProgress ){
+			hasInProgress = true;
+		}
 
-			if( !addedFirstNotStarted && !subTask.complete && !subTask.inProgress ){
-				subTask.notStarted = true;
-				addedFirstNotStarted = true;
-			}
+		if( subTask.complete || subTask.inProgress ){
+			subTask.href = urls.reportStage( subTask.stage, report );
+		}
+	}
 
-			if( subTask.complete || subTask.notStarted ){
+	//if we don't have any subTasks in progress, then link to the first not started task
+	if( !hasInProgress ){
+
+		for( let subTask of subTasks ){
+			if( subTask.notStarted ){
 				subTask.href = urls.reportStage( subTask.stage, report );
+				break;
 			}
 		}
 	}

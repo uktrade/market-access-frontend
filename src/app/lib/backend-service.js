@@ -70,5 +70,11 @@ module.exports = {
 		problem_impact: problem.impact,
 		estimated_loss_range: problem.losses,
 		other_companies_affected: problem.otherCompanies
+	} ),
+	saveNextSteps: ( req, reportId, values ) => backend.put( `/reports/${ reportId }/`, getToken( req ), {
+		govt_response_requester: values.response,
+		is_confidential: values.sensitivities,
+		sensitivity_summary: values.sensitivitesText,
+		can_publish: values.permission
 	} )
 };

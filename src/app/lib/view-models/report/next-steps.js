@@ -6,7 +6,7 @@ let sensitivities;
 let permissions;
 
 
-module.exports = ( csrfToken, report ) => {
+module.exports = ( csrfToken, report, formValues ) => {
 
 	if( !responses ){ responses = radioItemsFromObj( metadata.govResponse ); }
 	if( !permissions ){ permissions = radioItemsFromObj( metadata.publishResponse ); }

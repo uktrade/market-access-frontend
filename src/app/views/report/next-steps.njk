@@ -31,7 +31,7 @@
 						classes: 'govuk-fieldset__legend--s'
 					}
 				},
-				items: responses,
+				items: response,
 				errorMessage: errors | errorForName( 'response-1' )
 				} )
 			}}
@@ -69,11 +69,11 @@
 				name: 'permission',
 				fieldset: {
 					legend: {
-						text: 'What type of UK government response has the company requested',
+						text: 'Is the company offering permission for the UK goverment to publish a public-facing summary of this barrier?',
 						classes: 'govuk-fieldset__legend--s'
 					}
 				},
-				items: permissions,
+				items: permission,
 				errorMessage: errors | errorForName( 'permission-1' )
 				} )
 			}}
