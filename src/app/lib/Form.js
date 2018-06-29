@@ -1,3 +1,7 @@
+const validators = require( './validators' );
+const radioItemsFromObj = require( './radio-items-from-object' );
+const metadata = require( './metadata' );
+
 const RADIO = 'radio';
 const SELECT = 'select';
 
@@ -44,29 +48,52 @@ function createMatcher( key ){
 const isChecked = createMatcher( 'checked' );
 const isSelected = createMatcher( 'selected' );
 
-function Form( req, res, fields ){
-
+function Form( req, fields ){
 
 	this.req = req;
-	this.res = res;
 	this.fields = fields;
 
 	this.isPost = req.method === 'POST';
+	this.isExit = ( this.isPost && ( req.body.action === 'exit' ) );
 	this.fieldNames = [];
 	this.values = {};
 	this.errors = [];
 
 	for( let [ name, field ] of Object.entries( fields ) ){
 
-		field.id = field.id || createId( name, field.type );
-
-		this.fieldNames.push( name );
+		this.addField( name, field );
 
 		if( this.isPost ){
 			this.values[ name ] = req.body[ name ];
 		}
 	}
 }
+
+Form.prototype.addField = function( name, field ){
+
+	field.id = field.id || createId( name, field.type );
+
+	this.fieldNames.push( name );
+
+	field.validators = ( field.validators || [] );
+
+	if( field.required ){
+
+		field.validators.unshift( {
+			fn: validators.isDefined,
+			message: field.required
+		} );
+	}
+
+	if( field.metadata ){
+
+		field.items = radioItemsFromObj( metadata[ field.metadata.key ] );
+		field.validators.push( {
+			fn: validators.isMetadata( field.metadata.key ),
+			message: field.metadata.message
+		} );
+	}
+};
 
 Form.prototype.passedConditions = function( name ){
 

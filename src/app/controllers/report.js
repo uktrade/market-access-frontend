@@ -8,7 +8,6 @@ const validators = require( '../lib/validators' );
 
 const startFormViewModel = require( '../lib/view-models/report/start-form' );
 const aboutProblemViewModel = require( '../lib/view-models/report/about-problem' );
-const nextStepsViewModel = require( '../lib/view-models/report/next-steps' );
 const reportDetailViewModel = require( '../lib/view-models/report/detail' );
 
 module.exports = {
@@ -188,6 +187,17 @@ module.exports = {
 	aboutProblem: async ( req, res, next ) => {
 
 		const report = req.report;
+		/*const form = new Form( req, {
+			item: {
+				otherValues: [ report.product ],
+				validators: [
+					{
+						fn: validators.isDefined
+					}
+				]
+			}
+		} );*/
+
 		let formValues = {};
 
 		if( req.method === 'POST' ){
@@ -248,72 +258,51 @@ module.exports = {
 	nextSteps: async ( req, res, next ) => {
 
 		const report = req.report;
-		const form = new Form( req, res, {
+		const form = new Form( req, {
 
 			response: {
 				type: Form.RADIO,
-				items: radioItemsFromObj( metadata.govResponse ),
 				otherValues: [ req.report.govt_response_requester ],
-				validators: [
-					{
-						fn: validators.isDefined,
-						message: 'Please answer the type of UK goverment response'
-					},{
-						fn: validators.isMetadata( 'govResponse' ),
-						message: 'Please select a valid choice for type of UK goverment response'
-					}
-				]
+				required: 'Please answer the type of UK goverment response',
+				metadata: {
+					key: 'govResponse',
+					message: 'Please select a valid choice for type of UK goverment response'
+				}
 			},
 
 			sensitivities: {
 				type: Form.RADIO,
-				items: radioItemsFromObj( metadata.bool ),
 				otherValues: [ report.is_confidential ],
-				validators: [
-					{
-						fn: validators.isDefined,
-						message: 'Please answer if there are any sensitivities'
-					},{
-						fn: validators.isMetadata( 'bool' ),
-						message: 'Please select a valid choice for any sensitivities'
-					}
-				]
+				required: 'Please answer if there are any sensitivities',
+				metadata: {
+					key: 'bool',
+					message: 'Please select a valid choice for any sensitivities'
+				}
 			},
 
 			sensitivitesText: {
 				otherValues: [ report.sensitivity_summary ],
 				conditional: { name: 'sensitivities', value: 'true' },
-				validators: [
-					{
-						fn: validators.isDefined,
-						message: 'Please describe the sensitivities'
-					}
-				]
+				required: 'Please describe the sensitivities'
 			},
 
 			permission: {
 				type: Form.RADIO,
-				items: radioItemsFromObj( metadata.publishResponse ),
 				otherValues: [ report.can_publish ],
-				validators: [
-					{
-						fn: validators.isDefined,
-						message: 'Please answer if we can publish a summary of the barrier'
-					},{
-						fn: validators.isMetadata( 'publishResponse' ),
-						message: 'Please select a valid choice for if we can publish the summary'
-					}
-				]
+				required: 'Please answer if we can publish a summary of the barrier',
+				metadata: {
+					key: 'publishResponse',
+					message: 'Please select a valid choice for if we can publish the summary'
+				}
 			}
 		} );
 
-		if( req.method == 'POST' ){
+		if( form.isPost ){
 
+			const isExit = ( req.body.action === 'exit' );
 			form.validate();
 
 			if( !form.hasErrors() ){
-
-				const isExit = ( req.body.action === 'exit' );
 
 				try {
 
@@ -336,6 +325,5 @@ module.exports = {
 		}
 
 		res.render( 'report/next-steps', form.getTemplateValues() );
-		//res.render( 'report/next-steps', nextStepsViewModel( req.csrfToken(), req.report ) );
 	}
 };
