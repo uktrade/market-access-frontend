@@ -1,63 +1,67 @@
-(function( doc, jessie ){
+ma.pages.report.start = (function( doc, jessie ){
 
-	if( !jessie.hasFeatures( 'query', 'queryOne', 'addClass', 'setAriaAttribute', 'attachListener' ) ){ return; }
+	return function(){
 
-	var extraElem = jessie.queryOne( '.report-barrier-emergency' );
-	var extraInputs = jessie.query( '.govuk-radios__input', extraElem );
-	var inputs = jessie.query( '.problem-status .govuk-radios__input' );
-	var input;
-	var i = 0;
-	var extraElemId;
+		if( !jessie.hasFeatures( 'query', 'queryOne', 'addClass', 'setAriaAttribute', 'attachListener' ) ){ return; }
 
-	if( !extraElem || inputs.length < 2 ){ return; }
-
-	function toggleEmergency( show ){
-
-		var classFn = ( show ? 'removeClass' : 'addClass' );
+		var extraElem = jessie.queryOne( '.report-barrier-emergency' );
+		var extraInputs = jessie.query( '.govuk-radios__input', extraElem );
+		var inputs = jessie.query( '.problem-status .govuk-radios__input' );
 		var input;
 		var i = 0;
+		var extraElemId;
 
-		jessie[ classFn ]( extraElem, 'visually-hidden' );
-		jessie.setAriaAttribute( extraElem, 'hidden', !show );
+		if( !extraElem || inputs.length < 2 ){ return; }
 
-		if( !show ){
-			// if we hide the extra inputs, make sure none of them are checked
-			while( ( input = extraInputs[ i++ ] ) ){
-				input.checked = false;
+		function toggleEmergency( show ){
+
+			var classFn = ( show ? 'removeClass' : 'addClass' );
+			var input;
+			var i = 0;
+
+			jessie[ classFn ]( extraElem, 'visually-hidden' );
+			jessie.setAriaAttribute( extraElem, 'hidden', !show );
+
+			if( !show ){
+				// if we hide the extra inputs, make sure none of them are checked
+				while( ( input = extraInputs[ i++ ] ) ){
+					input.checked = false;
+				}
 			}
 		}
-	}
 
-	function controlsEmergency( value ){
+		function controlsEmergency( value ){
 
-		return ( value === '1' || value === '2' );
-	}
-
-	function checkState( /* e */ ){
-
-		var checked = jessie.queryOne( '.problem-status input[ name="status" ]:checked' );
-
-		if( checked ){
-
-			var value = checked && jessie.getInputValue( checked );
-			var showEmergency = controlsEmergency( value );
-			toggleEmergency( showEmergency );
+			return ( value === '1' || value === '2' );
 		}
-	}
 
-	extraElemId = extraElem.getAttribute( 'id' );
-	jessie.addClass( extraElem, 'visually-hidden' );
-	jessie.setAriaAttribute( extraElem, 'hidden', true );
+		function checkState( /* e */ ){
 
-	while( ( input = inputs[ i++ ] ) ){
+			var checked = jessie.queryOne( '.problem-status input[ name="status" ]:checked' );
 
-		jessie.attachListener( input, 'click', checkState );
+			if( checked ){
 
-		if( controlsEmergency( jessie.getInputValue( input ) ) ){
-			jessie.setAriaAttribute( input, 'controls', extraElemId );
+				var value = checked && jessie.getInputValue( checked );
+				var showEmergency = controlsEmergency( value );
+				toggleEmergency( showEmergency );
+			}
 		}
-	}
 
-	checkState();
+		extraElemId = extraElem.getAttribute( 'id' );
+		jessie.addClass( extraElem, 'visually-hidden' );
+		jessie.setAriaAttribute( extraElem, 'hidden', true );
+
+		while( ( input = inputs[ i++ ] ) ){
+
+			jessie.attachListener( input, 'click', checkState );
+
+			if( controlsEmergency( jessie.getInputValue( input ) ) ){
+				jessie.setAriaAttribute( input, 'controls', extraElemId );
+			}
+		}
+
+		checkState();
+	};
+
 
 }( document, jessie ));

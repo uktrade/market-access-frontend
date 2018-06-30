@@ -5,6 +5,12 @@
 
 {% block page_title %}{{ super() }} - Report - Status of the problem{% endblock %}
 
+{% block body_script %}
+	<script>
+		ma.pages.report.start();
+	</script>
+{% endblock %}
+
 {% block page_content %}
 
 	{{ heading({
@@ -25,8 +31,8 @@
 					classes: 'govuk-fieldset__legend--s'
 				}
 			},
-			items: statusTypes,
-			errorMessage: errors | errorForName( 'status' )
+			items: status,
+			errorMessage: errors | errorForName( 'status-1' )
 		}) }}
 
 		<div class="report-barrier-emergency paragraph-width" id="report-barrier-emergency">
@@ -43,8 +49,8 @@
 				hint: {
 					text: 'Is an export facing significant and imminent financial or other loss and does government need to take action urgently?'
 				},
-				items: emergencyTypes,
-				errorMessage: errors | errorForName( 'emergency' )
+				items: emergency,
+				errorMessage: errors | errorForName( 'emergency-1' )
 			}) }}
 		</div>
 

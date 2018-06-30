@@ -1,9 +1,8 @@
 const validators = require( './validators' );
-const radioItemsFromObj = require( './radio-items-from-object' );
-const metadata = require( './metadata' );
 
 const RADIO = 'radio';
 const SELECT = 'select';
+const isDefined = validators.isDefined;
 
 function camelCaseToDash( str ) {
 	return str.replace( /([a-z])([A-Z])/g, '$1-$2' ).toLowerCase();
@@ -80,17 +79,8 @@ Form.prototype.addField = function( name, field ){
 	if( field.required ){
 
 		field.validators.unshift( {
-			fn: validators.isDefined,
+			fn: isDefined,
 			message: field.required
-		} );
-	}
-
-	if( field.metadata ){
-
-		field.items = radioItemsFromObj( metadata[ field.metadata.key ] );
-		field.validators.push( {
-			fn: validators.isMetadata( field.metadata.key ),
-			message: field.metadata.message
 		} );
 	}
 };
@@ -102,14 +92,22 @@ Form.prototype.passedConditions = function( name ){
 	if( !field ){ throw new Error( name + ' field not found' ); }
 
 	const conditional = field.conditional;
-	const hasConditions = !!field.conditional;
-	let passedConditions = !hasConditions;
 
-	if( hasConditions && this.values[ conditional.name ] == conditional.value ){
-		passedConditions = true;
+	if( conditional ){
+
+		const value = this.values[ conditional.name ];
+
+		if( Array.isArray( conditional.values ) ){
+
+			return conditional.values.includes( value );
+
+		} else {
+
+			return ( value == conditional.value );
+		}
 	}
 
-	return passedConditions;
+	return true;
 };
 
 Form.prototype.validateField = function( name ){
@@ -117,15 +115,18 @@ Form.prototype.validateField = function( name ){
 	const field = this.fields[ name ];
 
 	if( !field ){ throw new Error( name + ' field not found' ); }
+
+	const value = this.values[ name ];
+	const shouldValidate = ( this.isExit ? isDefined( value ) : true );
 	let valid = true;
 
-	if( this.passedConditions( name ) && Array.isArray( field.validators ) ){
-
-		const value = this.values[ name ];
+	if( this.passedConditions( name ) && shouldValidate && Array.isArray( field.validators ) ){
 
 		for( let { fn, message } of field.validators ){
-			if( !fn( value ) ){
-				valid = false;
+
+			valid = fn( value );
+
+			if( !valid ){
 				this.errors.push( { id: field.id, message } );
 				break;
 			}
@@ -173,7 +174,7 @@ Form.prototype.getTemplateValues = function( errorsName ){
 
 		const field = this.fields[ name ];
 		const formValue = this.getValue( name );
-		const value = this.isPost ? formValue : getFirstValue( formValue, ...( field.otherValues || [] ) );
+		const value = this.isPost ? formValue : getFirstValue( formValue, ...( field.values || [] ) );
 
 		let templateValue;
 

@@ -3,12 +3,12 @@ const metadata = require( '../lib/metadata' );
 const backend = require( '../lib/backend-service' );
 const datahub = require( '../lib/datahub-service' );
 const Form = require( '../lib/Form' );
-const radioItemsFromObj = require( '../lib/radio-items-from-object' );
+const govukItemsFromObj = require( '../lib/govuk-items-from-object' );
 const validators = require( '../lib/validators' );
 
-const startFormViewModel = require( '../lib/view-models/report/start-form' );
-const aboutProblemViewModel = require( '../lib/view-models/report/about-problem' );
 const reportDetailViewModel = require( '../lib/view-models/report/detail' );
+
+let countryItems;
 
 module.exports = {
 
@@ -18,39 +18,45 @@ module.exports = {
 
 	start: ( req, res ) => {
 
-		const isPost = ( req.method === 'POST' );
-		const { status, emergency } = req.body || {};
-		const formValues = { status, emergency };
+		const sessionValues = ( req.session.startFormValues || {} );
+		const report  = ( req.report || {} );
+		const form = new Form( req, {
 
-		if( isPost ){
+			status: {
+				type: Form.RADIO,
+				values: [ sessionValues.status, report.problem_status ],
+				items: govukItemsFromObj( metadata.statusTypes ),
+				validators: [{
+					fn: validators.isMetadata( 'statusTypes' ),
+					message: 'Please select the current status of the problem'
+				}]
+			},
 
-			const statusError = ( !status || !status.length );
-
-			if( statusError ){
-				req.error( 'status-1', 'Please select the current status of the problem' );
+			emergency: {
+				type: Form.RADIO,
+				values: [ sessionValues.emergency, ( report.is_emergency + '' ) ],
+				items: govukItemsFromObj( metadata.bool ),
+				conditional: { name: 'status', values: [ '1', '2' ] },
+				validators: [{
+					fn: validators.isMetadata( 'bool' ),
+					message: 'Please answer if the problem is an emergency'
+				}]
 			}
+		} );
 
-			if( !statusError ){
+		if( form.isPost ){
 
-				if( ( status === '1' || status === '2' ) && !emergency ){
-					req.error( 'emergency-1', 'Please answer if the problem is an emergency' );
-				}
-			}
-
+			form.validate();
 			delete req.session.startFormValues;
+
+			if( !form.hasErrors() ){
+
+				req.session.startFormValues = form.getValues();
+				return res.redirect( urls.report.companySearch( req.params.reportId ) );
+			}
 		}
 
-		if( isPost && !req.hasErrors() ){
-
-			//TODO: validate input
-			req.session.startFormValues = formValues;
-
-			res.redirect( urls.report.companySearch( req.params.reportId ) );
-
-		} else {
-
-			res.render( 'report/start', startFormViewModel( req.csrfToken(), ( isPost ? {} : req.report ), formValues, req.session.startFormValues ) );
-		}
+		res.render( 'report/start', form.getTemplateValues() );
 	},
 
 	companySearch: async ( req, res, next ) => {
@@ -186,59 +192,87 @@ module.exports = {
 
 	aboutProblem: async ( req, res, next ) => {
 
+		if( !countryItems ){
+
+			countryItems = metadata.countries.map( ( country ) => ( {
+				value: country.id,
+				text: country.name
+			} ) );
+
+			countryItems.unshift( {	value: '', text: 'Please choose a country' } );
+		}
+
 		const report = req.report;
-		/*const form = new Form( req, {
+		const form = new Form( req, {
+
 			item: {
-				otherValues: [ report.product ],
+				values: [ report.product ],
+				required: 'Please enter the product or service being exported'
+			},
+
+			commodityCode: {
+				values: [ ( report.commodity_codes && report.commodity_codes.join( ', ' ) ) ]
+			},
+
+			country: {
+				type: Form.SELECT,
+				values: [ report.export_country ],
+				items: countryItems,
+				required: 'Please choose an export country/trading bloc',
 				validators: [
 					{
-						fn: validators.isDefined
+						fn: validators.isCountry,
+						message: 'Please select a valid export country/trading bloc'
 					}
 				]
+			},
+
+			description: {
+				values: [ report.problem_description ],
+				required: 'Please enter a brief description of the problem'
+			},
+
+			impact: {
+				values: [ report.problem_impact ],
+				required: 'Please describe the impact of the problem'
+			},
+
+			losses: {
+				type: Form.RADIO,
+				values: [ report.estimated_loss_range ],
+				required: 'Please select the value of losses',
+				items: govukItemsFromObj( metadata.lossScale ),
+				validators: [ {
+					fn: validators.isMetadata( 'lossScale' ),
+					message: 'Please select a valid value of losses'
+				} ]
+			},
+
+			otherCompanies: {
+				type: Form.RADIO,
+				values: [ report.other_companies_affected ],
+				required: 'Please answer if any other companies are affected',
+				items: govukItemsFromObj( metadata.boolScale ),
+				validators: [ {
+					fn: validators.isMetadata( 'boolScale' ),
+					message: 'Please choose an answer for companies affected'
+				} ]
 			}
-		} );*/
+		} );
 
-		let formValues = {};
+		if( form.isPost ){
 
-		if( req.method === 'POST' ){
+			form.validate();
 
-			const isExit = req.body.action === 'exit';
-			const {
-				item,
-				commodityCode,
-				country,
-				description,
-				impact,
-				losses,
-				otherCompanies
-			} = req.body;
-
-			if( !item ){ req.error( 'item', 'Please enter the product or service being exported' ); }
-			if( !country ){ req.error( 'country', 'Please choose an export country/trading bloc' ); }
-			if( !description ){ req.error( 'description', 'Please enter a brief description of the problem' ); }
-			if( !impact ){ req.error( 'impact', 'Please describe the impact of the problem' ); }
-			if( !losses ){ req.error( 'losses-1', 'Please select the value of losses' ); }
-			if( !otherCompanies ){ req.error( 'other-companies-1', 'Please answer if any other companies are affected' ); }
-
-			formValues = {
-				item,
-				commodityCode,
-				country,
-				description,
-				impact,
-				losses,
-				otherCompanies
-			};
-
-			if( !req.hasErrors() ){
+			if( !form.hasErrors() ){
 
 				try {
 
-					const { response } = await backend.saveProblem( req, report.id, formValues );
+					const { response } = await backend.saveProblem( req, report.id, form.getValues() );
 
 					if( response.isSuccess ){
 
-						return res.redirect( isExit ? urls.report.detail( report.id ) : urls.report.nextSteps( report.id ) );
+						return res.redirect( form.isExit ? urls.report.detail( report.id ) : urls.report.nextSteps( report.id ) );
 
 					} else {
 
@@ -252,7 +286,7 @@ module.exports = {
 			}
 		}
 
-		res.render( 'report/about-problem', aboutProblemViewModel( req.csrfToken(), req.report, formValues ) );
+		res.render( 'report/about-problem', form.getTemplateValues() );
 	},
 
 	nextSteps: async ( req, res, next ) => {
@@ -262,44 +296,46 @@ module.exports = {
 
 			response: {
 				type: Form.RADIO,
-				otherValues: [ req.report.govt_response_requester ],
+				values: [ report.govt_response_requester ],
 				required: 'Please answer the type of UK goverment response',
-				metadata: {
-					key: 'govResponse',
+				items: govukItemsFromObj( metadata.govResponse ),
+				validators: [ {
+					fn: validators.isMetadata( 'govResponse' ),
 					message: 'Please select a valid choice for type of UK goverment response'
-				}
+				} ]
 			},
 
 			sensitivities: {
 				type: Form.RADIO,
-				otherValues: [ report.is_confidential ],
+				values: [ report.is_confidential ],
 				required: 'Please answer if there are any sensitivities',
-				metadata: {
-					key: 'bool',
+				items: govukItemsFromObj( metadata.bool ),
+				validators: [ {
+					fn: validators.isMetadata( 'bool' ),
 					message: 'Please select a valid choice for any sensitivities'
-				}
+				} ]
 			},
 
 			sensitivitesText: {
-				otherValues: [ report.sensitivity_summary ],
+				values: [ report.sensitivity_summary ],
 				conditional: { name: 'sensitivities', value: 'true' },
 				required: 'Please describe the sensitivities'
 			},
 
 			permission: {
 				type: Form.RADIO,
-				otherValues: [ report.can_publish ],
+				values: [ report.can_publish ],
 				required: 'Please answer if we can publish a summary of the barrier',
-				metadata: {
-					key: 'publishResponse',
+				items: govukItemsFromObj( metadata.publishResponse ),
+				validators: [ {
+					fn: validators.isMetadata( 'publishResponse' ),
 					message: 'Please select a valid choice for if we can publish the summary'
-				}
+				} ]
 			}
 		} );
 
 		if( form.isPost ){
 
-			const isExit = ( req.body.action === 'exit' );
 			form.validate();
 
 			if( !form.hasErrors() ){
@@ -310,7 +346,7 @@ module.exports = {
 
 					if( response.isSuccess ){
 
-						return res.redirect( isExit ? urls.report.detail( report.id ) : urls.index() );
+						return res.redirect( form.isExit ? urls.report.detail( report.id ) : urls.index() );
 
 					} else {
 

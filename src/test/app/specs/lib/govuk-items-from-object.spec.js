@@ -1,6 +1,6 @@
-const radioItemsFromObj = require( '../../../../app/lib/radio-items-from-object' );
+const govukItemsFromObj = require( '../../../../app/lib/govuk-items-from-object' );
 
-describe( 'radioItemsFromObject', () => {
+describe( 'govukItemsFromObject', () => {
 	it( 'Should convert an object into an array', () => {
 
 		const input = {
@@ -9,7 +9,7 @@ describe( 'radioItemsFromObject', () => {
 			'3': 'test3'
 		};
 
-		const output = radioItemsFromObj( input );
+		const output = govukItemsFromObj( input );
 
 		expect( output ).toEqual( [
 
