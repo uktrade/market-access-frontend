@@ -10,7 +10,7 @@ module.exports = {
 		if( isString ){ return value.length > 0; }
 		return isDefined;
 	},
-	isUuid: ( value ) => /^[a-zA-Z-]+$/.test( value ),
+	isUuid: ( value ) => /^[a-zA-Z0-9-]+$/.test( value ),
 	isMetadata: ( key ) => ( value ) => Object.keys( metadata[ key ] ).includes( value ),
 	isCountry: ( value ) => metadata.countries.some( ( country ) => country.id === value )
 };

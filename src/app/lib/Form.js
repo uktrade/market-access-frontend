@@ -118,22 +118,22 @@ Form.prototype.validateField = function( name ){
 
 	const value = this.values[ name ];
 	const shouldValidate = ( this.isExit ? isDefined( value ) : true );
-	let valid = true;
+	let isValid = true;
 
 	if( this.passedConditions( name ) && shouldValidate && Array.isArray( field.validators ) ){
 
 		for( let { fn, message } of field.validators ){
 
-			valid = fn( value );
+			isValid = fn( value );
 
-			if( !valid ){
+			if( !isValid ){
 				this.errors.push( { id: field.id, message } );
 				break;
 			}
 		}
 	}
 
-	return valid;
+	return isValid;
 };
 
 Form.prototype.validate = function(){
