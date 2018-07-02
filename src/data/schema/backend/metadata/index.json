@@ -8,12 +8,12 @@
 
 		"status_types": {
 			"type": "object",
-			"required": [ "NOT_STARTED", "ACTIVE", "COMPLETE" ],
+			"required": [ "1", "2", "3" ],
 			"properties": {
 
-				"NOT_STARTED": { "$ref": "$refs/common.json#/words" },
-				"ACTIVE": { "$ref": "$refs/common.json#/words" },
-				"COMPLETE": { "$ref": "$refs/common.json#/words" }
+				"1": { "$ref": "$refs/common.json#/words" },
+				"2": { "$ref": "$refs/common.json#/words" },
+				"3": { "$ref": "$refs/common.json#/words" }
 			}
 		},
 

@@ -17,7 +17,6 @@ function sortReportProgress( item ){
 			if( aCode === bCode ){ return 0; }
 			if( Number( aCode ) < Number( bCode ) ){ return -1; }
 			if( Number( aCode ) > Number( bCode ) ){ return 1; }
-
 		} );
 	}
 }
@@ -74,7 +73,7 @@ module.exports = {
 	saveNextSteps: ( req, reportId, values ) => backend.put( `/reports/${ reportId }/`, getToken( req ), {
 		govt_response_requester: values.response,
 		is_confidential: values.sensitivities,
-		sensitivity_summary: values.sensitivitesText,
+		sensitivity_summary: values.sensitivitiesText,
 		can_publish: values.permission
 	} )
 };

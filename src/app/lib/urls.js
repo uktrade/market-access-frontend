@@ -67,6 +67,10 @@ module.exports = {
 				default:
 					return reportUrl.detail( report.id );
 			}
+
+		} else {
+
+			return reportUrl.detail( report.id );
 		}
 	}
 };

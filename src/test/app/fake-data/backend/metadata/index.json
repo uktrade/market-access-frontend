@@ -1,8 +1,8 @@
 {
    "status_types": {
-      "NOT_STARTED": "qui culpa eveniet",
-      "ACTIVE": "veniam nobis aut",
-      "COMPLETE": "necessitatibus et perferendis"
+      "1": "qui culpa eveniet",
+      "2": "veniam nobis aut",
+      "3": "necessitatibus et perferendis"
    },
    "loss_range": {
       "1": "voluptatem ut doloribus",

@@ -218,11 +218,10 @@ module.exports = {
 				type: Form.SELECT,
 				values: [ report.export_country ],
 				items: countryItems,
-				required: 'Please choose an export country/trading bloc',
 				validators: [
 					{
 						fn: validators.isCountry,
-						message: 'Please select a valid export country/trading bloc'
+						message: 'Please choose an export country/trading bloc'
 					}
 				]
 			},
@@ -240,22 +239,20 @@ module.exports = {
 			losses: {
 				type: Form.RADIO,
 				values: [ report.estimated_loss_range ],
-				required: 'Please select the value of losses',
 				items: govukItemsFromObj( metadata.lossScale ),
 				validators: [ {
 					fn: validators.isMetadata( 'lossScale' ),
-					message: 'Please select a valid value of losses'
+					message: 'Please answer the value of losses'
 				} ]
 			},
 
 			otherCompanies: {
 				type: Form.RADIO,
 				values: [ report.other_companies_affected ],
-				required: 'Please answer if any other companies are affected',
 				items: govukItemsFromObj( metadata.boolScale ),
 				validators: [ {
 					fn: validators.isMetadata( 'boolScale' ),
-					message: 'Please choose an answer for companies affected'
+					message: 'Please answer if any other companies are affected'
 				} ]
 			}
 		} );
@@ -297,7 +294,6 @@ module.exports = {
 			response: {
 				type: Form.RADIO,
 				values: [ report.govt_response_requester ],
-				required: 'Please answer the type of UK goverment response',
 				items: govukItemsFromObj( metadata.govResponse ),
 				validators: [ {
 					fn: validators.isMetadata( 'govResponse' ),
@@ -308,7 +304,6 @@ module.exports = {
 			sensitivities: {
 				type: Form.RADIO,
 				values: [ report.is_confidential ],
-				required: 'Please answer if there are any sensitivities',
 				items: govukItemsFromObj( metadata.bool ),
 				validators: [ {
 					fn: validators.isMetadata( 'bool' ),
@@ -316,7 +311,7 @@ module.exports = {
 				} ]
 			},
 
-			sensitivitesText: {
+			sensitivitiesText: {
 				values: [ report.sensitivity_summary ],
 				conditional: { name: 'sensitivities', value: 'true' },
 				required: 'Please describe the sensitivities'
@@ -325,7 +320,6 @@ module.exports = {
 			permission: {
 				type: Form.RADIO,
 				values: [ report.can_publish ],
-				required: 'Please answer if we can publish a summary of the barrier',
 				items: govukItemsFromObj( metadata.publishResponse ),
 				validators: [ {
 					fn: validators.isMetadata( 'publishResponse' ),

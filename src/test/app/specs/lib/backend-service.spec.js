@@ -43,26 +43,60 @@ describe( 'Backend Service', () => {
 	} );
 
 	describe( 'getReports', () => {
-		it( 'Should call the correct path', () => {
+		describe( 'When the results are an array', () => {
+			it( 'Should call the correct path and sort the progress', async () => {
 
-			backend.get.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body: {} } ) );
+				backend.get.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body: jasmine.getFakeData( '/backend/reports/' ) } ) );
 
-			service.getReports( req );
+				const { body } = await service.getReports( req );
 
-			expect( backend.get ).toHaveBeenCalledWith( '/reports/', token );
+				expect( backend.get ).toHaveBeenCalledWith( '/reports/', token );
+				expect( body.results[ 0 ].progress.map( ( item ) => item.stage_code ) ).toEqual( [ '1.3', '1.4', '1.4', '1.5', '2.4', '2.5', '3', '3.1' ] );
+			} );
+		} );
+
+		describe( 'When the results are NOT an array', () => {
+			it( 'Should call the correct path and NOT sort the progress', async () => {
+
+				const responseBody = {
+					"count": 1,
+					"results": 'test'
+				};
+
+				backend.get.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body: responseBody } ) );
+
+				await service.getReports( req );
+
+				expect( backend.get ).toHaveBeenCalledWith( '/reports/', token );
+			} );
 		} );
 	} );
 
 	describe( 'getReport', () => {
-		it( 'Should call the correct path', () => {
+		describe( 'When the response is a success', () => {
+			it( 'Should call the correct path and sort the progress', () => {
 
-			const reportId = 1;
+				const reportId = 1;
 
-			backend.get.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body: {} } ) );
+				backend.get.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body: {} } ) );
 
-			service.getReport( req, reportId );
+				service.getReport( req, reportId );
 
-			expect( backend.get ).toHaveBeenCalledWith( `/reports/${ reportId }/`, token );
+				expect( backend.get ).toHaveBeenCalledWith( `/reports/${ reportId }/`, token );
+			} );
+		} );
+
+		describe( 'When the response is not a success', () => {
+			it( 'Should not sort the progress', () => {
+
+				const reportId = 1;
+
+				backend.get.and.callFake( () => Promise.resolve( { response: { isSuccess: false }, body: {} } ) );
+
+				service.getReport( req, reportId );
+
+				expect( backend.get ).toHaveBeenCalledWith( `/reports/${ reportId }/`, token );
+			} );
 		} );
 	} );
 
@@ -87,7 +121,7 @@ describe( 'Backend Service', () => {
 	} );
 
 	describe( 'updateReport', () => {
-		it( 'Should POST to the correct path', () => {
+		it( 'Should PUT to the correct path with the correct values', () => {
 
 			const status = 1;
 			const emergency = 2;
@@ -103,6 +137,67 @@ describe( 'Backend Service', () => {
 				company_id: company.id,
 				company_name: company.name,
 				contact_id: contactId
+			} );
+		} );
+	} );
+
+	describe( 'saveProblem', () => {
+		it( 'Should PUT to the correct path with the correct values', () => {
+
+			const reportId = '3';
+
+			const item = '1';
+			const commodityCode = '1, 2';
+			const country = 'a';
+			const description = 'b';
+			const impact = 'c';
+			const losses = 'd';
+			const otherCompanies = 'e';
+
+			service.saveProblem( req, reportId, {
+				item,
+				commodityCode,
+				country,
+				description,
+				impact,
+				losses,
+				otherCompanies
+			} );
+
+			expect( backend.put ).toHaveBeenCalledWith( `/reports/${ reportId }/`, token, {
+				product: item,
+				commodity_codes: commodityCode.split( ', ' ),
+				export_country: country,
+				problem_description: description,
+				problem_impact: impact,
+				estimated_loss_range: losses,
+				other_companies_affected: otherCompanies
+			} );
+		} );
+	} );
+
+	describe( 'saveNextSteps', () => {
+		it( 'Should PUT to the correct path with the correct values', () => {
+
+			const reportId = '4';
+
+			const response = '1';
+			const sensitivities = '2';
+			const sensitivitiesText = '3';
+			const permission = '4';
+
+			service.saveNextSteps( req, reportId, {
+				response,
+				sensitivities,
+				sensitivitiesText,
+				permission
+			} );
+
+			expect( backend.put ).toHaveBeenCalledWith( `/reports/${ reportId }/`, token, {
+				govt_response_requester: response,
+				is_confidential: sensitivities,
+				sensitivity_summary: sensitivitiesText,
+				can_publish: permission
 			} );
 		} );
 	} );
