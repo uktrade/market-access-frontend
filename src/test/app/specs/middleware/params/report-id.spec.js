@@ -44,7 +44,7 @@ describe( 'Report Id param middleware', () => {
 						await middleware( req, res, next );
 
 						expect( backend.getReport ).toHaveBeenCalledWith( req, reportId );
-						expect( req.session.report ).toEqual( getReportResponse );
+						expect( req.session.report ).not.toBeDefined();
 						expect( req.report ).toEqual( getReportResponse );
 						expect( res.locals.report ).toEqual( getReportResponse );
 						expect( next ).toHaveBeenCalledWith();
@@ -90,7 +90,7 @@ describe( 'Report Id param middleware', () => {
 			} );
 
 			describe( 'When there is a report in the session', () => {
-				it( 'Should put the report in the req and locals', async () => {
+				it( 'Should put the report in the req and locals and delete it from the session', async () => {
 
 					const sessionReport = { id: 1, name: 2 };
 
@@ -102,6 +102,7 @@ describe( 'Report Id param middleware', () => {
 					expect( backend.getReport ).not.toHaveBeenCalled();
 					expect( req.report ).toEqual( sessionReport );
 					expect( res.locals.report ).toEqual( sessionReport );
+					expect( req.session.report ).not.toBeDefined();
 					expect( next ).toHaveBeenCalledWith();
 				} );
 			} );

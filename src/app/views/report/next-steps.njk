@@ -1,0 +1,96 @@
+{% from 'frontend/components/radios/macro.njk' import govukRadios %}
+{% from 'frontend/components/textarea/macro.njk' import govukTextarea %}
+{% from 'components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Report - Next steps requested{% endblock %}
+
+{% block body_script %}
+	<script>
+		ma.pages.report.nextSteps();
+	</script>
+{% endblock %}
+
+{% block page_content %}
+
+	<div class="restrict-width">
+
+		{{ heading({
+			back: { href: urls.report.aboutProblem( report.id ) },
+			caption: 'Report a barrier',
+			text: 'Next steps the company affected have requested',
+			errors: errors
+		}) }}
+
+		<form action="{{ urls.report.nextSteps( report.id ) }}" method="POST">
+
+			<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+			{{ govukRadios( {
+
+				idPrefix: 'response',
+				name: 'response',
+				fieldset: {
+					legend: {
+						text: 'What type of UK government response has the company requested',
+						classes: 'govuk-fieldset__legend--s'
+					}
+				},
+				items: response,
+				errorMessage: errors | errorForName( 'response-1' )
+				} )
+			}}
+
+			{{ govukRadios( {
+
+				idPrefix: 'sensitivities',
+				name: 'sensitivities',
+				classes: 'step-sensitivities',
+				fieldset: {
+					legend: {
+						text: 'Are there any confidentiality or commercial sensitivities',
+						classes: 'govuk-fieldset__legend--s'
+					}
+				},
+				items: sensitivities,
+				errorMessage: errors | errorForName( 'sensitivities-1' )
+				} )
+			}}
+
+			<div class="conditional-content">
+				{{ govukTextarea( {
+
+					label: {
+						text: "Describe any sensitivities",
+						classes: 'govuk-label--s'
+					},
+					id: 'sensitivities-text',
+					name: 'sensitivitiesText',
+					value: sensitivitiesText,
+					errorMessage: errors | errorForName( 'sensitivities-text' )
+				} ) }}
+			</div>
+
+			{{ govukRadios( {
+
+				idPrefix: 'permission',
+				name: 'permission',
+				fieldset: {
+					legend: {
+						text: 'Is the company offering permission for the UK goverment to publish a public-facing summary of this barrier?',
+						classes: 'govuk-fieldset__legend--s'
+					}
+				},
+				items: permission,
+				errorMessage: errors | errorForName( 'permission-1' )
+				} )
+			}}
+
+			<input type="submit" class="govuk-button" value="Save and continue">
+			<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>
+
+		</form>
+	</div>
+
+{% endblock %}

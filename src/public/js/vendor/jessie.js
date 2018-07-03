@@ -22,7 +22,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 
 /*
 Return URI:
-http://127.0.0.1:1337/?addClass=1&hasClass=1&removeClass=1&toggleClass=1&getDescendantsByClassName=1&query=1&queryOne=1&setAriaAttribute=1&attachListener=1&getInputValue=1&toArray=2
+http://127.0.0.1:1337/?addClass=1&hasClass=1&removeClass=1&toggleClass=1&getDescendantsByClassName=1&query=1&queryOne=1&setAriaAttribute=1&attachListener=1&bind=2&getInputValue=1&toArray=2
 */
 
 var jessie;
@@ -174,6 +174,42 @@ getInputValue = function(elInput, defaultValue) {
 
 /*
 Description:
+Relies on `Function.prototype.bind` and `Function.prototype.apply` and `Array.prototype.slice`
+*/
+
+/*
+Degrades:
+IE5, IE4, IE3
+*/
+
+var bind;
+
+if (Function.prototype.bind) {
+	bind = function(fn, thisObject) {
+		return fn.bind.apply(fn, Array.prototype.slice.call(arguments, 1));
+	};
+}
+else if (canCall && Array.prototype.slice) {
+	bind = function(fn, context) {
+		var prependArgs = Array.prototype.slice.call(arguments, 2);
+
+		if (prependArgs.length) {
+			return function() {
+				return fn.apply(context, Array.prototype.concat.apply(prependArgs, arguments));
+			};
+		}
+		return function() {
+			return fn.apply(context, arguments);
+		};
+	};
+
+}
+
+
+
+
+/*
+Description:
 Cutting edge
 */
 
@@ -294,6 +330,7 @@ jessie.removeClass = removeClass;
 jessie.hasClass = hasClass;
 jessie.addClass = addClass;
 jessie.getInputValue = getInputValue;
+jessie.bind = bind;
 jessie.attachListener = attachListener;
 jessie.setAriaAttribute = setAriaAttribute;
 jessie.queryOne = queryOne;

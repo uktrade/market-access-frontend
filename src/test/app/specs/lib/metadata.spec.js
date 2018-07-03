@@ -110,16 +110,13 @@ describe( 'metadata', () => {
 
 				expect( metadata.countries ).toEqual( [
 					{
-						"id": "88cdc899-d234-43be-9221-bb667ef5a0ed",
-						"name": "San Marino",
+						"id": "68496eb0-effd-42e0-91d8-349323b6fe5e",
+						"name": "Saint Lucia",
 						"disabled_on": null
-					},{
-						"id": "1121a63c-9454-40b4-a181-bbbcc2478197",
-						"name": "Dominican Republic",
-						"disabled_on": null
-					},{
-						"id": "9c166249-4c40-4e36-b409-b596cbb4d02d",
-						"name": "Tanzania",
+					},
+					{
+						"id": "9a662aa0-99ba-4f3b-835a-859fe210e9c2",
+						"name": "Senegal",
 						"disabled_on": null
 					}
 				] );

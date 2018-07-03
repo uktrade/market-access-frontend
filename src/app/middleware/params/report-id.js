@@ -7,7 +7,14 @@ module.exports = async ( req, res, next ) => {
 
 	if( reportId.length < 10 && isNumeric.test( reportId ) ){
 
-		if( !req.session.report ){
+		let report = req.session.report;
+
+		if( report ){
+
+			// ensure we don't use stale data
+			delete req.session.report;
+
+		} else {
 
 			try {
 
@@ -15,7 +22,7 @@ module.exports = async ( req, res, next ) => {
 
 				if( response.isSuccess ){
 
-					req.session.report = body;
+					report = body;
 
 				} else {
 
@@ -28,8 +35,8 @@ module.exports = async ( req, res, next ) => {
 			}
 		}
 
-		req.report = req.session.report;
-		res.locals.report = req.session.report;
+		req.report = report;
+		res.locals.report = report;
 		next();
 
 	} else {

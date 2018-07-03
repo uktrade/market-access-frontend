@@ -159,5 +159,110 @@ describe( 'URLs', () => {
 				expect( urls.report.aboutProblem( reportId ) ).toEqual( `/report/${ reportId }/problem/` );
 			} );
 		} );
+
+		describe( 'Next steps', () => {
+			it( 'Should return the correct path', () => {
+
+				const reportId = '5';
+
+				expect( urls.report.nextSteps( reportId ) ).toEqual( `/report/${ reportId }/next-steps/` );
+			} );
+		} );
+
+		describe( 'Report stage', () => {
+			it( 'Should return the correct path for the current stage', () => {
+
+				const report = {
+					id: '6',
+					company_id: 'abc-123',
+					contact_id: 'def-456'
+				};
+
+				expect( urls.reportStage( '1.1', report ) ).toEqual( urls.report.start( report.id ) );
+				expect( urls.reportStage( '1.2', report ) ).toEqual( urls.report.companyDetails( report.company_id, report.id ) );
+				expect( urls.reportStage( '1.3', report ) ).toEqual( urls.report.viewContact( report.contact_id, report.id ) );
+				expect( urls.reportStage( '1.4', report ) ).toEqual( urls.report.aboutProblem( report.id ) );
+				expect( urls.reportStage( '1.5', report ) ).toEqual( urls.report.nextSteps( report.id ) );
+				expect( urls.reportStage( 'blah', report ) ).toEqual( urls.report.detail( report.id ) );
+			} );
+		} );
+
+		describe( 'Next report stage', () => {
+
+			function createProgress( code ){
+
+				return [
+					{
+						status_id: 1,
+						stage_code: '1.0'
+					},{
+						status_id: 3,
+						stage_code: code
+					}
+				];
+			}
+
+			describe( 'Without a matching stage', () => {
+				describe( 'When the progress is not an array', () => {
+					it( 'Should return the detail page', () => {
+
+						const report = {
+							id: '10',
+							progress: ''
+						};
+
+						expect( urls.nextReportStage( report ) ).toEqual( urls.report.detail( report.id ) );
+					} );
+				} );
+
+				describe( 'When the progress is an array without a matching status_id', () => {
+					it( 'Should return the detail page', () => {
+
+						const report = {
+							id: '10',
+							progress: [ { status_id: '100' } ]
+						};
+
+						expect( urls.nextReportStage( report ) ).toEqual( urls.report.detail( report.id ) );
+					} );
+				} );
+			} );
+
+			describe( 'default', () => {
+				it( 'Should return the detail page', () => {
+
+					const report = {
+						id: '9',
+						progress: createProgress( '11.0' )
+					};
+
+					expect( urls.nextReportStage( report ) ).toEqual( urls.report.detail( report.id ) );
+				} );
+			} );
+
+			describe( 'For 1.3', () => {
+				it( 'Should return the url for the next stage', () => {
+
+					const report = {
+						id: '7',
+						progress: createProgress( '1.3' )
+					};
+
+					expect( urls.nextReportStage( report ) ).toEqual( urls.report.aboutProblem( report.id ) );
+				} );
+			} );
+
+			describe( 'For 1.4', () => {
+				it( 'Should return the url for the next stage', () => {
+
+					const report = {
+						id: '8',
+						progress: createProgress( '1.4' )
+					};
+
+					expect( urls.nextReportStage( report ) ).toEqual( urls.report.nextSteps( report.id ) );
+				} );
+			} );
+		} );
 	} );
 } );

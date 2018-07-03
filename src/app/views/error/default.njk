@@ -7,17 +7,22 @@
 	<h1 class="error-heading">Unexpected error</h1>
 
 	{% if showErrors %}
-
+	<div class="govuk-!-mt-r9">
 		{% if error.code %}
-
-		<h2 class="error-heading">
-			Code: {{ error.code }}
-		</h2>
-
+		<h2 class="govuk-heading-s">Code: {{ error.code }}</h2>
 		{% endif %}
 
+		{% if error.responseBody %}
+			<h2 class="govuk-heading-s">Response Body</h2>
+			<p class="stack-trace">
+				{{ error.responseBody | dump( 2 ) }}
+			</p>
+		{% endif %}
+
+		<h2 class="govuk-heading-s">Stack Trace</h2>
 		<p class="stack-trace">
 			{{ error.stack }}
 		</p>
+	</div>
 	{% endif %}
 {% endblock %}

@@ -138,7 +138,7 @@ Then( /^there should be a ([a-zA-Z]+) button$/, async( text ) => {
 Then( /^it should (reveal|hide) the emergency question$/, async ( state ) => {
 
 	const isHidden = ( state === 'hide' );
-	const emergencyElem = await driver.byCss( '.report-barrier-emergency' );
+	const emergencyElem = await driver.byCss( '#report-barrier-emergency' );
 	const classes = await emergencyElem.getAttribute( 'class' );
 	const ariaHidden = await emergencyElem.getAttribute( 'aria-hidden' );
 

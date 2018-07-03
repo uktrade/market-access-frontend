@@ -1,54 +1,62 @@
 const urls = require( '../lib/urls' );
+const metadata = require( '../lib/metadata' );
 const backend = require( '../lib/backend-service' );
 const datahub = require( '../lib/datahub-service' );
-const startFormViewModel = require( '../lib/view-models/report/start-form' );
-const aboutProblemViewModel = require( '../lib/view-models/report/about-problem' );
+const Form = require( '../lib/Form' );
+const govukItemsFromObj = require( '../lib/govuk-items-from-object' );
+const validators = require( '../lib/validators' );
+
+const reportDetailViewModel = require( '../lib/view-models/report/detail' );
+
+let countryItems;
 
 module.exports = {
 
-	index: ( req, res ) => res.render( 'report/index' ),
+	index: ( req, res ) => res.render( 'report/index', { tasks: metadata.reportTaskList } ),
+
+	report: ( req, res ) => res.render( 'report/detail', reportDetailViewModel( req.report ) ),
 
 	start: ( req, res ) => {
 
-		const isPost = ( req.method === 'POST' );
-		const { status, emergency } = req.body || {};
-		const formValues = { status, emergency };
+		const sessionValues = ( req.session.startFormValues || {} );
+		const report  = ( req.report || {} );
+		const form = new Form( req, {
 
-		let hasErrors = false;
+			status: {
+				type: Form.RADIO,
+				values: [ sessionValues.status, report.problem_status ],
+				items: govukItemsFromObj( metadata.statusTypes ),
+				validators: [{
+					fn: validators.isMetadata( 'statusTypes' ),
+					message: 'Please select the current status of the problem'
+				}]
+			},
 
-		if( isPost ){
-
-			const statusError = ( !status || !status.length );
-
-			if( statusError ){
-
-				hasErrors = true;
-				req.error( 'status-1', 'Please select the current status of the problem' );
+			emergency: {
+				type: Form.RADIO,
+				values: [ sessionValues.emergency, ( report.is_emergency + '' ) ],
+				items: govukItemsFromObj( metadata.bool ),
+				conditional: { name: 'status', values: [ '1', '2' ] },
+				validators: [{
+					fn: validators.isMetadata( 'bool' ),
+					message: 'Please answer if the problem is an emergency'
+				}]
 			}
+		} );
 
-			if( !statusError ){
+		if( form.isPost ){
 
-				if( ( status === '1' || status === '2' ) && !emergency ){
-
-					hasErrors = true;
-					req.error( 'emergency-1', 'Please answer if the problem is an emergency' );
-				}
-			}
-
+			form.validate();
 			delete req.session.startFormValues;
+
+			if( !form.hasErrors() ){
+
+				req.session.startFormValues = form.getValues();
+				return res.redirect( urls.report.companySearch( req.params.reportId ) );
+			}
 		}
 
-		if( isPost && !hasErrors ){
-
-			//TODO: validate input
-			req.session.startFormValues = formValues;
-
-			res.redirect( urls.report.companySearch( req.params.reportId ) );
-
-		} else {
-
-			res.render( 'report/start', startFormViewModel( req.csrfToken(), formValues, req.session.startFormValues ) );
-		}
+		res.render( 'report/start', form.getTemplateValues() );
 	},
 
 	companySearch: async ( req, res, next ) => {
@@ -131,11 +139,11 @@ module.exports = {
 
 		const contactId = req.body.contactId;
 		const reportId = req.params.reportId;
-		const sessionStartForm = ( req.session.startFormValues || req.report && { status: req.report.status, emergency: req.report.is_emergency } );
+		const sessionStartForm = ( req.session.startFormValues || req.report && { status: req.report.problem_status, emergency: ( req.report.is_emergency + '' ) } );
 		const sessionCompany =  ( req.session.reportCompany || req.report && { id: req.report.company_id, name: req.report.company_name } );
 		const sessionContact = req.session.reportContact;
 		const isUpdate = !!reportId;
-		//TODO: Validate company id
+		const isExit = req.body.action === 'exit';
 
 		if( !sessionContact ){ return res.redirect( urls.report.contacts( sessionCompany.id ) ); }
 
@@ -166,8 +174,9 @@ module.exports = {
 
 				} else {
 
-					req.session.report = body;
-					res.redirect( urls.report.aboutProblem( body.id ) );
+					// TODO: Can this be cached again?
+					//req.session.report = body;
+					res.redirect( isExit ? urls.report.detail( body.id ) : urls.report.aboutProblem( body.id ) );
 				}
 
 			} else {
@@ -181,40 +190,170 @@ module.exports = {
 		}
 	},
 
-	aboutProblem: ( req, res ) => {
+	aboutProblem: async ( req, res, next ) => {
 
-		let formValues = {};
+		if( !countryItems ){
 
-		if( req.method === 'POST' ){
+			countryItems = metadata.countries.map( ( country ) => ( {
+				value: country.id,
+				text: country.name
+			} ) );
 
-			const {
-				item,
-				commodityCode,
-				country,
-				description,
-				impact,
-				losses,
-				otherCompanies
-			} = req.body;
-
-			if( !item ){ req.error( 'item', 'Please enter the product or service being exported' ); }
-			if( !country ){ req.error( 'country', 'Please choose an export country/trading bloc' ); }
-			if( !description ){ req.error( 'description', 'Please enter a brief description of the problem' ); }
-			if( !impact ){ req.error( 'impact', 'Please describe the impact of the problem' ); }
-			if( !losses ){ req.error( 'losses-1', 'Please select the value of losses' ); }
-			if( !otherCompanies ){ req.error( 'other-companies-1', 'Please answer if any other companies are affected' ); }
-
-			formValues = {
-				item,
-				commodityCode,
-				country,
-				description,
-				impact,
-				losses,
-				otherCompanies
-			};
+			countryItems.unshift( {	value: '', text: 'Please choose a country' } );
 		}
 
-		res.render( 'report/about-problem', aboutProblemViewModel( req.csrfToken(), formValues ) );
+		const report = req.report;
+		const form = new Form( req, {
+
+			item: {
+				values: [ report.product ],
+				required: 'Please enter the product or service being exported'
+			},
+
+			commodityCode: {
+				values: [ ( report.commodity_codes && report.commodity_codes.join( ', ' ) ) ]
+			},
+
+			country: {
+				type: Form.SELECT,
+				values: [ report.export_country ],
+				items: countryItems,
+				validators: [
+					{
+						fn: validators.isCountry,
+						message: 'Please choose an export country/trading bloc'
+					}
+				]
+			},
+
+			description: {
+				values: [ report.problem_description ],
+				required: 'Please enter a brief description of the problem'
+			},
+
+			impact: {
+				values: [ report.problem_impact ],
+				required: 'Please describe the impact of the problem'
+			},
+
+			losses: {
+				type: Form.RADIO,
+				values: [ report.estimated_loss_range ],
+				items: govukItemsFromObj( metadata.lossScale ),
+				validators: [ {
+					fn: validators.isMetadata( 'lossScale' ),
+					message: 'Please answer the value of losses'
+				} ]
+			},
+
+			otherCompanies: {
+				type: Form.RADIO,
+				values: [ report.other_companies_affected ],
+				items: govukItemsFromObj( metadata.boolScale ),
+				validators: [ {
+					fn: validators.isMetadata( 'boolScale' ),
+					message: 'Please answer if any other companies are affected'
+				} ]
+			}
+		} );
+
+		if( form.isPost ){
+
+			form.validate();
+
+			if( !form.hasErrors() ){
+
+				try {
+
+					const { response } = await backend.saveProblem( req, report.id, form.getValues() );
+
+					if( response.isSuccess ){
+
+						return res.redirect( form.isExit ? urls.report.detail( report.id ) : urls.report.nextSteps( report.id ) );
+
+					} else {
+
+						return next( new Error( `Unable to save report, got ${ response.statusCode } from backend` ) );
+					}
+
+				} catch( e ){
+
+					return next( e );
+				}
+			}
+		}
+
+		res.render( 'report/about-problem', form.getTemplateValues() );
+	},
+
+	nextSteps: async ( req, res, next ) => {
+
+		const report = req.report;
+		const form = new Form( req, {
+
+			response: {
+				type: Form.RADIO,
+				values: [ report.govt_response_requester ],
+				items: govukItemsFromObj( metadata.govResponse ),
+				validators: [ {
+					fn: validators.isMetadata( 'govResponse' ),
+					message: 'Please select a valid choice for type of UK goverment response'
+				} ]
+			},
+
+			sensitivities: {
+				type: Form.RADIO,
+				values: [ report.is_confidential ],
+				items: govukItemsFromObj( metadata.bool ),
+				validators: [ {
+					fn: validators.isMetadata( 'bool' ),
+					message: 'Please select a valid choice for any sensitivities'
+				} ]
+			},
+
+			sensitivitiesText: {
+				values: [ report.sensitivity_summary ],
+				conditional: { name: 'sensitivities', value: 'true' },
+				required: 'Please describe the sensitivities'
+			},
+
+			permission: {
+				type: Form.RADIO,
+				values: [ report.can_publish ],
+				items: govukItemsFromObj( metadata.publishResponse ),
+				validators: [ {
+					fn: validators.isMetadata( 'publishResponse' ),
+					message: 'Please select a valid choice for if we can publish the summary'
+				} ]
+			}
+		} );
+
+		if( form.isPost ){
+
+			form.validate();
+
+			if( !form.hasErrors() ){
+
+				try {
+
+					const { response } = await backend.saveNextSteps( req, report.id, form.getValues() );
+
+					if( response.isSuccess ){
+
+						return res.redirect( form.isExit ? urls.report.detail( report.id ) : urls.index() );
+
+					} else {
+
+						return next( new Error( `Unable to save report, got ${ response.statusCode } from backend` ) );
+					}
+
+				} catch( e ){
+
+					return next( e );
+				}
+			}
+		}
+
+		res.render( 'report/next-steps', form.getTemplateValues() );
 	}
 };

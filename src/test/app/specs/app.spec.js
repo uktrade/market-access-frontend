@@ -164,7 +164,7 @@ describe( 'App', function(){
 				it( 'Should save the status values', ( done ) => {
 
 					agent.post( urls.report.start() )
-						.send( `_csrf=${ token }&status=1&emergency=2` )
+						.send( `_csrf=${ token }&status=1&emergency=true` )
 						.expect( 302, done );
 				} );
 
@@ -196,7 +196,7 @@ describe( 'App', function(){
 							const token = getCsrfToken( res, done.fail );
 
 							agent.post( urls.report.start() )
-								.send( `_csrf=${ token }&status=1&emergency=2` )
+								.send( `_csrf=${ token }&status=1&emergency=false` )
 								.expect( 302, done );
 						} );
 				} );
@@ -270,7 +270,7 @@ describe( 'App', function(){
 							const token = getCsrfToken( res, done.fail );
 
 							agent.post( urls.report.start() )
-								.send( `_csrf=${ token }&status=1&emergency=2` )
+								.send( `_csrf=${ token }&status=1&emergency=false` )
 								.expect( 302 )
 								.end( ( err ) => {
 

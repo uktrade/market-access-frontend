@@ -50,7 +50,10 @@ function makeRequest( method, path, opts = {} ){
 
 				} else {
 
-					reject( new Error( `Got at ${ response.statusCode } response code from backend` ) );
+					const error = new Error( `Got at ${ response.statusCode } response code from backend` );
+					error.responseBody = body;
+
+					reject( error );
 				}
 			}
 		} );

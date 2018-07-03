@@ -20,5 +20,13 @@ module.exports = ( reports ) => {
 		reports = reports.map( updateStatus );
 	}
 
+	reports.sort( ( a, b ) => {
+
+		const aDate = Date.parse( a.created_on );
+		const bDate = Date.parse( b.created_on );
+
+		return ( aDate === bDate ? 0 : ( aDate < bDate ? -1 : 1 ) );
+	} );
+
 	return {	reports	};
 };
