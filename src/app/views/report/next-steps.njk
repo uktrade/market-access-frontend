@@ -6,6 +6,12 @@
 
 {% block page_title %}{{ super() }} - Report - Next steps requested{% endblock %}
 
+{% block body_script %}
+	<script>
+		ma.pages.report.nextSteps();
+	</script>
+{% endblock %}
+
 {% block page_content %}
 
 	<div class="restrict-width">
@@ -40,6 +46,7 @@
 
 				idPrefix: 'sensitivities',
 				name: 'sensitivities',
+				classes: 'step-sensitivities',
 				fieldset: {
 					legend: {
 						text: 'Are there any confidentiality or commercial sensitivities',
@@ -51,17 +58,19 @@
 				} )
 			}}
 
-			{{ govukTextarea( {
+			<div class="conditional-content">
+				{{ govukTextarea( {
 
-				label: {
-					text: "Describe any sensitivities",
-					classes: 'govuk-label--s'
-				},
-				id: 'sensitivities-text',
-				name: 'sensitivitiesText',
-				value: sensitivitiesText,
-				errorMessage: errors | errorForName( 'sensitivities-text' )
-			} ) }}
+					label: {
+						text: "Describe any sensitivities",
+						classes: 'govuk-label--s'
+					},
+					id: 'sensitivities-text',
+					name: 'sensitivitiesText',
+					value: sensitivitiesText,
+					errorMessage: errors | errorForName( 'sensitivities-text' )
+				} ) }}
+			</div>
 
 			{{ govukRadios( {
 

@@ -1,67 +1,30 @@
-ma.pages.report.start = (function( doc, jessie ){
+ma.pages.report.start = (function( jessie ){
 
 	return function(){
 
-		if( !jessie.hasFeatures( 'query', 'queryOne', 'addClass', 'setAriaAttribute', 'attachListener' ) ){ return; }
+		if( !ma.components.ConditionalRadioContent || !jessie.query ){ return; }
 
-		var extraElem = jessie.queryOne( '.report-barrier-emergency' );
-		var extraInputs = jessie.query( '.govuk-radios__input', extraElem );
-		var inputs = jessie.query( '.problem-status .govuk-radios__input' );
-		var input;
-		var i = 0;
-		var extraElemId;
+		var conditionalElem = '.conditional-content';
 
-		if( !extraElem || inputs.length < 2 ){ return; }
+		var conitionalItems = new ma.components.ConditionalRadioContent({
+			inputContainer: '.problem-status',
+			inputName: 'status',
+			conditionalElem: conditionalElem,
+			shouldShow: function( value ){ return ( value === '1' || value === '2' ); }
+		});
 
-		function toggleEmergency( show ){
+		var extraInputs = jessie.query( conditionalElem + ' .govuk-radios__input' );
 
-			var classFn = ( show ? 'removeClass' : 'addClass' );
+		conitionalItems.events.toggle.subscribe( function( isVisible ){
+
 			var input;
 			var i = 0;
 
-			jessie[ classFn ]( extraElem, 'visually-hidden' );
-			jessie.setAriaAttribute( extraElem, 'hidden', !show );
-
-			if( !show ){
-				// if we hide the extra inputs, make sure none of them are checked
+			if( !isVisible ){
 				while( ( input = extraInputs[ i++ ] ) ){
 					input.checked = false;
 				}
 			}
-		}
-
-		function controlsEmergency( value ){
-
-			return ( value === '1' || value === '2' );
-		}
-
-		function checkState( /* e */ ){
-
-			var checked = jessie.queryOne( '.problem-status input[ name="status" ]:checked' );
-
-			if( checked ){
-
-				var value = checked && jessie.getInputValue( checked );
-				var showEmergency = controlsEmergency( value );
-				toggleEmergency( showEmergency );
-			}
-		}
-
-		extraElemId = extraElem.getAttribute( 'id' );
-		jessie.addClass( extraElem, 'visually-hidden' );
-		jessie.setAriaAttribute( extraElem, 'hidden', true );
-
-		while( ( input = inputs[ i++ ] ) ){
-
-			jessie.attachListener( input, 'click', checkState );
-
-			if( controlsEmergency( jessie.getInputValue( input ) ) ){
-				jessie.setAriaAttribute( input, 'controls', extraElemId );
-			}
-		}
-
-		checkState();
+		} );
 	};
-
-
-}( document, jessie ));
+}( jessie ));
