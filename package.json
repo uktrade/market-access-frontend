@@ -32,6 +32,7 @@
     "generate-data": "run-p generate:*",
     "generate:backend": "node src/data/faker/backend.js",
     "generate:datahub": "node src/data/faker/datahub.js",
+    "lint": "run-p lint:*",
     "lint:app": "eslint src/app",
     "lint:public": "eslint src/public/js --ignore-path src/public/js/.eslintignore",
     "lint:tests": "eslint src/test/app/specs"

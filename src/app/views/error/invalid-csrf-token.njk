@@ -3,5 +3,8 @@
 {% block page_title %}{{ super() }} - Forbidden{% endblock %}
 
 {% block page_content %}
-	The form you submitted has been tampered with.
+	<h1 class="error-heading">Invalid token</h1>
+	<p>
+		The form you submitted has been tampered with.
+	</p>
 {% endblock %}
