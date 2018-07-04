@@ -1,13 +1,18 @@
-module.exports = ( res, fail ) => {
+if( typeof jasmine !== 'undefined' ){
 
-	const matches = /"_csrf" value="(.+?)"/.exec( res.text );
+	jasmine.helpers = jasmine.helpers || {};
 
-	if( matches && matches.length > 1 ){
+	jasmine.helpers.getCsrfToken = ( res, fail ) => {
 
-		return matches[ 1 ];
+		const matches = /"_csrf" value="(.+?)"/.exec( res.text );
 
-	} else {
+		if( matches && matches.length > 1 ){
 
-		fail();
-	}
-};
+			return matches[ 1 ];
+
+		} else {
+
+			fail();
+		}
+	};
+}
