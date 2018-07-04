@@ -9,19 +9,19 @@
 
 .dash-button__heading {
 
-	background-image: govuk-file-url("icon-pointer.png");
+	background-image: govuk-image-url("icon-pointer.png");
 	background-repeat: no-repeat;
 	background-position: 100% 50%;
 	padding-right: govuk-em( 45, 24 );
 
 	@include govuk-device-pixel-ratio {
-		background-image: govuk-file-url("icon-pointer-2x.png");
+		background-image: govuk-image-url("icon-pointer-2x.png");
 		background-size: 30px 19px;
 	}
 }
 
 .dash-button__text {
-	@include govuk-font-regular-14;
+	@include govuk-font( $size: 14 );
 	display: block;
 	max-width: govuk-em( 250, 14 );
 	padding: govuk-em( 10, 14 ) 0;

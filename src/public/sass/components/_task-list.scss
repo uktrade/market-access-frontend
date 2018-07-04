@@ -19,7 +19,7 @@ $gutter: 30px;
 
 	display: table;
 
-	@include govuk-font-bold-24;
+	@include govuk-font( $size: 24, $weight: bold );
 	padding-bottom: ($gutter / 6);
 }
 
@@ -50,7 +50,7 @@ $gutter: 30px;
 }
 
 .task-list__item {
-	@include govuk-font-regular-16;
+	@include govuk-font( $size: 16 );
 	border-bottom: 1px solid $govuk-grey-2;
 	padding-top: ( $gutter / 3 );
 	padding-bottom: ( $gutter / 3 );

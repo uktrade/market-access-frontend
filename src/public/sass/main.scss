@@ -1,36 +1,36 @@
-$govuk-font-stack: Arial,"Helvetica Neue",Helvetica,sans-serif;
-$govuk-font-stack-tabular: Arial,"Helvetica Neue",Helvetica,sans-serif;
-$govuk-global-images: "/public/govuk/images/";
+$govuk-font-family: Arial,"Helvetica Neue",Helvetica,sans-serif;
+$govuk-font-family-tabular: Arial,"Helvetica Neue",Helvetica,sans-serif;
+$govuk-images-path: "/public/govuk/images/";
 
-@import "frontend/settings/all";
-@import "frontend/helpers/all";
-@import "frontend/tools/all";
-@import "frontend/core/typography";
-@import 'frontend/core/lists';
-@import "frontend/objects/width-container";
-@import "frontend/objects/form-group";
-@import "frontend/overrides/typography";
-@import "frontend/overrides/spacing";
+@import "govuk-frontend/settings/all";
+@import "govuk-frontend/helpers/all";
+@import "govuk-frontend/tools/all";
+@import "govuk-frontend/core/typography";
+@import 'govuk-frontend/core/lists';
+@import "govuk-frontend/objects/width-container";
+@import "govuk-frontend/objects/form-group";
+@import "govuk-frontend/overrides/typography";
+@import "govuk-frontend/overrides/spacing";
 
-@import 'frontend/components/footer/footer';
-@import 'frontend/components/button/button';
-@import 'frontend/components/tag/tag';
-@import 'frontend/components/error-message/error-message';
-@import 'frontend/components/fieldset/fieldset';
-@import 'frontend/components/label/label';
-@import 'frontend/components/hint/hint';
-@import 'frontend/components/radios/radios';
-@import 'frontend/components/input/input';
-@import 'frontend/components/select/select';
-@import 'frontend/components/warning-text/warning-text';
-@import 'frontend/components/textarea/textarea';
-@import 'frontend/components/back-link/back-link';
-@import 'frontend/components/error-summary/error-summary';
-@import 'frontend/components/error-message/error-message';
+@import 'govuk-frontend/components/footer/footer';
+@import 'govuk-frontend/components/button/button';
+@import 'govuk-frontend/components/tag/tag';
+@import 'govuk-frontend/components/error-message/error-message';
+@import 'govuk-frontend/components/fieldset/fieldset';
+@import 'govuk-frontend/components/label/label';
+@import 'govuk-frontend/components/hint/hint';
+@import 'govuk-frontend/components/radios/radios';
+@import 'govuk-frontend/components/input/input';
+@import 'govuk-frontend/components/select/select';
+@import 'govuk-frontend/components/warning-text/warning-text';
+@import 'govuk-frontend/components/textarea/textarea';
+@import 'govuk-frontend/components/back-link/back-link';
+@import 'govuk-frontend/components/error-summary/error-summary';
+@import 'govuk-frontend/components/error-message/error-message';
+
+@import 'settings/colours';
 
 @import 'error';
-
-$govuk-orange-aa: #F46A25;
 
 @import 'components/dash-button';
 @import 'components/task-list';
@@ -72,13 +72,13 @@ $govuk-orange-aa: #F46A25;
 }
 
 .results-count {
-	@include govuk-font-regular-19;
+	@include govuk-font( $size: 19 );
 	border-bottom: 5px solid $govuk-black;
 	padding-bottom: govuk-em( 5, 19 );
 }
 
 .results-count__number {
-	@include govuk-font-bold-36;
+	@include govuk-font( $size: 36, $weight: bold );
 }
 
 .highlight {
@@ -148,7 +148,7 @@ $govuk-orange-aa: #F46A25;
 }
 
 .header-bar {
-	@include govuk-font-regular-14;
+	@include govuk-font( $size: 14 );
 	background-color: $govuk-fuchsia;
 	padding: govuk-em( 10, 14 ) 0;
 	color: $govuk-white;
@@ -160,7 +160,7 @@ $govuk-orange-aa: #F46A25;
 }
 
 .footer-bar {
-	@include govuk-font-regular-14;
+	@include govuk-font( $size: 14 );
 	margin-top: govuk-em( 45, 14 );
 	border-bottom: 10px solid $govuk-fuchsia
 }
