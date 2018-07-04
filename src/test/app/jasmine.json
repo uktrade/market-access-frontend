@@ -1,10 +1,10 @@
 {
-  "spec_dir": "src/test/app/specs",
+  "spec_dir": "src/app",
   "spec_files": [
     "**/*.spec.js"
   ],
   "helpers": [
-    "../helpers/**/*.js"
+    "../test/app/helpers/**/*.js"
   ],
   "random": false
 }

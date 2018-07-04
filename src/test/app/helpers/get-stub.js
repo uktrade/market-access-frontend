@@ -3,14 +3,13 @@ const getFile = require( './get-file' );
 
 const DATA_FOLDER = path.resolve( __dirname, '../../../data/stubs' );
 
-function getStub( file ){
-
-	return getFile( DATA_FOLDER, file );
-}
-
-module.exports = getStub;
+function getStub( file ){ return getFile( DATA_FOLDER, file ); }
 
 if( typeof jasmine !== 'undefined' ){
 
-	jasmine.getStub = getStub;
+	jasmine.helpers = jasmine.helpers || {};
+
+	jasmine.helpers.getStub = getStub;
 }
+
+module.exports = getStub;

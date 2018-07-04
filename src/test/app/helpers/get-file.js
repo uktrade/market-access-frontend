@@ -1,4 +1,4 @@
-module.exports = function( folder, file ){
+function getFile( folder, file ){
 
 	if( file.substr( -1 ) === '/' ){
 
@@ -18,4 +18,13 @@ module.exports = function( folder, file ){
 		console.error( 'Unable to transform JSON for file: %s', fileWithExt );
 		console.error( e );
 	}
-};
+}
+
+if( typeof jasmine !== 'undefined' ){
+
+	jasmine.helpers = jasmine.helpers || {};
+
+	jasmine.helpers.getFile = getFile;
+}
+
+module.exports = getFile;

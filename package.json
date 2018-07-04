@@ -1,6 +1,6 @@
 {
   "name": "market-access-frontend",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "A front end for Market Access",
   "main": "server.js",
   "engines": {
@@ -20,7 +20,7 @@
     "test:features:local": "npm run test:setup; export TEST_HOST=10.200.10.1; export TEST_BROWSER=chrome; cucumber-js src/test/ci/features",
     "watch": "run-p watch:*",
     "watch-stub": "export DATAHUB_STUB=true; npm run watch",
-    "watch:node": "export LOG_LEVEL=debug; nodemon src/app/cluster.js --ignore 'src/public/**/*' --ignore 'src/test/**/*'",
+    "watch:node": "export LOG_LEVEL=debug; nodemon src/app/cluster.js --ignore 'src/public/**/*' --ignore 'src/test/**/*' --ignore 'src/app/**/*.spec.js'",
     "grunt": "grunt dist",
     "build:dist": "npm run sass:prod && grunt dist && npm run dist-install",
     "dist-install": "cd dist && npm install --production",
@@ -34,8 +34,7 @@
     "generate:datahub": "node src/data/faker/datahub.js",
     "lint": "run-p lint:*",
     "lint:app": "eslint src/app",
-    "lint:public": "eslint src/public/js --ignore-path src/public/js/.eslintignore",
-    "lint:tests": "eslint src/test/app/specs"
+    "lint:public": "eslint src/public/js --ignore-path src/public/js/.eslintignore"
   },
   "repository": {
     "type": "git",
