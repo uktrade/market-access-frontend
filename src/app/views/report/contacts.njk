@@ -1,5 +1,5 @@
-{% from 'frontend/components/warning-text/macro.njk' import govukWarningText %}
-{% from 'components/heading.njk' import heading %}
+{% from 'components/warning-text/macro.njk' import govukWarningText %}
+{% from 'app-components/heading.njk' import heading %}
 
 {% extends 'layout.njk' %}
 
@@ -14,7 +14,7 @@
 	}) }}
 
 	<h2 class="govuk-heading-s">Who at {{ company.name }} raised the issue?</h2>
-	<p class="govuk-hint govuk-!-mb-r5">
+	<p class="govuk-hint govuk-!-margin-bottom-5">
 		Select who you have been in contact with at this company about the barrier
 	</p>
 

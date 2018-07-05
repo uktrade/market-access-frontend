@@ -47,18 +47,6 @@ module.exports = function( grunt ){
 						dest: 'dist/'
 					}
 				]
-			},
-
-			//while the new frontend is in beta, copy the files
-			govuk: {
-				files: [
-					{
-						expand: true,
-						cwd: 'src/',
-						src: [ '@govuk-frontend/**/*' ],
-						dest: 'dist/'
-					}
-				]
 			}
 		},
 

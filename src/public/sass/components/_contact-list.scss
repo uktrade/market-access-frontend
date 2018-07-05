@@ -26,10 +26,10 @@
 
 .contact-list__item__sub-key {
 	color: $govuk-grey-1;
-	@include govuk-font-regular-14;
+	@include govuk-font( $size: 14 );
 }
 
 .contact-list__item__sub-value {
 	color: $govuk-black;
-	@include govuk-font-regular-14;
+	@include govuk-font( $size: 14 );
 }

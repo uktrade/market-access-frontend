@@ -8,12 +8,12 @@
 }
 
 .company-card__heading {
-	@include govuk-font-bold-19;
+	@include govuk-font( $weight: bold, $size: 19 );
 }
 
 .company-card__values {
 	color: $govuk-black;
-	@include govuk-font-regular-14;
+	@include govuk-font( $size: 14 );
 }
 
 .company-card__values__key {

@@ -11,13 +11,13 @@
 }
 
 .start-banner__heading {
-	@include govuk-font-bold-19;
+	@include govuk-font( $size: 19, $weight: bold );
 }
 
 //.start-banner__text {}
 
 .start-banner__button {
-	
+
 	@extend .govuk-button;
 	@extend .govuk-button--start;
 	margin-bottom: 2px;

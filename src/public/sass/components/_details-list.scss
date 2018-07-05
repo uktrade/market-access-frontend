@@ -7,7 +7,7 @@
 .details-list__group {
 
 	display: table-row;
-	@include govuk-font-regular-14;
+	@include govuk-font( $size: 14 );
 
 	&:nth-of-type( odd ){
 		background-color: $govuk-grey-4;
