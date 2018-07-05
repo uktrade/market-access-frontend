@@ -2,43 +2,43 @@ $govuk-font-family: Arial,"Helvetica Neue",Helvetica,sans-serif;
 $govuk-font-family-tabular: Arial,"Helvetica Neue",Helvetica,sans-serif;
 $govuk-images-path: "/public/govuk/images/";
 
-@import "govuk-frontend/settings/all";
-@import "govuk-frontend/helpers/all";
-@import "govuk-frontend/tools/all";
-@import "govuk-frontend/core/typography";
-@import 'govuk-frontend/core/lists';
-@import "govuk-frontend/objects/width-container";
-@import "govuk-frontend/objects/form-group";
-@import "govuk-frontend/overrides/typography";
-@import "govuk-frontend/overrides/spacing";
+@import "settings/all";
+@import "helpers/all";
+@import "tools/all";
+@import "core/typography";
+@import 'core/lists';
+@import "objects/width-container";
+@import "objects/form-group";
+@import "overrides/typography";
+@import "overrides/spacing";
 
-@import 'govuk-frontend/components/footer/footer';
-@import 'govuk-frontend/components/button/button';
-@import 'govuk-frontend/components/tag/tag';
-@import 'govuk-frontend/components/error-message/error-message';
-@import 'govuk-frontend/components/fieldset/fieldset';
-@import 'govuk-frontend/components/label/label';
-@import 'govuk-frontend/components/hint/hint';
-@import 'govuk-frontend/components/radios/radios';
-@import 'govuk-frontend/components/input/input';
-@import 'govuk-frontend/components/select/select';
-@import 'govuk-frontend/components/warning-text/warning-text';
-@import 'govuk-frontend/components/textarea/textarea';
-@import 'govuk-frontend/components/back-link/back-link';
-@import 'govuk-frontend/components/error-summary/error-summary';
-@import 'govuk-frontend/components/error-message/error-message';
+@import 'components/footer/footer';
+@import 'components/button/button';
+@import 'components/tag/tag';
+@import 'components/error-message/error-message';
+@import 'components/fieldset/fieldset';
+@import 'components/label/label';
+@import 'components/hint/hint';
+@import 'components/radios/radios';
+@import 'components/input/input';
+@import 'components/select/select';
+@import 'components/warning-text/warning-text';
+@import 'components/textarea/textarea';
+@import 'components/back-link/back-link';
+@import 'components/error-summary/error-summary';
+@import 'components/error-message/error-message';
 
-@import 'settings/colours';
+@import 'app-settings/colours';
 
 @import 'error';
 
-@import 'components/dash-button';
-@import 'components/task-list';
-@import 'components/details-list';
-@import 'components/company-card';
-@import 'components/search-form';
-@import 'components/table-standard';
-@import 'components/contact-list';
+@import 'app-components/dash-button';
+@import 'app-components/task-list';
+@import 'app-components/details-list';
+@import 'app-components/company-card';
+@import 'app-components/search-form';
+@import 'app-components/table-standard';
+@import 'app-components/contact-list';
 
 @import 'pages/report/index';
 
