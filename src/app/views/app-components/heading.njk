@@ -13,7 +13,8 @@
 	{% if params.errors and params.errors.length %}
 		{{ govukErrorSummary( {
 			titleText: 'There is a problem',
-			errorList: params.errors
+			errorList: params.errors,
+			classes: 'restrict-width'
 		} ) }}
 	{% endif %}
 {% endmacro %}

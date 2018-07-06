@@ -13,32 +13,6 @@ function addNumber( tasks ){
 	}
 }
 
-function addMissingItems( tasks ){
-
-	for( let task of tasks ){
-
-		const hasItems = ( task.items.length > 0 );
-
-		if( !hasItems ){
-
-			switch( task.stage ){
-				case '2.0':
-					task.items.push( {
-						name: 'Name and summarise the barrier',
-						stage: task.stage
-					} );
-				break;
-				case '3.0':
-					task.items.push( {
-						name: 'Describe next steps and what type of support you might need',
-						stage: task.stage
-					} );
-				break;
-			}
-		}
-	}
-}
-
 function createTaskList( reportStages ){
 
 	const tasks = [];
@@ -69,7 +43,6 @@ function createTaskList( reportStages ){
 	}
 
 	addNumber( tasks );
-	addMissingItems( tasks );
 
 	return tasks;
 }
@@ -90,6 +63,8 @@ module.exports.fetch = async () => {
 			module.exports.publishResponse = body.publish_response;
 			module.exports.reportStages = body.report_stages;
 			module.exports.reportTaskList = createTaskList( body.report_stages );
+			module.exports.barrierTypes = body.barrier_types;
+			module.exports.supportType = body.support_type;
 			module.exports.bool = {
 				'true': 'Yes',
 				'false': 'No'

@@ -7,5 +7,15 @@
 	"words": {
 		"type": "string",
 		"faker": "lorem.words"
+	},
+
+	"paragraph": {
+		"type": "string",
+		"faker": "lorem.paragraph"
+	},
+
+	"int": {
+		"type": "number",
+		"faker": "random.number"
 	}
 }

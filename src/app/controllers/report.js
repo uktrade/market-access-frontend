@@ -8,6 +8,34 @@ const validators = require( '../lib/validators' );
 
 const reportDetailViewModel = require( '../lib/view-models/report/detail' );
 
+function barrierTypeToRadio( item ){
+
+	const { id, title, category } = item;
+
+	return {
+		value: id,
+		text: title,
+		category
+	};
+}
+
+function groupBarrierTypes( types ){
+
+	const items = {
+		GOODS: [],
+		SERVICES: []
+	};
+
+	for( let type of types ){
+		items[ type.category ].push( type );
+	}
+
+	return {
+		goods: items.GOODS,
+		services: items.SERVICES
+	};
+}
+
 let countryItems;
 
 module.exports = {
@@ -383,7 +411,7 @@ module.exports = {
 
 					if( response.isSuccess ){
 
-						return res.redirect( form.isExit ? urls.report.detail( report.id ) : urls.index() );
+						return res.redirect( form.isExit ? urls.report.detail( report.id ) : urls.report.type( report.id ) );
 
 					} else {
 
@@ -398,6 +426,122 @@ module.exports = {
 		}
 
 		res.render( 'report/legal', form.getTemplateValues() );
+	},
+
+	type: async ( req, res, next ) => {
+
+		const report = req.report;
+		const form = new Form( req, {
+			barrierType: {
+				type: Form.RADIO,
+				items: metadata.barrierTypes.map( barrierTypeToRadio ),
+				values: [ report.barrier_type ],
+				required: 'Select a goods or service barrier type'
+			}
+		} );
+
+		if( form.isPost ){
+
+			form.validate();
+
+			if( !form.hasErrors() ){
+
+				try {
+
+					const { response } = await backend.saveBarrierType( req, report.id, form.getValues() );
+
+					if( response.isSuccess ){
+
+						return res.redirect( form.isExit ? urls.report.detail( report.id ) : urls.report.support( report.id ) );
+
+					} else {
+
+						return next( new Error( `Unable to save report, got ${ response.statusCode } from backend` ) );
+					}
+
+				} catch( e ){
+
+					return next( e );
+				}
+			}
+		}
+
+		const data = form.getTemplateValues();
+		data.items = groupBarrierTypes( data.barrierType );
+
+		res.render( 'report/type', data );
+	},
+
+	support: async ( req, res, next ) => {
+
+		const report = req.report;
+		const form = new Form( req, {
+			resolved: {
+				type: Form.RADIO,
+				values: [ report.is_resolved ],
+				items: govukItemsFromObj( metadata.bool ),
+				validators: [ {
+					fn: validators.isMetadata( 'bool' ),
+					message: 'Answer if the barrier has been resolved'
+				} ]
+			},
+			supportType: {
+				type: Form.RADIO,
+				values: [ report.support_type ],
+				items: govukItemsFromObj( metadata.supportType ),
+				conditional: { name: 'resolved', value: 'true' },
+				validators: [ {
+					fn: validators.isMetadata( 'supportType' ),
+					message: 'Answer what type of support you would like'
+				} ]
+			},
+			stepsTaken: {
+				values: [ report.steps_taken ],
+				required: 'Provide a summary of key steps/actions taken so far'
+			},
+			politicalSensitivities: {
+				type: Form.RADIO,
+				values: [ report.is_politically_sensitive ],
+				items: govukItemsFromObj( metadata.bool ),
+				validators: [ {
+					fn: validators.isMetadata( 'bool' ),
+					message: 'Answer if there are any political sensitivities'
+				} ]
+			},
+			sensitivitiesDescription: {
+				values: [ report.political_sensitivity_summary ],
+				conditional: { name: 'politicalSensitivities', value: 'true' },
+				required: 'Describe any political sensitivities'
+			}
+		} );
+
+		if( form.isPost ){
+
+			form.validate();
+
+			if( !form.hasErrors() ){
+
+				try {
+
+					const { response } = await backend.saveSupport( req, report.id, form.getValues() );
+
+					if( response.isSuccess ){
+
+						return res.redirect( form.isExit ? urls.report.detail( report.id ) : urls.report.nextSteps( report.id ) );
+
+					} else {
+
+						return next( new Error( `Unable to save report, got ${ response.statusCode } from backend` ) );
+					}
+
+				} catch( e ){
+
+					return next( e );
+				}
+			}
+		}
+
+		res.render( 'report/support', form.getTemplateValues() );
 	},
 
 	nextSteps: async ( req, res, next ) => {

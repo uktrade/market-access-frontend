@@ -86,6 +86,16 @@ module.exports = {
 		other_infingment: !!values.infringments.otherInfringment,
 		infringment_summary: getValue( values.infringmentSummary )
 	} ),
+	saveBarrierType: ( req, reportId, values ) => backend.put( `/reports/${ reportId }/`, getToken( req ), {
+		barrier_type: getValue( values.barrierType )
+	} ),
+	saveSupport: ( req, reportId, values ) => backend.put( `/report/${ reportId }/`, getToken( req ), {
+		is_resolved: getValue( values.resolved ),
+		support_type: getValue( values.supportType ),
+		steps_taken: getValue( values.stepsTaken ),
+		is_politically_sensitive: getValue( values.politicalSensitivities ),
+		political_sensitivity_summary: getValue( values.sensitivitiesDescription )
+	} ),
 	saveNextSteps: ( req, reportId, values ) => backend.put( `/reports/${ reportId }/`, getToken( req ), {
 		govt_response_requester: getValue( values.response ),
 		is_confidential: getValue( values.sensitivities ),

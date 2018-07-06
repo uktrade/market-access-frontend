@@ -27,6 +27,8 @@ const reportUrl = {
 	aboutProblem: ( reportId ) => `/report/${ reportId }/problem/`,
 	impact: ( reportId ) => `/report/${ reportId }/impact/`,
 	legal: ( reportId ) => `/report/${ reportId }/legal/`,
+	type: ( reportId ) => `/report/${ reportId }/type/`,
+	support: ( reportId ) => `/report/${ reportId }/support/`,
 	nextSteps: ( reportId ) => `/report/${ reportId }/next-steps/`,
 };
 
@@ -52,29 +54,14 @@ module.exports = {
 				return reportUrl.impact( report.id );
 			case '1.6':
 				return reportUrl.legal( report.id );
+			case '1.7':
+				return reportUrl.type( report.id );
+			case '2.1':
+				return reportUrl.support( report.id );
+			case '2.2':
+				return reportUrl.nextSteps( report.id );
 			default:
 				return reportUrl.detail( report.id );
-		}
-	},
-
-	nextReportStage: ( report ) => {
-
-		const reportStage = getReportLastCompletedStage( report.progress );
-
-		if( reportStage ){
-
-			switch( reportStage.stage_code ){
-				case '1.3':
-					return reportUrl.aboutProblem( report.id );
-				case '1.4':
-					return reportUrl.nextSteps( report.id );
-				default:
-					return reportUrl.detail( report.id );
-			}
-
-		} else {
-
-			return reportUrl.detail( report.id );
 		}
 	}
 };

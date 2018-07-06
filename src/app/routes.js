@@ -55,6 +55,12 @@ module.exports = function( express, app ){
 	app.get( '/report/:reportId/legal/', reportHeaderNav, csrfProtection, reportController.legal );
 	app.post( '/report/:reportId/legal/', reportHeaderNav, parseBody, csrfProtection, reportController.legal );
 
+	app.get( '/report/:reportId/type/', reportHeaderNav, csrfProtection, reportController.type );
+	app.post( '/report/:reportId/type/', reportHeaderNav, parseBody, csrfProtection, reportController.type );
+
+	app.get( '/report/:reportId/support/', reportHeaderNav, csrfProtection, reportController.support );
+	app.post( '/report/:reportId/support/', reportHeaderNav, parseBody, csrfProtection, reportController.support );
+
 	app.get( '/report/:reportId/next-steps/', reportHeaderNav, csrfProtection, reportController.nextSteps );
 	app.post( '/report/:reportId/next-steps/', reportHeaderNav, parseBody, csrfProtection, reportController.nextSteps );
 

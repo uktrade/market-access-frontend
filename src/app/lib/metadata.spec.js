@@ -89,6 +89,7 @@ describe( 'metadata', () => {
 		describe( 'statusTypes', () => {
 			it( 'Should return the data', () => {
 
+				expect( metadata.statusTypes ).toBeDefined();
 				expect( metadata.statusTypes ).toEqual( fakeData.status_types );
 			} );
 		} );
@@ -96,6 +97,7 @@ describe( 'metadata', () => {
 		describe( 'lossScale', () => {
 			it( 'Should return the data', () => {
 
+				expect( metadata.lossScale ).toBeDefined();
 				expect( metadata.lossScale ).toEqual( fakeData.loss_range );
 			} );
 		} );
@@ -103,6 +105,7 @@ describe( 'metadata', () => {
 		describe( 'boolScale', () => {
 			it( 'Should return the data', () => {
 
+				expect( metadata.boolScale ).toBeDefined();
 				expect( metadata.boolScale ).toEqual( fakeData.adv_boolean );
 			} );
 		} );
@@ -111,17 +114,111 @@ describe( 'metadata', () => {
 			it( 'Should return the data', () => {
 
 				expect( metadata.countries ).toEqual( [
+					fakeData.countries[ 0 ],
+					fakeData.countries[ 1 ]
+				] );
+			} );
+		} );
+
+		describe( 'govResponse', () => {
+			it( 'Should return the data', () => {
+
+				expect( metadata.govResponse ).toBeDefined();
+				expect( metadata.govResponse ).toEqual( fakeData.govt_response );
+			} );
+		} );
+
+		describe( 'publishResponse', () => {
+			it( 'Should retur the data', () => {
+
+				expect( metadata.publishResponse ).toBeDefined();
+				expect( metadata.publishResponse ).toEqual( fakeData.publish_response );
+			} );
+		} );
+
+		describe( 'reportStages', () => {
+			it( 'Should return the data', () => {
+
+				expect( metadata.reportStages ).toBeDefined();
+				expect( metadata.reportStages ).toEqual( fakeData.report_stages );
+			} );
+		} );
+
+		describe( 'reportTaskList', () => {
+			it( 'Should create the list from the reportStages', () => {
+				//console.log( JSON.stringify( metadata.reportTaskList, null ,2 ) );
+				expect( metadata.reportTaskList ).toEqual( [
 					{
-						"id": "68496eb0-effd-42e0-91d8-349323b6fe5e",
-						"name": "Saint Lucia",
-						"disabled_on": null
+						"stage": "1.0",
+						"name": "doloremque qui ipsum",
+						"items": [
+							{
+								"stage": "1.1",
+								"name": "non dolorem eaque"
+							},{
+								"stage": "1.2",
+								"name": "soluta dolores est"
+							},{
+								"stage": "1.3",
+								"name": "vero ducimus dolores"
+							},{
+								"stage": "1.4",
+								"name": "atque aut numquam"
+							},{
+								"stage": "1.5",
+								"name": "doloremque at ullam"
+							},{
+								"stage": "1.6",
+								"name": "sapiente quas itaque"
+							},{
+								"stage": "1.7",
+								"name": "delectus dolores aliquid"
+							}
+						],
+						"number": true
 					},
 					{
-						"id": "9a662aa0-99ba-4f3b-835a-859fe210e9c2",
-						"name": "Senegal",
-						"disabled_on": null
+						"stage": "2.0",
+						"name": "dolorem cum accusantium",
+						"items": [
+							{
+								"stage": "2.1",
+								"name": "ipsam dolor illo"
+							},{
+								"stage": "2.2",
+								"name": "et eligendi repellendus"
+							}
+						],
+						"number": true
 					}
 				] );
+			} );
+		} );
+
+		describe( 'barrierTypes', () => {
+			it( 'Should return the list', () => {
+
+				expect( metadata.barrierTypes ).toBeDefined();
+				expect( metadata.barrierTypes ).toEqual( fakeData.barrier_types );
+			} );
+		} );
+
+		describe( 'supportType', () => {
+			it( 'Should return the data', () => {
+
+				expect( metadata.supportType ).toBeDefined();
+				expect( metadata.supportType ).toEqual( fakeData.support_type );
+			} );
+		} );
+
+		describe( 'bool', () => {
+			it( 'Should return the data', () => {
+
+				expect( metadata.bool ).toBeDefined();
+				expect( metadata.bool ).toEqual( {
+					'true': 'Yes',
+					'false': 'No'
+				} );
 			} );
 		} );
 	} );
