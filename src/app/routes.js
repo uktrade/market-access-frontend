@@ -49,6 +49,12 @@ module.exports = function( express, app ){
 	app.get( '/report/:reportId/problem/', reportHeaderNav, csrfProtection, reportController.aboutProblem );
 	app.post( '/report/:reportId/problem/', reportHeaderNav, parseBody, csrfProtection, reportController.aboutProblem );
 
+	app.get( '/report/:reportId/impact/', reportHeaderNav, csrfProtection, reportController.impact );
+	app.post( '/report/:reportId/impact/', reportHeaderNav, parseBody, csrfProtection, reportController.impact );
+
+	app.get( '/report/:reportId/legal/', reportHeaderNav, csrfProtection, reportController.legal );
+	app.post( '/report/:reportId/legal/', reportHeaderNav, parseBody, csrfProtection, reportController.legal );
+
 	app.get( '/report/:reportId/next-steps/', reportHeaderNav, csrfProtection, reportController.nextSteps );
 	app.post( '/report/:reportId/next-steps/', reportHeaderNav, parseBody, csrfProtection, reportController.nextSteps );
 

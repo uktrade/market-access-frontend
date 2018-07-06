@@ -1,0 +1,97 @@
+{% from "components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from 'components/input/macro.njk' import govukInput %}
+{% from 'components/textarea/macro.njk' import govukTextarea %}
+{% from 'components/radios/macro.njk' import govukRadios %}
+{% from 'components/select/macro.njk' import govukSelect %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Report - Legal obligations infringed{% endblock %}
+
+{% block body_script %}
+	<script>
+		ma.pages.report.legal();
+	</script>
+{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.report.impact( report.id ) },
+		caption: 'Report a barrier',
+		text: 'Legal obligations infringed',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.report.legal( report.id ) }}" method="POST" class="restrict-width">
+
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{{ govukRadios( {
+
+			idPrefix: 'has-infringed',
+			name: 'hasInfringed',
+			classes: 'has-infringed',
+			fieldset: {
+				legend: {
+					text: 'Have any legal obligations been infringed?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: hasInfringed,
+			errorMessage: errors | errorForName( 'has-infringed-1' )
+			} )
+		}}
+		<div class="conditional-content">
+
+			{{ govukCheckboxes( {
+
+				idPrefix: 'infringments',
+				name: 'infringments',
+				fieldset: {
+					legend: {
+						text: 'Are there any other companies affected?',
+						classes: 'govuk-fieldset__legend--s'
+					}
+				},
+				items: [
+					{
+						text: 'WTO provision infinged',
+						name: 'wtoInfringment',
+						value: 'true',
+						checked: infringments.wtoInfringment
+					},{
+						text: 'FTA provisions infringed',
+						name: 'ftaInfringment',
+						value: 'true',
+						checked: infringments.ftaInfringment
+					},{
+						text: 'Other rules and principles (i.e. transparency, non discrimination, proportionality)',
+						name: 'otherInfringment',
+						value: 'true',
+						checked: infringments.otherInfringment
+					}
+				],
+				errorMessage: errors | errorForName( 'infringments-1' )
+				} )
+			}}
+
+			{{ govukTextarea( {
+
+				label: {
+					text: "Please list provisions infringed",
+					classes: 'govuk-label--s'
+				},
+				id: 'infringment-summary',
+				name: 'infringmentSummary',
+				value: infringmentSummary,
+				errorMessage: errors | errorForName( 'infringment-summary' )
+			} ) }}
+		</div>
+
+		<input type="submit" class="govuk-button" value="Save and continue">
+		<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>
+
+	</form>
+{% endblock %}

@@ -28,7 +28,7 @@ module.exports = {
 				items: govukItemsFromObj( metadata.statusTypes ),
 				validators: [{
 					fn: validators.isMetadata( 'statusTypes' ),
-					message: 'Please select the current status of the problem'
+					message: 'Select the current status of the problem'
 				}]
 			},
 
@@ -39,7 +39,7 @@ module.exports = {
 				conditional: { name: 'status', values: [ '1', '2' ] },
 				validators: [{
 					fn: validators.isMetadata( 'bool' ),
-					message: 'Please answer if the problem is an emergency'
+					message: 'Answer if the problem is an emergency'
 				}]
 			}
 		} );
@@ -68,7 +68,7 @@ module.exports = {
 		//TODO: Validate search term
 		if( hasQueryParam && !query ){
 
-			req.error( 'company', 'Please enter a search term' );
+			req.error( 'company', 'Enter a search term' );
 		}
 
 		if( query ){
@@ -199,7 +199,7 @@ module.exports = {
 				text: country.name
 			} ) );
 
-			countryItems.unshift( {	value: '', text: 'Please choose a country' } );
+			countryItems.unshift( {	value: '', text: 'Choose a country' } );
 		}
 
 		const report = req.report;
@@ -207,11 +207,11 @@ module.exports = {
 
 			item: {
 				values: [ report.product ],
-				required: 'Please enter the product or service being exported'
+				required: 'Enter the product or service being exported'
 			},
 
 			commodityCode: {
-				values: [ ( report.commodity_codes && report.commodity_codes.join( ', ' ) ) ]
+				values: [ report.commodity_codes ]
 			},
 
 			country: {
@@ -221,39 +221,19 @@ module.exports = {
 				validators: [
 					{
 						fn: validators.isCountry,
-						message: 'Please choose an export country/trading bloc'
+						message: 'Choose an export country/trading bloc'
 					}
 				]
 			},
 
 			description: {
 				values: [ report.problem_description ],
-				required: 'Please enter a brief description of the problem'
+				required: 'Enter a brief description of the problem'
 			},
 
-			impact: {
-				values: [ report.problem_impact ],
-				required: 'Please describe the impact of the problem'
-			},
-
-			losses: {
-				type: Form.RADIO,
-				values: [ report.estimated_loss_range ],
-				items: govukItemsFromObj( metadata.lossScale ),
-				validators: [ {
-					fn: validators.isMetadata( 'lossScale' ),
-					message: 'Please answer the value of losses'
-				} ]
-			},
-
-			otherCompanies: {
-				type: Form.RADIO,
-				values: [ report.other_companies_affected ],
-				items: govukItemsFromObj( metadata.boolScale ),
-				validators: [ {
-					fn: validators.isMetadata( 'boolScale' ),
-					message: 'Please answer if any other companies are affected'
-				} ]
+			barrierTitle: {
+				values: [ report.barrier_title ],
+				required: 'Enter a barrier title'
 			}
 		} );
 
@@ -269,7 +249,7 @@ module.exports = {
 
 					if( response.isSuccess ){
 
-						return res.redirect( form.isExit ? urls.report.detail( report.id ) : urls.report.nextSteps( report.id ) );
+						return res.redirect( form.isExit ? urls.report.detail( report.id ) : urls.report.impact( report.id ) );
 
 					} else {
 
@@ -286,6 +266,140 @@ module.exports = {
 		res.render( 'report/about-problem', form.getTemplateValues() );
 	},
 
+	impact: async ( req, res, next ) => {
+
+		const report = req.report;
+		const form = new Form( req, {
+
+			impact: {
+				values: [ report.problem_impact ],
+				required: 'Describe the impact of the problem'
+			},
+
+			losses: {
+				type: Form.RADIO,
+				values: [ report.estimated_loss_range ],
+				items: govukItemsFromObj( metadata.lossScale ),
+				validators: [ {
+					fn: validators.isMetadata( 'lossScale' ),
+					message: 'Answer the value of losses'
+				} ]
+			},
+
+			otherCompanies: {
+				type: Form.RADIO,
+				values: [ report.other_companies_affected ],
+				items: govukItemsFromObj( metadata.boolScale ),
+				validators: [ {
+					fn: validators.isMetadata( 'boolScale' ),
+					message: 'Answer if any other companies are affected'
+				} ]
+			},
+
+			otherCompaniesInfo: {
+				values: [ report.other_companies_info ],
+				conditional: { name: 'otherCompanies', value: '1' },
+				required: 'Enter information on the other companies'
+			}
+		} );
+
+		if( form.isPost ){
+
+			form.validate();
+
+			if( !form.hasErrors() ){
+
+				try {
+
+					const { response } = await backend.saveImpact( req, report.id, form.getValues() );
+
+					if( response.isSuccess ){
+
+						return res.redirect( form.isExit ? urls.report.detail( report.id ) : urls.report.legal( report.id ) );
+
+					} else {
+
+						return next( new Error( `Unable to save report, got ${ response.statusCode } from backend` ) );
+					}
+
+				} catch( e ){
+
+					return next( e );
+				}
+			}
+		}
+
+		res.render( 'report/impact', form.getTemplateValues() );
+	},
+
+	legal: async ( req, res, next ) => {
+
+		const report = req.report;
+		const form = new Form( req, {
+			hasInfringed: {
+				type: Form.RADIO,
+				values: [ report.has_legal_infringment ],
+				items: govukItemsFromObj( metadata.boolScale ),
+				validators: [ {
+					fn: validators.isMetadata( 'boolScale' ),
+					message: 'Answer if any legal obligations have been infringed'
+				} ]
+			},
+			infringments: {
+				type: Form.CHECKBOXES,
+				conditional: { name: 'hasInfringed', value: '1' },
+				validators: [ {
+					fn: validators.isOneBoolCheckboxChecked,
+					message: 'Select at least one infringment'
+				} ],
+				checkboxes: {
+					wtoInfringment: {
+						values: [ report.wto_infingment ]
+					},
+					ftaInfringment: {
+						values: [ report.fta_infingment ]
+					},
+					otherInfringment: {
+						values: [ report.other_infingment ]
+					}
+				}
+			},
+			infringmentSummary: {
+				values: [ report.infringment_summary ],
+				conditional: { name: 'hasInfringed', value: '1' },
+				required: 'List the provisions infringed'
+			}
+		} );
+
+		if( form.isPost ){
+
+			form.validate();
+
+			if( !form.hasErrors() ){
+
+				try {
+
+					const { response } = await backend.saveLegal( req, report.id, form.getValues() );
+
+					if( response.isSuccess ){
+
+						return res.redirect( form.isExit ? urls.report.detail( report.id ) : urls.index() );
+
+					} else {
+
+						return next( new Error( `Unable to save report, got ${ response.statusCode } from backend` ) );
+					}
+
+				} catch( e ){
+
+					return next( e );
+				}
+			}
+		}
+
+		res.render( 'report/legal', form.getTemplateValues() );
+	},
+
 	nextSteps: async ( req, res, next ) => {
 
 		const report = req.report;
@@ -297,7 +411,7 @@ module.exports = {
 				items: govukItemsFromObj( metadata.govResponse ),
 				validators: [ {
 					fn: validators.isMetadata( 'govResponse' ),
-					message: 'Please select a valid choice for type of UK goverment response'
+					message: 'Select a valid choice for type of UK goverment response'
 				} ]
 			},
 
@@ -307,14 +421,14 @@ module.exports = {
 				items: govukItemsFromObj( metadata.bool ),
 				validators: [ {
 					fn: validators.isMetadata( 'bool' ),
-					message: 'Please select a valid choice for any sensitivities'
+					message: 'Select a valid choice for any sensitivities'
 				} ]
 			},
 
 			sensitivitiesText: {
 				values: [ report.sensitivity_summary ],
 				conditional: { name: 'sensitivities', value: 'true' },
-				required: 'Please describe the sensitivities'
+				required: 'Describe the sensitivities'
 			},
 
 			permission: {
@@ -323,7 +437,7 @@ module.exports = {
 				items: govukItemsFromObj( metadata.publishResponse ),
 				validators: [ {
 					fn: validators.isMetadata( 'publishResponse' ),
-					message: 'Please select a valid choice for if we can publish the summary'
+					message: 'Select a valid choice for if we can publish the summary'
 				} ]
 			}
 		} );

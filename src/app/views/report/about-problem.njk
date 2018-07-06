@@ -24,7 +24,7 @@
 		{{ govukInput( {
 
 			label: {
-				text: "What's the product or service being exported?",
+				text: "What's the product or service being exported or invested in abroad?",
 				classes: 'govuk-label--s'
 			},
 			id: 'item',
@@ -36,19 +36,19 @@
 		{{ govukInput( {
 
 			label: {
-				text: "List the relevant commodity codes, if known (Optional)",
+				html: 'List the relevant commodity codes, if known <span class="govuk-!-font-weight-regular">(Optional)</span>',
 				classes: 'govuk-label--s'
 			},
 			id: 'commodity-code',
 			name: 'commodityCode',
 			value: commodityCode,
-			errorMessage: errors | errorForName( 'comodityCode' )
+			errorMessage: errors | errorForName( 'commodity-code' )
 		} ) }}
 
 		{{ govukSelect( {
 
 			label: {
-				text: "Which country/trading bloc are they trying to export to?",
+				text: "Which country/trading bloc are they trying to export to or invest in?",
 				classes: 'govuk-label--s'
 			},
 			id: 'country',
@@ -69,47 +69,20 @@
 			errorMessage: errors | errorForName( 'description' )
 		} ) }}
 
-		{{ govukTextarea( {
+		{{ govukInput( {
 
 			label: {
-				text: "What impact would you expect the problem to have on the company if it is not resolved?",
+				text: 'Suggest an appropriate title for this barrier',
 				classes: 'govuk-label--s'
 			},
-			id: 'impact',
-			name: 'impact',
-			value: impact,
-			errorMessage: errors | errorForName( 'impact' )
+			hint: {
+				text: 'Include both the product or service name and the country being exported to e.g. Import of steel rods into India'
+			},
+			id: 'barrier-title',
+			name: 'barrierTitle',
+			value: barrierTitle,
+			errorMessage: errors | errorForName( 'barrier-title' )
 		} ) }}
-
-		{{ govukRadios( {
-
-			idPrefix: 'losses',
-			name: 'losses',
-			fieldset: {
-				legend: {
-					text: 'Provide an estimate of the financial value of sales lost over a five year period',
-					classes: 'govuk-fieldset__legend--s'
-				}
-			},
-			items: losses,
-			errorMessage: errors | errorForName( 'losses-1' )
-			} )
-		}}
-
-		{{ govukRadios( {
-
-			idPrefix: 'other-companies',
-			name: 'otherCompanies',
-			fieldset: {
-				legend: {
-					text: 'Are there any other companies affected?',
-					classes: 'govuk-fieldset__legend--s'
-				}
-			},
-			items: otherCompanies,
-			errorMessage: errors | errorForName( 'other-companies-1' )
-			} )
-		}}
 
 		<input type="submit" class="govuk-button" value="Save and continue">
 		<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>

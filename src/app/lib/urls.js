@@ -25,7 +25,9 @@ const reportUrl = {
 	viewContact: ( contactId, reportId ) => `/report/${ reportId ? reportId + '/' : '' }contact/${ contactId }/`,
 	save: ( reportId ) => `/report/${ reportId ? reportId + '/' : '' }save/`,
 	aboutProblem: ( reportId ) => `/report/${ reportId }/problem/`,
-	nextSteps: ( reportId ) => `/report/${ reportId }/next-steps/`
+	impact: ( reportId ) => `/report/${ reportId }/impact/`,
+	legal: ( reportId ) => `/report/${ reportId }/legal/`,
+	nextSteps: ( reportId ) => `/report/${ reportId }/next-steps/`,
 };
 
 module.exports = {
@@ -47,7 +49,9 @@ module.exports = {
 			case '1.4':
 				return reportUrl.aboutProblem( report.id );
 			case '1.5':
-				return reportUrl.nextSteps( report.id );
+				return reportUrl.impact( report.id );
+			case '1.6':
+				return reportUrl.legal( report.id );
 			default:
 				return reportUrl.detail( report.id );
 		}

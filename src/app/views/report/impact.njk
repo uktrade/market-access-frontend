@@ -1,0 +1,91 @@
+{% from 'components/input/macro.njk' import govukInput %}
+{% from 'components/textarea/macro.njk' import govukTextarea %}
+{% from 'components/radios/macro.njk' import govukRadios %}
+{% from 'components/select/macro.njk' import govukSelect %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Report - Impact of the problem{% endblock %}
+
+{% block body_script %}
+	<script>
+		ma.pages.report.impact();
+	</script>
+{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.report.aboutProblem( report.id ) },
+		caption: 'Report a barrier',
+		text: 'Impact of the problem',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.report.impact( report.id ) }}" method="POST" class="restrict-width">
+
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{{ govukTextarea( {
+
+			label: {
+				text: "What impact would you expect the problem to have on the company if it is not resolved?",
+				classes: 'govuk-label--s'
+			},
+			id: 'impact',
+			name: 'impact',
+			value: impact,
+			errorMessage: errors | errorForName( 'impact' )
+		} ) }}
+
+		{{ govukRadios( {
+
+			idPrefix: 'losses',
+			name: 'losses',
+			fieldset: {
+				legend: {
+					text: 'Provide an estimate of the financial value of sales lost over a five year period',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: losses,
+			errorMessage: errors | errorForName( 'losses-1' )
+			} )
+		}}
+
+		{{ govukRadios( {
+
+			idPrefix: 'other-companies',
+			name: 'otherCompanies',
+			classes: 'other-companies',
+			fieldset: {
+				legend: {
+					text: 'Are there any other companies affected?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: otherCompanies,
+			errorMessage: errors | errorForName( 'other-companies-1' )
+			} )
+		}}
+
+		<div class="conditional-content">
+			{{ govukTextarea( {
+
+				label: {
+					text: "Provide information on other companies that are affected",
+					classes: 'govuk-label--s'
+				},
+				id: 'other-companies-info',
+				name: 'otherCompaniesInfo',
+				value: otherCompaniesInfo,
+				errorMessage: errors | errorForName( 'other-companies-info' )
+			} ) }}
+		</div>
+
+		<input type="submit" class="govuk-button" value="Save and continue">
+		<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>
+
+	</form>
+{% endblock %}

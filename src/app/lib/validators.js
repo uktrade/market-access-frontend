@@ -12,5 +12,16 @@ module.exports = {
 	},
 	isUuid: ( value ) => /^[a-zA-Z0-9-]+$/.test( value ),
 	isMetadata: ( key ) => ( value ) => Object.keys( metadata[ key ] ).includes( value ),
-	isCountry: ( value ) => metadata.countries.some( ( country ) => country.id === value )
+	isCountry: ( value ) => metadata.countries.some( ( country ) => country.id === value ),
+	isOneBoolCheckboxChecked: ( values ) => {
+
+		for( let [ /* key */, value ] of Object.entries( values ) ){
+
+			if( value === 'true' ){
+				return true;
+			}
+		}
+
+		return false;
+	}
 };

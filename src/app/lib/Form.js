@@ -2,6 +2,7 @@ const validators = require( './validators' );
 
 const RADIO = 'radio';
 const SELECT = 'select';
+const CHECKBOXES = 'checkbox';
 const isDefined = validators.isDefined;
 
 function camelCaseToDash( str ) {
@@ -15,6 +16,7 @@ function createId( name, type ){
 	switch( type ){
 
 		case RADIO:
+		case CHECKBOXES:
 			return ( dashedName + '-1' );
 		default:
 			return dashedName;
@@ -63,7 +65,21 @@ function Form( req, fields ){
 		this.addField( name, field );
 
 		if( this.isPost ){
-			this.values[ name ] = req.body[ name ];
+
+			if( field.type === CHECKBOXES ){
+
+				const checkboxValues = {};
+
+				for( let checkboxName of Object.keys( field.checkboxes ) ){
+					checkboxValues[ checkboxName ] = req.body[ checkboxName ];
+				}
+
+				this.values[ name ] = checkboxValues;
+
+			} else {
+
+				this.values[ name ] = req.body[ name ];
+			}
 		}
 	}
 }
@@ -174,20 +190,32 @@ Form.prototype.getTemplateValues = function( errorsName ){
 
 		const field = this.fields[ name ];
 		const formValue = this.getValue( name );
-		const value = this.isPost ? formValue : getFirstValue( formValue, ...( field.values || [] ) );
 
 		let templateValue;
 
-		switch( field.type ){
+		if( field.type === CHECKBOXES ){
 
-			case RADIO:
-				templateValue = field.items.map( isChecked( value ) );
-			break;
-			case SELECT:
-				templateValue = field.items.map( isSelected( value ) );
-			break;
-			default:
-				templateValue = value;
+			templateValue = {};
+
+			for( let [ checkboxName, { values } ] of Object.entries( field.checkboxes ) ){
+				const checkboxValue = ( formValue || {} )[ checkboxName ];
+				templateValue[ checkboxName ] = this.isPost ? checkboxValue : getFirstValue( checkboxValue, ...( values || [] ) );
+			}
+
+		} else {
+
+			const value = this.isPost ? formValue : getFirstValue( formValue, ...( field.values || [] ) );
+			switch( field.type ){
+
+				case RADIO:
+					templateValue = field.items.map( isChecked( value ) );
+				break;
+				case SELECT:
+					templateValue = field.items.map( isSelected( value ) );
+				break;
+				default:
+					templateValue = value;
+			}
 		}
 
 		values[ name ] = templateValue;
@@ -222,5 +250,6 @@ Form.prototype.hasErrors = function(){
 
 Form.RADIO = RADIO;
 Form.SELECT = SELECT;
+Form.CHECKBOXES = CHECKBOXES;
 
 module.exports = Form;

@@ -10,23 +10,23 @@
 		{{ heading({
 			back: { href: urls.report.companySearch( report.id ) },
 			caption: 'Report a barrier',
-			text: 'Export company affected'
+			text: 'Company or organisation affected'
 		}) }}
 
 		<section class="restrict-width">
 
-			<h2 class="govuk-heading-s">Company summary</h2>
+			<h2 class="govuk-heading-s">Company/Organisation summary</h2>
 
 			{{ detailsList( [
 				{
-					'key': 'Registered name',
-					'value': company.name
+					key: 'Registered name',
+					value: company.name
 				},{
-					'key': 'Companies house no.',
-					'value': company.company_number
+					key: 'Companies house no.',
+					value: company.company_number
 				},{
-					'key': 'Primary address',
-					'value': [
+					key: 'Primary address',
+					value: [
 							company.registered_address_1,
 							company.registered_address_2,
 							company.registered_address_town,
@@ -35,20 +35,20 @@
 							company.registered_address_country.name
 						] | removeEmpty | join( ', ' )
 				},{
-					'key': 'Sector',
-					'value': company.sector.name
+					key: 'Sector',
+					value: company.sector.name
 				},{
-					'key': 'Incorporated on',
-					'value': company.created_on | dateOnly
+					key: 'Incorporated on',
+					value: company.created_on | dateOnly
 				},{
-					'key': 'Type',
-					'value': company.headquarter_type
+					key: 'Type',
+					value: company.business_type.name
 				},{
-					'key': 'Scale of company',
-					'value': company.turnover_range.name
+					key: 'Scale of company',
+					value: company.turnover_range.name
 				},{
-					'key': 'Number of employees',
-					'value': company.employee_range.name
+					key: 'Number of employees',
+					value: company.employee_range.name
 				}
 			] ) }}
 

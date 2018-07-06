@@ -68,12 +68,23 @@ module.exports = {
 	} ),
 	saveProblem: ( req, reportId, problem ) => backend.put( `/reports/${ reportId }/`, getToken( req ), {
 		product: getValue( problem.item ),
-		commodity_codes: ( problem.commodityCode ? problem.commodityCode.split( ', ' ) : null ),
+		commodity_codes: getValue( problem.commodityCode ),
 		export_country: getValue( problem.country ),
 		problem_description: getValue( problem.description ),
-		problem_impact: getValue( problem.impact ),
-		estimated_loss_range: getValue( problem.losses ),
-		other_companies_affected: getValue( problem.otherCompanies )
+		barrier_title: getValue( problem.barrierTitle )
+	} ),
+	saveImpact: ( req, reportId, values ) => backend.put( `/reports/${ reportId }/`, getToken( req ), {
+		problem_impact: getValue( values.impact ),
+		estimated_loss_range: getValue( values.losses ),
+		other_companies_affected: getValue( values.otherCompanies ),
+		other_companies_info: getValue( values.otherCompaniesInfo )
+	} ),
+	saveLegal: ( req, reportId, values ) => backend.put( `/reports/${ reportId }/`, getToken( req ), {
+		has_legal_infringment: getValue( values.hasInfringed ),
+		wto_infingment: !!values.infringments.wtoInfringment,
+		fta_infingment: !!values.infringments.ftaInfringment,
+		other_infingment: !!values.infringments.otherInfringment,
+		infringment_summary: getValue( values.infringmentSummary )
 	} ),
 	saveNextSteps: ( req, reportId, values ) => backend.put( `/reports/${ reportId }/`, getToken( req ), {
 		govt_response_requester: getValue( values.response ),
