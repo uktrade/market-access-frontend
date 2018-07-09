@@ -561,7 +561,7 @@ module.exports = {
 
 			sensitivities: {
 				type: Form.RADIO,
-				values: [ report.is_confidential ],
+				values: [ report.is_commercially_sensitive ],
 				items: govukItemsFromObj( metadata.bool ),
 				validators: [ {
 					fn: validators.isMetadata( 'bool' ),
@@ -570,7 +570,7 @@ module.exports = {
 			},
 
 			sensitivitiesText: {
-				values: [ report.sensitivity_summary ],
+				values: [ report.commercial_sensitivity_summary ],
 				conditional: { name: 'sensitivities', value: 'true' },
 				required: 'Describe the sensitivities'
 			},

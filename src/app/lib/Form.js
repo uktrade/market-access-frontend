@@ -126,6 +126,23 @@ Form.prototype.passedConditions = function( name ){
 	return true;
 };
 
+Form.prototype.shouldValidate = function( field, value ){
+
+	if( this.isExit ){
+
+		if( field.type === Form.CHECKBOXES ){
+
+			return false;
+
+		} else {
+
+			return isDefined( value );
+		}
+	}
+
+	return true;
+};
+
 Form.prototype.validateField = function( name ){
 
 	const field = this.fields[ name ];
@@ -133,10 +150,9 @@ Form.prototype.validateField = function( name ){
 	if( !field ){ throw new Error( name + ' field not found' ); }
 
 	const value = this.values[ name ];
-	const shouldValidate = ( this.isExit ? isDefined( value ) : true );
 	let isValid = true;
 
-	if( this.passedConditions( name ) && shouldValidate && Array.isArray( field.validators ) ){
+	if( this.passedConditions( name ) && this.shouldValidate( field, value ) && Array.isArray( field.validators ) ){
 
 		for( let { fn, message } of field.validators ){
 
@@ -205,8 +221,8 @@ Form.prototype.getTemplateValues = function( errorsName ){
 		} else {
 
 			const value = this.isPost ? formValue : getFirstValue( formValue, ...( field.values || [] ) );
-			switch( field.type ){
 
+			switch( field.type ){
 				case RADIO:
 					templateValue = field.items.map( isChecked( value ) );
 				break;

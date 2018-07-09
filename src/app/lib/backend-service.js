@@ -5,9 +5,9 @@ function getToken( req ){
 	return req.session.ssoToken;
 }
 
-function getValue( input ){
+function getValue( value ){
 
-	return input || null;
+	return value || null;
 }
 
 function sortReportProgress( item ){
@@ -46,6 +46,11 @@ function transformReports( { response, body } ){
 	return { response, body };
 }
 
+function updateReport( token, reportId, data ){
+
+	return backend.put( `/reports/${ reportId }/`, token, data );
+}
+
 module.exports = {
 
 	getMetadata: () => backend.get( '/metadata/' ),
@@ -59,47 +64,47 @@ module.exports = {
 		company_name: getValue( company.name ),
 		contact_id: getValue( contactId )
 	} ),
-	updateReport: ( req, reportId, { status, emergency }, company, contactId ) => backend.put( `/reports/${ reportId }/`, getToken( req ), {
+	updateReport: ( req, reportId, { status, emergency }, company, contactId ) => updateReport( getToken( req ), reportId, {
 		problem_status: getValue( status ),
 		is_emergency: getValue( emergency ),
 		company_id: getValue( company.id ),
 		company_name: getValue( company.name ),
 		contact_id: getValue( contactId )
 	} ),
-	saveProblem: ( req, reportId, problem ) => backend.put( `/reports/${ reportId }/`, getToken( req ), {
+	saveProblem: ( req, reportId, problem ) => updateReport( getToken( req ), reportId, {
 		product: getValue( problem.item ),
 		commodity_codes: getValue( problem.commodityCode ),
 		export_country: getValue( problem.country ),
 		problem_description: getValue( problem.description ),
 		barrier_title: getValue( problem.barrierTitle )
 	} ),
-	saveImpact: ( req, reportId, values ) => backend.put( `/reports/${ reportId }/`, getToken( req ), {
+	saveImpact: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 		problem_impact: getValue( values.impact ),
 		estimated_loss_range: getValue( values.losses ),
 		other_companies_affected: getValue( values.otherCompanies ),
 		other_companies_info: getValue( values.otherCompaniesInfo )
 	} ),
-	saveLegal: ( req, reportId, values ) => backend.put( `/reports/${ reportId }/`, getToken( req ), {
+	saveLegal: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 		has_legal_infringment: getValue( values.hasInfringed ),
 		wto_infingment: !!values.infringments.wtoInfringment,
 		fta_infingment: !!values.infringments.ftaInfringment,
 		other_infingment: !!values.infringments.otherInfringment,
 		infringment_summary: getValue( values.infringmentSummary )
 	} ),
-	saveBarrierType: ( req, reportId, values ) => backend.put( `/reports/${ reportId }/`, getToken( req ), {
+	saveBarrierType: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 		barrier_type: getValue( values.barrierType )
 	} ),
-	saveSupport: ( req, reportId, values ) => backend.put( `/report/${ reportId }/`, getToken( req ), {
+	saveSupport: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 		is_resolved: getValue( values.resolved ),
 		support_type: getValue( values.supportType ),
 		steps_taken: getValue( values.stepsTaken ),
 		is_politically_sensitive: getValue( values.politicalSensitivities ),
 		political_sensitivity_summary: getValue( values.sensitivitiesDescription )
 	} ),
-	saveNextSteps: ( req, reportId, values ) => backend.put( `/reports/${ reportId }/`, getToken( req ), {
+	saveNextSteps: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 		govt_response_requester: getValue( values.response ),
-		is_confidential: getValue( values.sensitivities ),
-		sensitivity_summary: getValue( values.sensitivitiesText ),
+		is_commercially_sensitive: getValue( values.sensitivities ),
+		commercial_sensitivity_summary: getValue( values.sensitivitiesText ),
 		can_publish: getValue( values.permission )
 	} )
 };
