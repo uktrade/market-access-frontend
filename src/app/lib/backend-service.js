@@ -10,6 +10,11 @@ function getValue( value ){
 	return value || null;
 }
 
+function getCheckboxValue( parent, field ){
+
+	return getValue( parent ) && !!parent[ field ];
+}
+
 function sortReportProgress( item ){
 
 	if( Array.isArray( item.progress ) ){
@@ -86,9 +91,9 @@ module.exports = {
 	} ),
 	saveLegal: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 		has_legal_infringment: getValue( values.hasInfringed ),
-		wto_infingment: !!values.infringments.wtoInfringment,
-		fta_infingment: !!values.infringments.ftaInfringment,
-		other_infingment: !!values.infringments.otherInfringment,
+		wto_infingment: getCheckboxValue( values.infringments, 'wtoInfringment' ),
+		fta_infingment: getCheckboxValue( values.infringments, 'ftaInfringment' ),
+		other_infingment: getCheckboxValue( values.infringments, 'otherInfringment' ),
 		infringment_summary: getValue( values.infringmentSummary )
 	} ),
 	saveBarrierType: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
