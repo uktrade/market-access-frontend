@@ -183,11 +183,12 @@ module.exports = {
 
 			let response;
 			let body;
+			let values = Object.assign( {}, sessionStartForm, { company: sessionCompany }, { contactId: sessionContact } );
 
 			if( isUpdate ){
-				({ response, body } = await backend.updateReport( req, reportId, sessionStartForm, sessionCompany, sessionContact ));
+				({ response, body } = await backend.updateReport( req, reportId, values ));
 			} else {
-				({ response, body } = await backend.saveNewReport( req, sessionStartForm, sessionCompany, sessionContact ));
+				({ response, body } = await backend.saveNewReport( req, values ));
 			}
 
 			delete req.session.startFormValues;

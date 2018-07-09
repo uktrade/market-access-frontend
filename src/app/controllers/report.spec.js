@@ -65,6 +65,10 @@ describe( 'Report controller', () => {
 				companyDetails: jasmine.createSpy( 'urls.report.companyDetails' ),
 				contacts: jasmine.createSpy( 'urls.report.contacts' ),
 				aboutProblem: jasmine.createSpy( 'urls.report.aboutProblem' ),
+				impact: jasmine.createSpy( 'urls.report.impact' ),
+				legal: jasmine.createSpy( 'urls.report.legal' ),
+				type: jasmine.createSpy( 'urls.report.type' ),
+				support: jasmine.createSpy( 'urls.report.support' ),
 				nextSteps: jasmine.createSpy( 'urls.report.nextSteps' ),
 				detail: jasmine.createSpy( 'urls.report.detail' )
 			}
@@ -520,11 +524,9 @@ describe( 'Report controller', () => {
 									response: { isSuccess: true },
 									body: responseBody
 								} ) );
-
 							} );
 
 							describe( 'When the action is exit', () => {
-
 								it( 'Should put the body in the session and redirect', async () => {
 
 									const detailUrl = '/b-test';
@@ -539,7 +541,25 @@ describe( 'Report controller', () => {
 									expect( urls.report.detail ).toHaveBeenCalledWith( responseBody.id );
 								} );
 							} );
+
 							describe( 'When the action is NOT exit', () => {
+								it( 'Should call the correct backend method', async () => {
+
+									const values = Object.assign( {},
+										req.session.startFormValues,
+										{ company: req.session.reportCompany },
+										{ contactId }
+									);
+
+									await controller.save( req, res, next );
+
+									expect( backend.saveNewReport ).toHaveBeenCalled();
+
+									const args = backend.saveNewReport.calls.argsFor( 0 );
+
+									expect( args[ 0 ] ).toEqual( req );
+									expect( args[ 1 ] ).toEqual( values );
+								} );
 
 								it( 'Should put the body in the session and redirect', async () => {
 
@@ -605,9 +625,15 @@ describe( 'Report controller', () => {
 						const args = backend.updateReport.calls.argsFor( 0 );
 						expect( args[ 0 ] ).toEqual( req );
 						expect( args[ 1 ] ).toEqual( reportId );
-						expect( args[ 2 ] ).toEqual( { status: req.report.problem_status, emergency: ( req.report.is_emergency + '' ) } );
-						expect( args[ 3 ] ).toEqual( { id: req.report.company_id, name: req.report.company_name } );
-						expect( args[ 4 ] ).toEqual( contactId );
+						expect( args[ 2 ] ).toEqual( {
+							status: req.report.problem_status,
+							emergency: ( req.report.is_emergency + '' ),
+							company: {
+								id: req.report.company_id,
+								name: req.report.company_name
+							},
+							contactId
+						} );
 					} );
 				} );
 
@@ -667,12 +693,10 @@ describe( 'Report controller', () => {
 			next = jasmine.createSpy( 'next' );
 			report = {
 				product: 'myProduct',
-				commodity_codes: [ 'code 1', 'code 2' ],
+				commodity_codes: 'code 1, code 2',
 				export_country: 'a country',
 				problem_description: 'a description',
-				problem_impact: 'problem_impact',
-				estimated_loss_range: 'a range',
-				other_companies_affected: 'a company'
+				barrier_title: 'barrier_title',
 			};
 			req.report = report;
 		} );
@@ -701,7 +725,7 @@ describe( 'Report controller', () => {
 			expect( config.item.values ).toEqual( [ report.product ] );
 
 			expect( config.commodityCode ).toBeDefined();
-			expect( config.commodityCode.values ).toEqual( [ report.commodity_codes.join( ', ' ) ] );
+			expect( config.commodityCode.values ).toEqual( [ report.commodity_codes ] );
 
 			expect( config.country ).toBeDefined();
 			expect( config.country.values ).toEqual( [ report.export_country ] );
@@ -711,17 +735,9 @@ describe( 'Report controller', () => {
 			expect( config.description.values ).toEqual( [ report.problem_description ] );
 			expect( config.description.required ).toBeDefined();
 
-			expect( config.impact ).toBeDefined();
-			expect( config.impact.values ).toEqual( [ report.problem_impact ] );
-			expect( config.impact.required ).toBeDefined();
-
-			expect( config.losses ).toBeDefined();
-			expect( config.losses.values ).toEqual( [ report.estimated_loss_range ] );
-			expect( config.losses.validators[ 0 ].fn ).toEqual( lossScaleResponse );
-
-			expect( config.otherCompanies ).toBeDefined();
-			expect( config.otherCompanies.values ).toEqual( [ report.other_companies_affected ] );
-			expect( config.otherCompanies.validators[ 0 ].fn ).toEqual( boolScaleResponse );
+			expect( config.barrierTitle ).toBeDefined();
+			expect( config.barrierTitle.values ).toEqual( [ report.barrier_title ] );
+			expect( config.barrierTitle.required ).toBeDefined();
 		} );
 
 		describe( 'When it is a GET', () => {
@@ -793,13 +809,13 @@ describe( 'Report controller', () => {
 					describe( 'When save and continue is used to submit the form', () => {
 						it( 'Should redirect', async () => {
 
-							const nextStepsUrlResponse = '/next/';
-							urls.report.nextSteps.and.callFake( () => nextStepsUrlResponse );
+							const impactUrlResponse = '/impact/';
+							urls.report.impact.and.callFake( () => impactUrlResponse );
 
 							await controller.aboutProblem( req, res, next );
 
-							expect( urls.report.nextSteps ).toHaveBeenCalledWith( req.report.id );
-							expect( res.redirect ).toHaveBeenCalledWith( nextStepsUrlResponse );
+							expect( urls.report.impact ).toHaveBeenCalledWith( req.report.id );
+							expect( res.redirect ).toHaveBeenCalledWith( impactUrlResponse );
 						} );
 					} );
 				} );
@@ -843,8 +859,8 @@ describe( 'Report controller', () => {
 			next = jasmine.createSpy( 'next' );
 			report = {
 				govt_response_requester: 'govt_response_requester',
-				is_confidential: 'is_confidential',
-				sensitivity_summary: 'a sensitivity_summary',
+				is_commercially_sensitive: 'is_commercially_sensitive',
+				commercial_sensitivity_summary: 'a commercial_sensitivity_summary',
 				can_publish: 'a descan_publishcription'
 			};
 			req.report = report;
@@ -876,11 +892,11 @@ describe( 'Report controller', () => {
 			expect( config.response.validators[ 0 ].fn ).toEqual( govResponseResponse );
 
 			expect( config.sensitivities ).toBeDefined();
-			expect( config.sensitivities.values ).toEqual( [ report.is_confidential ] );
+			expect( config.sensitivities.values ).toEqual( [ report.is_commercially_sensitive ] );
 			expect( config.sensitivities.validators[ 0 ].fn ).toEqual( boolResponse );
 
 			expect( config.sensitivitiesText ).toBeDefined();
-			expect( config.sensitivitiesText.values ).toEqual( [ report.sensitivity_summary ] );
+			expect( config.sensitivitiesText.values ).toEqual( [ report.commercial_sensitivity_summary ] );
 			expect( config.sensitivitiesText.required ).toBeDefined();
 
 			expect( config.permission ).toBeDefined();

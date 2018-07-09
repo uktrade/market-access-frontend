@@ -62,26 +62,26 @@ module.exports = {
 	getUser: ( req ) => backend.get( '/whoami/', getToken( req ) ),
 	getReports: ( req ) => backend.get( '/reports/', getToken( req ) ).then( transformReports ),
 	getReport: ( req, reportId ) => backend.get( `/reports/${ reportId }/`, getToken( req ) ).then( transformReport ),
-	saveNewReport: ( req, { status, emergency }, company, contactId ) => backend.post( '/reports/', getToken( req ), {
-		problem_status: getValue( status ),
-		is_emergency: getValue( emergency ),
-		company_id: getValue( company.id ),
-		company_name: getValue( company.name ),
-		contact_id: getValue( contactId )
+	saveNewReport: ( req, values ) => backend.post( '/reports/', getToken( req ), {
+		problem_status: getValue( values.status ),
+		is_emergency: getValue( values.emergency ),
+		company_id: getValue( values.company.id ),
+		company_name: getValue( values.company.name ),
+		contact_id: getValue( values.contactId )
 	} ),
-	updateReport: ( req, reportId, { status, emergency }, company, contactId ) => updateReport( getToken( req ), reportId, {
-		problem_status: getValue( status ),
-		is_emergency: getValue( emergency ),
-		company_id: getValue( company.id ),
-		company_name: getValue( company.name ),
-		contact_id: getValue( contactId )
+	updateReport: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
+		problem_status: getValue( values.status ),
+		is_emergency: getValue( values.emergency ),
+		company_id: getValue( values.company.id ),
+		company_name: getValue( values.company.name ),
+		contact_id: getValue( values.contactId )
 	} ),
-	saveProblem: ( req, reportId, problem ) => updateReport( getToken( req ), reportId, {
-		product: getValue( problem.item ),
-		commodity_codes: getValue( problem.commodityCode ),
-		export_country: getValue( problem.country ),
-		problem_description: getValue( problem.description ),
-		barrier_title: getValue( problem.barrierTitle )
+	saveProblem: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
+		product: getValue( values.item ),
+		commodity_codes: getValue( values.commodityCode ),
+		export_country: getValue( values.country ),
+		problem_description: getValue( values.description ),
+		barrier_title: getValue( values.barrierTitle )
 	} ),
 	saveImpact: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 		problem_impact: getValue( values.impact ),
