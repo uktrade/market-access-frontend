@@ -1,3 +1,4 @@
+/*
 function getReportLastCompletedStage( progress ){
 
 	if( Array.isArray( progress ) ){
@@ -14,7 +15,7 @@ function getReportLastCompletedStage( progress ){
 		}
 	}
 }
-
+*/
 const reportUrl = {
 	index: () => '/report/',
 	detail: ( reportId ) => `/report/${ reportId }/`,

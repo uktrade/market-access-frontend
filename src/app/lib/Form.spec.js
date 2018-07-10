@@ -43,10 +43,23 @@ describe( 'Form', () => {
 				req.body = {
 					test: 'value-1',
 					another: 'another-1',
-					unknown: 'unknown-1'
+					unknown: 'unknown-1',
+					item1: 'checkbox-value-1',
+					item2: 'checkbox-value-2'
 				};
 
 				fields = {
+					myCheckbox: {
+						type: Form.CHECKBOXES,
+						checkboxes: {
+							item1: {
+								values: [ 'checkbox-1' ]
+							},
+							item2: {
+								values: [ 'checkbox-2' ]
+							}
+						}
+					},
 					test: {
 						values: [ 'value-2' ],
 						required: 'Test required message'
@@ -79,8 +92,20 @@ describe( 'Form', () => {
 				expect( form.fieldNames.length ).toEqual( keys.length );
 
 				for( let name of keys ){
+
 					expect( form.fieldNames.includes( name ) ).toEqual( true );
-					expect( form.values[ name ] ).toEqual( req.body[ name ] );
+
+					if( name === 'myCheckbox' ){
+
+						expect( form.values[ name ] ).toEqual( {
+							item1: req.body.item1,
+							item2: req.body.item2
+						} );
+
+					} else {
+
+						expect( form.values[ name ] ).toEqual( req.body[ name ] );
+					}
 				}
 			} );
 
@@ -88,6 +113,10 @@ describe( 'Form', () => {
 				it( 'Should return the values', () => {
 
 					expect( form.getValues() ).toEqual( {
+						myCheckbox: {
+							item1: 'checkbox-value-1',
+							item2: 'checkbox-value-2'
+						},
 						test: 'value-1',
 						another: 'another-1'
 					} );
@@ -100,59 +129,108 @@ describe( 'Form', () => {
 				describe( 'When there are errors', () => {
 
 					let requiredMessage;
+					let checkboxRequiredMessage;
 
 					beforeEach( () => {
 
 						validators.isDefined.and.callFake( () => false );
 
 						requiredMessage = 'a test message';
+						checkboxRequiredMessage = 'Test checkboxes message';
 
 						fields = {
+							myCheckbox: {
+								type: Form.CHECKBOXES,
+								required: checkboxRequiredMessage,
+								checkboxes: {
+									item1: {},
+									item2: {}
+								}
+							},
 							test: {
 								required: requiredMessage
 							}
 						};
-
-						form = new Form( req, fields );
-
-						form.validate();
 					} );
 
-					it( 'Should return true when hasErrors is called after validation', () => {
+					describe( 'When isExit is true', () => {
+						it( 'Should return false when hasErrors is called after validation', () => {
 
-						expect( form.hasErrors() ).toEqual( true );
-						expect( form.errors.length ).toEqual( 1 );
-						expect( form.errors ).toEqual( [
-							{
-								id: 'test',
-								message: requiredMessage
-							}
-						] );
-						expect( form.getTemplateErrors() ).toEqual( [
-							{
-								href: '#test',
-								text: requiredMessage
-							}
-						] );
+							req.body.action = 'exit';
+
+							form = new Form( req, fields );
+
+							form.validate();
+
+							expect( form.hasErrors() ).toEqual( false );
+							expect( form.errors.length ).toEqual( 0 );
+						} );
 					} );
 
-					describe( 'Calling getTemplateValues', () => {
-						describe( 'Without specifiying a name for the errors', () => {
-							it( 'Should use the default name', () => {
-								expect( form.getTemplateValues() ).toEqual( {
-									csrfToken,
-									test: undefined,
-									errors: [ { href: '#test', text: 'a test message' } ]
-								} );
-							} );
+					describe( 'When isExit is false', () => {
+
+						beforeEach( () => {
+
+							form = new Form( req, fields );
+
+							form.validate();
 						} );
 
-						describe( 'specifiying an errors name', () => {
-							it( 'Should use the name specified', () => {
-								expect( form.getTemplateValues( 'fred') ).toEqual( {
-									csrfToken,
-									test: undefined,
-									fred: [ { href: '#test', text: 'a test message' } ]
+						it( 'Should return true when hasErrors is called after validation', () => {
+
+							expect( form.hasErrors() ).toEqual( true );
+							expect( form.errors.length ).toEqual( 2 );
+							expect( form.errors ).toEqual( [
+								{
+									id: 'my-checkbox-1',
+									message: checkboxRequiredMessage
+								},{
+									id: 'test',
+									message: requiredMessage
+								}
+							] );
+							expect( form.getTemplateErrors() ).toEqual( [
+								{
+									href: '#my-checkbox-1',
+									text: checkboxRequiredMessage
+								},{
+									href: '#test',
+									text: requiredMessage
+								}
+							] );
+						} );
+
+						describe( 'Calling getTemplateValues', () => {
+
+							let errorsResponse;
+
+							beforeEach( () => {
+
+								errorsResponse = [
+									{ href: '#my-checkbox-1', text: checkboxRequiredMessage },
+									{ href: '#test', text: requiredMessage }
+								];
+							} );
+
+							describe( 'Without specifiying a name for the errors', () => {
+								it( 'Should use the default name', () => {
+									expect( form.getTemplateValues() ).toEqual( {
+										csrfToken,
+										myCheckbox: { item1: undefined, item2: undefined },
+										test: undefined,
+										errors: errorsResponse
+									} );
+								} );
+							} );
+
+							describe( 'specifiying an errors name', () => {
+								it( 'Should use the name specified', () => {
+									expect( form.getTemplateValues( 'fred') ).toEqual( {
+										csrfToken,
+										myCheckbox: { item1: undefined, item2: undefined },
+										test: undefined,
+										fred: errorsResponse
+									} );
 								} );
 							} );
 						} );
@@ -234,6 +312,14 @@ describe( 'Form', () => {
 			it( 'Should return the correct values', () => {
 
 				fields = {
+					checkbox: {
+						type: Form.CHECKBOXES,
+						checkboxes: {
+							item1: { values: [ 'checkbox-1' ] },
+							item2: { values: [ 'checkbox-2' ] },
+							item3: { values: [ 'checkbox-3' ] }
+						}
+					},
 					radio: {
 						type: Form.RADIO,
 						items: [ { value: '1', text: 'text 1' }, { value: '2', 'text': 'text 2' } ],
@@ -253,6 +339,11 @@ describe( 'Form', () => {
 
 				expect( form.getTemplateValues() ).toEqual( {
 					csrfToken,
+					checkbox: {
+						item1: 'checkbox-1',
+						item2: 'checkbox-2',
+						item3: 'checkbox-3'
+					},
 					radio: [
 						{ value: '1', text: 'text 1', checked: false },
 						{ value: '2', text: 'text 2', checked: true }

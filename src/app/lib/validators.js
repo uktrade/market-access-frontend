@@ -23,5 +23,6 @@ module.exports = {
 		}
 
 		return false;
-	}
+	},
+	isBarrierType: ( value ) => metadata.barrierTypes.some( ( barrier ) => barrier.id == value )
 };

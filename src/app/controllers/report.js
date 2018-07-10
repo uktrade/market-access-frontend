@@ -437,7 +437,10 @@ module.exports = {
 				type: Form.RADIO,
 				items: metadata.barrierTypes.map( barrierTypeToRadio ),
 				values: [ report.barrier_type ],
-				required: 'Select a goods or service barrier type'
+				validators: [ {
+					fn: validators.isBarrierType,
+					message: 'Select a barrier type'
+				} ]
 			}
 		} );
 
