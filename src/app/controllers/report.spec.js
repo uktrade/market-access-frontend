@@ -1388,18 +1388,18 @@ describe( 'Report controller', () => {
 			expect( config.supportType ).toBeDefined();
 			expect( config.supportType.type ).toEqual( Form.RADIO );
 			expect( config.supportType.values ).toEqual( [ report.support_type ] );
-			expect( config.supportType.conditional ).toEqual( { name: 'resolved', value: 'true' } );
+			expect( config.supportType.conditional ).toEqual( { name: 'resolved', value: 'false' } );
 			expect( config.supportType.validators[ 0 ].fn ).toEqual( supportTypeResponse );
 
 			expect( config.stepsTaken ).toBeDefined();
 			expect( config.stepsTaken.values ).toEqual( [ report.steps_taken ] );
+			expect( config.stepsTaken.conditional ).toEqual( { name: 'resolved', value: 'false' } );
 			expect( config.stepsTaken.required ).toBeDefined();
 
 			expect( config.politicalSensitivities ).toBeDefined();
 			expect( config.politicalSensitivities.type ).toEqual( Form.RADIO );
 			expect( config.politicalSensitivities.values ).toEqual( [ report.is_politically_sensitive ] );
 			expect( config.politicalSensitivities.validators[ 0 ].fn ).toEqual( boolResponse );
-
 
 			expect( config.sensitivitiesDescription ).toBeDefined();
 			expect( config.sensitivitiesDescription.values ).toEqual( [ report.political_sensitivity_summary ] );

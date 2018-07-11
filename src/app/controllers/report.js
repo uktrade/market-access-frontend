@@ -493,7 +493,7 @@ module.exports = {
 				type: Form.RADIO,
 				values: [ report.support_type ],
 				items: govukItemsFromObj( metadata.supportType ),
-				conditional: { name: 'resolved', value: 'true' },
+				conditional: { name: 'resolved', value: 'false' },
 				validators: [ {
 					fn: validators.isMetadata( 'supportType' ),
 					message: 'Answer what type of support you would like'
@@ -501,6 +501,7 @@ module.exports = {
 			},
 			stepsTaken: {
 				values: [ report.steps_taken ],
+				conditional: { name: 'resolved', value: 'false' },
 				required: 'Provide a summary of key steps/actions taken so far'
 			},
 			politicalSensitivities: {

@@ -60,19 +60,19 @@
 				errorMessage: errors | errorForName( 'support-type-1' )
 				} )
 			}}
+
+			{{ govukTextarea( {
+
+				label: {
+					text: 'Please give a brief summary of key steps/actions taken so far in response to this barrier',
+					classes: 'govuk-label--s'
+				},
+				id: 'steps-taken',
+				name: 'stepsTaken',
+				value: stepsTaken,
+				errorMessage: errors | errorForName( 'steps-taken' )
+			} ) }}
 		</div>
-
-		{{ govukTextarea( {
-
-			label: {
-				text: 'Please give a brief summary of key steps/actions taken so far in response to this barrier',
-				classes: 'govuk-label--s'
-			},
-			id: 'steps-taken',
-			name: 'stepsTaken',
-			value: stepsTaken,
-			errorMessage: errors | errorForName( 'steps-taken' )
-		} ) }}
 
 		{{ govukRadios( {
 

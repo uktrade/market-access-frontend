@@ -6,7 +6,7 @@ ma.pages.report.support = function(){
 		inputContainer: '.resolved',
 		inputName: 'resolved',
 		conditionalElem: '#resolved-conditional',
-		shouldShow: function( value ){ return ( value === 'true' ); }
+		shouldShow: function( value ){ return ( value === 'false' ); }
 	});
 
 	new ma.components.ConditionalRadioContent({
