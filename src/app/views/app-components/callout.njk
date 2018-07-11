@@ -1,0 +1,26 @@
+{% macro callout( params ) %}
+
+	{%- set headingTag %}{{ params.heading.tag | default( 'h2' ) }}{% endset -%}
+
+	{%- set modifyer -%}
+		{%- if params.state == 'success' -%}
+		success
+		{%- elif params.state == 'warn' -%}
+		warn
+		{%- endif -%}
+	{%- endset -%}
+
+	{% if modifyer %}
+		{% set modifyer %} callout--{{ modifyer }}{% endset %}
+	{% endif %}
+
+	<div class="callout{{ modifyer }}">
+		<{{ headingTag }} class="callout__heading">{{ params.heading.text }}</{{ headingTag }}>
+		<p class="callout__text">{{ params.html | safe if params.html else params.text }}</p>
+
+		{% if params.button %}
+			<a href="{{ params.button.href }}" class="callout__button{{ ' callout__button--start' if params.button.type === 'start' }}">{{ params.button.text }}</a>
+		{% endif %}
+	</div>
+
+{% endmacro %}

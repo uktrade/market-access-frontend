@@ -1,5 +1,6 @@
 {% from 'app-components/task-list.njk' import taskList %}
 {% from 'app-components/heading.njk' import heading %}
+{% from 'app-components/callout.njk' import callout %}
 
 {% extends 'layout.njk' %}
 
@@ -14,14 +15,17 @@
 
 	<section class="restrict-width">
 
-		<div class="start-banner">
-			<h2 class="start-banner__heading">Complete the following tasks to report a barrier</h2>
-			<p class="start-banner__text">
-				Before you start, <a href="#">see what information you need to make a report</a>
-			</p>
-
-			<a href="{{ urls.report.start() }}" class="start-banner__button">Start now</a>
-		</div>
+		{{ callout({
+			heading: {
+				text: 'Complete the following tasks to report a barrier'
+			},
+			html: 'Before you start, <a href="#">see what information you need to make a report</a>',
+			button: {
+				type: 'start',
+				href: urls.report.start(),
+				text: 'Start now'
+			}
+		}) }}
 
 		{{ taskList( 'report-list', tasks ) }}
 

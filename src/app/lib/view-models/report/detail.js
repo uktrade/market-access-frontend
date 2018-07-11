@@ -22,6 +22,7 @@ function addReportData( tasks, report ){
 	//flatten each tasks items into one list
 	const subTasks = tasks.reduce( ( list, task ) => list.concat( task.items ), [] );
 	let hasInProgress = false;
+	let nextTask;
 
 	for( let subTask of subTasks ){
 
@@ -33,6 +34,7 @@ function addReportData( tasks, report ){
 
 		if( !hasInProgress && subTask.inProgress ){
 			hasInProgress = true;
+			nextTask = subTask;
 		}
 
 		if( subTask.complete || subTask.inProgress ){
@@ -46,10 +48,14 @@ function addReportData( tasks, report ){
 		for( let subTask of subTasks ){
 			if( subTask.notStarted ){
 				subTask.href = urls.reportStage( subTask.stage, report );
+				nextTask = subTask;
 				break;
 			}
 		}
 	}
+
+	tasks.complete = subTasks.every( ( subTask ) => subTask.complete );
+	tasks.next = nextTask;
 }
 
 

@@ -111,5 +111,6 @@ module.exports = {
 		is_commercially_sensitive: getValue( values.sensitivities ),
 		commercial_sensitivity_summary: getValue( values.sensitivitiesText ),
 		can_publish: getValue( values.permission )
-	} )
+	} ),
+	submitReport: ( req, reportId ) => backend.put( `/reports/${ reportId }/submit/`, getToken( req ) )
 };

@@ -40,8 +40,9 @@ $govuk-images-path: "/public/govuk/images/";
 @import 'app-components/search-form';
 @import 'app-components/table-standard';
 @import 'app-components/contact-list';
+@import 'app-components/callout';
 
-@import 'pages/report/index';
+@import 'pages/report/detail';
 
 .govuk-tag--ma {
 	position: relative;

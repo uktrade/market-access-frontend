@@ -66,4 +66,6 @@ module.exports = function( express, app ){
 
 	// detail muse be last route
 	app.get( '/report/:reportId/', reportHeaderNav, reportController.report );
+
+	app.get( '/report/:reportId/submit/', reportController.submit );
 };

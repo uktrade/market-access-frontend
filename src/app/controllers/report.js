@@ -618,5 +618,26 @@ module.exports = {
 		}
 
 		res.render( 'report/next-steps', form.getTemplateValues() );
+	},
+
+	submit: async ( req, res, next ) => {
+
+		try {
+
+			const { response } = await	backend.submitReport( req, req.report.id );
+
+			if( response.isSuccess ){
+
+				res.redirect( urls.index() );
+
+			} else {
+
+				res.redirect( urls.report.details( req.report.id ) );
+			}
+
+		} catch( e ){
+
+			return next( e );
+		}
 	}
 };
