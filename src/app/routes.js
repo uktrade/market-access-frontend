@@ -33,6 +33,7 @@ module.exports = function( express, app ){
 
 	app.get( '/', headerNav( { isDashboard: true } ), indexController );
 	app.get( '/report/', reportHeaderNav, reportController.index );
+	app.get( '/report/success/', reportHeaderNav, reportController.success );
 
 	app.get( '/report/:reportId?/start/', reportHeaderNav, csrfProtection, reportController.start );
 	app.post( '/report/:reportId?/start/', reportHeaderNav, parseBody, csrfProtection, reportController.start );
@@ -49,9 +50,22 @@ module.exports = function( express, app ){
 	app.get( '/report/:reportId/problem/', reportHeaderNav, csrfProtection, reportController.aboutProblem );
 	app.post( '/report/:reportId/problem/', reportHeaderNav, parseBody, csrfProtection, reportController.aboutProblem );
 
+	app.get( '/report/:reportId/impact/', reportHeaderNav, csrfProtection, reportController.impact );
+	app.post( '/report/:reportId/impact/', reportHeaderNav, parseBody, csrfProtection, reportController.impact );
+
+	app.get( '/report/:reportId/legal/', reportHeaderNav, csrfProtection, reportController.legal );
+	app.post( '/report/:reportId/legal/', reportHeaderNav, parseBody, csrfProtection, reportController.legal );
+
+	app.get( '/report/:reportId/type/', reportHeaderNav, csrfProtection, reportController.type );
+	app.post( '/report/:reportId/type/', reportHeaderNav, parseBody, csrfProtection, reportController.type );
+
+	app.get( '/report/:reportId/support/', reportHeaderNav, csrfProtection, reportController.support );
+	app.post( '/report/:reportId/support/', reportHeaderNav, parseBody, csrfProtection, reportController.support );
+
 	app.get( '/report/:reportId/next-steps/', reportHeaderNav, csrfProtection, reportController.nextSteps );
 	app.post( '/report/:reportId/next-steps/', reportHeaderNav, parseBody, csrfProtection, reportController.nextSteps );
 
+	app.post( '/report/:reportId/submit/', parseBody, csrfProtection, reportController.submit );
 	// detail muse be last route
-	app.get( '/report/:reportId/', reportHeaderNav, reportController.report );
+	app.get( '/report/:reportId/', reportHeaderNav, csrfProtection, reportController.report );
 };

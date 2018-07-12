@@ -20,6 +20,7 @@ $govuk-images-path: "/public/govuk/images/";
 @import 'components/label/label';
 @import 'components/hint/hint';
 @import 'components/radios/radios';
+@import 'components/checkboxes/checkboxes';
 @import 'components/input/input';
 @import 'components/select/select';
 @import 'components/warning-text/warning-text';
@@ -27,6 +28,7 @@ $govuk-images-path: "/public/govuk/images/";
 @import 'components/back-link/back-link';
 @import 'components/error-summary/error-summary';
 @import 'components/error-message/error-message';
+@import 'components/panel/panel';
 
 @import 'app-settings/colours';
 
@@ -39,8 +41,9 @@ $govuk-images-path: "/public/govuk/images/";
 @import 'app-components/search-form';
 @import 'app-components/table-standard';
 @import 'app-components/contact-list';
+@import 'app-components/callout';
 
-@import 'pages/report/index';
+@import 'pages/report/detail';
 
 .govuk-tag--ma {
 	position: relative;
@@ -49,18 +52,23 @@ $govuk-images-path: "/public/govuk/images/";
 	padding-bottom: 2px;
 }
 
-.unknown {
-	color: $govuk-grey-1;
-}
-
 .message-panel {
 	border: 3px solid $govuk-grey-3;
 	padding: govuk-em( 30, 16 );
 }
 
 .conditional-content {
-	border-left: 5px solid $govuk-grey-2;
+
 	padding-left: govuk-em( 15, 16 );
+
+	.govuk-form-group {
+		border-left: 5px solid $govuk-grey-2;
+		padding-left: govuk-em( 15, 16 );
+	}
+
+	.govuk-form-group--error {
+		border-color: $govuk-red;
+	}
 }
 
 .restrict-width {

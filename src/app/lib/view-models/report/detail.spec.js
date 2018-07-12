@@ -1,4 +1,5 @@
 const proxyquire = require( 'proxyquire' );
+const uuid = require( 'uuid/v4' );
 const modulePath = './detail';
 
 const reportTaskList = [
@@ -55,8 +56,11 @@ describe( 'Report detail view model', () => {
 
 	let viewModel;
 	let urls;
+	let csrfToken;
 
 	beforeEach( () => {
+
+		csrfToken = uuid();
 
 		urls = {
 			reportStage: jasmine.createSpy( 'urls.reportStage' )
@@ -105,9 +109,9 @@ describe( 'Report detail view model', () => {
 
 				urls.reportStage.and.callFake( () => reportStageResponse );
 
-				const output = viewModel( report );
+				const output = viewModel( csrfToken, report );
 
-				expect( output.tasks ).toEqual( [
+				const expectedOutput = [
 					{
 						stage: '1.0',
 						name: 'labore ea voluptatem',
@@ -178,7 +182,13 @@ describe( 'Report detail view model', () => {
 							}
 						]
 					}
-				] );
+				];
+
+				expectedOutput.complete = false;
+				expectedOutput.next = expectedOutput[ 1 ].items[ 0 ];
+
+				expect( output.csrfToken ).toEqual( csrfToken );
+				expect( output.tasks ).toEqual( expectedOutput );
 			} );
 		} );
 
@@ -217,9 +227,9 @@ describe( 'Report detail view model', () => {
 
 				urls.reportStage.and.callFake( () => reportStageResponse );
 
-				const output = viewModel( report );
+				const output = viewModel( csrfToken, report );
 
-				expect( output.tasks ).toEqual( [
+				const expectedOutput = [
 					{
 						stage: '1.0',
 						name: 'labore ea voluptatem',
@@ -289,7 +299,13 @@ describe( 'Report detail view model', () => {
 							}
 						]
 					}
-				] );
+				];
+
+				expectedOutput.complete = false;
+				expectedOutput.next = expectedOutput[ 0 ].items[ 4 ];
+
+				expect( output.csrfToken ).toEqual( csrfToken );
+				expect( output.tasks ).toEqual( expectedOutput );
 			} );
 		} );
 
@@ -304,9 +320,9 @@ describe( 'Report detail view model', () => {
 
 				urls.reportStage.and.callFake( () => reportStageResponse );
 
-				const output = viewModel( report );
+				const output = viewModel( csrfToken, report );
 
-				expect( output.tasks ).toEqual( [
+				const expectedOutput = [
 					{
 						stage: '1.0',
 						name: 'labore ea voluptatem',
@@ -371,7 +387,132 @@ describe( 'Report detail view model', () => {
 							}
 						]
 					}
-				] );
+				];
+
+				expectedOutput.complete = false;
+				expectedOutput.next = undefined;
+
+				expect( output.csrfToken ).toEqual( csrfToken );
+				expect( output.tasks ).toEqual( expectedOutput );
+			} );
+		} );
+
+		describe( 'When all tasks are complete', () => {
+			it( 'Should return the correct data', () => {
+
+				const report = {
+					id: 2,
+					progress: [
+						{
+							"stage_code": "1.1",
+							"status_id": 3
+						},{
+							"stage_code": "1.2",
+							"status_id": 3
+						},{
+							"stage_code": "1.3",
+							"status_id": 3
+						},{
+							"stage_code": "1.4",
+							"status_id": 3
+						},{
+							"stage_code": "1.5",
+							"status_id": 3
+						},{
+							"stage_code": "2.0",
+							"status_id": 3
+						},{
+							"stage_code": "3.0",
+							"status_id": 3
+						}
+					]
+				};
+
+				const reportStageResponse = '/a/b/c/';
+
+				urls.reportStage.and.callFake( () => reportStageResponse );
+
+				const output = viewModel( csrfToken, report );
+
+				const expectedOutput = [
+					{
+						stage: '1.0',
+						name: 'labore ea voluptatem',
+						number: true,
+						items: [
+							{
+								stage: '1.1',
+								name: 'unde culpa quia',
+								notStarted: false,
+								inProgress: false,
+								complete: true,
+								href: reportStageResponse
+							},{
+								stage: '1.2',
+								name: 'quos sequi commodi',
+								notStarted: false,
+								inProgress: false,
+								complete: true,
+								href: reportStageResponse
+							},{
+								stage: '1.3',
+								name: 'qui aliquid natus',
+								notStarted: false,
+								inProgress: false,
+								complete: true,
+								href: reportStageResponse
+							},{
+								stage: '1.4',
+								name: 'aliquam nisi quibusdam',
+								notStarted: false,
+								inProgress: false,
+								complete: true,
+								href: reportStageResponse
+							},{
+								stage: '1.5',
+								name: 'molestiae minus voluptatem',
+								notStarted: false,
+								inProgress: false,
+								complete: true,
+								href: reportStageResponse
+							}
+						]
+					},{
+						stage: '2.0',
+						name: 'nam cumque fuga',
+						number: false,
+						items: [
+							{
+								stage: '2.0',
+								name: 'sed fuga exercitationem',
+								notStarted: false,
+								inProgress: false,
+								complete: true,
+								href: reportStageResponse
+							}
+						]
+					},{
+						stage: '3.0',
+						name: 'sunt quo sit',
+						number: false,
+						items: [
+							{
+								stage: '3.0',
+								name: 'non minus necessitatibus',
+								notStarted: false,
+								inProgress: false,
+								complete: true,
+								href: reportStageResponse
+							}
+						]
+					}
+				];
+
+				expectedOutput.complete = true;
+				expectedOutput.next = undefined;
+
+				expect( output.csrfToken ).toEqual( csrfToken );
+				expect( output.tasks ).toEqual( expectedOutput );
 			} );
 		} );
 	} );

@@ -1,5 +1,7 @@
 function removeEmpty( item ){
 
+	if( item == null ){ return false; }
+
 	item = String( item );
 
 	return !!item && !!item.trim();

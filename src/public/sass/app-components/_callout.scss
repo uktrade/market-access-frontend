@@ -1,25 +1,24 @@
-.start-banner {
+.callout {
 
-	border-left: 10px solid $govuk-grey-1;
 	background-color: $govuk-grey-3;
 	padding: govuk-em( 15, 16 );
 	position: relative;
+	margin-bottom: govuk-em( 30, 16 );
 
 	@include mq( $from: tablet ){
 		padding-right: govuk-em( 200, 16 );
 	}
 }
 
-.start-banner__heading {
+.callout__heading {
 	@include govuk-font( $size: 19, $weight: bold );
 }
 
-//.start-banner__text {}
+//.callout__text {}
 
-.start-banner__button {
+.callout__button {
 
 	@extend .govuk-button;
-	@extend .govuk-button--start;
 	margin-bottom: 2px;
 
 	@include mq( $from: tablet ){
@@ -34,3 +33,16 @@
 	}
 }
 
+.callout__button--start {
+	@extend .govuk-button--start;
+}
+
+.callout--warn {
+	border: 5px solid $govuk-orange;
+	background-color: $govuk-orange-10;
+}
+
+.callout--success {
+	border: 5px solid $govuk-green;
+	background-color: $govuk-green-10;
+}

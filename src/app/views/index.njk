@@ -40,16 +40,16 @@
 						{% for report in reports %}
 						<tr class="standard-table__row">
 							<td class="standard-table__cell">
-								{{ report.company_name or ( '<span class="unknown">unknown</span>' | safe ) }}
+								{{ report.company_name or '---' }}
 							</td>
 							<td class="standard-table__cell">
-								{{ report.problem_status.name or ( '<span class="unknown">unknown</span>' | safe ) }}
+								{{ report.problem_status.name or '---' }}
 							</td>
 							<td class="standard-table__cell">
-								{{ report.created_by or ( '<span class="unknown">unknown</span>' | safe ) }}
+								{{ report.created_by or '---' }}
 							</td>
 							<td class="standard-table__cell">
-								{{ ( report.created_on | dateWithTime ) or ( '<span class="unknown">unknown</span>' | safe ) }}
+								{{ ( report.created_on | dateWithTime ) or '---' }}
 							</td>
 							<td class="standard-table__cell">
 								<a href="{{ urls.report.detail( report.id ) }}">Continue</a>

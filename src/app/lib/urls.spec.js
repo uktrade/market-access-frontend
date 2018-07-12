@@ -2,13 +2,6 @@ const urls = require( './urls' );
 
 describe( 'URLs', () => {
 
-	let reportId;
-
-	beforeEach( () => {
-
-		reportId = '12';
-	} );
-
 	describe( 'Index', () => {
 		it( 'Should return the correct path', () => {
 
@@ -23,7 +16,15 @@ describe( 'URLs', () => {
 		} );
 	} );
 
-	describe( 'Report a report', () => {
+	describe( 'Report urls', () => {
+
+		let reportId;
+
+		beforeEach( () => {
+
+			reportId = parseInt( ( Math.random() * 100 ) + 1, 10 ); // +1 to ensure we don't have 0 as a falsy value
+		} );
+
 		describe( 'index', () => {
 			it( 'Should return the correct path', () => {
 
@@ -51,7 +52,6 @@ describe( 'URLs', () => {
 			describe( 'With a reportId', () => {
 				it( 'Should return the correct path', () => {
 
-					const reportId = 'abc-123';
 					expect( urls.report.companySearch( reportId ) ).toEqual( `/report/${ reportId }/company/` );
 				} );
 			} );
@@ -82,7 +82,6 @@ describe( 'URLs', () => {
 			describe( 'With a reportId', () => {
 				it( 'Should return the correct path', () => {
 
-					const reportId = 'abc-123';
 					expect( urls.report.companyDetails( companyId, reportId ) ).toEqual( `/report/${ reportId }/company/${ companyId }/` );
 				} );
 			} );
@@ -151,118 +150,57 @@ describe( 'URLs', () => {
 			} );
 		} );
 
-		describe( 'About problem', () => {
-			it( 'Should return the correct path', () => {
+		describe( 'When the reportId is required', () => {
 
-				const reportId = '4';
+			function checkUrls( urlsInfo ){
 
-				expect( urls.report.aboutProblem( reportId ) ).toEqual( `/report/${ reportId }/problem/` );
-			} );
-		} );
+				for( let [ name, path ] of urlsInfo ){
 
-		describe( 'Next steps', () => {
-			it( 'Should return the correct path', () => {
-
-				const reportId = '5';
-
-				expect( urls.report.nextSteps( reportId ) ).toEqual( `/report/${ reportId }/next-steps/` );
-			} );
-		} );
-
-		describe( 'Report stage', () => {
-			it( 'Should return the correct path for the current stage', () => {
-
-				const report = {
-					id: '6',
-					company_id: 'abc-123',
-					contact_id: 'def-456'
-				};
-
-				expect( urls.reportStage( '1.1', report ) ).toEqual( urls.report.start( report.id ) );
-				expect( urls.reportStage( '1.2', report ) ).toEqual( urls.report.companyDetails( report.company_id, report.id ) );
-				expect( urls.reportStage( '1.3', report ) ).toEqual( urls.report.viewContact( report.contact_id, report.id ) );
-				expect( urls.reportStage( '1.4', report ) ).toEqual( urls.report.aboutProblem( report.id ) );
-				expect( urls.reportStage( '1.5', report ) ).toEqual( urls.report.nextSteps( report.id ) );
-				expect( urls.reportStage( 'blah', report ) ).toEqual( urls.report.detail( report.id ) );
-			} );
-		} );
-
-		describe( 'Next report stage', () => {
-
-			function createProgress( code ){
-
-				return [
-					{
-						status_id: 1,
-						stage_code: '1.0'
-					},{
-						status_id: 3,
-						stage_code: code
-					}
-				];
+					expect( urls.report[ name ]( reportId ) ).toEqual( `/report/${ reportId }/${ path }/` );
+				}
 			}
 
-			describe( 'Without a matching stage', () => {
-				describe( 'When the progress is not an array', () => {
-					it( 'Should return the detail page', () => {
+			it( 'Should return the correct path', () => {
 
-						const report = {
-							id: '10',
-							progress: ''
-						};
-
-						expect( urls.nextReportStage( report ) ).toEqual( urls.report.detail( report.id ) );
-					} );
-				} );
-
-				describe( 'When the progress is an array without a matching status_id', () => {
-					it( 'Should return the detail page', () => {
-
-						const report = {
-							id: '10',
-							progress: [ { status_id: '100' } ]
-						};
-
-						expect( urls.nextReportStage( report ) ).toEqual( urls.report.detail( report.id ) );
-					} );
-				} );
+				checkUrls( [
+					[ 'aboutProblem', 'problem' ],
+					[ 'impact', 'impact' ],
+					[ 'legal', 'legal' ],
+					[ 'type', 'type' ],
+					[ 'support', 'support' ],
+					[ 'nextSteps', 'next-steps' ],
+					[ 'submit', 'submit' ]
+				] );
 			} );
+		} );
 
-			describe( 'default', () => {
-				it( 'Should return the detail page', () => {
+		describe( 'success', () => {
+			it( 'Should return the correct path', () => {
 
-					const report = {
-						id: '9',
-						progress: createProgress( '11.0' )
-					};
-
-					expect( urls.nextReportStage( report ) ).toEqual( urls.report.detail( report.id ) );
-				} );
+				expect( urls.report.success() ).toEqual( '/report/success/' );
 			} );
+		} );
+	} );
 
-			describe( 'For 1.3', () => {
-				it( 'Should return the url for the next stage', () => {
+	describe( 'Report stage', () => {
+		it( 'Should return the correct path for the current stage', () => {
 
-					const report = {
-						id: '7',
-						progress: createProgress( '1.3' )
-					};
+			const report = {
+				id: '6',
+				company_id: 'abc-123',
+				contact_id: 'def-456'
+			};
 
-					expect( urls.nextReportStage( report ) ).toEqual( urls.report.aboutProblem( report.id ) );
-				} );
-			} );
-
-			describe( 'For 1.4', () => {
-				it( 'Should return the url for the next stage', () => {
-
-					const report = {
-						id: '8',
-						progress: createProgress( '1.4' )
-					};
-
-					expect( urls.nextReportStage( report ) ).toEqual( urls.report.nextSteps( report.id ) );
-				} );
-			} );
+			expect( urls.reportStage( '1.1', report ) ).toEqual( urls.report.start( report.id ) );
+			expect( urls.reportStage( '1.2', report ) ).toEqual( urls.report.companyDetails( report.company_id, report.id ) );
+			expect( urls.reportStage( '1.3', report ) ).toEqual( urls.report.viewContact( report.contact_id, report.id ) );
+			expect( urls.reportStage( '1.4', report ) ).toEqual( urls.report.aboutProblem( report.id ) );
+			expect( urls.reportStage( '1.5', report ) ).toEqual( urls.report.impact( report.id ) );
+			expect( urls.reportStage( '1.6', report ) ).toEqual( urls.report.legal( report.id ) );
+			expect( urls.reportStage( '1.7', report ) ).toEqual( urls.report.type( report.id ) );
+			expect( urls.reportStage( '2.1', report ) ).toEqual( urls.report.support( report.id ) );
+			expect( urls.reportStage( '2.2', report ) ).toEqual( urls.report.nextSteps( report.id ) );
+			expect( urls.reportStage( 'blah', report ) ).toEqual( urls.report.detail( report.id ) );
 		} );
 	} );
 } );

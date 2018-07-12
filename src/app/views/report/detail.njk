@@ -1,5 +1,6 @@
 {% from 'app-components/task-list.njk' import taskList %}
 {% from 'app-components/heading.njk' import heading %}
+{% from 'app-components/callout.njk' import callout %}
 
 {% extends 'layout.njk' %}
 
@@ -13,6 +14,60 @@
 	}) }}
 
 	<section class="restrict-width">
+
+		{% if tasks.complete %}
+
+			{{ callout( {
+				state: 'success',
+				heading: { text: 'All tasks completed for' },
+				text: report.company_name,
+				button: {
+					action: urls.report.submit( report.id ),
+					csrfToken: csrfToken,
+					text: 'Submit report'
+				}
+			} ) }}
+
+		{% elif tasks.next %}
+
+			{{ callout( {
+				state: 'warn',
+				heading: { text: 'Unfinished report for' },
+				text: report.company_name,
+				button: {
+					href: tasks.next.href,
+					text: 'Continue'
+				}
+			} ) }}
+
+		{% endif %}
+
+		<dl class="report-summary">
+			<div class="report-summary__group">
+				<dt class="report-summary__key">
+					Status of problem
+				</dt>
+				<dd class="report-summary__value">
+					{{ report.problem_status | metadataName( 'statusTypes' ) }}
+				</dd>
+			</div>
+			<div class="report-summary__group">
+				<dt class="report-summary__key">
+					Report started by
+				</dt>
+				<dd class="report-summary__value">
+					{{ report.created_by or '---' }}
+				</dd>
+			</div>
+			<div class="report-summary__group">
+				<dt class="report-summary__key">
+					Report started
+				</dt>
+				<dd class="report-summary__value">
+					{{ report.created_on | dateWithTime }}
+				</dd>
+			</div>
+		</dl>
 
 		{{ taskList( 'report-list', tasks ) }}
 

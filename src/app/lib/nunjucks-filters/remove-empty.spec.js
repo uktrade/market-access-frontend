@@ -2,7 +2,7 @@ const removeEmpty = require( './remove-empty' );
 
 describe( 'Remove empty', () => {
 	describe( 'When the input is an array', () => {
-		describe( 'When there are no non empty items', () => {
+		describe( 'When there are not any empty items', () => {
 			describe( 'When they are all strings', () => {
 				it( 'Should return the same values', () => {
 
@@ -37,6 +37,13 @@ describe( 'Remove empty', () => {
 				it( 'Should return only the non empty values', () => {
 
 					expect( removeEmpty( [ 'a', '  ', 'c', 'd', '  ' ] ) ).toEqual( [ 'a', 'c', 'd' ] );
+				} );
+			} );
+
+			describe( 'When it is null', () => {
+				it( 'Should return only the non empty values', () => {
+
+					expect( removeEmpty( [ "1 A Road", null, "Paris", null, "75001", "France" ] ) ).toEqual( [ "1 A Road",  "Paris",  "75001", "France" ] );
 				} );
 			} );
 		} );

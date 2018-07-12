@@ -8,13 +8,41 @@ const validators = require( '../lib/validators' );
 
 const reportDetailViewModel = require( '../lib/view-models/report/detail' );
 
+function barrierTypeToRadio( item ){
+
+	const { id, title, category } = item;
+
+	return {
+		value: id,
+		text: title,
+		category
+	};
+}
+
+function groupBarrierTypes( types ){
+
+	const items = {
+		GOODS: [],
+		SERVICES: []
+	};
+
+	for( let type of types ){
+		items[ type.category ].push( type );
+	}
+
+	return {
+		goods: items.GOODS,
+		services: items.SERVICES
+	};
+}
+
 let countryItems;
 
 module.exports = {
 
 	index: ( req, res ) => res.render( 'report/index', { tasks: metadata.reportTaskList } ),
 
-	report: ( req, res ) => res.render( 'report/detail', reportDetailViewModel( req.report ) ),
+	report: ( req, res ) => res.render( 'report/detail', reportDetailViewModel( req.csrfToken(), req.report ) ),
 
 	start: ( req, res ) => {
 
@@ -28,7 +56,7 @@ module.exports = {
 				items: govukItemsFromObj( metadata.statusTypes ),
 				validators: [{
 					fn: validators.isMetadata( 'statusTypes' ),
-					message: 'Please select the current status of the problem'
+					message: 'Select the current status of the problem'
 				}]
 			},
 
@@ -39,7 +67,7 @@ module.exports = {
 				conditional: { name: 'status', values: [ '1', '2' ] },
 				validators: [{
 					fn: validators.isMetadata( 'bool' ),
-					message: 'Please answer if the problem is an emergency'
+					message: 'Answer if the problem is an emergency'
 				}]
 			}
 		} );
@@ -68,7 +96,7 @@ module.exports = {
 		//TODO: Validate search term
 		if( hasQueryParam && !query ){
 
-			req.error( 'company', 'Please enter a search term' );
+			req.error( 'company', 'Enter a search term' );
 		}
 
 		if( query ){
@@ -119,8 +147,8 @@ module.exports = {
 
 		} else {
 
-			const { id, name } = req.company;
-			req.session.reportCompany = { id, name };
+			const { id, name, sector } = req.company;
+			req.session.reportCompany = { id, name, sector };
 
 			res.render( 'report/company-details', {
 				csrfToken: req.csrfToken()
@@ -155,11 +183,12 @@ module.exports = {
 
 			let response;
 			let body;
+			let values = Object.assign( {}, sessionStartForm, { company: sessionCompany }, { contactId: sessionContact } );
 
 			if( isUpdate ){
-				({ response, body } = await backend.updateReport( req, reportId, sessionStartForm, sessionCompany, sessionContact ));
+				({ response, body } = await backend.updateReport( req, reportId, values ));
 			} else {
-				({ response, body } = await backend.saveNewReport( req, sessionStartForm, sessionCompany, sessionContact ));
+				({ response, body } = await backend.saveNewReport( req, values ));
 			}
 
 			delete req.session.startFormValues;
@@ -199,7 +228,7 @@ module.exports = {
 				text: country.name
 			} ) );
 
-			countryItems.unshift( {	value: '', text: 'Please choose a country' } );
+			countryItems.unshift( {	value: '', text: 'Choose a country' } );
 		}
 
 		const report = req.report;
@@ -207,11 +236,11 @@ module.exports = {
 
 			item: {
 				values: [ report.product ],
-				required: 'Please enter the product or service being exported'
+				required: 'Enter the product or service being exported'
 			},
 
 			commodityCode: {
-				values: [ ( report.commodity_codes && report.commodity_codes.join( ', ' ) ) ]
+				values: [ report.commodity_codes ]
 			},
 
 			country: {
@@ -221,39 +250,19 @@ module.exports = {
 				validators: [
 					{
 						fn: validators.isCountry,
-						message: 'Please choose an export country/trading bloc'
+						message: 'Choose an export country/trading bloc'
 					}
 				]
 			},
 
 			description: {
 				values: [ report.problem_description ],
-				required: 'Please enter a brief description of the problem'
+				required: 'Enter a brief description of the problem'
 			},
 
-			impact: {
-				values: [ report.problem_impact ],
-				required: 'Please describe the impact of the problem'
-			},
-
-			losses: {
-				type: Form.RADIO,
-				values: [ report.estimated_loss_range ],
-				items: govukItemsFromObj( metadata.lossScale ),
-				validators: [ {
-					fn: validators.isMetadata( 'lossScale' ),
-					message: 'Please answer the value of losses'
-				} ]
-			},
-
-			otherCompanies: {
-				type: Form.RADIO,
-				values: [ report.other_companies_affected ],
-				items: govukItemsFromObj( metadata.boolScale ),
-				validators: [ {
-					fn: validators.isMetadata( 'boolScale' ),
-					message: 'Please answer if any other companies are affected'
-				} ]
+			barrierTitle: {
+				values: [ report.barrier_title ],
+				required: 'Enter a barrier title'
 			}
 		} );
 
@@ -266,6 +275,260 @@ module.exports = {
 				try {
 
 					const { response } = await backend.saveProblem( req, report.id, form.getValues() );
+
+					if( response.isSuccess ){
+
+						return res.redirect( form.isExit ? urls.report.detail( report.id ) : urls.report.impact( report.id ) );
+
+					} else {
+
+						return next( new Error( `Unable to save report, got ${ response.statusCode } from backend` ) );
+					}
+
+				} catch( e ){
+
+					return next( e );
+				}
+			}
+		}
+
+		res.render( 'report/about-problem', form.getTemplateValues() );
+	},
+
+	impact: async ( req, res, next ) => {
+
+		const report = req.report;
+		const form = new Form( req, {
+
+			impact: {
+				values: [ report.problem_impact ],
+				required: 'Describe the impact of the problem'
+			},
+
+			losses: {
+				type: Form.RADIO,
+				values: [ report.estimated_loss_range ],
+				items: govukItemsFromObj( metadata.lossScale ),
+				validators: [ {
+					fn: validators.isMetadata( 'lossScale' ),
+					message: 'Answer the value of losses'
+				} ]
+			},
+
+			otherCompanies: {
+				type: Form.RADIO,
+				values: [ report.other_companies_affected ],
+				items: govukItemsFromObj( metadata.boolScale ),
+				validators: [ {
+					fn: validators.isMetadata( 'boolScale' ),
+					message: 'Answer if any other companies are affected'
+				} ]
+			},
+
+			otherCompaniesInfo: {
+				values: [ report.other_companies_info ],
+				conditional: { name: 'otherCompanies', value: '1' },
+				required: 'Enter information on the other companies'
+			}
+		} );
+
+		if( form.isPost ){
+
+			form.validate();
+
+			if( !form.hasErrors() ){
+
+				try {
+
+					const { response } = await backend.saveImpact( req, report.id, form.getValues() );
+
+					if( response.isSuccess ){
+
+						return res.redirect( form.isExit ? urls.report.detail( report.id ) : urls.report.legal( report.id ) );
+
+					} else {
+
+						return next( new Error( `Unable to save report, got ${ response.statusCode } from backend` ) );
+					}
+
+				} catch( e ){
+
+					return next( e );
+				}
+			}
+		}
+
+		res.render( 'report/impact', form.getTemplateValues() );
+	},
+
+	legal: async ( req, res, next ) => {
+
+		const report = req.report;
+		const form = new Form( req, {
+			hasInfringed: {
+				type: Form.RADIO,
+				values: [ report.has_legal_infringement ],
+				items: govukItemsFromObj( metadata.boolScale ),
+				validators: [ {
+					fn: validators.isMetadata( 'boolScale' ),
+					message: 'Answer if any legal obligations have been infringed'
+				} ]
+			},
+			infringements: {
+				type: Form.CHECKBOXES,
+				conditional: { name: 'hasInfringed', value: '1' },
+				validators: [ {
+					fn: validators.isOneBoolCheckboxChecked,
+					message: 'Select at least one infringement'
+				} ],
+				checkboxes: {
+					wtoInfringement: {
+						values: [ report.wto_infringement ]
+					},
+					ftaInfringement: {
+						values: [ report.fta_infringement ]
+					},
+					otherInfringement: {
+						values: [ report.other_infringement ]
+					}
+				}
+			},
+			infringementSummary: {
+				values: [ report.infringement_summary ],
+				conditional: { name: 'hasInfringed', value: '1' },
+				required: 'List the provisions infringed'
+			}
+		} );
+
+		if( form.isPost ){
+
+			form.validate();
+
+			if( !form.hasErrors() ){
+
+				try {
+
+					const { response } = await backend.saveLegal( req, report.id, form.getValues() );
+
+					if( response.isSuccess ){
+
+						return res.redirect( form.isExit ? urls.report.detail( report.id ) : urls.report.type( report.id ) );
+
+					} else {
+
+						return next( new Error( `Unable to save report, got ${ response.statusCode } from backend` ) );
+					}
+
+				} catch( e ){
+
+					return next( e );
+				}
+			}
+		}
+
+		res.render( 'report/legal', form.getTemplateValues() );
+	},
+
+	type: async ( req, res, next ) => {
+
+		const report = req.report;
+		const form = new Form( req, {
+			barrierType: {
+				type: Form.RADIO,
+				items: metadata.barrierTypes.map( barrierTypeToRadio ),
+				values: [ report.barrier_type ],
+				validators: [ {
+					fn: validators.isBarrierType,
+					message: 'Select a barrier type'
+				} ]
+			}
+		} );
+
+		if( form.isPost ){
+
+			form.validate();
+
+			if( !form.hasErrors() ){
+
+				try {
+
+					const { response } = await backend.saveBarrierType( req, report.id, form.getValues() );
+
+					if( response.isSuccess ){
+
+						return res.redirect( form.isExit ? urls.report.detail( report.id ) : urls.report.support( report.id ) );
+
+					} else {
+
+						return next( new Error( `Unable to save report, got ${ response.statusCode } from backend` ) );
+					}
+
+				} catch( e ){
+
+					return next( e );
+				}
+			}
+		}
+
+		const data = form.getTemplateValues();
+		data.items = groupBarrierTypes( data.barrierType );
+
+		res.render( 'report/type', data );
+	},
+
+	support: async ( req, res, next ) => {
+
+		const report = req.report;
+		const form = new Form( req, {
+			resolved: {
+				type: Form.RADIO,
+				values: [ report.is_resolved ],
+				items: govukItemsFromObj( metadata.bool ),
+				validators: [ {
+					fn: validators.isMetadata( 'bool' ),
+					message: 'Answer if the barrier has been resolved'
+				} ]
+			},
+			supportType: {
+				type: Form.RADIO,
+				values: [ report.support_type ],
+				items: govukItemsFromObj( metadata.supportType ),
+				conditional: { name: 'resolved', value: 'false' },
+				validators: [ {
+					fn: validators.isMetadata( 'supportType' ),
+					message: 'Answer what type of support you would like'
+				} ]
+			},
+			stepsTaken: {
+				values: [ report.steps_taken ],
+				conditional: { name: 'resolved', value: 'false' },
+				required: 'Provide a summary of key steps/actions taken so far'
+			},
+			politicalSensitivities: {
+				type: Form.RADIO,
+				values: [ report.is_politically_sensitive ],
+				items: govukItemsFromObj( metadata.bool ),
+				validators: [ {
+					fn: validators.isMetadata( 'bool' ),
+					message: 'Answer if there are any political sensitivities'
+				} ]
+			},
+			sensitivitiesDescription: {
+				values: [ report.political_sensitivity_summary ],
+				conditional: { name: 'politicalSensitivities', value: 'true' },
+				required: 'Describe any political sensitivities'
+			}
+		} );
+
+		if( form.isPost ){
+
+			form.validate();
+
+			if( !form.hasErrors() ){
+
+				try {
+
+					const { response } = await backend.saveSupport( req, report.id, form.getValues() );
 
 					if( response.isSuccess ){
 
@@ -283,7 +546,7 @@ module.exports = {
 			}
 		}
 
-		res.render( 'report/about-problem', form.getTemplateValues() );
+		res.render( 'report/support', form.getTemplateValues() );
 	},
 
 	nextSteps: async ( req, res, next ) => {
@@ -293,28 +556,28 @@ module.exports = {
 
 			response: {
 				type: Form.RADIO,
-				values: [ report.govt_response_requester ],
+				values: [ report.govt_response_requested ],
 				items: govukItemsFromObj( metadata.govResponse ),
 				validators: [ {
 					fn: validators.isMetadata( 'govResponse' ),
-					message: 'Please select a valid choice for type of UK goverment response'
+					message: 'Select a valid choice for type of UK goverment response'
 				} ]
 			},
 
 			sensitivities: {
 				type: Form.RADIO,
-				values: [ report.is_confidential ],
+				values: [ report.is_commercially_sensitive ],
 				items: govukItemsFromObj( metadata.bool ),
 				validators: [ {
 					fn: validators.isMetadata( 'bool' ),
-					message: 'Please select a valid choice for any sensitivities'
+					message: 'Select a valid choice for any sensitivities'
 				} ]
 			},
 
 			sensitivitiesText: {
-				values: [ report.sensitivity_summary ],
+				values: [ report.commercial_sensitivity_summary ],
 				conditional: { name: 'sensitivities', value: 'true' },
-				required: 'Please describe the sensitivities'
+				required: 'Describe the sensitivities'
 			},
 
 			permission: {
@@ -323,7 +586,7 @@ module.exports = {
 				items: govukItemsFromObj( metadata.publishResponse ),
 				validators: [ {
 					fn: validators.isMetadata( 'publishResponse' ),
-					message: 'Please select a valid choice for if we can publish the summary'
+					message: 'Select a valid choice for if we can publish the summary'
 				} ]
 			}
 		} );
@@ -340,7 +603,7 @@ module.exports = {
 
 					if( response.isSuccess ){
 
-						return res.redirect( form.isExit ? urls.report.detail( report.id ) : urls.index() );
+						return res.redirect( urls.report.detail( report.id ) );
 
 					} else {
 
@@ -355,5 +618,30 @@ module.exports = {
 		}
 
 		res.render( 'report/next-steps', form.getTemplateValues() );
-	}
+	},
+
+	submit: async ( req, res, next ) => {
+
+		const reportId = req.report.id;
+
+		try {
+
+			const { response } = await	backend.submitReport( req, reportId );
+
+			if( response.isSuccess ){
+
+				res.redirect( urls.report.success() );
+
+			} else {
+
+				res.redirect( urls.report.detail( reportId ) );
+			}
+
+		} catch( e ){
+
+			return next( e );
+		}
+	},
+
+	success: ( req, res ) => res.render( 'report/success' )
 };

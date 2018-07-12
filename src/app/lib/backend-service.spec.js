@@ -106,193 +106,283 @@ describe( 'Backend Service', () => {
 		describe( 'When the values are empty', () => {
 			it( 'Should POST to the correct path with null values', () => {
 
-				const company = { id: '', name: '' };
+				const company = { id: '', name: '', sector: null };
 				const contactId = '';
 
-				service.saveNewReport( req, { status: '', emergency: '' }, company, contactId );
+				service.saveNewReport( req, {
+					status: '',
+					emergency: '',
+					company,
+					contactId
+				} );
 
 				expect( backend.post ).toHaveBeenCalledWith( '/reports/', token, {
 					problem_status: null,
 					is_emergency: null,
 					company_id: null,
 					company_name: null,
+					company_sector_id: null,
+					company_sector_name: null,
 					contact_id: null
 				} );
 			} );
 		} );
 
 		describe( 'When the values are not empty', () => {
-			it( 'Should POST to the correct path with the values', () => {
 
-				const status = 1;
-				const emergency = 2;
-				const company = { id: 3, name: 'test company' };
-				const contactId = '123-abc';
+			let status;
+			let emergency;
+			let company;
+			let contactId;
 
-				service.saveNewReport( req, { status, emergency }, company, contactId );
+			beforeEach( () => {
 
-				expect( backend.post ).toHaveBeenCalledWith( '/reports/', token, {
-					problem_status: status,
-					is_emergency: emergency,
-					company_id: company.id,
-					company_name: company.name,
-					contact_id: contactId
+				status = 1;
+				emergency = 2;
+				company = { id: 3, name: 'test company', sector: null };
+				contactId = '123-abc';
+			} );
+
+			describe( 'When there is a sector for the company', () => {
+				it( 'Should POST to the correct path with the values and the sector', () => {
+
+					company.sector = { id: 4, name: 'a sector' };
+
+					service.saveNewReport( req, {
+						status,
+						emergency,
+						company,
+						contactId
+					} );
+
+					expect( backend.post ).toHaveBeenCalledWith( '/reports/', token, {
+						problem_status: status,
+						is_emergency: emergency,
+						company_id: company.id,
+						company_name: company.name,
+						company_sector_id: company.sector.id,
+						company_sector_name: company.sector.name,
+						contact_id: contactId
+					} );
+				} );
+			} );
+
+			describe( 'When there is not a sector for the company', () => {
+				it( 'Should POST to the correct path with the values and sector as null', () => {
+
+					service.saveNewReport( req, {
+						status,
+						emergency,
+						company,
+						contactId
+					} );
+
+					expect( backend.post ).toHaveBeenCalledWith( '/reports/', token, {
+						problem_status: status,
+						is_emergency: emergency,
+						company_id: company.id,
+						company_name: company.name,
+						company_sector_id: null,
+						company_sector_name: null,
+						contact_id: contactId
+					} );
 				} );
 			} );
 		} );
 	} );
 
-	describe( 'updateReport', () => {
-		describe( 'When the values are empty', () => {
-			it( 'Should PUT to the correct path with null values', () => {
+	describe( 'PUTing data to the report', () => {
 
-				const company = { id: '', name: '' };
-				const contactId = '';
-				const reportId = '2';
+		let reportId;
+		let path;
 
-				service.updateReport( req, reportId, { status: '', emergency: '' }, company, contactId );
+		beforeEach( () => {
 
-				expect( backend.put ).toHaveBeenCalledWith( `/reports/${ reportId }/`, token, {
-					problem_status: null,
-					is_emergency: null,
-					company_id: null,
-					company_name: null,
-					contact_id: null
+			reportId = parseInt( Math.random() * 100, 10 );
+			path = `/reports/${ reportId }/`;
+		} );
+
+		function checkWithAndWithoutValues( methodName, serviceData, backendData ){
+
+			describe( 'With empty values', () => {
+				it( 'Should use null for the values', () => {
+
+					const emptyServiceData = {};
+					const nullBackendData = {};
+
+					for( let key of Object.keys( serviceData ) ){
+						emptyServiceData[ key ] = '';
+					}
+
+					for( let key of Object.keys( backendData ) ){
+
+						nullBackendData[ key ] = null;
+					}
+
+					service[ methodName ]( req, reportId, emptyServiceData );
+
+					expect( backend.put ).toHaveBeenCalledWith( path, token, nullBackendData );
 				} );
+			} );
+
+			describe( 'With non empty values', () => {
+				it( 'Should use the values', () => {
+
+				service[ methodName ]( req, reportId, serviceData );
+
+				expect( backend.put ).toHaveBeenCalledWith( path, token, backendData );
+				} );
+			} );
+		}
+
+		describe( 'updateReport', () => {
+
+			const status = 1;
+			const emergency = 2;
+			const company = { id: 3, name: 'test company', sector: { id: 4, name: 'another sector' } };
+			const contactId = '123-abc';
+
+			checkWithAndWithoutValues( 'updateReport', {
+				status,
+				emergency,
+				company,
+				contactId
+			}, {
+				problem_status: status,
+				is_emergency: emergency,
+				company_id: company.id,
+				company_name: company.name,
+				company_sector_id: company.sector.id,
+				company_sector_name: company.sector.name,
+				contact_id: contactId
 			} );
 		} );
 
-		describe( 'When the values are not empty', () => {
-			it( 'Should PUT to the correct path with the correct values', () => {
+		describe( 'saveProblem', () => {
 
-				const status = 1;
-				const emergency = 2;
-				const company = { id: 3, name: 'test company' };
-				const contactId = '123-abc';
-				const reportId = '2';
+			const item = '1';
+			const commodityCode = '1, 2';
+			const country = 'a';
+			const description = 'b';
+			const barrierTitle = 'c';
 
-				service.updateReport( req, reportId, { status, emergency }, company, contactId );
+			checkWithAndWithoutValues( 'saveProblem', {
+				item,
+				commodityCode,
+				country,
+				description,
+				barrierTitle
+			}, {
+				product: item,
+				commodity_codes: commodityCode,
+				export_country: country,
+				problem_description: description,
+				barrier_title: barrierTitle,
+			} );
+		} );
 
-				expect( backend.put ).toHaveBeenCalledWith( `/reports/${ reportId }/`, token, {
-					problem_status: status,
-					is_emergency: emergency,
-					company_id: company.id,
-					company_name: company.name,
-					contact_id: contactId
-				} );
+		describe( 'saveImpact', () => {
+
+			const impact = '1';
+			const losses = '2';
+			const otherCompanies = '3';
+			const otherCompaniesInfo = 'test';
+
+			checkWithAndWithoutValues( 'saveImpact', {
+				impact,
+				losses,
+				otherCompanies,
+				otherCompaniesInfo
+			}, {
+				problem_impact: impact,
+				estimated_loss_range: losses,
+				other_companies_affected: otherCompanies,
+				other_companies_info: otherCompaniesInfo
+			} );
+		} );
+
+		describe( 'saveLegal', () => {
+
+			const hasInfringed = 'true';
+			const infringements = {
+				wtoInfringement: 'true',
+				ftaInfringement: '',
+				otherInfringement: 'true'
+			};
+			const infringementSummary = 'test';
+
+			checkWithAndWithoutValues( 'saveLegal', {
+				hasInfringed,
+				infringements,
+				infringementSummary
+			}, {
+				has_legal_infringement: hasInfringed,
+				wto_infringement: true,
+				fta_infringement: false,
+				other_infringement: true,
+				infringement_summary: infringementSummary
+			} );
+		} );
+
+		describe( 'saveBarrierType', () => {
+
+			const barrierType = '2';
+
+			checkWithAndWithoutValues( 'saveBarrierType', { barrierType }, { barrier_type: barrierType } );
+		} );
+
+		describe( 'saveSupport', () => {
+
+			const resolved = '1';
+			const supportType = '2';
+			const stepsTaken = '3';
+			const politicalSensitivities = '1';
+			const sensitivitiesDescription = 'test';
+
+			checkWithAndWithoutValues( 'saveSupport', {
+				resolved,
+				supportType,
+				stepsTaken,
+				politicalSensitivities,
+				sensitivitiesDescription
+			}, {
+				is_resolved: resolved,
+				support_type: supportType,
+				steps_taken: stepsTaken,
+				is_politically_sensitive: politicalSensitivities,
+				political_sensitivity_summary: sensitivitiesDescription
+			} );
+		} );
+
+		describe( 'saveNextSteps', () => {
+
+			const response = '1';
+			const sensitivities = '2';
+			const sensitivitiesText = '3';
+			const permission = '4';
+
+			checkWithAndWithoutValues( 'saveNextSteps', {
+				response,
+				sensitivities,
+				sensitivitiesText,
+				permission
+			}, {
+				govt_response_requested: response,
+				is_commercially_sensitive: sensitivities,
+				commercial_sensitivity_summary: sensitivitiesText,
+				can_publish: permission
 			} );
 		} );
 	} );
 
-	describe( 'saveProblem', () => {
+	describe( 'submitReport', () => {
+		it( 'Should call the correct path', () => {
 
-		const reportId = '3';
+			const reportId = 200;
 
-		describe( 'When the values are empty', () => {
-			it( 'Should PUT to the correct path with null values', () => {
+			service.submitReport( req, reportId );
 
-				service.saveProblem( req, reportId, {
-					item: '',
-					commodityCode: '',
-					country: '',
-					description: '',
-					impact: '',
-					losses: '',
-					otherCompanies: ''
-				} );
-
-				expect( backend.put ).toHaveBeenCalledWith( `/reports/${ reportId }/`, token, {
-					product: null,
-					commodity_codes: null,
-					export_country: null,
-					problem_description: null,
-					problem_impact: null,
-					estimated_loss_range: null,
-					other_companies_affected: null
-				} );
-			} );
-		} );
-
-		describe( 'When the values are not empty', () => {
-			it( 'Should PUT to the correct path with the correct values', () => {
-
-				const item = '1';
-				const commodityCode = '1, 2';
-				const country = 'a';
-				const description = 'b';
-				const impact = 'c';
-				const losses = 'd';
-				const otherCompanies = 'e';
-
-				service.saveProblem( req, reportId, {
-					item,
-					commodityCode,
-					country,
-					description,
-					impact,
-					losses,
-					otherCompanies
-				} );
-
-				expect( backend.put ).toHaveBeenCalledWith( `/reports/${ reportId }/`, token, {
-					product: item,
-					commodity_codes: commodityCode.split( ', ' ),
-					export_country: country,
-					problem_description: description,
-					problem_impact: impact,
-					estimated_loss_range: losses,
-					other_companies_affected: otherCompanies
-				} );
-			} );
-		} );
-	} );
-
-	describe( 'saveNextSteps', () => {
-
-		const reportId = '4';
-
-		describe( 'When the valuea are empty', () => {
-			it( 'Should PUT to the correct path with the correct values', () => {
-
-				service.saveNextSteps( req, reportId, {
-					response: '',
-					sensitivities: '',
-					sensitivitiesText: '',
-					permission: ''
-				} );
-
-				expect( backend.put ).toHaveBeenCalledWith( `/reports/${ reportId }/`, token, {
-					govt_response_requester: null,
-					is_confidential: null,
-					sensitivity_summary: null,
-					can_publish: null
-				} );
-			} );
-		} );
-
-		describe( 'When the valuea are not empty', () => {
-			it( 'Should PUT to the correct path with the correct values', () => {
-
-
-				const response = '1';
-				const sensitivities = '2';
-				const sensitivitiesText = '3';
-				const permission = '4';
-
-				service.saveNextSteps( req, reportId, {
-					response,
-					sensitivities,
-					sensitivitiesText,
-					permission
-				} );
-
-				expect( backend.put ).toHaveBeenCalledWith( `/reports/${ reportId }/`, token, {
-					govt_response_requester: response,
-					is_confidential: sensitivities,
-					sensitivity_summary: sensitivitiesText,
-					can_publish: permission
-				} );
-			} );
+			expect( backend.put ).toHaveBeenCalledWith( `/reports/${ reportId }/submit/`, token );
 		} );
 	} );
 } );

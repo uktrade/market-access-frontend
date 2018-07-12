@@ -13,7 +13,8 @@ describe( 'validators', () => {
 				'test-value-1': 'some value',
 				'test-value-2': 'another value'
 			},
-			countries: [ { id: 'abc-123' }, { id: 'def-456' } ]
+			countries: [ { id: 'abc-123' }, { id: 'def-456' } ],
+			barrierTypes: [ { id: 1 }, { id: 2}, { id: 4 } ]
 		};
 
 		validators = proxyquire( modulePath, {
@@ -83,10 +84,60 @@ describe( 'validators', () => {
 				expect( validators.isCountry( 'abc-123' ) ).toEqual( true );
 			} );
 		} );
+
 		describe( 'With a valid country', () => {
 			it( 'Should return true', () => {
 
 				expect( validators.isCountry( 'xyz-123' ) ).toEqual( false );
+			} );
+		} );
+	} );
+
+	describe( 'isOneBoolCheckboxChecked', () => {
+		describe( 'When one value is true', () => {
+			it( 'Should return true', () => {
+
+				expect( validators.isOneBoolCheckboxChecked( {
+					a: 'blah',
+					b: 'true',
+					c: 'bar'
+				} ) ).toEqual( true );
+			} );
+		} );
+
+		describe( 'When no values are true', () => {
+			it( 'Should return false', () => {
+
+				expect( validators.isOneBoolCheckboxChecked( {
+					a: 'foo',
+					b: 'baz',
+					c: 'bar'
+				} ) ).toEqual( false );
+			} );
+		} );
+	} );
+
+	describe( 'isBarrierType', () => {
+		describe( 'With a valid country', () => {
+			describe( 'With the id as a string', () => {
+				it( 'Should return true', () => {
+
+					expect( validators.isBarrierType( '4' ) ).toEqual( true );
+				} );
+			} );
+
+			describe( 'With the id as a number', () => {
+				it( 'Should return true', () => {
+
+					expect( validators.isBarrierType( 4 ) ).toEqual( true );
+				} );
+			} );
+		} );
+
+		describe( 'With a valid country', () => {
+			it( 'Should return true', () => {
+
+				expect( validators.isBarrierType( 'xyz' ) ).toEqual( false );
 			} );
 		} );
 	} );

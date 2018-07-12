@@ -5,9 +5,14 @@ function getToken( req ){
 	return req.session.ssoToken;
 }
 
-function getValue( input ){
+function getValue( value ){
 
-	return input || null;
+	return value || null;
+}
+
+function getCheckboxValue( parent, field ){
+
+	return getValue( parent ) && !!parent[ field ];
 }
 
 function sortReportProgress( item ){
@@ -46,39 +51,70 @@ function transformReports( { response, body } ){
 	return { response, body };
 }
 
+function updateReport( token, reportId, data ){
+
+	return backend.put( `/reports/${ reportId }/`, token, data );
+}
+
 module.exports = {
 
 	getMetadata: () => backend.get( '/metadata/' ),
 	getUser: ( req ) => backend.get( '/whoami/', getToken( req ) ),
 	getReports: ( req ) => backend.get( '/reports/', getToken( req ) ).then( transformReports ),
 	getReport: ( req, reportId ) => backend.get( `/reports/${ reportId }/`, getToken( req ) ).then( transformReport ),
-	saveNewReport: ( req, { status, emergency }, company, contactId ) => backend.post( '/reports/', getToken( req ), {
-		problem_status: getValue( status ),
-		is_emergency: getValue( emergency ),
-		company_id: getValue( company.id ),
-		company_name: getValue( company.name ),
-		contact_id: getValue( contactId )
+	saveNewReport: ( req, values ) => backend.post( '/reports/', getToken( req ), {
+		problem_status: getValue( values.status ),
+		is_emergency: getValue( values.emergency ),
+		company_id: getValue( values.company.id ),
+		company_name: getValue( values.company.name ),
+		company_sector_id: getValue( values.company.sector && values.company.sector.id ),
+		company_sector_name: getValue( values.company.sector && values.company.sector.name ),
+		contact_id: getValue( values.contactId )
 	} ),
-	updateReport: ( req, reportId, { status, emergency }, company, contactId ) => backend.put( `/reports/${ reportId }/`, getToken( req ), {
-		problem_status: getValue( status ),
-		is_emergency: getValue( emergency ),
-		company_id: getValue( company.id ),
-		company_name: getValue( company.name ),
-		contact_id: getValue( contactId )
+	updateReport: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
+		problem_status: getValue( values.status ),
+		is_emergency: getValue( values.emergency ),
+		company_id: getValue( values.company.id ),
+		company_name: getValue( values.company.name ),
+		company_sector_id: getValue( values.company.sector && values.company.sector.id ),
+		company_sector_name: getValue( values.company.sector && values.company.sector.name ),
+		contact_id: getValue( values.contactId )
 	} ),
-	saveProblem: ( req, reportId, problem ) => backend.put( `/reports/${ reportId }/`, getToken( req ), {
-		product: getValue( problem.item ),
-		commodity_codes: ( problem.commodityCode ? problem.commodityCode.split( ', ' ) : null ),
-		export_country: getValue( problem.country ),
-		problem_description: getValue( problem.description ),
-		problem_impact: getValue( problem.impact ),
-		estimated_loss_range: getValue( problem.losses ),
-		other_companies_affected: getValue( problem.otherCompanies )
+	saveProblem: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
+		product: getValue( values.item ),
+		commodity_codes: getValue( values.commodityCode ),
+		export_country: getValue( values.country ),
+		problem_description: getValue( values.description ),
+		barrier_title: getValue( values.barrierTitle )
 	} ),
-	saveNextSteps: ( req, reportId, values ) => backend.put( `/reports/${ reportId }/`, getToken( req ), {
-		govt_response_requester: getValue( values.response ),
-		is_confidential: getValue( values.sensitivities ),
-		sensitivity_summary: getValue( values.sensitivitiesText ),
+	saveImpact: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
+		problem_impact: getValue( values.impact ),
+		estimated_loss_range: getValue( values.losses ),
+		other_companies_affected: getValue( values.otherCompanies ),
+		other_companies_info: getValue( values.otherCompaniesInfo )
+	} ),
+	saveLegal: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
+		has_legal_infringement: getValue( values.hasInfringed ),
+		wto_infringement: getCheckboxValue( values.infringements, 'wtoInfringement' ),
+		fta_infringement: getCheckboxValue( values.infringements, 'ftaInfringement' ),
+		other_infringement: getCheckboxValue( values.infringements, 'otherInfringement' ),
+		infringement_summary: getValue( values.infringementSummary )
+	} ),
+	saveBarrierType: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
+		barrier_type: getValue( values.barrierType )
+	} ),
+	saveSupport: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
+		is_resolved: getValue( values.resolved ),
+		support_type: getValue( values.supportType ),
+		steps_taken: getValue( values.stepsTaken ),
+		is_politically_sensitive: getValue( values.politicalSensitivities ),
+		political_sensitivity_summary: getValue( values.sensitivitiesDescription )
+	} ),
+	saveNextSteps: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
+		govt_response_requested: getValue( values.response ),
+		is_commercially_sensitive: getValue( values.sensitivities ),
+		commercial_sensitivity_summary: getValue( values.sensitivitiesText ),
 		can_publish: getValue( values.permission )
-	} )
+	} ),
+	submitReport: ( req, reportId ) => backend.put( `/reports/${ reportId }/submit/`, getToken( req ) )
 };

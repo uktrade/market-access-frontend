@@ -12,7 +12,14 @@ $govuk-grey-1: govuk-colour( 'grey-1' );
 $govuk-grey-2: govuk-colour( 'grey-2' );
 $govuk-grey-3: govuk-colour( 'grey-3' );
 $govuk-grey-4: govuk-colour( 'grey-4' );
+
 $govuk-orange-aa: #F46A25;
+$govuk-orange: $govuk-orange-aa;
+$govuk-orange-10: tint( $govuk-orange, 90 );
+
+$govuk-green: govuk-colour( 'green' );
+$govuk-green-10: tint( $govuk-green, 90 );
+
 $govuk-yellow-25: tint( govuk-colour( 'yellow' ), 75 );
 $govuk-fuchsia: govuk-colour( 'bright-purple' );
 $govuk-white: govuk-colour( 'white' );

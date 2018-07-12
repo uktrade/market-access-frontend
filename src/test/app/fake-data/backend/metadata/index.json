@@ -26,15 +26,48 @@
       "3": "eveniet doloribus itaque"
    },
    "report_stages": {
-      "1.0": "labore ea voluptatem",
-      "1.1": "unde culpa quia",
-      "1.2": "quos sequi commodi",
-      "1.3": "qui aliquid natus",
-      "1.4": "aliquam nisi quibusdam",
-      "1.5": "molestiae minus voluptatem",
-      "2.0": "nam cumque fuga",
-      "3.0": "sunt quo sit"
+      "1.0": "doloremque qui ipsum",
+      "1.1": "non dolorem eaque",
+      "1.2": "soluta dolores est",
+      "1.3": "vero ducimus dolores",
+      "1.4": "atque aut numquam",
+      "1.5": "doloremque at ullam",
+      "1.6": "sapiente quas itaque",
+      "1.7": "delectus dolores aliquid",
+      "2.0": "dolorem cum accusantium",
+      "2.1": "ipsam dolor illo",
+      "2.2": "et eligendi repellendus"
    },
+   "support_type": {
+      "1": "cumque hic officiis",
+      "2": "quisquam eum est"
+   },
+   "barrier_types": [
+      {
+         "id": 55838,
+         "title": "repudiandae qui non",
+         "description": "Qui velit nobis quisquam esse voluptates omnis autem blanditiis libero. Necessitatibus qui sit rem nam magni deserunt provident. Veritatis saepe autem exercitationem quae voluptatem. Fuga soluta facilis numquam iure nam vero ea illo numquam.",
+         "category": "GOODS"
+      },
+      {
+         "id": 76915,
+         "title": "minima dolor rerum",
+         "description": "Alias ex voluptates placeat illo et eum veritatis consectetur libero. Aliquid aspernatur dolorem officiis et recusandae in. Accusantium ratione veniam et iusto repellat qui et. Nihil aliquam et praesentium. Vel impedit eligendi nobis nesciunt veritatis non.",
+         "category": "SERVICES"
+      },
+      {
+         "id": 35344,
+         "title": "aut et in",
+         "description": "Et iure animi corrupti officia tempore quia sed velit. Quis sit ex ad. Et suscipit quo non in et dolorem nesciunt. Doloremque libero quod eum voluptatem ut itaque ratione excepturi non. Explicabo eius id.",
+         "category": "GOODS"
+      },
+      {
+         "id": 27190,
+         "title": "delectus nesciunt consequuntur",
+         "description": "Voluptatem non tempore in et ut exercitationem ipsa quis. Sed aliquid ex qui soluta quas nulla. Corrupti provident qui temporibus nobis eveniet amet ipsam ab in.",
+         "category": "SERVICES"
+      }
+   ],
    "countries": [
       {
          "id": "68496eb0-effd-42e0-91d8-349323b6fe5e",

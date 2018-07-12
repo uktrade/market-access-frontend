@@ -1,0 +1,112 @@
+{% from "components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from 'components/input/macro.njk' import govukInput %}
+{% from 'components/textarea/macro.njk' import govukTextarea %}
+{% from 'components/radios/macro.njk' import govukRadios %}
+{% from 'components/select/macro.njk' import govukSelect %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Report - Describe the next steps and what support you may need{% endblock %}
+
+{% block body_script %}
+	<script>
+		ma.pages.report.support();
+	</script>
+{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.report.type( report.id ) },
+		caption: 'Report a barrier',
+		text: 'Describe the next steps and what support you may need',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.report.support( report.id ) }}" method="POST" class="restrict-width">
+
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{{ govukRadios( {
+
+			idPrefix: 'resolved',
+			name: 'resolved',
+			classes: 'resolved',
+			fieldset: {
+				legend: {
+					text: 'Has the barrier been resolved?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: resolved,
+			errorMessage: errors | errorForName( 'resolved-1' )
+			} )
+		}}
+
+		<div class="conditional-content" id="resolved-conditional">
+			{{ govukRadios( {
+
+				idPrefix: 'support-type',
+				name: 'supportType',
+				classes: 'support-type',
+				fieldset: {
+					legend: {
+						text: 'What type of support would you like to resolve this barrier?',
+						classes: 'govuk-fieldset__legend--s'
+					}
+				},
+				items: supportType,
+				errorMessage: errors | errorForName( 'support-type-1' )
+				} )
+			}}
+
+			{{ govukTextarea( {
+
+				label: {
+					text: 'Please give a brief summary of key steps/actions taken so far in response to this barrier',
+					classes: 'govuk-label--s'
+				},
+				id: 'steps-taken',
+				name: 'stepsTaken',
+				value: stepsTaken,
+				errorMessage: errors | errorForName( 'steps-taken' )
+			} ) }}
+		</div>
+
+		{{ govukRadios( {
+
+				idPrefix: 'political-sensitivities',
+				name: 'politicalSensitivities',
+				classes: 'political-sensitivities',
+				fieldset: {
+					legend: {
+						text: 'Are there any political sensitivities we need to be aware of?',
+						classes: 'govuk-fieldset__legend--s'
+					}
+				},
+				items: politicalSensitivities,
+				errorMessage: errors | errorForName( 'political-sensitivities-1' )
+				} )
+			}}
+
+		<div class="conditional-content" id="political-sensitivities">
+
+			{{ govukTextarea( {
+
+				label: {
+					text: 'Describe any sensitivities',
+					classes: 'govuk-label--s'
+				},
+				id: 'sensitivities-description',
+				name: 'sensitivitiesDescription',
+				value: sensitivitiesDescription,
+				errorMessage: errors | errorForName( 'sensitivities-description' )
+			} ) }}
+		</div>
+
+		<input type="submit" class="govuk-button" value="Save and continue">
+		<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>
+
+	</form>
+{% endblock %}

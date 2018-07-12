@@ -4,7 +4,7 @@
 
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Report - Next steps requested{% endblock %}
+{% block page_title %}{{ super() }} - Report - Next steps the company affected have requested{% endblock %}
 
 {% block body_script %}
 	<script>
@@ -17,7 +17,7 @@
 	<div class="restrict-width">
 
 		{{ heading({
-			back: { href: urls.report.aboutProblem( report.id ) },
+			back: { href: urls.report.support( report.id ) },
 			caption: 'Report a barrier',
 			text: 'Next steps the company affected have requested',
 			errors: errors
