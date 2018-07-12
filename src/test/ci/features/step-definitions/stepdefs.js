@@ -41,7 +41,7 @@ When( 'I navigate to the report a barrier page', async () => {
 
 When( 'I navigate to the start page', async () => {
 
-	const button = await driver.byCss( '.start-banner__button' );
+	const button = await driver.byCss( '.callout__button' );
 	await button.click();
 } );
 
@@ -112,8 +112,8 @@ Then( 'the footer links should be present', async () => {
 
 Then( 'there should be a start banner with a start button', async () => {
 
-	const banner = await driver.allByCss( '.start-banner' );
-	const bannerButton = await driver.byCss( '.start-banner__button' );
+	const banner = await driver.allByCss( '.callout' );
+	const bannerButton = await driver.byCss( '.callout__button' );
 	const buttonText = await bannerButton.getText();
 
 	assert.equal( banner.length, 1 );
