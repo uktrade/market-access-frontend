@@ -22,7 +22,7 @@ describe( 'URLs', () => {
 
 		beforeEach( () => {
 
-			reportId = parseInt( Math.random() * 100, 10 );
+			reportId = parseInt( ( Math.random() * 100 ) + 1, 10 ); // +1 to ensure we don't have 0 as a falsy value
 		} );
 
 		describe( 'index', () => {
@@ -168,7 +168,8 @@ describe( 'URLs', () => {
 					[ 'legal', 'legal' ],
 					[ 'type', 'type' ],
 					[ 'support', 'support' ],
-					[ 'nextSteps', 'next-steps' ]
+					[ 'nextSteps', 'next-steps' ],
+					[ 'submit', 'submit' ]
 				] );
 			} );
 		} );

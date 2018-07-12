@@ -147,8 +147,8 @@ module.exports = {
 
 		} else {
 
-			const { id, name } = req.company;
-			req.session.reportCompany = { id, name };
+			const { id, name, sector } = req.company;
+			req.session.reportCompany = { id, name, sector };
 
 			res.render( 'report/company-details', {
 				csrfToken: req.csrfToken()
@@ -367,34 +367,34 @@ module.exports = {
 		const form = new Form( req, {
 			hasInfringed: {
 				type: Form.RADIO,
-				values: [ report.has_legal_infringment ],
+				values: [ report.has_legal_infringement ],
 				items: govukItemsFromObj( metadata.boolScale ),
 				validators: [ {
 					fn: validators.isMetadata( 'boolScale' ),
 					message: 'Answer if any legal obligations have been infringed'
 				} ]
 			},
-			infringments: {
+			infringements: {
 				type: Form.CHECKBOXES,
 				conditional: { name: 'hasInfringed', value: '1' },
 				validators: [ {
 					fn: validators.isOneBoolCheckboxChecked,
-					message: 'Select at least one infringment'
+					message: 'Select at least one infringement'
 				} ],
 				checkboxes: {
-					wtoInfringment: {
-						values: [ report.wto_infingment ]
+					wtoInfringement: {
+						values: [ report.wto_infringement ]
 					},
-					ftaInfringment: {
-						values: [ report.fta_infingment ]
+					ftaInfringement: {
+						values: [ report.fta_infringement ]
 					},
-					otherInfringment: {
-						values: [ report.other_infingment ]
+					otherInfringement: {
+						values: [ report.other_infringement ]
 					}
 				}
 			},
-			infringmentSummary: {
-				values: [ report.infringment_summary ],
+			infringementSummary: {
+				values: [ report.infringement_summary ],
 				conditional: { name: 'hasInfringed', value: '1' },
 				required: 'List the provisions infringed'
 			}
@@ -556,7 +556,7 @@ module.exports = {
 
 			response: {
 				type: Form.RADIO,
-				values: [ report.govt_response_requester ],
+				values: [ report.govt_response_requested ],
 				items: govukItemsFromObj( metadata.govResponse ),
 				validators: [ {
 					fn: validators.isMetadata( 'govResponse' ),
@@ -603,7 +603,7 @@ module.exports = {
 
 					if( response.isSuccess ){
 
-						return res.redirect( form.isExit ? urls.report.detail( report.id ) : urls.index() );
+						return res.redirect( urls.report.detail( report.id ) );
 
 					} else {
 
@@ -628,11 +628,11 @@ module.exports = {
 
 			if( response.isSuccess ){
 
-				res.redirect( urls.index() );
+				res.render( 'report/submitted' );
 
 			} else {
 
-				res.redirect( urls.report.details( req.report.id ) );
+				res.redirect( urls.report.detail( req.report.id ) );
 			}
 
 		} catch( e ){

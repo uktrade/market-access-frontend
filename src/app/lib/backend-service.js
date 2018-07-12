@@ -67,6 +67,8 @@ module.exports = {
 		is_emergency: getValue( values.emergency ),
 		company_id: getValue( values.company.id ),
 		company_name: getValue( values.company.name ),
+		company_sector_id: getValue( values.company.sector && values.company.sector.id ),
+		company_sector_name: getValue( values.company.sector && values.company.sector.name ),
 		contact_id: getValue( values.contactId )
 	} ),
 	updateReport: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
@@ -74,6 +76,8 @@ module.exports = {
 		is_emergency: getValue( values.emergency ),
 		company_id: getValue( values.company.id ),
 		company_name: getValue( values.company.name ),
+		company_sector_id: getValue( values.company.sector && values.company.sector.id ),
+		company_sector_name: getValue( values.company.sector && values.company.sector.name ),
 		contact_id: getValue( values.contactId )
 	} ),
 	saveProblem: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
@@ -90,11 +94,11 @@ module.exports = {
 		other_companies_info: getValue( values.otherCompaniesInfo )
 	} ),
 	saveLegal: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
-		has_legal_infringment: getValue( values.hasInfringed ),
-		wto_infingment: getCheckboxValue( values.infringments, 'wtoInfringment' ),
-		fta_infingment: getCheckboxValue( values.infringments, 'ftaInfringment' ),
-		other_infingment: getCheckboxValue( values.infringments, 'otherInfringment' ),
-		infringment_summary: getValue( values.infringmentSummary )
+		has_legal_infringement: getValue( values.hasInfringed ),
+		wto_infringement: getCheckboxValue( values.infringements, 'wtoInfringement' ),
+		fta_infringement: getCheckboxValue( values.infringements, 'ftaInfringement' ),
+		other_infringement: getCheckboxValue( values.infringements, 'otherInfringement' ),
+		infringement_summary: getValue( values.infringementSummary )
 	} ),
 	saveBarrierType: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 		barrier_type: getValue( values.barrierType )
@@ -107,7 +111,7 @@ module.exports = {
 		political_sensitivity_summary: getValue( values.sensitivitiesDescription )
 	} ),
 	saveNextSteps: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
-		govt_response_requester: getValue( values.response ),
+		govt_response_requested: getValue( values.response ),
 		is_commercially_sensitive: getValue( values.sensitivities ),
 		commercial_sensitivity_summary: getValue( values.sensitivitiesText ),
 		can_publish: getValue( values.permission )

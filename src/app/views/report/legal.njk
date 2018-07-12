@@ -47,8 +47,8 @@
 
 			{{ govukCheckboxes( {
 
-				idPrefix: 'infringments',
-				name: 'infringments',
+				idPrefix: 'infringements',
+				name: 'infringements',
 				fieldset: {
 					legend: {
 						text: 'What provisions have been infringed?',
@@ -60,23 +60,23 @@
 				},
 				items: [
 					{
-						text: 'WTO provision infinged',
-						name: 'wtoInfringment',
+						text: 'WTO provision infringed',
+						name: 'wtoInfringement',
 						value: 'true',
-						checked: infringments.wtoInfringment
+						checked: infringements.wtoInfringement
 					},{
 						text: 'FTA provisions infringed',
-						name: 'ftaInfringment',
+						name: 'ftaInfringement',
 						value: 'true',
-						checked: infringments.ftaInfringment
+						checked: infringements.ftaInfringement
 					},{
 						text: 'Other rules and principles (i.e. transparency, non discrimination, proportionality)',
-						name: 'otherInfringment',
+						name: 'otherInfringement',
 						value: 'true',
-						checked: infringments.otherInfringment
+						checked: infringements.otherInfringement
 					}
 				],
-				errorMessage: errors | errorForName( 'infringments-1' )
+				errorMessage: errors | errorForName( 'infringements-1' )
 				} )
 			}}
 
@@ -86,10 +86,10 @@
 					text: "Please list provisions infringed",
 					classes: 'govuk-label--s'
 				},
-				id: 'infringment-summary',
-				name: 'infringmentSummary',
-				value: infringmentSummary,
-				errorMessage: errors | errorForName( 'infringment-summary' )
+				id: 'infringement-summary',
+				name: 'infringementSummary',
+				value: infringementSummary,
+				errorMessage: errors | errorForName( 'infringement-summary' )
 			} ) }}
 		</div>
 

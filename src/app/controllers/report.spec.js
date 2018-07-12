@@ -8,6 +8,7 @@ describe( 'Report controller', () => {
 	let controller;
 	let req;
 	let res;
+	let next;
 	let datahub;
 	let backend;
 	let urls;
@@ -54,6 +55,7 @@ describe( 'Report controller', () => {
 			render: jasmine.createSpy( 'res.render' ),
 			redirect: jasmine.createSpy( 'res.redirect' )
 		};
+		next = jasmine.createSpy( 'next' );
 		backend = {
 			saveNewReport: jasmine.createSpy( 'backend.saveNewReport' ),
 			updateReport: jasmine.createSpy( 'backend.updateReport' ),
@@ -62,7 +64,8 @@ describe( 'Report controller', () => {
 			saveLegal: jasmine.createSpy( 'backend.saveLegal' ),
 			saveBarrierType: jasmine.createSpy( 'backend.saveBarrierType' ),
 			saveSupport: jasmine.createSpy( 'backend.saveSupport' ),
-			saveNextSteps: jasmine.createSpy( 'backend.saveNextSteps' )
+			saveNextSteps: jasmine.createSpy( 'backend.saveNextSteps' ),
+			submitReport: jasmine.createSpy( 'backend.submitReport' )
 		};
 		datahub = {
 			searchCompany: jasmine.createSpy( 'datahub.searchCompany' )
@@ -269,13 +272,7 @@ describe( 'Report controller', () => {
 
 	describe( 'Company Search', () => {
 
-		let next;
 		const template = 'report/company-search';
-
-		beforeEach( () => {
-
-			next = jasmine.createSpy( 'next' );
-		} );
 
 		describe( 'Without a query', () => {
 			it( 'Should render the search page', () => {
@@ -419,13 +416,17 @@ describe( 'Report controller', () => {
 					id: 'abc-123',
 					name: 'a company name',
 					something: 'else',
-					another: 'thing'
+					another: 'thing',
+					sector: {
+						id: 1,
+						name: 'a sector'
+					}
 				};
 
 				req.company = company;
 				controller.companyDetails( req, res );
 
-				expect( req.session.reportCompany ).toEqual( { id: company.id, name: company.name } );
+				expect( req.session.reportCompany ).toEqual( { id: company.id, name: company.name, sector: company.sector } );
 				expect( res.render ).toHaveBeenCalledWith( 'report/company-details', { csrfToken } );
 			} );
 		} );
@@ -433,11 +434,8 @@ describe( 'Report controller', () => {
 
 	describe( 'Save', () => {
 
-		let next;
-
 		beforeEach( () => {
 
-			next = jasmine.createSpy( 'next' );
 			req.body = {};
 		} );
 
@@ -696,12 +694,10 @@ describe( 'Report controller', () => {
 
 	describe( 'aboutProblem', () => {
 
-		let next;
 		let report;
 
 		beforeEach( () => {
 
-			next = jasmine.createSpy( 'next' );
 			report = {
 				product: 'myProduct',
 				commodity_codes: 'code 1, code 2',
@@ -862,12 +858,10 @@ describe( 'Report controller', () => {
 
 	describe( 'impact', () => {
 
-		let next;
 		let report;
 
 		beforeEach( () => {
 
-			next = jasmine.createSpy( 'next' );
 			report = {
 				problem_impact: 'problem_impact',
 				estimated_loss_range: 'estimated_loss_range',
@@ -1030,18 +1024,16 @@ describe( 'Report controller', () => {
 
 	describe( 'legal', () => {
 
-		let next;
 		let report;
 
 		beforeEach( () => {
 
-			next = jasmine.createSpy( 'next' );
 			report = {
-				has_legal_infringment: 'has_legal_infringment',
+				has_legal_infringement: 'has_legal_infringement',
 				wto_infingment: 'wto_infingment',
 				fta_infingment: 'fta_infingment',
 				other_infingment: 'other_infingment',
-				infringment_summary: 'infringment_summary'
+				infringement_summary: 'infringement_summary'
 			};
 
 			req.report = report;
@@ -1067,20 +1059,20 @@ describe( 'Report controller', () => {
 
 			expect( config.hasInfringed ).toBeDefined();
 			expect( config.hasInfringed.type ).toEqual( Form.RADIO );
-			expect( config.hasInfringed.values ).toEqual( [ report.has_legal_infringment ] );
+			expect( config.hasInfringed.values ).toEqual( [ report.has_legal_infringement ] );
 			expect( config.hasInfringed.validators[ 0 ].fn ).toEqual( boolScaleResponse );
 
-			expect( config.infringments ).toBeDefined();
-			expect( config.infringments.type ).toEqual( Form.CHECKBOXES );
-			expect( config.infringments.checkboxes.wtoInfringment.values ).toEqual( [ report.wto_infingment ] );
-			expect( config.infringments.checkboxes.ftaInfringment.values ).toEqual( [ report.fta_infingment ] );
-			expect( config.infringments.checkboxes.otherInfringment.values ).toEqual( [ report.other_infingment ] );
-			expect( config.infringments.validators[ 0 ].fn ).toEqual( validators.isOneBoolCheckboxChecked );
+			expect( config.infringements ).toBeDefined();
+			expect( config.infringements.type ).toEqual( Form.CHECKBOXES );
+			expect( config.infringements.checkboxes.wtoInfringement.values ).toEqual( [ report.wto_infingement ] );
+			expect( config.infringements.checkboxes.ftaInfringement.values ).toEqual( [ report.fta_infingement ] );
+			expect( config.infringements.checkboxes.otherInfringement.values ).toEqual( [ report.other_infingement ] );
+			expect( config.infringements.validators[ 0 ].fn ).toEqual( validators.isOneBoolCheckboxChecked );
 
-			expect( config.infringmentSummary ).toBeDefined();
-			expect( config.infringmentSummary.values ).toEqual( [ report.infringment_summary ] );
-			expect( config.infringmentSummary.conditional ).toEqual( { name: 'hasInfringed', value: '1' } );
-			expect( config.infringmentSummary.required ).toBeDefined();
+			expect( config.infringementSummary ).toBeDefined();
+			expect( config.infringementSummary.values ).toEqual( [ report.infringement_summary ] );
+			expect( config.infringementSummary.conditional ).toEqual( { name: 'hasInfringed', value: '1' } );
+			expect( config.infringementSummary.required ).toBeDefined();
 		} );
 
 		describe( 'When it is a GET', () => {
@@ -1194,12 +1186,10 @@ describe( 'Report controller', () => {
 
 	describe( 'type', () => {
 
-		let next;
 		let report;
 
 		beforeEach( () => {
 
-			next = jasmine.createSpy( 'next' );
 			report = {
 				barrier_type: 'barrier_type'
 			};
@@ -1343,12 +1333,10 @@ describe( 'Report controller', () => {
 
 	describe( 'support', () => {
 
-		let next;
 		let report;
 
 		beforeEach( () => {
 
-			next = jasmine.createSpy( 'next' );
 			report = {
 				is_resolved: 'is_resolved',
 				support_type: 'support_type',
@@ -1525,7 +1513,7 @@ describe( 'Report controller', () => {
 
 			next = jasmine.createSpy( 'next' );
 			report = {
-				govt_response_requester: 'govt_response_requester',
+				govt_response_requested: 'govt_response_requested',
 				is_commercially_sensitive: 'is_commercially_sensitive',
 				commercial_sensitivity_summary: 'a commercial_sensitivity_summary',
 				can_publish: 'a descan_publishcription'
@@ -1555,7 +1543,7 @@ describe( 'Report controller', () => {
 			expect( args[ 0 ] ).toEqual( req );
 
 			expect( config.response ).toBeDefined();
-			expect( config.response.values ).toEqual( [ report.govt_response_requester ] );
+			expect( config.response.values ).toEqual( [ report.govt_response_requested ] );
 			expect( config.response.validators[ 0 ].fn ).toEqual( govResponseResponse );
 
 			expect( config.sensitivities ).toBeDefined();
@@ -1607,10 +1595,14 @@ describe( 'Report controller', () => {
 			} );
 
 			describe( 'When the required values are filled', () => {
+
+				let reportDetailResponse;
 				describe( 'When the response is a success', () => {
 
 					beforeEach( () => {
 
+						reportDetailResponse = '/reportDetail';
+						urls.report.detail.and.callFake( () => reportDetailResponse );
 						backend.saveNextSteps.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
 
 						req.report = { id: 1, b: 2 };
@@ -1626,8 +1618,6 @@ describe( 'Report controller', () => {
 					describe( 'When save and exit is used to submit the form', () => {
 						it( 'Should redirect to the report detail page', async () => {
 
-							const reportDetailResponse = '/reportDetail';
-							urls.report.detail.and.callFake( () => reportDetailResponse );
 							form.isExit = true;
 
 							await controller.nextSteps( req, res, next );
@@ -1640,13 +1630,10 @@ describe( 'Report controller', () => {
 					describe( 'When save and continue is used to submit the form', () => {
 						it( 'Should redirect', async () => {
 
-							const indexResponse = '/next/';
-							urls.index.and.callFake( () => indexResponse );
-
 							await controller.nextSteps( req, res, next );
 
-							expect( urls.index ).toHaveBeenCalledWith();
-							expect( res.redirect ).toHaveBeenCalledWith( indexResponse );
+							expect( urls.report.detail ).toHaveBeenCalledWith( req.report.id );
+							expect( res.redirect ).toHaveBeenCalledWith( reportDetailResponse );
 						} );
 					} );
 				} );
@@ -1678,5 +1665,66 @@ describe( 'Report controller', () => {
 				} );
 			} );
 		} );
+	} );
+
+	describe( 'submitReport', () => {
+
+		beforeEach( () => {
+
+			req.report = { id: 1, b: 2 };
+		} );
+
+		describe( 'When the response is a success', () => {
+
+			beforeEach( () => {
+
+				backend.submitReport.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+
+				form.hasErrors = () => false;
+			} );
+
+			afterEach( () => {
+
+				expect( next ).not.toHaveBeenCalled();
+				expect( backend.submitReport ).toHaveBeenCalledWith( req, req.report.id );
+			} );
+
+			it( 'Should render the submitted page', async () => {
+
+				await controller.submit( req, res, next );
+
+				expect( res.render ).toHaveBeenCalledWith( 'report/submitted' );
+			} );
+		} );
+
+		describe( 'When the response is not a success', () => {
+			it( 'Should call next with an error', async () => {
+
+				const statusCode = 500;
+				const reportDetailResponse = '/reportDetail';
+				urls.report.detail.and.callFake( () => reportDetailResponse );
+				form.hasErrors = () => false;
+				backend.submitReport.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
+
+				await controller.submit( req, res, next );
+
+				expect( urls.report.detail ).toHaveBeenCalledWith( req.report.id );
+				expect( res.redirect ).toHaveBeenCalledWith( reportDetailResponse );
+			} );
+		} );
+
+		describe( 'When the request fails', () => {
+			it( 'Should call next with the error', async () => {
+
+				const err = new Error( 'my test' );
+				form.hasErrors = () => false;
+				backend.submitReport.and.callFake( () => Promise.reject( err ) );
+
+				await controller.submit( req, res, next );
+
+				expect( next ).toHaveBeenCalledWith( err );
+			} );
+		} );
+
 	} );
 } );

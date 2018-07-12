@@ -106,7 +106,7 @@ describe( 'Backend Service', () => {
 		describe( 'When the values are empty', () => {
 			it( 'Should POST to the correct path with null values', () => {
 
-				const company = { id: '', name: '' };
+				const company = { id: '', name: '', sector: null };
 				const contactId = '';
 
 				service.saveNewReport( req, {
@@ -121,32 +121,71 @@ describe( 'Backend Service', () => {
 					is_emergency: null,
 					company_id: null,
 					company_name: null,
+					company_sector_id: null,
+					company_sector_name: null,
 					contact_id: null
 				} );
 			} );
 		} );
 
 		describe( 'When the values are not empty', () => {
-			it( 'Should POST to the correct path with the values', () => {
 
-				const status = 1;
-				const emergency = 2;
-				const company = { id: 3, name: 'test company' };
-				const contactId = '123-abc';
+			let status;
+			let emergency;
+			let company;
+			let contactId;
 
-				service.saveNewReport( req, {
-					status,
-					emergency,
-					company,
-					contactId
+			beforeEach( () => {
+
+				status = 1;
+				emergency = 2;
+				company = { id: 3, name: 'test company', sector: null };
+				contactId = '123-abc';
+			} );
+
+			describe( 'When there is a sector for the company', () => {
+				it( 'Should POST to the correct path with the values and the sector', () => {
+
+					company.sector = { id: 4, name: 'a sector' };
+
+					service.saveNewReport( req, {
+						status,
+						emergency,
+						company,
+						contactId
+					} );
+
+					expect( backend.post ).toHaveBeenCalledWith( '/reports/', token, {
+						problem_status: status,
+						is_emergency: emergency,
+						company_id: company.id,
+						company_name: company.name,
+						company_sector_id: company.sector.id,
+						company_sector_name: company.sector.name,
+						contact_id: contactId
+					} );
 				} );
+			} );
 
-				expect( backend.post ).toHaveBeenCalledWith( '/reports/', token, {
-					problem_status: status,
-					is_emergency: emergency,
-					company_id: company.id,
-					company_name: company.name,
-					contact_id: contactId
+			describe( 'When there is not a sector for the company', () => {
+				it( 'Should POST to the correct path with the values and sector as null', () => {
+
+					service.saveNewReport( req, {
+						status,
+						emergency,
+						company,
+						contactId
+					} );
+
+					expect( backend.post ).toHaveBeenCalledWith( '/reports/', token, {
+						problem_status: status,
+						is_emergency: emergency,
+						company_id: company.id,
+						company_name: company.name,
+						company_sector_id: null,
+						company_sector_name: null,
+						contact_id: contactId
+					} );
 				} );
 			} );
 		} );
@@ -200,7 +239,7 @@ describe( 'Backend Service', () => {
 
 			const status = 1;
 			const emergency = 2;
-			const company = { id: 3, name: 'test company' };
+			const company = { id: 3, name: 'test company', sector: { id: 4, name: 'another sector' } };
 			const contactId = '123-abc';
 
 			checkWithAndWithoutValues( 'updateReport', {
@@ -213,6 +252,8 @@ describe( 'Backend Service', () => {
 				is_emergency: emergency,
 				company_id: company.id,
 				company_name: company.name,
+				company_sector_id: company.sector.id,
+				company_sector_name: company.sector.name,
 				contact_id: contactId
 			} );
 		} );
@@ -263,23 +304,23 @@ describe( 'Backend Service', () => {
 		describe( 'saveLegal', () => {
 
 			const hasInfringed = 'true';
-			const infringments = {
-				wtoInfringment: 'true',
-				ftaInfringment: '',
-				otherInfringment: 'true'
+			const infringements = {
+				wtoInfringement: 'true',
+				ftaInfringement: '',
+				otherInfringement: 'true'
 			};
-			const infringmentSummary = 'test';
+			const infringementSummary = 'test';
 
 			checkWithAndWithoutValues( 'saveLegal', {
 				hasInfringed,
-				infringments,
-				infringmentSummary
+				infringements,
+				infringementSummary
 			}, {
-				has_legal_infringment: hasInfringed,
-				wto_infingment: true,
-				fta_infingment: false,
-				other_infingment: true,
-				infringment_summary: infringmentSummary
+				has_legal_infringement: hasInfringed,
+				wto_infringement: true,
+				fta_infringement: false,
+				other_infringement: true,
+				infringement_summary: infringementSummary
 			} );
 		} );
 
@@ -326,11 +367,22 @@ describe( 'Backend Service', () => {
 				sensitivitiesText,
 				permission
 			}, {
-				govt_response_requester: response,
+				govt_response_requested: response,
 				is_commercially_sensitive: sensitivities,
 				commercial_sensitivity_summary: sensitivitiesText,
 				can_publish: permission
 			} );
+		} );
+	} );
+
+	describe( 'submitReport', () => {
+		it( 'Should call the correct path', () => {
+
+			const reportId = 200;
+
+			service.submitReport( req, reportId );
+
+			expect( backend.put ).toHaveBeenCalledWith( `/reports/${ reportId }/submit/`, token );
 		} );
 	} );
 } );
