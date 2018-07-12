@@ -22,7 +22,8 @@
 				heading: { text: 'All tasks completed for' },
 				text: report.company_name,
 				button: {
-					href: urls.report.submit( report.id ),
+					action: urls.report.submit( report.id ),
+					csrfToken: csrfToken,
 					text: 'Submit report'
 				}
 			} ) }}

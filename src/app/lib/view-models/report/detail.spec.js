@@ -1,4 +1,5 @@
 const proxyquire = require( 'proxyquire' );
+const uuid = require( 'uuid/v4' );
 const modulePath = './detail';
 
 const reportTaskList = [
@@ -55,8 +56,11 @@ describe( 'Report detail view model', () => {
 
 	let viewModel;
 	let urls;
+	let csrfToken;
 
 	beforeEach( () => {
+
+		csrfToken = uuid();
 
 		urls = {
 			reportStage: jasmine.createSpy( 'urls.reportStage' )
@@ -105,7 +109,7 @@ describe( 'Report detail view model', () => {
 
 				urls.reportStage.and.callFake( () => reportStageResponse );
 
-				const output = viewModel( report );
+				const output = viewModel( csrfToken, report );
 
 				const expectedOutput = [
 					{
@@ -183,6 +187,7 @@ describe( 'Report detail view model', () => {
 				expectedOutput.complete = false;
 				expectedOutput.next = expectedOutput[ 1 ].items[ 0 ];
 
+				expect( output.csrfToken ).toEqual( csrfToken );
 				expect( output.tasks ).toEqual( expectedOutput );
 			} );
 		} );
@@ -222,7 +227,7 @@ describe( 'Report detail view model', () => {
 
 				urls.reportStage.and.callFake( () => reportStageResponse );
 
-				const output = viewModel( report );
+				const output = viewModel( csrfToken, report );
 
 				const expectedOutput = [
 					{
@@ -299,6 +304,7 @@ describe( 'Report detail view model', () => {
 				expectedOutput.complete = false;
 				expectedOutput.next = expectedOutput[ 0 ].items[ 4 ];
 
+				expect( output.csrfToken ).toEqual( csrfToken );
 				expect( output.tasks ).toEqual( expectedOutput );
 			} );
 		} );
@@ -314,7 +320,7 @@ describe( 'Report detail view model', () => {
 
 				urls.reportStage.and.callFake( () => reportStageResponse );
 
-				const output = viewModel( report );
+				const output = viewModel( csrfToken, report );
 
 				const expectedOutput = [
 					{
@@ -386,6 +392,7 @@ describe( 'Report detail view model', () => {
 				expectedOutput.complete = false;
 				expectedOutput.next = undefined;
 
+				expect( output.csrfToken ).toEqual( csrfToken );
 				expect( output.tasks ).toEqual( expectedOutput );
 			} );
 		} );
@@ -425,7 +432,7 @@ describe( 'Report detail view model', () => {
 
 				urls.reportStage.and.callFake( () => reportStageResponse );
 
-				const output = viewModel( report );
+				const output = viewModel( csrfToken, report );
 
 				const expectedOutput = [
 					{
@@ -504,6 +511,7 @@ describe( 'Report detail view model', () => {
 				expectedOutput.complete = true;
 				expectedOutput.next = undefined;
 
+				expect( output.csrfToken ).toEqual( csrfToken );
 				expect( output.tasks ).toEqual( expectedOutput );
 			} );
 		} );

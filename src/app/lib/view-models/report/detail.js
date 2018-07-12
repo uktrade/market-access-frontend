@@ -59,7 +59,7 @@ function addReportData( tasks, report ){
 }
 
 
-module.exports = ( report ) => {
+module.exports = ( csrfToken, report ) => {
 
 	//copy tasks before we mutate
 	const tasks = JSON.parse( JSON.stringify( metadata.reportTaskList ) );
@@ -67,5 +67,5 @@ module.exports = ( report ) => {
 	addReportData( tasks, report );
 	//console.log( JSON.stringify( tasks, null, 2 ) );
 
-	return { tasks };
+	return { csrfToken, tasks };
 };

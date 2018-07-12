@@ -31,7 +31,8 @@ const reportUrl = {
 	type: ( reportId ) => `/report/${ reportId }/type/`,
 	support: ( reportId ) => `/report/${ reportId }/support/`,
 	nextSteps: ( reportId ) => `/report/${ reportId }/next-steps/`,
-	submit: ( reportId ) => `/report/${ reportId }/submit/`
+	submit: ( reportId ) => `/report/${ reportId }/submit/`,
+	success: () => `/report/success/`
 };
 
 module.exports = {

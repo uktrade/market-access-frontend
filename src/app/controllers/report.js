@@ -42,7 +42,7 @@ module.exports = {
 
 	index: ( req, res ) => res.render( 'report/index', { tasks: metadata.reportTaskList } ),
 
-	report: ( req, res ) => res.render( 'report/detail', reportDetailViewModel( req.report ) ),
+	report: ( req, res ) => res.render( 'report/detail', reportDetailViewModel( req.csrfToken(), req.report ) ),
 
 	start: ( req, res ) => {
 
@@ -622,22 +622,26 @@ module.exports = {
 
 	submit: async ( req, res, next ) => {
 
+		const reportId = req.report.id;
+
 		try {
 
-			const { response } = await	backend.submitReport( req, req.report.id );
+			const { response } = await	backend.submitReport( req, reportId );
 
 			if( response.isSuccess ){
 
-				res.render( 'report/submitted' );
+				res.redirect( urls.report.success() );
 
 			} else {
 
-				res.redirect( urls.report.detail( req.report.id ) );
+				res.redirect( urls.report.detail( reportId ) );
 			}
 
 		} catch( e ){
 
 			return next( e );
 		}
-	}
+	},
+
+	success: ( req, res ) => res.render( 'report/success' )
 };

@@ -173,6 +173,13 @@ describe( 'URLs', () => {
 				] );
 			} );
 		} );
+
+		describe( 'success', () => {
+			it( 'Should return the correct path', () => {
+
+				expect( urls.report.success() ).toEqual( '/report/success/' );
+			} );
+		} );
 	} );
 
 	describe( 'Report stage', () => {

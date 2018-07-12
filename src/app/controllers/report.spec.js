@@ -82,7 +82,8 @@ describe( 'Report controller', () => {
 				type: jasmine.createSpy( 'urls.report.type' ),
 				support: jasmine.createSpy( 'urls.report.support' ),
 				nextSteps: jasmine.createSpy( 'urls.report.nextSteps' ),
-				detail: jasmine.createSpy( 'urls.report.detail' )
+				detail: jasmine.createSpy( 'urls.report.detail' ),
+				success: jasmine.createSpy( 'urls.report.success' )
 			}
 		};
 
@@ -153,7 +154,7 @@ describe( 'Report controller', () => {
 
 			controller.report( req, res );
 
-			expect( reportDetailViewModel ).toHaveBeenCalledWith( req.report );
+			expect( reportDetailViewModel ).toHaveBeenCalledWith( csrfToken, req.report );
 			expect( res.render ).toHaveBeenCalledWith( 'report/detail', reportDetailViewModelResponse );
 		} );
 	} );
@@ -1691,9 +1692,13 @@ describe( 'Report controller', () => {
 
 			it( 'Should render the submitted page', async () => {
 
+				const successUrlResponse = '/a-url';
+
+				urls.report.success.and.callFake( () => successUrlResponse );
+
 				await controller.submit( req, res, next );
 
-				expect( res.render ).toHaveBeenCalledWith( 'report/submitted' );
+				expect( res.redirect ).toHaveBeenCalledWith( successUrlResponse );
 			} );
 		} );
 
@@ -1726,5 +1731,14 @@ describe( 'Report controller', () => {
 			} );
 		} );
 
+	} );
+
+	describe( 'success', () => {
+		it( 'Should render the success page', () => {
+
+			controller.success( req, res );
+
+			expect( res.render ).toHaveBeenCalledWith( 'report/success' );
+		} );
 	} );
 } );

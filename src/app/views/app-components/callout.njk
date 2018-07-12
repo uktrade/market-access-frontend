@@ -19,7 +19,16 @@
 		<p class="callout__text">{{ params.html | safe if params.html else params.text }}</p>
 
 		{% if params.button %}
+			{% if params.button.action %}
+			<form action="{{ params.button.action }}" method="{{ params.button.method or 'POST' }}">
+				{% if params.button.csrfToken %}
+				<input type="hidden" name="_csrf" value="{{ params.button.csrfToken }}">
+				{% endif %}
+				<input type="submit" value="{{ params.button.text }}" class="callout__button{{ ' callout__button--start' if params.button.type === 'start' }}">
+			</form>
+			{% else %}
 			<a href="{{ params.button.href }}" class="callout__button{{ ' callout__button--start' if params.button.type === 'start' }}">{{ params.button.text }}</a>
+			{% endif %}
 		{% endif %}
 	</div>
 

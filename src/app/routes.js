@@ -33,6 +33,7 @@ module.exports = function( express, app ){
 
 	app.get( '/', headerNav( { isDashboard: true } ), indexController );
 	app.get( '/report/', reportHeaderNav, reportController.index );
+	app.get( '/report/success/', reportHeaderNav, reportController.success );
 
 	app.get( '/report/:reportId?/start/', reportHeaderNav, csrfProtection, reportController.start );
 	app.post( '/report/:reportId?/start/', reportHeaderNav, parseBody, csrfProtection, reportController.start );
@@ -64,8 +65,7 @@ module.exports = function( express, app ){
 	app.get( '/report/:reportId/next-steps/', reportHeaderNav, csrfProtection, reportController.nextSteps );
 	app.post( '/report/:reportId/next-steps/', reportHeaderNav, parseBody, csrfProtection, reportController.nextSteps );
 
+	app.post( '/report/:reportId/submit/', parseBody, csrfProtection, reportController.submit );
 	// detail muse be last route
-	app.get( '/report/:reportId/', reportHeaderNav, reportController.report );
-
-	app.get( '/report/:reportId/submit/', reportController.submit );
+	app.get( '/report/:reportId/', reportHeaderNav, csrfProtection, reportController.report );
 };
