@@ -1065,9 +1065,9 @@ describe( 'Report controller', () => {
 
 			expect( config.infringements ).toBeDefined();
 			expect( config.infringements.type ).toEqual( Form.CHECKBOXES );
-			expect( config.infringements.checkboxes.wtoInfringement.values ).toEqual( [ report.wto_infingement ] );
-			expect( config.infringements.checkboxes.ftaInfringement.values ).toEqual( [ report.fta_infingement ] );
-			expect( config.infringements.checkboxes.otherInfringement.values ).toEqual( [ report.other_infingement ] );
+			expect( config.infringements.items.wtoInfringement.values ).toEqual( [ report.wto_infingement ] );
+			expect( config.infringements.items.ftaInfringement.values ).toEqual( [ report.fta_infingement ] );
+			expect( config.infringements.items.otherInfringement.values ).toEqual( [ report.other_infingement ] );
 			expect( config.infringements.validators[ 0 ].fn ).toEqual( validators.isOneBoolCheckboxChecked );
 
 			expect( config.infringementSummary ).toBeDefined();

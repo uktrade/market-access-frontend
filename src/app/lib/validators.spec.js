@@ -141,4 +141,62 @@ describe( 'validators', () => {
 			} );
 		} );
 	} );
+
+	describe( 'isDateValue', () => {
+		describe( 'With a valid date value', () => {
+			it( 'Should return true', () => {
+
+				expect( validators.isDateValue( 'day' )( { day: '02' } ) ).toEqual( true );
+			} );
+		} );
+
+		describe( 'With an invalid date value', () => {
+			it( 'Should return false', () => {
+
+				expect( validators.isDateValue( 'day' )( { day: '' } ) ).toEqual( false );
+				expect( validators.isDateValue( 'day' )( {} ) ).toEqual( false );
+			} );
+		} );
+	} );
+
+	describe( 'isDateValid', () => {
+		describe( 'With a valid date', () => {
+			it( 'Should return true', () => {
+
+				expect( validators.isDateValid( { year: '2016', month: '01', day: '01' } ) ).toEqual( true );
+			} );
+		} );
+
+		describe( 'With an invalid date', () => {
+			it( 'Should return false', () => {
+
+				expect( validators.isDateValid( { year: '2016', month: '20', day: '01' } ) ).toEqual( false );
+			} );
+		} );
+	} );
+
+	describe( 'isDateInPast', () => {
+		describe( 'With a valid date', () => {
+			describe( 'When the date is in the past', () => {
+				it( 'Should return true', () => {
+
+					expect( validators.isDateInPast( { year: '2016', month: '01', day: '01' } ) ).toEqual( true );
+				} );
+			} );
+
+			describe( 'When the date is in the future', () => {
+				it( 'Should return false', () => {
+
+					expect( validators.isDateInPast( { year: '2050', month: '01', day: '01' } ) ).toEqual( false );
+				} );
+			} );
+		} );
+
+		describe( 'With an invalid date', () => {
+			it( 'Should return false', () => {
+
+				expect( validators.isDateInPast( { year: '2016', month: '20', day: '01' } ) ).toEqual( false );
+			} );
+		} );
+	} );
 } );

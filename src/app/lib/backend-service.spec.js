@@ -338,17 +338,23 @@ describe( 'Backend Service', () => {
 			const stepsTaken = '3';
 			const politicalSensitivities = '1';
 			const sensitivitiesDescription = 'test';
+			const resolvedDate = { year: '2016', month: '01', day: '01' };
+			const resolvedSummary = 'resolvedSummary';
 
 			checkWithAndWithoutValues( 'saveSupport', {
 				resolved,
 				supportType,
 				stepsTaken,
+				resolvedDate,
+				resolvedSummary,
 				politicalSensitivities,
 				sensitivitiesDescription
 			}, {
 				is_resolved: resolved,
 				support_type: supportType,
 				steps_taken: stepsTaken,
+				resolved_date: '2016-01-01',
+				resolution_summary: resolvedSummary,
 				is_politically_sensitive: politicalSensitivities,
 				political_sensitivity_summary: sensitivitiesDescription
 			} );

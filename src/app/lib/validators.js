@@ -24,5 +24,8 @@ module.exports = {
 
 		return false;
 	},
-	isBarrierType: ( value ) => metadata.barrierTypes.some( ( barrier ) => barrier.id == value )
+	isBarrierType: ( value ) => metadata.barrierTypes.some( ( barrier ) => barrier.id == value ),
+	isDateValue: ( key ) => ( values ) => !!values[ key ],
+	isDateValid: ( values ) => !!Date.parse( [ values.year, values.month, values.day ].join( '-' ) ),
+	isDateInPast: ( values ) => ( Date.parse( [ values.year, values.month, values.day ].join( '-' ) ) < Date.now() )
 };

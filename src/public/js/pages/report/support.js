@@ -5,8 +5,15 @@ ma.pages.report.support = function(){
 	new ma.components.ConditionalRadioContent({
 		inputContainer: '.resolved',
 		inputName: 'resolved',
-		conditionalElem: '#resolved-conditional',
+		conditionalElem: '#resolved-false-conditional',
 		shouldShow: function( value ){ return ( value === 'false' ); }
+	});
+
+	new ma.components.ConditionalRadioContent({
+		inputContainer: '.resolved',
+		inputName: 'resolved',
+		conditionalElem: '#resolved-true-conditional',
+		shouldShow: function( value ){ return ( value === 'true' ); }
 	});
 
 	new ma.components.ConditionalRadioContent({

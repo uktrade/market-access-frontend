@@ -45,18 +45,31 @@ describe( 'Form', () => {
 					another: 'another-1',
 					unknown: 'unknown-1',
 					item1: 'checkbox-value-1',
-					item2: 'checkbox-value-2'
+					item2: 'checkbox-value-2',
+					groupItem1: 'group-value-1',
+					groupItem2: 'group-value-2'
 				};
 
 				fields = {
 					myCheckbox: {
 						type: Form.CHECKBOXES,
-						checkboxes: {
+						items: {
 							item1: {
 								values: [ 'checkbox-1' ]
 							},
 							item2: {
 								values: [ 'checkbox-2' ]
+							}
+						}
+					},
+					myGroup: {
+						type: Form.GROUP,
+						items: {
+							groupItem1: {
+								values: [ 'group-1' ]
+							},
+							groupItem2: {
+								values: [ 'group-2' ]
 							}
 						}
 					},
@@ -102,6 +115,13 @@ describe( 'Form', () => {
 							item2: req.body.item2
 						} );
 
+					} else if( name === 'myGroup' ){
+
+						expect( form.values[ name ] ).toEqual( {
+							groupItem1: req.body.groupItem1,
+							groupItem2: req.body.groupItem2
+						} );
+
 					} else {
 
 						expect( form.values[ name ] ).toEqual( req.body[ name ] );
@@ -113,6 +133,10 @@ describe( 'Form', () => {
 				it( 'Should return the values', () => {
 
 					expect( form.getValues() ).toEqual( {
+						myGroup: {
+							groupItem1: 'group-value-1',
+							groupItem2: 'group-value-2'
+						},
 						myCheckbox: {
 							item1: 'checkbox-value-1',
 							item2: 'checkbox-value-2'
@@ -130,6 +154,7 @@ describe( 'Form', () => {
 
 					let requiredMessage;
 					let checkboxRequiredMessage;
+					let groupErrorMessage;
 
 					beforeEach( () => {
 
@@ -137,15 +162,26 @@ describe( 'Form', () => {
 
 						requiredMessage = 'a test message';
 						checkboxRequiredMessage = 'Test checkboxes message';
+						groupErrorMessage = 'a group error';
 
 						fields = {
 							myCheckbox: {
 								type: Form.CHECKBOXES,
 								required: checkboxRequiredMessage,
-								checkboxes: {
+								items: {
 									item1: {},
 									item2: {}
 								}
+							},
+							myGroup: {
+								type: Form.GROUP,
+								items: {
+									groupItem1: {}
+								},
+								validators: [ {
+									fn: () => false,
+									message: groupErrorMessage
+								} ]
 							},
 							test: {
 								required: requiredMessage
@@ -179,11 +215,14 @@ describe( 'Form', () => {
 						it( 'Should return true when hasErrors is called after validation', () => {
 
 							expect( form.hasErrors() ).toEqual( true );
-							expect( form.errors.length ).toEqual( 2 );
+							expect( form.errors.length ).toEqual( 3 );
 							expect( form.errors ).toEqual( [
 								{
 									id: 'my-checkbox-1',
 									message: checkboxRequiredMessage
+								},{
+									id: 'my-group',
+									message: groupErrorMessage
 								},{
 									id: 'test',
 									message: requiredMessage
@@ -193,6 +232,9 @@ describe( 'Form', () => {
 								{
 									href: '#my-checkbox-1',
 									text: checkboxRequiredMessage
+								},{
+									href: '#my-group',
+									text: groupErrorMessage
 								},{
 									href: '#test',
 									text: requiredMessage
@@ -208,6 +250,7 @@ describe( 'Form', () => {
 
 								errorsResponse = [
 									{ href: '#my-checkbox-1', text: checkboxRequiredMessage },
+									{ href: '#my-group', text: groupErrorMessage },
 									{ href: '#test', text: requiredMessage }
 								];
 							} );
@@ -216,6 +259,7 @@ describe( 'Form', () => {
 								it( 'Should use the default name', () => {
 									expect( form.getTemplateValues() ).toEqual( {
 										csrfToken,
+										myGroup: { groupItem1: undefined },
 										myCheckbox: { item1: undefined, item2: undefined },
 										test: undefined,
 										errors: errorsResponse
@@ -227,6 +271,7 @@ describe( 'Form', () => {
 								it( 'Should use the name specified', () => {
 									expect( form.getTemplateValues( 'fred') ).toEqual( {
 										csrfToken,
+										myGroup: { groupItem1: undefined },
 										myCheckbox: { item1: undefined, item2: undefined },
 										test: undefined,
 										fred: errorsResponse
@@ -314,7 +359,7 @@ describe( 'Form', () => {
 				fields = {
 					checkbox: {
 						type: Form.CHECKBOXES,
-						checkboxes: {
+						items: {
 							item1: { values: [ 'checkbox-1' ] },
 							item2: { values: [ 'checkbox-2' ] },
 							item3: { values: [ 'checkbox-3' ] }
