@@ -553,7 +553,7 @@ module.exports = {
 			sensitivitiesDescription: {
 				values: [ report.political_sensitivity_summary ],
 				conditional: { name: 'politicalSensitivities', value: 'true' },
-				required: 'Describe any political sensitivities'
+				required: 'Describe the sensitivities'
 			}
 		} );
 
@@ -597,7 +597,7 @@ module.exports = {
 				items: govukItemsFromObj( metadata.govResponse ),
 				validators: [ {
 					fn: validators.isMetadata( 'govResponse' ),
-					message: 'Select a valid choice for type of UK goverment response'
+					message: 'Select a type of UK goverment response'
 				} ]
 			},
 
@@ -607,7 +607,7 @@ module.exports = {
 				items: govukItemsFromObj( metadata.bool ),
 				validators: [ {
 					fn: validators.isMetadata( 'bool' ),
-					message: 'Select a valid choice for any sensitivities'
+					message: 'Answser if there are any sensitivities'
 				} ]
 			},
 
@@ -623,7 +623,7 @@ module.exports = {
 				items: govukItemsFromObj( metadata.publishResponse ),
 				validators: [ {
 					fn: validators.isMetadata( 'publishResponse' ),
-					message: 'Select a valid choice for if we can publish the summary'
+					message: 'Answer if we can publish the summary'
 				} ]
 			}
 		} );

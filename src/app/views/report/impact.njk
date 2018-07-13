@@ -54,23 +54,7 @@
 			} )
 		}}
 
-		{{ govukRadios( {
-
-			idPrefix: 'other-companies',
-			name: 'otherCompanies',
-			classes: 'other-companies',
-			fieldset: {
-				legend: {
-					text: 'Are there any other companies affected?',
-					classes: 'govuk-fieldset__legend--s'
-				}
-			},
-			items: otherCompanies,
-			errorMessage: errors | errorForName( 'other-companies-1' )
-			} )
-		}}
-
-		<div class="conditional-content">
+		{% set companiesAffectedHtml %}
 			{{ govukTextarea( {
 
 				label: {
@@ -82,7 +66,25 @@
 				value: otherCompaniesInfo,
 				errorMessage: errors | errorForName( 'other-companies-info' )
 			} ) }}
-		</div>
+		{% endset %}
+
+		{{ govukRadios( {
+
+			idPrefix: 'other-companies',
+			name: 'otherCompanies',
+			classes: 'other-companies',
+			fieldset: {
+				legend: {
+					text: 'Are there any other companies affected?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: otherCompanies | addConditionalRadioHtml( {
+				'1': { html: companiesAffectedHtml }
+			} ),
+			errorMessage: errors | errorForName( 'other-companies-1' )
+			} )
+		}}
 
 		<input type="submit" class="govuk-button" value="Save and continue">
 		<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>

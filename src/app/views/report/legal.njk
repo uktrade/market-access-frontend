@@ -28,22 +28,7 @@
 
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
-		{{ govukRadios( {
-
-			idPrefix: 'has-infringed',
-			name: 'hasInfringed',
-			classes: 'has-infringed',
-			fieldset: {
-				legend: {
-					text: 'Have any legal obligations been infringed?',
-					classes: 'govuk-fieldset__legend--s'
-				}
-			},
-			items: hasInfringed,
-			errorMessage: errors | errorForName( 'has-infringed-1' )
-			} )
-		}}
-		<div class="conditional-content">
+		{% set hasInfringedHtml %}
 
 			{{ govukCheckboxes( {
 
@@ -91,7 +76,25 @@
 				value: infringementSummary,
 				errorMessage: errors | errorForName( 'infringement-summary' )
 			} ) }}
-		</div>
+		{% endset %}
+
+		{{ govukRadios( {
+
+			idPrefix: 'has-infringed',
+			name: 'hasInfringed',
+			classes: 'has-infringed',
+			fieldset: {
+				legend: {
+					text: 'Have any legal obligations been infringed?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: hasInfringed | addConditionalRadioHtml( {
+				'1': { html: hasInfringedHtml }
+			} ),
+			errorMessage: errors | errorForName( 'has-infringed-1' )
+			} )
+		}}
 
 		<input type="submit" class="govuk-button" value="Save and continue">
 		<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>

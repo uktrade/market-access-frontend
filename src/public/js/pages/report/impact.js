@@ -5,7 +5,7 @@ ma.pages.report.impact = function(){
 	new ma.components.ConditionalRadioContent({
 		inputContainer: '.other-companies',
 		inputName: 'otherCompanies',
-		conditionalElem: '.conditional-content',
+		conditionalElem: '#conditional-1',
 		shouldShow: function( value ){ return ( value === '1' ); }
 	});
 };

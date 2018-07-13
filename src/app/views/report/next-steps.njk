@@ -42,23 +42,7 @@
 				} )
 			}}
 
-			{{ govukRadios( {
-
-				idPrefix: 'sensitivities',
-				name: 'sensitivities',
-				classes: 'step-sensitivities',
-				fieldset: {
-					legend: {
-						text: 'Are there any confidentiality or commercial sensitivities',
-						classes: 'govuk-fieldset__legend--s'
-					}
-				},
-				items: sensitivities,
-				errorMessage: errors | errorForName( 'sensitivities-1' )
-				} )
-			}}
-
-			<div class="conditional-content">
+			{% set hasSensitivitiesHtml %}
 				{{ govukTextarea( {
 
 					label: {
@@ -70,7 +54,25 @@
 					value: sensitivitiesText,
 					errorMessage: errors | errorForName( 'sensitivities-text' )
 				} ) }}
-			</div>
+			{% endset %}
+
+			{{ govukRadios( {
+
+				idPrefix: 'sensitivities',
+				name: 'sensitivities',
+				classes: 'step-sensitivities',
+				fieldset: {
+					legend: {
+						text: 'Are there any confidentiality or commercial sensitivities',
+						classes: 'govuk-fieldset__legend--s'
+					}
+				},
+				items: sensitivities | addConditionalRadioHtml( {
+					'true': { html: hasSensitivitiesHtml }
+				} ),
+				errorMessage: errors | errorForName( 'sensitivities-1' )
+				} )
+			}}
 
 			{{ govukRadios( {
 

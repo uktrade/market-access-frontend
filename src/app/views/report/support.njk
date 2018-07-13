@@ -29,23 +29,7 @@
 
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
-		{{ govukRadios( {
-
-			idPrefix: 'resolved',
-			name: 'resolved',
-			classes: 'resolved',
-			fieldset: {
-				legend: {
-					text: 'Has the barrier been resolved?',
-					classes: 'govuk-fieldset__legend--s'
-				}
-			},
-			items: resolved,
-			errorMessage: errors | errorForName( 'resolved-1' )
-			} )
-		}}
-
-		<div class="conditional-content" id="resolved-false-conditional">
+		{% set isNotResolvedHtml %}
 			{{ govukRadios( {
 
 				idPrefix: 'support-type',
@@ -73,9 +57,8 @@
 				value: stepsTaken,
 				errorMessage: errors | errorForName( 'steps-taken' )
 			} ) }}
-		</div>
-
-		<div class="conditional-content" id="resolved-true-conditional">
+		{% endset %}
+		{% set isResolvedHtml %}
 			{{ govukDateInput( {
 
 				id: 'resolved-date',
@@ -113,7 +96,40 @@
 				value: resolvedSummary,
 				errorMessage: errors | errorForName( 'resolved-summary' )
 			} ) }}
-		</div>
+		{% endset %}
+
+		{{ govukRadios( {
+
+			idPrefix: 'resolved',
+			name: 'resolved',
+			classes: 'resolved',
+			fieldset: {
+				legend: {
+					text: 'Has the barrier been resolved?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: resolved | addConditionalRadioHtml( {
+				'true': { id: 'resolved-true', html: isResolvedHtml },
+				'false': { id: 'resolved-false', html: isNotResolvedHtml }
+			} ),
+			errorMessage: errors | errorForName( 'resolved-1' )
+			} )
+		}}
+
+		{% set isPoliticallySensitiveHtml %}
+			{{ govukTextarea( {
+
+				label: {
+					text: 'Describe any sensitivities',
+					classes: 'govuk-label--s'
+				},
+				id: 'sensitivities-description',
+				name: 'sensitivitiesDescription',
+				value: sensitivitiesDescription,
+				errorMessage: errors | errorForName( 'sensitivities-description' )
+			} ) }}
+		{% endset %}
 
 		{{ govukRadios( {
 
@@ -126,25 +142,12 @@
 						classes: 'govuk-fieldset__legend--s'
 					}
 				},
-				items: politicalSensitivities,
+				items: politicalSensitivities | addConditionalRadioHtml( {
+					'true': { id: 'political-sensitivities-true', html: isPoliticallySensitiveHtml }
+				} ),
 				errorMessage: errors | errorForName( 'political-sensitivities-1' )
 				} )
 			}}
-
-		<div class="conditional-content" id="political-sensitivities">
-
-			{{ govukTextarea( {
-
-				label: {
-					text: 'Describe any sensitivities',
-					classes: 'govuk-label--s'
-				},
-				id: 'sensitivities-description',
-				name: 'sensitivitiesDescription',
-				value: sensitivitiesDescription,
-				errorMessage: errors | errorForName( 'sensitivities-description' )
-			} ) }}
-		</div>
 
 		<input type="submit" class="govuk-button" value="Save and continue">
 		<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>
