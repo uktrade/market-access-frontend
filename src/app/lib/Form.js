@@ -3,17 +3,18 @@ const validators = require( './validators' );
 const RADIO = 'radio';
 const SELECT = 'select';
 const CHECKBOXES = 'checkbox';
+const GROUP = 'group';
 const isDefined = validators.isDefined;
 
 function camelCaseToDash( str ) {
 	return str.replace( /([a-z])([A-Z])/g, '$1-$2' ).toLowerCase();
 }
 
-function createId( name, type ){
+function createId( name, field ){
 
 	const dashedName = camelCaseToDash( name );
 
-	switch( type ){
+	switch( field.type ){
 
 		case RADIO:
 		case CHECKBOXES:
@@ -66,15 +67,15 @@ function Form( req, fields ){
 
 		if( this.isPost ){
 
-			if( field.type === CHECKBOXES ){
+			if( field.type === CHECKBOXES || field.type === GROUP ){
 
-				const checkboxValues = {};
+				const fieldValues = {};
 
-				for( let checkboxName of Object.keys( field.checkboxes ) ){
-					checkboxValues[ checkboxName ] = req.body[ checkboxName ];
+				for( let name of Object.keys( field.items ) ){
+					fieldValues[ name ] = req.body[ name ];
 				}
 
-				this.values[ name ] = checkboxValues;
+				this.values[ name ] = fieldValues;
 
 			} else {
 
@@ -86,7 +87,7 @@ function Form( req, fields ){
 
 Form.prototype.addField = function( name, field ){
 
-	field.id = field.id || createId( name, field.type );
+	field.id = field.id || createId( name, field );
 
 	this.fieldNames.push( name );
 
@@ -130,7 +131,7 @@ Form.prototype.shouldValidate = function( field, value ){
 
 	if( this.isExit ){
 
-		if( field.type === Form.CHECKBOXES ){
+		if( field.type === CHECKBOXES || field.type === GROUP ){
 
 			return false;
 
@@ -209,13 +210,13 @@ Form.prototype.getTemplateValues = function( errorsName ){
 
 		let templateValue;
 
-		if( field.type === CHECKBOXES ){
+		if( field.type === CHECKBOXES || field.type === GROUP ){
 
 			templateValue = {};
 
-			for( let [ checkboxName, { values } ] of Object.entries( field.checkboxes ) ){
-				const checkboxValue = ( formValue || {} )[ checkboxName ];
-				templateValue[ checkboxName ] = this.isPost ? checkboxValue : getFirstValue( checkboxValue, ...( values || [] ) );
+			for( let [ fieldName, { values } ] of Object.entries( field.items ) ){
+				const fieldValue = ( formValue || {} )[ fieldName ];
+				templateValue[ fieldName ] = this.isPost ? fieldValue : getFirstValue( fieldValue, ...( values || [] ) );
 			}
 
 		} else {
@@ -267,5 +268,6 @@ Form.prototype.hasErrors = function(){
 Form.RADIO = RADIO;
 Form.SELECT = SELECT;
 Form.CHECKBOXES = CHECKBOXES;
+Form.GROUP = GROUP;
 
 module.exports = Form;

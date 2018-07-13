@@ -381,7 +381,7 @@ module.exports = {
 					fn: validators.isOneBoolCheckboxChecked,
 					message: 'Select at least one infringement'
 				} ],
-				checkboxes: {
+				items: {
 					wtoInfringement: {
 						values: [ report.wto_infringement ]
 					},
@@ -479,6 +479,7 @@ module.exports = {
 	support: async ( req, res, next ) => {
 
 		const report = req.report;
+		const dateParts = ( report.resolved_date || '' ).split( '-' );
 		const form = new Form( req, {
 			resolved: {
 				type: Form.RADIO,
@@ -504,6 +505,42 @@ module.exports = {
 				conditional: { name: 'resolved', value: 'false' },
 				required: 'Provide a summary of key steps/actions taken so far'
 			},
+			resolvedDate: {
+				type: Form.GROUP,
+				conditional: { name: 'resolved', value: 'true' },
+				validators: [ {
+					fn: validators.isDateValue( 'day' ),
+					message: 'Enter a value for resolved day'
+				},{
+					fn: validators.isDateValue( 'month' ),
+					message: 'Enter a value for resolved month'
+				},{
+					fn: validators.isDateValue( 'year' ),
+					message: 'Enter a value for resolved year'
+				},{
+					fn: validators.isDateValid,
+					message: 'Enter a valid resolved date'
+				},{
+					fn: validators.isDateInPast,
+					message: 'Enter a resolved date that is in the past'
+				} ],
+				items: {
+					day: {
+						values: [ dateParts[ 2 ] ]
+					},
+					month: {
+						values: [ dateParts[ 1 ] ]
+					},
+					year: {
+						values: [ dateParts[ 0 ] ]
+					}
+				}
+			},
+			resolvedSummary: {
+				values: [ report.resolution_summary ],
+				conditional: { name: 'resolved', value: 'true' },
+				required: 'Enter a summary for how the barrier was resolved'
+			},
 			politicalSensitivities: {
 				type: Form.RADIO,
 				values: [ report.is_politically_sensitive ],
@@ -516,7 +553,7 @@ module.exports = {
 			sensitivitiesDescription: {
 				values: [ report.political_sensitivity_summary ],
 				conditional: { name: 'politicalSensitivities', value: 'true' },
-				required: 'Describe any political sensitivities'
+				required: 'Describe the sensitivities'
 			}
 		} );
 
@@ -560,7 +597,7 @@ module.exports = {
 				items: govukItemsFromObj( metadata.govResponse ),
 				validators: [ {
 					fn: validators.isMetadata( 'govResponse' ),
-					message: 'Select a valid choice for type of UK goverment response'
+					message: 'Select a type of UK goverment response'
 				} ]
 			},
 
@@ -570,7 +607,7 @@ module.exports = {
 				items: govukItemsFromObj( metadata.bool ),
 				validators: [ {
 					fn: validators.isMetadata( 'bool' ),
-					message: 'Select a valid choice for any sensitivities'
+					message: 'Answser if there are any sensitivities'
 				} ]
 			},
 
@@ -586,7 +623,7 @@ module.exports = {
 				items: govukItemsFromObj( metadata.publishResponse ),
 				validators: [ {
 					fn: validators.isMetadata( 'publishResponse' ),
-					message: 'Select a valid choice for if we can publish the summary'
+					message: 'Answer if we can publish the summary'
 				} ]
 			}
 		} );

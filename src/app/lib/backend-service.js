@@ -15,6 +15,19 @@ function getCheckboxValue( parent, field ){
 	return getValue( parent ) && !!parent[ field ];
 }
 
+function getDate( field ){
+
+	if( field ){
+
+		const { year, month, day } = field;
+
+		if( year && month && day ){
+
+			return [ year, month, day ].join( '-' );
+		}
+	}
+}
+
 function sortReportProgress( item ){
 
 	if( Array.isArray( item.progress ) ){
@@ -107,6 +120,8 @@ module.exports = {
 		is_resolved: getValue( values.resolved ),
 		support_type: getValue( values.supportType ),
 		steps_taken: getValue( values.stepsTaken ),
+		resolved_date: getValue( getDate( values.resolvedDate ) ),
+		resolution_summary: getValue( values.resolvedSummary ),
 		is_politically_sensitive: getValue( values.politicalSensitivities ),
 		political_sensitivity_summary: getValue( values.sensitivitiesDescription )
 	} ),

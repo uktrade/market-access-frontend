@@ -3,6 +3,7 @@
 {% from 'components/textarea/macro.njk' import govukTextarea %}
 {% from 'components/radios/macro.njk' import govukRadios %}
 {% from 'components/select/macro.njk' import govukSelect %}
+{% from 'components/date-input/macro.njk' import govukDateInput %}
 {% from 'app-components/heading.njk' import heading %}
 
 {% extends 'layout.njk' %}
@@ -28,23 +29,7 @@
 
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
-		{{ govukRadios( {
-
-			idPrefix: 'resolved',
-			name: 'resolved',
-			classes: 'resolved',
-			fieldset: {
-				legend: {
-					text: 'Has the barrier been resolved?',
-					classes: 'govuk-fieldset__legend--s'
-				}
-			},
-			items: resolved,
-			errorMessage: errors | errorForName( 'resolved-1' )
-			} )
-		}}
-
-		<div class="conditional-content" id="resolved-conditional">
+		{% set isNotResolvedHtml %}
 			{{ govukRadios( {
 
 				idPrefix: 'support-type',
@@ -72,7 +57,79 @@
 				value: stepsTaken,
 				errorMessage: errors | errorForName( 'steps-taken' )
 			} ) }}
-		</div>
+		{% endset %}
+		{% set isResolvedHtml %}
+			{{ govukDateInput( {
+
+				id: 'resolved-date',
+				fieldset: {
+					legend: {
+						text: 'Date the barrier was resolved',
+						classes: 'govuk-fieldset__legend--s'
+					}
+				},
+				errorMessage: errors | errorForName( 'resolved-date' ),
+				items: [
+					{
+						name: 'day',
+						value: resolvedDate.day
+					},
+					{
+						name: 'month',
+						value: resolvedDate.month
+					},
+					{
+						name: 'year',
+						value: resolvedDate.year
+					}
+				]
+			} ) }}
+
+			{{ govukTextarea( {
+
+				label: {
+					text: 'Provide a summary of how this barrier was resolved',
+					classes: 'govuk-label--s'
+				},
+				id: 'resolved-summary',
+				name: 'resolvedSummary',
+				value: resolvedSummary,
+				errorMessage: errors | errorForName( 'resolved-summary' )
+			} ) }}
+		{% endset %}
+
+		{{ govukRadios( {
+
+			idPrefix: 'resolved',
+			name: 'resolved',
+			classes: 'resolved',
+			fieldset: {
+				legend: {
+					text: 'Has the barrier been resolved?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: resolved | addConditionalRadioHtml( {
+				'true': { id: 'resolved-true', html: isResolvedHtml },
+				'false': { id: 'resolved-false', html: isNotResolvedHtml }
+			} ),
+			errorMessage: errors | errorForName( 'resolved-1' )
+			} )
+		}}
+
+		{% set isPoliticallySensitiveHtml %}
+			{{ govukTextarea( {
+
+				label: {
+					text: 'Describe any sensitivities',
+					classes: 'govuk-label--s'
+				},
+				id: 'sensitivities-description',
+				name: 'sensitivitiesDescription',
+				value: sensitivitiesDescription,
+				errorMessage: errors | errorForName( 'sensitivities-description' )
+			} ) }}
+		{% endset %}
 
 		{{ govukRadios( {
 
@@ -85,25 +142,12 @@
 						classes: 'govuk-fieldset__legend--s'
 					}
 				},
-				items: politicalSensitivities,
+				items: politicalSensitivities | addConditionalRadioHtml( {
+					'true': { id: 'political-sensitivities-true', html: isPoliticallySensitiveHtml }
+				} ),
 				errorMessage: errors | errorForName( 'political-sensitivities-1' )
 				} )
 			}}
-
-		<div class="conditional-content" id="political-sensitivities">
-
-			{{ govukTextarea( {
-
-				label: {
-					text: 'Describe any sensitivities',
-					classes: 'govuk-label--s'
-				},
-				id: 'sensitivities-description',
-				name: 'sensitivitiesDescription',
-				value: sensitivitiesDescription,
-				errorMessage: errors | errorForName( 'sensitivities-description' )
-			} ) }}
-		</div>
 
 		<input type="submit" class="govuk-button" value="Save and continue">
 		<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>
