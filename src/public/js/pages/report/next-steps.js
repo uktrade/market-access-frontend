@@ -1,14 +1,11 @@
-ma.pages.report.nextSteps = (function( doc ){
+ma.pages.report.nextSteps = function(){
 
-	return function(){
+	if( !ma.components.ConditionalRadioContent ){ return; }
 
-		if( !ma.components.ConditionalRadioContent ){ return; }
-
-		new ma.components.ConditionalRadioContent({
-			inputContainer: '.step-sensitivities',
-			inputName: 'sensitivities',
-			conditionalElem: '#conditional-true',
-			shouldShow: function( value ){ return ( value === 'true' ); }
-		});
-	};
-}( document ));
+	new ma.components.ConditionalRadioContent({
+		inputContainer: '.step-sensitivities',
+		inputName: 'sensitivities',
+		conditionalElem: '#conditional-true',
+		shouldShow: function( value ){ return ( value === 'true' ); }
+	});
+};
