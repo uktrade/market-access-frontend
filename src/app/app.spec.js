@@ -41,6 +41,8 @@ function checkPage( title, done, responseCode = 200 ){
 
 	return ( err, res ) => {
 
+		if( err ){ return done.fail( err ); }
+
 		checkResponse( res, responseCode );
 		expect( getTitle( res ) ).toEqual( title );
 		done();
@@ -58,11 +60,17 @@ function checkNock(){
 	}
 }
 
+function interceptReport( reportId ){
+
+	intercept.backend()
+		.get( `/reports/${ reportId }/` )
+		.reply( 200, intercept.stub( '/backend/reports/report' ) );
+}
+
 describe( 'App', function(){
 
 	let app;
 	let oldTimeout;
-	let appModule;
 
 	beforeAll( function(){
 
@@ -84,6 +92,8 @@ describe( 'App', function(){
 
 	describe( 'Pages', function(){
 
+		let appInstance;
+
 		beforeAll( async () => {
 
 			intercept.backend()
@@ -91,14 +101,16 @@ describe( 'App', function(){
 				.get( '/metadata/' )
 				.reply( 200, intercept.stub( '/backend/metadata/' ) );
 
-			appModule =  proxyquire( modulePath, {
+			const appModule =  proxyquire( modulePath, {
 				'morgan': () => ( req, res, next ) => next(),
 				'./config': {
 					isDev: true
 				}
 			} );
 
-			app = supertest( await appModule.create() );
+			appInstance = await appModule.create();
+
+			app = supertest( appInstance );
 		} );
 
 		describe( 'index page', function(){
@@ -156,50 +168,60 @@ describe( 'App', function(){
 			describe( 'Company search page', () => {
 
 				let agent;
-				let token;
 
-				beforeAll( async () => {
+				beforeAll( async ( done ) => {
 
-					agent = supertest.agent( await appModule.create() );
-				} );
-
-				it( 'Should get the form and save the token', ( done ) => {
+					agent = supertest.agent( appInstance );
 
 					agent
 						.get( urls.report.start() )
 						.end( ( err, res ) => {
 
-							token = getCsrfToken( res, done.fail );
-							done();
+							const token = getCsrfToken( res, done.fail );
+
+							agent
+								.post( urls.report.start() )
+								.send( `_csrf=${ token }&status=1&emergency=true` )
+								.expect( 302, done );
 						} );
 				} );
 
-				it( 'Should save the status values', ( done ) => {
+				describe( 'Without a report id', () => {
+					it( 'Should render the company search page', ( done ) => {
 
-					agent
-						.post( urls.report.start() )
-						.send( `_csrf=${ token }&status=1&emergency=true` )
-						.expect( 302, done );
+						agent
+							.get( urls.report.companySearch() )
+							.end( checkPage( 'Market Access - Report - Search for company', done ) );
+					} );
 				} );
 
-				it( 'Should render the company search page', ( done ) => {
+				describe( 'With a report id', () => {
 
-					agent
-						.get( urls.report.companySearch() )
-						.end( checkPage( 'Market Access - Report - Search for company', done ) );
+					afterEach( checkNock );
+
+					it( 'Should fetch the report and render the company search page', ( done ) => {
+
+						const reportId = '1234';
+
+						interceptReport( reportId );
+
+						agent
+							.get( urls.report.companySearch( reportId ) )
+							.end( checkPage( 'Market Access - Report - Search for company', done ) );
+					} );
 				} );
 			} );
 
-			describe( 'Company detail', () => {
+			describe( 'Company details', () => {
 
 				let companyId;
 				let agent;
 
-				beforeEach( async ( done ) => {
+				beforeEach( ( done ) => {
 
 					companyId = 'd829a9c6-cffb-4d6a-953b-3e02a2b33028';
 
-					agent = supertest.agent( await appModule.create() );
+					agent = supertest.agent( appInstance );
 
 					agent
 						.get( urls.report.start() )
@@ -217,15 +239,36 @@ describe( 'App', function(){
 				afterEach( checkNock );
 
 				describe( 'With a success', () => {
-					it( 'Should render the details of a company', ( done ) => {
+
+					const title = 'Market Access - Report - Company details';
+
+					beforeEach( () => {
 
 						intercept.datahub()
 							.get( `/v3/company/${ companyId }` )
 							.reply( 200, intercept.stub( '/datahub/company/detail' ) );
+					} );
 
-						agent
-							.get( urls.report.companyDetails( companyId ) )
-							.end( checkPage( 'Market Access - Report - Company details', done ) );
+					describe( 'Without a report id', () => {
+						it( 'Should render the details of a company', ( done ) => {
+
+							agent
+								.get( urls.report.companyDetails( companyId ) )
+								.end( checkPage( title, done ) );
+						} );
+					} );
+
+					describe( 'With a report id', () => {
+						it( 'Should fetch the report and render the details of a company', ( done ) => {
+
+							const reportId = '789';
+
+							interceptReport( reportId );
+
+							agent
+								.get( urls.report.companyDetails( companyId, reportId ) )
+								.end( checkPage( title, done ) );
+						} );
 					} );
 				} );
 
@@ -248,7 +291,7 @@ describe( 'App', function(){
 				let companyId;
 				let agent;
 
-				beforeEach( async ( done ) => {
+				beforeEach( ( done ) => {
 
 					companyId = 'd829a9c6-cffb-4d6a-953b-3e02a2b33028';
 
@@ -256,7 +299,7 @@ describe( 'App', function(){
 						.get( `/v3/company/${ companyId }` )
 						.reply( 200, intercept.stub( '/datahub/company/detail' ) );
 
-					agent = supertest.agent( await appModule.create() );
+					agent = supertest.agent( appInstance );
 
 					agent
 						.get( urls.report.start() )
@@ -331,9 +374,7 @@ describe( 'App', function(){
 
 							const reportId = '123';
 
-							intercept.backend()
-								.get( `/reports/${ reportId }/` )
-								.reply( 200, intercept.stub( '/backend/reports/report' ) );
+							interceptReport( reportId );
 
 							agent
 								.get( urls.report.viewContact( contactId, reportId ) )
@@ -350,10 +391,7 @@ describe( 'App', function(){
 				beforeEach( () => {
 
 					reportId = '123';
-
-					intercept.backend()
-						.get( `/reports/${ reportId }/` )
-						.reply( 200, intercept.stub( '/backend/reports/report' ) );
+					interceptReport( reportId );
 				} );
 
 				afterEach( checkNock );
