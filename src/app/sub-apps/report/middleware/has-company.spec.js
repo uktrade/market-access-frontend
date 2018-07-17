@@ -26,7 +26,7 @@ describe( 'hasCompany middleware', () => {
 		companySearch = jasmine.createSpy( 'urls.report.companySearch' ).and.callFake( () => companySearchUrlResponse );
 
 		middleware = proxyquire( modulePath, {
-			'../lib/urls': { report: { companySearch	} }
+			'../../../lib/urls': { report: { companySearch	} }
 		} );
 	} );
 

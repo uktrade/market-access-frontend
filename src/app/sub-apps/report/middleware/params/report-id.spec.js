@@ -19,7 +19,7 @@ describe( 'Report Id param middleware', () => {
 		};
 
 		middleware = proxyquire( modulePath, {
-			'../../lib/backend-service': backend
+			'../../../../lib/backend-service': backend
 		} );
 	} );
 

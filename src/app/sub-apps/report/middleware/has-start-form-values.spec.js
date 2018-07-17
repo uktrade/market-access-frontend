@@ -26,7 +26,7 @@ describe( 'hasStartFormValues middleware', () => {
 		start = jasmine.createSpy( 'urls.report.start' ).and.callFake( () => startUrlResponse );
 
 		middleware = proxyquire( modulePath, {
-			'../lib/urls': { report: { start	} }
+			'../../../lib/urls': { report: { start	} }
 		} );
 	} );
 

@@ -1,12 +1,12 @@
-const urls = require( '../lib/urls' );
-const metadata = require( '../lib/metadata' );
-const backend = require( '../lib/backend-service' );
-const datahub = require( '../lib/datahub-service' );
-const Form = require( '../lib/Form' );
-const govukItemsFromObj = require( '../lib/govuk-items-from-object' );
-const validators = require( '../lib/validators' );
+const urls = require( '../../lib/urls' );
+const metadata = require( '../../lib/metadata' );
+const backend = require( '../../lib/backend-service' );
+const datahub = require( '../../lib/datahub-service' );
+const Form = require( '../../lib/Form' );
+const govukItemsFromObj = require( '../../lib/govuk-items-from-object' );
+const validators = require( '../../lib/validators' );
 
-const reportDetailViewModel = require( '../lib/view-models/report/detail' );
+const reportDetailViewModel = require( '../../lib/view-models/report/detail' );
 
 function barrierTypeToRadio( item ){
 
@@ -40,9 +40,9 @@ let countryItems;
 
 module.exports = {
 
-	index: ( req, res ) => res.render( 'report/index', { tasks: metadata.reportTaskList } ),
+	index: ( req, res ) => res.render( 'report/views/index', { tasks: metadata.reportTaskList } ),
 
-	report: ( req, res ) => res.render( 'report/detail', reportDetailViewModel( req.csrfToken(), req.report ) ),
+	report: ( req, res ) => res.render( 'report/views/detail', reportDetailViewModel( req.csrfToken(), req.report ) ),
 
 	start: ( req, res ) => {
 
@@ -84,7 +84,7 @@ module.exports = {
 			}
 		}
 
-		res.render( 'report/start', form.getTemplateValues() );
+		res.render( 'report/views/start', form.getTemplateValues() );
 	},
 
 	companySearch: async ( req, res, next ) => {
@@ -126,7 +126,7 @@ module.exports = {
 			}
 		}
 
-		res.render( 'report/company-search', data );
+		res.render( 'report/views/company-search', data );
 	},
 
 	companyDetails: ( req, res ) => {
@@ -150,17 +150,17 @@ module.exports = {
 			const { id, name, sector } = req.company;
 			req.session.reportCompany = { id, name, sector };
 
-			res.render( 'report/company-details', {
+			res.render( 'report/views/company-details', {
 				csrfToken: req.csrfToken()
 			} );
 		}
 	},
 
-	contacts: async ( req, res ) => res.render( 'report/contacts' ),
+	contacts: async ( req, res ) => res.render( 'report/views/contacts' ),
 
 	contactDetails: ( req, res ) => {
 		req.session.reportContact = req.contact.id;
-		res.render( 'report/contact-details', { csrfToken: req.csrfToken() } );
+		res.render( 'report/views/contact-details', { csrfToken: req.csrfToken() } );
 	},
 
 	save: async ( req, res, next ) => {
@@ -292,7 +292,7 @@ module.exports = {
 			}
 		}
 
-		res.render( 'report/about-problem', form.getTemplateValues() );
+		res.render( 'report/views/about-problem', form.getTemplateValues() );
 	},
 
 	impact: async ( req, res, next ) => {
@@ -358,7 +358,7 @@ module.exports = {
 			}
 		}
 
-		res.render( 'report/impact', form.getTemplateValues() );
+		res.render( 'report/views/impact', form.getTemplateValues() );
 	},
 
 	legal: async ( req, res, next ) => {
@@ -426,7 +426,7 @@ module.exports = {
 			}
 		}
 
-		res.render( 'report/legal', form.getTemplateValues() );
+		res.render( 'report/views/legal', form.getTemplateValues() );
 	},
 
 	type: async ( req, res, next ) => {
@@ -473,7 +473,7 @@ module.exports = {
 		const data = form.getTemplateValues();
 		data.items = groupBarrierTypes( data.barrierType );
 
-		res.render( 'report/type', data );
+		res.render( 'report/views/type', data );
 	},
 
 	support: async ( req, res, next ) => {
@@ -583,7 +583,7 @@ module.exports = {
 			}
 		}
 
-		res.render( 'report/support', form.getTemplateValues() );
+		res.render( 'report/views/support', form.getTemplateValues() );
 	},
 
 	nextSteps: async ( req, res, next ) => {
@@ -654,7 +654,7 @@ module.exports = {
 			}
 		}
 
-		res.render( 'report/next-steps', form.getTemplateValues() );
+		res.render( 'report/views/next-steps', form.getTemplateValues() );
 	},
 
 	submit: async ( req, res, next ) => {
@@ -680,5 +680,5 @@ module.exports = {
 		}
 	},
 
-	success: ( req, res ) => res.render( 'report/success' )
+	success: ( req, res ) => res.render( 'report/views/success' )
 };

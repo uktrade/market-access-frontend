@@ -1,5 +1,5 @@
-const urls = require( '../lib/urls' );
-const logger = require( '../lib/logger' );
+const urls = require( '../../../lib/urls' );
+const logger = require( '../../../lib/logger' );
 
 module.exports = ( req, res, next ) => {
 

@@ -1,7 +1,7 @@
 const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
 
-const modulePath = './report';
+const modulePath = './controllers';
 
 describe( 'Report controller', () => {
 
@@ -105,13 +105,13 @@ describe( 'Report controller', () => {
 		};
 
 		controller = proxyquire( modulePath, {
-			'../lib/backend-service': backend,
-			'../lib/datahub-service': datahub,
-			'../lib/urls': urls,
-			'../lib/metadata': metadata,
-			'../lib/Form': Form,
-			'../lib/validators': validators,
-			'../lib/view-models/report/detail': reportDetailViewModel
+			'../../lib/backend-service': backend,
+			'../../lib/datahub-service': datahub,
+			'../../lib/urls': urls,
+			'../../lib/metadata': metadata,
+			'../../lib/Form': Form,
+			'../../lib/validators': validators,
+			'../../lib/view-models/report/detail': reportDetailViewModel
 		} );
 	} );
 
@@ -140,7 +140,7 @@ describe( 'Report controller', () => {
 
 			controller.index( req, res );
 
-			expect( res.render ).toHaveBeenCalledWith( 'report/index', { tasks: metadata.reportTaskList } );
+			expect( res.render ).toHaveBeenCalledWith( 'report/views/index', { tasks: metadata.reportTaskList } );
 		} );
 	} );
 
@@ -155,7 +155,7 @@ describe( 'Report controller', () => {
 			controller.report( req, res );
 
 			expect( reportDetailViewModel ).toHaveBeenCalledWith( csrfToken, req.report );
-			expect( res.render ).toHaveBeenCalledWith( 'report/detail', reportDetailViewModelResponse );
+			expect( res.render ).toHaveBeenCalledWith( 'report/views/detail', reportDetailViewModelResponse );
 		} );
 	} );
 
@@ -266,14 +266,14 @@ describe( 'Report controller', () => {
 				controller.start( req, res );
 
 				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'report/start', getTemplateValuesResponse );
+				expect( res.render ).toHaveBeenCalledWith( 'report/views/start', getTemplateValuesResponse );
 			} );
 		} );
 	} );
 
 	describe( 'Company Search', () => {
 
-		const template = 'report/company-search';
+		const template = 'report/views/company-search';
 
 		describe( 'Without a query', () => {
 			it( 'Should render the search page', () => {
@@ -428,7 +428,7 @@ describe( 'Report controller', () => {
 				controller.companyDetails( req, res );
 
 				expect( req.session.reportCompany ).toEqual( { id: company.id, name: company.name, sector: company.sector } );
-				expect( res.render ).toHaveBeenCalledWith( 'report/company-details', { csrfToken } );
+				expect( res.render ).toHaveBeenCalledWith( 'report/views/company-details', { csrfToken } );
 			} );
 		} );
 	} );
@@ -671,7 +671,7 @@ describe( 'Report controller', () => {
 
 			controller.contacts( req, res );
 
-			expect( res.render ).toHaveBeenCalledWith( 'report/contacts' );
+			expect( res.render ).toHaveBeenCalledWith( 'report/views/contacts' );
 		} );
 	} );
 
@@ -689,7 +689,7 @@ describe( 'Report controller', () => {
 			controller.contactDetails( req, res );
 
 			expect( req.session.reportContact ).toEqual( contact.id );
-			expect( res.render ).toHaveBeenCalledWith( 'report/contact-details', { csrfToken } );
+			expect( res.render ).toHaveBeenCalledWith( 'report/views/contact-details', { csrfToken } );
 		} );
 	} );
 
@@ -755,7 +755,7 @@ describe( 'Report controller', () => {
 
 				expect( form.validate ).not.toHaveBeenCalled();
 				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'report/about-problem', getTemplateValuesResponse );
+				expect( res.render ).toHaveBeenCalledWith( 'report/views/about-problem', getTemplateValuesResponse );
 			} );
 		} );
 
@@ -779,7 +779,7 @@ describe( 'Report controller', () => {
 
 					await controller.aboutProblem( req, res, next );
 
-					expect( res.render ).toHaveBeenCalledWith( 'report/about-problem', getTemplateValuesResponse );
+					expect( res.render ).toHaveBeenCalledWith( 'report/views/about-problem', getTemplateValuesResponse );
 				} );
 			} );
 
@@ -921,7 +921,7 @@ describe( 'Report controller', () => {
 
 				expect( form.validate ).not.toHaveBeenCalled();
 				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'report/impact', getTemplateValuesResponse );
+				expect( res.render ).toHaveBeenCalledWith( 'report/views/impact', getTemplateValuesResponse );
 			} );
 		} );
 
@@ -945,7 +945,7 @@ describe( 'Report controller', () => {
 
 					await controller.impact( req, res, next );
 
-					expect( res.render ).toHaveBeenCalledWith( 'report/impact', getTemplateValuesResponse );
+					expect( res.render ).toHaveBeenCalledWith( 'report/views/impact', getTemplateValuesResponse );
 				} );
 			} );
 
@@ -1083,7 +1083,7 @@ describe( 'Report controller', () => {
 
 				expect( form.validate ).not.toHaveBeenCalled();
 				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'report/legal', getTemplateValuesResponse );
+				expect( res.render ).toHaveBeenCalledWith( 'report/views/legal', getTemplateValuesResponse );
 			} );
 		} );
 
@@ -1107,7 +1107,7 @@ describe( 'Report controller', () => {
 
 					await controller.legal( req, res, next );
 
-					expect( res.render ).toHaveBeenCalledWith( 'report/legal', getTemplateValuesResponse );
+					expect( res.render ).toHaveBeenCalledWith( 'report/views/legal', getTemplateValuesResponse );
 				} );
 			} );
 
@@ -1230,7 +1230,7 @@ describe( 'Report controller', () => {
 
 				expect( form.validate ).not.toHaveBeenCalled();
 				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'report/type', getTemplateValuesResponse );
+				expect( res.render ).toHaveBeenCalledWith( 'report/views/type', getTemplateValuesResponse );
 			} );
 		} );
 
@@ -1254,7 +1254,7 @@ describe( 'Report controller', () => {
 
 					await controller.type( req, res, next );
 
-					expect( res.render ).toHaveBeenCalledWith( 'report/type', getTemplateValuesResponse );
+					expect( res.render ).toHaveBeenCalledWith( 'report/views/type', getTemplateValuesResponse );
 				} );
 			} );
 
@@ -1403,7 +1403,7 @@ describe( 'Report controller', () => {
 
 				expect( form.validate ).not.toHaveBeenCalled();
 				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'report/support', getTemplateValuesResponse );
+				expect( res.render ).toHaveBeenCalledWith( 'report/views/support', getTemplateValuesResponse );
 			} );
 		} );
 
@@ -1427,7 +1427,7 @@ describe( 'Report controller', () => {
 
 					await controller.support( req, res, next );
 
-					expect( res.render ).toHaveBeenCalledWith( 'report/support', getTemplateValuesResponse );
+					expect( res.render ).toHaveBeenCalledWith( 'report/views/support', getTemplateValuesResponse );
 				} );
 			} );
 
@@ -1567,7 +1567,7 @@ describe( 'Report controller', () => {
 
 				expect( form.validate ).not.toHaveBeenCalled();
 				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'report/next-steps', getTemplateValuesResponse );
+				expect( res.render ).toHaveBeenCalledWith( 'report/views/next-steps', getTemplateValuesResponse );
 			} );
 		} );
 
@@ -1591,7 +1591,7 @@ describe( 'Report controller', () => {
 
 					await controller.nextSteps( req, res, next );
 
-					expect( res.render ).toHaveBeenCalledWith( 'report/next-steps', getTemplateValuesResponse );
+					expect( res.render ).toHaveBeenCalledWith( 'report/views/next-steps', getTemplateValuesResponse );
 				} );
 			} );
 
@@ -1738,7 +1738,7 @@ describe( 'Report controller', () => {
 
 			controller.success( req, res );
 
-			expect( res.render ).toHaveBeenCalledWith( 'report/success' );
+			expect( res.render ).toHaveBeenCalledWith( 'report/views/success' );
 		} );
 	} );
 } );

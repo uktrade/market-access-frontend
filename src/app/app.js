@@ -31,6 +31,7 @@ module.exports = {
 
 		const nunjucksEnv = nunjucks.configure( [
 				`${__dirname}/views`,
+				`${__dirname}/sub-apps`,
 				path.resolve( __dirname, ( isDev ? '../' : '' ) + '../node_modules/govuk-frontend' )
 			], {
 			autoescape: true,

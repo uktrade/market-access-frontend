@@ -1,4 +1,4 @@
-const backend = require( '../../lib/backend-service' );
+const backend = require( '../../../../lib/backend-service' );
 const isNumeric = /^[0-9]+$/;
 
 module.exports = async ( req, res, next ) => {

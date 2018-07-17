@@ -1,8 +1,8 @@
 const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
-const modulePath = './contact-id';
+const modulePath = './company-id';
 
-describe( 'Contact Id param middleware', () => {
+describe( 'Company Id param middleware', () => {
 
 	let req;
 	let res;
@@ -17,11 +17,11 @@ describe( 'Contact Id param middleware', () => {
 		res = { locals: {} };
 		next = jasmine.createSpy( 'next' );
 		datahub = {
-			getContact: jasmine.createSpy( 'datahub.getContact' )
+			getCompany: jasmine.createSpy( 'datahub.getCompany' )
 		};
 
 		middleware = proxyquire( modulePath, {
-			'../../lib/datahub-service': datahub
+			'../../../../lib/datahub-service': datahub
 		} );
 	} );
 
@@ -33,18 +33,18 @@ describe( 'Contact Id param middleware', () => {
 		} );
 
 		describe( 'When the response is a success', () => {
-			it( 'Should add the contact to the req and locals', async () => {
+			it( 'Should add the company to the req and locals', async () => {
 
-				const contact = { name: 'test', id };
-				const promise = Promise.resolve( { response: { isSuccess: true }, body: contact } );
+				const company = { name: 'test', id };
+				const promise = Promise.resolve( { response: { isSuccess: true }, body: company } );
 
-				datahub.getContact.and.callFake( () => promise );
+				datahub.getCompany.and.callFake( () => promise );
 
 				await middleware( req, res, next, id );
 
-				expect( datahub.getContact ).toHaveBeenCalledWith( req, id );
-				expect( req.contact ).toEqual( contact );
-				expect( res.locals.contact ).toEqual( contact );
+				expect( datahub.getCompany ).toHaveBeenCalledWith( req, id );
+				expect( req.company ).toEqual( company );
+				expect( res.locals.company ).toEqual( company );
 				expect( next ).toHaveBeenCalledWith();
 			} );
 		} );
@@ -54,13 +54,13 @@ describe( 'Contact Id param middleware', () => {
 
 				const promise = Promise.resolve( { response: { isSuccess: false }, body: {} } );
 
-				datahub.getContact.and.callFake( () => promise );
+				datahub.getCompany.and.callFake( () => promise );
 
 				await middleware( req, res, next, id );
 
-				expect( datahub.getContact ).toHaveBeenCalledWith( req, id );
-				expect( req.contact ).not.toBeDefined();
-				expect( res.locals.contact ).not.toBeDefined();
+				expect( datahub.getCompany ).toHaveBeenCalledWith( req, id );
+				expect( req.company ).not.toBeDefined();
+				expect( res.locals.company ).not.toBeDefined();
 				expect( next ).toHaveBeenCalledWith( new Error( 'Not a successful response from datahub' ) );
 			} );
 		} );
@@ -71,11 +71,11 @@ describe( 'Contact Id param middleware', () => {
 				const err = new Error( 'a datahub error' );
 				const promise = Promise.reject( err );
 
-				datahub.getContact.and.callFake( () => promise );
+				datahub.getCompany.and.callFake( () => promise );
 
 				await middleware( req, res, next, id );
 
-				expect( datahub.getContact ).toHaveBeenCalledWith( req, id );
+				expect( datahub.getCompany ).toHaveBeenCalledWith( req, id );
 				expect( next ).toHaveBeenCalledWith( err );
 			} );
 		} );
@@ -88,8 +88,8 @@ describe( 'Contact Id param middleware', () => {
 
 			await middleware( req, res, next, id );
 
-			expect( datahub.getContact ).not.toHaveBeenCalled();
-			expect( next ).toHaveBeenCalledWith( new Error( 'Invalid contact id' ) );
+			expect( datahub.getCompany ).not.toHaveBeenCalled();
+			expect( next ).toHaveBeenCalledWith( new Error( 'Invalid company id' ) );
 		} );
 	} );
 } );

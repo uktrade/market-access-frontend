@@ -1,4 +1,4 @@
-const datahub =require( '../../lib/datahub-service' );
+const datahub =require( '../../../../lib/datahub-service' );
 const isValid = /^[a-zA-Z0-9-_]+$/;
 
 module.exports = async ( req, res, next, id ) => {
