@@ -11,6 +11,6 @@ module.exports = ( req, res, next ) => {
 
 	} else {
 		logger.debug( 'No startFormValues in session, redirecting...' );
-		res.redirect( urls.report.start( req.params.reportId ) );
+		res.redirect( urls.reports.start( req.params.reportId ) );
 	}
 };

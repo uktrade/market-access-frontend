@@ -1,6 +1,6 @@
 const ssoController = require( './controllers/sso' );
 const indexController = require( './controllers/index' );
-const reportRoutes = require( './sub-apps/report/routes' );
+const reportRoutes = require( './sub-apps/reports/routes' );
 
 const headerNav = require( './middleware/header-nav' );
 const user = require( './middleware/user' );
@@ -15,5 +15,5 @@ module.exports = function( express, app ){
 	app.use( formErrors );
 
 	app.get( '/', headerNav( { isDashboard: true } ), indexController );
-	app.use( '/report/', headerNav( { isReport: true } ), reportRoutes( express, express.Router() ) );
+	app.use( '/reports/', headerNav( { isReport: true } ), reportRoutes( express, express.Router() ) );
 };

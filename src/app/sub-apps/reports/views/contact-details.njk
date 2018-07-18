@@ -8,7 +8,7 @@
 {% block page_content %}
 
 	{{ heading({
-		back: { href: urls.report.contacts( contact.company.id, report.id ) },
+		back: { href: urls.reports.contacts( contact.company.id, report.id ) },
 		caption: 'Report a barrier',
 		text: 'About the reporter'
 	}) }}
@@ -41,7 +41,7 @@
 		</pre>
 #}
 
-		<form action="{{ urls.report.save( report.id ) }}" method="POST">
+		<form action="{{ urls.reports.save( report.id ) }}" method="POST">
 			<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 			<input type="hidden" name="contactId" value="{{ contact.id }}">
 			<input type="submit" class="govuk-button" value="Save and continue">
@@ -52,6 +52,6 @@
 
 	<span class="govuk-heading-s">Or</span>
 
-	<a href="{{ urls.report.contacts( contact.company.id, report.id ) }}">Choose another contact</a>
+	<a href="{{ urls.reports.contacts( contact.company.id, report.id ) }}">Choose another contact</a>
 
 {% endblock %}

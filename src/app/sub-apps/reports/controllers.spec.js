@@ -72,18 +72,18 @@ describe( 'Report controller', () => {
 		};
 		urls = {
 			index: jasmine.createSpy( 'urls.index' ),
-			report: {
-				companySearch: jasmine.createSpy( 'urls.report.companySearch' ),
-				companyDetails: jasmine.createSpy( 'urls.report.companyDetails' ),
-				contacts: jasmine.createSpy( 'urls.report.contacts' ),
-				aboutProblem: jasmine.createSpy( 'urls.report.aboutProblem' ),
-				impact: jasmine.createSpy( 'urls.report.impact' ),
-				legal: jasmine.createSpy( 'urls.report.legal' ),
-				type: jasmine.createSpy( 'urls.report.type' ),
-				support: jasmine.createSpy( 'urls.report.support' ),
-				nextSteps: jasmine.createSpy( 'urls.report.nextSteps' ),
-				detail: jasmine.createSpy( 'urls.report.detail' ),
-				success: jasmine.createSpy( 'urls.report.success' )
+			reports: {
+				companySearch: jasmine.createSpy( 'urls.reports.companySearch' ),
+				companyDetails: jasmine.createSpy( 'urls.reports.companyDetails' ),
+				contacts: jasmine.createSpy( 'urls.reports.contacts' ),
+				aboutProblem: jasmine.createSpy( 'urls.reports.aboutProblem' ),
+				impact: jasmine.createSpy( 'urls.reports.impact' ),
+				legal: jasmine.createSpy( 'urls.reports.legal' ),
+				type: jasmine.createSpy( 'urls.reports.type' ),
+				support: jasmine.createSpy( 'urls.reports.support' ),
+				nextSteps: jasmine.createSpy( 'urls.reports.nextSteps' ),
+				detail: jasmine.createSpy( 'urls.reports.detail' ),
+				success: jasmine.createSpy( 'urls.reports.success' )
 			}
 		};
 
@@ -111,7 +111,7 @@ describe( 'Report controller', () => {
 			'../../lib/metadata': metadata,
 			'../../lib/Form': Form,
 			'../../lib/validators': validators,
-			'../../lib/view-models/report/detail': reportDetailViewModel
+			'./view-models/detail': reportDetailViewModel
 		} );
 	} );
 
@@ -140,7 +140,16 @@ describe( 'Report controller', () => {
 
 			controller.index( req, res );
 
-			expect( res.render ).toHaveBeenCalledWith( 'report/views/index', { tasks: metadata.reportTaskList } );
+			expect( res.render ).toHaveBeenCalledWith( 'reports/views/index' );
+		} );
+	} );
+
+	describe( 'New', () => {
+		it( 'Should render the reports page', () => {
+
+			controller.new( req, res );
+
+			expect( res.render ).toHaveBeenCalledWith( 'reports/views/new', { tasks: metadata.reportTaskList } );
 		} );
 	} );
 
@@ -155,7 +164,7 @@ describe( 'Report controller', () => {
 			controller.report( req, res );
 
 			expect( reportDetailViewModel ).toHaveBeenCalledWith( csrfToken, req.report );
-			expect( res.render ).toHaveBeenCalledWith( 'report/views/detail', reportDetailViewModelResponse );
+			expect( res.render ).toHaveBeenCalledWith( 'reports/views/detail', reportDetailViewModelResponse );
 		} );
 	} );
 
@@ -229,7 +238,7 @@ describe( 'Report controller', () => {
 					req.body = { status, emergency };
 					form.hasErrors = () => false;
 
-					urls.report.companySearch.and.callFake( () => companyUrl );
+					urls.reports.companySearch.and.callFake( () => companyUrl );
 
 					controller.start( req, res );
 
@@ -266,14 +275,14 @@ describe( 'Report controller', () => {
 				controller.start( req, res );
 
 				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'report/views/start', getTemplateValuesResponse );
+				expect( res.render ).toHaveBeenCalledWith( 'reports/views/start', getTemplateValuesResponse );
 			} );
 		} );
 	} );
 
 	describe( 'Company Search', () => {
 
-		const template = 'report/views/company-search';
+		const template = 'reports/views/company-search';
 
 		describe( 'Without a query', () => {
 			it( 'Should render the search page', () => {
@@ -378,14 +387,14 @@ describe( 'Report controller', () => {
 					req.method = 'POST';
 					req.body = { companyId };
 					req.session.reportCompany = { id: companyId };
-					req.params.reportId = reportId;
+					req.report = { id: reportId };
 
-					urls.report.contacts.and.callFake( () => contactResponse );
+					urls.reports.contacts.and.callFake( () => contactResponse );
 
 					controller.companyDetails( req, res );
 
 					expect( res.redirect ).toHaveBeenCalledWith( contactResponse );
-					expect( urls.report.contacts ).toHaveBeenCalledWith( companyId, reportId );
+					expect( urls.reports.contacts ).toHaveBeenCalledWith( companyId, reportId );
 				} );
 			} );
 
@@ -397,15 +406,15 @@ describe( 'Report controller', () => {
 
 					req.method = 'POST';
 					req.body = { companyId: '123' };
-					req.params.reportId = reportId;
+					req.report = { id: reportId };
 					req.session.reportCompany = { id: '123-456' };
 
-					urls.report.companySearch.and.callFake( () => searchResponse );
+					urls.reports.companySearch.and.callFake( () => searchResponse );
 
 					controller.companyDetails( req, res );
 
 					expect( res.redirect ).toHaveBeenCalledWith( searchResponse );
-					expect( urls.report.companySearch ).toHaveBeenCalledWith( reportId );
+					expect( urls.reports.companySearch ).toHaveBeenCalledWith( reportId );
 				} );
 			} );
 		} );
@@ -428,7 +437,7 @@ describe( 'Report controller', () => {
 				controller.companyDetails( req, res );
 
 				expect( req.session.reportCompany ).toEqual( { id: company.id, name: company.name, sector: company.sector } );
-				expect( res.render ).toHaveBeenCalledWith( 'report/views/company-details', { csrfToken } );
+				expect( res.render ).toHaveBeenCalledWith( 'reports/views/company-details', { csrfToken } );
 			} );
 		} );
 	} );
@@ -448,12 +457,12 @@ describe( 'Report controller', () => {
 
 				req.session.reportCompany = sessionCompany;
 
-				urls.report.contacts.and.callFake( () => contactsResponse );
+				urls.reports.contacts.and.callFake( () => contactsResponse );
 
 				await controller.save( req, res, next );
 
 				expect( res.redirect ).toHaveBeenCalledWith( contactsResponse );
-				expect( urls.report.contacts ).toHaveBeenCalledWith( sessionCompany.id );
+				expect( urls.reports.contacts ).toHaveBeenCalledWith( sessionCompany.id );
 			} );
 		} );
 
@@ -490,7 +499,7 @@ describe( 'Report controller', () => {
 				expect( req.session.reportCompany ).not.toBeDefined();
 			}
 
-			describe( 'When there is NOT a reportId', () => {
+			describe( 'When there is NOT a report', () => {
 				describe( 'When there is an error thrown', () => {
 					it( 'Should call next with the error', async () => {
 
@@ -542,13 +551,13 @@ describe( 'Report controller', () => {
 									const detailUrl = '/b-test';
 									req.body.action = 'exit';
 
-									urls.report.detail.and.callFake( () => detailUrl );
+									urls.reports.detail.and.callFake( () => detailUrl );
 
 									await controller.save( req, res, next );
 
 									//expect( req.session.report ).toEqual( responseBody );
 									expect( res.redirect ).toHaveBeenCalledWith( detailUrl );
-									expect( urls.report.detail ).toHaveBeenCalledWith( responseBody.id );
+									expect( urls.reports.detail ).toHaveBeenCalledWith( responseBody.id );
 								} );
 							} );
 
@@ -575,13 +584,13 @@ describe( 'Report controller', () => {
 
 									const aboutProblemUrl = '/a-test';
 
-									urls.report.aboutProblem.and.callFake( () => aboutProblemUrl );
+									urls.reports.aboutProblem.and.callFake( () => aboutProblemUrl );
 
 									await controller.save( req, res, next );
 
 									//expect( req.session.report ).toEqual( responseBody );
 									expect( res.redirect ).toHaveBeenCalledWith( aboutProblemUrl );
-									expect( urls.report.aboutProblem ).toHaveBeenCalledWith( responseBody.id );
+									expect( urls.reports.aboutProblem ).toHaveBeenCalledWith( responseBody.id );
 								} );
 							} );
 						} );
@@ -605,23 +614,17 @@ describe( 'Report controller', () => {
 				} );
 			} );
 
-			describe( 'When there is a reportId', () => {
-
-				let reportId;
-
-				beforeEach( () => {
-
-					reportId = '3';
-					req.params.reportId = reportId;
-				} );
-
+			describe( 'When there is a report', () => {
 				describe( 'When the response is a success', () => {
 					it( 'Should call the update method', async () => {
+
+						const reportId = '3';
 
 						delete req.session.startFormValues;
 						delete req.session.reportCompany;
 
 						req.report = {
+							id: reportId,
 							problem_status: 1,
 							is_emergency: 2,
 							company_id: 3,
@@ -652,6 +655,8 @@ describe( 'Report controller', () => {
 
 						const statusCode = 500;
 
+						req.report = { id: 12 };
+
 						backend.updateReport.and.callFake( () => Promise.resolve( {
 							response: { isSuccess: false, statusCode }
 						} ) );
@@ -671,7 +676,7 @@ describe( 'Report controller', () => {
 
 			controller.contacts( req, res );
 
-			expect( res.render ).toHaveBeenCalledWith( 'report/views/contacts' );
+			expect( res.render ).toHaveBeenCalledWith( 'reports/views/contacts' );
 		} );
 	} );
 
@@ -689,7 +694,7 @@ describe( 'Report controller', () => {
 			controller.contactDetails( req, res );
 
 			expect( req.session.reportContact ).toEqual( contact.id );
-			expect( res.render ).toHaveBeenCalledWith( 'report/views/contact-details', { csrfToken } );
+			expect( res.render ).toHaveBeenCalledWith( 'reports/views/contact-details', { csrfToken } );
 		} );
 	} );
 
@@ -755,7 +760,7 @@ describe( 'Report controller', () => {
 
 				expect( form.validate ).not.toHaveBeenCalled();
 				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'report/views/about-problem', getTemplateValuesResponse );
+				expect( res.render ).toHaveBeenCalledWith( 'reports/views/about-problem', getTemplateValuesResponse );
 			} );
 		} );
 
@@ -779,7 +784,7 @@ describe( 'Report controller', () => {
 
 					await controller.aboutProblem( req, res, next );
 
-					expect( res.render ).toHaveBeenCalledWith( 'report/views/about-problem', getTemplateValuesResponse );
+					expect( res.render ).toHaveBeenCalledWith( 'reports/views/about-problem', getTemplateValuesResponse );
 				} );
 			} );
 
@@ -804,12 +809,12 @@ describe( 'Report controller', () => {
 						it( 'Should redirect to the report detail page', async () => {
 
 							const reportDetailResponse = '/reportDetail';
-							urls.report.detail.and.callFake( () => reportDetailResponse );
+							urls.reports.detail.and.callFake( () => reportDetailResponse );
 							form.isExit = true;
 
 							await controller.aboutProblem( req, res, next );
 
-							expect( urls.report.detail ).toHaveBeenCalledWith( req.report.id );
+							expect( urls.reports.detail ).toHaveBeenCalledWith( req.report.id );
 							expect( res.redirect ).toHaveBeenCalledWith( reportDetailResponse );
 						} );
 					} );
@@ -818,11 +823,11 @@ describe( 'Report controller', () => {
 						it( 'Should redirect', async () => {
 
 							const impactUrlResponse = '/impact/';
-							urls.report.impact.and.callFake( () => impactUrlResponse );
+							urls.reports.impact.and.callFake( () => impactUrlResponse );
 
 							await controller.aboutProblem( req, res, next );
 
-							expect( urls.report.impact ).toHaveBeenCalledWith( req.report.id );
+							expect( urls.reports.impact ).toHaveBeenCalledWith( req.report.id );
 							expect( res.redirect ).toHaveBeenCalledWith( impactUrlResponse );
 						} );
 					} );
@@ -921,7 +926,7 @@ describe( 'Report controller', () => {
 
 				expect( form.validate ).not.toHaveBeenCalled();
 				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'report/views/impact', getTemplateValuesResponse );
+				expect( res.render ).toHaveBeenCalledWith( 'reports/views/impact', getTemplateValuesResponse );
 			} );
 		} );
 
@@ -945,7 +950,7 @@ describe( 'Report controller', () => {
 
 					await controller.impact( req, res, next );
 
-					expect( res.render ).toHaveBeenCalledWith( 'report/views/impact', getTemplateValuesResponse );
+					expect( res.render ).toHaveBeenCalledWith( 'reports/views/impact', getTemplateValuesResponse );
 				} );
 			} );
 
@@ -970,12 +975,12 @@ describe( 'Report controller', () => {
 						it( 'Should redirect to the report detail page', async () => {
 
 							const reportDetailResponse = '/reportDetail';
-							urls.report.detail.and.callFake( () => reportDetailResponse );
+							urls.reports.detail.and.callFake( () => reportDetailResponse );
 							form.isExit = true;
 
 							await controller.impact( req, res, next );
 
-							expect( urls.report.detail ).toHaveBeenCalledWith( req.report.id );
+							expect( urls.reports.detail ).toHaveBeenCalledWith( req.report.id );
 							expect( res.redirect ).toHaveBeenCalledWith( reportDetailResponse );
 						} );
 					} );
@@ -984,11 +989,11 @@ describe( 'Report controller', () => {
 						it( 'Should redirect', async () => {
 
 							const legalResponse = '/legal/';
-							urls.report.legal.and.callFake( () => legalResponse );
+							urls.reports.legal.and.callFake( () => legalResponse );
 
 							await controller.impact( req, res, next );
 
-							expect( urls.report.legal ).toHaveBeenCalledWith( req.report.id );
+							expect( urls.reports.legal ).toHaveBeenCalledWith( req.report.id );
 							expect( res.redirect ).toHaveBeenCalledWith( legalResponse );
 						} );
 					} );
@@ -1083,7 +1088,7 @@ describe( 'Report controller', () => {
 
 				expect( form.validate ).not.toHaveBeenCalled();
 				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'report/views/legal', getTemplateValuesResponse );
+				expect( res.render ).toHaveBeenCalledWith( 'reports/views/legal', getTemplateValuesResponse );
 			} );
 		} );
 
@@ -1107,7 +1112,7 @@ describe( 'Report controller', () => {
 
 					await controller.legal( req, res, next );
 
-					expect( res.render ).toHaveBeenCalledWith( 'report/views/legal', getTemplateValuesResponse );
+					expect( res.render ).toHaveBeenCalledWith( 'reports/views/legal', getTemplateValuesResponse );
 				} );
 			} );
 
@@ -1132,12 +1137,12 @@ describe( 'Report controller', () => {
 						it( 'Should redirect to the report detail page', async () => {
 
 							const reportDetailResponse = '/reportDetail';
-							urls.report.detail.and.callFake( () => reportDetailResponse );
+							urls.reports.detail.and.callFake( () => reportDetailResponse );
 							form.isExit = true;
 
 							await controller.legal( req, res, next );
 
-							expect( urls.report.detail ).toHaveBeenCalledWith( req.report.id );
+							expect( urls.reports.detail ).toHaveBeenCalledWith( req.report.id );
 							expect( res.redirect ).toHaveBeenCalledWith( reportDetailResponse );
 						} );
 					} );
@@ -1146,11 +1151,11 @@ describe( 'Report controller', () => {
 						it( 'Should redirect', async () => {
 
 							const typeResponse = '/type/';
-							urls.report.type.and.callFake( () => typeResponse );
+							urls.reports.type.and.callFake( () => typeResponse );
 
 							await controller.legal( req, res, next );
 
-							expect( urls.report.type ).toHaveBeenCalledWith( req.report.id );
+							expect( urls.reports.type ).toHaveBeenCalledWith( req.report.id );
 							expect( res.redirect ).toHaveBeenCalledWith( typeResponse );
 						} );
 					} );
@@ -1230,7 +1235,7 @@ describe( 'Report controller', () => {
 
 				expect( form.validate ).not.toHaveBeenCalled();
 				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'report/views/type', getTemplateValuesResponse );
+				expect( res.render ).toHaveBeenCalledWith( 'reports/views/type', getTemplateValuesResponse );
 			} );
 		} );
 
@@ -1254,7 +1259,7 @@ describe( 'Report controller', () => {
 
 					await controller.type( req, res, next );
 
-					expect( res.render ).toHaveBeenCalledWith( 'report/views/type', getTemplateValuesResponse );
+					expect( res.render ).toHaveBeenCalledWith( 'reports/views/type', getTemplateValuesResponse );
 				} );
 			} );
 
@@ -1279,12 +1284,12 @@ describe( 'Report controller', () => {
 						it( 'Should redirect to the report detail page', async () => {
 
 							const reportDetailResponse = '/reportDetail';
-							urls.report.detail.and.callFake( () => reportDetailResponse );
+							urls.reports.detail.and.callFake( () => reportDetailResponse );
 							form.isExit = true;
 
 							await controller.type( req, res, next );
 
-							expect( urls.report.detail ).toHaveBeenCalledWith( req.report.id );
+							expect( urls.reports.detail ).toHaveBeenCalledWith( req.report.id );
 							expect( res.redirect ).toHaveBeenCalledWith( reportDetailResponse );
 						} );
 					} );
@@ -1293,11 +1298,11 @@ describe( 'Report controller', () => {
 						it( 'Should redirect', async () => {
 
 							const supportResponse = '/support/';
-							urls.report.support.and.callFake( () => supportResponse );
+							urls.reports.support.and.callFake( () => supportResponse );
 
 							await controller.type( req, res, next );
 
-							expect( urls.report.support ).toHaveBeenCalledWith( req.report.id );
+							expect( urls.reports.support ).toHaveBeenCalledWith( req.report.id );
 							expect( res.redirect ).toHaveBeenCalledWith( supportResponse );
 						} );
 					} );
@@ -1403,7 +1408,7 @@ describe( 'Report controller', () => {
 
 				expect( form.validate ).not.toHaveBeenCalled();
 				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'report/views/support', getTemplateValuesResponse );
+				expect( res.render ).toHaveBeenCalledWith( 'reports/views/support', getTemplateValuesResponse );
 			} );
 		} );
 
@@ -1427,7 +1432,7 @@ describe( 'Report controller', () => {
 
 					await controller.support( req, res, next );
 
-					expect( res.render ).toHaveBeenCalledWith( 'report/views/support', getTemplateValuesResponse );
+					expect( res.render ).toHaveBeenCalledWith( 'reports/views/support', getTemplateValuesResponse );
 				} );
 			} );
 
@@ -1452,12 +1457,12 @@ describe( 'Report controller', () => {
 						it( 'Should redirect to the report detail page', async () => {
 
 							const reportDetailResponse = '/reportDetail';
-							urls.report.detail.and.callFake( () => reportDetailResponse );
+							urls.reports.detail.and.callFake( () => reportDetailResponse );
 							form.isExit = true;
 
 							await controller.support( req, res, next );
 
-							expect( urls.report.detail ).toHaveBeenCalledWith( req.report.id );
+							expect( urls.reports.detail ).toHaveBeenCalledWith( req.report.id );
 							expect( res.redirect ).toHaveBeenCalledWith( reportDetailResponse );
 						} );
 					} );
@@ -1466,11 +1471,11 @@ describe( 'Report controller', () => {
 						it( 'Should redirect', async () => {
 
 							const nextStepsResponse = '/next-steps/';
-							urls.report.nextSteps.and.callFake( () => nextStepsResponse );
+							urls.reports.nextSteps.and.callFake( () => nextStepsResponse );
 
 							await controller.support( req, res, next );
 
-							expect( urls.report.nextSteps ).toHaveBeenCalledWith( req.report.id );
+							expect( urls.reports.nextSteps ).toHaveBeenCalledWith( req.report.id );
 							expect( res.redirect ).toHaveBeenCalledWith( nextStepsResponse );
 						} );
 					} );
@@ -1567,7 +1572,7 @@ describe( 'Report controller', () => {
 
 				expect( form.validate ).not.toHaveBeenCalled();
 				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'report/views/next-steps', getTemplateValuesResponse );
+				expect( res.render ).toHaveBeenCalledWith( 'reports/views/next-steps', getTemplateValuesResponse );
 			} );
 		} );
 
@@ -1591,7 +1596,7 @@ describe( 'Report controller', () => {
 
 					await controller.nextSteps( req, res, next );
 
-					expect( res.render ).toHaveBeenCalledWith( 'report/views/next-steps', getTemplateValuesResponse );
+					expect( res.render ).toHaveBeenCalledWith( 'reports/views/next-steps', getTemplateValuesResponse );
 				} );
 			} );
 
@@ -1603,7 +1608,7 @@ describe( 'Report controller', () => {
 					beforeEach( () => {
 
 						reportDetailResponse = '/reportDetail';
-						urls.report.detail.and.callFake( () => reportDetailResponse );
+						urls.reports.detail.and.callFake( () => reportDetailResponse );
 						backend.saveNextSteps.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
 
 						req.report = { id: 1, b: 2 };
@@ -1623,7 +1628,7 @@ describe( 'Report controller', () => {
 
 							await controller.nextSteps( req, res, next );
 
-							expect( urls.report.detail ).toHaveBeenCalledWith( req.report.id );
+							expect( urls.reports.detail ).toHaveBeenCalledWith( req.report.id );
 							expect( res.redirect ).toHaveBeenCalledWith( reportDetailResponse );
 						} );
 					} );
@@ -1633,7 +1638,7 @@ describe( 'Report controller', () => {
 
 							await controller.nextSteps( req, res, next );
 
-							expect( urls.report.detail ).toHaveBeenCalledWith( req.report.id );
+							expect( urls.reports.detail ).toHaveBeenCalledWith( req.report.id );
 							expect( res.redirect ).toHaveBeenCalledWith( reportDetailResponse );
 						} );
 					} );
@@ -1694,7 +1699,7 @@ describe( 'Report controller', () => {
 
 				const successUrlResponse = '/a-url';
 
-				urls.report.success.and.callFake( () => successUrlResponse );
+				urls.reports.success.and.callFake( () => successUrlResponse );
 
 				await controller.submit( req, res, next );
 
@@ -1707,13 +1712,13 @@ describe( 'Report controller', () => {
 
 				const statusCode = 500;
 				const reportDetailResponse = '/reportDetail';
-				urls.report.detail.and.callFake( () => reportDetailResponse );
+				urls.reports.detail.and.callFake( () => reportDetailResponse );
 				form.hasErrors = () => false;
 				backend.submitReport.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
 
 				await controller.submit( req, res, next );
 
-				expect( urls.report.detail ).toHaveBeenCalledWith( req.report.id );
+				expect( urls.reports.detail ).toHaveBeenCalledWith( req.report.id );
 				expect( res.redirect ).toHaveBeenCalledWith( reportDetailResponse );
 			} );
 		} );
@@ -1738,7 +1743,7 @@ describe( 'Report controller', () => {
 
 			controller.success( req, res );
 
-			expect( res.render ).toHaveBeenCalledWith( 'report/views/success' );
+			expect( res.render ).toHaveBeenCalledWith( 'reports/views/success' );
 		} );
 	} );
 } );

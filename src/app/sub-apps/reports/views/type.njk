@@ -18,13 +18,13 @@
 {% block page_content %}
 
 	{{ heading({
-		back: { href: urls.report.legal( report.id ) },
+		back: { href: urls.reports.legal( report.id ) },
 		caption: 'Report a barrier',
 		text: 'Define type of market access barrier',
 		errors: errors
 	}) }}
 
-	<form action="{{ urls.report.type( report.id ) }}" method="POST" class="restrict-width">
+	<form action="{{ urls.reports.type( report.id ) }}" method="POST" class="restrict-width">
 
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 

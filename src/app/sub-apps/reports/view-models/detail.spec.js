@@ -67,8 +67,8 @@ describe( 'Report detail view model', () => {
 		};
 
 		viewModel = proxyquire( modulePath, {
-			'../../urls': urls,
-			'../../metadata': { reportTaskList }
+			'../../../lib/urls': urls,
+			'../../../lib/metadata': { reportTaskList }
 		} );
 	} );
 

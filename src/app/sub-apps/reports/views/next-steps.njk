@@ -17,13 +17,13 @@
 	<div class="restrict-width">
 
 		{{ heading({
-			back: { href: urls.report.support( report.id ) },
+			back: { href: urls.reports.support( report.id ) },
 			caption: 'Report a barrier',
 			text: 'Next steps the company affected have requested',
 			errors: errors
 		}) }}
 
-		<form action="{{ urls.report.nextSteps( report.id ) }}" method="POST">
+		<form action="{{ urls.reports.nextSteps( report.id ) }}" method="POST">
 
 			<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 

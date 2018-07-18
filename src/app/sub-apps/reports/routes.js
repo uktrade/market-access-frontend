@@ -21,8 +21,9 @@ module.exports = ( express, app ) => {
 
 	app.use( parseBody, csrfProtection );
 
-	app.get( '/', controller.index );
-	app.get( '/success/', controller.success );
+	app.get( '/', controller.index ),
+	app.get( '/new/', controller.new );
+	app.get( '/new/success/', controller.success );
 
 	app.get( '/:reportId?/start/', controller.start );
 	app.post( '/:reportId?/start/', controller.start );

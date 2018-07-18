@@ -10,6 +10,6 @@ module.exports = ( req, res, next ) => {
 	} else {
 
 		logger.debug( 'No reportCompany in session, redirecting...' );
-		res.redirect( urls.report.companySearch( req.params.reportId ) );
+		res.redirect( urls.reports.companySearch( req.params.reportId ) );
 	}
 };

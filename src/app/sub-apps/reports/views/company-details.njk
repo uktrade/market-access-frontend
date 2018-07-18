@@ -8,7 +8,7 @@
 {% block page_content %}
 
 		{{ heading({
-			back: { href: urls.report.companySearch( report.id ) },
+			back: { href: urls.reports.companySearch( report.id ) },
 			caption: 'Report a barrier',
 			text: 'Company or organisation affected'
 		}) }}
@@ -52,7 +52,7 @@
 				}
 			] ) }}
 
-			<form action="{{ urls.report.companySearch( report.id ) }}" method="POST">
+			<form action="{{ urls.reports.companySearch( report.id ) }}" method="POST">
 				<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 				<input type="hidden" name="companyId" value="{{ company.id }}">
 				<input type="submit" class="govuk-button" value="Continue">
@@ -62,6 +62,6 @@
 
 		<span class="govuk-heading-s">Or</span>
 
-		<a href="{{ urls.report.companySearch( report.id ) }}">Search again</a>
+		<a href="{{ urls.reports.companySearch( report.id ) }}">Search again</a>
 
 {% endblock %}

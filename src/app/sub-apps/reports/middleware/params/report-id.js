@@ -5,7 +5,12 @@ module.exports = async ( req, res, next ) => {
 
 	const reportId = req.params.reportId;
 
-	if( reportId.length < 10 && isNumeric.test( reportId ) ){
+	if( reportId === 'new' ){
+
+		delete req.params.reportId;
+		next();
+
+	} else if( reportId.length < 10 && isNumeric.test( reportId ) ){
 
 		let report = req.session.report;
 

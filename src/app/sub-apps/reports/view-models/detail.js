@@ -1,5 +1,5 @@
-const metadata = require( '../../metadata' );
-const urls = require( '../../urls' );
+const metadata = require( '../../../lib/metadata' );
+const urls = require( '../../../lib/urls' );
 
 function getProgress( progress ){
 

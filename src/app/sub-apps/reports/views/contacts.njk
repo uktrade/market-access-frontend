@@ -8,7 +8,7 @@
 {% block page_content %}
 
 	{{ heading({
-		back: { href: urls.report.companySearch( report.id ) },
+		back: { href: urls.reports.companySearch( report.id ) },
 		caption: 'Report a barrier',
 		text: 'About the reporter'
 	}) }}
@@ -33,7 +33,7 @@
 	<ul class="contact-list restrict-width">
 		{% for contact in company.contacts %}
 			<li class="contact-list__item">
-				<a href="{{ urls.report.viewContact( contact.id, report.id ) }}" class="contact-list__item__link">
+				<a href="{{ urls.reports.viewContact( contact.id, report.id ) }}" class="contact-list__item__link">
 					<span class="contact-list__item__name">{{ contact.name }}</span>
 					<span class="contact-list__item__sub-key">Job title: </span><span class="contact-list__item__sub-value">{{ contact.job_title }}</span>
 				</a>

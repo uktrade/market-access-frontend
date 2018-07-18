@@ -128,10 +128,18 @@ describe( 'App', function(){
 
 		describe( 'Report a barrier', () => {
 			describe( 'Index page', () => {
-				it( 'Should render the index page', ( done ) => {
+				it( 'Should render a list of reports', ( done ) => {
 
 					app
-						.get( urls.report.index() )
+						.get( urls.reports.index() )
+						.end( checkPage( 'Market Access - Reports', done ) );
+				} );
+			} );
+			describe( 'New report page', () => {
+				it( 'Should render the new page', ( done ) => {
+
+					app
+						.get( urls.reports.new() )
 						.end( checkPage( 'Market Access - Report a barrier', done ) );
 				} );
 			} );
@@ -144,7 +152,7 @@ describe( 'App', function(){
 					it( 'Should render the start page', ( done ) => {
 
 						app
-							.get( urls.report.start() )
+							.get( urls.reports.start() )
 							.end( checkPage( title, done ) );
 					} );
 				} );
@@ -159,7 +167,7 @@ describe( 'App', function(){
 							.reply( 200, intercept.stub( '/backend/reports/report' ) );
 
 						app
-							.get( urls.report.start( reportId ) )
+							.get( urls.reports.start( reportId ) )
 							.end( checkPage( title, done ) );
 					} );
 				} );
@@ -174,13 +182,13 @@ describe( 'App', function(){
 					agent = supertest.agent( appInstance );
 
 					agent
-						.get( urls.report.start() )
+						.get( urls.reports.start() )
 						.end( ( err, res ) => {
 
 							const token = getCsrfToken( res, done.fail );
 
 							agent
-								.post( urls.report.start() )
+								.post( urls.reports.start() )
 								.send( `_csrf=${ token }&status=1&emergency=true` )
 								.expect( 302, done );
 						} );
@@ -190,7 +198,7 @@ describe( 'App', function(){
 					it( 'Should render the company search page', ( done ) => {
 
 						agent
-							.get( urls.report.companySearch() )
+							.get( urls.reports.companySearch() )
 							.end( checkPage( 'Market Access - Report - Search for company', done ) );
 					} );
 				} );
@@ -206,7 +214,7 @@ describe( 'App', function(){
 						interceptReport( reportId );
 
 						agent
-							.get( urls.report.companySearch( reportId ) )
+							.get( urls.reports.companySearch( reportId ) )
 							.end( checkPage( 'Market Access - Report - Search for company', done ) );
 					} );
 				} );
@@ -224,13 +232,13 @@ describe( 'App', function(){
 					agent = supertest.agent( appInstance );
 
 					agent
-						.get( urls.report.start() )
+						.get( urls.reports.start() )
 						.end( ( err, res ) => {
 
 							const token = getCsrfToken( res, done.fail );
 
 							agent
-								.post( urls.report.start() )
+								.post( urls.reports.start() )
 								.send( `_csrf=${ token }&status=1&emergency=false` )
 								.expect( 302, done );
 						} );
@@ -253,7 +261,7 @@ describe( 'App', function(){
 						it( 'Should render the details of a company', ( done ) => {
 
 							agent
-								.get( urls.report.companyDetails( companyId ) )
+								.get( urls.reports.companyDetails( companyId ) )
 								.end( checkPage( title, done ) );
 						} );
 					} );
@@ -266,7 +274,7 @@ describe( 'App', function(){
 							interceptReport( reportId );
 
 							agent
-								.get( urls.report.companyDetails( companyId, reportId ) )
+								.get( urls.reports.companyDetails( companyId, reportId ) )
 								.end( checkPage( title, done ) );
 						} );
 					} );
@@ -280,7 +288,7 @@ describe( 'App', function(){
 							.reply( 500, {} );
 
 						app
-							.get( urls.report.companyDetails( companyId ) )
+							.get( urls.reports.companyDetails( companyId ) )
 							.end( checkPage( 'Market Access - Error', done, 500 ) );
 					} );
 				} );
@@ -302,7 +310,7 @@ describe( 'App', function(){
 					agent = supertest.agent( appInstance );
 
 					agent
-						.get( urls.report.start() )
+						.get( urls.reports.start() )
 						.end( ( err, res ) => {
 
 							if( err ){ return done.fail( err ); }
@@ -310,7 +318,7 @@ describe( 'App', function(){
 							const token = getCsrfToken( res, done.fail );
 
 							agent
-								.post( urls.report.start() )
+								.post( urls.reports.start() )
 								.send( `_csrf=${ token }&status=1&emergency=false` )
 								.expect( 302 )
 								.end( ( err ) => {
@@ -318,7 +326,7 @@ describe( 'App', function(){
 									if( err ){ return done.fail( err ); }
 
 									agent
-										.get( urls.report.companyDetails( companyId ) )
+										.get( urls.reports.companyDetails( companyId ) )
 										.expect( 200 )
 										.end( ( err, res ) => {
 
@@ -327,7 +335,7 @@ describe( 'App', function(){
 											const token = getCsrfToken( res, done.fail );
 
 											agent
-												.post( urls.report.companySearch() )
+												.post( urls.reports.companySearch() )
 												.send( `_csrf=${ token }&companyId=${ companyId }` )
 												.expect( 302, done );
 										} );
@@ -344,7 +352,7 @@ describe( 'App', function(){
 						.reply( 200, intercept.stub( '/datahub/company/detail' ) );
 
 					agent
-						.get( urls.report.contacts( companyId ) )
+						.get( urls.reports.contacts( companyId ) )
 						.end( checkPage( 'Market Access - Report - Company contacts', done ) );
 				} );
 
@@ -364,7 +372,7 @@ describe( 'App', function(){
 						it( 'Should fetch the contact and render the page', ( done ) => {
 
 							agent
-								.get( urls.report.viewContact( contactId ) )
+								.get( urls.reports.viewContact( contactId ) )
 								.end( checkPage( title, done ) );
 						} );
 					} );
@@ -377,7 +385,7 @@ describe( 'App', function(){
 							interceptReport( reportId );
 
 							agent
-								.get( urls.report.viewContact( contactId, reportId ) )
+								.get( urls.reports.viewContact( contactId, reportId ) )
 								.end( checkPage( title, done ) );
 						} );
 					} );
@@ -400,7 +408,7 @@ describe( 'App', function(){
 					it( 'Should fetch the report and render the page', ( done ) => {
 
 						app
-							.get( urls.report.aboutProblem( reportId ) )
+							.get( urls.reports.aboutProblem( reportId ) )
 							.end( checkPage( 'Market Access - Report - About the problem', done ) );
 					} );
 				} );
@@ -409,7 +417,7 @@ describe( 'App', function(){
 					it( 'Should fetch the report and render the page', ( done ) => {
 
 						app
-							.get( urls.report.impact( reportId ) )
+							.get( urls.reports.impact( reportId ) )
 							.end( checkPage( 'Market Access - Report - Impact of the problem', done ) );
 					} );
 				} );
@@ -418,7 +426,7 @@ describe( 'App', function(){
 					it( 'Should fetch the report and render the page', ( done ) => {
 
 						app
-							.get( urls.report.legal( reportId ) )
+							.get( urls.reports.legal( reportId ) )
 							.end( checkPage( 'Market Access - Report - Legal obligations infringed', done ) );
 					} );
 				} );
@@ -427,7 +435,7 @@ describe( 'App', function(){
 					it( 'Should fetch the report and render the page', ( done ) => {
 
 						app
-							.get( urls.report.type( reportId ) )
+							.get( urls.reports.type( reportId ) )
 							.end( checkPage( 'Market Access - Report - Define type of market access barrier', done ) );
 					} );
 				} );
@@ -436,7 +444,7 @@ describe( 'App', function(){
 					it( 'Should fetch the report and render the page', ( done ) => {
 
 						app
-							.get( urls.report.support( reportId ) )
+							.get( urls.reports.support( reportId ) )
 							.end( checkPage( 'Market Access - Report - Describe the next steps and what support you may need', done ) );
 					} );
 				} );
@@ -445,7 +453,7 @@ describe( 'App', function(){
 					it( 'Should fetch the report and render the page', ( done ) => {
 
 						app
-							.get( urls.report.nextSteps( reportId ) )
+							.get( urls.reports.nextSteps( reportId ) )
 							.end( checkPage( 'Market Access - Report - Next steps the company affected have requested', done ) );
 					} );
 				} );
@@ -454,7 +462,7 @@ describe( 'App', function(){
 					it( 'Should fetch the report and render the page', ( done ) => {
 
 						app
-							.get( urls.report.detail( reportId ) )
+							.get( urls.reports.detail( reportId ) )
 							.end( checkPage( 'Market Access - Report details', done ) );
 					} );
 				} );

@@ -23,10 +23,10 @@ describe( 'hasStartFormValues middleware', () => {
 			redirect: jasmine.createSpy( 'res.redirect' )
 		};
 		next = jasmine.createSpy( 'next' );
-		start = jasmine.createSpy( 'urls.report.start' ).and.callFake( () => startUrlResponse );
+		start = jasmine.createSpy( 'urls.reports.start' ).and.callFake( () => startUrlResponse );
 
 		middleware = proxyquire( modulePath, {
-			'../../../lib/urls': { report: { start	} }
+			'../../../lib/urls': { reports: { start	} }
 		} );
 	} );
 

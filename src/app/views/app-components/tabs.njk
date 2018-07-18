@@ -1,0 +1,21 @@
+{% macro tab( item ) %}
+
+	{%- if item.href %}
+		<li class="page-tabs__tab">
+			<a class="page-tabs__tab__text" href="{{ item.href }}">{{ item.text }}</a>
+		</li>
+	{% else %}
+		<li class="page-tabs__tab page-tabs__tab--active">
+			<span class="page-tabs__tab__text">{{ item.text }}</span>
+		</li>
+	{% endif -%}
+
+{% endmacro %}
+
+{% macro tabs( items ) %}
+	<ul class="page-tabs">
+		{% for item in items %}
+			{{ tab( item ) }}
+		{% endfor %}
+	</ul>
+{% endmacro %}

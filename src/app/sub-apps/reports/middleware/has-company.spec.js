@@ -23,10 +23,10 @@ describe( 'hasCompany middleware', () => {
 			redirect: jasmine.createSpy( 'res.redirect' )
 		};
 		next = jasmine.createSpy( 'next' );
-		companySearch = jasmine.createSpy( 'urls.report.companySearch' ).and.callFake( () => companySearchUrlResponse );
+		companySearch = jasmine.createSpy( 'urls.reports.companySearch' ).and.callFake( () => companySearchUrlResponse );
 
 		middleware = proxyquire( modulePath, {
-			'../../../lib/urls': { report: { companySearch	} }
+			'../../../lib/urls': { reports: { companySearch	} }
 		} );
 	} );
 

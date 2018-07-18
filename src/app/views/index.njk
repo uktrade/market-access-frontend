@@ -1,3 +1,5 @@
+{% from 'app-components/tabs.njk' import tabs %}
+
 {% extends 'layout.njk' %}
 
 {% block page_title %}{{ super() }} - Homepage{% endblock %}
@@ -14,17 +16,24 @@
 
 		{% endif %}
 
-		<a href="{{ urls.report.index() }}" role="button" class="dash-button">
+		<a href="{{ urls.reports.new() }}" role="button" class="dash-button">
 			<span class="dash-button__heading">Report a barrier</span>
 			<span class="dash-button__text">
 				Report a market access barrier that is emerging, ongoing or has been resolved.
 			</span>
 		</a>
 
-		{% if reports.length %}
-		<div class="inline-tabs">
+		{{ tabs( [
+			{
+				text: 'Barrier instances'
+			},{
+				text: 'Unfinished reports',
+				href: urls.reports.index()
+			}
+		] ) }}
 
-			<div class="inline-tabs__content" id="inline-tab-1">
+		{% if reports.length %}
+			<div class="page-tab__content" id="inline-tab-1">
 
 				<table class="standard-table">
 					<thead>
@@ -52,13 +61,12 @@
 								{{ ( report.created_on | dateWithTime ) or '---' }}
 							</td>
 							<td class="standard-table__cell">
-								<a href="{{ urls.report.detail( report.id ) }}">Continue</a>
+								<a href="{{ urls.reports.detail( report.id ) }}">Continue</a>
 							</td>
 						</tr>
 						{% endfor %}
 					</tbody>
 				</table>
 			</div>
-		</div>
 		{% endif %}
 {% endblock %}

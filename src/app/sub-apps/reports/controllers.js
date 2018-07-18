@@ -6,7 +6,7 @@ const Form = require( '../../lib/Form' );
 const govukItemsFromObj = require( '../../lib/govuk-items-from-object' );
 const validators = require( '../../lib/validators' );
 
-const reportDetailViewModel = require( '../../lib/view-models/report/detail' );
+const reportDetailViewModel = require( './view-models/detail' );
 
 function barrierTypeToRadio( item ){
 
@@ -40,9 +40,11 @@ let countryItems;
 
 module.exports = {
 
-	index: ( req, res ) => res.render( 'report/views/index', { tasks: metadata.reportTaskList } ),
+	index: ( req, res ) => res.render( 'reports/views/index' ),
 
-	report: ( req, res ) => res.render( 'report/views/detail', reportDetailViewModel( req.csrfToken(), req.report ) ),
+	new: ( req, res ) => res.render( 'reports/views/new', { tasks: metadata.reportTaskList } ),
+
+	report: ( req, res ) => res.render( 'reports/views/detail', reportDetailViewModel( req.csrfToken(), req.report ) ),
 
 	start: ( req, res ) => {
 
@@ -80,11 +82,11 @@ module.exports = {
 			if( !form.hasErrors() ){
 
 				req.session.startFormValues = form.getValues();
-				return res.redirect( urls.report.companySearch( req.params.reportId ) );
+				return res.redirect( urls.reports.companySearch( report.id ) );
 			}
 		}
 
-		res.render( 'report/views/start', form.getTemplateValues() );
+		res.render( 'reports/views/start', form.getTemplateValues() );
 	},
 
 	companySearch: async ( req, res, next ) => {
@@ -126,7 +128,7 @@ module.exports = {
 			}
 		}
 
-		res.render( 'report/views/company-search', data );
+		res.render( 'reports/views/company-search', data );
 	},
 
 	companyDetails: ( req, res ) => {
@@ -134,15 +136,15 @@ module.exports = {
 		if( req.method === 'POST' ){
 
 			const companyId = req.body.companyId;
-			const reportId = req.params.reportId;
+			const reportId = ( req.report && req.report.id );
 
 			if( companyId === req.session.reportCompany.id ){
 
-				res.redirect( urls.report.contacts( companyId, reportId ) );
+				res.redirect( urls.reports.contacts( companyId, reportId ) );
 
 			} else {
 
-				res.redirect( urls.report.companySearch( reportId ) );
+				res.redirect( urls.reports.companySearch( reportId ) );
 			}
 
 		} else {
@@ -150,30 +152,30 @@ module.exports = {
 			const { id, name, sector } = req.company;
 			req.session.reportCompany = { id, name, sector };
 
-			res.render( 'report/views/company-details', {
+			res.render( 'reports/views/company-details', {
 				csrfToken: req.csrfToken()
 			} );
 		}
 	},
 
-	contacts: async ( req, res ) => res.render( 'report/views/contacts' ),
+	contacts: async ( req, res ) => res.render( 'reports/views/contacts' ),
 
 	contactDetails: ( req, res ) => {
 		req.session.reportContact = req.contact.id;
-		res.render( 'report/views/contact-details', { csrfToken: req.csrfToken() } );
+		res.render( 'reports/views/contact-details', { csrfToken: req.csrfToken() } );
 	},
 
 	save: async ( req, res, next ) => {
 
 		const contactId = req.body.contactId;
-		const reportId = req.params.reportId;
+		const reportId = ( req.report && req.report.id );
 		const sessionStartForm = ( req.session.startFormValues || req.report && { status: req.report.problem_status, emergency: ( req.report.is_emergency + '' ) } );
 		const sessionCompany =  ( req.session.reportCompany || req.report && { id: req.report.company_id, name: req.report.company_name } );
 		const sessionContact = req.session.reportContact;
 		const isUpdate = !!reportId;
 		const isExit = req.body.action === 'exit';
 
-		if( !sessionContact ){ return res.redirect( urls.report.contacts( sessionCompany.id ) ); }
+		if( !sessionContact ){ return res.redirect( urls.reports.contacts( sessionCompany.id ) ); }
 
 		if( contactId !== sessionContact ){
 			return next( new Error( 'Contact id doesn\'t match session' ) );
@@ -205,7 +207,7 @@ module.exports = {
 
 					// TODO: Can this be cached again?
 					//req.session.report = body;
-					res.redirect( isExit ? urls.report.detail( body.id ) : urls.report.aboutProblem( body.id ) );
+					res.redirect( isExit ? urls.reports.detail( body.id ) : urls.reports.aboutProblem( body.id ) );
 				}
 
 			} else {
@@ -278,7 +280,7 @@ module.exports = {
 
 					if( response.isSuccess ){
 
-						return res.redirect( form.isExit ? urls.report.detail( report.id ) : urls.report.impact( report.id ) );
+						return res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.impact( report.id ) );
 
 					} else {
 
@@ -292,7 +294,7 @@ module.exports = {
 			}
 		}
 
-		res.render( 'report/views/about-problem', form.getTemplateValues() );
+		res.render( 'reports/views/about-problem', form.getTemplateValues() );
 	},
 
 	impact: async ( req, res, next ) => {
@@ -344,7 +346,7 @@ module.exports = {
 
 					if( response.isSuccess ){
 
-						return res.redirect( form.isExit ? urls.report.detail( report.id ) : urls.report.legal( report.id ) );
+						return res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.legal( report.id ) );
 
 					} else {
 
@@ -358,7 +360,7 @@ module.exports = {
 			}
 		}
 
-		res.render( 'report/views/impact', form.getTemplateValues() );
+		res.render( 'reports/views/impact', form.getTemplateValues() );
 	},
 
 	legal: async ( req, res, next ) => {
@@ -412,7 +414,7 @@ module.exports = {
 
 					if( response.isSuccess ){
 
-						return res.redirect( form.isExit ? urls.report.detail( report.id ) : urls.report.type( report.id ) );
+						return res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.type( report.id ) );
 
 					} else {
 
@@ -426,7 +428,7 @@ module.exports = {
 			}
 		}
 
-		res.render( 'report/views/legal', form.getTemplateValues() );
+		res.render( 'reports/views/legal', form.getTemplateValues() );
 	},
 
 	type: async ( req, res, next ) => {
@@ -456,7 +458,7 @@ module.exports = {
 
 					if( response.isSuccess ){
 
-						return res.redirect( form.isExit ? urls.report.detail( report.id ) : urls.report.support( report.id ) );
+						return res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.support( report.id ) );
 
 					} else {
 
@@ -473,7 +475,7 @@ module.exports = {
 		const data = form.getTemplateValues();
 		data.items = groupBarrierTypes( data.barrierType );
 
-		res.render( 'report/views/type', data );
+		res.render( 'reports/views/type', data );
 	},
 
 	support: async ( req, res, next ) => {
@@ -569,7 +571,7 @@ module.exports = {
 
 					if( response.isSuccess ){
 
-						return res.redirect( form.isExit ? urls.report.detail( report.id ) : urls.report.nextSteps( report.id ) );
+						return res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.nextSteps( report.id ) );
 
 					} else {
 
@@ -583,7 +585,7 @@ module.exports = {
 			}
 		}
 
-		res.render( 'report/views/support', form.getTemplateValues() );
+		res.render( 'reports/views/support', form.getTemplateValues() );
 	},
 
 	nextSteps: async ( req, res, next ) => {
@@ -640,7 +642,7 @@ module.exports = {
 
 					if( response.isSuccess ){
 
-						return res.redirect( urls.report.detail( report.id ) );
+						return res.redirect( urls.reports.detail( report.id ) );
 
 					} else {
 
@@ -654,7 +656,7 @@ module.exports = {
 			}
 		}
 
-		res.render( 'report/views/next-steps', form.getTemplateValues() );
+		res.render( 'reports/views/next-steps', form.getTemplateValues() );
 	},
 
 	submit: async ( req, res, next ) => {
@@ -667,11 +669,11 @@ module.exports = {
 
 			if( response.isSuccess ){
 
-				res.redirect( urls.report.success() );
+				res.redirect( urls.reports.success() );
 
 			} else {
 
-				res.redirect( urls.report.detail( reportId ) );
+				res.redirect( urls.reports.detail( reportId ) );
 			}
 
 		} catch( e ){
@@ -680,5 +682,5 @@ module.exports = {
 		}
 	},
 
-	success: ( req, res ) => res.render( 'report/views/success' )
+	success: ( req, res ) => res.render( 'reports/views/success' )
 };

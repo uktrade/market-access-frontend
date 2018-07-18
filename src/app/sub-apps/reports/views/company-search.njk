@@ -8,7 +8,7 @@
 {% block page_content %}
 
 	{{ heading({
-		back: { href: urls.report.start( report.id ) },
+		back: { href: urls.reports.start( report.id ) },
 		caption: 'Report a barrier',
 		text: 'Company or organisation affected',
 		errors: errors
@@ -17,7 +17,7 @@
 	<section class="restrict-width">
 
 		{{ searchForm( {
-				action: urls.report.companySearch( report.id ),
+				action: urls.reports.companySearch( report.id ),
 				label: {
 					text: "Find the reporter's company record"
 				},
@@ -44,7 +44,7 @@
 			<ul class="company-card-list">
 			{% for company in results.results %}
 				<li class="company-card">
-					<a href="{{ urls.report.companyDetails( company.id, report.id ) }}" class="company-card__link">
+					<a href="{{ urls.reports.companyDetails( company.id, report.id ) }}" class="company-card__link">
 
 						<h3 class="company-card__heading">{{ company.name | highlight( query ) | safe }}</h3>
 						<dl class="company-card__values">

@@ -16,23 +16,27 @@ function getReportLastCompletedStage( progress ){
 	}
 }
 */
+function getReportPath( reportId ){
+	return ( reportId ? reportId : 'new' );
+}
 const reportUrl = {
-	index: () => '/report/',
-	detail: ( reportId ) => `/report/${ reportId }/`,
-	start: ( reportId ) => `/report/${ reportId ? reportId + '/' : '' }start/`,
-	companySearch: ( reportId ) => `/report/${ reportId ? reportId + '/' : '' }company/`,
-	companyDetails: ( companyId, reportId ) => `/report/${ reportId ? reportId + '/' : '' }company/${ companyId }/`,
-	contacts: ( companyId, reportId ) => `/report/${ reportId ? reportId + '/' : '' }company/${ companyId }/contacts/`,
-	viewContact: ( contactId, reportId ) => `/report/${ reportId ? reportId + '/' : '' }contact/${ contactId }/`,
-	save: ( reportId ) => `/report/${ reportId ? reportId + '/' : '' }save/`,
-	aboutProblem: ( reportId ) => `/report/${ reportId }/problem/`,
-	impact: ( reportId ) => `/report/${ reportId }/impact/`,
-	legal: ( reportId ) => `/report/${ reportId }/legal/`,
-	type: ( reportId ) => `/report/${ reportId }/type/`,
-	support: ( reportId ) => `/report/${ reportId }/support/`,
-	nextSteps: ( reportId ) => `/report/${ reportId }/next-steps/`,
-	submit: ( reportId ) => `/report/${ reportId }/submit/`,
-	success: () => `/report/success/`
+	index: () => '/reports/',
+	detail: ( reportId ) => `/reports/${ reportId }/`,
+	new: () => '/reports/new/',
+	start: ( reportId ) => `/reports/${ getReportPath( reportId ) }/start/`,
+	companySearch: ( reportId ) => `/reports/${ getReportPath( reportId ) }/company/`,
+	companyDetails: ( companyId, reportId ) => `/reports/${ getReportPath( reportId ) }/company/${ companyId }/`,
+	contacts: ( companyId, reportId ) => `/reports/${ getReportPath( reportId ) }/company/${ companyId }/contacts/`,
+	viewContact: ( contactId, reportId ) => `/reports/${ getReportPath( reportId ) }/contact/${ contactId }/`,
+	save: ( reportId ) => `/reports/${ getReportPath( reportId ) }/save/`,
+	aboutProblem: ( reportId ) => `/reports/${ reportId }/problem/`,
+	impact: ( reportId ) => `/reports/${ reportId }/impact/`,
+	legal: ( reportId ) => `/reports/${ reportId }/legal/`,
+	type: ( reportId ) => `/reports/${ reportId }/type/`,
+	support: ( reportId ) => `/reports/${ reportId }/support/`,
+	nextSteps: ( reportId ) => `/reports/${ reportId }/next-steps/`,
+	submit: ( reportId ) => `/reports/${ reportId }/submit/`,
+	success: () => `/reports/new/success/`
 };
 
 module.exports = {
@@ -40,7 +44,7 @@ module.exports = {
 	index: () => '/',
 	login: () => '/login/',
 
-	report: reportUrl,
+	reports: reportUrl,
 
 	reportStage: ( stageCode, report ) => {
 
