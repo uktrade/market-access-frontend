@@ -1,32 +1,37 @@
 const metadata = require( '../metadata' );
 
-function updateStatus( item ){
+function update( item ){
 
-	const id = item.problem_status;
+	const countryId = item.export_country;
+	const country = metadata.countries.find( ( country ) => country.id === countryId );
 
-	item.problem_status = {
-		id,
-		name: metadata.statusTypes[ id ],
-		isEmergency: item.is_emergency
+	item.country = {
+		id: countryId,
+		name: ( country && country.name )
 	};
+
+	item.resolved = item.current_status === 2;
+	item.supportNeeded = item.support_type === 1;
+	item.hasContributors = item.contributor_count > 0;
 
 	return item;
 }
 
-module.exports = ( reports ) => {
+module.exports = ( barriers ) => {
 
-	if( reports && reports.length ){
+	if( barriers && barriers.length ){
 
-		reports = reports.map( updateStatus );
+		barriers = barriers.map( update );
+
+		barriers.sort( ( a, b ) => {
+
+			const aDate = Date.parse( a.reported_on );
+			const bDate = Date.parse( b.reported_on );
+
+			return ( aDate === bDate ? 0 : ( aDate < bDate ? -1 : 1 ) );
+		} );
 	}
 
-	reports.sort( ( a, b ) => {
 
-		const aDate = Date.parse( a.created_on );
-		const bDate = Date.parse( b.created_on );
-
-		return ( aDate === bDate ? 0 : ( aDate < bDate ? -1 : 1 ) );
-	} );
-
-	return {	reports	};
+	return {	barriers	};
 };

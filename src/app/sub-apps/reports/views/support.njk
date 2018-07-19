@@ -1,0 +1,156 @@
+{% from "components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from 'components/input/macro.njk' import govukInput %}
+{% from 'components/textarea/macro.njk' import govukTextarea %}
+{% from 'components/radios/macro.njk' import govukRadios %}
+{% from 'components/select/macro.njk' import govukSelect %}
+{% from 'components/date-input/macro.njk' import govukDateInput %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Report - Describe the next steps and what support you may need{% endblock %}
+
+{% block body_script %}
+	<script>
+		ma.pages.report.support();
+	</script>
+{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.reports.type( report.id ) },
+		caption: 'Report a barrier',
+		text: 'Describe the next steps and what support you may need',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.reports.support( report.id ) }}" method="POST" class="restrict-width">
+
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{% set isNotResolvedHtml %}
+			{{ govukRadios( {
+
+				idPrefix: 'support-type',
+				name: 'supportType',
+				classes: 'support-type',
+				fieldset: {
+					legend: {
+						text: 'What type of support would you like to resolve this barrier?',
+						classes: 'govuk-fieldset__legend--s'
+					}
+				},
+				items: supportType,
+				errorMessage: errors | errorForName( 'support-type-1' )
+				} )
+			}}
+
+			{{ govukTextarea( {
+
+				label: {
+					text: 'Please give a brief summary of key steps/actions taken so far in response to this barrier',
+					classes: 'govuk-label--s'
+				},
+				id: 'steps-taken',
+				name: 'stepsTaken',
+				value: stepsTaken,
+				errorMessage: errors | errorForName( 'steps-taken' )
+			} ) }}
+		{% endset %}
+		{% set isResolvedHtml %}
+			{{ govukDateInput( {
+
+				id: 'resolved-date',
+				fieldset: {
+					legend: {
+						text: 'Date the barrier was resolved',
+						classes: 'govuk-fieldset__legend--s'
+					}
+				},
+				errorMessage: errors | errorForName( 'resolved-date' ),
+				items: [
+					{
+						name: 'day',
+						value: resolvedDate.day
+					},
+					{
+						name: 'month',
+						value: resolvedDate.month
+					},
+					{
+						name: 'year',
+						value: resolvedDate.year
+					}
+				]
+			} ) }}
+
+			{{ govukTextarea( {
+
+				label: {
+					text: 'Provide a summary of how this barrier was resolved',
+					classes: 'govuk-label--s'
+				},
+				id: 'resolved-summary',
+				name: 'resolvedSummary',
+				value: resolvedSummary,
+				errorMessage: errors | errorForName( 'resolved-summary' )
+			} ) }}
+		{% endset %}
+
+		{{ govukRadios( {
+
+			idPrefix: 'resolved',
+			name: 'resolved',
+			classes: 'resolved',
+			fieldset: {
+				legend: {
+					text: 'Has the barrier been resolved?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: resolved | addConditionalRadioHtml( {
+				'true': { id: 'resolved-true', html: isResolvedHtml },
+				'false': { id: 'resolved-false', html: isNotResolvedHtml }
+			} ),
+			errorMessage: errors | errorForName( 'resolved-1' )
+			} )
+		}}
+
+		{% set isPoliticallySensitiveHtml %}
+			{{ govukTextarea( {
+
+				label: {
+					text: 'Describe any sensitivities',
+					classes: 'govuk-label--s'
+				},
+				id: 'sensitivities-description',
+				name: 'sensitivitiesDescription',
+				value: sensitivitiesDescription,
+				errorMessage: errors | errorForName( 'sensitivities-description' )
+			} ) }}
+		{% endset %}
+
+		{{ govukRadios( {
+
+				idPrefix: 'political-sensitivities',
+				name: 'politicalSensitivities',
+				classes: 'political-sensitivities',
+				fieldset: {
+					legend: {
+						text: 'Are there any political sensitivities we need to be aware of?',
+						classes: 'govuk-fieldset__legend--s'
+					}
+				},
+				items: politicalSensitivities | addConditionalRadioHtml( {
+					'true': { id: 'political-sensitivities-true', html: isPoliticallySensitiveHtml }
+				} ),
+				errorMessage: errors | errorForName( 'political-sensitivities-1' )
+				} )
+			}}
+
+		<input type="submit" class="govuk-button" value="Save and continue">
+		<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>
+
+	</form>
+{% endblock %}

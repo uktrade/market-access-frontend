@@ -17,5 +17,17 @@
 	"int": {
 		"type": "number",
 		"faker": "random.number"
+	},
+
+	"small-int": {
+		"type": "number",
+		"faker": {
+			"finance.amount": [ 1, 20, 0 ]
+		}
+	},
+
+	"past-date": {
+		"type": "string",
+		"faker": "date.past"
 	}
 }

@@ -9,11 +9,11 @@ describe( 'Dashboard view model', () => {
 	beforeEach( () => {
 
 		metadata = {
-			statusTypes: {
-				'1': 'test',
-				'2': 'testing',
-				'3': 'more tests'
-			}
+			countries: [
+				{ id: 'abc-1', name: 'country 1' },
+				{ id: 'abc-2', name: 'country 2' },
+				{ id: 'abc-3', name: 'country 3' }
+			]
 		};
 
 		viewModel = proxyquire( modulePath, {
@@ -21,53 +21,69 @@ describe( 'Dashboard view model', () => {
 		} );
 	} );
 
-	describe( 'When there are some reports', () => {
+	describe( 'When there are some barriers', () => {
+		it( 'Should transform and sort them', () => {
 
-		it( 'Should transform them', () => {
-
-			const reports = [
-				{
-					problem_status: '1',
-					is_emergency: true
-				},{
-					problem_status: '2',
-					is_emergency: true
-				},{
-					problem_status: '3',
-					is_emergency: false
-				}
+			const barriers = [
+				{ id: 1, export_country: 'abc-1', current_status: 1, support_type: 2, contributor_count: 4, reported_on: 'Wed Nov 22 2017 10:45:25 GMT+0000 (GMT)' },
+				{ id: 2, export_country: 'abc-3', current_status: 2, support_type: 1, contributor_count: 0, reported_on: 'Fri Jun 01 2018 01:43:07 GMT+0100 (BST)' },
+				{ id: 3, export_country: 'def-1', current_status: 1, support_type: 2, contributor_count: 4, reported_on: 'Sat Mar 10 2018 12:51:35 GMT+0000 (GMT)' }
 			];
 
-			viewModel( reports );
+			const output = viewModel( barriers );
 
-			expect( reports[ 0 ].problem_status ).toEqual( {
-				id: '1',
-				name: 'test',
-				isEmergency: true
+			function checkBarrier( index, properties ){
+
+				const barrier = output.barriers[ index ];
+
+				for( let [ key, value ] of Object.entries( properties ) ){
+
+					expect( barrier[ key ] ).toEqual( value );
+				}
+			}
+
+			checkBarrier( 0, {
+				id: 1,
+				country: {
+					id: barriers[ 0 ].export_country,
+					name: metadata.countries[ 0 ].name
+				},
+				resolved: false,
+				supportNeeded: false,
+				hasContributors: true
 			} );
 
-			expect( reports[ 1 ].problem_status ).toEqual( {
-				id: '2',
-				name: 'testing',
-				isEmergency: true
+			checkBarrier( 1, {
+				id: 3,
+				country: {
+					id: barriers[ 2 ].export_country,
+					name: undefined
+				},
+				resolved: false,
+				supportNeeded: false,
+				hasContributors: true
 			} );
 
-			expect( reports[ 2 ].problem_status ).toEqual( {
-				id: '3',
-				name: 'more tests',
-				isEmergency: false
+			checkBarrier( 2, {
+				id: 2,
+				country: {
+					id: barriers[ 1 ].export_country,
+					name: metadata.countries[ 2 ].name
+				},
+				resolved: true,
+				supportNeeded: true,
+				hasContributors: false
 			} );
 		} );
 	} );
 
-	describe( 'When the list of reports is empty', () => {
-
-		it( 'Should return the reports', () => {
+	describe( 'When the list of barriers is empty', () => {
+		it( 'Should return the barriers', () => {
 
 			const input = [];
 			const output = viewModel( input );
 
-			expect( output ).toEqual( { reports: input } );
+			expect( output ).toEqual( { barriers: input } );
 		} );
 	} );
 } );

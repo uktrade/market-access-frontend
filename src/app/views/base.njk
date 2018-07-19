@@ -66,7 +66,7 @@
 						<nav id='proposition-menu'>
 							<ul id='proposition-links' aria-label='Top Level Navigation'>
 								<li><a href='{{ urls.index() }}'{% if headerNav.isDashboard %} class='active'{% endif %}>Dashboard</a></li>
-								<li><a href='{{ urls.report.index() }}'{% if headerNav.isReport %} class='active'{% endif %}>Report a barrier</a></li>
+								<li><a href='{{ urls.reports.new() }}'{% if headerNav.isReport %} class='active'{% endif %}>Report a barrier</a></li>
 								<li><a href='#'{% if headerNav.isFind %} class='active'{% endif %}>Find a barrier</a></li>
 							</ul>
 						</nav>

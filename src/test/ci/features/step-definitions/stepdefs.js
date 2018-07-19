@@ -19,7 +19,7 @@ Given( 'I\'m on the homepage', async () => {
 
 Given( 'I\'m on the report a barrier page', async () => {
 
-	await driver.fetch( urls.report.index() );
+	await driver.fetch( urls.reports.new() );
 	await driver.takeScreenshot( 'report-a-barrier' );
 
 	this.driver = driver.getInstance();
@@ -27,7 +27,7 @@ Given( 'I\'m on the report a barrier page', async () => {
 
 Given( 'I\'m on the start a report page', async () => {
 
-	await driver.fetch( urls.report.start() );
+	await driver.fetch( urls.reports.start() );
 	await driver.takeScreenshot( 'report-a-barrier_start' );
 
 	this.driver = driver.getInstance();
@@ -66,7 +66,7 @@ Then( 'there should be a link to report a barrier', async () => {
 	const href = await dashButton.getAttribute( 'href' );
 
 	assert.equal( tag, 'a' );
-	assert.equal( getPath( href ), '/report/' );
+	assert.equal( getPath( href ), urls.reports.new() );
 } );
 
  Then( /^the active heading link should be (.+)$/, async ( text ) => {
@@ -91,7 +91,7 @@ Then( 'the footer links should be present', async () => {
 	const info = [
 		[ 'View Data Hub', '/#' ],
 		[ 'Dashboard', '/' ],
-		[ 'Report a barrier', '/report/' ],
+		[ 'Report a barrier', urls.reports.new() ],
 		[ 'Find a barrier', '/#' ],
 		[ 'What is a barrier?', '/#' ]
 	];

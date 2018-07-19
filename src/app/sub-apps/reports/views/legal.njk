@@ -1,0 +1,103 @@
+{% from "components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from 'components/input/macro.njk' import govukInput %}
+{% from 'components/textarea/macro.njk' import govukTextarea %}
+{% from 'components/radios/macro.njk' import govukRadios %}
+{% from 'components/select/macro.njk' import govukSelect %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Report - Legal obligations infringed{% endblock %}
+
+{% block body_script %}
+	<script>
+		ma.pages.report.legal();
+	</script>
+{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.reports.impact( report.id ) },
+		caption: 'Report a barrier',
+		text: 'Legal obligations infringed',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.reports.legal( report.id ) }}" method="POST" class="restrict-width">
+
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{% set hasInfringedHtml %}
+
+			{{ govukCheckboxes( {
+
+				idPrefix: 'infringements',
+				name: 'infringements',
+				fieldset: {
+					legend: {
+						text: 'What provisions have been infringed?',
+						classes: 'govuk-fieldset__legend--s'
+					}
+				},
+				hint: {
+					text: 'Select all that apply'
+				},
+				items: [
+					{
+						text: 'WTO provision infringed',
+						name: 'wtoInfringement',
+						value: 'true',
+						checked: infringements.wtoInfringement
+					},{
+						text: 'FTA provisions infringed',
+						name: 'ftaInfringement',
+						value: 'true',
+						checked: infringements.ftaInfringement
+					},{
+						text: 'Other rules and principles (i.e. transparency, non discrimination, proportionality)',
+						name: 'otherInfringement',
+						value: 'true',
+						checked: infringements.otherInfringement
+					}
+				],
+				errorMessage: errors | errorForName( 'infringements-1' )
+				} )
+			}}
+
+			{{ govukTextarea( {
+
+				label: {
+					text: "Please list provisions infringed",
+					classes: 'govuk-label--s'
+				},
+				id: 'infringement-summary',
+				name: 'infringementSummary',
+				value: infringementSummary,
+				errorMessage: errors | errorForName( 'infringement-summary' )
+			} ) }}
+		{% endset %}
+
+		{{ govukRadios( {
+
+			idPrefix: 'has-infringed',
+			name: 'hasInfringed',
+			classes: 'has-infringed',
+			fieldset: {
+				legend: {
+					text: 'Have any legal obligations been infringed?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: hasInfringed | addConditionalRadioHtml( {
+				'1': { html: hasInfringedHtml }
+			} ),
+			errorMessage: errors | errorForName( 'has-infringed-1' )
+			} )
+		}}
+
+		<input type="submit" class="govuk-button" value="Save and continue">
+		<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>
+
+	</form>
+{% endblock %}

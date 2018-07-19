@@ -1,0 +1,45 @@
+{% from 'app-components/dashboard-heading.njk' import dashboardHeading %}
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Reports{% endblock %}
+
+{% block page_content %}
+
+	{{ dashboardHeading( isReports = true ) }}
+
+	{% if reports.length %}
+		<table class="standard-table">
+			<thead>
+				<tr class="standard-table__heading-row">
+					<th class="standard-table__heading">Company affected</th>
+					<th class="standard-table__heading">Problem status</th>
+					<th class="standard-table__heading">Report started by</th>
+					<th class="standard-table__heading standard-table__heading--active">Report started</th>
+					<th class="standard-table__heading">Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for report in reports %}
+				<tr class="standard-table__row">
+					<td class="standard-table__cell">
+						{{ report.company_name or '---' }}
+					</td>
+					<td class="standard-table__cell">
+						{{ report.problem_status.name or '---' }}
+					</td>
+					<td class="standard-table__cell">
+						{{ report.created_by or '---' }}
+					</td>
+					<td class="standard-table__cell">
+						{{ ( report.created_on | dateWithTime ) or '---' }}
+					</td>
+					<td class="standard-table__cell">
+						<a href="{{ urls.reports.detail( report.id ) }}">Continue</a>
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	{% endif %}
+
+{% endblock %}

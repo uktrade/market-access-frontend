@@ -28,7 +28,14 @@ describe( 'URLs', () => {
 		describe( 'index', () => {
 			it( 'Should return the correct path', () => {
 
-				expect( urls.report.index() ).toEqual( '/report/' );
+				expect( urls.reports.index() ).toEqual( '/reports/' );
+			} );
+		} );
+
+		describe( 'new', () => {
+			it( 'Should return the correct path', () => {
+
+				expect( urls.reports.new() ).toEqual( '/reports/new/' );
 			} );
 		} );
 
@@ -36,14 +43,14 @@ describe( 'URLs', () => {
 			describe( 'With a reportId', () => {
 				it( 'Should return the correct path', () => {
 
-					expect( urls.report.start( reportId ) ).toEqual( `/report/${ reportId }/start/` );
+					expect( urls.reports.start( reportId ) ).toEqual( `/reports/${ reportId }/start/` );
 				} );
 			} );
 			describe( 'Without a reportId', () => {
 
 				it( 'Should return the correct path', () => {
 
-					expect( urls.report.start() ).toEqual( '/report/start/' );
+					expect( urls.reports.start() ).toEqual( '/reports/new/start/' );
 				} );
 			} );
 		} );
@@ -52,13 +59,13 @@ describe( 'URLs', () => {
 			describe( 'With a reportId', () => {
 				it( 'Should return the correct path', () => {
 
-					expect( urls.report.companySearch( reportId ) ).toEqual( `/report/${ reportId }/company/` );
+					expect( urls.reports.companySearch( reportId ) ).toEqual( `/reports/${ reportId }/company/` );
 				} );
 			} );
 			describe( 'Without a reportId', () => {
 				it( 'Should return the correct path', () => {
 
-					expect( urls.report.companySearch() ).toEqual( '/report/company/' );
+					expect( urls.reports.companySearch() ).toEqual( '/reports/new/company/' );
 				} );
 			} );
 		} );
@@ -75,14 +82,14 @@ describe( 'URLs', () => {
 			describe( 'Without a reportId', () => {
 				it( 'Should return the correct path', () => {
 
-					expect( urls.report.companyDetails( companyId ) ).toEqual( `/report/company/${ companyId }/` );
+					expect( urls.reports.companyDetails( companyId ) ).toEqual( `/reports/new/company/${ companyId }/` );
 				} );
 			} );
 
 			describe( 'With a reportId', () => {
 				it( 'Should return the correct path', () => {
 
-					expect( urls.report.companyDetails( companyId, reportId ) ).toEqual( `/report/${ reportId }/company/${ companyId }/` );
+					expect( urls.reports.companyDetails( companyId, reportId ) ).toEqual( `/reports/${ reportId }/company/${ companyId }/` );
 				} );
 			} );
 		} );
@@ -99,14 +106,14 @@ describe( 'URLs', () => {
 			describe( 'With a reportId', () => {
 				it( 'Should return the correct path', () => {
 
-					expect( urls.report.contacts( companyId, reportId ) ).toEqual( `/report/${ reportId }/company/${ companyId }/contacts/` );
+					expect( urls.reports.contacts( companyId, reportId ) ).toEqual( `/reports/${ reportId }/company/${ companyId }/contacts/` );
 				} );
 			} );
 			describe( 'Without a reportId', () => {
 
 				it( 'Should return the correct path', () => {
 
-					expect( urls.report.contacts( companyId ) ).toEqual( `/report/company/${ companyId }/contacts/` );
+					expect( urls.reports.contacts( companyId ) ).toEqual( `/reports/new/company/${ companyId }/contacts/` );
 				} );
 			} );
 		} );
@@ -123,14 +130,14 @@ describe( 'URLs', () => {
 			describe( 'With a reportId', () => {
 				it( 'Should return the correct path', () => {
 
-					expect( urls.report.viewContact( contactId, reportId ) ).toEqual( `/report/${ reportId }/contact/${ contactId }/` );
+					expect( urls.reports.viewContact( contactId, reportId ) ).toEqual( `/reports/${ reportId }/contact/${ contactId }/` );
 				} );
 			} );
 			describe( 'Without a reportId', () => {
 
 				it( 'Should return the correct path', () => {
 
-					expect( urls.report.viewContact( contactId ) ).toEqual( `/report/contact/${ contactId }/` );
+					expect( urls.reports.viewContact( contactId ) ).toEqual( `/reports/new/contact/${ contactId }/` );
 				} );
 			} );
 		} );
@@ -139,13 +146,13 @@ describe( 'URLs', () => {
 			describe( 'With a reportId', () => {
 				it( 'Should return the correct path', () => {
 
-					expect( urls.report.save( reportId ) ).toEqual( `/report/${ reportId }/save/` );
+					expect( urls.reports.save( reportId ) ).toEqual( `/reports/${ reportId }/save/` );
 				} );
 			} );
 			describe( 'Without a reportId', () => {
 				it( 'Should return the correct path', () => {
 
-					expect( urls.report.save() ).toEqual( '/report/save/' );
+					expect( urls.reports.save() ).toEqual( '/reports/new/save/' );
 				} );
 			} );
 		} );
@@ -156,7 +163,7 @@ describe( 'URLs', () => {
 
 				for( let [ name, path ] of urlsInfo ){
 
-					expect( urls.report[ name ]( reportId ) ).toEqual( `/report/${ reportId }/${ path }/` );
+					expect( urls.reports[ name ]( reportId ) ).toEqual( `/reports/${ reportId }/${ path }/` );
 				}
 			}
 
@@ -177,7 +184,7 @@ describe( 'URLs', () => {
 		describe( 'success', () => {
 			it( 'Should return the correct path', () => {
 
-				expect( urls.report.success() ).toEqual( '/report/success/' );
+				expect( urls.reports.success() ).toEqual( '/reports/new/success/' );
 			} );
 		} );
 	} );
@@ -191,16 +198,16 @@ describe( 'URLs', () => {
 				contact_id: 'def-456'
 			};
 
-			expect( urls.reportStage( '1.1', report ) ).toEqual( urls.report.start( report.id ) );
-			expect( urls.reportStage( '1.2', report ) ).toEqual( urls.report.companyDetails( report.company_id, report.id ) );
-			expect( urls.reportStage( '1.3', report ) ).toEqual( urls.report.viewContact( report.contact_id, report.id ) );
-			expect( urls.reportStage( '1.4', report ) ).toEqual( urls.report.aboutProblem( report.id ) );
-			expect( urls.reportStage( '1.5', report ) ).toEqual( urls.report.impact( report.id ) );
-			expect( urls.reportStage( '1.6', report ) ).toEqual( urls.report.legal( report.id ) );
-			expect( urls.reportStage( '1.7', report ) ).toEqual( urls.report.type( report.id ) );
-			expect( urls.reportStage( '2.1', report ) ).toEqual( urls.report.support( report.id ) );
-			expect( urls.reportStage( '2.2', report ) ).toEqual( urls.report.nextSteps( report.id ) );
-			expect( urls.reportStage( 'blah', report ) ).toEqual( urls.report.detail( report.id ) );
+			expect( urls.reportStage( '1.1', report ) ).toEqual( urls.reports.start( report.id ) );
+			expect( urls.reportStage( '1.2', report ) ).toEqual( urls.reports.companyDetails( report.company_id, report.id ) );
+			expect( urls.reportStage( '1.3', report ) ).toEqual( urls.reports.viewContact( report.contact_id, report.id ) );
+			expect( urls.reportStage( '1.4', report ) ).toEqual( urls.reports.aboutProblem( report.id ) );
+			expect( urls.reportStage( '1.5', report ) ).toEqual( urls.reports.impact( report.id ) );
+			expect( urls.reportStage( '1.6', report ) ).toEqual( urls.reports.legal( report.id ) );
+			expect( urls.reportStage( '1.7', report ) ).toEqual( urls.reports.type( report.id ) );
+			expect( urls.reportStage( '2.1', report ) ).toEqual( urls.reports.support( report.id ) );
+			expect( urls.reportStage( '2.2', report ) ).toEqual( urls.reports.nextSteps( report.id ) );
+			expect( urls.reportStage( 'blah', report ) ).toEqual( urls.reports.detail( report.id ) );
 		} );
 	} );
 } );
