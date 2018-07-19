@@ -44,6 +44,10 @@ module.exports = {
 	index: () => '/',
 	login: () => '/login/',
 
+	barriers: {
+		detail: ( barrierId ) => `/barriers/${ barrierId }`
+	},
+
 	reports: reportUrl,
 
 	reportStage: ( stageCode, report ) => {

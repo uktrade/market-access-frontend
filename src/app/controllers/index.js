@@ -5,7 +5,7 @@ module.exports = async ( req, res, next ) => {
 
 	try {
 
-		const { response, body } = await backend.getReports( req );
+		const { response, body } = await backend.barriers.getAll( req );
 
 		if( response.isSuccess ){
 

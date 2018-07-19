@@ -1,5 +1,7 @@
 const csurf = require( 'csurf' );
 
+const headerNav = require( '../../middleware/header-nav' );
+
 const controller = require( './controllers' );
 
 const companyId = require( './middleware/params/company-id' );
@@ -21,7 +23,7 @@ module.exports = ( express, app ) => {
 
 	app.use( parseBody, csrfProtection );
 
-	app.get( '/', controller.index ),
+	app.get( '/', headerNav( { isDashboard: true } ), controller.index ),
 	app.get( '/new/', controller.new );
 	app.get( '/new/success/', controller.success );
 

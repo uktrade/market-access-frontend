@@ -20,6 +20,7 @@ describe( 'Report controller', () => {
 	let getTemplateValuesResponse;
 	let validators;
 	let reportDetailViewModel;
+	let reportsViewModel;
 
 	beforeEach( () => {
 
@@ -65,7 +66,8 @@ describe( 'Report controller', () => {
 			saveBarrierType: jasmine.createSpy( 'backend.saveBarrierType' ),
 			saveSupport: jasmine.createSpy( 'backend.saveSupport' ),
 			saveNextSteps: jasmine.createSpy( 'backend.saveNextSteps' ),
-			submitReport: jasmine.createSpy( 'backend.submitReport' )
+			submitReport: jasmine.createSpy( 'backend.submitReport' ),
+			getReports: jasmine.createSpy( 'backend.getReports' )
 		};
 		datahub = {
 			searchCompany: jasmine.createSpy( 'datahub.searchCompany' )
@@ -96,6 +98,7 @@ describe( 'Report controller', () => {
 		};
 		Form = jasmine.createSpy( 'Form' ).and.callFake( () => form );
 		reportDetailViewModel = jasmine.createSpy( 'reportDetailViewModel' );
+		reportsViewModel = jasmine.createSpy( 'reportsViewModel' );
 
 		validators = {
 			isMetadata: jasmine.createSpy( 'validators.isMetaData' ),
@@ -111,7 +114,8 @@ describe( 'Report controller', () => {
 			'../../lib/metadata': metadata,
 			'../../lib/Form': Form,
 			'../../lib/validators': validators,
-			'./view-models/detail': reportDetailViewModel
+			'./view-models/detail': reportDetailViewModel,
+			'./view-models/reports': reportsViewModel
 		} );
 	} );
 
@@ -136,11 +140,60 @@ describe( 'Report controller', () => {
 	}
 
 	describe( 'Index', () => {
-		it( 'Should render the reports page', () => {
+		describe( 'Without an error', () => {
+			describe( 'With a success response', () => {
+				it( 'Should get the reports and render the index page', async () => {
 
-			controller.index( req, res );
+					const reportsResponse = {
+						response: { isSuccess: true  },
+						body: {
+							results: [ { id: 1 } ]
+						}
+					};
+					const reportsViewModelResponse = { reports: true };
 
-			expect( res.render ).toHaveBeenCalledWith( 'reports/views/index' );
+					reportsViewModel.and.callFake( () => reportsViewModelResponse );
+					backend.getReports.and.callFake( () => Promise.resolve( reportsResponse ) );
+
+					await controller.index( req, res, next );
+
+					expect( next ).not.toHaveBeenCalled();
+					expect( backend.getReports ).toHaveBeenCalledWith( req );
+					expect( reportsViewModel ).toHaveBeenCalledWith( reportsResponse.body.results );
+					expect( res.render ).toHaveBeenCalledWith( 'reports/views/index', reportsViewModelResponse );
+				} );
+			} );
+
+			describe( 'Without a success response', () => {
+				it( 'Should get the reports and render the index page', async () => {
+
+					const reportsResponse = {
+						response: { isSuccess: false  },
+						body: {}
+					};
+
+					backend.getReports.and.callFake( () => Promise.resolve( reportsResponse ) );
+
+					await controller.index( req, res, next );
+
+					expect( next ).toHaveBeenCalledWith( new Error( `Got ${ reportsResponse.response.statusCode } response from backend` ) );
+					expect( backend.getReports ).toHaveBeenCalledWith( req );
+					expect( res.render ).not.toHaveBeenCalled();
+				} );
+			} );
+		} );
+
+		describe( 'With an error', () => {
+			it( 'Should call next with the error', async () => {
+
+				const err = new Error( 'issue with backend' );
+
+				backend.getReports.and.callFake( () => Promise.reject( err ) );
+
+				await controller.index( req, res, next );
+
+				expect( next ).toHaveBeenCalledWith( err );
+			} );
 		} );
 	} );
 

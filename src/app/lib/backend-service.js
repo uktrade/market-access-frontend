@@ -66,16 +66,19 @@ function transformReports( { response, body } ){
 
 function updateReport( token, reportId, data ){
 
-	return backend.put( `/reports/${ reportId }/`, token, data );
+	return backend.put( `/reports/${ reportId }`, token, data );
 }
 
 module.exports = {
 
-	getMetadata: () => backend.get( '/metadata/' ),
-	getUser: ( req ) => backend.get( '/whoami/', getToken( req ) ),
-	getReports: ( req ) => backend.get( '/reports/', getToken( req ) ).then( transformReports ),
-	getReport: ( req, reportId ) => backend.get( `/reports/${ reportId }/`, getToken( req ) ).then( transformReport ),
-	saveNewReport: ( req, values ) => backend.post( '/reports/', getToken( req ), {
+	getMetadata: () => backend.get( '/metadata' ),
+	getUser: ( req ) => backend.get( '/whoami', getToken( req ) ),
+	barriers: {
+		getAll: ( req ) => backend.get( '/barriers', getToken( req ) )
+	},
+	getReports: ( req ) => backend.get( '/reports', getToken( req ) ).then( transformReports ),
+	getReport: ( req, reportId ) => backend.get( `/reports/${ reportId }`, getToken( req ) ).then( transformReport ),
+	saveNewReport: ( req, values ) => backend.post( '/reports', getToken( req ), {
 		problem_status: getValue( values.status ),
 		is_emergency: getValue( values.emergency ),
 		company_id: getValue( values.company.id ),
@@ -131,5 +134,5 @@ module.exports = {
 		commercial_sensitivity_summary: getValue( values.sensitivitiesText ),
 		can_publish: getValue( values.permission )
 	} ),
-	submitReport: ( req, reportId ) => backend.put( `/reports/${ reportId }/submit/`, getToken( req ) )
+	submitReport: ( req, reportId ) => backend.put( `/reports/${ reportId }/submit`, getToken( req ) )
 };

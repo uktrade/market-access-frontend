@@ -1,0 +1,80 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "List of reports",
+
+	"type": "object",
+	"required": [ "count", "results" ],
+	"properties": {
+
+		"count": { "$ref": "$refs/common.json#/int" },
+
+		"results": {
+			"type": "array",
+			"minItems": 2,
+			"maxItems": 5,
+			"items": {
+				"$ref": "#/refs/barrier"
+			}
+		}
+	},
+
+	"refs": {
+		"barrier": {
+			"type": "object",
+			"required": [
+				"id",
+				"report_id",
+				"reported_on",
+				"barrier_title",
+				"company",
+				"export_country",
+				"support_type",
+				"contributor_count",
+				"current_status"
+			],
+			"properties": {
+
+				"id": { "$ref": "$refs/common.json#/uuid" },
+
+				"report_id": { "$ref": "$refs/common.json#/small-int" },
+				"reported_on": { "$ref": "$refs/common.json#/past-date" },
+				"barrier_title": { "$ref": "$refs/common.json#/words" },
+
+				"company": {
+					"type": "object",
+					"required": [ "id", "name", "sector_name" ],
+					"properties": {
+
+						"id": { "$ref": "$refs/common.json#/uuid" },
+						"name": { "$ref": "$refs/common.json#/words" },
+						"sector_name": { "$ref": "$refs/common.json#/words" }
+					}
+				},
+
+				"export_country": { "$ref": "$refs/common.json#/uuid" },
+
+				"support_type": {
+					"type": "number",
+					"enum": [ 1, 2 ]
+				},
+
+				"contributor_count": { "$ref": "$refs/common.json#/small-int" },
+
+				"current_status": {
+					"type": "object",
+					"required": [ "status", "created_on", "created_by" ],
+					"properties": {
+
+						"status": {
+							"type": "number",
+							"enum": [ 0, 1, 2, 3, 4 ]
+						},
+
+						"created_on": { "$ref": "$refs/common.json#/past-date" },
+						"created_by": { "$ref": "$refs/common.json#/words" }
+					}
+				}
+			}
+		}
+	}
+}

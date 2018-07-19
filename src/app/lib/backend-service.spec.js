@@ -31,7 +31,7 @@ describe( 'Backend Service', () => {
 
 			service.getUser( req );
 
-			expect( backend.get ).toHaveBeenCalledWith( '/whoami/', token );
+			expect( backend.get ).toHaveBeenCalledWith( '/whoami', token );
 		} );
 	} );
 
@@ -40,7 +40,7 @@ describe( 'Backend Service', () => {
 
 			service.getMetadata();
 
-			expect( backend.get ).toHaveBeenCalledWith( '/metadata/' );
+			expect( backend.get ).toHaveBeenCalledWith( '/metadata' );
 		} );
 	} );
 
@@ -52,7 +52,7 @@ describe( 'Backend Service', () => {
 
 				const { body } = await service.getReports( req );
 
-				expect( backend.get ).toHaveBeenCalledWith( '/reports/', token );
+				expect( backend.get ).toHaveBeenCalledWith( '/reports', token );
 				expect( body.results[ 0 ].progress.map( ( item ) => item.stage_code ) ).toEqual( [ '1.3', '1.4', '1.4', '1.5', '2.4', '2.5', '3', '3.1' ] );
 			} );
 		} );
@@ -69,7 +69,7 @@ describe( 'Backend Service', () => {
 
 				await service.getReports( req );
 
-				expect( backend.get ).toHaveBeenCalledWith( '/reports/', token );
+				expect( backend.get ).toHaveBeenCalledWith( '/reports', token );
 			} );
 		} );
 	} );
@@ -84,7 +84,7 @@ describe( 'Backend Service', () => {
 
 				service.getReport( req, reportId );
 
-				expect( backend.get ).toHaveBeenCalledWith( `/reports/${ reportId }/`, token );
+				expect( backend.get ).toHaveBeenCalledWith( `/reports/${ reportId }`, token );
 			} );
 		} );
 
@@ -97,7 +97,7 @@ describe( 'Backend Service', () => {
 
 				service.getReport( req, reportId );
 
-				expect( backend.get ).toHaveBeenCalledWith( `/reports/${ reportId }/`, token );
+				expect( backend.get ).toHaveBeenCalledWith( `/reports/${ reportId }`, token );
 			} );
 		} );
 	} );
@@ -116,7 +116,7 @@ describe( 'Backend Service', () => {
 					contactId
 				} );
 
-				expect( backend.post ).toHaveBeenCalledWith( '/reports/', token, {
+				expect( backend.post ).toHaveBeenCalledWith( '/reports', token, {
 					problem_status: null,
 					is_emergency: null,
 					company_id: null,
@@ -155,7 +155,7 @@ describe( 'Backend Service', () => {
 						contactId
 					} );
 
-					expect( backend.post ).toHaveBeenCalledWith( '/reports/', token, {
+					expect( backend.post ).toHaveBeenCalledWith( '/reports', token, {
 						problem_status: status,
 						is_emergency: emergency,
 						company_id: company.id,
@@ -177,7 +177,7 @@ describe( 'Backend Service', () => {
 						contactId
 					} );
 
-					expect( backend.post ).toHaveBeenCalledWith( '/reports/', token, {
+					expect( backend.post ).toHaveBeenCalledWith( '/reports', token, {
 						problem_status: status,
 						is_emergency: emergency,
 						company_id: company.id,
@@ -199,7 +199,7 @@ describe( 'Backend Service', () => {
 		beforeEach( () => {
 
 			reportId = parseInt( Math.random() * 100, 10 );
-			path = `/reports/${ reportId }/`;
+			path = `/reports/${ reportId }`;
 		} );
 
 		function checkWithAndWithoutValues( methodName, serviceData, backendData ){
@@ -388,7 +388,7 @@ describe( 'Backend Service', () => {
 
 			service.submitReport( req, reportId );
 
-			expect( backend.put ).toHaveBeenCalledWith( `/reports/${ reportId }/submit/`, token );
+			expect( backend.put ).toHaveBeenCalledWith( `/reports/${ reportId }/submit`, token );
 		} );
 	} );
 } );

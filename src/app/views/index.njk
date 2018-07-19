@@ -1,4 +1,4 @@
-{% from 'app-components/tabs.njk' import tabs %}
+{% from 'app-components/dashboard-heading.njk' import dashboardHeading %}
 
 {% extends 'layout.njk' %}
 
@@ -6,67 +6,38 @@
 
 {% block page_content %}
 
-		<h1 class="govuk-heading-l">
-			<span class="govuk-caption-m">Market access barriers</span> Dashboard
-		</h1>
+	{{ dashboardHeading( isBarriers = true ) }}
 
-		{% if error %}
+	{% if barriers and barriers.length %}
 
-			{{ error }}
+		<table class="standard-table">
+			<thead>
+				<tr class="standard-table__heading-row">
+					<th class="standard-table__heading standard-table__heading--active">Date reported</th>
+					<th class="standard-table__heading">Barrier title</th>
+					<th class="standard-table__heading">Company affected</th>
+					<th class="standard-table__heading">Export country</th>
+					<th class="standard-table__heading">Resolved</th>
+					<th class="standard-table__heading">Support needed?</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for barrier in barriers %}
+				<tr class="standard-table__row">
+					<td class="standard-table__cell">{{ barrier.reported_on | dateOnly }}</td>
+					<td class="standard-table__cell">
+						<a href="{{ urls.barriers.detail( barrier.id ) }}">
+							{{ barrier.barrier_title }}
+						</a>
+					</td>
+					<td class="standard-table__cell">{{ barrier.company.name }}</td>
+					<td class="standard-table__cell">{{ barrier.country.name }}</td>
+					<td class="standard-table__cell">{{ 'Yes' if barrier.resolved else 'No' }}</td>
+					<td class="standard-table__cell">{{ 'Yes' if barrier.supportNeeded else 'No' }}</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
 
-		{% endif %}
-
-		<a href="{{ urls.reports.new() }}" role="button" class="dash-button">
-			<span class="dash-button__heading">Report a barrier</span>
-			<span class="dash-button__text">
-				Report a market access barrier that is emerging, ongoing or has been resolved.
-			</span>
-		</a>
-
-		{{ tabs( [
-			{
-				text: 'Barrier instances'
-			},{
-				text: 'Unfinished reports',
-				href: urls.reports.index()
-			}
-		] ) }}
-
-		{% if reports.length %}
-			<div class="page-tab__content" id="inline-tab-1">
-
-				<table class="standard-table">
-					<thead>
-						<tr class="standard-table__heading-row">
-							<th class="standard-table__heading">Company affected</th>
-							<th class="standard-table__heading">Problem status</th>
-							<th class="standard-table__heading">Report started by</th>
-							<th class="standard-table__heading standard-table__heading--active">Report started</th>
-							<th class="standard-table__heading">Action</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for report in reports %}
-						<tr class="standard-table__row">
-							<td class="standard-table__cell">
-								{{ report.company_name or '---' }}
-							</td>
-							<td class="standard-table__cell">
-								{{ report.problem_status.name or '---' }}
-							</td>
-							<td class="standard-table__cell">
-								{{ report.created_by or '---' }}
-							</td>
-							<td class="standard-table__cell">
-								{{ ( report.created_on | dateWithTime ) or '---' }}
-							</td>
-							<td class="standard-table__cell">
-								<a href="{{ urls.reports.detail( report.id ) }}">Continue</a>
-							</td>
-						</tr>
-						{% endfor %}
-					</tbody>
-				</table>
-			</div>
-		{% endif %}
+	{% endif %}
 {% endblock %}

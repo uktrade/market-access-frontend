@@ -63,7 +63,7 @@ function checkNock(){
 function interceptReport( reportId ){
 
 	intercept.backend()
-		.get( `/reports/${ reportId }/` )
+		.get( `/reports/${ reportId }` )
 		.reply( 200, intercept.stub( '/backend/reports/report' ) );
 }
 
@@ -80,7 +80,7 @@ describe( 'App', function(){
 
 		intercept.backend()
 			.persist()
-			.get( '/whoami/' )
+			.get( '/whoami' )
 			.reply( 200, {} );
 	} );
 
@@ -98,7 +98,7 @@ describe( 'App', function(){
 
 			intercept.backend()
 				.persist()
-				.get( '/metadata/' )
+				.get( '/metadata' )
 				.reply( 200, intercept.stub( '/backend/metadata/' ) );
 
 			const appModule =  proxyquire( modulePath, {
@@ -117,8 +117,8 @@ describe( 'App', function(){
 			it( 'Should render the index page', function( done ){
 
 				intercept.backend()
-					.get( '/reports/' )
-					.reply( 200, intercept.stub( '/backend/reports/' ) );
+					.get( '/barriers' )
+					.reply( 200, intercept.stub( '/backend/barriers/' ) );
 
 				app
 					.get( urls.index() )
@@ -129,6 +129,10 @@ describe( 'App', function(){
 		describe( 'Report a barrier', () => {
 			describe( 'Index page', () => {
 				it( 'Should render a list of reports', ( done ) => {
+
+					intercept.backend()
+					.get( '/reports' )
+					.reply( 200, intercept.stub( '/backend/reports/' ) );
 
 					app
 						.get( urls.reports.index() )
@@ -163,7 +167,7 @@ describe( 'App', function(){
 						const reportId = '1';
 
 						intercept.backend()
-							.get( `/reports/${ reportId }/` )
+							.get( `/reports/${ reportId }` )
 							.reply( 200, intercept.stub( '/backend/reports/report' ) );
 
 						app
@@ -550,7 +554,7 @@ describe( 'App', function(){
 			};
 
 			intercept.backend()
-				.get( '/metadata/' )
+				.get( '/metadata' )
 				.reply( 200, intercept.stub( '/backend/metadata/' ) );
 		} );
 

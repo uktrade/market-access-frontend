@@ -7,6 +7,7 @@ const govukItemsFromObj = require( '../../lib/govuk-items-from-object' );
 const validators = require( '../../lib/validators' );
 
 const reportDetailViewModel = require( './view-models/detail' );
+const reportsViewModel = require( './view-models/reports' );
 
 function barrierTypeToRadio( item ){
 
@@ -40,7 +41,26 @@ let countryItems;
 
 module.exports = {
 
-	index: ( req, res ) => res.render( 'reports/views/index' ),
+	index: async ( req, res, next ) => {
+
+		try {
+
+			const { response, body } = await backend.getReports( req );
+
+			if( response.isSuccess ){
+
+				res.render( 'reports/views/index', reportsViewModel( body.results ) );
+
+			} else {
+
+				throw new Error( `Got ${ response.statusCode } response from backend` );
+			}
+
+		} catch( e ){
+
+			next( e );
+		}
+	},
 
 	new: ( req, res ) => res.render( 'reports/views/new', { tasks: metadata.reportTaskList } ),
 

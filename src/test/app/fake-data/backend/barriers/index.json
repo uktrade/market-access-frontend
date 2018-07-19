@@ -1,0 +1,62 @@
+{
+   "count": 31795,
+   "results": [
+      {
+         "id": "e60b7f08-a9f5-40ea-82e8-6e48a306ee7a",
+         "report_id": 11,
+         "reported_on": "Wed Nov 22 2017 10:45:25 GMT+0000 (GMT)",
+         "barrier_title": "qui ipsam ea",
+         "company": {
+            "id": "1e1603aa-c30a-4813-99fa-877092d64743",
+            "name": "sint nulla rerum",
+            "sector_name": "omnis quia exercitationem"
+         },
+         "export_country": "37e16305-1f71-4b9f-b70c-5cea64e5071f",
+         "support_type": 1,
+         "contributor_count": 9,
+         "current_status": {
+            "status": 0,
+            "created_on": "Fri Jun 01 2018 01:43:07 GMT+0100 (BST)",
+            "created_by": "voluptate nihil cum"
+         }
+      },
+      {
+         "id": "cd59c6c1-9af8-4774-a008-67547108d4c4",
+         "report_id": 15,
+         "reported_on": "Sun Jul 08 2018 08:34:56 GMT+0100 (BST)",
+         "barrier_title": "omnis repudiandae magni",
+         "company": {
+            "id": "3bd73218-408d-435f-8db6-439f5c2251ac",
+            "name": "dolores ea placeat",
+            "sector_name": "aut fugit omnis"
+         },
+         "export_country": "f290d2b1-9273-46d8-aaf7-534b0da3231d",
+         "support_type": 2,
+         "contributor_count": 7,
+         "current_status": {
+            "status": 0,
+            "created_on": "Wed Oct 18 2017 21:24:40 GMT+0100 (BST)",
+            "created_by": "autem corporis unde"
+         }
+      },
+      {
+         "id": "1b1d0391-61c5-4abf-83e7-700252a6b43d",
+         "report_id": 6,
+         "reported_on": "Sat Jul 14 2018 07:56:37 GMT+0100 (BST)",
+         "barrier_title": "qui molestias quis",
+         "company": {
+            "id": "34cb40b8-b6c5-4589-a650-2b34edfedb7a",
+            "name": "optio nam rerum",
+            "sector_name": "quos expedita a"
+         },
+         "export_country": "a46fa793-de07-4158-a307-ca24c9848039",
+         "support_type": 2,
+         "contributor_count": 19,
+         "current_status": {
+            "status": 1,
+            "created_on": "Sat Mar 10 2018 12:51:35 GMT+0000 (GMT)",
+            "created_by": "unde veniam dignissimos"
+         }
+      }
+   ]
+}
