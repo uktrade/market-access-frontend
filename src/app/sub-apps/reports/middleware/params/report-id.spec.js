@@ -15,7 +15,7 @@ describe( 'Report Id param middleware', () => {
 		res = { locals: {} };
 		next = jasmine.createSpy( 'next' );
 		backend = {
-			getReport: jasmine.createSpy( 'backend.getReport' )
+			reports: { get: jasmine.createSpy( 'backend.reports.get' ) }
 		};
 
 		middleware = proxyquire( modulePath, {
@@ -32,7 +32,7 @@ describe( 'Report Id param middleware', () => {
 						const reportId = '123';
 						const getReportResponse = { id: 1 };
 
-						backend.getReport.and.callFake( () => Promise.resolve( {
+						backend.reports.get.and.callFake( () => Promise.resolve( {
 							response: {
 								isSuccess: true,
 							},
@@ -43,7 +43,7 @@ describe( 'Report Id param middleware', () => {
 
 						await middleware( req, res, next );
 
-						expect( backend.getReport ).toHaveBeenCalledWith( req, reportId );
+						expect( backend.reports.get ).toHaveBeenCalledWith( req, reportId );
 						expect( req.session.report ).not.toBeDefined();
 						expect( req.report ).toEqual( getReportResponse );
 						expect( res.locals.report ).toEqual( getReportResponse );
@@ -56,7 +56,7 @@ describe( 'Report Id param middleware', () => {
 
 						req.params.reportId = '12';
 
-						backend.getReport.and.callFake( () => Promise.resolve( {
+						backend.reports.get.and.callFake( () => Promise.resolve( {
 							response: { isSuccess: false },
 							body: { data: true }
 						} ) );
@@ -77,7 +77,7 @@ describe( 'Report Id param middleware', () => {
 
 						req.params.reportId = '12';
 
-						backend.getReport.and.callFake( () => Promise.reject( err ) );
+						backend.reports.get.and.callFake( () => Promise.reject( err ) );
 
 						await middleware( req, res, next );
 
@@ -99,7 +99,7 @@ describe( 'Report Id param middleware', () => {
 
 					await middleware( req, res, next );
 
-					expect( backend.getReport ).not.toHaveBeenCalled();
+					expect( backend.reports.get ).not.toHaveBeenCalled();
 					expect( req.report ).toEqual( sessionReport );
 					expect( res.locals.report ).toEqual( sessionReport );
 					expect( req.session.report ).not.toBeDefined();

@@ -45,7 +45,7 @@ module.exports = {
 
 		try {
 
-			const { response, body } = await backend.getReports( req );
+			const { response, body } = await backend.reports.getAll( req );
 
 			if( response.isSuccess ){
 
@@ -208,9 +208,9 @@ module.exports = {
 			let values = Object.assign( {}, sessionStartForm, { company: sessionCompany }, { contactId: sessionContact } );
 
 			if( isUpdate ){
-				({ response, body } = await backend.updateReport( req, reportId, values ));
+				({ response, body } = await backend.reports.update( req, reportId, values ));
 			} else {
-				({ response, body } = await backend.saveNewReport( req, values ));
+				({ response, body } = await backend.reports.save( req, values ));
 			}
 
 			delete req.session.startFormValues;
@@ -296,7 +296,7 @@ module.exports = {
 
 				try {
 
-					const { response } = await backend.saveProblem( req, report.id, form.getValues() );
+					const { response } = await backend.reports.saveProblem( req, report.id, form.getValues() );
 
 					if( response.isSuccess ){
 
@@ -362,7 +362,7 @@ module.exports = {
 
 				try {
 
-					const { response } = await backend.saveImpact( req, report.id, form.getValues() );
+					const { response } = await backend.reports.saveImpact( req, report.id, form.getValues() );
 
 					if( response.isSuccess ){
 
@@ -430,7 +430,7 @@ module.exports = {
 
 				try {
 
-					const { response } = await backend.saveLegal( req, report.id, form.getValues() );
+					const { response } = await backend.reports.saveLegal( req, report.id, form.getValues() );
 
 					if( response.isSuccess ){
 
@@ -474,7 +474,7 @@ module.exports = {
 
 				try {
 
-					const { response } = await backend.saveBarrierType( req, report.id, form.getValues() );
+					const { response } = await backend.reports.saveBarrierType( req, report.id, form.getValues() );
 
 					if( response.isSuccess ){
 
@@ -587,7 +587,7 @@ module.exports = {
 
 				try {
 
-					const { response } = await backend.saveSupport( req, report.id, form.getValues() );
+					const { response } = await backend.reports.saveSupport( req, report.id, form.getValues() );
 
 					if( response.isSuccess ){
 
@@ -658,7 +658,7 @@ module.exports = {
 
 				try {
 
-					const { response } = await backend.saveNextSteps( req, report.id, form.getValues() );
+					const { response } = await backend.reports.saveNextSteps( req, report.id, form.getValues() );
 
 					if( response.isSuccess ){
 
@@ -685,7 +685,7 @@ module.exports = {
 
 		try {
 
-			const { response } = await	backend.submitReport( req, reportId );
+			const { response } = await	backend.reports.submit( req, reportId );
 
 			if( response.isSuccess ){
 

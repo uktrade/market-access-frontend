@@ -58,16 +58,18 @@ describe( 'Report controller', () => {
 		};
 		next = jasmine.createSpy( 'next' );
 		backend = {
-			saveNewReport: jasmine.createSpy( 'backend.saveNewReport' ),
-			updateReport: jasmine.createSpy( 'backend.updateReport' ),
-			saveProblem: jasmine.createSpy( 'backend.saveProblem' ),
-			saveImpact: jasmine.createSpy( 'backend.saveImpact' ),
-			saveLegal: jasmine.createSpy( 'backend.saveLegal' ),
-			saveBarrierType: jasmine.createSpy( 'backend.saveBarrierType' ),
-			saveSupport: jasmine.createSpy( 'backend.saveSupport' ),
-			saveNextSteps: jasmine.createSpy( 'backend.saveNextSteps' ),
-			submitReport: jasmine.createSpy( 'backend.submitReport' ),
-			getReports: jasmine.createSpy( 'backend.getReports' )
+			reports: {
+				save: jasmine.createSpy( 'backend.reports.save' ),
+				update: jasmine.createSpy( 'backend.reports.update' ),
+				saveProblem: jasmine.createSpy( 'backend.reports.saveProblem' ),
+				saveImpact: jasmine.createSpy( 'backend.reports.saveImpact' ),
+				saveLegal: jasmine.createSpy( 'backend.reports.saveLegal' ),
+				saveBarrierType: jasmine.createSpy( 'backend.reports.saveBarrierType' ),
+				saveSupport: jasmine.createSpy( 'backend.reports.saveSupport' ),
+				saveNextSteps: jasmine.createSpy( 'backend.reports.saveNextSteps' ),
+				submit: jasmine.createSpy( 'backend.reports.submit' ),
+				getAll: jasmine.createSpy( 'backend.reports.getAll' )
+			}
 		};
 		datahub = {
 			searchCompany: jasmine.createSpy( 'datahub.searchCompany' )
@@ -153,12 +155,12 @@ describe( 'Report controller', () => {
 					const reportsViewModelResponse = { reports: true };
 
 					reportsViewModel.and.callFake( () => reportsViewModelResponse );
-					backend.getReports.and.callFake( () => Promise.resolve( reportsResponse ) );
+					backend.reports.getAll.and.callFake( () => Promise.resolve( reportsResponse ) );
 
 					await controller.index( req, res, next );
 
 					expect( next ).not.toHaveBeenCalled();
-					expect( backend.getReports ).toHaveBeenCalledWith( req );
+					expect( backend.reports.getAll ).toHaveBeenCalledWith( req );
 					expect( reportsViewModel ).toHaveBeenCalledWith( reportsResponse.body.results );
 					expect( res.render ).toHaveBeenCalledWith( 'reports/views/index', reportsViewModelResponse );
 				} );
@@ -172,12 +174,12 @@ describe( 'Report controller', () => {
 						body: {}
 					};
 
-					backend.getReports.and.callFake( () => Promise.resolve( reportsResponse ) );
+					backend.reports.getAll.and.callFake( () => Promise.resolve( reportsResponse ) );
 
 					await controller.index( req, res, next );
 
 					expect( next ).toHaveBeenCalledWith( new Error( `Got ${ reportsResponse.response.statusCode } response from backend` ) );
-					expect( backend.getReports ).toHaveBeenCalledWith( req );
+					expect( backend.reports.getAll ).toHaveBeenCalledWith( req );
 					expect( res.render ).not.toHaveBeenCalled();
 				} );
 			} );
@@ -188,7 +190,7 @@ describe( 'Report controller', () => {
 
 				const err = new Error( 'issue with backend' );
 
-				backend.getReports.and.callFake( () => Promise.reject( err ) );
+				backend.reports.getAll.and.callFake( () => Promise.reject( err ) );
 
 				await controller.index( req, res, next );
 
@@ -558,7 +560,7 @@ describe( 'Report controller', () => {
 
 						const err = new Error( 'tester' );
 
-						backend.saveNewReport.and.callFake( () => Promise.reject( err ) );
+						backend.reports.save.and.callFake( () => Promise.reject( err ) );
 
 						await controller.save( req, res, next );
 
@@ -574,7 +576,7 @@ describe( 'Report controller', () => {
 						describe( 'When there is not an id in the body', () => {
 							it( 'Should call next with an error', async () => {
 
-								backend.saveNewReport.and.callFake( () => Promise.resolve( {
+								backend.reports.save.and.callFake( () => Promise.resolve( {
 									response: { isSuccess: true },
 									body: {}
 								} ) );
@@ -592,7 +594,7 @@ describe( 'Report controller', () => {
 							beforeEach( () => {
 
 								responseBody = { id: 1, name: 2 };
-								backend.saveNewReport.and.callFake( () => Promise.resolve( {
+								backend.reports.save.and.callFake( () => Promise.resolve( {
 									response: { isSuccess: true },
 									body: responseBody
 								} ) );
@@ -625,9 +627,9 @@ describe( 'Report controller', () => {
 
 									await controller.save( req, res, next );
 
-									expect( backend.saveNewReport ).toHaveBeenCalled();
+									expect( backend.reports.save ).toHaveBeenCalled();
 
-									const args = backend.saveNewReport.calls.argsFor( 0 );
+									const args = backend.reports.save.calls.argsFor( 0 );
 
 									expect( args[ 0 ] ).toEqual( req );
 									expect( args[ 1 ] ).toEqual( values );
@@ -654,7 +656,7 @@ describe( 'Report controller', () => {
 
 							const statusCode = 500;
 
-							backend.saveNewReport.and.callFake( () => Promise.resolve( {
+							backend.reports.save.and.callFake( () => Promise.resolve( {
 								response: { isSuccess: false, statusCode }
 							} ) );
 
@@ -686,9 +688,9 @@ describe( 'Report controller', () => {
 
 						await controller.save( req, res, next );
 
-						expect( backend.updateReport ).toHaveBeenCalled();
+						expect( backend.reports.update ).toHaveBeenCalled();
 
-						const args = backend.updateReport.calls.argsFor( 0 );
+						const args = backend.reports.update.calls.argsFor( 0 );
 						expect( args[ 0 ] ).toEqual( req );
 						expect( args[ 1 ] ).toEqual( reportId );
 						expect( args[ 2 ] ).toEqual( {
@@ -710,7 +712,7 @@ describe( 'Report controller', () => {
 
 						req.report = { id: 12 };
 
-						backend.updateReport.and.callFake( () => Promise.resolve( {
+						backend.reports.update.and.callFake( () => Promise.resolve( {
 							response: { isSuccess: false, statusCode }
 						} ) );
 
@@ -846,7 +848,7 @@ describe( 'Report controller', () => {
 
 					beforeEach( () => {
 
-						backend.saveProblem.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+						backend.reports.saveProblem.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
 
 						req.report = { id: 1, b: 2 };
 						form.hasErrors = () => false;
@@ -855,7 +857,7 @@ describe( 'Report controller', () => {
 					afterEach( () => {
 
 						expect( next ).not.toHaveBeenCalled();
-						expect( backend.saveProblem ).toHaveBeenCalledWith( req, req.report.id, getValuesResponse );
+						expect( backend.reports.saveProblem ).toHaveBeenCalledWith( req, req.report.id, getValuesResponse );
 					} );
 
 					describe( 'When save and exit is used to submit the form', () => {
@@ -891,7 +893,7 @@ describe( 'Report controller', () => {
 
 						const statusCode = 500;
 						form.hasErrors = () => false;
-						backend.saveProblem.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
+						backend.reports.saveProblem.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
 
 						await controller.aboutProblem( req, res, next );
 
@@ -904,7 +906,7 @@ describe( 'Report controller', () => {
 
 						const err = new Error( 'my test' );
 						form.hasErrors = () => false;
-						backend.saveProblem.and.callFake( () => Promise.reject( err ) );
+						backend.reports.saveProblem.and.callFake( () => Promise.reject( err ) );
 
 						await controller.aboutProblem( req, res, next );
 
@@ -1012,7 +1014,7 @@ describe( 'Report controller', () => {
 
 					beforeEach( () => {
 
-						backend.saveImpact.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+						backend.reports.saveImpact.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
 
 						req.report = { id: 1, b: 2 };
 						form.hasErrors = () => false;
@@ -1021,7 +1023,7 @@ describe( 'Report controller', () => {
 					afterEach( () => {
 
 						expect( next ).not.toHaveBeenCalled();
-						expect( backend.saveImpact ).toHaveBeenCalledWith( req, req.report.id, getValuesResponse );
+						expect( backend.reports.saveImpact ).toHaveBeenCalledWith( req, req.report.id, getValuesResponse );
 					} );
 
 					describe( 'When save and exit is used to submit the form', () => {
@@ -1057,7 +1059,7 @@ describe( 'Report controller', () => {
 
 						const statusCode = 500;
 						form.hasErrors = () => false;
-						backend.saveImpact.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
+						backend.reports.saveImpact.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
 
 						await controller.impact( req, res, next );
 
@@ -1070,7 +1072,7 @@ describe( 'Report controller', () => {
 
 						const err = new Error( 'my test' );
 						form.hasErrors = () => false;
-						backend.saveImpact.and.callFake( () => Promise.reject( err ) );
+						backend.reports.saveImpact.and.callFake( () => Promise.reject( err ) );
 
 						await controller.impact( req, res, next );
 
@@ -1174,7 +1176,7 @@ describe( 'Report controller', () => {
 
 					beforeEach( () => {
 
-						backend.saveLegal.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+						backend.reports.saveLegal.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
 
 						req.report = { id: 1, b: 2 };
 						form.hasErrors = () => false;
@@ -1183,7 +1185,7 @@ describe( 'Report controller', () => {
 					afterEach( () => {
 
 						expect( next ).not.toHaveBeenCalled();
-						expect( backend.saveLegal ).toHaveBeenCalledWith( req, req.report.id, getValuesResponse );
+						expect( backend.reports.saveLegal ).toHaveBeenCalledWith( req, req.report.id, getValuesResponse );
 					} );
 
 					describe( 'When save and exit is used to submit the form', () => {
@@ -1219,7 +1221,7 @@ describe( 'Report controller', () => {
 
 						const statusCode = 500;
 						form.hasErrors = () => false;
-						backend.saveLegal.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
+						backend.reports.saveLegal.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
 
 						await controller.legal( req, res, next );
 
@@ -1232,7 +1234,7 @@ describe( 'Report controller', () => {
 
 						const err = new Error( 'my test' );
 						form.hasErrors = () => false;
-						backend.saveLegal.and.callFake( () => Promise.reject( err ) );
+						backend.reports.saveLegal.and.callFake( () => Promise.reject( err ) );
 
 						await controller.legal( req, res, next );
 
@@ -1321,7 +1323,7 @@ describe( 'Report controller', () => {
 
 					beforeEach( () => {
 
-						backend.saveBarrierType.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+						backend.reports.saveBarrierType.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
 
 						req.report = { id: 1, b: 2 };
 						form.hasErrors = () => false;
@@ -1330,7 +1332,7 @@ describe( 'Report controller', () => {
 					afterEach( () => {
 
 						expect( next ).not.toHaveBeenCalled();
-						expect( backend.saveBarrierType ).toHaveBeenCalledWith( req, req.report.id, getValuesResponse );
+						expect( backend.reports.saveBarrierType ).toHaveBeenCalledWith( req, req.report.id, getValuesResponse );
 					} );
 
 					describe( 'When save and exit is used to submit the form', () => {
@@ -1366,7 +1368,7 @@ describe( 'Report controller', () => {
 
 						const statusCode = 500;
 						form.hasErrors = () => false;
-						backend.saveBarrierType.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
+						backend.reports.saveBarrierType.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
 
 						await controller.type( req, res, next );
 
@@ -1379,7 +1381,7 @@ describe( 'Report controller', () => {
 
 						const err = new Error( 'my test' );
 						form.hasErrors = () => false;
-						backend.saveBarrierType.and.callFake( () => Promise.reject( err ) );
+						backend.reports.saveBarrierType.and.callFake( () => Promise.reject( err ) );
 
 						await controller.type( req, res, next );
 
@@ -1494,7 +1496,7 @@ describe( 'Report controller', () => {
 
 					beforeEach( () => {
 
-						backend.saveSupport.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+						backend.reports.saveSupport.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
 
 						req.report = { id: 1, b: 2 };
 						form.hasErrors = () => false;
@@ -1503,7 +1505,7 @@ describe( 'Report controller', () => {
 					afterEach( () => {
 
 						expect( next ).not.toHaveBeenCalled();
-						expect( backend.saveSupport ).toHaveBeenCalledWith( req, req.report.id, getValuesResponse );
+						expect( backend.reports.saveSupport ).toHaveBeenCalledWith( req, req.report.id, getValuesResponse );
 					} );
 
 					describe( 'When save and exit is used to submit the form', () => {
@@ -1539,7 +1541,7 @@ describe( 'Report controller', () => {
 
 						const statusCode = 500;
 						form.hasErrors = () => false;
-						backend.saveSupport.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
+						backend.reports.saveSupport.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
 
 						await controller.support( req, res, next );
 
@@ -1552,7 +1554,7 @@ describe( 'Report controller', () => {
 
 						const err = new Error( 'my test' );
 						form.hasErrors = () => false;
-						backend.saveSupport.and.callFake( () => Promise.reject( err ) );
+						backend.reports.saveSupport.and.callFake( () => Promise.reject( err ) );
 
 						await controller.support( req, res, next );
 
@@ -1662,7 +1664,7 @@ describe( 'Report controller', () => {
 
 						reportDetailResponse = '/reportDetail';
 						urls.reports.detail.and.callFake( () => reportDetailResponse );
-						backend.saveNextSteps.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+						backend.reports.saveNextSteps.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
 
 						req.report = { id: 1, b: 2 };
 						form.hasErrors = () => false;
@@ -1671,7 +1673,7 @@ describe( 'Report controller', () => {
 					afterEach( () => {
 
 						expect( next ).not.toHaveBeenCalled();
-						expect( backend.saveNextSteps ).toHaveBeenCalledWith( req, req.report.id, getValuesResponse );
+						expect( backend.reports.saveNextSteps ).toHaveBeenCalledWith( req, req.report.id, getValuesResponse );
 					} );
 
 					describe( 'When save and exit is used to submit the form', () => {
@@ -1702,7 +1704,7 @@ describe( 'Report controller', () => {
 
 						const statusCode = 500;
 						form.hasErrors = () => false;
-						backend.saveNextSteps.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
+						backend.reports.saveNextSteps.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
 
 						await controller.nextSteps( req, res, next );
 
@@ -1715,7 +1717,7 @@ describe( 'Report controller', () => {
 
 						const err = new Error( 'my test' );
 						form.hasErrors = () => false;
-						backend.saveNextSteps.and.callFake( () => Promise.reject( err ) );
+						backend.reports.saveNextSteps.and.callFake( () => Promise.reject( err ) );
 
 						await controller.nextSteps( req, res, next );
 
@@ -1737,7 +1739,7 @@ describe( 'Report controller', () => {
 
 			beforeEach( () => {
 
-				backend.submitReport.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+				backend.reports.submit.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
 
 				form.hasErrors = () => false;
 			} );
@@ -1745,7 +1747,7 @@ describe( 'Report controller', () => {
 			afterEach( () => {
 
 				expect( next ).not.toHaveBeenCalled();
-				expect( backend.submitReport ).toHaveBeenCalledWith( req, req.report.id );
+				expect( backend.reports.submit ).toHaveBeenCalledWith( req, req.report.id );
 			} );
 
 			it( 'Should render the submitted page', async () => {
@@ -1767,7 +1769,7 @@ describe( 'Report controller', () => {
 				const reportDetailResponse = '/reportDetail';
 				urls.reports.detail.and.callFake( () => reportDetailResponse );
 				form.hasErrors = () => false;
-				backend.submitReport.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
+				backend.reports.submit.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
 
 				await controller.submit( req, res, next );
 
@@ -1781,14 +1783,13 @@ describe( 'Report controller', () => {
 
 				const err = new Error( 'my test' );
 				form.hasErrors = () => false;
-				backend.submitReport.and.callFake( () => Promise.reject( err ) );
+				backend.reports.submit.and.callFake( () => Promise.reject( err ) );
 
 				await controller.submit( req, res, next );
 
 				expect( next ).toHaveBeenCalledWith( err );
 			} );
 		} );
-
 	} );
 
 	describe( 'success', () => {

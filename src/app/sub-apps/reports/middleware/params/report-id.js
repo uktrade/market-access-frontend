@@ -23,7 +23,7 @@ module.exports = async ( req, res, next ) => {
 
 			try {
 
-				const { response, body } = await backend.getReport( req, reportId );
+				const { response, body } = await backend.reports.get( req, reportId );
 
 				if( response.isSuccess ){
 
