@@ -44,7 +44,9 @@ $govuk-images-path: "/public/govuk/images/";
 @import 'app-components/contact-list';
 @import 'app-components/callout';
 @import 'app-components/tabs';
+@import 'app-components/warning-icon';
 
+@import 'pages/index';
 @import 'pages/report/detail';
 
 .govuk-tag--ma {
