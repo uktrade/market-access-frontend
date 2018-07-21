@@ -1,0 +1,12 @@
+{% macro summaryGroup( params ) %}
+	{% set headingLevel = params.headingLevel if params.headingLevel else '2' %}
+	<section class="summary-group">
+		<h{{ headingLevel }} class="summary-group__heading">{{ params.heading }}</h{{ headingLevel }}>
+		<dl class="summary-group__list">
+			{% for item in params.items %}
+			<dt class="summary-group__list__key">{{ item.title }}</dt>
+			<dd class="summary-group__list__value">{{ item.text }}</dd>
+			{% endfor %}
+		</dl>
+	</section>
+{% endmacro %}

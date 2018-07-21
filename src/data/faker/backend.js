@@ -8,7 +8,8 @@ const jsonFiles = {
 	'metadata/index': generateSchema( '/backend/metadata/index' ),
 	'reports/index': generateSchema( '/backend/reports/index' ),
 	'reports/report': generateSchema( '/backend/reports/report' ),
-	'barriers/index': generateSchema( '/backend/barriers/index' )
+	'barriers/index': generateSchema( '/backend/barriers/index' ),
+	'barriers/barrier': generateSchema( '/backend/barriers/barrier' )
 };
 
 writeJsonFiles( OUTPUT_PATH, jsonFiles );

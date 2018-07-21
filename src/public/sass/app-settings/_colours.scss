@@ -20,8 +20,10 @@ $govuk-orange-10: tint( $govuk-orange, 90 );
 
 $govuk-green: govuk-colour( 'green' );
 $govuk-green-10: tint( $govuk-green, 90 );
+$govuk-green-15: tint( $govuk-green, 85 );
 
 $govuk-yellow-25: tint( govuk-colour( 'yellow' ), 75 );
 $govuk-fuchsia: govuk-colour( 'bright-purple' );
 $govuk-white: govuk-colour( 'white' );
 $govuk-blue: govuk-colour( 'blue' );
+$govuk-blue-15: tint( $govuk-blue, 85 );

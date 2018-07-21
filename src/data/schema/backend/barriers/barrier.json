@@ -1,0 +1,78 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Detail of a report",
+
+	"type": "object",
+	"required": [
+		"id",
+		"barrier_type",
+		"report",
+		"current_status",
+		"reported_on"
+	],
+	"properties": {
+
+		"id": { "$ref": "$refs/common.json#/uuid" },
+
+		"barrier_type": {
+			"type": "object",
+			"required": [
+				"id",
+				"title"
+			],
+			"properties": {
+
+				"id": { "$ref": "$refs/common.json#/small-int" },
+				"title": { "$ref": "$refs/common.json#/words" }
+			}
+		},
+
+		"report": {
+			"type": "object",
+			"required": [
+				"id",
+				"problem_status",
+				"company"
+			],
+			"properties": {
+
+				"id": { "$ref": "$refs/common.json#/small-int" },
+
+				"problem_status": {
+					"type": "number",
+					"enum": [ 1, 2, 3 ]
+				},
+
+				"company": {
+					"type": "object",
+					"required": [
+						"id",
+						"name",
+						"sector_id",
+						"sector_name"
+					],
+					"properties": {
+
+						"id": { "$ref": "$refs/common.json#/uuid" },
+						"name": { "$ref": "$refs/common.json#/words" },
+						"sector_id": { "$ref": "$refs/common.json#/uuid" },
+						"sector_name": { "$ref": "$refs/common.json#/words" }
+					}
+				}
+			}
+		},
+
+		"current_status": {
+			"type": "object",
+			"required": [ "status" ],
+			"properties": {
+				"status": {
+					"type": "number",
+					"enum": [ 1, 2, 3, 4 ]
+				}
+			}
+		},
+
+		"reported_on": { "$ref": "$refs/common.json#/past-date" }
+	}
+}

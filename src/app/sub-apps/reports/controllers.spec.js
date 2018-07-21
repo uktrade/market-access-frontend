@@ -68,7 +68,8 @@ describe( 'Report controller', () => {
 				saveSupport: jasmine.createSpy( 'backend.reports.saveSupport' ),
 				saveNextSteps: jasmine.createSpy( 'backend.reports.saveNextSteps' ),
 				submit: jasmine.createSpy( 'backend.reports.submit' ),
-				getAll: jasmine.createSpy( 'backend.reports.getAll' )
+				getAll: jasmine.createSpy( 'backend.reports.getAll' ),
+				getAllUnfinished: jasmine.createSpy( 'backend.reports.getAllUnfinished' )
 			}
 		};
 		datahub = {
@@ -146,7 +147,7 @@ describe( 'Report controller', () => {
 			describe( 'With a success response', () => {
 				it( 'Should get the reports and render the index page', async () => {
 
-					const reportsResponse = {
+					const unfinishedReportsResponse = {
 						response: { isSuccess: true  },
 						body: {
 							results: [ { id: 1 } ]
@@ -155,13 +156,13 @@ describe( 'Report controller', () => {
 					const reportsViewModelResponse = { reports: true };
 
 					reportsViewModel.and.callFake( () => reportsViewModelResponse );
-					backend.reports.getAll.and.callFake( () => Promise.resolve( reportsResponse ) );
+					backend.reports.getAllUnfinished.and.callFake( () => Promise.resolve( unfinishedReportsResponse ) );
 
 					await controller.index( req, res, next );
 
 					expect( next ).not.toHaveBeenCalled();
-					expect( backend.reports.getAll ).toHaveBeenCalledWith( req );
-					expect( reportsViewModel ).toHaveBeenCalledWith( reportsResponse.body.results );
+					expect( backend.reports.getAllUnfinished ).toHaveBeenCalledWith( req );
+					expect( reportsViewModel ).toHaveBeenCalledWith( unfinishedReportsResponse.body.results );
 					expect( res.render ).toHaveBeenCalledWith( 'reports/views/index', reportsViewModelResponse );
 				} );
 			} );
@@ -169,17 +170,17 @@ describe( 'Report controller', () => {
 			describe( 'Without a success response', () => {
 				it( 'Should get the reports and render the index page', async () => {
 
-					const reportsResponse = {
+					const unfinishedReportsResponse = {
 						response: { isSuccess: false  },
 						body: {}
 					};
 
-					backend.reports.getAll.and.callFake( () => Promise.resolve( reportsResponse ) );
+					backend.reports.getAllUnfinished.and.callFake( () => Promise.resolve( unfinishedReportsResponse ) );
 
 					await controller.index( req, res, next );
 
-					expect( next ).toHaveBeenCalledWith( new Error( `Got ${ reportsResponse.response.statusCode } response from backend` ) );
-					expect( backend.reports.getAll ).toHaveBeenCalledWith( req );
+					expect( next ).toHaveBeenCalledWith( new Error( `Got ${ unfinishedReportsResponse.response.statusCode } response from backend` ) );
+					expect( backend.reports.getAllUnfinished ).toHaveBeenCalledWith( req );
 					expect( res.render ).not.toHaveBeenCalled();
 				} );
 			} );
@@ -190,7 +191,7 @@ describe( 'Report controller', () => {
 
 				const err = new Error( 'issue with backend' );
 
-				backend.reports.getAll.and.callFake( () => Promise.reject( err ) );
+				backend.reports.getAllUnfinished.and.callFake( () => Promise.reject( err ) );
 
 				await controller.index( req, res, next );
 

@@ -123,14 +123,29 @@ describe( 'Report Id param middleware', () => {
 	} );
 
 	describe( 'When it is a word', () => {
-		it( 'Should call next with an error', async () => {
+		describe( 'When the word is "new"', () => {
+			it( 'Should delete the reportId param and call next', async () => {
 
-			req.params.reportId = 'abc';
+				req.params.reportId = 'new';
 
-			await middleware( req, res, next );
+				await middleware( req, res, next );
 
-			expect( res.locals.reportId ).not.toBeDefined();
-			expect( next ).toHaveBeenCalledWith( new Error( 'Invalid reportId' ) );
+				expect( req.params.reportId ).not.toBeDefined();
+				expect( res.locals.reportId ).not.toBeDefined();
+				expect( next ).toHaveBeenCalledWith();
+			} );
+		} );
+
+		describe( 'Any other word', () => {
+			it( 'Should call next with an error', async () => {
+
+				req.params.reportId = 'abc';
+
+				await middleware( req, res, next );
+
+				expect( res.locals.reportId ).not.toBeDefined();
+				expect( next ).toHaveBeenCalledWith( new Error( 'Invalid reportId' ) );
+			} );
 		} );
 	} );
 } );

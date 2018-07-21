@@ -9,6 +9,7 @@ $govuk-images-path: "/public/govuk/images/";
 @import 'core/lists';
 @import "objects/width-container";
 @import "objects/form-group";
+@import "objects/grid";
 @import "overrides/typography";
 @import "overrides/spacing";
 
@@ -45,6 +46,9 @@ $govuk-images-path: "/public/govuk/images/";
 @import 'app-components/callout';
 @import 'app-components/tabs';
 @import 'app-components/warning-icon';
+@import 'app-components/barrier-summary';
+@import 'app-components/side-nav';
+@import 'app-components/summary-group';
 
 @import 'pages/index';
 @import 'pages/report/detail';
@@ -59,6 +63,12 @@ $govuk-images-path: "/public/govuk/images/";
 .message-panel {
 	border: 3px solid $govuk-grey-3;
 	padding: govuk-em( 30, 16 );
+}
+
+.no-results-message {
+	@include govuk-font( $size: 24 );
+	padding: govuk-em( 30, 24 );
+	text-align: center;
 }
 
 .conditional-content {
