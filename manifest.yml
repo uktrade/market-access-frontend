@@ -1,4 +1,6 @@
 ---
 applications:
   - buildpack: https://github.com/cloudfoundry/nodejs-buildpack.git#v1.6.23
-    memory: 512M
+  - memory: 512M
+  - health-check-type: http
+  - health-check-http-endpoint: /ping/
