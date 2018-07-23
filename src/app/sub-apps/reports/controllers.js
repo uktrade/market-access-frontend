@@ -45,7 +45,7 @@ module.exports = {
 
 		try {
 
-			const { response, body } = await backend.reports.getAll( req );
+			const { response, body } = await backend.reports.getAllUnfinished( req );
 
 			if( response.isSuccess ){
 

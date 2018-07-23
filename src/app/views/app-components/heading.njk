@@ -3,18 +3,18 @@
 
 {% macro heading( params ) %}
 	{% if params.back %}
-	{{ govukBackLink( params.back ) }}
-	{% endif %}
+	{{- govukBackLink( params.back ) -}}
+	{% endif -%}
 
 	<h1 class="govuk-heading-l">
 		<span class="govuk-caption-m">{{ params.caption }}</span> {{ params.text }}
 	</h1>
 
-	{% if params.errors and params.errors.length %}
-		{{ govukErrorSummary( {
+	{%- if params.errors and params.errors.length %}
+		{{- govukErrorSummary( {
 			titleText: 'There is a problem',
 			errorList: params.errors,
 			classes: 'restrict-width'
-		} ) }}
+		} ) -}}
 	{% endif %}
 {% endmacro %}

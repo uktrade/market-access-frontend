@@ -1,0 +1,30 @@
+{% macro barrierSummary( barrier ) %}
+	<section class="barrier-summary">
+		<h1 class="barrier-summary__heading">{{ barrier.title }}</h1>
+		<span class="barrier-summary__status barrier-summary__status--{{ barrier.status.modifyer }}">
+			Status: <strong>{{ barrier.status.name }}</strong>
+		</span>
+		<dl class="barrier-summary__info">
+			<div class="barrier-summary__info__group">
+				<dt class="barrier-summary__info__group__key">Date reported</dt>
+				<dd class="barrier-summary__info__group__value">{{ barrier.reportedOn | dateOnly }}</dd>
+			</div>
+			<div class="barrier-summary__info__group">
+				<dt class="barrier-summary__info__group__key">Company affected</dt>
+				<dd class="barrier-summary__info__group__value">{{ barrier.company.name }}</dd>
+			</div>
+			<div class="barrier-summary__info__group">
+				<dt class="barrier-summary__info__group__key">Export country</dt>
+				<dd class="barrier-summary__info__group__value">{{ barrier.country.name }}</dd>
+			</div>
+			<div class="barrier-summary__info__group">
+				<dt class="barrier-summary__info__group__key">Barrier Type</dt>
+				<dd class="barrier-summary__info__group__value">{{ barrier.type.title }}</dd>
+			</div>
+			<div class="barrier-summary__info__group">
+				<dt class="barrier-summary__info__group__key">Sector</dt>
+				<dd class="barrier-summary__info__group__value">{{ barrier.sector.name }}</dd>
+			</div>
+		</dl>
+	</section>
+{% endmacro %}

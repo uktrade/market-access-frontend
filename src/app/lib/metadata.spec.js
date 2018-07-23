@@ -113,10 +113,12 @@ describe( 'metadata', () => {
 		describe( 'countries', () => {
 			it( 'Should return the data', () => {
 
-				expect( metadata.countries ).toEqual( [
+				const output = [
 					fakeData.countries[ 0 ],
 					fakeData.countries[ 1 ]
-				] );
+				].map( ( { id, name } ) => ({ id, name }) );
+
+				expect( metadata.countries ).toEqual( output );
 			} );
 		} );
 

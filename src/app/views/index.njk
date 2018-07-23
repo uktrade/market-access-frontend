@@ -8,7 +8,7 @@
 
 	{{ dashboardHeading( isBarriers = true ) }}
 
-	{% if barriers and barriers.length %}
+	{%- if barriers and barriers.length -%}
 
 		<table class="standard-table standard-table--barriers">
 			<thead>
@@ -22,7 +22,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				{% for barrier in barriers %}
+				{%- for barrier in barriers %}
 				<tr class="standard-table__row">
 					<td class="standard-table__cell">{{ barrier.reported_on | dateOnly }}</td>
 					<td class="standard-table__cell">
@@ -36,18 +36,24 @@
 					<td class="standard-table__cell">
 						{% if barrier.supportNeeded -%}
 							<span class="warning-icon" aria-hidden="true">!</span>Yes
-							{% if not barrier.hasContributors %}
+							{% if not barrier.hasContributors -%}
 								<br>
 								<span class="warning-icon warning-icon--error" aria-hidden="true">!</span>No contributors
-							{% endif %}
+							{%- endif %}
 						{%- else -%}
 							No
 						{%- endif %}
 					</td>
 				</tr>
-				{% endfor %}
+				{%- endfor %}
 			</tbody>
 		</table>
 
-	{% endif %}
+	{%- else -%}
+
+		<p class="no-results-message">
+			There aren't any barrier instances.
+		</p>
+
+	{%- endif %}
 {% endblock %}

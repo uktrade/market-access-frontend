@@ -7,7 +7,8 @@
 
 	{{ dashboardHeading( isReports = true ) }}
 
-	{% if reports.length %}
+	{%- if reports.length -%}
+
 		<table class="standard-table">
 			<thead>
 				<tr class="standard-table__heading-row">
@@ -40,6 +41,12 @@
 				{% endfor %}
 			</tbody>
 		</table>
-	{% endif %}
 
+	{%- else -%}
+
+		<p class="no-results-message">
+			There aren't any unfinished reports.
+		</p>
+
+	{%- endif %}
 {% endblock %}

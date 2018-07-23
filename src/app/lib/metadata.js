@@ -5,6 +5,14 @@ function notDisabled( item ){
 	return  item.disabled_on === null;
 }
 
+function cleanCountry( item ){
+
+	return {
+		id: item.id,
+		name: item.name
+	};
+}
+
 function addNumber( tasks ){
 
 	for( let task of tasks ){
@@ -58,7 +66,7 @@ module.exports.fetch = async () => {
 			module.exports.statusTypes = body.status_types;
 			module.exports.lossScale = body.loss_range;
 			module.exports.boolScale = body.adv_boolean;
-			module.exports.countries = body.countries.filter( notDisabled );
+			module.exports.countries = body.countries.filter( notDisabled ).map( cleanCountry );
 			module.exports.govResponse = body.govt_response;
 			module.exports.publishResponse = body.publish_response;
 			module.exports.reportStages = body.report_stages;

@@ -1,0 +1,21 @@
+{
+   "id": "1be2d5b6-7b6b-4944-9366-03ef143ab930",
+   "barrier_type": {
+      "id": 15,
+      "title": "sunt sapiente officiis"
+   },
+   "report": {
+      "id": 7,
+      "problem_status": 1,
+      "company": {
+         "id": "fc3dbdc3-b0ef-4f5c-b0ac-b42852cfb323",
+         "name": "facere sint a",
+         "sector_id": "5f9cd335-e3ea-48ab-b8cd-6a3970edeed1",
+         "sector_name": "cumque ipsa quo"
+      }
+   },
+   "current_status": {
+      "status": 1
+   },
+   "reported_on": "Fri Apr 27 2018 05:20:40 GMT+0100 (BST)"
+}

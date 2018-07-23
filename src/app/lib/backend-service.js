@@ -75,11 +75,13 @@ module.exports = {
 	getUser: ( req ) => backend.get( '/whoami', getToken( req ) ),
 
 	barriers: {
-		getAll: ( req ) => backend.get( '/barriers', getToken( req ) )
+		getAll: ( req ) => backend.get( '/barriers', getToken( req ) ),
+		get: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }`, getToken( req ) )
 	},
 
 	reports: {
 		getAll: ( req ) => backend.get( '/reports', getToken( req ) ).then( transformReports ),
+		getAllUnfinished: ( req ) => backend.get( '/reports/unfinished', getToken( req ) ).then( transformReports ),
 		get: ( req, reportId ) => backend.get( `/reports/${ reportId }`, getToken( req ) ).then( transformReport ),
 		save: ( req, values ) => backend.post( '/reports', getToken( req ), {
 			problem_status: getValue( values.status ),

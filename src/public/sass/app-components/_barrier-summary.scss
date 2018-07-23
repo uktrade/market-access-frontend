@@ -1,0 +1,45 @@
+.barrier-summary {
+	border-bottom: 2px solid $govuk-grey-2;
+	padding-top: govuk-em( 10, 16 );
+	padding-bottom: govuk-em( 30, 16 );
+	margin-bottom: govuk-em( 45, 16 );
+}
+
+.barrier-summary__heading {
+	@include govuk-font( $size: 27, $weight: bold );
+	float: left;
+	width: 70%;
+}
+
+.barrier-summary__status {
+	border: 4px solid $govuk-blue;
+	background-color: $govuk-blue-15;
+	display: inline-block;
+	padding: govuk-em( 3, 16 ) govuk-em( 15, 16 );
+	float: left;
+}
+
+.barrier-summary__status--resolved {
+	border-color: $govuk-green;
+	background-color: $govuk-green-15;
+}
+
+.barrier-summary__info {
+	clear: left;
+	overflow: hidden;
+	padding-top: govuk-em( 30, 16 );
+}
+
+.barrier-summary__info__group {
+	float: left;
+	padding-right: govuk-em( 45, 16 );
+	max-width: 200px;
+}
+
+.barrier-summary__info__group__key {
+	font-weight: bold;
+}
+
+.barrier-summary__info__group__value {
+	margin: 0;
+}
