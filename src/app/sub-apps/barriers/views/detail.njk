@@ -23,7 +23,9 @@
 		<article class="govuk-grid-column-three-quarters">
 
 			{{ summaryGroup( {
-				heading: 'Barrier headlines',
+				heading: {
+					text: 'Barrier headlines'
+				},
 				items: [
 					{
 						title: 'Market access barrier type',
@@ -36,8 +38,10 @@
 			} ) }}
 
 			{{ summaryGroup( {
-				heading: 'Impact of the problem',
-				headingLevel: 3,
+				heading: {
+					text: 'Impact of the problem',
+					level: 3
+				},
 				items: [
 					{
 						title: 'Estimated financial value of sales lost over a five year period',
@@ -55,8 +59,10 @@
 			{%- if barrier.legal.hasInfringements -%}
 
 				{{ summaryGroup( {
-					heading: 'Legal obligations infringed',
-					headingLevel: 3,
+					heading: {
+						text: 'Legal obligations infringed',
+						level: 3
+					},
 					items: [
 						{
 							title: 'Legal obligations infringed',
@@ -75,7 +81,10 @@
 			{% else %}
 
 				{{ summaryGroup( {
-					heading: 'Legal obligations infringed',
+					heading: {
+						text: 'Legal obligations infringed',
+						level: 3
+					},
 					items: [
 						{
 							title: 'Legal obligations infringed',
@@ -89,7 +98,7 @@
 		</article>
 	</div>
 
-	<pre>
+{# 	<pre>
 		{{ barrier | dump( 2 ) | safe }}
-	</pre>
+	</pre> #}
 {% endblock %}

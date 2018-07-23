@@ -1,7 +1,7 @@
 {% macro summaryGroup( params ) %}
-	{% set headingLevel = params.headingLevel if params.headingLevel else '2' %}
+	{% set headingLevel = params.heading.level if params.heading.level else '2' %}
 	<section class="summary-group">
-		<h{{ headingLevel }} class="summary-group__heading">{{ params.heading }}</h{{ headingLevel }}>
+		<h{{ headingLevel }} class="summary-group__heading{{ (' summary-group__heading--sub') if params.heading.level == 3 }}">{{ params.heading.text }}</h{{ headingLevel }}>
 		<dl class="summary-group__list">
 			{% for item in params.items %}
 			<dt class="summary-group__list__key">{{ item.title }}</dt>

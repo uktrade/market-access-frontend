@@ -8,6 +8,10 @@
 	@include govuk-font( $size: 24, $weight: bold );
 }
 
+.summary-group__heading--sub {
+	@include govuk-font( $size: 19, $weight: bold );
+}
+
 .summary-group__list {
 
 }
