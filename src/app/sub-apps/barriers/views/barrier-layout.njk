@@ -1,0 +1,55 @@
+{% from 'components/back-link/macro.njk' import govukBackLink %}
+{% from 'components/error-summary/macro.njk' import govukErrorSummary %}
+{% from 'app-components/barrier-summary.njk' import barrierSummary %}
+{% from 'app-components/summary-group.njk' import summaryGroup %}
+
+{% extends 'layout.njk' %}
+
+{% set navItems = [
+	{
+		name: 'headlines',
+		href: urls.barriers.detail( barrier.id ),
+		text: 'Barrier headlines'
+	},{
+		name: 'interactions',
+		href: urls.barriers.interactions( barrier.id ),
+		text: 'Interactions & events'
+	}
+] %}
+
+{% block page_content %}
+
+	{{ govukBackLink( { href: urls.index() } ) }}
+
+	{{ barrierSummary( barrier ) }}
+
+	<div class="govuk-grid-row">
+
+		<aside class="govuk-grid-column-one-quarter">
+			<nav class="side-nav">
+				{% for item in navItems %}
+				<a class="side-nav__item{{ ' side-nav__item--active' if activeBarrierNav == item.name }}" href="{{ item.href }}">{{ item.text }}</a>
+				{% endfor %}
+			</nav>
+		</aside>
+
+		<article class="govuk-grid-column-three-quarters">
+
+			{% if errors and errors.length %}
+			{{ govukErrorSummary( {
+				titleText: 'There is a problem',
+				errorList: errors
+			} ) }}
+			{% endif %}
+
+			{% block barrier_content %}{% endblock -%}
+
+		</article>
+	</div>
+
+{#  	<pre>
+ 		{{ errors | dump( 2 ) | safe }}
+		{{ barrier | dump( 2 ) | safe }}
+		{{ interactions | dump( 2 ) | safe }}
+	</pre> #}
+{% endblock %}

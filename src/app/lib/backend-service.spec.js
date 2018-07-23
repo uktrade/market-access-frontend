@@ -46,12 +46,55 @@ describe( 'Backend Service', () => {
 
 	describe( 'Barriers', () => {
 
+		let barrierId;
+
+		beforeEach( () => {
+
+			barrierId = uuid();
+		} );
+
 		describe( 'getAll', () => {
 			it( 'Should call the correct path', async () => {
 
 				await service.barriers.getAll( req );
 
 				expect( backend.get ).toHaveBeenCalledWith( '/barriers', token );
+			} );
+		} );
+
+		describe( 'get', () => {
+			it( 'Should call the correct path', async () => {
+
+				await service.barriers.get( req, barrierId );
+
+				expect( backend.get ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token );
+			} );
+		} );
+
+		describe( 'getInteractions', () => {
+			it( 'Should call the correct path', async () => {
+
+				await service.barriers.getInteractions( req, barrierId );
+
+				expect( backend.get ).toHaveBeenCalledWith( `/barriers/${ barrierId }/interactions`, token );
+			} );
+		} );
+
+		describe( 'saveNote', () => {
+			it( 'Should POST to the correct path with the correct values', async () => {
+
+				const note = 'my test note';
+				const pinned = 'true';
+
+				await service.barriers.saveNote( req, barrierId, {
+					note,
+					pinned
+				} );
+
+				expect( backend.post ).toHaveBeenCalledWith( `/barriers/${ barrierId }/interactions`, token, {
+					text: note,
+					pinned: true
+				} );
 			} );
 		} );
 	} );

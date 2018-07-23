@@ -49,6 +49,7 @@ $govuk-images-path: "/public/govuk/images/";
 @import 'app-components/barrier-summary';
 @import 'app-components/side-nav';
 @import 'app-components/summary-group';
+@import 'app-components/event-list';
 
 @import 'pages/index';
 @import 'pages/report/detail';
@@ -115,7 +116,7 @@ $govuk-images-path: "/public/govuk/images/";
 	background-color: $govuk-grey-3;
 	box-shadow: 0 2px 0 $govuk-grey-1;
 	color: $govuk-grey-1;
-	display: block;
+	display: inline-block;
 
 	&:link,
 	&:visited,
@@ -128,6 +129,21 @@ $govuk-images-path: "/public/govuk/images/";
 	&:hover {
 		background-color: $govuk-grey-4;
 	}
+}
+
+.button-cancel {
+	line-height: 2.5;
+	margin-left: govuk-em( 10, 16 );
+}
+
+.interaction-panel {
+	background-color: $govuk-grey-3;
+	padding: govuk-em( 15, 16 );
+	margin-bottom: govuk-em( 30, 16 );
+}
+
+.barrier-section-intro {
+	margin-bottom: govuk-em( 30, 16 );
 }
 
 .user-info {

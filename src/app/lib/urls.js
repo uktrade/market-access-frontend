@@ -45,7 +45,9 @@ module.exports = {
 	login: () => '/login/',
 
 	barriers: {
-		detail: ( barrierId ) => `/barriers/${ barrierId }`
+		detail: ( barrierId ) => `/barriers/${ barrierId }/`,
+		interactions: ( barrierId ) => `/barriers/${ barrierId }/interactions/`,
+		addNote: ( barrierId ) => `/barriers/${ barrierId }/interactions/add-note/`
 	},
 
 	reports: reportUrl,

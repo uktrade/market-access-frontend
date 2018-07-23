@@ -1,104 +1,82 @@
-{% from 'components/back-link/macro.njk' import govukBackLink %}
-{% from 'app-components/barrier-summary.njk' import barrierSummary %}
-{% from 'app-components/summary-group.njk' import summaryGroup %}
+{% extends './barrier-layout.njk' %}
 
-{% extends 'layout.njk' %}
+{% set activeBarrierNav = 'headlines' %}
 
 {% block page_title %}{{ super() }} - Barrier details{% endblock %}
 
-{% block page_content %}
+{% block barrier_content %}
 
-	{{ govukBackLink( { href: urls.index() } ) }}
+	{{ summaryGroup( {
+		heading: {
+			text: 'Barrier headlines'
+		},
+		items: [
+			{
+				title: 'Market access barrier type',
+				text: barrier.type.title
+			},{
+				title: 'Summary of barrier',
+				text: barrier.summary
+			}
+		]
+	} ) }}
 
-	{{ barrierSummary( barrier ) }}
+	{{ summaryGroup( {
+		heading: {
+			text: 'Impact of the problem',
+			level: 3
+		},
+		items: [
+			{
+				title: 'Estimated financial value of sales lost over a five year period',
+				text: barrier.impact.loss
+			},{
+				title: 'Impact the problem is expected to have on the company if it is not resolved',
+				text: barrier.impact.summary
+			},{
+				title: 'Are there other companies affected',
+				text: barrier.impact.companiesAffected
+			}
+		]
+	} ) }}
 
-	<div class="govuk-grid-row">
+	{%- if barrier.legal.hasInfringements -%}
 
-		<aside class="govuk-grid-column-one-quarter">
-			<nav class="side-nav">
-				<a class="side-nav__item side-nav__item--active" href="{{ urls.barriers.detail( barrier.id ) }}">Barrier headlines</a>
-			</nav>
-		</aside>
+		{{ summaryGroup( {
+			heading: {
+				text: 'Legal obligations infringed',
+				level: 3
+			},
+			items: [
+				{
+					title: 'Legal obligations infringed',
+					text: [
+						'WTO' if barrier.legal.infringements.wto,
+						'FTA' if barrier.legal.infringements.fta,
+						'Other' if barrier.legal.infringements.other
+					] | removeEmpty | join( ', ' )
+				},{
+					title: 'Summary of infringements',
+					text: barrier.legal.summary
+				}
+			]
+		} ) }}
 
-		<article class="govuk-grid-column-three-quarters">
+	{% else %}
 
-			{{ summaryGroup( {
-				heading: {
-					text: 'Barrier headlines'
-				},
-				items: [
-					{
-						title: 'Market access barrier type',
-						text: barrier.type.title
-					},{
-						title: 'Summary of barrier',
-						text: barrier.summary
-					}
-				]
-			} ) }}
+		{{ summaryGroup( {
+			heading: {
+				text: 'Legal obligations infringed',
+				level: 3
+			},
+			items: [
+				{
+					title: 'Legal obligations infringed',
+					text: 'Unknown' if barrier.legal.unknownInfringements else 'None'
+				}
+			]
+		} ) }}
 
-			{{ summaryGroup( {
-				heading: {
-					text: 'Impact of the problem',
-					level: 3
-				},
-				items: [
-					{
-						title: 'Estimated financial value of sales lost over a five year period',
-						text: barrier.impact.loss
-					},{
-						title: 'Impact the problem is expected to have on the company if it is not resolved',
-						text: barrier.impact.summary
-					},{
-						title: 'Are there other companies affected',
-						text: barrier.impact.companiesAffected
-					}
-				]
-			} ) }}
+	{% endif %}
 
-			{%- if barrier.legal.hasInfringements -%}
-
-				{{ summaryGroup( {
-					heading: {
-						text: 'Legal obligations infringed',
-						level: 3
-					},
-					items: [
-						{
-							title: 'Legal obligations infringed',
-							text: [
-								'WTO' if barrier.legal.infringements.wto,
-								'FTA' if barrier.legal.infringements.fta,
-								'Other' if barrier.legal.infringements.other
-							] | removeEmpty | join( ', ' )
-						},{
-							title: 'Summary of infringements',
-							text: barrier.legal.summary
-						}
-					]
-				} ) }}
-
-			{% else %}
-
-				{{ summaryGroup( {
-					heading: {
-						text: 'Legal obligations infringed',
-						level: 3
-					},
-					items: [
-						{
-							title: 'Legal obligations infringed',
-							text: 'Unknown' if barrier.legal.unknownInfringements else 'None'
-						}
-					]
-				} ) }}
-
-			{% endif %}
-
-		</article>
-	</div>
-
-{# 	<pre>
-		{{ barrier | dump( 2 ) | safe }}
-	</pre> #}
 {% endblock %}

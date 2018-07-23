@@ -1,5 +1,5 @@
 const urls = require( './urls' );
-
+const uuid = require( 'uuid/v4' );
 describe( 'URLs', () => {
 
 	describe( 'Index', () => {
@@ -13,6 +13,37 @@ describe( 'URLs', () => {
 		it( 'Should return the login path', () => {
 
 			expect( urls.login() ).toEqual( '/login/' );
+		} );
+	} );
+
+	describe( 'Barier urls', () => {
+
+		let barrierId;
+
+		beforeEach( () => {
+
+			barrierId = uuid();
+		} );
+
+		describe( 'Detail', () => {
+			it( 'Should return the correct path', () => {
+
+				expect( urls.barriers.detail( barrierId ) ).toEqual( `/barriers/${ barrierId }/` );
+			} );
+		} );
+
+		describe( 'Interactions', () => {
+			it( 'Should return the correct path', () => {
+
+				expect( urls.barriers.interactions( barrierId ) ).toEqual( `/barriers/${ barrierId }/interactions/` );
+			} );
+		} );
+
+		describe( 'Add note', () => {
+			it( 'Should return the correct path', () => {
+
+				expect( urls.barriers.addNote( barrierId ) ).toEqual( `/barriers/${ barrierId }/interactions/add-note/` );
+			} );
 		} );
 	} );
 

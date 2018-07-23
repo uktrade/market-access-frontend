@@ -13,6 +13,7 @@ module.exports = ( barrier ) => {
 
 	return {
 		barrier: {
+			id: barrier.id,
 			title: report && report.barrier_title,
 			summary: barrier.summary,
 			type: barrier.barrier_type,

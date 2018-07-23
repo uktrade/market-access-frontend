@@ -1,0 +1,63 @@
+{% from "components/textarea/macro.njk" import govukTextarea %}
+{% from "components/checkboxes/macro.njk" import govukCheckboxes %}
+
+{% extends './barrier-layout.njk' %}
+
+{% set activeBarrierNav = 'interactions' %}
+
+{% block page_title %}{{ super() }} - Barrier interactions{% endblock %}
+
+{% block barrier_content %}
+	<h2>
+		Interactions &amp; events
+	</h2>
+	<p class="barrier-section-intro">
+		Add to the narrative of this barrier instace. An interaction could be a meeting, call, email or another activity associated with solving this barrier.
+	</p>
+
+	{% if noteForm %}
+		<div class="interaction-panel">
+			<form action="{{ urls.barriers.addNote( barrier.id ) }}" method="POST">
+
+				<input type="hidden" name="_csrf" value="{{ _csrf }}">
+
+				{{ govukTextarea({
+					name: 'note',
+					id: 'note',
+					label: {
+						text: 'Add notes on an interaction or event',
+						classes: 'govuk-!-font-weight-bold'
+					},
+					errorMessage: errors | errorForName( 'note' )
+				}) }}
+
+				{{ govukCheckboxes({
+					name: 'pinned',
+					items: [
+						{
+							value: 'true',
+							text: 'Pin this note to the top of the timeline'
+						}
+					]
+				}) }}
+
+				<input type="submit" value="Save note" class="govuk-button">
+				<a class="button-cancel" href="{{ urls.barriers.interactions( barrier.id ) }}">Cancel</a>
+			</form>
+		</div>
+	{% else %}
+		<a class="govuk-button button--secondary" href="{{ urls.barriers.addNote( barrier.id ) }}">Add note</a>
+	{% endif %}
+
+	{% if interactions and interactions.length %}
+		<ol class="event-list">
+			{% for item in interactions %}
+			<li class="event-list__item{{ ' event-list__item--pinned' if item.pinned }}">
+				<h4 class="event-list__item__heading">{{ item.created_on | dateWithTime }}</h4>
+				<p class="event-list__item__text">{{ item.text }}</p>
+			</li>
+			{% endfor %}
+		</ol>
+	{% endif %}
+
+{% endblock -%}
