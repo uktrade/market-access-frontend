@@ -81,6 +81,18 @@ module.exports = {
 		saveNote: ( req, barrierId, values ) => backend.post( `/barriers/${ barrierId }/interactions`, getToken( req ), {
 			text: values.note,
 			pinned: ( values.pinned === 'true' )
+		} ),
+		resolve: ( req, barrierId, values ) => {
+
+			const { day, month, year } = values.resolvedDate;
+
+			return backend.post( `/barriers/${ barrierId }/resolve`, getToken( req ), {
+				status_date: [ year, month, day ].join( '-' ) + 'T00:00',
+				summary: values.resolvedSummary
+			} );
+		},
+		hibernate: ( req, barrierId, values ) => backend.post( `/barriers/${ barrierId }/hibernate`, getToken( req ), {
+			summary: values.hibernationSummary
 		} )
 	},
 

@@ -10,7 +10,7 @@ function update( item ){
 		name: ( country && country.name )
 	};
 
-	item.resolved = item.current_status === 2;
+	item.resolved = ( item.current_status && item.current_status.status ) === 4;
 	item.supportNeeded = item.support_type === 1;
 	item.hasContributors = item.contributor_count > 0;
 

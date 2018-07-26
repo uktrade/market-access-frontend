@@ -1,0 +1,16 @@
+{% from 'components/panel/macro.njk' import govukPanel %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Barrier status changed{% endblock %}
+
+{% block page_content %}
+
+	{{ govukPanel({
+		titleText: 'Barrier status updated',
+		text: 'This barrier has now been marked as hibernated'
+	}) }}
+
+	<a href="{{ urls.barriers.detail( barrierId ) }}" class="govuk-button button--secondary">View barrier record</a>
+
+{% endblock -%}
