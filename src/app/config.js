@@ -1,5 +1,6 @@
 /* eslint no-console: 0 */
 const os = require( 'os' );
+const vcap = require( './lib/vcap-services' );
 const requiredEnvs = [];
 
 function env( name, defaultValue ){
@@ -48,6 +49,7 @@ function checkRequiredEnvs(){
 const cpus = ( os.cpus().length || 1 );
 const isDev = ( ( process.env.NODE_ENV || 'development' ) === 'development' );
 const isCi = bool( 'CI', false );
+const vcapRedisUrl = vcap.parseRedis( env( 'VCAP_SERVICES' ) );
 
 let config = {
 	isDev,
@@ -80,7 +82,7 @@ let config = {
 		host: env( 'REDIS_HOST' ),
 		port: number( 'REDIS_PORT' ),
 		password: env( 'REDIS_PASSWORD' ),
-		url: env( 'REDIS_URL' ) || env( 'REDISTOGO_URL' ),
+		url: ( vcapRedisUrl || env( 'REDIS_URL', env( 'REDISTOGO_URL' ) ) ),
 		tls: bool( 'REDIS_USE_TLS' )
 	},
 	session: {
