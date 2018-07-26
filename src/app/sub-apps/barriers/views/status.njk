@@ -1,0 +1,106 @@
+{% from 'components/radios/macro.njk' import govukRadios %}
+{% from 'components/date-input/macro.njk' import govukDateInput %}
+{% from 'components/textarea/macro.njk' import govukTextarea %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Barrier edit status{% endblock %}
+
+{% block body_script %}
+	<script>
+		ma.pages.barrier.status();
+	</script>
+{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.barriers.detail( barrier.id ) },
+		caption: barrier.report.barrier_title,
+		text: 'Barrier Status',
+		errors: errors
+	}) }}
+
+	{% set isResolvedHtml %}
+		{{ govukDateInput( {
+
+			id: 'resolved-date',
+			fieldset: {
+				legend: {
+					text: 'Date the barrier was resolved',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			errorMessage: errors | errorForName( 'resolved-date' ),
+			items: [
+				{
+					name: 'day',
+					value: resolvedDate.day
+				},
+				{
+					name: 'month',
+					value: resolvedDate.month
+				},
+				{
+					name: 'year',
+					value: resolvedDate.year
+				}
+			]
+		} ) }}
+
+		{{ govukTextarea( {
+
+			label: {
+				text: 'Provide a summary of how this barrier was resolved',
+				classes: 'govuk-label--s'
+			},
+			id: 'resolved-summary',
+			name: 'resolvedSummary',
+			value: resolvedSummary,
+			errorMessage: errors | errorForName( 'resolved-summary' )
+		} ) }}
+	{% endset %}
+
+	{% set isHibernateHtml %}
+
+		{{ govukTextarea( {
+
+			label: {
+				text: 'Provide a summary of why this barrier is being put into hibernation',
+				classes: 'govuk-label--s'
+			},
+			id: 'hibernation-summary',
+			name: 'hibernationSummary',
+			value: hibernationSummary,
+			errorMessage: errors | errorForName( 'hibernation-summary' )
+		} ) }}
+	{% endset %}
+
+	<form action="{{ urls.barriers.status( barrier.id ) }}" method="POST">
+		<input type="hidden" name="_csrf" value="{{ _csrf }}">
+
+		{{ govukRadios( {
+
+			idPrefix: 'status',
+			name: 'status',
+			classes: 'status',
+			fieldset: {
+				legend: {
+					text: 'Change barrier status',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: status | addConditionalRadioHtml( {
+				'resolve': { html: isResolvedHtml },
+				'hibernate': { html: isHibernateHtml }
+			} ),
+			errorMessage: errors | errorForName( 'status-1' )
+			} )
+		}}
+
+		<input type="submit" class="govuk-button" value="Change barrier status">
+		<a href="{{ urls.barriers.detail( barrier.id ) }}" class="govuk-button button--secondary">Cancel</a>
+	</form>
+
+{% endblock -%}

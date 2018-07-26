@@ -2,7 +2,8 @@ const metadata = require( '../../../lib/metadata' );
 
 const barrierStatus = {
 	2: { name: 'Assessment', modifyer: 'assessment' },
-	4: { name: 'Resolved', modifyer: 'resolved' }
+	4: { name: 'Resolved', modifyer: 'resolved' },
+	5: { name: 'Hibernated', modifyer: 'hibernated' }
 };
 
 module.exports = ( barrier ) => {

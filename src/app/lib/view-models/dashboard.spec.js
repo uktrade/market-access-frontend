@@ -25,9 +25,9 @@ describe( 'Dashboard view model', () => {
 		it( 'Should transform and sort them', () => {
 
 			const barriers = [
-				{ id: 1, export_country: 'abc-1', current_status: 1, support_type: 2, contributor_count: 4, reported_on: 'Wed Nov 22 2017 10:45:25 GMT+0000 (GMT)' },
-				{ id: 2, export_country: 'abc-3', current_status: 2, support_type: 1, contributor_count: 0, reported_on: 'Fri Jun 01 2018 01:43:07 GMT+0100 (BST)' },
-				{ id: 3, export_country: 'def-1', current_status: 1, support_type: 2, contributor_count: 4, reported_on: 'Sat Mar 10 2018 12:51:35 GMT+0000 (GMT)' }
+				{ id: 1, export_country: 'abc-1', current_status: { status: 1 }, support_type: 2, contributor_count: 4, reported_on: 'Wed Nov 22 2017 10:45:25 GMT+0000 (GMT)' },
+				{ id: 2, export_country: 'abc-3', current_status: { status: 4 }, support_type: 1, contributor_count: 0, reported_on: 'Fri Jun 01 2018 01:43:07 GMT+0100 (BST)' },
+				{ id: 3, export_country: 'def-1', current_status: { status: 1 }, support_type: 2, contributor_count: 4, reported_on: 'Sat Mar 10 2018 12:51:35 GMT+0000 (GMT)' }
 			];
 
 			const output = viewModel( barriers );

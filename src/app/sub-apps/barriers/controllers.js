@@ -1,6 +1,7 @@
 const backend = require( '../../lib/backend-service' );
 const Form = require( '../../lib/Form' );
 const urls = require( '../../lib/urls' );
+const validators = require( '../../lib/validators' );
 const detailVieWModel = require( './view-models/detail' );
 
 function sortByDate( a, b ){
@@ -34,6 +35,7 @@ function getInteractionsList( interactions ){
 }
 
 async function renderInteractions( req, res, next, data ){
+
 	try {
 
 		const { response, body } = await backend.barriers.getInteractions( req, req.barrier.id );
@@ -107,5 +109,110 @@ module.exports = {
 			{ noteForm: true },
 			form.getTemplateValues()
 		) );
-	}
+	},
+
+	status: async ( req, res, next ) => {
+
+		const RESOLVE = 'resolve';
+		const HIBERNATE = 'hibernate';
+
+		const form = new Form( req, {
+
+			_csrf: {
+				values: [ req.csrfToken() ]
+			},
+
+			status: {
+				type: Form.RADIO,
+				values: [ req.barrier.current_status.status ],
+				items: [
+					{
+						value: RESOLVE,
+						html: 'Mark as <strong>resolved</strong>'
+					},{
+						value: HIBERNATE,
+						html: 'Mark as <strong>hibernation</strong>'
+					}
+				],
+				validators: [
+					{
+						fn: ( value ) => ( value === RESOLVE || value === HIBERNATE ),
+						message: 'Choose a status'
+					}
+				]
+			},
+
+			resolvedDate: {
+				type: Form.GROUP,
+				conditional: { name: 'status', value: RESOLVE },
+				validators: [ {
+					fn: validators.isDateValue( 'day' ),
+					message: 'Enter a value for resolved day'
+				},{
+					fn: validators.isDateValue( 'month' ),
+					message: 'Enter a value for resolved month'
+				},{
+					fn: validators.isDateValue( 'year' ),
+					message: 'Enter a value for resolved year'
+				},{
+					fn: validators.isDateValid,
+					message: 'Enter a valid resolved date'
+				},{
+					fn: validators.isDateInPast,
+					message: 'Enter a resolved date that is in the past'
+				} ],
+				items: {
+					day: {},
+					month: {},
+					year: {}
+				}
+			},
+
+			resolvedSummary: {
+				conditional: { name: 'status', value: RESOLVE },
+				required: 'Enter a resolved summary'
+			},
+
+			hibernationSummary: {
+				conditional: { name: 'status', value: HIBERNATE },
+				required: 'Enter a hibernation summary'
+			}
+		} );
+
+		if( form.isPost ){
+
+			form.validate();
+
+			if( !form.hasErrors() ){
+
+				try {
+
+					const formValues = form.getValues();
+					const isResolve = ( formValues.status === RESOLVE );
+					const serviceMethod = ( isResolve ? 'resolve' : 'hibernate' );
+					const successPage = ( isResolve ? 'statusResolved' : 'statusHibernated' );
+
+					const { response } = await backend.barriers[ serviceMethod ]( req, req.barrier.id, formValues );
+
+					if( response.isSuccess ){
+
+						return res.redirect( urls.barriers[ successPage ]( req.barrier.id ) );
+
+					} else {
+
+						return next( new Error( `Unable to save barrier note, got ${ response.statusCode } from backend` ) );
+					}
+
+				} catch( e ){
+
+					return next( e );
+				}
+			}
+		}
+
+		res.render( 'barriers/views/status', form.getTemplateValues() );
+	},
+
+	statusResolved: ( req, res ) => res.render( 'barriers/views/status-resolved', { barrierId: req.uuid } ),
+	statusHibernated: ( req, res ) => res.render( 'barriers/views/status-hibernated', { barrierId: req.uuid } )
 };

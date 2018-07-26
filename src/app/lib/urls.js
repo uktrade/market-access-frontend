@@ -47,7 +47,10 @@ module.exports = {
 	barriers: {
 		detail: ( barrierId ) => `/barriers/${ barrierId }/`,
 		interactions: ( barrierId ) => `/barriers/${ barrierId }/interactions/`,
-		addNote: ( barrierId ) => `/barriers/${ barrierId }/interactions/add-note/`
+		addNote: ( barrierId ) => `/barriers/${ barrierId }/interactions/add-note/`,
+		status: ( barrierId ) => `/barriers/${ barrierId }/status/`,
+		statusResolved:( barrierId ) => `/barriers/${ barrierId }/status/resolved/`,
+		statusHibernated:( barrierId ) => `/barriers/${ barrierId }/status/hibernated/`
 	},
 
 	reports: reportUrl,
