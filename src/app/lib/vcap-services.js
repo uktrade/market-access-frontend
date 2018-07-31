@@ -1,4 +1,4 @@
-const logger = require( './logger' );
+/* eslint no-console:0 */
 module.exports = {
 
 	parseRedis: function( json ){
@@ -12,7 +12,7 @@ module.exports = {
 
 			} catch( e ){
 
-				logger.error( e );
+				console.error( e );
 			}
 		}
 	}

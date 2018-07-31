@@ -99,7 +99,7 @@ describe( 'Backend Service', () => {
 		} );
 
 		describe( 'resolve', () => {
-			it( 'Should PUT to the correct path with the correct values', async () => {
+			it( 'Should POST to the correct path with the correct values', async () => {
 
 				const [ day, month, year ] = [ '10', '11', '2000' ];
 				const resolvedSummary = 'my summary text';
@@ -112,6 +112,21 @@ describe( 'Backend Service', () => {
 				expect( backend.post ).toHaveBeenCalledWith( `/barriers/${ barrierId }/resolve`, token, {
 					status_date: [ year, month, day ].join( '-' ) + 'T00:00',
 					summary: resolvedSummary
+				} );
+			} );
+		} );
+
+		describe( 'hibernate', () => {
+			it( 'Should POST to the correct path with the correct values', async () => {
+
+				const hibernationSummary = 'my summary text';
+
+				await service.barriers.hibernate( req, barrierId, {
+					hibernationSummary
+				} );
+
+				expect( backend.post ).toHaveBeenCalledWith( `/barriers/${ barrierId }/hibernate`, token, {
+					summary: hibernationSummary
 				} );
 			} );
 		} );
