@@ -1,6 +1,6 @@
 {
   "name": "market-access-frontend",
-  "version": "3.3.2",
+  "version": "3.3.3",
   "description": "A front end for Market Access",
   "main": "server.js",
   "engines": {
