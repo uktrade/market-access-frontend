@@ -45,6 +45,27 @@ describe( 'URLs', () => {
 				expect( urls.barriers.addNote( barrierId ) ).toEqual( `/barriers/${ barrierId }/interactions/add-note/` );
 			} );
 		} );
+
+		describe( 'status', () => {
+			it( 'Should return the correct path', () => {
+
+				expect( urls.barriers.status( barrierId ) ).toEqual( `/barriers/${ barrierId }/status/` );
+			} );
+		} );
+
+		describe( 'statusResolved', () => {
+			it( 'Should return the correct path', () => {
+
+				expect( urls.barriers.statusResolved( barrierId ) ).toEqual( `/barriers/${ barrierId }/status/resolved/` );
+			} );
+		} );
+
+		describe( 'statusHibernated', () => {
+			it( 'Should return the correct path', () => {
+
+				expect( urls.barriers.statusHibernated( barrierId ) ).toEqual( `/barriers/${ barrierId }/status/hibernated/` );
+			} );
+		} );
 	} );
 
 	describe( 'Report urls', () => {

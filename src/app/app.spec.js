@@ -1,6 +1,6 @@
 const supertest = require( 'supertest' );
 const proxyquire = require( 'proxyquire' );
-const winston = require( 'winston' );
+//const winston = require( 'winston' );
 const nock = require( 'nock' );
 
 const urls = require( './lib/urls' );
@@ -74,7 +74,8 @@ describe( 'App', function(){
 
 	beforeAll( function(){
 
-		logger.remove( winston.transports.Console );
+		logger.configure({ silent: true });
+
 		oldTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
 		jasmine.DEFAULT_TIMEOUT_INTERVAL = 3000;
 
@@ -86,7 +87,6 @@ describe( 'App', function(){
 
 	afterAll( function(){
 
-		logger.add( winston.transports.Console );
 		jasmine.DEFAULT_TIMEOUT_INTERVAL = oldTimeout;
 	} );
 
