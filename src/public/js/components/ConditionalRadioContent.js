@@ -1,14 +1,17 @@
 ma.components.ConditionalRadioContent = (function( jessie ){
 
-	if( !jessie.hasFeatures( 'bind', 'query', 'queryOne', 'addClass', 'setAriaAttribute', 'attachListener', 'getInputValue' ) ){ return; }
+	if( !jessie.hasFeatures( 'bind', 'query', 'queryOne', 'addClass', 'removeClass', 'setAriaAttribute', 'attachListener', 'getInputValue' ) ){ return; }
 
 	var bind = jessie.bind;
 	var query = jessie.query;
 	var queryOne = jessie.queryOne;
 	var attachListener = jessie.attachListener;
 	var addClass = jessie.addClass;
+	var removeClass = jessie.removeClass;
 	var setAriaAttribute = jessie.setAriaAttribute;
 	var getInputValue = jessie.getInputValue;
+
+	var govukClass = 'govuk-radios__conditional--hidden';
 
 	function ConditionalRadioContent( opts){
 
@@ -33,6 +36,7 @@ ma.components.ConditionalRadioContent = (function( jessie ){
 
 		this.conditionalElemId = this.conditionalElem.getAttribute( 'id' );
 		addClass( this.conditionalElem, 'visually-hidden' );
+		removeClass( this.conditionalElem, govukClass ); // remove this class as it keeps the content hidden
 		setAriaAttribute( this.conditionalElem, 'hidden', true );
 
 		while( ( input = inputs[ i++ ] ) ){

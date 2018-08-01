@@ -145,21 +145,22 @@ module.exports = {
 			resolvedDate: {
 				type: Form.GROUP,
 				conditional: { name: 'status', value: RESOLVE },
+				errorField: 'status_date',
 				validators: [ {
 					fn: validators.isDateValue( 'day' ),
-					message: 'Enter a value for resolved day'
+					message: 'Enter a day'
 				},{
 					fn: validators.isDateValue( 'month' ),
-					message: 'Enter a value for resolved month'
+					message: 'Enter a month'
 				},{
 					fn: validators.isDateValue( 'year' ),
-					message: 'Enter a value for resolved year'
+					message: 'Enter a year'
 				},{
 					fn: validators.isDateValid,
-					message: 'Enter a valid resolved date'
+					message: 'Enter a valid date'
 				},{
 					fn: validators.isDateInPast,
-					message: 'Enter a resolved date that is in the past'
+					message: 'Enter a date that is in the past'
 				} ],
 				items: {
 					day: {},
@@ -170,12 +171,14 @@ module.exports = {
 
 			resolvedSummary: {
 				conditional: { name: 'status', value: RESOLVE },
-				required: 'Enter a resolved summary'
+				errorField: 'summary',
+				required: 'Enter a summary'
 			},
 
 			hibernationSummary: {
 				conditional: { name: 'status', value: HIBERNATE },
-				required: 'Enter a hibernation summary'
+				errorField: 'summary',
+				required: 'Enter a summary'
 			}
 		} );
 
@@ -192,15 +195,24 @@ module.exports = {
 					const serviceMethod = ( isResolve ? 'resolve' : 'hibernate' );
 					const successPage = ( isResolve ? 'statusResolved' : 'statusHibernated' );
 
-					const { response } = await backend.barriers[ serviceMethod ]( req, req.barrier.id, formValues );
+					const { response, body } = await backend.barriers[ serviceMethod ]( req, req.barrier.id, formValues );
 
 					if( response.isSuccess ){
 
 						return res.redirect( urls.barriers[ successPage ]( req.barrier.id ) );
 
+					} else if ( response.statusCode === 400 && body.fields ){
+
+						form.addErrors( body.fields );
+
+						if( !form.hasErrors() ){
+
+							return next( new Error( `Unable to save barrier status, got ${ response.statusCode } from backend` ) );
+						}
+
 					} else {
 
-						return next( new Error( `Unable to save barrier note, got ${ response.statusCode } from backend` ) );
+						return next( new Error( `Unable to save barrier status, got ${ response.statusCode } from backend` ) );
 					}
 
 				} catch( e ){
