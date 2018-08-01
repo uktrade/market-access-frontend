@@ -265,6 +265,22 @@ Form.prototype.hasErrors = function(){
 	return !!this.errors.length;
 };
 
+Form.prototype.addErrors = function( fields ){
+
+	for( let name of this.fieldNames ){
+
+		if( this.passedConditions( name ) ){
+
+			const field = this.fields[ name ];
+			const message = fields[ field.errorField ];
+
+			if( message ){
+				this.errors.push( { id: field.id, message } );
+			}
+		}
+	}
+};
+
 Form.RADIO = RADIO;
 Form.SELECT = SELECT;
 Form.CHECKBOXES = CHECKBOXES;

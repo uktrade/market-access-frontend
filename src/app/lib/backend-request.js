@@ -42,15 +42,17 @@ function makeRequest( method, path, opts = {} ){
 
 			} else {
 
-				response.isSuccess = ( response.statusCode >= 200 && response.statusCode <= 300 );
+				const statusCode = response.statusCode;
 
-				if( response.isSuccess || response.statusCode === 404 ){
+				response.isSuccess = ( statusCode >= 200 && statusCode <= 300 );
+
+				if( response.isSuccess || statusCode === 404 || statusCode === 400 ){
 
 					resolve( { response, body } );
 
 				} else {
 
-					const error = new Error( `Got at ${ response.statusCode } response code from backend` );
+					const error = new Error( `Got at ${ statusCode } response code from backend` );
 					error.responseBody = body;
 
 					reject( error );

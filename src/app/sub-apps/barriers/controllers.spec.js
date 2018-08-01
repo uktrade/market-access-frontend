@@ -303,6 +303,7 @@ describe( 'Barriers controller', () => {
 
 		const RESOLVE = 'resolve';
 		const HIBERNATE = 'hibernate';
+		const TEMPLATE = 'barriers/views/status';
 
 		let barrier;
 
@@ -372,7 +373,7 @@ describe( 'Barriers controller', () => {
 
 				expect( form.validate ).not.toHaveBeenCalled();
 				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'barriers/views/status', getTemplateValuesResponse );
+				expect( res.render ).toHaveBeenCalledWith( TEMPLATE, getTemplateValuesResponse );
 			} );
 		} );
 
@@ -396,7 +397,7 @@ describe( 'Barriers controller', () => {
 
 					await controller.status( req, res, next );
 
-					expect( res.render ).toHaveBeenCalledWith( 'barriers/views/status', getTemplateValuesResponse );
+					expect( res.render ).toHaveBeenCalledWith( TEMPLATE, getTemplateValuesResponse );
 				} );
 			} );
 
@@ -437,15 +438,65 @@ describe( 'Barriers controller', () => {
 					} );
 
 					describe( 'When the response is not a success', () => {
-						it( 'Should call next with an error', async () => {
+						describe( 'When the error is a 400', () => {
 
-							const statusCode = 500;
-							form.hasErrors = () => false;
-							backend.barriers.resolve.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
+							let statusCode;
+							let fields;
 
-							await controller.status( req, res, next );
+							beforeEach( () => {
 
-							expect( next ).toHaveBeenCalledWith( new Error( `Unable to save barrier note, got ${ statusCode } from backend` ) );
+								statusCode = 400;
+								fields = { a: 1, b: 2 };
+
+								backend.barriers.resolve.and.callFake( () => Promise.resolve( {
+									response: { isSuccess: false, statusCode },
+									body: { fields }
+								} ) );
+
+								form.addErrors = jasmine.createSpy( 'form.addErrors' );
+							} );
+
+							describe( 'When the fields match', () => {
+								it( 'Should call form.addErrors and render the page', async () => {
+
+
+									form.hasErrors = () => false;
+									form.addErrors.and.callFake( () => {
+										form.hasErrors = () => true;
+									} );
+
+									await controller.status( req, res, next );
+
+									expect( form.addErrors ).toHaveBeenCalledWith( fields );
+									expect( res.render ).toHaveBeenCalledWith( TEMPLATE, getTemplateValuesResponse );
+								} );
+							} );
+
+							describe( 'When the fields do not match', () => {
+								it( 'Should call next with an error', async () => {
+
+									form.hasErrors = () => false;
+
+									await controller.status( req, res, next );
+
+									expect( next ).toHaveBeenCalledWith( new Error( `Unable to save barrier status, got ${ statusCode } from backend` ) );
+								} );
+							} );
+						} );
+
+						describe( 'When it is a unknown error', () => {
+							it( 'Should call next with an error', async () => {
+
+								const statusCode = 500;
+								form.hasErrors = () => false;
+								backend.barriers.resolve.and.callFake( () => Promise.resolve( {
+									response: { isSuccess: false, statusCode }
+								} ) );
+
+								await controller.status( req, res, next );
+
+								expect( next ).toHaveBeenCalledWith( new Error( `Unable to save barrier status, got ${ statusCode } from backend` ) );
+							} );
 						} );
 					} );
 
