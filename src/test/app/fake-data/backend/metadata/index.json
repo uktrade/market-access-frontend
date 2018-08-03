@@ -84,5 +84,9 @@
          "name": "Mali",
          "disabled_on": "Fri Dec 08 2017 23:40:33 GMT+0000 (GMT)"
       }
-   ]
+   ],
+   "barrier_type_categories": {
+      "GOODS": "aut dolores architecto",
+      "SERVICES": "facilis assumenda voluptatem"
+   }
 }

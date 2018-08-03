@@ -205,6 +205,14 @@ describe( 'metadata', () => {
 			} );
 		} );
 
+		describe( 'barrierTypeCategories', () => {
+			it( 'Should return the list', () => {
+
+				expect( metadata.barrierTypeCategories ).toBeDefined();
+				expect( metadata.barrierTypeCategories ).toEqual( fakeData.barrier_type_categories );
+			} );
+		} );
+
 		describe( 'supportType', () => {
 			it( 'Should return the data', () => {
 
