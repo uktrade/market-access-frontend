@@ -18,7 +18,7 @@
 {% block page_content %}
 
 	{{ heading({
-		back: { href: urls.reports.legal( report.id ) },
+		back: { href: urls.reports.typeCategory( report.id ) },
 		caption: 'Report a barrier',
 		text: 'Define type of market access barrier',
 		errors: errors
@@ -37,27 +37,11 @@
 			classes: 'barrier-type',
 			fieldset: {
 				legend: {
-					text: 'Goods barriers',
+					text: title,
 					classes: 'govuk-fieldset__legend--s'
 				}
 			},
-			items: items.goods,
-			errorMessage: errors | errorForName( 'barrier-type-1' )
-			} )
-		}}
-
-		{{ govukRadios( {
-
-			idPrefix: 'barrier-type-services',
-			name: 'barrierType',
-			classes: 'barrier-type-services',
-			fieldset: {
-				legend: {
-					text: 'Service barriers',
-					classes: 'govuk-fieldset__legend--s'
-				}
-			},
-			items: items.services,
+			items: barrierType,
 			errorMessage: errors | errorForName( 'barrier-type-1' )
 			} )
 		}}
