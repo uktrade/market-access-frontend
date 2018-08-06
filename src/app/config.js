@@ -59,6 +59,7 @@ let config = {
 	logLevel: env( 'LOG_LEVEL', 'warn' ),
 	sentryDsn: env( 'SENTRY_DSN' ),
 	analyticsId: env( 'ANALYTICS_ID' ),
+	feedbackEmail: requiredEnv( 'FEEDBACK_EMAIL' ),
 	datahubDomain: env( 'DATA_HUB_DOMAIN', 'https://www.datahub.trade.gov.uk' ),
 	views: {
 		cache: bool( 'CACHE_VIEWS', true )

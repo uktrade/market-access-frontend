@@ -9,4 +9,5 @@ module.exports = function( env ){
 	env.addGlobal( 'profileLink', `${ config.datahubDomain }/profile` );
 	env.addGlobal( 'urls', urls );
 	env.addGlobal( 'showErrors', config.isDev );
+	env.addGlobal( 'feedbackEmail', config.feedbackEmail );
 };
