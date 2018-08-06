@@ -3,7 +3,7 @@
 	"title": "Metadata",
 
 	"type": "object",
-	"required": [ "status_types", "loss_range", "adv_boolean", "govt_response", "publish_response", "report_stages", "support_type", "barrier_types", "countries" ],
+	"required": [ "status_types", "loss_range", "adv_boolean", "govt_response", "publish_response", "report_stages", "support_type", "barrier_types", "countries", "barrier_type_categories" ],
 	"properties": {
 
 		"status_types": {
@@ -117,6 +117,15 @@
 			"maxItems": 50,
 			"items": {
 				"$ref": "#/refs/country"
+			}
+		},
+
+		"barrier_type_categories": {
+			"type": "object",
+			"required": [ "GOODS", "SERVICES" ],
+			"properties": {
+				"GOODS": { "$ref": "$refs/common.json#/words" },
+				"SERVICES": { "$ref": "$refs/common.json#/words" }
 			}
 		}
 	},

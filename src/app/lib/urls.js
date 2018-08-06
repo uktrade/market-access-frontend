@@ -32,6 +32,7 @@ const reportUrl = {
 	aboutProblem: ( reportId ) => `/reports/${ reportId }/problem/`,
 	impact: ( reportId ) => `/reports/${ reportId }/impact/`,
 	legal: ( reportId ) => `/reports/${ reportId }/legal/`,
+	typeCategory: ( reportId ) => `/reports/${ reportId }/type-category/`,
 	type: ( reportId ) => `/reports/${ reportId }/type/`,
 	support: ( reportId ) => `/reports/${ reportId }/support/`,
 	nextSteps: ( reportId ) => `/reports/${ reportId }/next-steps/`,
@@ -71,7 +72,7 @@ module.exports = {
 			case '1.6':
 				return reportUrl.legal( report.id );
 			case '1.7':
-				return reportUrl.type( report.id );
+				return reportUrl.typeCategory( report.id );
 			case '2.1':
 				return reportUrl.support( report.id );
 			case '2.2':

@@ -72,6 +72,7 @@ module.exports.fetch = async () => {
 			module.exports.reportStages = body.report_stages;
 			module.exports.reportTaskList = createTaskList( body.report_stages );
 			module.exports.barrierTypes = body.barrier_types;
+			module.exports.barrierTypeCategories = body.barrier_type_categories;
 			module.exports.supportType = body.support_type;
 			module.exports.bool = {
 				'true': 'Yes',

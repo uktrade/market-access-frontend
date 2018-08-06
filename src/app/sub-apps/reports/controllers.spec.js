@@ -41,6 +41,10 @@ describe( 'Report controller', () => {
 				{ id: 1, title: 'barrier 1', category: 'GOODS' },
 				{ id: 2, title: 'barrier 2', category: 'SERVICES' }
 			],
+			barrierTypeCategories: {
+				'GOODS': 'title 1',
+				'SERVICES': 'title 2'
+			},
 			supportType: { '1': 'x', '2': 'y', '3': 'z' }
 		};
 
@@ -84,6 +88,7 @@ describe( 'Report controller', () => {
 				aboutProblem: jasmine.createSpy( 'urls.reports.aboutProblem' ),
 				impact: jasmine.createSpy( 'urls.reports.impact' ),
 				legal: jasmine.createSpy( 'urls.reports.legal' ),
+				typeCategory: jasmine.createSpy( 'urls.reports.typeCategory' ),
 				type: jasmine.createSpy( 'urls.reports.type' ),
 				support: jasmine.createSpy( 'urls.reports.support' ),
 				nextSteps: jasmine.createSpy( 'urls.reports.nextSteps' ),
@@ -1206,13 +1211,13 @@ describe( 'Report controller', () => {
 					describe( 'When save and continue is used to submit the form', () => {
 						it( 'Should redirect', async () => {
 
-							const typeResponse = '/type/';
-							urls.reports.type.and.callFake( () => typeResponse );
+							const typeCategoryResponse = '/type-category/';
+							urls.reports.typeCategory.and.callFake( () => typeCategoryResponse );
 
 							await controller.legal( req, res, next );
 
-							expect( urls.reports.type ).toHaveBeenCalledWith( req.report.id );
-							expect( res.redirect ).toHaveBeenCalledWith( typeResponse );
+							expect( urls.reports.typeCategory ).toHaveBeenCalledWith( req.report.id );
+							expect( res.redirect ).toHaveBeenCalledWith( typeCategoryResponse );
 						} );
 					} );
 				} );
@@ -1246,17 +1251,122 @@ describe( 'Report controller', () => {
 		} );
 	} );
 
-	describe( 'type', () => {
+	describe( 'typeCategory', () => {
 
+		let ssoToken;
 		let report;
 
 		beforeEach( () => {
 
+			ssoToken = uuid();
+			req.session = { ssoToken };
 			report = {
-				barrier_type: 'barrier_type'
+				id: 123,
+				barrier_type_category: 'barrier_type_category'
+			};
+			req.report = report;
+		} );
+
+		it( 'Should setup the form correctly', () => {
+
+			const barrierTypeCategories = { barrierTypeCategories: 1 };
+			const sessionValues = {
+				category: 'GOODS',
+			};
+
+			req.session.typeCategoryValues = sessionValues;
+
+			validators.isMetadata.and.callFake( () => barrierTypeCategories );
+
+			controller.typeCategory( req, res );
+
+			const args = Form.calls.argsFor( 0 );
+			const config = args[ 1 ];
+
+			expect( Form ).toHaveBeenCalled();
+			expect( args[ 0 ] ).toEqual( req );
+
+			expect( config.category ).toBeDefined();
+			expect( config.category.values ).toEqual( [ sessionValues.category, report.barrier_type_category ] );
+			expect( config.category.items.length ).toEqual( Object.entries( metadata.barrierTypeCategories ).length );
+			expect( config.category.validators[ 0 ].fn ).toEqual( barrierTypeCategories );
+		} );
+
+		describe( 'When it is a POST', () => {
+
+			beforeEach( () => {
+
+				req.method = 'POST';
+				req.body = {};
+				form.isPost = true;
+			} );
+
+			describe( 'When the input values are valid', () => {
+
+				it( 'Should save the values and redirect to the next step', () => {
+
+					const typeUrl = 'my-url';
+					const status = '123';
+					const emergency = '456';
+
+					req.body = { status, emergency };
+					form.hasErrors = () => false;
+
+					urls.reports.type.and.callFake( () => typeUrl );
+
+					controller.typeCategory( req, res );
+
+					expect( form.validate ).toHaveBeenCalled();
+					expect( req.session.typeCategoryValues ).toEqual( getValuesResponse );
+					expect( res.redirect ).toHaveBeenCalledWith( typeUrl );
+				} );
+			} );
+
+			describe( 'When no input values are given', () => {
+
+				beforeEach( () => {
+
+					req.session.typeCategoryValues = { test: 1 };
+					form.hasErrors = () => true;
+				} );
+
+				it( 'Should not save the values to the session', () => {
+
+					controller.typeCategory( req, res );
+					expect( req.session.typeCategoryValues ).not.toBeDefined();
+				} );
+			} );
+		} );
+
+		describe( 'When it is a GET', () => {
+			it( 'Should render the start page with the form values', () => {
+
+				const sessionValues = { category: 'GOODS' };
+
+				req.session.typeCategoryValues = sessionValues;
+
+				controller.typeCategory( req, res );
+
+				expect( form.getTemplateValues ).toHaveBeenCalledWith();
+				expect( res.render ).toHaveBeenCalledWith( 'reports/views/type-category', getTemplateValuesResponse );
+			} );
+		} );
+	} );
+
+	describe( 'type', () => {
+
+		let report;
+		let templateData;
+
+		beforeEach( () => {
+
+			report = {
+				id: 123,
+				barrier_type_id: 456
 			};
 
 			req.report = report;
+			req.session.typeCategoryValues = { category: 'GOODS' };
 
 			getTemplateValuesResponse = {
 				barrierType: [
@@ -1264,6 +1374,11 @@ describe( 'Report controller', () => {
 					{ value: 2, text: 'barrier 2', category: 'SERVICES' }
 				]
 			};
+
+			templateData = Object.assign(
+				getTemplateValuesResponse,
+				{ title: metadata.barrierTypeCategories.GOODS }
+			);
 		} );
 
 		it( 'Should setup the form correctly', () => {
@@ -1274,13 +1389,18 @@ describe( 'Report controller', () => {
 
 			const args = Form.calls.argsFor( 0 );
 			const config = args[ 1 ];
+			const goodsBarrierType = metadata.barrierTypes[ 0 ];
 
 			expect( args[ 0 ] ).toEqual( req );
 
 			expect( config.barrierType ).toBeDefined();
 			expect( config.barrierType.type ).toEqual( Form.RADIO );
-			expect( config.barrierType.items ).toEqual( getTemplateValuesResponse.barrierType );
-			expect( config.barrierType.values ).toEqual( [ report.barrier_type ] );
+			expect( config.barrierType.items ).toEqual( [{
+				value: goodsBarrierType.id,
+				text: goodsBarrierType.title,
+				category: goodsBarrierType.category
+			}] );
+			expect( config.barrierType.values ).toEqual( [ report.barrier_type_id ] );
 			expect( config.barrierType.validators[ 0 ].fn ).toEqual( validators.isBarrierType );
 		} );
 
@@ -1291,7 +1411,7 @@ describe( 'Report controller', () => {
 
 				expect( form.validate ).not.toHaveBeenCalled();
 				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'reports/views/type', getTemplateValuesResponse );
+				expect( res.render ).toHaveBeenCalledWith( 'reports/views/type', templateData );
 			} );
 		} );
 
@@ -1315,7 +1435,7 @@ describe( 'Report controller', () => {
 
 					await controller.type( req, res, next );
 
-					expect( res.render ).toHaveBeenCalledWith( 'reports/views/type', getTemplateValuesResponse );
+					expect( res.render ).toHaveBeenCalledWith( 'reports/views/type', templateData );
 				} );
 			} );
 
@@ -1333,6 +1453,7 @@ describe( 'Report controller', () => {
 					afterEach( () => {
 
 						expect( next ).not.toHaveBeenCalled();
+						expect( req.session.typeCategoryValues ).not.toBeDefined();
 						expect( backend.reports.saveBarrierType ).toHaveBeenCalledWith( req, req.report.id, getValuesResponse );
 					} );
 

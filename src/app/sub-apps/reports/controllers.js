@@ -20,21 +20,9 @@ function barrierTypeToRadio( item ){
 	};
 }
 
-function groupBarrierTypes( types ){
+function isBarrierTypeCategory( category ){
 
-	const items = {
-		GOODS: [],
-		SERVICES: []
-	};
-
-	for( let type of types ){
-		items[ type.category ].push( type );
-	}
-
-	return {
-		goods: items.GOODS,
-		services: items.SERVICES
-	};
+	return ( item ) => item.category === category;
 }
 
 let countryItems;
@@ -434,7 +422,7 @@ module.exports = {
 
 					if( response.isSuccess ){
 
-						return res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.type( report.id ) );
+						return res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.typeCategory( report.id ) );
 
 					} else {
 
@@ -451,14 +439,48 @@ module.exports = {
 		res.render( 'reports/views/legal', form.getTemplateValues() );
 	},
 
+	typeCategory: ( req, res ) => {
+
+		const report = req.report;
+		const sessionValues = req.session.typeCategoryValues;
+		const categoryValue = ( sessionValues && sessionValues.category );
+		const form = new Form( req, {
+			category: {
+				type: Form.RADIO,
+				items: govukItemsFromObj( metadata.barrierTypeCategories ),
+				values: [ categoryValue, report.barrier_type_category ],
+				validators: [ {
+					fn: validators.isMetadata( 'barrierTypeCategories' ),
+					message: 'Choose a barrier type category'
+				} ]
+			}
+		} );
+
+		if( form.isPost ){
+
+			form.validate();
+			delete req.session.typeCategoryValues;
+
+			if( !form.hasErrors() ){
+
+				req.session.typeCategoryValues = form.getValues();
+				return res.redirect( urls.reports.type( report.id ) );
+			}
+		}
+
+		res.render( 'reports/views/type-category', form.getTemplateValues() );
+	},
+
 	type: async ( req, res, next ) => {
 
 		const report = req.report;
+		const category = req.session.typeCategoryValues.category;
+		const items = metadata.barrierTypes.filter( isBarrierTypeCategory( category ) ).map( barrierTypeToRadio );
 		const form = new Form( req, {
 			barrierType: {
 				type: Form.RADIO,
-				items: metadata.barrierTypes.map( barrierTypeToRadio ),
-				values: [ report.barrier_type ],
+				items,
+				values: [ report.barrier_type_id ],
 				validators: [ {
 					fn: validators.isBarrierType,
 					message: 'Select a barrier type'
@@ -478,6 +500,7 @@ module.exports = {
 
 					if( response.isSuccess ){
 
+						delete req.session.typeCategoryValues;
 						return res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.support( report.id ) );
 
 					} else {
@@ -493,7 +516,7 @@ module.exports = {
 		}
 
 		const data = form.getTemplateValues();
-		data.items = groupBarrierTypes( data.barrierType );
+		data.title = metadata.barrierTypeCategories[ category ];
 
 		res.render( 'reports/views/type', data );
 	},

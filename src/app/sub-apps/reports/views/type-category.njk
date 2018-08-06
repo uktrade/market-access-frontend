@@ -1,0 +1,33 @@
+{% from 'components/radios/macro.njk' import govukRadios %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Report - Define type of market access barrier - Category{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		caption: 'Report a barrier',
+		text: 'Define type of market acces barrier',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.reports.typeCategory( report.id ) }}" method="POST">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{{ govukRadios({
+			name: 'category',
+			fieldset: {
+				legend: {
+					text: 'What is the barrier category?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: category,
+			errorMessage: errors | errorForName( 'category-1' )
+		}) }}
+
+		<input type="submit" value="Continue" class="govuk-button">
+	</form>
+{% endblock %}

@@ -10,6 +10,7 @@ const reportId = require( './middleware/params/report-id' );
 
 const hasStartFormValues = require( './middleware/has-start-form-values' );
 const hasCompany = require( './middleware/has-company' );
+const hasBarrierTypeCategory = require( './middleware/has-barrier-type-category' );
 
 const csrfProtection = csurf();
 
@@ -48,8 +49,11 @@ module.exports = ( express, app ) => {
 	app.get( '/:reportId/legal/', controller.legal );
 	app.post( '/:reportId/legal/', controller.legal );
 
-	app.get( '/:reportId/type/', controller.type );
-	app.post( '/:reportId/type/', controller.type );
+	app.get( '/:reportId/type-category/', controller.typeCategory );
+	app.post( '/:reportId/type-category/', controller.typeCategory );
+
+	app.get( '/:reportId/type/', hasBarrierTypeCategory, controller.type );
+	app.post( '/:reportId/type/', hasBarrierTypeCategory, controller.type );
 
 	app.get( '/:reportId/support/', controller.support );
 	app.post( '/:reportId/support/', controller.support );

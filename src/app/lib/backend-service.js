@@ -44,21 +44,34 @@ function sortReportProgress( item ){
 	}
 }
 
-function transformReport( { response, body } ){
+function transformReport( report ){
+
+	sortReportProgress( report );
+
+	if( report.barrier_type ){
+
+		report.barrier_type_id = report.barrier_type.id;
+		report.barrier_type_category =report.barrier_type.category;
+	}
+
+	return report;
+}
+
+function transformSingleReport( { response, body } ){
 
 	if( response.isSuccess ){
 
-		sortReportProgress( body );
+		body = transformReport( body );
 	}
 
 	return { response, body };
 }
 
-function transformReports( { response, body } ){
+function transformReportList( { response, body } ){
 
 	if( response.isSuccess && Array.isArray( body.results ) ){
 
-		body.results.forEach( sortReportProgress );
+		body.results = body.results.map( transformReport );
 	}
 
 	return { response, body };
@@ -97,9 +110,9 @@ module.exports = {
 	},
 
 	reports: {
-		getAll: ( req ) => backend.get( '/reports', getToken( req ) ).then( transformReports ),
-		getAllUnfinished: ( req ) => backend.get( '/reports/unfinished', getToken( req ) ).then( transformReports ),
-		get: ( req, reportId ) => backend.get( `/reports/${ reportId }`, getToken( req ) ).then( transformReport ),
+		getAll: ( req ) => backend.get( '/reports', getToken( req ) ).then( transformReportList ),
+		getAllUnfinished: ( req ) => backend.get( '/reports/unfinished', getToken( req ) ).then( transformReportList ),
+		get: ( req, reportId ) => backend.get( `/reports/${ reportId }`, getToken( req ) ).then( transformSingleReport ),
 		save: ( req, values ) => backend.post( '/reports', getToken( req ), {
 			problem_status: getValue( values.status ),
 			is_emergency: getValue( values.emergency ),
