@@ -9,15 +9,21 @@ describe( 'Static globals', function(){
 	let calls;
 	let staticGlobals;
 	let urls;
+	let isDev;
+	let feedbackEmail;
 
 	beforeEach( function(){
 
 		urls = { mySpy: true };
+		isDev = false;
+		feedbackEmail = 'test@test.com';
 
 		staticGlobals = proxyquire( modulePath, {
 			'../config': {
 				analyticsId,
-				datahubDomain
+				datahubDomain,
+				isDev,
+				feedbackEmail
 			},
 			'./urls': urls
 		} );
@@ -68,5 +74,21 @@ describe( 'Static globals', function(){
 
 		expect( args[ 0 ] ).toEqual( 'urls' );
 		expect( args[ 1 ] ).toEqual( urls );
+	} );
+
+	it( 'Should set showErrors', () => {
+
+		const args = calls.argsFor( 5 );
+
+		expect( args[ 0 ] ).toEqual( 'showErrors' );
+		expect( args[ 1 ] ).toEqual( isDev );
+	} );
+
+	it( 'Should set feedbackEmail', () => {
+
+		const args = calls.argsFor( 6 );
+
+		expect( args[ 0 ] ).toEqual( 'feedbackEmail' );
+		expect( args[ 1 ] ).toEqual( feedbackEmail );
 	} );
 } );

@@ -20,6 +20,7 @@ jobs:
           SSO_BYPASS: true
           SSO_MOCK_CODE: abc-def-ghi
           DATAHUB_URL: 'http://localhost.datahub'
+          FEEDBACK_EMAIL: 'test@test'
           CI: true
       - image: redis:3
       - image: ukti/mock-sso
