@@ -36,6 +36,7 @@ a {
 }
 
 @include mq( $from: mobile ){
+
 	.govuk-header--ma {
 
 		border-bottom: none;
@@ -45,11 +46,19 @@ a {
 			margin-bottom: 0;
 		}
 	}
+
+	.js-enabled .header-wrapper__user {
+		display: none;
+	}
 }
 
 .header-wrapper {
 	background-color: $govuk-black;
 	color: $govuk-white;
+}
+
+.js-enabled .header-wrapper__user--open {
+	displaY: block;
 }
 
 .header-wrapper__user__content {
@@ -76,6 +85,10 @@ a {
 		top: govuk-em( 10, 16 );
 		left: 0;
 		width: 100%;
+	}
+
+	.js-enabled .header-wrapper__user {
+		display: block;
 	}
 
 	.header-wrapper__user__content {
@@ -142,18 +155,6 @@ a {
 	.user-info {
 		line-height: 2.1;
 		margin-right: 0;
-	}
-} */
-
-/* .header-bar {
-	@include govuk-font( $size: 14 );
-	background-color: $govuk-fuchsia;
-	padding: govuk-em( 10, 14 ) 0;
-	color: $govuk-white;
-	margin-bottom: govuk-em( 45, 14 );
-
-	a {
-		color: $govuk-white;
 	}
 } */
 
