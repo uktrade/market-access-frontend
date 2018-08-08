@@ -1,29 +1,86 @@
 {% from 'components/footer/macro.njk' import govukFooter %}
+{% from "components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from 'app-components/govuk-header-ma.njk' import govukHeaderMa %}
 
-{% extends 'base.njk' %}
+{% set assetPath = '/govuk-public' %}
 
-{% block head_content %}
+{% extends 'template.njk' %}{# extend from govuk-template #}
+
+{% block pageTitle %}{% block page_title %}Market Access{% endblock %}{% endblock %}
+
+{% block head %}
 	<!-- build:css(src) /public/css/main.min.css -->
 	<link href="/public/css/main.css" media="screen" rel="stylesheet">
 	<!-- endbuild -->
-	{% block head %}{% endblock -%}
 	{% block head_styles %}{% endblock -%}
 	{% block head_script %}{% endblock -%}
 {% endblock %}
 
-{% block body_content %}
-	<main class="page-content" id="content">
-		{% block page_content %}{% endblock %}
-	</main>
+{% block headIcons %}
+	<link rel="shortcut icon" href="/public/img/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="/public/img/favicon-192x192.png" type="image/png">
+	<link rel="apple-touch-icon" href="/public/img/apple-touch-icon.png">
+{% endblock %}
+
+{% block header %}
+	<div class="header-wrapper">
+		{{ govukHeaderMa({
+			classes: 'govuk-header--ma',
+			logoText: 'Data Hub',
+			serviceName: 'Market access barriers',
+			serviceUrl: '/',
+			navigation: [
+				{
+					href: urls.index(),
+					text: 'Dashboard',
+					active: headerNav.isDashboard
+				},{
+					href: urls.reports.new(),
+					text: 'Report a barrier',
+					active: headerNav.isReport
+				},{
+					href: '#',
+					text: 'Find a barrier',
+					active: headerNav.isFind
+				}
+			]
+		}) }}
+		<div class="header-wrapper__user" role="complementary">
+			<p class="header-wrapper__user__content">
+				{% if user %}
+				<span class="user-info">{{ user.username }} <a href="#">Logout</a></span>
+				{% endif %}
+			</p>
+		</div>
+	</div>
+{% endblock %}
+
+{% block beforeContent %}
+	{{ govukPhaseBanner({
+		attributes: { role: 'complementary' },
+		classes: 'govuk-phase-banner--ma',
+		tag: {
+			text: "beta",
+			classes: 'govuk-tag--ma'
+		},
+		html: 'This is a new service – your <a class="govuk-link" href="mailto:{{ feedbackEmail }}">feedback</a> will help us to improve it.'
+	}) }}
+{% endblock %}
+
+{% block content %}
+	{% block page_content %}{% endblock %}
 
 	<div class="footer-bar" role="complementary" aria-labelledby="footer-title">
-		<p class="footer-bar__content govuk-width-container">
+		<p class="footer-bar__content">
 			<strong id="footer-title">Is there anything wrong with this page?</strong>
 			Give us <a href="mailto:{{ feedbackEmail }}">feedback on this page</a> to help us improve this service.
 		</p>
 	</div>
+{% endblock %}
 
+{% block footer %}
 	{{- govukFooter({
+		classes: 'govuk-footer--ma',
 		'navigation': [
 			{
 				'title': 'Data Hub',
@@ -54,5 +111,22 @@
 			}
 		]
 	}) }}
+{% endblock %}
 
+{% block bodyEnd %}
+	<!-- build:js(src) /public/js/vendor.min.js -->
+	<script src="/public/js/vendor/jessie.js"></script>
+	<!-- endbuild -->
+	<!-- build:js(src) /public/js/app.min.js -->
+	<script src="/public/js/ma.js"></script>
+	<script src="/public/js/ma.CustomEvent.js"></script>
+	<script src="/public/js/components/ConditionalRadioContent.js"></script>
+	<script src="/public/js/pages/report/start.js"></script>
+	<script src="/public/js/pages/report/impact.js"></script>
+	<script src="/public/js/pages/report/legal.js"></script>
+	<script src="/public/js/pages/report/support.js"></script>
+	<script src="/public/js/pages/report/next-steps.js"></script>
+	<script src="/public/js/pages/barrier/status.js"></script>
+	<!-- endbuild -->
+	{% block body_script %}{% endblock %}
 {% endblock %}

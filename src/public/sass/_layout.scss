@@ -1,0 +1,180 @@
+body {
+	font-family: Arial,"Helvetica Neue",Helvetica,sans-serif;
+	color: $govuk-black;
+	line-height: 1.5;
+	font-weight: 400;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale
+}
+
+a {
+	@extend .govuk-link;
+}
+
+.visually-hidden {
+	@include govuk-visually-hidden;
+}
+
+.govuk-phase-banner--ma {
+	margin-bottom: govuk-em( 45, 16 );
+}
+
+.govuk-header--ma {
+
+	border-bottom: none;
+
+	.govuk-header__container {
+		border-bottom: none;
+		margin-bottom: 0;
+	}
+
+	.govuk-header__navigation-item--active a:link,
+	.govuk-header__navigation-item--active a:hover,
+	.govuk-header__navigation-item--active a:visited {
+		color: $govuk-fuchsia-50;
+	}
+}
+
+@include mq( $from: mobile ){
+	.govuk-header--ma {
+
+		border-bottom: none;
+
+		.govuk-header__container {
+			border-bottom: none;
+			margin-bottom: 0;
+		}
+	}
+}
+
+.header-wrapper {
+	background-color: $govuk-black;
+	color: $govuk-white;
+}
+
+.header-wrapper__user__content {
+	max-width: 960px;
+	border-top: 1px solid $govuk-grey-1;
+	margin: 0 govuk-em( 15, 16 );
+	padding: govuk-em( 10, 16 ) 0;
+}
+
+@include mq( $from: tablet ){
+	.header-wrapper__user__content {
+		margin: 0 govuk-em( 30, 16 );
+	}
+}
+
+@include mq( $from: desktop ){
+
+	.header-wrapper {
+		position: relative;
+	}
+
+	.header-wrapper__user {
+		position: absolute;
+		top: govuk-em( 10, 16 );
+		left: 0;
+		width: 100%;
+	}
+
+	.header-wrapper__user__content {
+		border-top: 0;
+		text-align: right;
+	}
+}
+
+// As soon as the viewport is greater than the width of the page plus the
+// gutters, just centre the content instead of adding gutters.
+@include govuk-media-query($and: "(min-width: #{($govuk-page-width + $govuk-gutter * 2)})") {
+
+	.header-wrapper__user__content {
+		margin: 0 auto;
+	}
+}
+
+.govuk-tag--ma {
+	position: relative;
+	top: -2px;
+	padding-top: 4px;
+	padding-bottom: 2px;
+	background-color: $govuk-fuchsia;
+}
+
+.user-info {
+	color: white;
+	font-weight: bold;
+	// line-height: 1.7;
+	// margin-left: 2em;
+}
+
+.user-info a {
+
+	font-weight: normal;
+	color: white;
+	text-decoration: none;
+	margin-left: govuk-em( 10, 16 );
+
+	&:hover {
+		text-decoration: underline;
+	}
+
+	&:visited {
+		color: white;
+	}
+}
+/*
+@media (min-width: 372px) {
+
+	.user-info {
+		margin: 0 1em;
+	}
+}
+
+@media (min-width: 641px) {
+	.user-info {
+		font-size: 16px;
+		line-height: 2;
+	}
+}
+
+@media (min-width: 769px) {
+	.user-info {
+		line-height: 2.1;
+		margin-right: 0;
+	}
+} */
+
+/* .header-bar {
+	@include govuk-font( $size: 14 );
+	background-color: $govuk-fuchsia;
+	padding: govuk-em( 10, 14 ) 0;
+	color: $govuk-white;
+	margin-bottom: govuk-em( 45, 14 );
+
+	a {
+		color: $govuk-white;
+	}
+} */
+
+.footer-bar {
+	@include govuk-font( $size: 14 );
+	margin-top: govuk-em( 45, 14 );
+}
+
+.footer-bar__content {
+
+	margin: 0;
+	background-color: $govuk-fuchsia;
+	color: $govuk-white;
+	box-sizing: border-box;
+	padding: govuk-em( 10, 14 ) govuk-em( 10, 14 ) govuk-em( 5, 14 ) govuk-em( 10, 14 );
+
+	a {
+		color: $govuk-white;
+	}
+}
+
+.govuk-footer--ma {
+	border-top: 8px solid $govuk-fuchsia
+}

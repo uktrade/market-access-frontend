@@ -27,6 +27,7 @@ module.exports = {
 		const app = express();
 		const isDev = config.isDev;
 		const pathToPublic = path.resolve( __dirname, '../public' );
+		const pathToGovukAssets = path.resolve( __dirname, '../../node_modules/govuk-frontend/assets' );
 		const staticMaxAge = ( isDev ? 0 : '2y' );
 
 		const nunjucksEnv = nunjucks.configure( [
@@ -60,6 +61,7 @@ module.exports = {
 		if( !isDev ){ app.use( compression() ); }
 		app.use( forceHttps( config.server.secure ) );
 		app.use( '/public', express.static( pathToPublic, { maxAge: staticMaxAge } ) );
+		app.use( '/govuk-public', express.static( pathToGovukAssets, { maxAge: staticMaxAge } ) );
 		app.use( morganLogger( ( isDev ? 'dev' : 'combined' ) ) );
 		app.use( headers( isDev ) );
 		app.use( ping );
