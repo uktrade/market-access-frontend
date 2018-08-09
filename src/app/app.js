@@ -35,6 +35,8 @@ module.exports = {
 				`${__dirname}/sub-apps`,
 				path.resolve( __dirname, ( isDev ? '../' : '' ) + '../node_modules/govuk-frontend' )
 			], {
+			trimBlocks: true,
+			lstripBlocks: true,
 			autoescape: true,
 			watch: isDev,
 			noCache: !config.views.cache,
