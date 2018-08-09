@@ -115,72 +115,119 @@ module.exports = {
 
 		const RESOLVE = 'resolve';
 		const HIBERNATE = 'hibernate';
+		const OPEN = 'open';
 
-		const form = new Form( req, {
+		const barrier = req.barrier;
+		const currentStatus = barrier.current_status.status;
+		const configItems = {
+			[ RESOLVE ]: {
+				serviceMethod: 'resolve',
+				successPage: 'statusResolved',
+				label: 'Mark as <strong>resolved</strong>',
+				fields: {
+					resolvedDate: {
+						type: Form.GROUP,
+						conditional: { name: 'status', value: RESOLVE },
+						errorField: 'status_date',
+						validators: [ {
+							fn: validators.isDateValue( 'day' ),
+							message: 'Enter a day'
+						},{
+							fn: validators.isDateValue( 'month' ),
+							message: 'Enter a month'
+						},{
+							fn: validators.isDateValue( 'year' ),
+							message: 'Enter a year'
+						},{
+							fn: validators.isDateValid,
+							message: 'Enter a valid date'
+						},{
+							fn: validators.isDateInPast,
+							message: 'Enter a date that is in the past'
+						} ],
+						items: {
+							day: {},
+							month: {},
+							year: {}
+						}
+					},
 
-			_csrf: {
-				values: [ req.csrfToken() ]
-			},
-
-			status: {
-				type: Form.RADIO,
-				values: [ req.barrier.current_status.status ],
-				items: [
-					{
-						value: RESOLVE,
-						html: 'Mark as <strong>resolved</strong>'
-					},{
-						value: HIBERNATE,
-						html: 'Mark as <strong>hibernation</strong>'
+					resolvedSummary: {
+						conditional: { name: 'status', value: RESOLVE },
+						errorField: 'summary',
+						required: 'Enter a summary'
 					}
-				],
-				validators: [
-					{
-						fn: ( value ) => ( value === RESOLVE || value === HIBERNATE ),
-						message: 'Choose a status'
-					}
-				]
-			},
-
-			resolvedDate: {
-				type: Form.GROUP,
-				conditional: { name: 'status', value: RESOLVE },
-				errorField: 'status_date',
-				validators: [ {
-					fn: validators.isDateValue( 'day' ),
-					message: 'Enter a day'
-				},{
-					fn: validators.isDateValue( 'month' ),
-					message: 'Enter a month'
-				},{
-					fn: validators.isDateValue( 'year' ),
-					message: 'Enter a year'
-				},{
-					fn: validators.isDateValid,
-					message: 'Enter a valid date'
-				},{
-					fn: validators.isDateInPast,
-					message: 'Enter a date that is in the past'
-				} ],
-				items: {
-					day: {},
-					month: {},
-					year: {}
 				}
 			},
-
-			resolvedSummary: {
-				conditional: { name: 'status', value: RESOLVE },
-				errorField: 'summary',
-				required: 'Enter a summary'
+			[ HIBERNATE ]: {
+				serviceMethod: 'hibernate',
+				successPage: 'statusHibernated',
+				label: 'Mark as <strong>hibernation</strong>',
+				fields: {
+					hibernationSummary: {
+						conditional: { name: 'status', value: HIBERNATE },
+						errorField: 'summary',
+						required: 'Enter a summary'
+					},
+				}
 			},
-
-			hibernationSummary: {
-				conditional: { name: 'status', value: HIBERNATE },
-				errorField: 'summary',
-				required: 'Enter a summary'
+			[ OPEN ]: {
+				serviceMethod: '',
+				successPage: '',
+				label: 'Mark as <strong>open</strong>',
+				fields: {
+					reopenSummary: {
+						conditional: { name: 'status', value: OPEN },
+						errorField: 'summary',
+						required: 'Enter a summary'
+					}
+				}
 			}
-		} );
+		};
+
+		let formOptions;
+		const items = [];
+		const formFields = {};
+
+		switch( currentStatus ){
+			case 2: //Open
+				formOptions = [ RESOLVE, HIBERNATE ];
+			break;
+			case 4: //Resolved
+				formOptions = [ OPEN, HIBERNATE ];
+			break;
+			case 5: //Hibernated
+				formOptions = [ OPEN, RESOLVE ];
+			break;
+		}
+
+		for( let option of formOptions ){
+
+			const configItem = configItems[ option ];
+
+			items.push( {
+				value: option,
+				html: configItem.label
+			} );
+
+			for( let [ key, value ] of Object.entries( configItem.fields ) ){
+				formFields[ key ] = value;
+			}
+		}
+
+		formFields.status = {
+			type: Form.RADIO,
+			values: [ currentStatus ],
+			items,
+			validators: [
+				{
+					fn: ( value ) => formOptions.includes( value ),
+					message: 'Choose a status'
+				}
+			]
+		};
+
+		const form = new Form( req, formFields );
 
 		if( form.isPost ){
 
@@ -191,15 +238,13 @@ module.exports = {
 				try {
 
 					const formValues = form.getValues();
-					const isResolve = ( formValues.status === RESOLVE );
-					const serviceMethod = ( isResolve ? 'resolve' : 'hibernate' );
-					const successPage = ( isResolve ? 'statusResolved' : 'statusHibernated' );
+					const configItem = configItems[ formValues.status ];
 
-					const { response, body } = await backend.barriers[ serviceMethod ]( req, req.barrier.id, formValues );
+					const { response, body } = await backend.barriers[ configItem.serviceMethod ]( req, req.barrier.id, formValues );
 
 					if( response.isSuccess ){
 
-						return res.redirect( urls.barriers[ successPage ]( req.barrier.id ) );
+						return res.redirect( urls.barriers[ configItem.successPage ]( req.barrier.id ) );
 
 					} else if ( response.statusCode === 400 && body.fields ){
 

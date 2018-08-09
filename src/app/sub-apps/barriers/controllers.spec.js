@@ -303,49 +303,30 @@ describe( 'Barriers controller', () => {
 
 		const RESOLVE = 'resolve';
 		const HIBERNATE = 'hibernate';
+		const OPEN = 'open';
 		const TEMPLATE = 'barriers/views/status';
 
 		let barrier;
+		let dayValidator;
+		let monthValidator;
+		let yearValidator;
 
-		beforeEach( () => {
-
-			barrier = {
-				id: uuid(),
-				current_status: {
-					status: 4
-				}
-			};
-			req.barrier = barrier;
-		} );
-
-		it( 'Should setup the form correctly', () => {
-
-			const dayValidator = { day: 1 };
-			const monthValidator = { month: 1 };
-			const yearValidator = { year: 1 };
-
-			validators.isDateValue.and.callFake( ( name ) => {
-
-				if( name === 'day' ){ return dayValidator; }
-				if( name === 'month' ){ return monthValidator; }
-				if( name === 'year' ){ return yearValidator; }
-			} );
-
-			controller.status( req, res );
-
+		function checkAndGetConfig(){
 			const args = Form.calls.argsFor( 0 );
 			const config = args[ 1 ];
 
 			expect( Form ).toHaveBeenCalled();
 			expect( args[ 0 ] ).toEqual( req );
 
-			expect( config._csrf ).toBeDefined();
-			expect( config._csrf.values ).toEqual( [ csrfToken ] );
-
 			expect( config.status ).toBeDefined();
 			expect( config.status.values ).toEqual( [ barrier.current_status.status ] );
 			expect( Array.isArray( config.status.items ) ).toEqual( true );
 			expect( typeof config.status.validators[ 0 ].fn ).toEqual( 'function' );
+
+			return config;
+		}
+
+		function hasResolveConfig( config ){
 
 			expect( config.resolvedDate ).toBeDefined();
 			expect( config.resolvedDate.type ).toEqual( GROUP );
@@ -360,122 +341,187 @@ describe( 'Barriers controller', () => {
 			expect( config.resolvedSummary ).toBeDefined();
 			expect( config.resolvedSummary.conditional ).toEqual( { name: 'status', value: RESOLVE } );
 			expect( config.resolvedSummary.required ).toBeDefined();
+			expect( config.resolvedSummary.errorField ).toEqual( 'summary' );
+		}
+
+		function hasHibernateConfig( config ){
 
 			expect( config.hibernationSummary ).toBeDefined();
 			expect( config.hibernationSummary.conditional ).toEqual( { name: 'status', value: HIBERNATE } );
 			expect( config.hibernationSummary.required ).toBeDefined();
-		} );
+			expect( config.hibernationSummary.errorField ).toEqual( 'summary' );
+		}
 
-		describe( 'When it is a GET', () => {
-			it( 'Should render the view with the viewModel', async () => {
+		function hasOpenConfig( config ){
 
-				await controller.status( req, res, next );
+			expect( config.reopenSummary ).toBeDefined();
+			expect( config.reopenSummary.conditional ).toEqual( { name: 'status', value: OPEN } );
+			expect( config.reopenSummary.required ).toBeDefined();
+			expect( config.reopenSummary.errorField ).toEqual( 'summary' );
+		}
 
-				expect( form.validate ).not.toHaveBeenCalled();
-				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( TEMPLATE, getTemplateValuesResponse );
+		beforeEach( () => {
+
+			barrier = {
+				id: uuid(),
+				current_status: {}
+			};
+			req.barrier = barrier;
+
+			dayValidator = { day: 1 };
+			monthValidator = { month: 1 };
+			yearValidator = { year: 1 };
+
+			validators.isDateValue.and.callFake( ( name ) => {
+
+				if( name === 'day' ){ return dayValidator; }
+				if( name === 'month' ){ return monthValidator; }
+				if( name === 'year' ){ return yearValidator; }
 			} );
 		} );
 
-		describe( 'When it is a POST', () => {
+		describe( 'When the current status is OPEN', () => {
 
 			beforeEach( () => {
 
-				req.body = {};
-				form.isPost = true;
+				barrier.current_status.status = 2;
 			} );
 
-			afterEach( () => {
+			it( 'Should setup the form correctly', () => {
 
-				expect( form.validate ).toHaveBeenCalled();
+				controller.status( req, res );
+
+				const config = checkAndGetConfig();
+				hasResolveConfig( config );
+				hasHibernateConfig( config );
 			} );
 
-			describe( 'When the required values are empty', () => {
-				it( 'Should render the template', async () => {
-
-					form.hasErrors = () => true;
+			describe( 'When it is a GET', () => {
+				it( 'Should render the view with the viewModel', async () => {
 
 					await controller.status( req, res, next );
 
+					expect( form.validate ).not.toHaveBeenCalled();
+					expect( form.getTemplateValues ).toHaveBeenCalledWith();
 					expect( res.render ).toHaveBeenCalledWith( TEMPLATE, getTemplateValuesResponse );
 				} );
 			} );
 
-			describe( 'When the required values are filled', () => {
-				describe( 'When it is resolve', () => {
+			describe( 'When it is a POST', () => {
 
-					beforeEach( () => {
+				beforeEach( () => {
 
-						getValuesResponse.status = RESOLVE;
+					req.body = {};
+					form.isPost = true;
+				} );
+
+				afterEach( () => {
+
+					expect( form.validate ).toHaveBeenCalled();
+				} );
+
+				describe( 'When the required values are empty', () => {
+					it( 'Should render the template', async () => {
+
+						form.hasErrors = () => true;
+
+						await controller.status( req, res, next );
+
+						expect( res.render ).toHaveBeenCalledWith( TEMPLATE, getTemplateValuesResponse );
 					} );
+				} );
 
-					describe( 'When the response is a success', () => {
+				describe( 'When the required values are filled', () => {
+					describe( 'When it is RESOLVE', () => {
 
 						beforeEach( () => {
 
-							backend.barriers.resolve.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
-							form.hasErrors = () => false;
+							getValuesResponse.status = RESOLVE;
 						} );
 
-						afterEach( () => {
-
-							expect( next ).not.toHaveBeenCalled();
-							expect( backend.barriers.resolve ).toHaveBeenCalledWith( req, req.barrier.id, getValuesResponse );
-						} );
-
-						describe( 'When the form is saved', () => {
-							it( 'Should redirect', async () => {
-
-								const resolvedlUrl = '/resolved/';
-								urls.barriers.statusResolved.and.callFake( () => resolvedlUrl );
-
-								await controller.status( req, res, next );
-
-								expect( urls.barriers.statusResolved ).toHaveBeenCalledWith( req.barrier.id );
-								expect( res.redirect ).toHaveBeenCalledWith( resolvedlUrl );
-							} );
-						} );
-					} );
-
-					describe( 'When the response is not a success', () => {
-						describe( 'When the error is a 400', () => {
-
-							let statusCode;
-							let fields;
+						describe( 'When the response is a success', () => {
 
 							beforeEach( () => {
 
-								statusCode = 400;
-								fields = { a: 1, b: 2 };
-
-								backend.barriers.resolve.and.callFake( () => Promise.resolve( {
-									response: { isSuccess: false, statusCode },
-									body: { fields }
-								} ) );
-
-								form.addErrors = jasmine.createSpy( 'form.addErrors' );
+								backend.barriers.resolve.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+								form.hasErrors = () => false;
 							} );
 
-							describe( 'When the fields match', () => {
-								it( 'Should call form.addErrors and render the page', async () => {
+							afterEach( () => {
 
+								expect( next ).not.toHaveBeenCalled();
+								expect( backend.barriers.resolve ).toHaveBeenCalledWith( req, req.barrier.id, getValuesResponse );
+							} );
 
-									form.hasErrors = () => false;
-									form.addErrors.and.callFake( () => {
-										form.hasErrors = () => true;
-									} );
+							describe( 'When the form is saved', () => {
+								it( 'Should redirect', async () => {
+
+									const resolvedlUrl = '/resolved/';
+									urls.barriers.statusResolved.and.callFake( () => resolvedlUrl );
 
 									await controller.status( req, res, next );
 
-									expect( form.addErrors ).toHaveBeenCalledWith( fields );
-									expect( res.render ).toHaveBeenCalledWith( TEMPLATE, getTemplateValuesResponse );
+									expect( urls.barriers.statusResolved ).toHaveBeenCalledWith( req.barrier.id );
+									expect( res.redirect ).toHaveBeenCalledWith( resolvedlUrl );
+								} );
+							} );
+						} );
+
+						describe( 'When the response is not a success', () => {
+							describe( 'When the error is a 400', () => {
+
+								let statusCode;
+								let fields;
+
+								beforeEach( () => {
+
+									statusCode = 400;
+									fields = { a: 1, b: 2 };
+
+									backend.barriers.resolve.and.callFake( () => Promise.resolve( {
+										response: { isSuccess: false, statusCode },
+										body: { fields }
+									} ) );
+
+									form.addErrors = jasmine.createSpy( 'form.addErrors' );
+								} );
+
+								describe( 'When the fields match', () => {
+									it( 'Should call form.addErrors and render the page', async () => {
+
+
+										form.hasErrors = () => false;
+										form.addErrors.and.callFake( () => {
+											form.hasErrors = () => true;
+										} );
+
+										await controller.status( req, res, next );
+
+										expect( form.addErrors ).toHaveBeenCalledWith( fields );
+										expect( res.render ).toHaveBeenCalledWith( TEMPLATE, getTemplateValuesResponse );
+									} );
+								} );
+
+								describe( 'When the fields do not match', () => {
+									it( 'Should call next with an error', async () => {
+
+										form.hasErrors = () => false;
+
+										await controller.status( req, res, next );
+
+										expect( next ).toHaveBeenCalledWith( new Error( `Unable to save barrier status, got ${ statusCode } from backend` ) );
+									} );
 								} );
 							} );
 
-							describe( 'When the fields do not match', () => {
+							describe( 'When it is a unknown error', () => {
 								it( 'Should call next with an error', async () => {
 
+									const statusCode = 500;
 									form.hasErrors = () => false;
+									backend.barriers.resolve.and.callFake( () => Promise.resolve( {
+										response: { isSuccess: false, statusCode }
+									} ) );
 
 									await controller.status( req, res, next );
 
@@ -484,35 +530,168 @@ describe( 'Barriers controller', () => {
 							} );
 						} );
 
-						describe( 'When it is a unknown error', () => {
-							it( 'Should call next with an error', async () => {
+						describe( 'When the request fails', () => {
+							it( 'Should call next with the error', async () => {
 
-								const statusCode = 500;
+								const err = new Error( 'my test' );
 								form.hasErrors = () => false;
-								backend.barriers.resolve.and.callFake( () => Promise.resolve( {
-									response: { isSuccess: false, statusCode }
-								} ) );
+								backend.barriers.resolve.and.callFake( () => Promise.reject( err ) );
 
 								await controller.status( req, res, next );
 
-								expect( next ).toHaveBeenCalledWith( new Error( `Unable to save barrier status, got ${ statusCode } from backend` ) );
+								expect( next ).toHaveBeenCalledWith( err );
 							} );
 						} );
 					} );
 
-					describe( 'When the request fails', () => {
-						it( 'Should call next with the error', async () => {
+					describe( 'When it is HIBERNATE', () => {
 
-							const err = new Error( 'my test' );
-							form.hasErrors = () => false;
-							backend.barriers.resolve.and.callFake( () => Promise.reject( err ) );
+						beforeEach( () => {
 
-							await controller.status( req, res, next );
+							getValuesResponse.status = HIBERNATE;
+						} );
 
-							expect( next ).toHaveBeenCalledWith( err );
+						describe( 'When the response is a success', () => {
+
+							beforeEach( () => {
+
+								backend.barriers.hibernate.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+								form.hasErrors = () => false;
+							} );
+
+							afterEach( () => {
+
+								expect( next ).not.toHaveBeenCalled();
+								expect( backend.barriers.hibernate ).toHaveBeenCalledWith( req, req.barrier.id, getValuesResponse );
+							} );
+
+							describe( 'When the form is saved', () => {
+								it( 'Should redirect', async () => {
+
+									const hibernatelUrl = '/resolved/';
+									urls.barriers.statusHibernated.and.callFake( () => hibernatelUrl );
+
+									await controller.status( req, res, next );
+
+									expect( urls.barriers.statusHibernated ).toHaveBeenCalledWith( req.barrier.id );
+									expect( res.redirect ).toHaveBeenCalledWith( hibernatelUrl );
+								} );
+							} );
+						} );
+
+						describe( 'When the response is not a success', () => {
+							describe( 'When the error is a 400', () => {
+
+								let statusCode;
+								let fields;
+
+								beforeEach( () => {
+
+									statusCode = 400;
+									fields = { a: 1, b: 2 };
+
+									backend.barriers.hibernate.and.callFake( () => Promise.resolve( {
+										response: { isSuccess: false, statusCode },
+										body: { fields }
+									} ) );
+
+									form.addErrors = jasmine.createSpy( 'form.addErrors' );
+								} );
+
+								describe( 'When the fields match', () => {
+									it( 'Should call form.addErrors and render the page', async () => {
+
+
+										form.hasErrors = () => false;
+										form.addErrors.and.callFake( () => {
+											form.hasErrors = () => true;
+										} );
+
+										await controller.status( req, res, next );
+
+										expect( form.addErrors ).toHaveBeenCalledWith( fields );
+										expect( res.render ).toHaveBeenCalledWith( TEMPLATE, getTemplateValuesResponse );
+									} );
+								} );
+
+								describe( 'When the fields do not match', () => {
+									it( 'Should call next with an error', async () => {
+
+										form.hasErrors = () => false;
+
+										await controller.status( req, res, next );
+
+										expect( next ).toHaveBeenCalledWith( new Error( `Unable to save barrier status, got ${ statusCode } from backend` ) );
+									} );
+								} );
+							} );
+
+							describe( 'When it is a unknown error', () => {
+								it( 'Should call next with an error', async () => {
+
+									const statusCode = 500;
+									form.hasErrors = () => false;
+									backend.barriers.hibernate.and.callFake( () => Promise.resolve( {
+										response: { isSuccess: false, statusCode }
+									} ) );
+
+									await controller.status( req, res, next );
+
+									expect( next ).toHaveBeenCalledWith( new Error( `Unable to save barrier status, got ${ statusCode } from backend` ) );
+								} );
+							} );
+						} );
+
+						describe( 'When the request fails', () => {
+							it( 'Should call next with the error', async () => {
+
+								const err = new Error( 'my test' );
+								form.hasErrors = () => false;
+								backend.barriers.hibernate.and.callFake( () => Promise.reject( err ) );
+
+								await controller.status( req, res, next );
+
+								expect( next ).toHaveBeenCalledWith( err );
+							} );
 						} );
 					} );
 				} );
+			} );
+		} );
+
+		describe( 'When the current status is RESOLVE', () => {
+
+			beforeEach( () => {
+
+				barrier.current_status.status = 4;
+			} );
+
+			it( 'Should setup the form correctly', () => {
+
+				controller.status( req, res );
+
+				const config = checkAndGetConfig();
+
+				hasOpenConfig( config );
+				hasHibernateConfig( config );
+			} );
+		} );
+
+		describe( 'When the current status is HIBERNATE', () => {
+
+			beforeEach( () => {
+
+				barrier.current_status.status = 5;
+			} );
+
+			it( 'Should setup the form correctly', () => {
+
+				controller.status( req, res );
+
+				const config = checkAndGetConfig();
+
+				hasOpenConfig( config );
+				hasResolveConfig( config );
 			} );
 		} );
 	} );
