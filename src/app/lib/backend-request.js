@@ -1,6 +1,26 @@
 const request = require( 'request' );
+const hawk = require( 'hawk' );
 const config = require( '../config' );
 const logger = require( './logger' );
+
+const credentials = {
+	'id': 'metadata',
+	'key': 'kbr6j2m10n6569d29gcyufnzlnz7rez73o4zmqiv9v6e32bmu3',
+	'algorithm': 'sha256'
+};
+
+function getHawkHeader( requestOptions ){
+
+	const { uri, method } = requestOptions;
+	const payload = requestOptions.body;
+
+	// Generate Authorization request header
+	return hawk.client.header( uri, method, {
+		credentials,
+		payload: ( payload || '' ),
+		contentType: ( payload ? 'application/json' : 'text/plain' )
+	} );
+}
 
 function makeRequest( method, path, opts = {} ){
 
@@ -16,19 +36,24 @@ function makeRequest( method, path, opts = {} ){
 		json: true
 	};
 
-	if( opts.token ){
-
-		requestOptions.headers = { Authorization: `Bearer ${ opts.token }` };
-	}
-
 	if( opts.body ){
 
 		requestOptions.body = opts.body;
 	}
 
+	if( opts.token ){
+
+		requestOptions.headers = { Authorization: `Bearer ${ opts.token }` };
+
+	} else {
+
+		requestOptions.headers = { Authorization: getHawkHeader( requestOptions ).header };
+	}
+
 	return new Promise( ( resolve, reject ) => {
 
 		logger.debug( `Sending ${ method } request to: ${ uri }` );
+		logger.debug( JSON.stringify( requestOptions.headers, null, 2 ) );
 
 		if( opts.body ){
 			logger.debug( 'With body: ' + JSON.stringify( opts.body, null, 2 ) );
