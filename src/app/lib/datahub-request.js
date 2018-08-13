@@ -48,15 +48,17 @@ function makeRequest( method, path, token, opts = {} ){
 
 			} else {
 
-				response.isSuccess = ( response.statusCode >= 200 && response.statusCode <= 300 );
+				const statusCode = response.statusCode;
 
-				if( response.isSuccess || response.statusCode === 404 ){
+				response.isSuccess = ( statusCode >= 200 && statusCode <= 300 );
+
+				if( response.isSuccess || statusCode === 404 || statusCode === 403 ){
 
 					resolve( { response, body } );
 
 				} else {
 
-					reject( new Error( `Got at ${ response.statusCode } response code from datahub` ) );
+					reject( new Error( `Got at ${ statusCode } response code from datahub` ) );
 				}
 			}
 		} );

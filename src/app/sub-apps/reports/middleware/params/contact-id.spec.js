@@ -14,7 +14,7 @@ describe( 'Contact Id param middleware', () => {
 	beforeEach( () => {
 
 		req = {};
-		res = { locals: {} };
+		res = { locals: {}, render: jasmine.createSpy( 'res.render' ) };
 		next = jasmine.createSpy( 'next' );
 		datahub = {
 			getContact: jasmine.createSpy( 'datahub.getContact' )
@@ -62,6 +62,22 @@ describe( 'Contact Id param middleware', () => {
 				expect( req.contact ).not.toBeDefined();
 				expect( res.locals.contact ).not.toBeDefined();
 				expect( next ).toHaveBeenCalledWith( new Error( 'Not a successful response from datahub' ) );
+			} );
+
+			describe( 'When the statusCode is 403', () => {
+				it( 'Should call next with an error', async () => {
+
+					const promise = Promise.resolve( { response: { isSuccess: false, statusCode: 403 }, body: {} } );
+
+					datahub.getContact.and.callFake( () => promise );
+
+					await middleware( req, res, next, id );
+
+					expect( datahub.getContact ).toHaveBeenCalledWith( req, id );
+					expect( req.contact ).not.toBeDefined();
+					expect( res.locals.contact ).not.toBeDefined();
+					expect( res.render ).toHaveBeenCalledWith( 'reports/views/error/data-hub/403' );
+				} );
 			} );
 		} );
 

@@ -114,6 +114,25 @@ describe( 'datahub Request', () => {
 				} );
 			} );
 
+			describe( 'With a 403 statusCode', () => {
+				it( 'Should resolve', ( done ) => {
+
+					const path = '/whoami/';
+
+					mockResponse.statusCode = 403;
+
+					datahub.get( path, token ).then( ( { response, body } ) => {
+
+						expect( response ).toEqual( mockResponse );
+						expect( body ).toEqual( mockBody );
+						done();
+					});
+
+					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
+					checkRequest( path, GET );
+				} );
+			} );
+
 			describe( 'With a 400 statusCode', () => {
 				it( 'Should reject', ( done ) => {
 

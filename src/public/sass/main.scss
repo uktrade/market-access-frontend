@@ -54,6 +54,13 @@ $govuk-images-path: "/public/govuk/images/";
 @import 'pages/index';
 @import 'pages/report/detail';
 
+.error-message {
+	@include govuk-font( 24 );
+	border: 4px solid $govuk-red;
+	padding: govuk-em( 30, 24 );
+	background-color: $govuk-red-5;
+}
+
 .govuk-tag--ma {
 	position: relative;
 	top: -2px;

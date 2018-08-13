@@ -16,6 +16,10 @@ module.exports = async ( req, res, next, id ) => {
 
 				next();
 
+			} else if( response.statusCode === 403 ){
+
+				return res.render( 'reports/views/error/data-hub/403' );
+
 			} else {
 
 				throw new Error( 'Not a successful response from datahub' );
