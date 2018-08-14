@@ -97,13 +97,16 @@ function makeRequest( method, path, opts = {} ){
 
 				response.isSuccess = ( statusCode >= 200 && statusCode <= 300 );
 
-				try {
+				if( response.headers[ 'content-type' ] === 'application/json' ){
 
-					body = JSON.parse( body );
+					try {
 
-				} catch( e ){
+						body = JSON.parse( body );
 
-					logger.debug( `Invalid JSON response for ${ uri }` );
+					} catch( e ){
+
+						logger.debug( `Invalid JSON response for ${ uri }` );
+					}
 				}
 
 				if( response.isSuccess || statusCode === 404 || statusCode === 400 ){
