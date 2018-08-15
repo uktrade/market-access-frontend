@@ -16,6 +16,7 @@ describe( 'Backend Request', () => {
 	let mockResponse;
 	let mockBody;
 	let hawkHeaderResponse;
+	let hawkCredentials;
 
 	function checkRequest( method, path, opts = {} ){
 
@@ -45,6 +46,8 @@ describe( 'Backend Request', () => {
 		}
 
 		expect( request.calls.argsFor( 0 )[ 0 ] ).toEqual( requestOptions );
+
+		return requestOptions;
 	}
 
 	function checkForMockResponse( { response, body } ){
@@ -74,6 +77,10 @@ describe( 'Backend Request', () => {
 				authenticate: jasmine.createSpy( 'hawk.client.authenticate' ).and.callFake( () => true )
 			}
 		};
+		hawkCredentials = {
+			id: 'a hawk id',
+			key: 'a hawk key'
+		};
 		token = uuid();
 		mockResponse = {
 			headers: {},
@@ -85,7 +92,10 @@ describe( 'Backend Request', () => {
 			request,
 			hawk,
 			'../config': {
-				backend: { url: backendUrl }
+				backend: {
+					url: backendUrl,
+					hawk: hawkCredentials
+				}
 			}
 		} );
 	} );
@@ -162,7 +172,7 @@ describe( 'Backend Request', () => {
 	describe( 'post', () => {
 		describe( 'With a 200 response', () => {
 			describe( 'Without a token or body', () => {
-				it( 'Should create the correct options', async () => {
+				it( 'Should create a hawk header with the correct options', async () => {
 
 					respondWithMocks();
 
@@ -170,8 +180,49 @@ describe( 'Backend Request', () => {
 
 					const responseData = await backend.post( path );
 
-					checkRequest( POST, path );
+					const requestOptions = checkRequest( POST, path );
 					checkForMockResponse( responseData );
+					expect( hawk.client.header ).toHaveBeenCalledWith(
+						requestOptions.uri,
+						requestOptions.method,
+						{
+							credentials: {
+								id: hawkCredentials.id,
+								key: hawkCredentials.key,
+								algorithm: 'sha256'
+							},
+							payload: '',
+							contentType: 'text/plain'
+						}
+					);
+				} );
+			} );
+
+			describe( 'Without a token but with a body', () => {
+				it( 'Should create a hawk header with the correct options', async () => {
+
+					respondWithMocks();
+
+					const path = '/a-test';
+					const body = { some: 'body' };
+
+					const responseData = await backend.post( path, null, body );
+
+					const requestOptions = checkRequest( POST, path, { body } );
+					checkForMockResponse( responseData );
+					expect( hawk.client.header ).toHaveBeenCalledWith(
+						requestOptions.uri,
+						requestOptions.method,
+						{
+							credentials: {
+								id: hawkCredentials.id,
+								key: hawkCredentials.key,
+								algorithm: 'sha256'
+							},
+							payload: JSON.stringify( body ),
+							contentType: 'application/json'
+						}
+					);
 				} );
 			} );
 

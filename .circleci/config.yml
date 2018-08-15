@@ -7,6 +7,8 @@ jobs:
         environment:
           SERVER_WORKERS: 2
           BACKEND_URL: 'http://localhost:8000'
+          BACKEND_HAWK_ID: frontend
+          BACKEND_HAWK_KEY: 'abc123def456'
           SESSION_SECRET: abcdef123
           SSO_PROTOCOL: http
           SSO_DOMAIN: localhost
@@ -31,7 +33,7 @@ jobs:
       - image: postgres:9
         environment:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: ""
+          POSTGRES_PASSWORD: ''
           POSTGRES_DB: market_access
       - image: ukti/market-access-api
         environment:
@@ -40,6 +42,9 @@ jobs:
           SSO_ENABLED: 'True'
           FAKE_METADATA: 'True'
           DATABASE_URL: 'postgres://postgres@localhost/market_access'
+          SENTRY_DSN: ''
+          HAWK_ID: frontend
+          HAWK_KEY: 'abc123def456'
           RESOURCE_SERVER_INTROSPECTION_URL: 'http://localhost:5000/o/introspect/'
           RESOURCE_SERVER_AUTH_TOKEN: abc123
         command: ./start-wait-for-db.sh

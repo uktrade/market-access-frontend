@@ -65,7 +65,11 @@ let config = {
 		cache: bool( 'CACHE_VIEWS', true )
 	},
 	backend: {
-		url: requiredEnv( 'BACKEND_URL' )
+		url: requiredEnv( 'BACKEND_URL' ),
+		hawk: {
+			id: requiredEnv( 'BACKEND_HAWK_ID' ),
+			key: requiredEnv( 'BACKEND_HAWK_KEY' )
+		}
 	},
 	datahub: {
 		url: requiredEnv( 'DATAHUB_URL' ),

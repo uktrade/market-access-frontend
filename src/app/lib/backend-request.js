@@ -4,9 +4,9 @@ const config = require( '../config' );
 const logger = require( './logger' );
 
 const credentials = {
-	'id': 'metadata',
-	'key': 'kbr6j2m10n6569d29gcyufnzlnz7rez73o4zmqiv9v6e32bmu3',
-	'algorithm': 'sha256'
+	id: config.backend.hawk.id,
+	key: config.backend.hawk.key,
+	algorithm: 'sha256'
 };
 
 function getHawkHeader( requestOptions ){
@@ -66,10 +66,15 @@ function makeRequest( method, path, opts = {} ){
 
 		logger.debug( `Sending ${ method } request to: ${ uri }` );
 
-		if( config.isDev && opts.body ){
+		//if( config.isDev ){
+
 			logger.debug( 'With headers: ' + JSON.stringify( requestOptions.headers, null, 2 ) );
-			logger.debug( 'With body: ' + JSON.stringify( opts.body, null, 2 ) );
-		}
+
+			if( opts.body ){
+
+				logger.debug( 'With body: ' + JSON.stringify( opts.body, null, 2 ) );
+			}
+		//}
 
 		request( requestOptions, ( err, response, body ) => {
 
@@ -80,6 +85,10 @@ function makeRequest( method, path, opts = {} ){
 			} else {
 
 				const statusCode = response.statusCode;
+
+				//if( config.isDev ){
+					logger.debug( 'Response headers: ' + JSON.stringify( response.headers, null, 2 ) );
+				//}
 
 				if( clientHeader ){
 
