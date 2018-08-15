@@ -78,6 +78,7 @@ describe( 'Backend Request', () => {
 			}
 		};
 		hawkCredentials = {
+			enabled: true,
 			id: 'a hawk id',
 			key: 'a hawk key'
 		};

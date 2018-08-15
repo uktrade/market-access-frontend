@@ -67,6 +67,7 @@ let config = {
 	backend: {
 		url: requiredEnv( 'BACKEND_URL' ),
 		hawk: {
+			enabled: bool( 'BACKEND_HAWK_ENABLED', true ),
 			id: requiredEnv( 'BACKEND_HAWK_ID' ),
 			key: requiredEnv( 'BACKEND_HAWK_KEY' )
 		}

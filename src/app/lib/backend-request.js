@@ -3,6 +3,8 @@ const hawk = require( 'hawk' );
 const config = require( '../config' );
 const logger = require( './logger' );
 
+const hawkEnabled = config.backend.hawk.enabled;
+
 const credentials = {
 	id: config.backend.hawk.id,
 	key: config.backend.hawk.key,
@@ -56,7 +58,7 @@ function makeRequest( method, path, opts = {} ){
 
 		requestOptions.headers.Authorization = `Bearer ${ opts.token }`;
 
-	} else {
+	} else if( hawkEnabled ){
 
 		clientHeader = getHawkHeader( requestOptions );
 		requestOptions.headers.Authorization = clientHeader.header;
