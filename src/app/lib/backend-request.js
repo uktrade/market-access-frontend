@@ -93,7 +93,7 @@ function makeRequest( method, path, opts = {} ){
 				//if( config.isDev ){
 					logger.debug( 'Response headers: ' + JSON.stringify( response.headers, null, 2 ) );
 				//}
-/*
+
 				if( clientHeader ){
 
 					// Authenticate the server's response
@@ -107,7 +107,7 @@ function makeRequest( method, path, opts = {} ){
 						return reject( new Error( 'Invalid response' ) );
 					}
 				}
-*/
+
 				response.isSuccess = ( statusCode >= 200 && statusCode <= 300 );
 
 				if( response.headers[ 'content-type' ] === 'application/json' ){
