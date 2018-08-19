@@ -1,6 +1,6 @@
 {
   "name": "market-access-frontend",
-  "version": "3.5.0",
+  "version": "4.1.0",
   "description": "A front end for Market Access",
   "main": "server.js",
   "engines": {
@@ -55,6 +55,7 @@
     "express": "^4.16.3",
     "express-session": "^1.15.6",
     "govuk-frontend": "^1.2.0",
+    "hawk": "^7.0.7",
     "morgan": "^1.9.0",
     "nunjucks": "^3.1.3",
     "raven": "^2.6.3",

@@ -1,6 +1,7 @@
 const request = require( 'request' );
 const config = require( '../config' );
 const logger = require( './logger' );
+const reporter = require( './reporter' );
 
 const datahubToken = config.datahub.token;
 
@@ -48,15 +49,22 @@ function makeRequest( method, path, token, opts = {} ){
 
 			} else {
 
-				response.isSuccess = ( response.statusCode >= 200 && response.statusCode <= 300 );
+				const statusCode = response.statusCode;
 
-				if( response.isSuccess || response.statusCode === 404 ){
+				response.isSuccess = ( statusCode >= 200 && statusCode <= 300 );
+
+				if( response.isSuccess || statusCode === 404 || statusCode === 403 ){
 
 					resolve( { response, body } );
 
+					if( statusCode === 403 ){
+
+						reporter.message( 'info', 'Data Hub API returned 403 for user' );
+					}
+
 				} else {
 
-					reject( new Error( `Got at ${ response.statusCode } response code from datahub` ) );
+					reject( new Error( `Got at ${ statusCode } response code from datahub` ) );
 				}
 			}
 		} );

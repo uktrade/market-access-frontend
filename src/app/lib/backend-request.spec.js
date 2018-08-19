@@ -2,7 +2,7 @@ const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
 const modulePath = './backend-request';
 
-const backendUrl = 'http://some.domain.com';
+const backendUrl = 'https://some.domain.com';
 const GET = 'GET';
 const POST = 'POST';
 const PUT = 'PUT';
@@ -10,10 +10,13 @@ const PUT = 'PUT';
 describe( 'Backend Request', () => {
 
 	let request;
+	let hawk;
 	let backend;
 	let token;
 	let mockResponse;
 	let mockBody;
+	let hawkHeaderResponse;
+	let hawkCredentials;
 
 	function checkRequest( method, path, opts = {} ){
 
@@ -22,35 +25,78 @@ describe( 'Backend Request', () => {
 		const requestOptions = {
 			uri,
 			method,
-			json: true
+			headers: {
+				accept: 'application/json'
+			}
 		};
 
 		if( opts.token ){
 
-			requestOptions.headers = { Authorization: `Bearer ${ opts.token }` };
+			requestOptions.headers.Authorization = `Bearer ${ opts.token }`;
+
+		} else {
+
+			requestOptions.headers.Authorization = hawkHeaderResponse;
 		}
 
 		if( opts.body ){
 
-			requestOptions.body = opts.body;
+			requestOptions.body = JSON.stringify( opts.body );
+			requestOptions.headers[ 'content-type' ] = 'application/json';
 		}
 
 		expect( request.calls.argsFor( 0 )[ 0 ] ).toEqual( requestOptions );
+
+		return requestOptions;
+	}
+
+	function checkForMockResponse( { response, body } ){
+
+		expect( response.isSuccess ).toEqual( true );
+		expect( response ).toEqual( mockResponse );
+		expect( body ).toEqual( mockBody );
+	}
+
+	function requestCallback( ...args ){
+
+		request.and.callFake( ( opts, cb ) => cb( ...args ) );
+	}
+
+	function respondWithMocks(){
+
+		requestCallback( null, mockResponse, mockBody );
 	}
 
 	beforeEach( () => {
 
 		request = jasmine.createSpy( 'request' );
+		hawkHeaderResponse = 'a hawk header';
+		hawk = {
+			client: {
+				header: jasmine.createSpy( 'hawk.client.header' ).and.callFake( () => ({ header: hawkHeaderResponse }) ),
+				authenticate: jasmine.createSpy( 'hawk.client.authenticate' ).and.callFake( () => true )
+			}
+		};
+		hawkCredentials = {
+			enabled: true,
+			id: 'a hawk id',
+			key: 'a hawk key'
+		};
 		token = uuid();
 		mockResponse = {
+			headers: {},
 			statusCode: 200
 		};
 		mockBody = 'a body';
 
 		backend = proxyquire( modulePath, {
 			request,
+			hawk,
 			'../config': {
-				backend: { url: backendUrl }
+				backend: {
+					url: backendUrl,
+					hawk: hawkCredentials
+				}
 			}
 		} );
 	} );
@@ -67,31 +113,28 @@ describe( 'Backend Request', () => {
 					} ).toThrow( new Error( 'Path is required' ) );
 				} );
 			} );
-
 		} );
 
 		describe( 'Without an error', () => {
 			describe( 'get', () => {
 				describe( 'With a 200 response', () => {
-					it( 'Should return the response', ( done ) => {
+					it( 'Should return the response', async () => {
+
+						respondWithMocks();
 
 						const path = '/whoami/';
 
-						backend.get( path, token ).then( ( { response, body } ) => {
+						const responseData = await backend.get( path, token );
 
-							expect( response.isSuccess ).toEqual( true );
-							expect( response ).toEqual( mockResponse );
-							expect( body ).toEqual( mockBody );
-							done();
-						});
-
-						request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
 						checkRequest( GET, path, { token } );
+						checkForMockResponse( responseData );
 					} );
 				} );
 
 				describe( 'With a 500 response', () => {
 					it( 'Should throw an error', ( done ) => {
+
+						respondWithMocks();
 
 						const path = '/whoami/';
 
@@ -103,7 +146,6 @@ describe( 'Backend Request', () => {
 							done();
 						});
 
-						request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
 						checkRequest( GET, path, { token } );
 					} );
 				} );
@@ -116,13 +158,13 @@ describe( 'Backend Request', () => {
 
 					const mockError = new Error( 'Broken' );
 
+					requestCallback( mockError );
+
 					backend.get( '/test/', token ).then( done.fail ).catch( ( err ) => {
 
 						expect( err ).toEqual( mockError );
 						done();
 					} );
-
-					request.calls.argsFor( 0 )[ 1 ]( mockError );
 				} );
 			} );
 		} );
@@ -131,57 +173,86 @@ describe( 'Backend Request', () => {
 	describe( 'post', () => {
 		describe( 'With a 200 response', () => {
 			describe( 'Without a token or body', () => {
-				it( 'Should create the correct options', ( done ) => {
+				it( 'Should create a hawk header with the correct options', async () => {
+
+					respondWithMocks();
 
 					const path = '/a-test';
 
-					backend.post( path ).then( ( { response, body } ) => {
+					const responseData = await backend.post( path );
 
-						expect( response.isSuccess ).toEqual( true );
-						expect( response ).toEqual( mockResponse );
-						expect( body ).toEqual( mockBody );
-						done();
-					} );
-
-					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
-					checkRequest( POST, path );
+					const requestOptions = checkRequest( POST, path );
+					checkForMockResponse( responseData );
+					expect( hawk.client.header ).toHaveBeenCalledWith(
+						requestOptions.uri.replace( 'https', 'http' ),
+						requestOptions.method,
+						{
+							credentials: {
+								id: hawkCredentials.id,
+								key: hawkCredentials.key,
+								algorithm: 'sha256'
+							},
+							payload: '',
+							contentType: 'text/plain'
+						}
+					);
 				} );
 			} );
 
-			describe( 'Wtih a token but no body', () => {
-				it( 'Should create the correct options', ( done ) => {
+			describe( 'Without a token but with a body', () => {
+				it( 'Should create a hawk header with the correct options', async () => {
 
-					const path = '/a-test';
-
-					backend.post( path, token ).then( ( { response, body } ) => {
-
-						expect( response.isSuccess ).toEqual( true );
-						expect( response ).toEqual( mockResponse );
-						expect( body ).toEqual( mockBody );
-						done();
-					} );
-
-					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
-					checkRequest( POST, path, { token } );
-				} );
-			} );
-
-			describe( 'Wtih a token and body', () => {
-				it( 'Should create the correct options', ( done ) => {
+					respondWithMocks();
 
 					const path = '/a-test';
 					const body = { some: 'body' };
 
-					backend.post( path, token, body ).then( ( { response, body } )=> {
+					const responseData = await backend.post( path, null, body );
 
-						expect( response.isSuccess ).toEqual( true );
-						expect( response ).toEqual( mockResponse );
-						expect( body ).toEqual( mockBody );
-						done();
-					} );
+					const requestOptions = checkRequest( POST, path, { body } );
+					checkForMockResponse( responseData );
+					expect( hawk.client.header ).toHaveBeenCalledWith(
+						requestOptions.uri.replace( 'https', 'http' ),
+						requestOptions.method,
+						{
+							credentials: {
+								id: hawkCredentials.id,
+								key: hawkCredentials.key,
+								algorithm: 'sha256'
+							},
+							payload: JSON.stringify( body ),
+							contentType: 'application/json'
+						}
+					);
+				} );
+			} );
 
-					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
+			describe( 'With a token but no body', () => {
+				it( 'Should create the correct options', async () => {
+
+					respondWithMocks();
+
+					const path = '/a-test';
+
+					const responseData = await backend.post( path, token );
+
+					checkRequest( POST, path, { token } );
+					checkForMockResponse( responseData );
+				} );
+			} );
+
+			describe( 'With a token and body', () => {
+				it( 'Should create the correct options', async () => {
+
+					respondWithMocks();
+
+					const path = '/a-test';
+					const body = { some: 'body' };
+
+					const responseData = await backend.post( path, token, body );
+
 					checkRequest( POST, path, { token, body } );
+					checkForMockResponse( responseData );
 				} );
 			} );
 		} );
@@ -190,57 +261,45 @@ describe( 'Backend Request', () => {
 	describe( 'put', () => {
 		describe( 'With a 200 response', () => {
 			describe( 'Without a token or body', () => {
-				it( 'Should create the correct options', ( done ) => {
+				it( 'Should create the correct options', async () => {
+
+					respondWithMocks();
 
 					const path = '/a-test';
 
-					backend.put( path ).then( ( { response, body } ) => {
+					const responseData = await backend.put( path );
 
-						expect( response.isSuccess ).toEqual( true );
-						expect( response ).toEqual( mockResponse );
-						expect( body ).toEqual( mockBody );
-						done();
-					} );
-
-					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
 					checkRequest( PUT, path );
+					checkForMockResponse( responseData );
 				} );
 			} );
 
-			describe( 'Wtih a token but no body', () => {
-				it( 'Should create the correct options', ( done ) => {
+			describe( 'With a token but no body', () => {
+				it( 'Should create the correct options', async () => {
+
+					respondWithMocks();
 
 					const path = '/a-test';
 
-					backend.put( path, token ).then( ( { response, body } ) => {
+					const responseData = await backend.put( path, token );
 
-						expect( response.isSuccess ).toEqual( true );
-						expect( response ).toEqual( mockResponse );
-						expect( body ).toEqual( mockBody );
-						done();
-					} );
-
-					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
 					checkRequest( PUT, path, { token } );
+					checkForMockResponse( responseData );
 				} );
 			} );
 
-			describe( 'Wtih a token and body', () => {
-				it( 'Should create the correct options', ( done ) => {
+			describe( 'With a token and body', () => {
+				it( 'Should create the correct options', async () => {
+
+					respondWithMocks();
 
 					const path = '/a-test';
 					const body = { some: 'body' };
 
-					backend.put( path, token, body ).then( ( { response, body } )=> {
+					const responseData = await backend.put( path, token, body );
 
-						expect( response.isSuccess ).toEqual( true );
-						expect( response ).toEqual( mockResponse );
-						expect( body ).toEqual( mockBody );
-						done();
-					} );
-
-					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
 					checkRequest( PUT, path, { token, body } );
+					checkForMockResponse( responseData );
 				} );
 			} );
 		} );
