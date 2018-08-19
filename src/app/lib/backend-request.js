@@ -17,7 +17,8 @@ function getHawkHeader( requestOptions ){
 	const payload = requestOptions.body;
 
 	// Generate Authorization request header
-	return hawk.client.header( uri, method, {
+	// Always use http as the backend will be running in http mode behind an https proxy
+	return hawk.client.header( uri.replace( 'https', 'http' ), method, {
 		credentials,
 		payload: ( payload || '' ),
 		contentType: ( payload ? 'application/json' : 'text/plain' )

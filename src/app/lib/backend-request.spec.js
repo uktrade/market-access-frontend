@@ -2,7 +2,7 @@ const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
 const modulePath = './backend-request';
 
-const backendUrl = 'http://some.domain.com';
+const backendUrl = 'https://some.domain.com';
 const GET = 'GET';
 const POST = 'POST';
 const PUT = 'PUT';
@@ -184,7 +184,7 @@ describe( 'Backend Request', () => {
 					const requestOptions = checkRequest( POST, path );
 					checkForMockResponse( responseData );
 					expect( hawk.client.header ).toHaveBeenCalledWith(
-						requestOptions.uri,
+						requestOptions.uri.replace( 'https', 'http' ),
 						requestOptions.method,
 						{
 							credentials: {
@@ -212,7 +212,7 @@ describe( 'Backend Request', () => {
 					const requestOptions = checkRequest( POST, path, { body } );
 					checkForMockResponse( responseData );
 					expect( hawk.client.header ).toHaveBeenCalledWith(
-						requestOptions.uri,
+						requestOptions.uri.replace( 'https', 'http' ),
 						requestOptions.method,
 						{
 							credentials: {
