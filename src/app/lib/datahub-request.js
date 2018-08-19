@@ -1,6 +1,7 @@
 const request = require( 'request' );
 const config = require( '../config' );
 const logger = require( './logger' );
+const reporter = require( './reporter' );
 
 const datahubToken = config.datahub.token;
 
@@ -55,6 +56,11 @@ function makeRequest( method, path, token, opts = {} ){
 				if( response.isSuccess || statusCode === 404 || statusCode === 403 ){
 
 					resolve( { response, body } );
+
+					if( statusCode === 403 ){
+
+						reporter.message( 'info', 'Data Hub API returned 403 for user' );
+					}
 
 				} else {
 

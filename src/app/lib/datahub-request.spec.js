@@ -13,6 +13,7 @@ describe( 'datahub Request', () => {
 	let datahub;
 	let mockResponse;
 	let mockBody;
+	let reporter;
 
 	function checkRequest( path, method, body ){
 
@@ -43,9 +44,13 @@ describe( 'datahub Request', () => {
 			statusCode: 200
 		};
 		mockBody = 'a body';
+		reporter = {
+			message: jasmine.createSpy( 'reporter.message' )
+		};
 
 		datahub = proxyquire( modulePath, {
 			request,
+			'./reporter': reporter,
 			'../config': {
 				datahub: { url: datahubUrl }
 			}
@@ -130,6 +135,7 @@ describe( 'datahub Request', () => {
 
 					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
 					checkRequest( path, GET );
+					expect( reporter.message ).toHaveBeenCalledWith( 'info', 'Data Hub API returned 403 for user' );
 				} );
 			} );
 
