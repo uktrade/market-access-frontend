@@ -4,6 +4,7 @@ const config = require( '../config' );
 const logger = require( './logger' );
 
 const hawkEnabled = config.backend.hawk.enabled;
+const defaultHawkContentType = ( config.isDev ? 'text/plain' : '' );
 
 const credentials = {
 	id: config.backend.hawk.id,
@@ -21,7 +22,7 @@ function getHawkHeader( requestOptions ){
 	return hawk.client.header( uri.replace( 'https', 'http' ), method, {
 		credentials,
 		payload: ( payload || '' ),
-		contentType: ( payload ? 'application/json' : 'text/plain' )
+		contentType: ( payload ? 'application/json' : defaultHawkContentType )
 	} );
 }
 
