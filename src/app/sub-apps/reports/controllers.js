@@ -121,13 +121,23 @@ module.exports = {
 
 					data.results = body;
 
-				} else if( response.statusCode === 404 ){
-
-					data.error = 'No company found';
-
 				} else {
 
-					data.error = 'There was an error finding the company';
+					let message;
+
+					switch( response.statusCode ){
+
+						case 404:
+							message = 'No company found';
+						break;
+						case 403:
+							message = 'You do not have permission to search for a company, please contact Data Hub support.';
+						break;
+						default:
+							message = 'There was an error finding the company';
+					}
+
+					data.error = message;
 				}
 
 			} catch ( e ){
