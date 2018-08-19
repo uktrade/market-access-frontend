@@ -42,7 +42,8 @@ jobs:
           SSO_ENABLED: 'True'
           FAKE_METADATA: 'True'
           DATABASE_URL: 'postgres://postgres@localhost/market_access'
-          SENTRY_DSN: ''
+          SENTRY_DSN: 'http://test:test@localhost/123'
+          DH_METADATA_URL: ''
           HAWK_ID: frontend
           HAWK_KEY: 'abc123def456'
           RESOURCE_SERVER_INTROSPECTION_URL: 'http://localhost:5000/o/introspect/'
