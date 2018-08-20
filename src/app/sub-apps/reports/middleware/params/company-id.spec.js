@@ -14,7 +14,7 @@ describe( 'Company Id param middleware', () => {
 	beforeEach( () => {
 
 		req = {};
-		res = { locals: {} };
+		res = { locals: {}, render: jasmine.createSpy( 'res.render' ) };
 		next = jasmine.createSpy( 'next' );
 		datahub = {
 			getCompany: jasmine.createSpy( 'datahub.getCompany' )
@@ -62,6 +62,22 @@ describe( 'Company Id param middleware', () => {
 				expect( req.company ).not.toBeDefined();
 				expect( res.locals.company ).not.toBeDefined();
 				expect( next ).toHaveBeenCalledWith( new Error( 'Not a successful response from datahub' ) );
+			} );
+
+			describe( 'When the statusCode is 403', () => {
+				it( 'Should render the 403 page', async () => {
+
+					const promise = Promise.resolve( { response: { isSuccess: false, statusCode: 403 }, body: {} } );
+
+					datahub.getCompany.and.callFake( () => promise );
+
+					await middleware( req, res, next, id );
+
+					expect( datahub.getCompany ).toHaveBeenCalledWith( req, id );
+					expect( req.company ).not.toBeDefined();
+					expect( res.locals.company ).not.toBeDefined();
+					expect( res.render ).toHaveBeenCalledWith( 'reports/views/error/data-hub/403' );
+				} );
 			} );
 		} );
 

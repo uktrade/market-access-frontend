@@ -52,3 +52,4 @@ src/public/css/main.css
 src/public/govuk
 src/data/stubs
 src/data/faker/output
+src/test/backstop/data

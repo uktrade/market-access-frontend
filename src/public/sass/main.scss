@@ -1,11 +1,13 @@
 $govuk-font-family: Arial,"Helvetica Neue",Helvetica,sans-serif;
 $govuk-font-family-tabular: Arial,"Helvetica Neue",Helvetica,sans-serif;
-$govuk-images-path: "/public/govuk/images/";
+$govuk-images-path: "/govuk-public/images/";
 
 @import "settings/all";
 @import "helpers/all";
 @import "tools/all";
 @import "core/typography";
+@import "core/links";
+@import "core/template";
 @import 'core/lists';
 @import "objects/width-container";
 @import "objects/form-group";
@@ -13,6 +15,9 @@ $govuk-images-path: "/public/govuk/images/";
 @import "overrides/typography";
 @import "overrides/spacing";
 
+@import 'components/skip-link/skip-link';
+@import 'components/phase-banner/phase-banner';
+@import 'components/header/header';
 @import 'components/footer/footer';
 @import 'components/button/button';
 @import 'components/tag/tag';
@@ -34,6 +39,7 @@ $govuk-images-path: "/public/govuk/images/";
 
 @import 'app-settings/colours';
 
+@import 'layout';
 @import 'error';
 
 @import 'app-components/dash-button';
@@ -54,11 +60,11 @@ $govuk-images-path: "/public/govuk/images/";
 @import 'pages/index';
 @import 'pages/report/detail';
 
-.govuk-tag--ma {
-	position: relative;
-	top: -2px;
-	padding-top: 4px;
-	padding-bottom: 2px;
+.error-message {
+	@include govuk-font( 24 );
+	border: 4px solid $govuk-red;
+	padding: govuk-em( 30, 24 );
+	background-color: $govuk-red-5;
 }
 
 .message-panel {
@@ -146,70 +152,3 @@ $govuk-images-path: "/public/govuk/images/";
 	margin-bottom: govuk-em( 30, 16 );
 }
 
-.user-info {
-	color: white;
-	float: right;
-	font-weight: bold;
-	line-height: 1.7;
-	margin-left: 2em;
-}
-
-.user-info a {
-	font-weight: normal;
-	color: white;
-	text-decoration: none;
-}
-
-.user-info a:hover {
-	text-decoration: underline;
-}
-
-@media (min-width: 372px) {
-
-	.user-info {
-		margin: 0 1em;
-	}
-}
-
-@media (min-width: 641px) {
-	.user-info {
-		font-size: 16px;
-		line-height: 2;
-	}
-}
-
-@media (min-width: 769px) {
-	.user-info {
-		line-height: 2.1;
-		margin-right: 0;
-	}
-}
-
-.header-bar {
-	@include govuk-font( $size: 14 );
-	background-color: $govuk-fuchsia;
-	padding: govuk-em( 10, 14 ) 0;
-	color: $govuk-white;
-	margin-bottom: govuk-em( 45, 14 );
-
-	a {
-		color: $govuk-white;
-	}
-}
-
-.footer-bar {
-	@include govuk-font( $size: 14 );
-	margin-top: govuk-em( 45, 14 );
-	border-bottom: 10px solid $govuk-fuchsia
-}
-
-.footer-bar__content {
-	background-color: $govuk-fuchsia;
-	color: $govuk-white;
-	box-sizing: border-box;
-	padding: govuk-em( 10, 14 ) govuk-em( 10, 14 ) govuk-em( 5, 14 ) govuk-em( 10, 14 );
-
-	a {
-		color: $govuk-white;
-	}
-}

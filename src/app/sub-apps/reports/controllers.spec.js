@@ -393,6 +393,19 @@ describe( 'Report controller', () => {
 					} );
 				} );
 
+				describe( 'When the user does not have permission to use the API', () => {
+					it( 'Should render an error message', async () => {
+
+						const promise = Promise.resolve( { response: { isSuccess: false, statusCode: 403 } } );
+
+						datahub.searchCompany.and.callFake( () => promise );
+
+						await controller.companySearch( req, res, next );
+
+						expect( res.render ).toHaveBeenCalledWith( template, { query, error: 'You do not have permission to search for a company, please contact Data Hub support.' } );
+					} );
+				} );
+
 				describe( 'When there is an error with the request', () => {
 					it( 'Should render an error message', async () => {
 
