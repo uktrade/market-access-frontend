@@ -1,0 +1,47 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "List of barrier interactions",
+
+	"type": "object",
+	"required": [ "count", "results" ],
+	"properties": {
+
+		"count": { "$ref": "$refs/common.json#/int" },
+
+		"results": {
+			"type": "array",
+			"minItems": 2,
+			"maxItems": 10,
+			"items": {
+				"$ref": "#/refs/barrier"
+			}
+		}
+	},
+
+	"refs": {
+		"barrier": {
+			"type": "object",
+			"required": [
+				"id",
+				"kind",
+				"text",
+				"pinned",
+				"is_active",
+				"created_on",
+				"barrier",
+				"created_by"
+			],
+			"properties": {
+
+				"id": { "$ref": "$refs/common.json#/small-int" },
+				"kind": { "$ref": "$refs/common.json#/word" },
+				"text": { "$ref": "$refs/common.json#/words" },
+				"pinned": { "$ref": "$refs/common.json#/boolean" },
+				"is_active": { "$ref": "$refs/common.json#/boolean" },
+				"created_on": { "$ref": "$refs/common.json#/past-date" },
+				"barrier": { "$ref": "$refs/common.json#/uuid" },
+				"created_by": { "$ref": "$refs/common.json#/words" }
+			}
+		}
+	}
+}

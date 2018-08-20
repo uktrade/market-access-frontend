@@ -116,6 +116,21 @@ describe( 'Backend Service', () => {
 			} );
 		} );
 
+		describe( 'open', () => {
+			it( 'Should POST to the correct path with the correct values', async () => {
+
+				const openSummary = 'my summary text';
+
+				await service.barriers.open( req, barrierId, {
+					openSummary
+				} );
+
+				expect( backend.post ).toHaveBeenCalledWith( `/barriers/${ barrierId }/open`, token, {
+					summary: openSummary
+				} );
+			} );
+		} );
+
 		describe( 'hibernate', () => {
 			it( 'Should POST to the correct path with the correct values', async () => {
 

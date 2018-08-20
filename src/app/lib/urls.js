@@ -51,7 +51,8 @@ module.exports = {
 		addNote: ( barrierId ) => `/barriers/${ barrierId }/interactions/add-note/`,
 		status: ( barrierId ) => `/barriers/${ barrierId }/status/`,
 		statusResolved:( barrierId ) => `/barriers/${ barrierId }/status/resolved/`,
-		statusHibernated:( barrierId ) => `/barriers/${ barrierId }/status/hibernated/`
+		statusHibernated:( barrierId ) => `/barriers/${ barrierId }/status/hibernated/`,
+		statusOpen:( barrierId ) => `/barriers/${ barrierId }/status/open/`
 	},
 
 	reports: reportUrl,

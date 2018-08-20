@@ -172,8 +172,8 @@ module.exports = {
 				}
 			},
 			[ OPEN ]: {
-				serviceMethod: '',
-				successPage: '',
+				serviceMethod: 'open',
+				successPage: 'statusOpen',
 				label: 'Mark as <strong>open</strong>',
 				fields: {
 					reopenSummary: {
@@ -271,5 +271,6 @@ module.exports = {
 	},
 
 	statusResolved: ( req, res ) => res.render( 'barriers/views/status-resolved', { barrierId: req.uuid } ),
-	statusHibernated: ( req, res ) => res.render( 'barriers/views/status-hibernated', { barrierId: req.uuid } )
+	statusHibernated: ( req, res ) => res.render( 'barriers/views/status-hibernated', { barrierId: req.uuid } ),
+	statusOpen: ( req, res ) => res.render( 'barriers/views/status-open', { barrierId: req.uuid } )
 };

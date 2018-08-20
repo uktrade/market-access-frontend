@@ -4,6 +4,11 @@
 		"faker": "random.uuid"
 	},
 
+	"word": {
+		"type": "string",
+		"faker": "lorem.word"
+	},
+
 	"words": {
 		"type": "string",
 		"faker": "lorem.words"
@@ -29,5 +34,10 @@
 	"past-date": {
 		"type": "string",
 		"faker": "date.past"
+	},
+
+	"boolean": {
+		"type": "boolean",
+		"faker": "random.boolean"
 	}
 }

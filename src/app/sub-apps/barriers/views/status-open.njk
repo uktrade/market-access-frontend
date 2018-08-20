@@ -2,13 +2,13 @@
 
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Barrier resolved{% endblock %}
+{% block page_title %}{{ super() }} - Barrier open{% endblock %}
 
 {% block page_content %}
 
 	{{ govukPanel({
 		titleText: 'Barrier status updated',
-		text: 'This barrier has now been marked as resolved'
+		text: 'This barrier has now been marked as open'
 	}) }}
 
 	<a href="{{ urls.barriers.detail( barrierId ) }}" class="govuk-button button--secondary">View barrier record</a>

@@ -106,6 +106,9 @@ module.exports = {
 		},
 		hibernate: ( req, barrierId, values ) => backend.post( `/barriers/${ barrierId }/hibernate`, getToken( req ), {
 			summary: values.hibernationSummary
+		} ),
+		open: ( req, barrierId, values ) => backend.post( `/barriers/${ barrierId }/open`, getToken( req ), {
+			summary: values.openSummary
 		} )
 	},
 

@@ -66,6 +66,13 @@ describe( 'URLs', () => {
 				expect( urls.barriers.statusHibernated( barrierId ) ).toEqual( `/barriers/${ barrierId }/status/hibernated/` );
 			} );
 		} );
+
+		describe( 'statusOpen', () => {
+			it( 'Should return the correct path', () => {
+
+				expect( urls.barriers.statusOpen( barrierId ) ).toEqual( `/barriers/${ barrierId }/status/open/` );
+			} );
+		} );
 	} );
 
 	describe( 'Report urls', () => {
