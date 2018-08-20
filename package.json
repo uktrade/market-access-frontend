@@ -35,7 +35,10 @@
     "lint": "run-p lint:*",
     "lint:app": "eslint src/app",
     "lint:public": "eslint src/public/js --ignore-path src/public/js/.eslintignore",
-    "govuk-assets": "mkdir -p src/public/govuk/images; cp node_modules/govuk-frontend/assets/images/* src/public/govuk/images/"
+    "govuk-assets": "mkdir -p src/public/govuk/images; cp node_modules/govuk-frontend/assets/images/* src/public/govuk/images/",
+    "backstop:reference": "backstop reference --config=src/test/backstop/backstop.js",
+    "backstop:test": "backstop test --config=src/test/backstop/backstop.js",
+    "backstop:approve": "backstop approve --config=src/test/backstop/backstop.js"
   },
   "repository": {
     "type": "git",
@@ -66,6 +69,7 @@
   },
   "devDependencies": {
     "axe-webdriverjs": "^2.0.1",
+    "backstopjs": "^3.5.3",
     "cucumber": "^4.2.1",
     "eslint": "^5.2.0",
     "faker": "^4.1.0",
