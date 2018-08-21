@@ -42,11 +42,11 @@ module.exports = {
 		}
 	},
 
-	captureException: function( err ){
+	captureException: function( err, extra ){
 
 		if( useSentry ){
 
-			raven.captureException( err );
+			raven.captureException( err, { extra } );
 
 		} else {
 
