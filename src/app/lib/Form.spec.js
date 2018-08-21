@@ -60,7 +60,8 @@ describe( 'Form', () => {
 							item2: {
 								values: [ 'checkbox-2' ]
 							}
-						}
+						},
+						errorField: 'a'
 					},
 					myGroup: {
 						type: Form.GROUP,
@@ -71,11 +72,13 @@ describe( 'Form', () => {
 							groupItem2: {
 								values: [ 'group-2' ]
 							}
-						}
+						},
+						errorField: 'b'
 					},
 					test: {
 						values: [ 'value-2' ],
-						required: 'Test required message'
+						required: 'Test required message',
+						errorField: 'c'
 					},
 					another: {
 						values: [ 'another-2' ],
@@ -328,6 +331,78 @@ describe( 'Form', () => {
 					} );
 				} );
 			} );
+
+			describe( 'Adding additional errors', () => {
+
+				beforeEach( () => {
+
+					req.body = {
+						test: 'value-1',
+						another: 'another-1',
+						unknown: 'unknown-1',
+						item1: 'checkbox-value-1',
+						item2: 'checkbox-value-2',
+						groupItem1: 'group-value-1',
+						groupItem2: 'group-value-2'
+					};
+
+					fields = {
+						myCheckbox: {
+							type: Form.CHECKBOXES,
+							items: {
+								item1: {
+									values: [ 'checkbox-1' ]
+								},
+								item2: {
+									values: [ 'checkbox-2' ]
+								}
+							},
+							errorField: 'a'
+						},
+						myGroup: {
+							type: Form.GROUP,
+							items: {
+								groupItem1: {
+									values: [ 'group-1' ]
+								},
+								groupItem2: {
+									values: [ 'group-2' ]
+								}
+							},
+							errorField: 'b'
+						},
+						test: {
+							values: [ 'value-2' ],
+							required: 'Test required message',
+							conditional: { name: 'myCheckbox', value: 'unmatched' },
+							errorField: 'c'
+						},
+						another: {
+							values: [ 'another-2' ],
+							required: 'Test another required message'
+						}
+					};
+				} );
+
+				it( 'Should add the correct errors', () => {
+
+					const form = new Form( req, fields );
+
+					const errors = {
+						a: 'Error message a',
+						b: 'Error message b',
+						c: 'Error message c'
+					};
+
+					form.addErrors( errors );
+
+					expect( form.hasErrors() ).toEqual( true );
+					expect( form.errors ).toEqual( [
+						{ id: 'my-checkbox-1', message: errors.a },
+						{ id: 'my-group', message: errors.b }
+					] );
+				} );
+			} );
 		} );
 	} );
 
@@ -360,9 +435,9 @@ describe( 'Form', () => {
 					checkbox: {
 						type: Form.CHECKBOXES,
 						items: {
-							item1: { values: [ 'checkbox-1' ] },
+							item1: { values: [ 'checkbox-1', 'another value' ] },
 							item2: { values: [ 'checkbox-2' ] },
-							item3: { values: [ 'checkbox-3' ] }
+							item3: {}
 						}
 					},
 					radio: {
@@ -376,8 +451,9 @@ describe( 'Form', () => {
 						values: [ 'a' ]
 					},
 					text: {
-						values: [ 'a text string' ]
-					}
+						values: [ 'a text string', 'b text string' ]
+					},
+					text2: {}
 				};
 
 				form = new Form( req, fields );
@@ -387,7 +463,7 @@ describe( 'Form', () => {
 					checkbox: {
 						item1: 'checkbox-1',
 						item2: 'checkbox-2',
-						item3: 'checkbox-3'
+						item3: undefined
 					},
 					radio: [
 						{ value: '1', text: 'text 1', checked: false },
@@ -397,7 +473,8 @@ describe( 'Form', () => {
 						{ value: 'a', text: 'value 1', selected: true },
 						{ value: 'b', text: 'value b', selected: false }
 					],
-					text: 'a text string'
+					text: 'a text string',
+					text2: undefined
 				} );
 			} );
 		} );

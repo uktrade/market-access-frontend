@@ -1,7 +1,7 @@
 const metadata = require( '../../../lib/metadata' );
 
 const barrierStatus = {
-	2: { name: 'Assessment', modifyer: 'assessment' },
+	2: { name: 'Open', modifyer: 'assessment' },
 	4: { name: 'Resolved', modifyer: 'resolved' },
 	5: { name: 'Hibernated', modifyer: 'hibernated' }
 };

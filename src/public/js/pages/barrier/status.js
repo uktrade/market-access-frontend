@@ -15,4 +15,11 @@ ma.pages.barrier.status = function(){
 		conditionalElem: '#conditional-hibernate',
 		shouldShow: function( value ){ return ( value === 'hibernate' ); }
 	});
+
+	new ma.components.ConditionalRadioContent({
+		inputContainer: '.status',
+		inputName: 'status',
+		conditionalElem: '#conditional-open',
+		shouldShow: function( value ){ return ( value === 'open' ); }
+	});
 };

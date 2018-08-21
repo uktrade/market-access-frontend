@@ -128,19 +128,74 @@ describe( 'App', function(){
 
 		describe( 'Barriers', () => {
 			describe( 'Barrier detail', () => {
-						it( 'Should fetch the barrier and render the page', ( done ) => {
+				it( 'Should fetch the barrier and render the page', ( done ) => {
 
-							const barrierId = 'abc-123';
+					const barrierId = 'abc-123';
 
-							intercept.backend()
-								.get( `/barriers/${ barrierId }` )
-								.reply( 200, intercept.stub( '/backend/barriers/barrier' ) );
+					intercept.backend()
+						.get( `/barriers/${ barrierId }` )
+						.reply( 200, intercept.stub( '/backend/barriers/barrier' ) );
 
-							app
-								.get( urls.barriers.detail( barrierId ) )
-								.end( checkPage( 'Market Access - Barrier details', done ) );
-						} );
+					app
+						.get( urls.barriers.detail( barrierId ) )
+						.end( checkPage( 'Market Access - Barrier details', done ) );
+				} );
+			} );
+
+			describe( 'Barrier interactions', () => {
+				it( 'Should fetch the barrier and render the page', ( done ) => {
+
+					const barrierId = 'abc-123';
+					const barrier = intercept.stub( '/backend/barriers/barrier' );
+
+					intercept.backend()
+						.get( `/barriers/${ barrierId }` )
+						.reply( 200, barrier );
+
+					intercept.backend()
+						.get( `/barriers/${ barrier.id }/interactions` )
+						.reply( 200, intercept.stub( '/backend/barriers/interactions' ) );
+
+					app
+						.get( urls.barriers.interactions( barrierId ) )
+						.end( checkPage( 'Market Access - Barrier interactions', done ) );
+				} );
+			} );
+
+			describe( 'Barrier status', () => {
+				describe( 'Resolved', () => {
+					it( 'Should render the page', ( done ) => {
+
+						const barrierId = 'abc-123';
+
+						app
+							.get( urls.barriers.statusResolved( barrierId ) )
+							.end( checkPage( 'Market Access - Barrier resolved', done ) );
 					} );
+				} );
+
+				describe( 'Hibernated', () => {
+					it( 'Should render the page', ( done ) => {
+
+						const barrierId = 'abc-123';
+
+						app
+							.get( urls.barriers.statusHibernated( barrierId ) )
+							.end( checkPage( 'Market Access - Barrier hibernated', done ) );
+					} );
+				} );
+
+				describe( 'Open', () => {
+					it( 'Should render the page', ( done ) => {
+
+						const barrierId = 'abc-123';
+
+						app
+							.get( urls.barriers.statusOpen( barrierId ) )
+							.end( checkPage( 'Market Access - Barrier open', done ) );
+					} );
+				} );
+			} );
 		} );
 
 		describe( 'Reports', () => {

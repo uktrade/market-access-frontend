@@ -15,6 +15,11 @@ ma.components.ConditionalRadioContent = (function( jessie ){
 
 	function ConditionalRadioContent( opts){
 
+		if( !opts.inputName ){ throw new Error( 'inputName is required' ); }
+		if( !opts.inputContainer ){ throw new Error( 'inputContainer is required' ); }
+		if( !opts.conditionalElem ){ throw new Error( 'conditionalElem is required' ); }
+		if( !opts.shouldShow ){ throw new Error( 'shouldShow is required' ); }
+
 		this.inputContainer = queryOne( opts.inputContainer );
 		this.inputName = opts.inputName;
 		this.conditionalElem = queryOne( opts.conditionalElem );
@@ -24,9 +29,6 @@ ma.components.ConditionalRadioContent = (function( jessie ){
 		};
 
 		if( !this.inputContainer ){ throw new Error( 'inputContainer not found' ); }
-		if( !this.inputName ){ throw new Error( 'inputName is required' ); }
-		if( !this.conditionalElem ){ throw new Error( 'conditionalElem not found' ); }
-		if( !this.shouldShow ){ throw new Error( 'shouldShow is required' ); }
 
 		var inputs = query( '.govuk-radios__input', this.inputContainer );
 		var input;

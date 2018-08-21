@@ -101,10 +101,11 @@ describe( 'Error reporter', function(){
 			it( 'Should raise an exception', function(){
 
 				const err = new Error( 'test exception' );
+				const myExtra = { something: 'true' };
 
-				reporter.captureException( err );
+				reporter.captureException( err, myExtra );
 
-				expect( raven.captureException ).toHaveBeenCalledWith( err );
+				expect( raven.captureException ).toHaveBeenCalledWith( err, { extra: myExtra } );
 			} );
 		} );
 	} );

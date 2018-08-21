@@ -21,6 +21,7 @@ module.exports = ( express, app ) => {
 	app.post( '/:barrierId/status/', parseBody, csrfProtection, controller.status );
 	app.get( '/:uuid/status/resolved', controller.statusResolved );
 	app.get( '/:uuid/status/hibernated', controller.statusHibernated );
+	app.get( '/:uuid/status/open', controller.statusOpen );
 
 	return app;
 };

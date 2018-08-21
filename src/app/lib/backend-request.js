@@ -2,6 +2,7 @@ const request = require( 'request' );
 const hawk = require( 'hawk' );
 const config = require( '../config' );
 const logger = require( './logger' );
+const reporter = require( './reporter' );
 
 const hawkEnabled = config.backend.hawk.enabled;
 const defaultHawkContentType = ( config.isDev ? 'text/plain' : '' );
@@ -74,9 +75,9 @@ function makeRequest( method, path, opts = {} ){
 
 			logger.debug( 'With headers: ' + JSON.stringify( requestOptions.headers, null, 2 ) );
 
-			if( opts.body ){
+			if( requestOptions.body ){
 
-				logger.debug( 'With body: ' + JSON.stringify( opts.body, null, 2 ) );
+				logger.debug( 'With body: ' + requestOptions.body );
 			}
 		//}
 
@@ -118,6 +119,7 @@ function makeRequest( method, path, opts = {} ){
 
 					} catch( e ){
 
+						reporter.captureException( e, { uri } );
 						logger.debug( `Invalid JSON response for ${ uri }` );
 					}
 				}

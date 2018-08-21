@@ -77,8 +77,23 @@
 		} ) }}
 	{% endset %}
 
+	{% set isOpenHtml %}
+
+		{{ govukTextarea( {
+
+			label: {
+				text: 'Provide a summary of why this barrier is being reopened',
+				classes: 'govuk-label--s'
+			},
+			id: 'reopen-summary',
+			name: 'reopenSummary',
+			value: reopenSummary,
+			errorMessage: errors | errorForName( 'reopen-summary' )
+		} ) }}
+	{% endset %}
+
 	<form action="{{ urls.barriers.status( barrier.id ) }}" method="POST">
-		<input type="hidden" name="_csrf" value="{{ _csrf }}">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
 		{{ govukRadios( {
 
@@ -93,7 +108,8 @@
 			},
 			items: status | addConditionalRadioHtml( {
 				'resolve': { html: isResolvedHtml },
-				'hibernate': { html: isHibernateHtml }
+				'hibernate': { html: isHibernateHtml },
+				'open': { html: isOpenHtml }
 			} ),
 			errorMessage: errors | errorForName( 'status-1' )
 			} )

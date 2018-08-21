@@ -17,6 +17,8 @@ describe( 'Backend Request', () => {
 	let mockBody;
 	let hawkHeaderResponse;
 	let hawkCredentials;
+	let logger;
+	let reporter;
 
 	function checkRequest( method, path, opts = {} ){
 
@@ -69,6 +71,10 @@ describe( 'Backend Request', () => {
 
 	beforeEach( () => {
 
+		logger = jasmine.helpers.mockLogger.create();
+		reporter = {
+			captureException: jasmine.createSpy( 'reporter.captureException' )
+		},
 		request = jasmine.createSpy( 'request' );
 		hawkHeaderResponse = 'a hawk header';
 		hawk = {
@@ -92,6 +98,8 @@ describe( 'Backend Request', () => {
 		backend = proxyquire( modulePath, {
 			request,
 			hawk,
+			'./logger': logger,
+			'./reporter': reporter,
 			'../config': {
 				backend: {
 					url: backendUrl,
@@ -118,16 +126,60 @@ describe( 'Backend Request', () => {
 		describe( 'Without an error', () => {
 			describe( 'get', () => {
 				describe( 'With a 200 response', () => {
-					it( 'Should return the response', async () => {
+					describe( 'An unspecified response tyoe', () => {
+						it( 'Should return the response', async () => {
 
-						respondWithMocks();
+							respondWithMocks();
 
-						const path = '/whoami/';
+							const path = '/whoami/';
 
-						const responseData = await backend.get( path, token );
+							const responseData = await backend.get( path, token );
 
-						checkRequest( GET, path, { token } );
-						checkForMockResponse( responseData );
+							checkRequest( GET, path, { token } );
+							checkForMockResponse( responseData );
+						} );
+					} );
+
+					describe( 'An application/json response type', () => {
+
+						beforeEach( () => {
+
+							mockResponse.headers[ 'content-type' ] = 'application/json';
+						} );
+
+						describe( 'With a valid JSON body', () => {
+							it( 'Should return the response', async () => {
+
+								requestCallback( null, mockResponse, '{ "a": 1, "b": 2 }' );
+
+								const path = '/whoami/';
+
+								const { response, body } = await backend.get( path, token );
+
+								checkRequest( GET, path, { token } );
+								expect( response.isSuccess ).toEqual( true );
+								expect( response ).toEqual( mockResponse );
+								expect( body ).toEqual( { a: 1, b: 2 } );
+							} );
+						} );
+
+						describe( 'With an invalid JSON body', () => {
+							it( 'Should return the response', async () => {
+
+								const invalidBody = '[ "test" : 123 ]';
+								requestCallback( null, mockResponse, invalidBody );
+
+								const path = '/whoami/';
+
+								const { response, body } = await backend.get( path, token );
+
+								checkRequest( GET, path, { token } );
+								expect( response.isSuccess ).toEqual( true );
+								expect( response ).toEqual( mockResponse );
+								expect( body ).toEqual( invalidBody );
+								expect( reporter.captureException ).toHaveBeenCalledWith( new SyntaxError( 'Unexpected token : in JSON at position 9' ), { uri: 'https://some.domain.com/whoami/' });
+							} );
+						} );
 					} );
 				} );
 
@@ -172,12 +224,17 @@ describe( 'Backend Request', () => {
 
 	describe( 'post', () => {
 		describe( 'With a 200 response', () => {
+
+			let path;
+
+			beforeEach( () => {
+
+				path = '/a-test';
+				respondWithMocks();
+			} );
+
 			describe( 'Without a token or body', () => {
 				it( 'Should create a hawk header with the correct options', async () => {
-
-					respondWithMocks();
-
-					const path = '/a-test';
 
 					const responseData = await backend.post( path );
 
@@ -202,9 +259,6 @@ describe( 'Backend Request', () => {
 			describe( 'Without a token but with a body', () => {
 				it( 'Should create a hawk header with the correct options', async () => {
 
-					respondWithMocks();
-
-					const path = '/a-test';
 					const body = { some: 'body' };
 
 					const responseData = await backend.post( path, null, body );
@@ -230,10 +284,6 @@ describe( 'Backend Request', () => {
 			describe( 'With a token but no body', () => {
 				it( 'Should create the correct options', async () => {
 
-					respondWithMocks();
-
-					const path = '/a-test';
-
 					const responseData = await backend.post( path, token );
 
 					checkRequest( POST, path, { token } );
@@ -242,17 +292,30 @@ describe( 'Backend Request', () => {
 			} );
 
 			describe( 'With a token and body', () => {
-				it( 'Should create the correct options', async () => {
+				describe( 'With a valid JSON body', () => {
+					it( 'Should create the correct options', async () => {
 
-					respondWithMocks();
+						const body = { some: 'body' };
 
-					const path = '/a-test';
-					const body = { some: 'body' };
+						const responseData = await backend.post( path, token, body );
 
-					const responseData = await backend.post( path, token, body );
+						checkRequest( POST, path, { token, body } );
+						checkForMockResponse( responseData );
+					} );
+				} );
 
-					checkRequest( POST, path, { token, body } );
-					checkForMockResponse( responseData );
+				describe( 'With an invalid JSON body', () => {
+					it( 'Should log an error create the correct options', async () => {
+
+						const circularReference = { otherData: 123 };
+						circularReference.myself = circularReference;
+
+						const responseData = await backend.post( path, token, circularReference );
+
+						checkRequest( POST, path, { token, circularReference } );
+						checkForMockResponse( responseData );
+						expect( logger.debug ).toHaveBeenCalledWith( 'Unable to stringify request body' );
+					} );
 				} );
 			} );
 		} );
