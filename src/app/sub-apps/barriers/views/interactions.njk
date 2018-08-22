@@ -19,7 +19,7 @@
 		<div class="interaction-panel">
 			<form action="{{ urls.barriers.addNote( barrier.id ) }}" method="POST">
 
-				<input type="hidden" name="_csrf" value="{{ _csrf }}">
+				<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
 				{{ govukTextarea({
 					name: 'note',

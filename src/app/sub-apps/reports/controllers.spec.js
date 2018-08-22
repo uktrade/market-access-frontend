@@ -916,7 +916,7 @@ describe( 'Report controller', () => {
 
 						await controller.aboutProblem( req, res, next );
 
-						expect( next ).toHaveBeenCalledWith( new Error( `Unable to save report, got ${ statusCode } from backend` ) );
+						expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save form - got 500 from backend' ) );
 					} );
 				} );
 
@@ -1082,7 +1082,7 @@ describe( 'Report controller', () => {
 
 						await controller.impact( req, res, next );
 
-						expect( next ).toHaveBeenCalledWith( new Error( `Unable to save report, got ${ statusCode } from backend` ) );
+						expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save form - got 500 from backend' ) );
 					} );
 				} );
 
@@ -1244,7 +1244,7 @@ describe( 'Report controller', () => {
 
 						await controller.legal( req, res, next );
 
-						expect( next ).toHaveBeenCalledWith( new Error( `Unable to save report, got ${ statusCode } from backend` ) );
+						expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save form - got 500 from backend' ) );
 					} );
 				} );
 
@@ -1507,7 +1507,7 @@ describe( 'Report controller', () => {
 
 						await controller.type( req, res, next );
 
-						expect( next ).toHaveBeenCalledWith( new Error( `Unable to save report, got ${ statusCode } from backend` ) );
+						expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save form - got 500 from backend' ) );
 					} );
 				} );
 
@@ -1680,7 +1680,7 @@ describe( 'Report controller', () => {
 
 						await controller.support( req, res, next );
 
-						expect( next ).toHaveBeenCalledWith( new Error( `Unable to save report, got ${ statusCode } from backend` ) );
+						expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save form - got 500 from backend' ) );
 					} );
 				} );
 
@@ -1843,7 +1843,7 @@ describe( 'Report controller', () => {
 
 						await controller.nextSteps( req, res, next );
 
-						expect( next ).toHaveBeenCalledWith( new Error( `Unable to save report, got ${ statusCode } from backend` ) );
+						expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save form - got 500 from backend' ) );
 					} );
 				} );
 

@@ -1,5 +1,6 @@
 const backend = require( '../../lib/backend-service' );
 const Form = require( '../../lib/Form' );
+const FormProcessor = require( '../../lib/FormProcessor' );
 const urls = require( '../../lib/urls' );
 const validators = require( '../../lib/validators' );
 const detailVieWModel = require( './view-models/detail' );
@@ -70,45 +71,30 @@ module.exports = {
 		const barrier = req.barrier;
 
 		const form = new Form( req, {
-			_csrf: {
-				values: [ req.csrfToken() ]
-			},
 			note: {
 				required: 'Add some text for the note.'
 			},
 			pinned: {}
 		} );
 
-		if( form.isPost ){
+		const processor = new FormProcessor( {
+			form,
+			render: ( templateValues ) => renderInteractions( req, res, next, Object.assign( {},
+				{ noteForm: true },
+				templateValues
+			) ),
+			saveFormData: ( formValues ) => backend.barriers.saveNote( req, barrier.id, formValues ),
+			saved: () => res.redirect( urls.barriers.interactions( barrier.id ) )
+		} );
 
-			form.validate();
+		try {
 
-			if( !form.hasErrors() ){
+			await processor.process();
 
-				try {
+		} catch( e ){
 
-					const { response } = await backend.barriers.saveNote( req, barrier.id, form.getValues() );
-
-					if( response.isSuccess ){
-
-						return res.redirect( urls.barriers.interactions( barrier.id ) );
-
-					} else {
-
-						return next( new Error( `Unable to save barrier note, got ${ response.statusCode } from backend` ) );
-					}
-
-				} catch( e ){
-
-					return next( e );
-				}
-			}
+			next( e );
 		}
-
-		renderInteractions( req, res, next, Object.assign( {},
-			{ noteForm: true },
-			form.getTemplateValues()
-		) );
 	},
 
 	status: async ( req, res, next ) => {
@@ -227,47 +213,27 @@ module.exports = {
 			]
 		};
 
+		let configItem;
 		const form = new Form( req, formFields );
+		const processor = new FormProcessor( {
+			form,
+			render: ( templateValues ) => res.render( 'barriers/views/status', templateValues ),
+			saveFormData: ( formValues ) => {
 
-		if( form.isPost ){
+				configItem = configItems[ formValues.status ];
+				return backend.barriers[ configItem.serviceMethod ]( req, req.barrier.id, formValues );
+			},
+			saved: () => res.redirect( urls.barriers[ configItem.successPage ]( req.barrier.id ) )
+		} );
 
-			form.validate();
+		try {
 
-			if( !form.hasErrors() ){
+			await processor.process({ checkResponseErrors: true });
 
-				try {
+		} catch( e ){
 
-					const formValues = form.getValues();
-					const configItem = configItems[ formValues.status ];
-
-					const { response, body } = await backend.barriers[ configItem.serviceMethod ]( req, req.barrier.id, formValues );
-
-					if( response.isSuccess ){
-
-						return res.redirect( urls.barriers[ configItem.successPage ]( req.barrier.id ) );
-
-					} else if ( response.statusCode === 400 && body.fields ){
-
-						form.addErrors( body.fields );
-
-						if( !form.hasErrors() ){
-
-							return next( new Error( `Unable to save barrier status, got ${ response.statusCode } from backend` ) );
-						}
-
-					} else {
-
-						return next( new Error( `Unable to save barrier status, got ${ response.statusCode } from backend` ) );
-					}
-
-				} catch( e ){
-
-					return next( e );
-				}
-			}
+			next( e );
 		}
-
-		res.render( 'barriers/views/status', form.getTemplateValues() );
 	},
 
 	statusResolved: ( req, res ) => res.render( 'barriers/views/status-resolved', { barrierId: req.uuid } ),

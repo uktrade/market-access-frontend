@@ -3,6 +3,7 @@ const metadata = require( '../../lib/metadata' );
 const backend = require( '../../lib/backend-service' );
 const datahub = require( '../../lib/datahub-service' );
 const Form = require( '../../lib/Form' );
+const FormProcessor = require( '../../lib/FormProcessor' );
 const govukItemsFromObj = require( '../../lib/govuk-items-from-object' );
 const validators = require( '../../lib/validators' );
 
@@ -286,33 +287,21 @@ module.exports = {
 			}
 		} );
 
-		if( form.isPost ){
+		const processor = new FormProcessor( {
+			form,
+			render: ( templateValues ) => res.render( 'reports/views/about-problem', templateValues ),
+			saveFormData: ( formValues ) => backend.reports.saveProblem( req, report.id, formValues ),
+			saved: () => res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.impact( report.id ) )
+		} );
 
-			form.validate();
+		try {
 
-			if( !form.hasErrors() ){
+			await processor.process();
 
-				try {
+		} catch( e ){
 
-					const { response } = await backend.reports.saveProblem( req, report.id, form.getValues() );
-
-					if( response.isSuccess ){
-
-						return res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.impact( report.id ) );
-
-					} else {
-
-						return next( new Error( `Unable to save report, got ${ response.statusCode } from backend` ) );
-					}
-
-				} catch( e ){
-
-					return next( e );
-				}
-			}
+			next( e );
 		}
-
-		res.render( 'reports/views/about-problem', form.getTemplateValues() );
 	},
 
 	impact: async ( req, res, next ) => {
@@ -352,33 +341,21 @@ module.exports = {
 			}
 		} );
 
-		if( form.isPost ){
+		const processor = new FormProcessor( {
+			form,
+			render: ( templateValues ) => res.render( 'reports/views/impact', templateValues ),
+			saveFormData: ( formValues ) => backend.reports.saveImpact( req, report.id, formValues ),
+			saved: () => res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.legal( report.id ) )
+		} );
 
-			form.validate();
+		try {
 
-			if( !form.hasErrors() ){
+			await processor.process();
 
-				try {
+		} catch ( e ){
 
-					const { response } = await backend.reports.saveImpact( req, report.id, form.getValues() );
-
-					if( response.isSuccess ){
-
-						return res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.legal( report.id ) );
-
-					} else {
-
-						return next( new Error( `Unable to save report, got ${ response.statusCode } from backend` ) );
-					}
-
-				} catch( e ){
-
-					return next( e );
-				}
-			}
+			next( e );
 		}
-
-		res.render( 'reports/views/impact', form.getTemplateValues() );
 	},
 
 	legal: async ( req, res, next ) => {
@@ -420,33 +397,21 @@ module.exports = {
 			}
 		} );
 
-		if( form.isPost ){
+		const processor = new FormProcessor( {
+			form,
+			render: ( templateValues ) => res.render( 'reports/views/legal', templateValues ),
+			saveFormData: ( formValues ) => backend.reports.saveLegal( req, report.id, formValues ),
+			saved: () => res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.typeCategory( report.id ) )
+		} );
 
-			form.validate();
+		try {
 
-			if( !form.hasErrors() ){
+			await processor.process();
 
-				try {
+		} catch( e ){
 
-					const { response } = await backend.reports.saveLegal( req, report.id, form.getValues() );
-
-					if( response.isSuccess ){
-
-						return res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.typeCategory( report.id ) );
-
-					} else {
-
-						return next( new Error( `Unable to save report, got ${ response.statusCode } from backend` ) );
-					}
-
-				} catch( e ){
-
-					return next( e );
-				}
-			}
+			next( e );
 		}
-
-		res.render( 'reports/views/legal', form.getTemplateValues() );
 	},
 
 	typeCategory: ( req, res ) => {
@@ -498,37 +463,30 @@ module.exports = {
 			}
 		} );
 
-		if( form.isPost ){
+		const processor = new FormProcessor( {
+			form,
+			render: ( templateValues ) => {
 
-			form.validate();
+				templateValues.title = metadata.barrierTypeCategories[ category ];
 
-			if( !form.hasErrors() ){
+				res.render( 'reports/views/type', templateValues );
+			},
+			saveFormData: ( formValues ) => backend.reports.saveBarrierType( req, report.id, formValues ),
+			saved: () => {
 
-				try {
-
-					const { response } = await backend.reports.saveBarrierType( req, report.id, form.getValues() );
-
-					if( response.isSuccess ){
-
-						delete req.session.typeCategoryValues;
-						return res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.support( report.id ) );
-
-					} else {
-
-						return next( new Error( `Unable to save report, got ${ response.statusCode } from backend` ) );
-					}
-
-				} catch( e ){
-
-					return next( e );
-				}
+				delete req.session.typeCategoryValues;
+				res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.support( report.id ) );
 			}
+		} );
+
+		try {
+
+			await processor.process();
+
+		} catch( e ){
+
+			next( e );
 		}
-
-		const data = form.getTemplateValues();
-		data.title = metadata.barrierTypeCategories[ category ];
-
-		res.render( 'reports/views/type', data );
 	},
 
 	support: async ( req, res, next ) => {
@@ -612,33 +570,21 @@ module.exports = {
 			}
 		} );
 
-		if( form.isPost ){
+		const processor = new FormProcessor( {
+			form,
+			render: ( templateValues ) => res.render( 'reports/views/support', templateValues ),
+			saveFormData: ( formValues ) => backend.reports.saveSupport( req, report.id, formValues ),
+			saved: () => res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.nextSteps( report.id ) )
+		} );
 
-			form.validate();
+		try {
 
-			if( !form.hasErrors() ){
+			await processor.process();
 
-				try {
+		} catch( e ){
 
-					const { response } = await backend.reports.saveSupport( req, report.id, form.getValues() );
-
-					if( response.isSuccess ){
-
-						return res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.nextSteps( report.id ) );
-
-					} else {
-
-						return next( new Error( `Unable to save report, got ${ response.statusCode } from backend` ) );
-					}
-
-				} catch( e ){
-
-					return next( e );
-				}
-			}
+			next( e );
 		}
-
-		res.render( 'reports/views/support', form.getTemplateValues() );
 	},
 
 	nextSteps: async ( req, res, next ) => {
@@ -683,33 +629,21 @@ module.exports = {
 			}
 		} );
 
-		if( form.isPost ){
+		const processor = new FormProcessor( {
+			form,
+			render: ( templateValues ) => res.render( 'reports/views/next-steps', templateValues ),
+			saveFormData: ( formValues ) => backend.reports.saveNextSteps( req, report.id, formValues ),
+			saved: () => res.redirect( urls.reports.detail( report.id ) )
+		} );
 
-			form.validate();
+		try {
 
-			if( !form.hasErrors() ){
+			await processor.process();
 
-				try {
+		} catch( e ){
 
-					const { response } = await backend.reports.saveNextSteps( req, report.id, form.getValues() );
-
-					if( response.isSuccess ){
-
-						return res.redirect( urls.reports.detail( report.id ) );
-
-					} else {
-
-						return next( new Error( `Unable to save report, got ${ response.statusCode } from backend` ) );
-					}
-
-				} catch( e ){
-
-					return next( e );
-				}
-			}
+			next( e );
 		}
-
-		res.render( 'reports/views/next-steps', form.getTemplateValues() );
 	},
 
 	submit: async ( req, res, next ) => {
