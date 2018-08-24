@@ -173,9 +173,6 @@ describe( 'Barriers controller', () => {
 			expect( Form ).toHaveBeenCalled();
 			expect( args[ 0 ] ).toEqual( req );
 
-			expect( config._csrf ).toBeDefined();
-			expect( config._csrf.values ).toEqual( [ csrfToken ] );
-
 			expect( config.note ).toBeDefined();
 			expect( config.note.required ).toBeDefined();
 
@@ -229,7 +226,7 @@ describe( 'Barriers controller', () => {
 
 						await controller.addNote( req, res, next );
 
-						expect( next ).toHaveBeenCalledWith( new Error( `Unable to save barrier note, got ${ statusCode } from backend` ) );
+						expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save form - got 500 from backend' ) );
 					} );
 				} );
 
@@ -509,7 +506,7 @@ describe( 'Barriers controller', () => {
 
 										await controller.status( req, res, next );
 
-										expect( next ).toHaveBeenCalledWith( new Error( `Unable to save barrier status, got ${ statusCode } from backend` ) );
+										expect( next ).toHaveBeenCalledWith( new Error( 'No errors in response body, form not saved - got 400 from backend' ) );
 									} );
 								} );
 							} );
@@ -525,7 +522,7 @@ describe( 'Barriers controller', () => {
 
 									await controller.status( req, res, next );
 
-									expect( next ).toHaveBeenCalledWith( new Error( `Unable to save barrier status, got ${ statusCode } from backend` ) );
+									expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save form - got 500 from backend' ) );
 								} );
 							} );
 						} );
@@ -621,7 +618,7 @@ describe( 'Barriers controller', () => {
 
 										await controller.status( req, res, next );
 
-										expect( next ).toHaveBeenCalledWith( new Error( `Unable to save barrier status, got ${ statusCode } from backend` ) );
+										expect( next ).toHaveBeenCalledWith( new Error( 'No errors in response body, form not saved - got 400 from backend' ) );
 									} );
 								} );
 							} );
@@ -637,7 +634,7 @@ describe( 'Barriers controller', () => {
 
 									await controller.status( req, res, next );
 
-									expect( next ).toHaveBeenCalledWith( new Error( `Unable to save barrier status, got ${ statusCode } from backend` ) );
+									expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save form - got 500 from backend' ) );
 								} );
 							} );
 						} );
