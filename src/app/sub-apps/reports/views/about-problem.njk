@@ -57,18 +57,6 @@
 			errorMessage: errors | errorForName( 'country' )
 		} ) }}
 
-		{{ govukTextarea( {
-
-			label: {
-				text: "Provide a brief description of the problem",
-				classes: 'govuk-label--s'
-			},
-			id: 'description',
-			name: 'description',
-			value: description,
-			errorMessage: errors | errorForName( 'description' )
-		} ) }}
-
 		{{ govukInput( {
 
 			label: {
@@ -82,6 +70,18 @@
 			name: 'barrierTitle',
 			value: barrierTitle,
 			errorMessage: errors | errorForName( 'barrier-title' )
+		} ) }}
+
+		{{ govukTextarea( {
+
+			label: {
+				text: "Provide a brief description of the problem",
+				classes: 'govuk-label--s'
+			},
+			id: 'description',
+			name: 'description',
+			value: description,
+			errorMessage: errors | errorForName( 'description' )
 		} ) }}
 
 		<input type="submit" class="govuk-button" value="Save and continue">
