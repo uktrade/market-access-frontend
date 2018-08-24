@@ -230,12 +230,9 @@ describe( 'URLs', () => {
 
 				checkUrls( [
 					[ 'aboutProblem', 'problem' ],
-					[ 'impact', 'impact' ],
 					[ 'legal', 'legal' ],
 					[ 'typeCategory', 'type-category' ],
 					[ 'type', 'type' ],
-					[ 'support', 'support' ],
-					[ 'nextSteps', 'next-steps' ],
 					[ 'submit', 'submit' ]
 				] );
 			} );
@@ -262,11 +259,11 @@ describe( 'URLs', () => {
 			expect( urls.reportStage( '1.2', report ) ).toEqual( urls.reports.companyDetails( report.company_id, report.id ) );
 			expect( urls.reportStage( '1.3', report ) ).toEqual( urls.reports.viewContact( report.contact_id, report.id ) );
 			expect( urls.reportStage( '1.4', report ) ).toEqual( urls.reports.aboutProblem( report.id ) );
-			expect( urls.reportStage( '1.5', report ) ).toEqual( urls.reports.impact( report.id ) );
+			expect( urls.reportStage( '1.5', report ) ).toEqual( '#' );
 			expect( urls.reportStage( '1.6', report ) ).toEqual( urls.reports.legal( report.id ) );
 			expect( urls.reportStage( '1.7', report ) ).toEqual( urls.reports.typeCategory( report.id ) );
-			expect( urls.reportStage( '2.1', report ) ).toEqual( urls.reports.support( report.id ) );
-			expect( urls.reportStage( '2.2', report ) ).toEqual( urls.reports.nextSteps( report.id ) );
+			expect( urls.reportStage( '2.1', report ) ).toEqual( '#' );
+			expect( urls.reportStage( '2.2', report ) ).toEqual( '#' );
 			expect( urls.reportStage( 'blah', report ) ).toEqual( urls.reports.detail( report.id ) );
 		} );
 	} );
