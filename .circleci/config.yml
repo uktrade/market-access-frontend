@@ -1,79 +1,106 @@
+default-setup: &defaults
+  working_directory: ~/app
+  images:
+    - image: circleci/node:8.11
+      environment:
+        SERVER_WORKERS: 2
+        BACKEND_URL: 'http://localhost:8000'
+        BACKEND_HAWK_ID: frontend
+        BACKEND_HAWK_KEY: abc123def456
+        SESSION_SECRET: abcdef123
+        SSO_PROTOCOL: http
+        SSO_DOMAIN: localhost
+        SSO_PORT: 5000
+        SSO_CLIENT: abc123
+        SSO_SECRET: def567
+        SSO_PATH_AUTH: /o/authorize/
+        SSO_PATH_TOKEN: /o/token/
+        SSO_PATH_INTROSPECT: /o/introspect/
+        SSO_REDIRECT_URI: 'http://localhost:8080/login/callback/'
+        SSO_BYPASS: true
+        SSO_MOCK_CODE: abc-def-ghi
+        DATAHUB_URL: 'http://localhost.datahub'
+        FEEDBACK_EMAIL: 'test@test'
+        CI: true
+    - image: redis:3
+    - image: ukti/mock-sso
+      environment:
+        MOCK_SSO_PORT: 5000
+        MOCK_SSO_USERNAME: test-user
+        MOCK_SSO_SCOPE: test
+    - image: postgres:9
+      environment:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: ''
+        POSTGRES_DB: market_access
+    - image: selenium/standalone-chrome:3
+  steps:
+    - checkout
+    - restore_cache:
+        key: node-modules-{{ arch }}-{{ checksum "package-lock.json" }}
+    - run: npm install
+    - run: npm test
+    - run: npm run coverage
+    - run: npm run build:dist
+    - save_cache:
+        key: node-modules-{{ arch }}-{{ checksum "package-lock.json" }}
+        paths:
+          - "node_modules"
+          - "dist/node_modules"
+    - run:
+        command: npm start
+        background: true
+    - run: npm run test:health
+    - run: TEST_BROWSER=chrome npm run test:features
+    - store_artifacts:
+        path: src/test/ci/output/screenshots
+        destination: screenshots
+    - store_artifacts:
+        path: src/test/ci/output/accessibility-reports
+        destination: accessibility-reports
+    - store_artifacts:
+        path: coverage
+        destination: coverage
+
+api: &api
+  environment:
+    DEBUG: 'True'
+    SECRET_KEY: abc-123-456
+    SSO_ENABLED: 'True'
+    FAKE_METADATA: 'True'
+    DATABASE_URL: 'postgres://postgres@localhost/market_access'
+    SENTRY_DSN: 'http://test:test@localhost/123'
+    DH_METADATA_URL: ''
+    HAWK_ID: frontend
+    HAWK_KEY: 'abc123def456'
+    RESOURCE_SERVER_INTROSPECTION_URL: 'http://localhost:5000/o/introspect/'
+    RESOURCE_SERVER_AUTH_TOKEN: abc123
+  command: ./start-wait-for-db.sh
+
 version: 2
 jobs:
   build:
-    working_directory: ~/app
+    <<: *defaults
     docker:
-      - image: circleci/node:8.11
-        environment:
-          SERVER_WORKERS: 2
-          BACKEND_URL: 'http://localhost:8000'
-          BACKEND_HAWK_ID: frontend
-          BACKEND_HAWK_KEY: abc123def456
-          SESSION_SECRET: abcdef123
-          SSO_PROTOCOL: http
-          SSO_DOMAIN: localhost
-          SSO_PORT: 5000
-          SSO_CLIENT: abc123
-          SSO_SECRET: def567
-          SSO_PATH_AUTH: /o/authorize/
-          SSO_PATH_TOKEN: /o/token/
-          SSO_PATH_INTROSPECT: /o/introspect/
-          SSO_REDIRECT_URI: 'http://localhost:8080/login/callback/'
-          SSO_BYPASS: true
-          SSO_MOCK_CODE: abc-def-ghi
-          DATAHUB_URL: 'http://localhost.datahub'
-          FEEDBACK_EMAIL: 'test@test'
-          CI: true
-      - image: redis:3
-      - image: ukti/mock-sso
-        environment:
-          MOCK_SSO_PORT: 5000
-          MOCK_SSO_USERNAME: test-user
-          MOCK_SSO_SCOPE: test
-      - image: postgres:9
-        environment:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: ''
-          POSTGRES_DB: market_access
       - image: ukti/market-access-api
-        environment:
-          DEBUG: 'True'
-          SECRET_KEY: abc-123-456
-          SSO_ENABLED: 'True'
-          FAKE_METADATA: 'True'
-          DATABASE_URL: 'postgres://postgres@localhost/market_access'
-          SENTRY_DSN: 'http://test:test@localhost/123'
-          DH_METADATA_URL: ''
-          HAWK_ID: frontend
-          HAWK_KEY: 'abc123def456'
-          RESOURCE_SERVER_INTROSPECTION_URL: 'http://localhost:5000/o/introspect/'
-          RESOURCE_SERVER_AUTH_TOKEN: abc123
-        command: ./start-wait-for-db.sh
-      - image: selenium/standalone-chrome:3
-    steps:
-      - checkout
-      - restore_cache:
-          key: node-modules-{{ arch }}-{{ checksum "package-lock.json" }}
-      - run: npm install
-      - run: npm test
-      - run: npm run coverage
-      - run: npm run build:dist
-      - save_cache:
-          key: node-modules-{{ arch }}-{{ checksum "package-lock.json" }}
-          paths:
-            - "node_modules"
-            - "dist/node_modules"
-      - run:
-          command: npm start
-          background: true
-      - run: npm run test:health
-      - run: TEST_BROWSER=chrome npm run test:features
-      - store_artifacts:
-          path: src/test/ci/output/screenshots
-          destination: screenshots
-      - store_artifacts:
-          path: src/test/ci/output/accessibility-reports
-          destination: accessibility-reports
-      - store_artifacts:
-          path: coverage
-          destination: coverage
+        <<: *api
+  build_develop:
+    <<: *defaults
+    docker:
+      - image: ukti/market-access-api:develop
+        <<: *api
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build:
+        filters:
+          branches:
+            ignore: develop
+  develop:
+    jobs:
+      - build_develop:
+        filters:
+          branches:
+            only: develop
