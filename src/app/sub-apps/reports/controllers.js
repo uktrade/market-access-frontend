@@ -249,7 +249,7 @@ module.exports = {
 				text: country.name
 			} ) );
 
-			countryItems.unshift( {	value: '', text: 'Choose a country' } );
+			countryItems.unshift( { value: '', text: 'Choose a country' } );
 		}
 
 		const report = req.report;

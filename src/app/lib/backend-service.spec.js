@@ -183,8 +183,9 @@ describe( 'Backend Service', () => {
 				it( 'Should call the correct path and sort the progress', () => {
 
 					const reportId = 1;
+					const report = getFakeData( '/backend/reports/report' );
 
-					backend.get.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body: {} } ) );
+					backend.get.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body: report } ) );
 
 					service.reports.get( req, reportId );
 

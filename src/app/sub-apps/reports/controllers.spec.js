@@ -787,41 +787,44 @@ describe( 'Report controller', () => {
 
 		it( 'Should setup the form correctly', () => {
 
-			const lossScaleResponse = { lossScale: 1 };
-			const boolScaleResponse = { boolScale: 1 };
+			function checkForm( args ){
 
-			validators.isMetadata.and.callFake( ( key ) => {
+				const config = args[ 1 ];
 
-				if( key === 'lossScale' ){ return lossScaleResponse; }
-				if( key === 'boolScale' ){ return boolScaleResponse; }
-			} );
+				expect( Form ).toHaveBeenCalled();
+				expect( args[ 0 ] ).toEqual( req );
+
+				expect( config.item ).toBeDefined();
+				expect( config.item.required ).toBeDefined();
+				expect( config.item.values ).toEqual( [ report.product ] );
+
+				expect( config.commodityCode ).toBeDefined();
+				expect( config.commodityCode.values ).toEqual( [ report.commodity_codes ] );
+
+				expect( config.country ).toBeDefined();
+				expect( config.country.values ).toEqual( [ report.export_country ] );
+				expect( config.country.items.length ).toEqual( metadata.countries.length + 1 );
+				expect( config.country.items[ 0 ] ).toEqual( { value: '', text: 'Choose a country' } );
+				expect( config.country.validators[ 0 ].fn ).toEqual( validators.isCountry );
+
+				expect( config.description ).toBeDefined();
+				expect( config.description.values ).toEqual( [ report.problem_description ] );
+				expect( config.description.required ).toBeDefined();
+
+				expect( config.barrierTitle ).toBeDefined();
+				expect( config.barrierTitle.values ).toEqual( [ report.barrier_title ] );
+				expect( config.barrierTitle.required ).toBeDefined();
+			}
+
+			// check setup twice because of the country caching
+			// so coverage is 100%
+			controller.aboutProblem( req, res );
+
+			checkForm( Form.calls.argsFor( 0 ) );
 
 			controller.aboutProblem( req, res );
 
-			const args = Form.calls.argsFor( 0 );
-			const config = args[ 1 ];
-
-			expect( Form ).toHaveBeenCalled();
-			expect( args[ 0 ] ).toEqual( req );
-
-			expect( config.item ).toBeDefined();
-			expect( config.item.required ).toBeDefined();
-			expect( config.item.values ).toEqual( [ report.product ] );
-
-			expect( config.commodityCode ).toBeDefined();
-			expect( config.commodityCode.values ).toEqual( [ report.commodity_codes ] );
-
-			expect( config.country ).toBeDefined();
-			expect( config.country.values ).toEqual( [ report.export_country ] );
-			expect( config.country.validators[ 0 ].fn ).toEqual( validators.isCountry );
-
-			expect( config.description ).toBeDefined();
-			expect( config.description.values ).toEqual( [ report.problem_description ] );
-			expect( config.description.required ).toBeDefined();
-
-			expect( config.barrierTitle ).toBeDefined();
-			expect( config.barrierTitle.values ).toEqual( [ report.barrier_title ] );
-			expect( config.barrierTitle.required ).toBeDefined();
+			checkForm( Form.calls.argsFor( 1 ) );
 		} );
 
 		describe( 'When it is a GET', () => {

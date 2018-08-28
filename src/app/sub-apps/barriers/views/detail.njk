@@ -21,25 +21,6 @@
 		]
 	} ) }}
 
-	{{ summaryGroup( {
-		heading: {
-			text: 'Impact of the problem',
-			level: 3
-		},
-		items: [
-			{
-				title: 'Estimated financial value of sales lost over a five year period',
-				text: barrier.impact.loss
-			},{
-				title: 'Impact the problem is expected to have on the company if it is not resolved',
-				text: barrier.impact.summary
-			},{
-				title: 'Are there other companies affected',
-				text: barrier.impact.companiesAffected
-			}
-		]
-	} ) }}
-
 	{%- if barrier.legal.hasInfringements -%}
 
 		{{ summaryGroup( {
