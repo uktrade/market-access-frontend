@@ -3,7 +3,7 @@
 	"title": "Detail of a report",
 
 	"type": "object",
-	"required": [ "id", "company_name" ],
+	"required": [ "id", "company_name", "barrier_type" ],
 	"properties": {
 
 		"id": {
@@ -16,6 +16,19 @@
 		"company_name": {
 			"type": "string",
 			"faker": "lorem.words"
+		},
+
+		"barrier_type": {
+			"type": "object",
+			"required": [
+				"id",
+				"title"
+			],
+			"properties": {
+
+				"id": { "$ref": "$refs/common.json#/small-int" },
+				"title": { "$ref": "$refs/common.json#/words" }
+			}
 		}
 	}
 }

@@ -15,7 +15,7 @@ module.exports = ( barrier ) => {
 	return {
 		barrier: {
 			id: barrier.id,
-			title: report && report.barrier_title,
+			title: report.barrier_title,
 			summary: barrier.summary,
 			type: barrier.barrier_type,
 			status: barrierStatus[ barrierStatusCode ],
@@ -25,11 +25,6 @@ module.exports = ( barrier ) => {
 			sector: {
 				id: company.sector_id,
 				name: company.sector_name
-			},
-			impact: {
-				loss: metadata.lossScale[ barrier.estimated_loss_range ],
-				summary: barrier.impact_summary,
-				companiesAffected: metadata.boolScale[ barrier.other_companies_affected ]
 			},
 			legal: {
 				hasInfringements: ( barrier.has_legal_infringement == '1' ),

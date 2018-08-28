@@ -6,9 +6,18 @@
 	"required": [
 		"id",
 		"barrier_type",
+		"barrier_title",
+		"summary",
 		"report",
 		"current_status",
-		"reported_on"
+		"reported_on",
+		"company",
+		"export_country",
+		"has_legal_infringement",
+		"wto_infringement",
+		"fta_infringement",
+		"other_infringement",
+		"infringement_summary"
 	],
 	"properties": {
 
@@ -27,6 +36,13 @@
 			}
 		},
 
+		"barrier_title": {
+			"type": "string",
+			"faker": "lorem.words"
+		},
+
+		"summary": { "$ref": "$refs/common.json#/paragraph" },
+
 		"report": {
 			"type": "object",
 			"required": [
@@ -44,20 +60,7 @@
 				},
 
 				"company": {
-					"type": "object",
-					"required": [
-						"id",
-						"name",
-						"sector_id",
-						"sector_name"
-					],
-					"properties": {
-
-						"id": { "$ref": "$refs/common.json#/uuid" },
-						"name": { "$ref": "$refs/common.json#/words" },
-						"sector_id": { "$ref": "$refs/common.json#/uuid" },
-						"sector_name": { "$ref": "$refs/common.json#/words" }
-					}
+					"$ref": "#/refs/company"
 				}
 			}
 		},
@@ -73,6 +76,37 @@
 			}
 		},
 
-		"reported_on": { "$ref": "$refs/common.json#/past-date" }
+		"reported_on": { "$ref": "$refs/common.json#/past-date" },
+		"company": { "$ref": "#/refs/company" },
+		"export_country": { "$ref": "$refs/common.json#/uuid" },
+
+		"has_legal_infringement": {
+			"type": "string",
+			"enum": [ "1", "2", "3" ]
+		},
+
+		"wto_infringement": { "$ref": "$refs/common.json#/boolean" },
+		"fta_infringement": { "$ref": "$refs/common.json#/boolean" },
+		"other_infringement": { "$ref": "$refs/common.json#/boolean" },
+		"infringement_summary":  { "$ref": "$refs/common.json#/paragraph" }
+	},
+
+	"refs": {
+		"company": {
+			"type": "object",
+			"required": [
+				"id",
+				"name",
+				"sector_id",
+				"sector_name"
+			],
+			"properties": {
+
+				"id": { "$ref": "$refs/common.json#/uuid" },
+				"name": { "$ref": "$refs/common.json#/words" },
+				"sector_id": { "$ref": "$refs/common.json#/uuid" },
+				"sector_name": { "$ref": "$refs/common.json#/words" }
+			}
+		}
 	}
 }

@@ -1,21 +1,35 @@
 {
-   "id": "1be2d5b6-7b6b-4944-9366-03ef143ab930",
+   "id": "c6c39e5e-5bb4-422a-8936-f8dabab9bbff",
    "barrier_type": {
-      "id": 15,
-      "title": "sunt sapiente officiis"
+      "id": 17,
+      "title": "officia assumenda maiores"
    },
+   "barrier_title": "fugiat esse qui",
+   "summary": "Iste aut nisi quisquam aut non est architecto unde soluta. Molestias omnis eos. Sit aut rerum sit impedit ut ut recusandae et.",
    "report": {
-      "id": 7,
-      "problem_status": 1,
+      "id": 8,
+      "problem_status": 2,
       "company": {
-         "id": "fc3dbdc3-b0ef-4f5c-b0ac-b42852cfb323",
-         "name": "facere sint a",
-         "sector_id": "5f9cd335-e3ea-48ab-b8cd-6a3970edeed1",
-         "sector_name": "cumque ipsa quo"
+         "id": "884f6930-fac1-4feb-9233-ae5b1e219146",
+         "name": "velit voluptatibus ea",
+         "sector_id": "e38eb400-5df1-4bc2-a81f-0d89a25c534b",
+         "sector_name": "quo accusamus qui"
       }
    },
    "current_status": {
-      "status": 1
+      "status": 3
    },
-   "reported_on": "Fri Apr 27 2018 05:20:40 GMT+0100 (BST)"
+   "reported_on": "Fri Jun 22 2018 13:21:43 GMT+0100 (BST)",
+   "company": {
+      "id": "4397afb6-6725-445f-bfe9-e87683677ca9",
+      "name": "ipsa commodi unde",
+      "sector_id": "72d54511-61b2-482c-ab65-b937386ea6f5",
+      "sector_name": "id aut et"
+   },
+   "export_country": "0f4156b9-ae0f-42f4-9af2-257a8f948c63",
+   "has_legal_infringement": "3",
+   "wto_infringement": false,
+   "fta_infringement": true,
+   "other_infringement": false,
+   "infringement_summary": "Aut aliquid omnis qui omnis ipsam eum et veritatis fuga. Odio temporibus reiciendis suscipit non voluptatem suscipit. Provident adipisci corrupti aspernatur voluptas recusandae."
 }

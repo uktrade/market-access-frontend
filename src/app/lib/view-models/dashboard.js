@@ -32,6 +32,5 @@ module.exports = ( barriers ) => {
 		} );
 	}
 
-
 	return {	barriers	};
 };

@@ -249,7 +249,7 @@ module.exports = {
 				text: country.name
 			} ) );
 
-			countryItems.unshift( {	value: '', text: 'Choose a country' } );
+			countryItems.unshift( { value: '', text: 'Choose a country' } );
 		}
 
 		const report = req.report;
@@ -291,60 +291,6 @@ module.exports = {
 			form,
 			render: ( templateValues ) => res.render( 'reports/views/about-problem', templateValues ),
 			saveFormData: ( formValues ) => backend.reports.saveProblem( req, report.id, formValues ),
-			saved: () => res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.impact( report.id ) )
-		} );
-
-		try {
-
-			await processor.process();
-
-		} catch( e ){
-
-			next( e );
-		}
-	},
-
-	impact: async ( req, res, next ) => {
-
-		const report = req.report;
-		const form = new Form( req, {
-
-			impact: {
-				values: [ report.problem_impact ],
-				required: 'Describe the impact of the problem'
-			},
-
-			losses: {
-				type: Form.RADIO,
-				values: [ report.estimated_loss_range ],
-				items: govukItemsFromObj( metadata.lossScale ),
-				validators: [ {
-					fn: validators.isMetadata( 'lossScale' ),
-					message: 'Answer the value of losses'
-				} ]
-			},
-
-			otherCompanies: {
-				type: Form.RADIO,
-				values: [ report.other_companies_affected ],
-				items: govukItemsFromObj( metadata.boolScale ),
-				validators: [ {
-					fn: validators.isMetadata( 'boolScale' ),
-					message: 'Answer if any other companies are affected'
-				} ]
-			},
-
-			otherCompaniesInfo: {
-				values: [ report.other_companies_info ],
-				conditional: { name: 'otherCompanies', value: '1' },
-				required: 'Enter information on the other companies'
-			}
-		} );
-
-		const processor = new FormProcessor( {
-			form,
-			render: ( templateValues ) => res.render( 'reports/views/impact', templateValues ),
-			saveFormData: ( formValues ) => backend.reports.saveImpact( req, report.id, formValues ),
 			saved: () => res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.legal( report.id ) )
 		} );
 
@@ -352,7 +298,7 @@ module.exports = {
 
 			await processor.process();
 
-		} catch ( e ){
+		} catch( e ){
 
 			next( e );
 		}
@@ -475,165 +421,8 @@ module.exports = {
 			saved: () => {
 
 				delete req.session.typeCategoryValues;
-				res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.support( report.id ) );
+				res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.detail( report.id ) );
 			}
-		} );
-
-		try {
-
-			await processor.process();
-
-		} catch( e ){
-
-			next( e );
-		}
-	},
-
-	support: async ( req, res, next ) => {
-
-		const report = req.report;
-		const dateParts = ( report.resolved_date || '' ).split( '-' );
-		const form = new Form( req, {
-			resolved: {
-				type: Form.RADIO,
-				values: [ report.is_resolved ],
-				items: govukItemsFromObj( metadata.bool ),
-				validators: [ {
-					fn: validators.isMetadata( 'bool' ),
-					message: 'Answer if the barrier has been resolved'
-				} ]
-			},
-			supportType: {
-				type: Form.RADIO,
-				values: [ report.support_type ],
-				items: govukItemsFromObj( metadata.supportType ),
-				conditional: { name: 'resolved', value: 'false' },
-				validators: [ {
-					fn: validators.isMetadata( 'supportType' ),
-					message: 'Answer what type of support you would like'
-				} ]
-			},
-			stepsTaken: {
-				values: [ report.steps_taken ],
-				conditional: { name: 'resolved', value: 'false' },
-				required: 'Provide a summary of key steps/actions taken so far'
-			},
-			resolvedDate: {
-				type: Form.GROUP,
-				conditional: { name: 'resolved', value: 'true' },
-				validators: [ {
-					fn: validators.isDateValue( 'day' ),
-					message: 'Enter a value for resolved day'
-				},{
-					fn: validators.isDateValue( 'month' ),
-					message: 'Enter a value for resolved month'
-				},{
-					fn: validators.isDateValue( 'year' ),
-					message: 'Enter a value for resolved year'
-				},{
-					fn: validators.isDateValid,
-					message: 'Enter a valid resolved date'
-				},{
-					fn: validators.isDateInPast,
-					message: 'Enter a resolved date that is in the past'
-				} ],
-				items: {
-					day: {
-						values: [ dateParts[ 2 ] ]
-					},
-					month: {
-						values: [ dateParts[ 1 ] ]
-					},
-					year: {
-						values: [ dateParts[ 0 ] ]
-					}
-				}
-			},
-			resolvedSummary: {
-				values: [ report.resolution_summary ],
-				conditional: { name: 'resolved', value: 'true' },
-				required: 'Enter a summary for how the barrier was resolved'
-			},
-			politicalSensitivities: {
-				type: Form.RADIO,
-				values: [ report.is_politically_sensitive ],
-				items: govukItemsFromObj( metadata.bool ),
-				validators: [ {
-					fn: validators.isMetadata( 'bool' ),
-					message: 'Answer if there are any political sensitivities'
-				} ]
-			},
-			sensitivitiesDescription: {
-				values: [ report.political_sensitivity_summary ],
-				conditional: { name: 'politicalSensitivities', value: 'true' },
-				required: 'Describe the sensitivities'
-			}
-		} );
-
-		const processor = new FormProcessor( {
-			form,
-			render: ( templateValues ) => res.render( 'reports/views/support', templateValues ),
-			saveFormData: ( formValues ) => backend.reports.saveSupport( req, report.id, formValues ),
-			saved: () => res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.nextSteps( report.id ) )
-		} );
-
-		try {
-
-			await processor.process();
-
-		} catch( e ){
-
-			next( e );
-		}
-	},
-
-	nextSteps: async ( req, res, next ) => {
-
-		const report = req.report;
-		const form = new Form( req, {
-
-			response: {
-				type: Form.RADIO,
-				values: [ report.govt_response_requested ],
-				items: govukItemsFromObj( metadata.govResponse ),
-				validators: [ {
-					fn: validators.isMetadata( 'govResponse' ),
-					message: 'Select a type of UK goverment response'
-				} ]
-			},
-
-			sensitivities: {
-				type: Form.RADIO,
-				values: [ report.is_commercially_sensitive ],
-				items: govukItemsFromObj( metadata.bool ),
-				validators: [ {
-					fn: validators.isMetadata( 'bool' ),
-					message: 'Answser if there are any sensitivities'
-				} ]
-			},
-
-			sensitivitiesText: {
-				values: [ report.commercial_sensitivity_summary ],
-				conditional: { name: 'sensitivities', value: 'true' },
-				required: 'Describe the sensitivities'
-			},
-
-			permission: {
-				type: Form.RADIO,
-				values: [ report.can_publish ],
-				items: govukItemsFromObj( metadata.publishResponse ),
-				validators: [ {
-					fn: validators.isMetadata( 'publishResponse' ),
-					message: 'Answer if we can publish the summary'
-				} ]
-			}
-		} );
-
-		const processor = new FormProcessor( {
-			form,
-			render: ( templateValues ) => res.render( 'reports/views/next-steps', templateValues ),
-			saveFormData: ( formValues ) => backend.reports.saveNextSteps( req, report.id, formValues ),
-			saved: () => res.redirect( urls.reports.detail( report.id ) )
 		} );
 
 		try {

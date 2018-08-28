@@ -491,15 +491,6 @@ describe( 'App', function(){
 						} );
 					} );
 
-					describe( 'Impact of the problem', () => {
-						it( 'Should fetch the report and render the page', ( done ) => {
-
-							app
-								.get( urls.reports.impact( reportId ) )
-								.end( checkPage( 'Market Access - Report - Impact of the problem', done ) );
-						} );
-					} );
-
 					describe( 'Legal obligations infringed', () => {
 						it( 'Should fetch the report and render the page', ( done ) => {
 
@@ -565,24 +556,6 @@ describe( 'App', function(){
 										.end( checkPage( 'Market Access - Report - Define type of market access barrier', done ) );
 								} );
 							} );
-						} );
-					} );
-
-					describe( 'Describe the next steps and what support you may need', () => {
-						it( 'Should fetch the report and render the page', ( done ) => {
-
-							app
-								.get( urls.reports.support( reportId ) )
-								.end( checkPage( 'Market Access - Report - Describe the next steps and what support you may need', done ) );
-						} );
-					} );
-
-					describe( 'Next steps the company affected have requested', () => {
-						it( 'Should fetch the report and render the page', ( done ) => {
-
-							app
-								.get( urls.reports.nextSteps( reportId ) )
-								.end( checkPage( 'Market Access - Report - Next steps the company affected have requested', done ) );
 						} );
 					} );
 

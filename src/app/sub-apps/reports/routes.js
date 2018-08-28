@@ -43,9 +43,6 @@ module.exports = ( express, app ) => {
 	app.get( '/:reportId/problem/', controller.aboutProblem );
 	app.post( '/:reportId/problem/', controller.aboutProblem );
 
-	app.get( '/:reportId/impact/', controller.impact );
-	app.post( '/:reportId/impact/', controller.impact );
-
 	app.get( '/:reportId/legal/', controller.legal );
 	app.post( '/:reportId/legal/', controller.legal );
 
@@ -54,12 +51,6 @@ module.exports = ( express, app ) => {
 
 	app.get( '/:reportId/type/', hasBarrierTypeCategory, controller.type );
 	app.post( '/:reportId/type/', hasBarrierTypeCategory, controller.type );
-
-	app.get( '/:reportId/support/', controller.support );
-	app.post( '/:reportId/support/', controller.support );
-
-	app.get( '/:reportId/next-steps/', controller.nextSteps );
-	app.post( '/:reportId/next-steps/', controller.nextSteps );
 
 	app.post( '/:reportId/submit/', controller.submit );
 	// detail muse be last route
