@@ -1,13 +1,12 @@
 #!/bin/bash
 
-if [ -d ./output/screenshots ]; then
-	rm -r ./output/screenshots;
-fi
+paths=( ./output/screenshots ./output/accessibility-reports ./output/test-reports/cucumber )
 
-mkdir -p ./output/screenshots;
+for i in "${paths[@]}"
+do
+	if [ -d "$i" ]; then
+		rm -r "$i";
+	fi
 
-if [ -d ./output/accessibility-reports ]; then
-	rm -r ./output/accessibility-reports;
-fi
-
-mkdir -p ./output/accessibility-reports;
+	mkdir -p "$i";
+done

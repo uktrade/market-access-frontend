@@ -30,6 +30,8 @@ aliases:
       - store_artifacts:
           path: coverage
           destination: coverage
+      - store_test_results:
+          path: src/test/ci/output/test-reports
   - &node
     image: circleci/node:8.11
     environment:
