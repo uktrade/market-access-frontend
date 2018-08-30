@@ -781,11 +781,20 @@ describe( 'Report controller', () => {
 				export_country: 'a country',
 				problem_description: 'a description',
 				barrier_title: 'barrier_title',
+				barrier_awareness: 'barrier_awareness',
+				barrier_awareness_other: 'barrier_awareness_other'
 			};
 			req.report = report;
 		} );
 
 		it( 'Should setup the form correctly', () => {
+
+			const barrierAwarenessResponse = { barrierAwarenessResponse: true };
+
+			validators.isMetadata.and.callFake( ( key ) => {
+
+				if( key === 'barrierAwareness' ){ return barrierAwarenessResponse; }
+			} );
 
 			function checkForm( args ){
 
@@ -814,6 +823,16 @@ describe( 'Report controller', () => {
 				expect( config.barrierTitle ).toBeDefined();
 				expect( config.barrierTitle.values ).toEqual( [ report.barrier_title ] );
 				expect( config.barrierTitle.required ).toBeDefined();
+
+				expect( config.barrierAwareness ).toBeDefined();
+				expect( config.barrierAwareness.type ).toEqual( Form.RADIO );
+				expect( config.barrierAwareness.values ).toEqual( [ report.barrier_awareness ] );
+				expect( config.barrierAwareness.validators[ 0 ].fn ).toEqual( barrierAwarenessResponse );
+				expect( Array.isArray( config.barrierAwareness.items ) ).toEqual( true );
+
+				expect( config.barrierAwarenessOther ).toBeDefined();
+				expect( config.barrierAwarenessOther.conditional ).toEqual( { name: 'barrierAwareness', value: '4' } );
+				expect( config.barrierAwarenessOther.values ).toEqual( [ report.barrier_awareness_other ] );
 			}
 
 			// check setup twice because of the country caching

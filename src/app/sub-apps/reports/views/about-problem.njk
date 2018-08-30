@@ -8,6 +8,12 @@
 
 {% block page_title %}{{ super() }} - Report - About the problem{% endblock %}
 
+{% block body_script %}
+	<script>
+		ma.pages.report.aboutProblem();
+	</script>
+{% endblock %}
+
 {% block page_content %}
 
 	{{ heading({
@@ -32,6 +38,37 @@
 			value: item,
 			errorMessage: errors | errorForName( 'item' )
 		} ) }}
+
+		{% set barrierAwarenessOtherHtml %}
+
+			{{ govukInput( {
+
+				label: {
+					text: 'Please specify',
+					classes: 'govuk-label--s'
+				},
+				id: 'barrier-awareness-other',
+				name: 'barrierAwarenessOther',
+				value: barrierAwarenessOther,
+				errorMessage: errors | errorForName( 'barrier-awareness-other' )
+			} ) }}
+
+		{% endset %}
+
+		{{ govukRadios({
+			name: 'barrierAwareness',
+			classes: [ 'barrier-awareness' ],
+			fieldset: {
+				legend: {
+					text: 'How did you become aware of the barrier?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: barrierAwareness | addConditionalRadioHtml( {
+				'4': { html: barrierAwarenessOtherHtml }
+			} ),
+			errorMessage: errors | errorForName( 'barrierAwareness-1' )
+		}) }}
 
 		{{ govukInput( {
 

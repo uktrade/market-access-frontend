@@ -139,7 +139,9 @@ module.exports = {
 			commodity_codes: getValue( values.commodityCode ),
 			export_country: getValue( values.country ),
 			problem_description: getValue( values.description ),
-			barrier_title: getValue( values.barrierTitle )
+			barrier_title: getValue( values.barrierTitle ),
+			barrier_awareness: getValue( values.barrierAwareness ),
+			barrier_awareness_other: getValue( values.barrierAwarenessOther )
 		} ),
 		saveImpact: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 			problem_impact: getValue( values.impact ),

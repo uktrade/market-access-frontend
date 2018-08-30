@@ -284,7 +284,25 @@ module.exports = {
 			barrierTitle: {
 				values: [ report.barrier_title ],
 				required: 'Enter a barrier title'
-			}
+			},
+
+			barrierAwareness: {
+				type: Form.RADIO,
+				values: [ report.barrier_awareness ],
+				items: govukItemsFromObj( metadata.barrierAwareness ),
+				validators: [
+					{
+						fn: validators.isMetadata( 'barrierAwareness' ),
+						message: 'Select an option'
+					}
+				]
+			},
+
+			barrierAwarenessOther: {
+				values: [ report.barrier_awareness_other ],
+				conditional: { name: 'barrierAwareness', value: '4' },
+				required: 'Answer how you became aware'
+			},
 		} );
 
 		const processor = new FormProcessor( {
