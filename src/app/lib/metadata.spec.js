@@ -231,5 +231,18 @@ describe( 'metadata', () => {
 				} );
 			} );
 		} );
+
+		describe( 'barrierAwareness', () => {
+			it( 'Should return a list', () => {
+
+				expect( metadata.barrierAwareness ).toBeDefined();
+				expect( metadata.barrierAwareness ).toEqual( {
+					'1': 'Company',
+					'2': 'Trade association',
+					'3': 'Government entity',
+					'4': 'Other'
+				} );
+			} );
+		} );
 	} );
 } );

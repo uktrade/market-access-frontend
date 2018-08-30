@@ -78,6 +78,12 @@ module.exports.fetch = async () => {
 				'true': 'Yes',
 				'false': 'No'
 			};
+			module.exports.barrierAwareness = {
+				'1': 'Company',
+				'2': 'Trade association',
+				'3': 'Government entity',
+				'4': 'Other'
+			};
 
 		} else {
 

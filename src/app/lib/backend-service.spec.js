@@ -370,19 +370,25 @@ describe( 'Backend Service', () => {
 				const country = 'a';
 				const description = 'b';
 				const barrierTitle = 'c';
+				const barrierAwareness = 'd';
+				const barrierAwarenessOther = 'e';
 
 				checkWithAndWithoutValues( 'saveProblem', {
 					item,
 					commodityCode,
 					country,
 					description,
-					barrierTitle
+					barrierTitle,
+					barrierAwareness,
+					barrierAwarenessOther
 				}, {
 					product: item,
 					commodity_codes: commodityCode,
 					export_country: country,
 					problem_description: description,
 					barrier_title: barrierTitle,
+					barrier_awareness: barrierAwareness,
+					barrier_awareness_other: barrierAwarenessOther
 				} );
 			} );
 
