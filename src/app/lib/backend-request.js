@@ -69,9 +69,9 @@ function makeRequest( method, path, opts = {} ){
 
 	return new Promise( ( resolve, reject ) => {
 
-		logger.debug( `Sending ${ method } request to: ${ uri }` );
+		logger.verbose( `Sending ${ method } request to: ${ uri }` );
 
-		//if( config.isDev ){
+		if( config.isDev ){
 
 			logger.debug( 'With headers: ' + JSON.stringify( requestOptions.headers, null, 2 ) );
 
@@ -79,7 +79,7 @@ function makeRequest( method, path, opts = {} ){
 
 				logger.debug( 'With body: ' + requestOptions.body );
 			}
-		//}
+		}
 
 		request( requestOptions, ( err, response, body ) => {
 
@@ -90,10 +90,11 @@ function makeRequest( method, path, opts = {} ){
 			} else {
 
 				const statusCode = response.statusCode;
+				logger.verbose( `Response code: ${ response.statusCode } for ${ uri }` );
 
-				//if( config.isDev ){
+				if( config.isDev ){
 					logger.debug( 'Response headers: ' + JSON.stringify( response.headers, null, 2 ) );
-				//}
+				}
 
 				if( clientHeader ){
 
@@ -101,7 +102,7 @@ function makeRequest( method, path, opts = {} ){
 					// must use raw response body here
 					const isValid = hawk.client.authenticate( response, credentials, clientHeader.artifacts, { payload: body } );
 
-					logger.debug( `Response code: ${ response.statusCode } for ${ uri }, isValid:` + !!isValid );
+					logger.verbose( `Response isValid:` + !!isValid );
 
 					if( !isValid ){
 
@@ -120,8 +121,12 @@ function makeRequest( method, path, opts = {} ){
 					} catch( e ){
 
 						reporter.captureException( e, { uri } );
-						logger.debug( `Invalid JSON response for ${ uri }` );
+						logger.error( `Invalid JSON response for ${ uri }` );
 					}
+				}
+
+				if( config.isDev ){
+					logger.debug( 'Response body: ' + JSON.stringify( body, null, 2 ) );
 				}
 
 				if( response.isSuccess || statusCode === 404 || statusCode === 400 ){

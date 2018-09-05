@@ -1,0 +1,71 @@
+{% from 'components/radios/macro.njk' import govukRadios %}
+{% from 'components/date-input/macro.njk' import govukDateInput %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Report - Status of the problem{% endblock %}
+
+{% block body_script %}
+	<script>
+		ma.pages.report.isResolved();
+	</script>
+{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.reports.start( report.id ) },
+		caption: 'Report a barrier',
+		text: 'Status of the problem',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.reports.isResolved( report.id ) }}" method="POST">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{% set isResolvedHtml %}
+			{{ govukDateInput( {
+
+				id: 'resolved-date',
+				fieldset: {
+					legend: {
+						text: 'When was the barrier resolved',
+						classes: 'govuk-fieldset__legend--s'
+					}
+				},
+				errorMessage: errors | errorForName( 'resolved-date' ),
+				items: [
+					{
+						name: 'month',
+						value: resolvedDate.month
+					},
+					{
+						name: 'year',
+						value: resolvedDate.year
+					}
+				]
+			} ) }}
+		{% endset %}
+
+		{{ govukRadios( {
+
+			idPrefix: 'is-resolved',
+			name: 'isResolved',
+			classes: 'is-resolved',
+			fieldset: {
+				legend: {
+					text: 'Has the barrier been resolved?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: isResolved | addConditionalRadioHtml( {
+				'true': { html: isResolvedHtml }
+			} ),
+			errorMessage: errors | errorForName( 'is-resolved-1' )
+			} )
+		}}
+
+		<input type="submit" value="Continue" class="govuk-button">
+	</form>
+{% endblock %}

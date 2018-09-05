@@ -1,0 +1,36 @@
+{% from 'components/select/macro.njk' import govukSelect %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Report - Export country{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.reports.isResolved( report.id ) },
+		caption: 'Report a barrier',
+		text: 'Export country',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.reports.country( report.id ) }}" method="POST" class="restrict-width">
+
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{{ govukSelect( {
+
+			label: {
+				text: "Which country or trading bloc is the source of the problem?",
+				classes: 'govuk-label--s'
+			},
+			id: 'country',
+			name: 'country',
+			items: country,
+			errorMessage: errors | errorForName( 'country' )
+		} ) }}
+
+		<input type="submit" class="govuk-button" value="Continue">
+
+	</form>
+{% endblock %}

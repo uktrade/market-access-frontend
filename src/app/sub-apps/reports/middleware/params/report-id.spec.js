@@ -108,10 +108,10 @@ describe( 'Report Id param middleware', () => {
 			} );
 		} );
 
-		describe( 'When the number is more than 10 digits', () => {
+		describe( 'When the number is more than 60 digits', () => {
 			it( 'Should call next with an error', async () => {
 
-				req.params.reportId = '1234567891011';
+				req.params.reportId = '1234567891123456789112345678911234567891123456789112345678911';
 
 				await middleware( req, res, next );
 
@@ -139,7 +139,7 @@ describe( 'Report Id param middleware', () => {
 		describe( 'Any other word', () => {
 			it( 'Should call next with an error', async () => {
 
-				req.params.reportId = 'abc';
+				req.params.reportId = 'abc_zyx';
 
 				await middleware( req, res, next );
 

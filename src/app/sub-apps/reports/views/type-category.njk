@@ -8,6 +8,7 @@
 {% block page_content %}
 
 	{{ heading({
+		back: { href: urls.reports.aboutProblem( reprot.id ) },
 		caption: 'Report a barrier',
 		text: 'Define type of market acces barrier',
 		errors: errors

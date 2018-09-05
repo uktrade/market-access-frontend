@@ -147,7 +147,7 @@ describe( 'Backend Service', () => {
 		} );
 	} );
 
-	describe( 'Reports', () => {
+	xdescribe( 'Reports', () => {
 		describe( 'getAll', () => {
 			describe( 'When the results are an array', () => {
 				it( 'Should call the correct path and sort the progress', async () => {

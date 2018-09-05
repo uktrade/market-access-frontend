@@ -1,14 +1,14 @@
 const proxyquire = require( 'proxyquire' );
-const modulePath = './has-company';
+const modulePath = './has-resolved-form-values';
 
-const companySearchUrlResponse = 'a-url';
+const isResolvedUrlResponse = 'a-url';
 
-describe( 'hasCompany middleware', () => {
+describe( 'hasResolvedFormValues middleware', () => {
 
 	let req;
 	let res;
 	let next;
-	let companySearch;
+	let isResolved;
 	let middleware;
 
 	beforeEach( () => {
@@ -23,10 +23,10 @@ describe( 'hasCompany middleware', () => {
 			redirect: jasmine.createSpy( 'res.redirect' )
 		};
 		next = jasmine.createSpy( 'next' );
-		companySearch = jasmine.createSpy( 'urls.reports.companySearch' ).and.callFake( () => companySearchUrlResponse );
+		isResolved = jasmine.createSpy( 'urls.reports.isResolved' ).and.callFake( () => isResolvedUrlResponse );
 
 		middleware = proxyquire( modulePath, {
-			'../../../lib/urls': { reports: { companySearch	} }
+			'../../../lib/urls': { reports: { isResolved	} }
 		} );
 	} );
 
@@ -44,10 +44,10 @@ describe( 'hasCompany middleware', () => {
 		} );
 	} );
 
-	describe( 'When there is a reportCompany in the session', () => {
+	describe( 'When isResolvedFormValues is in the session', () => {
 		it( 'Should call next', () => {
 
-			req.session.reportCompany = {
+			req.session.isResolvedFormValues = {
 				id: 1,
 				name: 'test'
 			};
@@ -58,14 +58,14 @@ describe( 'hasCompany middleware', () => {
 		} );
 	} );
 
-	describe( 'When there is not a req.report object or a reportCompany in the session', () => {
-		it( 'Should redirect to the company search page', () => {
+	describe( 'When there is not a req.report object or isResolvedFormValues in the session', () => {
+		it( 'Should redirect to the isResolved page', () => {
 
 			middleware( req, res, next );
 
 			expect( next ).not.toHaveBeenCalled();
-			expect( companySearch ).toHaveBeenCalledWith( req.params.reportId );
-			expect( res.redirect ).toHaveBeenCalledWith( companySearchUrlResponse );
+			expect( isResolved ).toHaveBeenCalledWith( req.params.reportId );
+			expect( res.redirect ).toHaveBeenCalledWith( isResolvedUrlResponse );
 		} );
 	} );
 } );

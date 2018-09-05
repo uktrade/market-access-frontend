@@ -15,17 +15,22 @@ function getCheckboxValue( parent, field ){
 	return getValue( parent ) && !!parent[ field ];
 }
 
-function getDate( field ){
+function getDate( field, defaultDay ){
 
 	if( field ){
 
 		const { year, month, day } = field;
 
-		if( year && month && day ){
+		if( year && month ){
 
-			return [ year, month, day ].join( '-' );
+			return [ year, month, ( day || defaultDay ) ].join( '-' );
 		}
 	}
+}
+
+function getDefaultedDate( field ){
+
+	return getDate( field, '01' );
 }
 
 function sortReportProgress( item ){
@@ -114,40 +119,31 @@ module.exports = {
 
 	reports: {
 		getAll: ( req ) => backend.get( '/reports', getToken( req ) ).then( transformReportList ),
-		getAllUnfinished: ( req ) => backend.get( '/reports/unfinished', getToken( req ) ).then( transformReportList ),
 		get: ( req, reportId ) => backend.get( `/reports/${ reportId }`, getToken( req ) ).then( transformSingleReport ),
 		save: ( req, values ) => backend.post( '/reports', getToken( req ), {
 			problem_status: getValue( values.status ),
-			is_emergency: getValue( values.emergency ),
-			company_id: getValue( values.company.id ),
-			company_name: getValue( values.company.name ),
-			company_sector_id: getValue( values.company.sector && values.company.sector.id ),
-			company_sector_name: getValue( values.company.sector && values.company.sector.name ),
-			contact_id: getValue( values.contactId )
+			is_resolved: getValue( values.isResolved ),
+			resolved_date: getValue( getDefaultedDate( values.resolvedDate ) ),
+			export_country: getValue( values.country )
 		} ),
 		update: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 			problem_status: getValue( values.status ),
-			is_emergency: getValue( values.emergency ),
-			company_id: getValue( values.company.id ),
-			company_name: getValue( values.company.name ),
-			company_sector_id: getValue( values.company.sector && values.company.sector.id ),
-			company_sector_name: getValue( values.company.sector && values.company.sector.name ),
-			contact_id: getValue( values.contactId )
+			is_resolved: getValue( values.isResolved ),
+			resolved_date: getValue( getDefaultedDate( values.resolvedDate ) ),
+			export_country: getValue( values.country )
+		} ),
+		saveHasSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
+			sectors_affected: values.hasSectors
+		} ),
+		saveSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
+			sectors: values.sectors
 		} ),
 		saveProblem: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 			product: getValue( values.item ),
-			commodity_codes: getValue( values.commodityCode ),
-			export_country: getValue( values.country ),
 			problem_description: getValue( values.description ),
 			barrier_title: getValue( values.barrierTitle ),
-			barrier_awareness: getValue( values.barrierAwareness ),
-			barrier_awareness_other: getValue( values.barrierAwarenessOther )
-		} ),
-		saveImpact: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
-			problem_impact: getValue( values.impact ),
-			estimated_loss_range: getValue( values.losses ),
-			other_companies_affected: getValue( values.otherCompanies ),
-			other_companies_info: getValue( values.otherCompaniesInfo )
+			source: getValue( values.barrierAwareness ),
+			other_source: getValue( values.barrierAwarenessOther )
 		} ),
 		saveLegal: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 			has_legal_infringement: getValue( values.hasInfringed ),
