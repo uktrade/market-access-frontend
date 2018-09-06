@@ -10,10 +10,12 @@ function getValue( value ){
 	return value || null;
 }
 
+/*
 function getCheckboxValue( parent, field ){
 
 	return getValue( parent ) && !!parent[ field ];
 }
+*/
 
 function getDate( field, defaultDay ){
 
@@ -133,10 +135,10 @@ module.exports = {
 			export_country: getValue( values.country )
 		} ),
 		saveHasSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
-			sectors_affected: values.hasSectors
+			sectors_affected: getValue( values.hasSectors )
 		} ),
 		saveSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
-			sectors: values.sectors
+			sectors: getValue( values.sectors )
 		} ),
 		saveProblem: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 			product: getValue( values.item ),
@@ -145,30 +147,8 @@ module.exports = {
 			source: getValue( values.barrierAwareness ),
 			other_source: getValue( values.barrierAwarenessOther )
 		} ),
-		saveLegal: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
-			has_legal_infringement: getValue( values.hasInfringed ),
-			wto_infringement: getCheckboxValue( values.infringements, 'wtoInfringement' ),
-			fta_infringement: getCheckboxValue( values.infringements, 'ftaInfringement' ),
-			other_infringement: getCheckboxValue( values.infringements, 'otherInfringement' ),
-			infringement_summary: getValue( values.infringementSummary )
-		} ),
 		saveBarrierType: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 			barrier_type: getValue( values.barrierType )
-		} ),
-		saveSupport: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
-			is_resolved: getValue( values.resolved ),
-			support_type: getValue( values.supportType ),
-			steps_taken: getValue( values.stepsTaken ),
-			resolved_date: getValue( getDate( values.resolvedDate ) ),
-			resolution_summary: getValue( values.resolvedSummary ),
-			is_politically_sensitive: getValue( values.politicalSensitivities ),
-			political_sensitivity_summary: getValue( values.sensitivitiesDescription )
-		} ),
-		saveNextSteps: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
-			govt_response_requested: getValue( values.response ),
-			is_commercially_sensitive: getValue( values.sensitivities ),
-			commercial_sensitivity_summary: getValue( values.sensitivitiesText ),
-			can_publish: getValue( values.permission )
 		} ),
 		submit: ( req, reportId ) => backend.put( `/reports/${ reportId }/submit`, getToken( req ) )
 	}
