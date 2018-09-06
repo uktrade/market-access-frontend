@@ -69,6 +69,20 @@ describe( 'Barrier detail view model', () => {
 		} );
 	} );
 
+	describe( 'With sectors missing on an open barrier', () => {
+		it( 'Should create all the correct properties', () => {
+
+			inputBarrier.current_status.status = 2;
+			inputBarrier.sectors = null;
+
+			const output = viewModel( inputBarrier );
+			const outpuBarrier = output.barrier;
+
+			expect( outpuBarrier.sectors ).toEqual( [] );
+			expect( output.sectorsList ).toEqual( [] );
+		} );
+	} );
+
 	describe( 'A resolved barrier', () => {
 		it( 'Should have the correct properties', () => {
 

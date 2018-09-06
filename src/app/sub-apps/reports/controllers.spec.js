@@ -159,12 +159,12 @@ xdescribe( 'Report controller', () => {
 					const reportsViewModelResponse = { reports: true };
 
 					reportsViewModel.and.callFake( () => reportsViewModelResponse );
-					backend.reports.getAllUnfinished.and.callFake( () => Promise.resolve( unfinishedReportsResponse ) );
+					backend.reports.getAll.and.callFake( () => Promise.resolve( unfinishedReportsResponse ) );
 
 					await controller.index( req, res, next );
 
 					expect( next ).not.toHaveBeenCalled();
-					expect( backend.reports.getAllUnfinished ).toHaveBeenCalledWith( req );
+					expect( backend.reports.getAll ).toHaveBeenCalledWith( req );
 					expect( reportsViewModel ).toHaveBeenCalledWith( unfinishedReportsResponse.body.results );
 					expect( res.render ).toHaveBeenCalledWith( 'reports/views/index', reportsViewModelResponse );
 				} );
@@ -178,12 +178,12 @@ xdescribe( 'Report controller', () => {
 						body: {}
 					};
 
-					backend.reports.getAllUnfinished.and.callFake( () => Promise.resolve( unfinishedReportsResponse ) );
+					backend.reports.getAll.and.callFake( () => Promise.resolve( unfinishedReportsResponse ) );
 
 					await controller.index( req, res, next );
 
 					expect( next ).toHaveBeenCalledWith( new Error( `Got ${ unfinishedReportsResponse.response.statusCode } response from backend` ) );
-					expect( backend.reports.getAllUnfinished ).toHaveBeenCalledWith( req );
+					expect( backend.reports.getAll ).toHaveBeenCalledWith( req );
 					expect( res.render ).not.toHaveBeenCalled();
 				} );
 			} );
@@ -194,7 +194,7 @@ xdescribe( 'Report controller', () => {
 
 				const err = new Error( 'issue with backend' );
 
-				backend.reports.getAllUnfinished.and.callFake( () => Promise.reject( err ) );
+				backend.reports.getAll.and.callFake( () => Promise.reject( err ) );
 
 				await controller.index( req, res, next );
 
@@ -227,7 +227,7 @@ xdescribe( 'Report controller', () => {
 		} );
 	} );
 
-	xdescribe( 'Start', () => {
+	describe( 'Start', () => {
 
 		let ssoToken;
 

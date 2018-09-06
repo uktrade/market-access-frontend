@@ -81,7 +81,7 @@ describe( 'Backend Service', () => {
 		} );
 
 		describe( 'saveNote', () => {
-			it( 'Should POST to the correct path with the correct values', async () => {
+			it( 'Should PUT to the correct path with the correct values', async () => {
 
 				const note = 'my test note';
 				const pinned = 'true';
@@ -91,7 +91,7 @@ describe( 'Backend Service', () => {
 					pinned
 				} );
 
-				expect( backend.post ).toHaveBeenCalledWith( `/barriers/${ barrierId }/interactions`, token, {
+				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/interactions`, token, {
 					text: note,
 					pinned: true
 				} );
@@ -99,7 +99,7 @@ describe( 'Backend Service', () => {
 		} );
 
 		describe( 'resolve', () => {
-			it( 'Should POST to the correct path with the correct values', async () => {
+			it( 'Should PUT to the correct path with the correct values', async () => {
 
 				const [ day, month, year ] = [ '10', '11', '2000' ];
 				const resolvedSummary = 'my summary text';
@@ -109,7 +109,7 @@ describe( 'Backend Service', () => {
 					resolvedSummary
 				} );
 
-				expect( backend.post ).toHaveBeenCalledWith( `/barriers/${ barrierId }/resolve`, token, {
+				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/resolve`, token, {
 					status_date: [ year, month, day ].join( '-' ) + 'T00:00',
 					summary: resolvedSummary
 				} );
@@ -117,7 +117,7 @@ describe( 'Backend Service', () => {
 		} );
 
 		describe( 'open', () => {
-			it( 'Should POST to the correct path with the correct values', async () => {
+			it( 'Should PUT to the correct path with the correct values', async () => {
 
 				const openSummary = 'my summary text';
 
@@ -125,14 +125,14 @@ describe( 'Backend Service', () => {
 					openSummary
 				} );
 
-				expect( backend.post ).toHaveBeenCalledWith( `/barriers/${ barrierId }/open`, token, {
+				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/open`, token, {
 					summary: openSummary
 				} );
 			} );
 		} );
 
 		describe( 'hibernate', () => {
-			it( 'Should POST to the correct path with the correct values', async () => {
+			it( 'Should PUT to the correct path with the correct values', async () => {
 
 				const hibernationSummary = 'my summary text';
 
@@ -140,7 +140,7 @@ describe( 'Backend Service', () => {
 					hibernationSummary
 				} );
 
-				expect( backend.post ).toHaveBeenCalledWith( `/barriers/${ barrierId }/hibernate`, token, {
+				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/hibernate`, token, {
 					summary: hibernationSummary
 				} );
 			} );

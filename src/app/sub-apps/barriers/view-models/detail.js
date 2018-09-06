@@ -9,7 +9,7 @@ const barrierStatus = {
 module.exports = ( barrier ) => {
 
 	const barrierStatusCode = barrier.current_status.status;
-	const sectors = barrier.sectors.map( metadata.getSector );
+	const sectors = ( barrier.sectors || [] ).map( metadata.getSector );
 
 	return {
 		barrier: {

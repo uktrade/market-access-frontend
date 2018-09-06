@@ -98,7 +98,7 @@ module.exports = {
 		getAll: ( req ) => backend.get( '/barriers', getToken( req ) ),
 		get: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }`, getToken( req ) ),
 		getInteractions: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }/interactions`, getToken( req ) ),
-		saveNote: ( req, barrierId, values ) => backend.post( `/barriers/${ barrierId }/interactions`, getToken( req ), {
+		saveNote: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/interactions`, getToken( req ), {
 			text: values.note,
 			pinned: ( values.pinned === 'true' )
 		} ),
@@ -106,15 +106,15 @@ module.exports = {
 
 			const { day, month, year } = values.resolvedDate;
 
-			return backend.post( `/barriers/${ barrierId }/resolve`, getToken( req ), {
+			return backend.put( `/barriers/${ barrierId }/resolve`, getToken( req ), {
 				status_date: [ year, month, day ].join( '-' ) + 'T00:00',
 				summary: values.resolvedSummary
 			} );
 		},
-		hibernate: ( req, barrierId, values ) => backend.post( `/barriers/${ barrierId }/hibernate`, getToken( req ), {
+		hibernate: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/hibernate`, getToken( req ), {
 			summary: values.hibernationSummary
 		} ),
-		open: ( req, barrierId, values ) => backend.post( `/barriers/${ barrierId }/open`, getToken( req ), {
+		open: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/open`, getToken( req ), {
 			summary: values.openSummary
 		} )
 	},
