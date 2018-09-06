@@ -120,38 +120,21 @@
 			"type": "array",
 			"minItems": 10,
 			"maxItems": 20,
-			"items": {
-				"type": "object",
-				"required": [ "id", "title", "description", "category" ],
-				"properties": {
-
-					"id": { "$ref": "$refs/common.json#/int" },
-					"title": { "$ref": "$refs/common.json#/words" },
-					"description": { "$ref": "$refs/common.json#/paragraph" },
-					"category": {
-						"type": "string",
-						"pattern": "GOODS|SERVICES"
-					}
-				}
-			}
+			"items": { "$ref": "$refs/common.json#/barrier_type" }
 		},
 
 		"countries": {
 			"type": "array",
 			"minItems": 20,
 			"maxItems": 50,
-			"items": {
-				"$ref": "#/refs/country"
-			}
+			"items": { "$ref": "$refs/common.json#/country" }
 		},
 
 		"sectors": {
 			"type": "array",
 			"minItems": 15,
 			"maxItems": 30,
-			"items": {
-				"$ref": "#/refs/sector"
-			}
+			"items": { "$ref": "$refs/common.json#/sector" }
 		},
 
 		"barrier_status": {
@@ -186,54 +169,6 @@
 				"TRADE": { "$ref": "$refs/common.json#/words" },
 				"GOVT": { "$ref": "$refs/common.json#/words" },
 				"OTHER": { "$ref": "$refs/common.json#/word" }
-			}
-		}
-	},
-
-	"refs": {
-		"country": {
-			"type": "object",
-			"required": [ "id", "name", "disabled_on" ],
-			"properties": {
-
-				"id": { "$ref": "$refs/common.json#/uuid" },
-
-				"name" : {
-					"type": "string",
-					"faker": "address.country"
-				},
-
-				"disabled_on": {
-					"oneOf": [
-						{ "type": "null" },
-						{
-							"type": "string",
-							"faker": "date.past"
-						}
-					]
-				}
-			}
-		},
-
-		"sector": {
-			"type": "object",
-			"required": [ "id", "name", "level", "disabled_on" ],
-			"properties": {
-
-				"id": { "$ref": "$refs/common.json#/uuid" },
-				"name" : { "$ref": "$refs/common.json#/words" },
-				"level": {
-					"enum": [ 0, 1, 2 ]
-				},
-				"disabled_on": {
-					"oneOf": [
-						{ "type": "null" },
-						{
-							"type": "string",
-							"faker": "date.past"
-						}
-					]
-				}
 			}
 		}
 	}

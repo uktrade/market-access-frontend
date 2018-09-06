@@ -12,6 +12,10 @@
 		},
 		items: [
 			{
+				title: ( 'Sector' + ( 's' if barrier.sectors.length !== 1 ) + ' affected' ),
+				items: sectorsList
+			},
+			{
 				title: 'Market access barrier type',
 				text: barrier.type.title
 			},{
@@ -21,7 +25,7 @@
 		]
 	} ) }}
 
-	{%- if barrier.legal.hasInfringements -%}
+	{#%- if barrier.legal.hasInfringements -%}
 
 		{{ summaryGroup( {
 			heading: {
@@ -58,6 +62,6 @@
 			]
 		} ) }}
 
-	{% endif %}
+	{% endif %#}
 
 {% endblock %}

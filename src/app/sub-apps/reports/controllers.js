@@ -26,11 +26,6 @@ function isBarrierTypeCategory( category ){
 	return ( item ) => item.category === category;
 }
 
-function getSector( sectorId ){
-
-	return metadata.sectors.find( ( sector ) => sector.id === sectorId );
-}
-
 module.exports = {
 
 	index: async ( req, res, next ) => {
@@ -304,7 +299,7 @@ module.exports = {
 			}
 		}
 
-		res.render( 'reports/views/sectors', { sectors: sectors.map( getSector ), csrfToken: req.csrfToken() } );
+		res.render( 'reports/views/sectors', { sectors: sectors.map( metadata.getSector ), csrfToken: req.csrfToken() } );
 	},
 
 	removeSector: ( req, res ) => {
@@ -354,7 +349,7 @@ module.exports = {
 			}
 		}
 
-		res.render( 'reports/views/add-sector', Object.assign( form.getTemplateValues(), { currentSectors: sectors.map( getSector ) } ) );
+		res.render( 'reports/views/add-sector', Object.assign( form.getTemplateValues(), { currentSectors: sectors.map( metadata.getSector ) } ) );
 	},
 
 	aboutProblem: async ( req, res, next ) => {

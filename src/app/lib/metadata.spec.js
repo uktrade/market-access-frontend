@@ -232,16 +232,42 @@ describe( 'metadata', () => {
 			} );
 		} );
 
-		xdescribe( 'sectors', () => {
+		describe( 'sectors', () => {
 
-		} );
+			let nonDisabledSectors;
+			let level0Sectors;
 
-		xdescribe( 'level0Sectors', () => {
+			beforeEach( () => {
 
-		} );
+				nonDisabledSectors = fakeData.sectors.filter( ( sector ) => sector.disabled_on === null );
+				level0Sectors = nonDisabledSectors.filter( ( sector ) => sector.level === 0 );
+			} );
 
-		xdescribe( 'affectedSectorsList', () => {
+			describe( 'sectors', () => {
+				it( 'Should return all sectors that are not disabled', () => {
 
+					expect( metadata.sectors ).toEqual( nonDisabledSectors );
+				} );
+			} );
+
+			describe( 'level0Sectors', () => {
+				it( 'Should return all sectors that are not disabled and have a level of 0', () => {
+
+					expect( metadata.level0Sectors ).toEqual( level0Sectors );
+				} );
+			} );
+
+			describe( 'affectedSectorsList', () => {
+
+				it( 'Should return all sectors that are not disabled and have a level of 0 in a govuk formate', () => {
+
+					const affectedSectorsList = level0Sectors.map( ( sector ) => ({ value: sector.id, text: sector.name } ) );
+
+					affectedSectorsList.unshift( { value: '', text: 'Select a sector affected' } );
+
+					expect( metadata.affectedSectorsList ).toEqual( affectedSectorsList );
+				} );
+			} );
 		} );
 
 		describe( 'barrierAwareness', () => {

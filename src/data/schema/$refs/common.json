@@ -39,5 +39,66 @@
 	"boolean": {
 		"type": "boolean",
 		"faker": "random.boolean"
+	},
+
+	"country": {
+		"type": "object",
+		"required": [ "id", "name", "disabled_on" ],
+		"properties": {
+
+			"id": { "$ref": "#/uuid" },
+
+			"name" : {
+				"type": "string",
+				"faker": "address.country"
+			},
+
+			"disabled_on": {
+				"oneOf": [
+					{ "type": "null" },
+					{
+						"type": "string",
+						"faker": "date.past"
+					}
+				]
+			}
+		}
+	},
+
+	"sector": {
+		"type": "object",
+		"required": [ "id", "name", "level", "disabled_on" ],
+		"properties": {
+
+			"id": { "$ref": "#/uuid" },
+			"name" : { "$ref": "#/words" },
+			"level": {
+				"enum": [ 0, 1, 2 ]
+			},
+			"disabled_on": {
+				"oneOf": [
+					{ "type": "null" },
+					{
+						"type": "string",
+						"faker": "date.past"
+					}
+				]
+			}
+		}
+	},
+
+	"barrier_type": {
+		"type": "object",
+		"required": [ "id", "title", "description", "category" ],
+		"properties": {
+
+			"id": { "$ref": "#/int" },
+			"title": { "$ref": "#/words" },
+			"description": { "$ref": "#/paragraph" },
+			"category": {
+				"type": "string",
+				"pattern": "GOODS|SERVICES"
+			}
+		}
 	}
 }

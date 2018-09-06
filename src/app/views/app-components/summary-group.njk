@@ -5,8 +5,21 @@
 		<dl class="summary-group__list">
 			{% for item in params.items %}
 			<dt class="summary-group__list__key">{{ item.title }}</dt>
-			<dd class="summary-group__list__value">{{ item.text }}</dd>
+			<dd class="summary-group__list__value">
+				{{- item.html | safe if item.html else item.text -}}
+				{{ summaryGroupList( item.items ) if item.items }}
+			</dd>
 			{% endfor %}
 		</dl>
 	</section>
+{% endmacro %}
+
+{% macro summaryGroupList( items ) %}
+	{% if items.length %}
+		<ul class="summary-group__list__value__list">
+			{% for item in items %}
+				<li class="summary-group__list__value__list__item">{{ item.text }}</li>
+			{% endfor %}
+		</ul>
+	{% endif %}
 {% endmacro %}

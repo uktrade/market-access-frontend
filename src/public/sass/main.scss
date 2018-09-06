@@ -116,6 +116,11 @@ $govuk-images-path: "/govuk-public/images/";
 	border-bottom: 2px solid $govuk-yellow-25;
 }
 
+.form-cancel {
+	line-height: 2.5;
+	margin-left: govuk-em( 10, 16 );
+}
+
 .button--secondary {
 
 	background-color: $govuk-grey-3;

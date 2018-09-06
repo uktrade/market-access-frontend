@@ -34,6 +34,14 @@
 	box-sizing: border-box;
 }
 
+.summary-group__list__value__list {
+	padding: 0;
+}
+
+.summary-group__list__value__list__item {
+	list-style: inside;
+}
+
 @include mq( $from: tablet ){
 
 	.summary-group__list {
