@@ -98,7 +98,7 @@ module.exports = {
 		getAll: ( req ) => backend.get( '/barriers', getToken( req ) ),
 		get: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }`, getToken( req ) ),
 		getInteractions: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }/interactions`, getToken( req ) ),
-		saveNote: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/interactions`, getToken( req ), {
+		saveNote: ( req, barrierId, values ) => backend.post( `/barriers/${ barrierId }/interactions`, getToken( req ), {
 			text: values.note,
 			pinned: ( values.pinned === 'true' )
 		} ),

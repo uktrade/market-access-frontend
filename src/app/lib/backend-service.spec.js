@@ -91,7 +91,7 @@ describe( 'Backend Service', () => {
 					pinned
 				} );
 
-				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/interactions`, token, {
+				expect( backend.post ).toHaveBeenCalledWith( `/barriers/${ barrierId }/interactions`, token, {
 					text: note,
 					pinned: true
 				} );

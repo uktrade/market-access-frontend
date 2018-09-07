@@ -25,6 +25,10 @@ describe( 'Barrier detail view model', () => {
 				{ id: faker.random.uuid(), name: faker.lorem.words() },
 				{ id: faker.random.uuid(), name: faker.lorem.words() }
 			],
+			statusTypes: {
+				'1': 'Problem status one',
+				'2': 'Problem status two'
+			},
 			getCountry: jasmine.createSpy( 'metadata.getCountry' ),
 			getSector: jasmine.createSpy( 'metadata.getSector' )
 		};
@@ -41,6 +45,7 @@ describe( 'Barrier detail view model', () => {
 		it( 'Should create all the correct properties', () => {
 
 			inputBarrier.current_status.status = 2;
+			inputBarrier.problem_status = '2';
 
 			const output = viewModel( inputBarrier );
 			const outpuBarrier = output.barrier;
@@ -48,7 +53,8 @@ describe( 'Barrier detail view model', () => {
 
 			expect( outpuBarrier.id ).toEqual( inputBarrier.id );
 			expect( outpuBarrier.title ).toEqual( inputBarrier.barrier_title );
-			expect( outpuBarrier.summary ).toEqual( inputBarrier.summary );
+			expect( outpuBarrier.problem.status ).toEqual( metadata.statusTypes[ inputBarrier.problem_status ] );
+			expect( outpuBarrier.problem.description ).toEqual( inputBarrier.problem_description );
 			expect( outpuBarrier.type ).toEqual( inputBarrier.barrier_type );
 			expect( outpuBarrier.status ).toEqual( { name: 'Open', modifyer: 'assessment' } );
 			expect( outpuBarrier.reportedOn ).toEqual( inputBarrier.reported_on );

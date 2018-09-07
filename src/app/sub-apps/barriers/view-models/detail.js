@@ -15,7 +15,10 @@ module.exports = ( barrier ) => {
 		barrier: {
 			id: barrier.id,
 			title: barrier.barrier_title,
-			summary: barrier.summary,
+			problem: {
+				status: metadata.statusTypes[ barrier.problem_status ],
+				description: barrier.problem_description
+			},
 			type: barrier.barrier_type,
 			status: barrierStatus[ barrierStatusCode ],
 			reportedOn: barrier.reported_on,
