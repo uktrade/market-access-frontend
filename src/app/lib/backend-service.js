@@ -116,6 +116,9 @@ module.exports = {
 		} ),
 		open: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/open`, getToken( req ), {
 			summary: values.openSummary
+		} ),
+		saveType: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }`, getToken( req ), {
+			barrier_type: getValue( values.barrierType )
 		} )
 	},
 
@@ -146,9 +149,6 @@ module.exports = {
 			barrier_title: getValue( values.barrierTitle ),
 			source: getValue( values.barrierAwareness ),
 			other_source: getValue( values.barrierAwarenessOther )
-		} ),
-		saveBarrierType: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
-			barrier_type: getValue( values.barrierType )
 		} ),
 		submit: ( req, reportId ) => backend.put( `/reports/${ reportId }/submit`, getToken( req ) )
 	}

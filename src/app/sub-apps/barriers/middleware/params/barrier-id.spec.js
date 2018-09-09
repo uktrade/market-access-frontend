@@ -12,7 +12,7 @@ describe( 'Barrier Id param middleware', () => {
 
 	beforeEach( () => {
 
-		req = { params: {}, session: {} };
+		req = { session: {} };
 		res = { locals: {} };
 		next = jasmine.createSpy( 'next' );
 		backend = {
@@ -31,7 +31,6 @@ describe( 'Barrier Id param middleware', () => {
 		beforeEach( () => {
 
 			barrierId = uuid();
-			req.params = { barrierId };
 		} );
 
 		describe( 'When the response is a success', () => {
@@ -46,7 +45,7 @@ describe( 'Barrier Id param middleware', () => {
 					body: getBarrierResponse
 				} ) );
 
-				await middleware( req, res, next );
+				await middleware( req, res, next, barrierId );
 
 				expect( backend.barriers.get ).toHaveBeenCalledWith( req, barrierId );
 				expect( req.barrier ).toEqual( getBarrierResponse );
@@ -63,7 +62,7 @@ describe( 'Barrier Id param middleware', () => {
 					body: { data: true }
 				} ) );
 
-				await middleware( req, res, next );
+				await middleware( req, res, next, barrierId );
 
 				expect( req.barrier ).not.toBeDefined();
 				expect( res.locals.barrier ).not.toBeDefined();
@@ -78,7 +77,7 @@ describe( 'Barrier Id param middleware', () => {
 
 				backend.barriers.get.and.callFake( () => Promise.reject( err ) );
 
-				await middleware( req, res, next );
+				await middleware( req, res, next, barrierId );
 
 				expect( next ).toHaveBeenCalledWith( err );
 				expect( req.barrier ).not.toBeDefined();
@@ -90,11 +89,9 @@ describe( 'Barrier Id param middleware', () => {
 	describe( 'When it is not a valid uuid', () => {
 		it( 'Should call next with an error', async () => {
 
-			req.params.barrierId = 'abc_def';
+			await middleware( req, res, next, 'abc_def' );
 
-			await middleware( req, res, next );
-
-			expect( res.locals.barrierId ).not.toBeDefined();
+			expect( res.locals.barrier ).not.toBeDefined();
 			expect( req.barrier ).not.toBeDefined();
 			expect( next ).toHaveBeenCalledWith( new Error( 'Invalid barrierId' ) );
 		} );

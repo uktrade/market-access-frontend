@@ -11,7 +11,7 @@ describe( 'Report Id param middleware', () => {
 
 	beforeEach( () => {
 
-		req = { params: {}, session: {} };
+		req = { params: { reportId: 'default' }, session: {} };
 		res = { locals: {} };
 		next = jasmine.createSpy( 'next' );
 		backend = {
@@ -39,9 +39,7 @@ describe( 'Report Id param middleware', () => {
 							body: getReportResponse
 						} ) );
 
-						req.params = { reportId };
-
-						await middleware( req, res, next );
+						await middleware( req, res, next, reportId );
 
 						expect( backend.reports.get ).toHaveBeenCalledWith( req, reportId );
 						expect( req.session.report ).not.toBeDefined();
@@ -54,14 +52,12 @@ describe( 'Report Id param middleware', () => {
 				describe( 'When the response is not a success', () => {
 					it( 'Should call next with an error', async () => {
 
-						req.params.reportId = '12';
-
 						backend.reports.get.and.callFake( () => Promise.resolve( {
 							response: { isSuccess: false },
 							body: { data: true }
 						} ) );
 
-						await middleware( req, res, next );
+						await middleware( req, res, next, '1' );
 
 						expect( req.session.report ).not.toBeDefined();
 						expect( req.report ).not.toBeDefined();
@@ -75,11 +71,9 @@ describe( 'Report Id param middleware', () => {
 
 						const err = new Error( 'Something broke' );
 
-						req.params.reportId = '12';
-
 						backend.reports.get.and.callFake( () => Promise.reject( err ) );
 
-						await middleware( req, res, next );
+						await middleware( req, res, next, '2' );
 
 						expect( next ).toHaveBeenCalledWith( err );
 						expect( req.session.report ).not.toBeDefined();
@@ -94,10 +88,9 @@ describe( 'Report Id param middleware', () => {
 
 					const sessionReport = { id: 1, name: 2 };
 
-					req.params.reportId = '12';
 					req.session.report = sessionReport;
 
-					await middleware( req, res, next );
+					await middleware( req, res, next, '3' );
 
 					expect( backend.reports.get ).not.toHaveBeenCalled();
 					expect( req.report ).toEqual( sessionReport );
@@ -111,9 +104,9 @@ describe( 'Report Id param middleware', () => {
 		describe( 'When the number is more than 60 digits', () => {
 			it( 'Should call next with an error', async () => {
 
-				req.params.reportId = '1234567891123456789112345678911234567891123456789112345678911';
+				const reportId = '1234567891123456789112345678911234567891123456789112345678911';
 
-				await middleware( req, res, next );
+				await middleware( req, res, next, reportId );
 
 				expect( res.locals.reportId ).not.toBeDefined();
 				expect( req.report ).not.toBeDefined();
@@ -126,9 +119,7 @@ describe( 'Report Id param middleware', () => {
 		describe( 'When the word is "new"', () => {
 			it( 'Should delete the reportId param and call next', async () => {
 
-				req.params.reportId = 'new';
-
-				await middleware( req, res, next );
+				await middleware( req, res, next, 'new' );
 
 				expect( req.params.reportId ).not.toBeDefined();
 				expect( res.locals.reportId ).not.toBeDefined();
@@ -139,9 +130,7 @@ describe( 'Report Id param middleware', () => {
 		describe( 'Any other word', () => {
 			it( 'Should call next with an error', async () => {
 
-				req.params.reportId = 'abc_zyx';
-
-				await middleware( req, res, next );
+				await middleware( req, res, next, 'abc_zyx' );
 
 				expect( res.locals.reportId ).not.toBeDefined();
 				expect( next ).toHaveBeenCalledWith( new Error( 'Invalid reportId' ) );

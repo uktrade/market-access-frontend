@@ -31,8 +31,6 @@ const reportUrl = {
 	addSector: ( reportId ) => `/reports/${ reportId }/sectors/add/`,
 	removeSector: ( reportId ) => `/reports/${ reportId }/sectors/remove/`,
 	aboutProblem: ( reportId ) => `/reports/${ reportId }/problem/`,
-	typeCategory: ( reportId ) => `/reports/${ reportId }/type-category/`,
-	type: ( reportId ) => `/reports/${ reportId }/type/`,
 	submit: ( reportId ) => `/reports/${ reportId }/submit/`,
 	success: () => `/reports/new/success/`
 };
@@ -47,9 +45,14 @@ module.exports = {
 		interactions: ( barrierId ) => `/barriers/${ barrierId }/interactions/`,
 		addNote: ( barrierId ) => `/barriers/${ barrierId }/interactions/add-note/`,
 		status: ( barrierId ) => `/barriers/${ barrierId }/status/`,
-		statusResolved:( barrierId ) => `/barriers/${ barrierId }/status/resolved/`,
-		statusHibernated:( barrierId ) => `/barriers/${ barrierId }/status/hibernated/`,
-		statusOpen:( barrierId ) => `/barriers/${ barrierId }/status/open/`
+		statusResolved: ( barrierId ) => `/barriers/${ barrierId }/status/resolved/`,
+		statusHibernated: ( barrierId ) => `/barriers/${ barrierId }/status/hibernated/`,
+		statusOpen: ( barrierId ) => `/barriers/${ barrierId }/status/open/`,
+		type: {
+			edit: ( barrierId ) => `/barriers/${ barrierId }/type/edit/`,
+			add: ( barrierId ) => `/barriers/${ barrierId }/type/`,
+			list: ( barrierId, category ) => `/barriers/${ barrierId }/type/${ category }/`
+		}
 	},
 
 	reports: reportUrl,
@@ -67,8 +70,6 @@ module.exports = {
 				return reportUrl.hasSectors( report.id );
 			case '1.5':
 				return reportUrl.aboutProblem( report.id );
-			case '1.6':
-				return reportUrl.typeCategory( report.id );
 			default:
 				return reportUrl.detail( report.id );
 		}

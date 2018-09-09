@@ -34,6 +34,19 @@
 	box-sizing: border-box;
 }
 
+.summary-group__list__value__add {
+	border: 2px dashed $govuk-grey-2;
+	background-color: $govuk-grey-4;
+	width: 100%;
+	padding: govuk-em( 15, 16 );
+	display: block;
+	box-sizing: border-box;
+}
+
+.summary-group__list__value__edit {
+	display: block;
+}
+
 .summary-group__list__value__list {
 	padding: 0;
 	margin: 0;
@@ -51,24 +64,14 @@
 	}
 
 	.summary-group__list__key {
-
 		width: 35%;
 		padding-right: govuk-em( 30, 16 );
 		padding-left: govuk-em( 10, 16 );
 		background-color: transparent;
-
-		&:nth-of-type( odd ){
-			background-color: $govuk-grey-4;
-		}
 	}
 
 	.summary-group__list__value {
-
 		width: 65%;
-		padding-right: govuk-em( 10, 16 );
-
-		&:nth-of-type( odd ){
-			background-color: $govuk-grey-4;
-		}
+		//padding-right: govuk-em( 10, 16 );
 	}
 }

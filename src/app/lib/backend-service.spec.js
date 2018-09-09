@@ -390,13 +390,6 @@ describe( 'Backend Service', () => {
 					other_source: barrierAwarenessOther
 				} );
 			} );
-
-			describe( 'saveBarrierType', () => {
-
-				const barrierType = '2';
-
-				checkWithAndWithoutValues( 'saveBarrierType', { barrierType }, { barrier_type: barrierType } );
-			} );
 		} );
 
 		describe( 'submit', () => {

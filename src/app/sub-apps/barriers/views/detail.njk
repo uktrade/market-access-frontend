@@ -13,11 +13,22 @@
 		items: [
 			{
 				title: ( 'Sector' + ( 's' if barrier.sectors.length !== 1 ) + ' affected' ),
-				items: sectorsList
+				items: sectorsList,
+				add: {
+					text: 'Add one or several sectors',
+					href: '#'
+				}
 			},
 			{
 				title: 'Market access barrier type',
-				text: barrier.type.title
+				text: barrier.type.title,
+				add: {
+					text: 'Add a type of Market Access Barrier',
+					href: urls.barriers.type.add( barrier.id )
+				},
+				edit: {
+					href: urls.barriers.type.edit( barrier.id )
+				}
 			},{
 				title: 'Summary of barrier',
 				text: barrier.problem.description

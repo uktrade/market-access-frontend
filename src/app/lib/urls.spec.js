@@ -74,6 +74,29 @@ describe( 'URLs', () => {
 				expect( urls.barriers.statusOpen( barrierId ) ).toEqual( `/barriers/${ barrierId }/status/open/` );
 			} );
 		} );
+
+		describe( 'type', () => {
+			describe( 'edit', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.type.edit( barrierId ) ).toEqual( `/barriers/${ barrierId }/type/edit/` );
+				} );
+			} );
+			describe( 'add', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.type.add( barrierId ) ).toEqual( `/barriers/${ barrierId }/type/` );
+				} );
+			} );
+			describe( 'list', () => {
+				it( 'Should return the correct path', () => {
+
+					const category = 'abc';
+
+					expect( urls.barriers.type.list( barrierId, category ) ).toEqual( `/barriers/${ barrierId }/type/${ category }/` );
+				} );
+			} );
+		} );
 	} );
 
 	describe( 'Report urls', () => {
@@ -170,8 +193,6 @@ describe( 'URLs', () => {
 					[ 'addSector', 'sectors/add' ],
 					[ 'removeSector', 'sectors/remove' ],
 					[ 'aboutProblem', 'problem' ],
-					[ 'typeCategory', 'type-category' ],
-					[ 'type', 'type' ],
 					[ 'submit', 'submit' ]
 				] );
 			} );
@@ -197,7 +218,6 @@ describe( 'URLs', () => {
 			expect( urls.reportStage( '1.3', report ) ).toEqual( urls.reports.country( report.id ) );
 			expect( urls.reportStage( '1.4', report ) ).toEqual( urls.reports.hasSectors( report.id ) );
 			expect( urls.reportStage( '1.5', report ) ).toEqual( urls.reports.aboutProblem( report.id ) );
-			expect( urls.reportStage( '1.6', report ) ).toEqual( urls.reports.typeCategory( report.id ) );
 			expect( urls.reportStage( 'blah', report ) ).toEqual( urls.reports.detail( report.id ) );
 		} );
 	} );

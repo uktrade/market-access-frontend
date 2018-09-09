@@ -45,12 +45,6 @@ module.exports = ( express, app ) => {
 	app.get( '/:reportId/problem/', controller.aboutProblem );
 	app.post( '/:reportId/problem/', controller.aboutProblem );
 
-	app.get( '/:reportId/type-category/', controller.typeCategory );
-	app.post( '/:reportId/type-category/', controller.typeCategory );
-
-	app.get( '/:reportId/type/', controller.type );
-	app.post( '/:reportId/type/', controller.type );
-
 	app.post( '/:reportId/submit/', controller.submit );
 	// detail muse be last route
 	app.get( '/:reportId/', controller.report );

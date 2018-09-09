@@ -10,22 +10,6 @@ const getDateParts = require( '../../lib/get-date-parts' );
 const reportDetailViewModel = require( './view-models/detail' );
 const reportsViewModel = require( './view-models/reports' );
 
-function barrierTypeToRadio( item ){
-
-	const { id, title, category } = item;
-
-	return {
-		value: id,
-		text: title,
-		category
-	};
-}
-
-function isBarrierTypeCategory( category ){
-
-	return ( item ) => item.category === category;
-}
-
 module.exports = {
 
 	index: async ( req, res, next ) => {
@@ -403,82 +387,7 @@ module.exports = {
 				res.render( 'reports/views/about-problem', templateValues );
 			},
 			saveFormData: ( formValues ) => backend.reports.saveProblem( req, report.id, formValues ),
-			saved: () => res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.typeCategory( report.id ) )
-		} );
-
-		try {
-
-			await processor.process();
-
-		} catch( e ){
-
-			next( e );
-		}
-	},
-
-	typeCategory: ( req, res ) => {
-
-		const report = req.report;
-		const sessionValues = req.session.typeCategoryValues;
-		const categoryValue = ( sessionValues && sessionValues.category );
-		const form = new Form( req, {
-			category: {
-				type: Form.RADIO,
-				items: govukItemsFromObj( metadata.barrierTypeCategories ),
-				values: [ categoryValue, report.barrier_type_category ],
-				validators: [ {
-					fn: validators.isMetadata( 'barrierTypeCategories' ),
-					message: 'Choose a barrier type category'
-				} ]
-			}
-		} );
-
-		if( form.isPost ){
-
-			form.validate();
-			delete req.session.typeCategoryValues;
-
-			if( !form.hasErrors() ){
-
-				req.session.typeCategoryValues = form.getValues();
-				return res.redirect( urls.reports.type( report.id ) );
-			}
-		}
-
-		res.render( 'reports/views/type-category', form.getTemplateValues() );
-	},
-
-	type: async ( req, res, next ) => {
-
-		const report = req.report;
-		const category = req.session.typeCategoryValues.category;
-		const items = metadata.barrierTypes.filter( isBarrierTypeCategory( category ) ).map( barrierTypeToRadio );
-		const form = new Form( req, {
-			barrierType: {
-				type: Form.RADIO,
-				items,
-				values: [ report.barrier_type_id ],
-				validators: [ {
-					fn: validators.isBarrierType,
-					message: 'Select a barrier type'
-				} ]
-			}
-		} );
-
-		const processor = new FormProcessor( {
-			form,
-			render: ( templateValues ) => {
-
-				templateValues.title = metadata.barrierTypeCategories[ category ];
-
-				res.render( 'reports/views/type', templateValues );
-			},
-			saveFormData: ( formValues ) => backend.reports.saveBarrierType( req, report.id, formValues ),
-			saved: () => {
-
-				delete req.session.typeCategoryValues;
-				res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.detail( report.id ) );
-			}
+			saved: () => res.redirect( urls.reports.detail( report.id ) )
 		} );
 
 		try {

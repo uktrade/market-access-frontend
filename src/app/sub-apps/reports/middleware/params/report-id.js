@@ -2,9 +2,7 @@ const backend = require( '../../../../lib/backend-service' );
 const { isUuid } = require( '../../../../lib/validators' );
 const maxUuidLength = 60;
 
-module.exports = async ( req, res, next ) => {
-
-	const reportId = req.params.reportId;
+module.exports = async ( req, res, next, reportId ) => {
 
 	if( reportId === 'new' ){
 
