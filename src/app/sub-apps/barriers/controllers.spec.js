@@ -714,4 +714,267 @@ describe( 'Barriers controller', () => {
 			expect( res.render ).toHaveBeenCalledWith( 'barriers/views/status-hibernated', { barrierId: req.uuid } );
 		} );
 	} );
+
+	xdescribe( 'typeCategory', () => {
+
+		let ssoToken;
+		let report;
+
+		beforeEach( () => {
+
+			ssoToken = uuid();
+			req.session = { ssoToken };
+			report = {
+				id: 123,
+				barrier_type_category: 'barrier_type_category'
+			};
+			req.report = report;
+		} );
+
+		it( 'Should setup the form correctly', () => {
+
+			const barrierTypeCategories = { barrierTypeCategories: 1 };
+			const sessionValues = {
+				category: 'GOODS',
+			};
+
+			req.session.typeCategoryValues = sessionValues;
+
+			validators.isMetadata.and.callFake( () => barrierTypeCategories );
+
+			controller.typeCategory( req, res );
+
+			const args = Form.calls.argsFor( 0 );
+			const config = args[ 1 ];
+
+			expect( Form ).toHaveBeenCalled();
+			expect( args[ 0 ] ).toEqual( req );
+
+			expect( config.category ).toBeDefined();
+			expect( config.category.values ).toEqual( [ sessionValues.category, report.barrier_type_category ] );
+			expect( config.category.items.length ).toEqual( Object.entries( metadata.barrierTypeCategories ).length );
+			expect( config.category.validators[ 0 ].fn ).toEqual( barrierTypeCategories );
+		} );
+
+		describe( 'When it is a POST', () => {
+
+			beforeEach( () => {
+
+				req.method = 'POST';
+				req.body = {};
+				form.isPost = true;
+			} );
+
+			describe( 'When the input values are valid', () => {
+
+				it( 'Should save the values and redirect to the next step', () => {
+
+					const typeUrl = 'my-url';
+					const status = '123';
+					const emergency = '456';
+
+					req.body = { status, emergency };
+					form.hasErrors = () => false;
+
+					urls.reports.type.and.callFake( () => typeUrl );
+
+					controller.typeCategory( req, res );
+
+					expect( form.validate ).toHaveBeenCalled();
+					expect( req.session.typeCategoryValues ).toEqual( getValuesResponse );
+					expect( res.redirect ).toHaveBeenCalledWith( typeUrl );
+				} );
+			} );
+
+			describe( 'When no input values are given', () => {
+
+				beforeEach( () => {
+
+					req.session.typeCategoryValues = { test: 1 };
+					form.hasErrors = () => true;
+				} );
+
+				it( 'Should not save the values to the session', () => {
+
+					controller.typeCategory( req, res );
+					expect( req.session.typeCategoryValues ).not.toBeDefined();
+				} );
+			} );
+		} );
+
+		describe( 'When it is a GET', () => {
+			it( 'Should render the start page with the form values', () => {
+
+				const sessionValues = { category: 'GOODS' };
+
+				req.session.typeCategoryValues = sessionValues;
+
+				controller.typeCategory( req, res );
+
+				expect( form.getTemplateValues ).toHaveBeenCalledWith();
+				expect( res.render ).toHaveBeenCalledWith( 'reports/views/type-category', getTemplateValuesResponse );
+			} );
+		} );
+	} );
+
+	xdescribe( 'type', () => {
+
+		let report;
+		let templateData;
+
+		beforeEach( () => {
+
+			report = {
+				id: 123,
+				barrier_type_id: 456
+			};
+
+			req.report = report;
+			req.session.typeCategoryValues = { category: 'GOODS' };
+
+			getTemplateValuesResponse = {
+				barrierType: [
+					{ value: 1, text: 'barrier 1', category: 'GOODS' },
+					{ value: 2, text: 'barrier 2', category: 'SERVICES' }
+				]
+			};
+
+			templateData = Object.assign(
+				getTemplateValuesResponse,
+				{ title: metadata.barrierTypeCategories.GOODS }
+			);
+		} );
+
+		it( 'Should setup the form correctly', () => {
+
+			controller.type( req, res, next );
+
+			expect( Form ).toHaveBeenCalled();
+
+			const args = Form.calls.argsFor( 0 );
+			const config = args[ 1 ];
+			const goodsBarrierType = metadata.barrierTypes[ 0 ];
+
+			expect( args[ 0 ] ).toEqual( req );
+
+			expect( config.barrierType ).toBeDefined();
+			expect( config.barrierType.type ).toEqual( Form.RADIO );
+			expect( config.barrierType.items ).toEqual( [{
+				value: goodsBarrierType.id,
+				text: goodsBarrierType.title,
+				category: goodsBarrierType.category
+			}] );
+			expect( config.barrierType.values ).toEqual( [ report.barrier_type_id ] );
+			expect( config.barrierType.validators[ 0 ].fn ).toEqual( validators.isBarrierType );
+		} );
+
+		describe( 'When it is a GET', () => {
+			it( 'Should render the view with the viewModel', async () => {
+
+				await controller.type( req, res, next );
+
+				expect( form.validate ).not.toHaveBeenCalled();
+				expect( form.getTemplateValues ).toHaveBeenCalledWith();
+				expect( res.render ).toHaveBeenCalledWith( 'reports/views/type', templateData );
+			} );
+		} );
+
+		describe( 'When it is a POST', () => {
+
+			beforeEach( () => {
+
+				req.body = {};
+				form.isPost = true;
+			} );
+
+			afterEach( () => {
+
+				expect( form.validate ).toHaveBeenCalled();
+			} );
+
+			describe( 'When the required values are empty', () => {
+				it( 'Should render the template', async () => {
+
+					form.hasErrors = () => true;
+
+					await controller.type( req, res, next );
+
+					expect( res.render ).toHaveBeenCalledWith( 'reports/views/type', templateData );
+				} );
+			} );
+
+			describe( 'When the required values are filled', () => {
+				describe( 'When the response is a success', () => {
+
+					beforeEach( () => {
+
+						backend.reports.saveBarrierType.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+
+						req.report = { id: 1, b: 2 };
+						form.hasErrors = () => false;
+					} );
+
+					afterEach( () => {
+
+						expect( next ).not.toHaveBeenCalled();
+						expect( req.session.typeCategoryValues ).not.toBeDefined();
+						expect( backend.reports.saveBarrierType ).toHaveBeenCalledWith( req, req.report.id, getValuesResponse );
+					} );
+
+					describe( 'When save and exit is used to submit the form', () => {
+						it( 'Should redirect to the report detail page', async () => {
+
+							const reportDetailResponse = '/reportDetail';
+							urls.reports.detail.and.callFake( () => reportDetailResponse );
+							form.isExit = true;
+
+							await controller.type( req, res, next );
+
+							expect( urls.reports.detail ).toHaveBeenCalledWith( req.report.id );
+							expect( res.redirect ).toHaveBeenCalledWith( reportDetailResponse );
+						} );
+					} );
+
+					describe( 'When save and continue is used to submit the form', () => {
+						it( 'Should redirect', async () => {
+
+							const detailResponse = '/detail/';
+							urls.reports.detail.and.callFake( () => detailResponse );
+
+							await controller.type( req, res, next );
+
+							expect( urls.reports.detail ).toHaveBeenCalledWith( req.report.id );
+							expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
+						} );
+					} );
+				} );
+
+				describe( 'When the response is not a success', () => {
+					it( 'Should call next with an error', async () => {
+
+						const statusCode = 500;
+						form.hasErrors = () => false;
+						backend.reports.saveBarrierType.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
+
+						await controller.type( req, res, next );
+
+						expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save form - got 500 from backend' ) );
+					} );
+				} );
+
+				describe( 'When the request fails', () => {
+					it( 'Should call next with the error', async () => {
+
+						const err = new Error( 'my test' );
+						form.hasErrors = () => false;
+						backend.reports.saveBarrierType.and.callFake( () => Promise.reject( err ) );
+
+						await controller.type( req, res, next );
+
+						expect( next ).toHaveBeenCalledWith( err );
+					} );
+				} );
+			} );
+		} );
+	} );
 } );
