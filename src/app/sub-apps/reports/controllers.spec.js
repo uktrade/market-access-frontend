@@ -45,14 +45,6 @@ describe( 'Report controller', () => {
 				{ id: 1, name: 'country 1' },
 				{ id: 2, name: 'country 2' }
 			],
-			barrierTypes: [
-				{ id: 1, title: 'barrier 1', category: 'GOODS' },
-				{ id: 2, title: 'barrier 2', category: 'SERVICES' }
-			],
-			barrierTypeCategories: {
-				'GOODS': 'title 1',
-				'SERVICES': 'title 2'
-			},
 			barrierAwareness: {
 				'A': 'a',
 				'B': 'b'

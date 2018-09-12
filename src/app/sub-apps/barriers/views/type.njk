@@ -8,7 +8,7 @@
 {% block page_content %}
 
 	{{ heading({
-		back: { href: urls.barriers.type.add( barrier.id ) },
+		back: { href: urls.barriers.type.category( barrier.id ) },
 		caption: barrier.barrier_title,
 		text: 'Define type of market access barrier',
 		errors: errors

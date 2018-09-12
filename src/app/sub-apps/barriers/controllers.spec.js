@@ -21,6 +21,7 @@ describe( 'Barriers controller', () => {
 	let validators;
 	let barrierDetailViewModel;
 	let barrierId;
+	let metadata;
 
 	beforeEach( () => {
 
@@ -47,7 +48,8 @@ describe( 'Barriers controller', () => {
 				getInteractions: jasmine.createSpy( 'backend.barriers.getInteractions' ),
 				saveNote: jasmine.createSpy( 'backend.barriers.saveNote' ),
 				resolve: jasmine.createSpy( 'backend.barriers.resolve' ),
-				hibernate: jasmine.createSpy( 'backend.barriers.hibernate' )
+				hibernate: jasmine.createSpy( 'backend.barriers.hibernate' ),
+				saveType: jasmine.createSpy( 'backend.barriers.saveType' )
 			}
 		};
 
@@ -57,8 +59,22 @@ describe( 'Barriers controller', () => {
 				detail: jasmine.createSpy( 'urls.barriers.detail' ),
 				interactions: jasmine.createSpy( 'urls.barriers.interactions' ),
 				statusResolved: jasmine.createSpy( 'urls.barriers.statusResolved' ),
-				statusHibernated: jasmine.createSpy( 'urls.barriers.statusHibernated' )
+				statusHibernated: jasmine.createSpy( 'urls.barriers.statusHibernated' ),
+				type: {
+					list: jasmine.createSpy( 'urls.barriers.type.list' )
+				}
 			}
+		};
+
+		metadata = {
+			barrierTypes: [
+				{ id: 1, title: 'barrier 1', category: 'GOODS' },
+				{ id: 2, title: 'barrier 2', category: 'SERVICES' }
+			],
+			barrierTypeCategories: {
+				'GOODS': 'title 1',
+				'SERVICES': 'title 2'
+			},
 		};
 
 		getValuesResponse = { a: 1, b: 2 };
@@ -75,7 +91,8 @@ describe( 'Barriers controller', () => {
 		validators = {
 			isDateValue: jasmine.createSpy( 'validators.isDateValue' ),
 			isDateValid: ( name ) => jasmine.createSpy( 'validators.isDateValid: ' + name ),
-			isDateInPast: jasmine.createSpy( 'validators.isDateInPast' )
+			isDateInPast: jasmine.createSpy( 'validators.isDateInPast' ),
+			isMetadata: jasmine.createSpy( 'validators.metadata' )
 		};
 
 		controller = proxyquire( modulePath, {
@@ -84,6 +101,7 @@ describe( 'Barriers controller', () => {
 			'../../lib/Form': Form,
 			'../../lib/validators': validators,
 			'./view-models/detail': barrierDetailViewModel,
+			'../../lib/metadata': metadata
 		} );
 	} );
 
@@ -715,7 +733,7 @@ describe( 'Barriers controller', () => {
 		} );
 	} );
 
-	xdescribe( 'typeCategory', () => {
+	describe( 'type.category', () => {
 
 		let ssoToken;
 		let report;
@@ -731,29 +749,58 @@ describe( 'Barriers controller', () => {
 			req.report = report;
 		} );
 
-		it( 'Should setup the form correctly', () => {
+		describe( 'form setup', () => {
 
 			const barrierTypeCategories = { barrierTypeCategories: 1 };
-			const sessionValues = {
-				category: 'GOODS',
-			};
 
-			req.session.typeCategoryValues = sessionValues;
+			beforeEach( () => {
 
-			validators.isMetadata.and.callFake( () => barrierTypeCategories );
+				validators.isMetadata.and.callFake( () => barrierTypeCategories );
+			} );
 
-			controller.typeCategory( req, res );
+			afterEach( () => {
 
-			const args = Form.calls.argsFor( 0 );
-			const config = args[ 1 ];
+				const args = Form.calls.argsFor( 0 );
+				const config = args[ 1 ];
 
-			expect( Form ).toHaveBeenCalled();
-			expect( args[ 0 ] ).toEqual( req );
+				expect( Form ).toHaveBeenCalled();
+				expect( args[ 0 ] ).toEqual( req );
 
-			expect( config.category ).toBeDefined();
-			expect( config.category.values ).toEqual( [ sessionValues.category, report.barrier_type_category ] );
-			expect( config.category.items.length ).toEqual( Object.entries( metadata.barrierTypeCategories ).length );
-			expect( config.category.validators[ 0 ].fn ).toEqual( barrierTypeCategories );
+				expect( config.category ).toBeDefined();
+				expect( config.category.type ).toEqual( Form.RADIO );
+				expect( config.category.items.length ).toEqual( Object.entries( metadata.barrierTypeCategories ).length );
+				expect( config.category.validators[ 0 ].fn ).toEqual( barrierTypeCategories );
+			} );
+
+			describe( 'When there is not a barrier', () => {
+				it( 'Should setup the form correctly', () => {
+
+					controller.type.category( req, res );
+
+					const config = Form.calls.argsFor( 0 )[ 1 ];
+
+					expect( config.category.values ).toEqual( [] );
+				} );
+			} );
+
+			describe( 'When there is not a barrier', () => {
+				it( 'Should setup the form correctly', () => {
+
+					const barrier = {
+						barrier_type: {
+							category: 'abc-123'
+						}
+					};
+
+					req.barrier = barrier;
+
+					controller.type.category( req, res );
+
+					const config = Form.calls.argsFor( 0 )[ 1 ];
+					expect( config.category.values ).toEqual( [ barrier.barrier_type.category ] );
+
+				} );
+			} );
 		} );
 
 		describe( 'When it is a POST', () => {
@@ -769,20 +816,20 @@ describe( 'Barriers controller', () => {
 
 				it( 'Should save the values and redirect to the next step', () => {
 
-					const typeUrl = 'my-url';
-					const status = '123';
-					const emergency = '456';
+					const listUrl = 'my-url';
+					const category = '123';
 
-					req.body = { status, emergency };
+					req.body = { category };
+					getValuesResponse = { category };
 					form.hasErrors = () => false;
 
-					urls.reports.type.and.callFake( () => typeUrl );
+					urls.barriers.type.list.and.callFake( () => listUrl );
 
-					controller.typeCategory( req, res );
+					controller.type.category( req, res );
 
 					expect( form.validate ).toHaveBeenCalled();
-					expect( req.session.typeCategoryValues ).toEqual( getValuesResponse );
-					expect( res.redirect ).toHaveBeenCalledWith( typeUrl );
+					expect( urls.barriers.type.list ).toHaveBeenCalledWith( barrierId, category );
+					expect( res.redirect ).toHaveBeenCalledWith( listUrl );
 				} );
 			} );
 
@@ -790,47 +837,49 @@ describe( 'Barriers controller', () => {
 
 				beforeEach( () => {
 
-					req.session.typeCategoryValues = { test: 1 };
 					form.hasErrors = () => true;
 				} );
 
-				it( 'Should not save the values to the session', () => {
+				it( 'Should render the template with the form values', () => {
 
-					controller.typeCategory( req, res );
-					expect( req.session.typeCategoryValues ).not.toBeDefined();
+					controller.type.category( req, res );
+					expect( res.render ).toHaveBeenCalledWith( 'barriers/views/type-category', getTemplateValuesResponse );
 				} );
 			} );
 		} );
 
 		describe( 'When it is a GET', () => {
-			it( 'Should render the start page with the form values', () => {
+			it( 'Should render the template with the form values', () => {
 
 				const sessionValues = { category: 'GOODS' };
 
 				req.session.typeCategoryValues = sessionValues;
 
-				controller.typeCategory( req, res );
+				controller.type.category( req, res );
 
 				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'reports/views/type-category', getTemplateValuesResponse );
+				expect( res.render ).toHaveBeenCalledWith( 'barriers/views/type-category', getTemplateValuesResponse );
 			} );
 		} );
 	} );
 
-	xdescribe( 'type', () => {
+	describe( 'type.list', () => {
 
-		let report;
+		let barrier;
 		let templateData;
+		let category;
 
 		beforeEach( () => {
 
-			report = {
+			barrier = {
 				id: 123,
-				barrier_type_id: 456
+				barrier_type: { id: 456 }
 			};
 
-			req.report = report;
-			req.session.typeCategoryValues = { category: 'GOODS' };
+			category = 'GOODS';
+
+			req.barrier = barrier;
+			req.category = category;
 
 			getTemplateValuesResponse = {
 				barrierType: [
@@ -845,9 +894,9 @@ describe( 'Barriers controller', () => {
 			);
 		} );
 
-		it( 'Should setup the form correctly', () => {
+		it( 'Should setup the form correctly', async () => {
 
-			controller.type( req, res, next );
+			await controller.type.list( req, res, next );
 
 			expect( Form ).toHaveBeenCalled();
 
@@ -864,18 +913,18 @@ describe( 'Barriers controller', () => {
 				text: goodsBarrierType.title,
 				category: goodsBarrierType.category
 			}] );
-			expect( config.barrierType.values ).toEqual( [ report.barrier_type_id ] );
+			expect( config.barrierType.values ).toEqual( [ barrier.barrier_type.id ] );
 			expect( config.barrierType.validators[ 0 ].fn ).toEqual( validators.isBarrierType );
 		} );
 
 		describe( 'When it is a GET', () => {
 			it( 'Should render the view with the viewModel', async () => {
 
-				await controller.type( req, res, next );
+				await controller.type.list( req, res, next );
 
 				expect( form.validate ).not.toHaveBeenCalled();
 				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'reports/views/type', templateData );
+				expect( res.render ).toHaveBeenCalledWith( 'barriers/views/type', templateData );
 			} );
 		} );
 
@@ -897,9 +946,9 @@ describe( 'Barriers controller', () => {
 
 					form.hasErrors = () => true;
 
-					await controller.type( req, res, next );
+					await controller.type.list( req, res, next );
 
-					expect( res.render ).toHaveBeenCalledWith( 'reports/views/type', templateData );
+					expect( res.render ).toHaveBeenCalledWith( 'barriers/views/type', templateData );
 				} );
 			} );
 
@@ -908,9 +957,9 @@ describe( 'Barriers controller', () => {
 
 					beforeEach( () => {
 
-						backend.reports.saveBarrierType.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+						backend.barriers.saveType.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
 
-						req.report = { id: 1, b: 2 };
+						req.barrier = { id: 1, b: 2 };
 						form.hasErrors = () => false;
 					} );
 
@@ -918,20 +967,20 @@ describe( 'Barriers controller', () => {
 
 						expect( next ).not.toHaveBeenCalled();
 						expect( req.session.typeCategoryValues ).not.toBeDefined();
-						expect( backend.reports.saveBarrierType ).toHaveBeenCalledWith( req, req.report.id, getValuesResponse );
+						expect( backend.barriers.saveType ).toHaveBeenCalledWith( req, req.barrier.id, getValuesResponse );
 					} );
 
 					describe( 'When save and exit is used to submit the form', () => {
-						it( 'Should redirect to the report detail page', async () => {
+						it( 'Should redirect to the barrier detail page', async () => {
 
-							const reportDetailResponse = '/reportDetail';
-							urls.reports.detail.and.callFake( () => reportDetailResponse );
+							const barrierDetailResponse = '/barrierDetail';
+							urls.barriers.detail.and.callFake( () => barrierDetailResponse );
 							form.isExit = true;
 
-							await controller.type( req, res, next );
+							await controller.type.list( req, res, next );
 
-							expect( urls.reports.detail ).toHaveBeenCalledWith( req.report.id );
-							expect( res.redirect ).toHaveBeenCalledWith( reportDetailResponse );
+							expect( urls.barriers.detail ).toHaveBeenCalledWith( req.barrier.id );
+							expect( res.redirect ).toHaveBeenCalledWith( barrierDetailResponse );
 						} );
 					} );
 
@@ -939,11 +988,11 @@ describe( 'Barriers controller', () => {
 						it( 'Should redirect', async () => {
 
 							const detailResponse = '/detail/';
-							urls.reports.detail.and.callFake( () => detailResponse );
+							urls.barriers.detail.and.callFake( () => detailResponse );
 
-							await controller.type( req, res, next );
+							await controller.type.list( req, res, next );
 
-							expect( urls.reports.detail ).toHaveBeenCalledWith( req.report.id );
+							expect( urls.barriers.detail ).toHaveBeenCalledWith( req.barrier.id );
 							expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
 						} );
 					} );
@@ -954,9 +1003,9 @@ describe( 'Barriers controller', () => {
 
 						const statusCode = 500;
 						form.hasErrors = () => false;
-						backend.reports.saveBarrierType.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
+						backend.barriers.saveType.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
 
-						await controller.type( req, res, next );
+						await controller.type.list( req, res, next );
 
 						expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save form - got 500 from backend' ) );
 					} );
@@ -967,9 +1016,9 @@ describe( 'Barriers controller', () => {
 
 						const err = new Error( 'my test' );
 						form.hasErrors = () => false;
-						backend.reports.saveBarrierType.and.callFake( () => Promise.reject( err ) );
+						backend.barriers.saveType.and.callFake( () => Promise.reject( err ) );
 
-						await controller.type( req, res, next );
+						await controller.type.list( req, res, next );
 
 						expect( next ).toHaveBeenCalledWith( err );
 					} );

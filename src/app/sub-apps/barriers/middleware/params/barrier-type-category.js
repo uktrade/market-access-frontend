@@ -1,5 +1,5 @@
 const validators = require( '../../../../lib/validators' );
-const MAX_LENGTH = 10;
+const MAX_LENGTH = 20;
 const isCategory = validators.isMetadata( 'barrierTypeCategories' );
 
 module.exports = ( req, res, next, category ) => {

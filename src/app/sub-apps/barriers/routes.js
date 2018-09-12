@@ -33,9 +33,6 @@ module.exports = ( express, app ) => {
 	app.get( '/:barrierId/type/', controller.type.category );
 	app.post( '/:barrierId/type/', controller.type.category );
 
-	app.get( '/:barrierId/type/edit', controller.type.edit );
-	app.post( '/:barrierId/type/edit', controller.type.edit );
-
 	app.get( '/:barrierId/type/:barrierTypeCategory', controller.type.list );
 	app.post( '/:barrierId/type/:barrierTypeCategory', controller.type.list );
 

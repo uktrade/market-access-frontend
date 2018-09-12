@@ -308,37 +308,11 @@ module.exports = {
 		category: ( req, res ) => {
 
 			const barrierId = req.barrier.id;
+			const category = ( req.barrier.barrier_type && req.barrier.barrier_type.category );
 			const form = new Form( req, {
 				category: {
 					type: Form.RADIO,
-					items: govukItemsFromObj( metadata.barrierTypeCategories ),
-					validators: [ {
-						fn: validators.isMetadata( 'barrierTypeCategories' ),
-						message: 'Choose a barrier type category'
-					} ]
-				}
-			} );
-
-			if( form.isPost ){
-
-				form.validate();
-
-				if( !form.hasErrors() ){
-
-					const category = form.getValues().category;
-					return res.redirect( urls.barriers.type.list( barrierId, category ) );
-				}
-			}
-
-			res.render( 'barriers/views/type-category', form.getTemplateValues() );
-		},
-
-		edit: ( req, res ) => {
-
-			const barrierId = req.barrier.id;
-			const form = new Form( req, {
-				category: {
-					type: Form.RADIO,
+					values: ( category ? [ category ] : [] ),
 					items: govukItemsFromObj( metadata.barrierTypeCategories ),
 					validators: [ {
 						fn: validators.isMetadata( 'barrierTypeCategories' ),

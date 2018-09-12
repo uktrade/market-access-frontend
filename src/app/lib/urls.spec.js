@@ -76,16 +76,10 @@ describe( 'URLs', () => {
 		} );
 
 		describe( 'type', () => {
-			describe( 'edit', () => {
+			describe( 'category', () => {
 				it( 'Should return the correct path', () => {
 
-					expect( urls.barriers.type.edit( barrierId ) ).toEqual( `/barriers/${ barrierId }/type/edit/` );
-				} );
-			} );
-			describe( 'add', () => {
-				it( 'Should return the correct path', () => {
-
-					expect( urls.barriers.type.add( barrierId ) ).toEqual( `/barriers/${ barrierId }/type/` );
+					expect( urls.barriers.type.category( barrierId ) ).toEqual( `/barriers/${ barrierId }/type/` );
 				} );
 			} );
 			describe( 'list', () => {

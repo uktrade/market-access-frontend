@@ -14,7 +14,7 @@
 		errors: errors
 	}) }}
 
-	<form action="{{ urls.barriers.type.add( barrier.id ) }}" method="POST">
+	<form action="{{ urls.barriers.type.category( barrier.id ) }}" method="POST">
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
 		{{ govukRadios({

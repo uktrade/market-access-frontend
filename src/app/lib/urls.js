@@ -49,8 +49,7 @@ module.exports = {
 		statusHibernated: ( barrierId ) => `/barriers/${ barrierId }/status/hibernated/`,
 		statusOpen: ( barrierId ) => `/barriers/${ barrierId }/status/open/`,
 		type: {
-			edit: ( barrierId ) => `/barriers/${ barrierId }/type/edit/`,
-			add: ( barrierId ) => `/barriers/${ barrierId }/type/`,
+			category: ( barrierId ) => `/barriers/${ barrierId }/type/`,
 			list: ( barrierId, category ) => `/barriers/${ barrierId }/type/${ category }/`
 		}
 	},
