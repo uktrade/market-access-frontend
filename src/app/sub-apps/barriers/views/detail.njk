@@ -12,16 +12,31 @@
 		},
 		items: [
 			{
+				title: ( 'Sector' + ( 's' if barrier.sectors.length !== 1 ) + ' affected' ),
+				items: sectorsList,
+				add: {
+					text: 'Add one or several sectors',
+					href: '#'
+				}
+			},
+			{
 				title: 'Market access barrier type',
-				text: barrier.type.title
+				text: barrier.type.title,
+				add: {
+					text: 'Add a type of Market Access Barrier',
+					href: urls.barriers.type.category( barrier.id )
+				},
+				edit: {
+					href: urls.barriers.type.category( barrier.id )
+				}
 			},{
 				title: 'Summary of barrier',
-				text: barrier.summary
+				text: barrier.problem.description
 			}
 		]
 	} ) }}
 
-	{%- if barrier.legal.hasInfringements -%}
+	{#%- if barrier.legal.hasInfringements -%}
 
 		{{ summaryGroup( {
 			heading: {
@@ -58,6 +73,6 @@
 			]
 		} ) }}
 
-	{% endif %}
+	{% endif %#}
 
 {% endblock %}

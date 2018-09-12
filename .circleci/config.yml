@@ -116,13 +116,7 @@ workflows:
   version: 2
   build:
     jobs:
-      - build:
-          filters:
-            branches:
-              ignore: develop
+      - build
   develop:
     jobs:
-      - build_develop:
-          filters:
-            branches:
-              only: develop
+      - build_develop

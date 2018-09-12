@@ -24,15 +24,13 @@ const reportUrl = {
 	detail: ( reportId ) => `/reports/${ reportId }/`,
 	new: () => '/reports/new/',
 	start: ( reportId ) => `/reports/${ getReportPath( reportId ) }/start/`,
-	companySearch: ( reportId ) => `/reports/${ getReportPath( reportId ) }/company/`,
-	companyDetails: ( companyId, reportId ) => `/reports/${ getReportPath( reportId ) }/company/${ companyId }/`,
-	contacts: ( companyId, reportId ) => `/reports/${ getReportPath( reportId ) }/company/${ companyId }/contacts/`,
-	viewContact: ( contactId, reportId ) => `/reports/${ getReportPath( reportId ) }/contact/${ contactId }/`,
-	save: ( reportId ) => `/reports/${ getReportPath( reportId ) }/save/`,
+	isResolved: ( reportId ) => `/reports/${ getReportPath( reportId ) }/is-resolved/`,
+	country: ( reportId ) => `/reports/${ getReportPath( reportId ) }/country/`,
+	hasSectors: ( reportId ) => `/reports/${ reportId }/has-sectors/`,
+	sectors: ( reportId ) => `/reports/${ reportId }/sectors/`,
+	addSector: ( reportId ) => `/reports/${ reportId }/sectors/add/`,
+	removeSector: ( reportId ) => `/reports/${ reportId }/sectors/remove/`,
 	aboutProblem: ( reportId ) => `/reports/${ reportId }/problem/`,
-	legal: ( reportId ) => `/reports/${ reportId }/legal/`,
-	typeCategory: ( reportId ) => `/reports/${ reportId }/type-category/`,
-	type: ( reportId ) => `/reports/${ reportId }/type/`,
 	submit: ( reportId ) => `/reports/${ reportId }/submit/`,
 	success: () => `/reports/new/success/`
 };
@@ -47,9 +45,13 @@ module.exports = {
 		interactions: ( barrierId ) => `/barriers/${ barrierId }/interactions/`,
 		addNote: ( barrierId ) => `/barriers/${ barrierId }/interactions/add-note/`,
 		status: ( barrierId ) => `/barriers/${ barrierId }/status/`,
-		statusResolved:( barrierId ) => `/barriers/${ barrierId }/status/resolved/`,
-		statusHibernated:( barrierId ) => `/barriers/${ barrierId }/status/hibernated/`,
-		statusOpen:( barrierId ) => `/barriers/${ barrierId }/status/open/`
+		statusResolved: ( barrierId ) => `/barriers/${ barrierId }/status/resolved/`,
+		statusHibernated: ( barrierId ) => `/barriers/${ barrierId }/status/hibernated/`,
+		statusOpen: ( barrierId ) => `/barriers/${ barrierId }/status/open/`,
+		type: {
+			category: ( barrierId ) => `/barriers/${ barrierId }/type/`,
+			list: ( barrierId, category ) => `/barriers/${ barrierId }/type/${ category }/`
+		}
 	},
 
 	reports: reportUrl,
@@ -60,21 +62,13 @@ module.exports = {
 			case '1.1':
 				return reportUrl.start( report.id );
 			case '1.2':
-				return reportUrl.companyDetails( report.company_id, report.id );
+				return reportUrl.isResolved( report.id );
 			case '1.3':
-				return reportUrl.viewContact( report.contact_id, report.id );
+				return reportUrl.country( report.id );
 			case '1.4':
-				return reportUrl.aboutProblem( report.id );
+				return reportUrl.hasSectors( report.id );
 			case '1.5':
-				return '#';
-			case '1.6':
-				return reportUrl.legal( report.id );
-			case '1.7':
-				return reportUrl.typeCategory( report.id );
-			case '2.1':
-				return '#';
-			case '2.2':
-				return '#';
+				return reportUrl.aboutProblem( report.id );
 			default:
 				return reportUrl.detail( report.id );
 		}

@@ -1,35 +1,33 @@
 {
-   "id": "c6c39e5e-5bb4-422a-8936-f8dabab9bbff",
+   "id": "c8bb7e86-b164-4681-8605-3793ec210fb0",
+   "problem_status": 1,
+   "is_resolved": true,
+   "resolved_date": "Fri Dec 22 2017 01:08:08 GMT+0000 (GMT)",
+   "sectors_affected": false,
+   "sectors": [
+      "ecb89515-9df1-4432-b191-d4b41ad2eb39",
+      "d929fa2c-b0ee-4cbb-ba4a-2fc7b6bbd4d3",
+      "4a6929f4-eb00-4357-aa14-a0c2ee537e0f"
+   ],
+   "product": "quas quis est",
+   "source": "TRADE",
+   "other_source": "aliquid voluptatibus repellendus",
    "barrier_type": {
-      "id": 17,
-      "title": "officia assumenda maiores"
+      "id": 45540,
+      "title": "repellendus dignissimos ut",
+      "description": "Necessitatibus vitae quisquam. Qui harum enim et iste non. Asperiores quis autem eum at autem ex quibusdam. Quae voluptas tempora omnis molestias expedita eos natus corporis optio. Deserunt deleniti nihil labore.",
+      "category": "GOODS"
    },
-   "barrier_title": "fugiat esse qui",
-   "summary": "Iste aut nisi quisquam aut non est architecto unde soluta. Molestias omnis eos. Sit aut rerum sit impedit ut ut recusandae et.",
-   "report": {
-      "id": 8,
-      "problem_status": 2,
-      "company": {
-         "id": "884f6930-fac1-4feb-9233-ae5b1e219146",
-         "name": "velit voluptatibus ea",
-         "sector_id": "e38eb400-5df1-4bc2-a81f-0d89a25c534b",
-         "sector_name": "quo accusamus qui"
-      }
-   },
+   "barrier_title": "nemo nobis ut",
+   "problem_description": "Accusamus saepe sed non in molestiae minima voluptas. Quis atque ipsa est laborum voluptatem sed fugit autem quos. Et sit omnis praesentium debitis odit sint officiis.",
    "current_status": {
-      "status": 3
+      "status": 1
    },
-   "reported_on": "Fri Jun 22 2018 13:21:43 GMT+0100 (BST)",
-   "company": {
-      "id": "4397afb6-6725-445f-bfe9-e87683677ca9",
-      "name": "ipsa commodi unde",
-      "sector_id": "72d54511-61b2-482c-ab65-b937386ea6f5",
-      "sector_name": "id aut et"
-   },
-   "export_country": "0f4156b9-ae0f-42f4-9af2-257a8f948c63",
-   "has_legal_infringement": "3",
-   "wto_infringement": false,
+   "reported_on": "Fri Mar 30 2018 01:46:38 GMT+0100 (BST)",
+   "export_country": "8230925c-ee7c-4ddb-aedc-db3cc049f64f",
+   "has_legal_infringement": "2",
+   "wto_infringement": true,
    "fta_infringement": true,
    "other_infringement": false,
-   "infringement_summary": "Aut aliquid omnis qui omnis ipsam eum et veritatis fuga. Odio temporibus reiciendis suscipit non voluptatem suscipit. Provident adipisci corrupti aspernatur voluptas recusandae."
+   "infringement_summary": "Iure sequi vel et deserunt voluptatem qui et minima. Placeat iure voluptatem nulla repellendus occaecati quia inventore. Omnis eaque facilis omnis facere deleniti. Eum dolores dolorem occaecati inventore molestias."
 }

@@ -5,12 +5,6 @@
 
 {% block page_title %}{{ super() }} - Report - Status of the problem{% endblock %}
 
-{% block body_script %}
-	<script>
-		ma.pages.report.start();
-	</script>
-{% endblock %}
-
 {% block page_content %}
 
 	{{ heading({
@@ -34,24 +28,6 @@
 			items: status,
 			errorMessage: errors | errorForName( 'status-1' )
 		}) }}
-
-		<div class="conditional-content paragraph-width" id="report-barrier-emergency">
-
-			{{ govukRadios({
-				name: 'emergency',
-				fieldset: {
-					legend: {
-						text: 'Is this an emergency?',
-						classes: 'govuk-fieldset__legend--s'
-					}
-				},
-				hint: {
-					text: 'Is an export facing significant and imminent financial or other loss and does government need to take action urgently?'
-				},
-				items: emergency,
-				errorMessage: errors | errorForName( 'emergency-1' )
-			}) }}
-		</div>
 
 		<input type="submit" value="Continue" class="govuk-button">
 	</form>

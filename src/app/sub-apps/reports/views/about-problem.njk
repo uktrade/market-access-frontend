@@ -17,7 +17,7 @@
 {% block page_content %}
 
 	{{ heading({
-		back: { href: urls.reports.contacts( report.company_id, report.id ) },
+		back: { href: backHref },
 		caption: 'Report a barrier',
 		text: 'About the problem',
 		errors: errors
@@ -65,34 +65,10 @@
 				}
 			},
 			items: barrierAwareness | addConditionalRadioHtml( {
-				'4': { html: barrierAwarenessOtherHtml }
+				'OTHER': { html: barrierAwarenessOtherHtml }
 			} ),
-			errorMessage: errors | errorForName( 'barrierAwareness-1' )
+			errorMessage: errors | errorForName( 'barrier-awareness-1' )
 		}) }}
-
-		{{ govukInput( {
-
-			label: {
-				html: 'List the relevant commodity codes, if known <span class="govuk-!-font-weight-regular">(Optional)</span>',
-				classes: 'govuk-label--s'
-			},
-			id: 'commodity-code',
-			name: 'commodityCode',
-			value: commodityCode,
-			errorMessage: errors | errorForName( 'commodity-code' )
-		} ) }}
-
-		{{ govukSelect( {
-
-			label: {
-				text: "Which country/trading bloc are they trying to export to or invest in?",
-				classes: 'govuk-label--s'
-			},
-			id: 'country',
-			name: 'country',
-			items: country,
-			errorMessage: errors | errorForName( 'country' )
-		} ) }}
 
 		{{ govukInput( {
 

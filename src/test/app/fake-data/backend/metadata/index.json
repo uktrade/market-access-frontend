@@ -1,14 +1,18 @@
 {
    "status_types": {
-      "1": "qui culpa eveniet",
-      "2": "veniam nobis aut",
-      "3": "necessitatibus et perferendis"
+      "1": "minima aspernatur optio",
+      "2": "veritatis alias maxime"
    },
    "loss_range": {
-      "1": "voluptatem ut doloribus",
-      "2": "expedita mollitia eaque",
-      "3": "nemo unde repudiandae",
-      "4": "at ducimus consequatur"
+      "1": "saepe animi sed",
+      "2": "temporibus et assumenda",
+      "3": "corporis illum aut",
+      "4": "quia rerum rerum"
+   },
+   "stage_status": {
+      "1": "modi",
+      "2": "officiis",
+      "3": "error"
    },
    "adv_boolean": {
       "1": "Yes",
@@ -16,14 +20,14 @@
       "3": "Don't know"
    },
    "govt_response": {
-      "1": "dolores aut voluptatum",
-      "2": "qui ut id",
-      "3": "quod magni aut"
+      "1": "maiores animi illum",
+      "2": "atque eos quaerat",
+      "3": "laborum assumenda pariatur"
    },
    "publish_response": {
       "1": "Yes",
       "2": "No",
-      "3": "eveniet doloribus itaque"
+      "3": "repudiandae soluta molestiae"
    },
    "report_stages": {
       "1.0": "doloremque qui ipsum",
@@ -39,33 +43,87 @@
       "2.2": "et eligendi repellendus"
    },
    "support_type": {
-      "1": "cumque hic officiis",
-      "2": "quisquam eum est"
+      "1": "provident enim sapiente",
+      "2": "dolorem et incidunt"
    },
    "barrier_types": [
       {
-         "id": 55838,
-         "title": "repudiandae qui non",
-         "description": "Qui velit nobis quisquam esse voluptates omnis autem blanditiis libero. Necessitatibus qui sit rem nam magni deserunt provident. Veritatis saepe autem exercitationem quae voluptatem. Fuga soluta facilis numquam iure nam vero ea illo numquam.",
+         "id": 6183,
+         "title": "sed repellendus quia",
+         "description": "Suscipit aut earum voluptate expedita repellat adipisci nostrum rerum ut. Et corporis dolorem ducimus rerum. Officiis quia dolores natus omnis dolore voluptatem ut ipsam maiores. Distinctio laboriosam sequi animi dolores magnam. Laudantium sint et numquam sed ea optio quod molestias. Corrupti saepe quod ullam saepe.",
          "category": "GOODS"
       },
       {
-         "id": 76915,
-         "title": "minima dolor rerum",
-         "description": "Alias ex voluptates placeat illo et eum veritatis consectetur libero. Aliquid aspernatur dolorem officiis et recusandae in. Accusantium ratione veniam et iusto repellat qui et. Nihil aliquam et praesentium. Vel impedit eligendi nobis nesciunt veritatis non.",
-         "category": "SERVICES"
-      },
-      {
-         "id": 35344,
-         "title": "aut et in",
-         "description": "Et iure animi corrupti officia tempore quia sed velit. Quis sit ex ad. Et suscipit quo non in et dolorem nesciunt. Doloremque libero quod eum voluptatem ut itaque ratione excepturi non. Explicabo eius id.",
+         "id": 60835,
+         "title": "similique natus quia",
+         "description": "Inventore et incidunt accusamus ullam dolores. Repellat aut quisquam alias ut. Totam aspernatur vitae ad quibusdam a. Vero velit corporis laborum est aut blanditiis cum necessitatibus. Quo recusandae molestiae mollitia. Et magnam consectetur iste magni ex vero.",
          "category": "GOODS"
       },
       {
-         "id": 27190,
-         "title": "delectus nesciunt consequuntur",
-         "description": "Voluptatem non tempore in et ut exercitationem ipsa quis. Sed aliquid ex qui soluta quas nulla. Corrupti provident qui temporibus nobis eveniet amet ipsam ab in.",
+         "id": 14553,
+         "title": "aut error et",
+         "description": "Rem quia non beatae. Ut quidem quos sit voluptates. Qui odit ad ratione dolorem aut voluptatem qui. Est fugiat iste saepe voluptatem culpa quidem. Veritatis doloremque autem voluptates totam voluptate.",
+         "category": "GOODS"
+      },
+      {
+         "id": 17053,
+         "title": "est rem amet",
+         "description": "Consequatur sed quia minima rem. Sed accusantium suscipit dolor omnis nobis aut. Ad aliquid suscipit reprehenderit ut ipsum voluptatem.",
+         "category": "GOODS"
+      },
+      {
+         "id": 17088,
+         "title": "accusantium atque praesentium",
+         "description": "Similique illo odio et temporibus. Doloremque voluptates voluptatibus qui enim vel non est. Incidunt quia aperiam incidunt blanditiis.",
+         "category": "GOODS"
+      },
+      {
+         "id": 42175,
+         "title": "ea saepe omnis",
+         "description": "Et saepe ducimus aut deleniti dolore possimus. Minima ut adipisci debitis qui. Animi distinctio placeat quisquam commodi provident voluptatem molestiae porro. Molestiae quo et natus tempore. Necessitatibus tempora sit maxime nostrum omnis aliquam consequatur alias suscipit. Nulla quis aut est eligendi harum facere omnis libero dicta.",
+         "category": "GOODS"
+      },
+      {
+         "id": 15757,
+         "title": "et voluptates dolorum",
+         "description": "Sunt harum voluptatibus nisi ab. Modi sapiente libero vel voluptatibus distinctio culpa nisi est. Ea ipsam aliquam harum sit ea aut et. Maiores cumque a rerum error officia. Enim quas similique voluptatibus et quod possimus dolores sint quisquam. Distinctio quia nisi aliquam et nemo.",
          "category": "SERVICES"
+      },
+      {
+         "id": 48368,
+         "title": "et eos magnam",
+         "description": "Sit ipsam enim facilis qui ut explicabo illo officia ratione. Nam voluptate ea expedita repellendus. Veritatis et distinctio ratione nostrum magnam excepturi officiis soluta.",
+         "category": "SERVICES"
+      },
+      {
+         "id": 58560,
+         "title": "pariatur libero enim",
+         "description": "Beatae aut quis occaecati facilis. Aut cum fugit. Sit quam facere est. Deleniti nostrum fugiat sed et officiis minima dolores molestiae. Dicta totam quo et quia consequatur nam. Aut voluptatem omnis dolorem.",
+         "category": "SERVICES"
+      },
+      {
+         "id": 4248,
+         "title": "placeat quis deleniti",
+         "description": "Tempora consequatur itaque. Quia nisi sunt dignissimos a. Consequatur odit temporibus numquam ducimus veritatis. Nobis est vero quos doloremque placeat veniam dolorum aut. Aut molestiae dolorem aut.",
+         "category": "SERVICES"
+      },
+      {
+         "id": 40619,
+         "title": "maxime numquam veritatis",
+         "description": "Non animi hic nihil ea. Rem et in est veritatis rerum blanditiis doloremque adipisci. Illo quidem et. Voluptate commodi suscipit perferendis dolores maiores sed aut.",
+         "category": "SERVICES"
+      },
+      {
+         "id": 1248,
+         "title": "similique numquam vitae",
+         "description": "Reiciendis eum ut. Impedit consequatur ut. Corrupti odio dicta quia ut est doloribus aliquam eligendi facere. Praesentium consequuntur qui quia voluptatem.",
+         "category": "SERVICES"
+      },
+      {
+         "id": 67641,
+         "title": "incidunt assumenda non",
+         "description": "Est eos aperiam distinctio nesciunt soluta optio. Qui laboriosam repudiandae inventore nisi non accusamus necessitatibus. Eos quod rem ut esse vitae. Velit exercitationem provident aliquid. Error inventore excepturi eos dolor laboriosam.",
+         "category": "GOODS"
       }
    ],
    "countries": [
@@ -85,8 +143,126 @@
          "disabled_on": "Fri Dec 08 2017 23:40:33 GMT+0000 (GMT)"
       }
    ],
+   "sectors": [
+      {
+         "id": "b9cccc97-e6ee-479a-8aa2-e99876a5d5b2",
+         "name": "dolores ea adipisci",
+         "level": 1,
+         "disabled_on": "Tue Mar 27 2018 18:45:06 GMT+0100 (BST)"
+      },
+      {
+         "id": "ecb89515-9df1-4432-b191-d4b41ad2eb39",
+         "name": "perspiciatis dolor sit",
+         "level": 0,
+         "disabled_on": null
+      },
+      {
+         "id": "5a07a9f4-2e9e-45da-ab2b-14bcc152a10f",
+         "name": "voluptatum maxime doloremque",
+         "level": 0,
+         "disabled_on": "Sat Apr 28 2018 17:51:28 GMT+0100 (BST)"
+      },
+      {
+         "id": "cc883e44-29eb-4cdf-b879-37268d363df5",
+         "name": "iste soluta asperiores",
+         "level": 2,
+         "disabled_on": "Sun Mar 04 2018 16:39:28 GMT+0000 (GMT)"
+      },
+      {
+         "id": "8c495910-b670-4f27-a788-6db1fbe8e077",
+         "name": "ea hic quibusdam",
+         "level": 2,
+         "disabled_on": "Sat Jun 16 2018 04:41:25 GMT+0100 (BST)"
+      },
+      {
+         "id": "4e9378ee-6058-45fc-acee-72302e5a18f1",
+         "name": "est adipisci voluptatibus",
+         "level": 1,
+         "disabled_on": null
+      },
+      {
+         "id": "a579cb66-15a4-44c3-bfc8-c3859d906140",
+         "name": "quia ut veniam",
+         "level": 0,
+         "disabled_on": "Thu Jul 26 2018 19:16:15 GMT+0100 (BST)"
+      },
+      {
+         "id": "4a6929f4-eb00-4357-aa14-a0c2ee537e0f",
+         "name": "eos atque quae",
+         "level": 0,
+         "disabled_on": null
+      },
+      {
+         "id": "8b0d8501-b18a-4b50-946f-627b0ab679f6",
+         "name": "et cupiditate accusantium",
+         "level": 1,
+         "disabled_on": null
+      },
+      {
+         "id": "52f3a06e-7967-4c31-bbe3-96c540c8d723",
+         "name": "blanditiis vel sint",
+         "level": 2,
+         "disabled_on": null
+      },
+      {
+         "id": "243b6b62-657e-4f7e-a5c8-11e8995c2fcc",
+         "name": "natus et est",
+         "level": 1,
+         "disabled_on": "Wed Feb 21 2018 02:03:52 GMT+0000 (GMT)"
+      },
+      {
+         "id": "e3fc60cc-0712-4bc0-9406-7e6737c28ada",
+         "name": "non pariatur ducimus",
+         "level": 2,
+         "disabled_on": "Sat Dec 16 2017 16:39:38 GMT+0000 (GMT)"
+      },
+      {
+         "id": "d929fa2c-b0ee-4cbb-ba4a-2fc7b6bbd4d3",
+         "name": "porro unde minus",
+         "level": 1,
+         "disabled_on": null
+      },
+      {
+         "id": "99a17f7f-a9cb-4317-8dc6-7d285ed82209",
+         "name": "impedit ratione dolores",
+         "level": 2,
+         "disabled_on": "Sat Jun 30 2018 18:46:25 GMT+0100 (BST)"
+      },
+      {
+         "id": "0749ec6b-eea4-4eb9-a8a8-43604c532a5e",
+         "name": "nulla quia neque",
+         "level": 1,
+         "disabled_on": "Thu Jan 04 2018 20:17:06 GMT+0000 (GMT)"
+      },
+      {
+         "id": "443387ee-e155-40ee-82a6-483dd03ae541",
+         "name": "quis minima sequi",
+         "level": 0,
+         "disabled_on": "Wed Apr 11 2018 13:12:48 GMT+0100 (BST)"
+      },
+      {
+         "id": "33744c2b-ab95-4378-ac3a-7b2372c08a41",
+         "name": "quia illo nisi",
+         "level": 0,
+         "disabled_on": "Fri Dec 01 2017 15:00:12 GMT+0000 (GMT)"
+      }
+   ],
+   "barrier_status": {
+      "1": "necessitatibus doloribus et",
+      "2": "deleniti accusamus facilis",
+      "3": "sit omnis aperiam",
+      "4": "non id qui",
+      "5": "culpa et placeat",
+      "6": "non sapiente quam"
+   },
    "barrier_type_categories": {
-      "GOODS": "aut dolores architecto",
-      "SERVICES": "facilis assumenda voluptatem"
+      "GOODS": "rerum dolores sapiente",
+      "SERVICES": "asperiores cupiditate tempore"
+   },
+   "barrier_source": {
+      "COMPANY": "distinctio",
+      "TRADE": "nam distinctio nihil",
+      "GOVT": "voluptatem quia est",
+      "OTHER": "qui"
    }
 }

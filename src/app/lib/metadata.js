@@ -55,6 +55,33 @@ function createTaskList( reportStages ){
 	return tasks;
 }
 
+function createCountryList( countries ){
+
+	const countryList = countries.map( ( country ) => ( {
+		value: country.id,
+		text: country.name
+	} ) );
+
+	countryList.unshift( { value: '', text: 'Choose a country' } );
+
+	return countryList;
+}
+
+function createSectorsList( sectors, text ){
+
+	const sectorList = sectors.map( ( sector ) => ( {
+		value: sector.id,
+		text: sector.name
+	} ) );
+
+	sectorList.unshift( { value: '', text } );
+
+	return sectorList;
+}
+
+let countries;
+let sectors;
+
 module.exports.fetch = async () => {
 
 	try {
@@ -63,10 +90,16 @@ module.exports.fetch = async () => {
 
 		if( response.isSuccess ){
 
+			countries = body.countries.filter( notDisabled ).map( cleanCountry );
+			sectors = body.sectors.filter( notDisabled );
+
+			const level0Sectors = sectors.filter( ( sector ) => sector.level === 0 );
+
 			module.exports.statusTypes = body.status_types;
 			module.exports.lossScale = body.loss_range;
 			module.exports.boolScale = body.adv_boolean;
-			module.exports.countries = body.countries.filter( notDisabled ).map( cleanCountry );
+			module.exports.countries = countries;
+			module.exports.countryList = createCountryList( module.exports.countries );
 			module.exports.govResponse = body.govt_response;
 			module.exports.publishResponse = body.publish_response;
 			module.exports.reportStages = body.report_stages;
@@ -74,15 +107,13 @@ module.exports.fetch = async () => {
 			module.exports.barrierTypes = body.barrier_types;
 			module.exports.barrierTypeCategories = body.barrier_type_categories;
 			module.exports.supportType = body.support_type;
+			module.exports.sectors = sectors;
+			module.exports.level0Sectors = level0Sectors;
+			module.exports.affectedSectorsList = createSectorsList( level0Sectors, 'Select a sector affected' );
+			module.exports.barrierAwareness = body.barrier_source;
 			module.exports.bool = {
 				'true': 'Yes',
 				'false': 'No'
-			};
-			module.exports.barrierAwareness = {
-				'1': 'Company',
-				'2': 'Trade association',
-				'3': 'Government entity',
-				'4': 'Other'
 			};
 
 		} else {
@@ -95,3 +126,6 @@ module.exports.fetch = async () => {
 		throw e;
 	}
 };
+
+module.exports.getSector = ( sectorId ) => sectors.find( ( sector ) => sector.id === sectorId );
+module.exports.getCountry = ( countryId ) => countries.find( ( country ) => country.id === countryId );

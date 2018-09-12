@@ -5,13 +5,19 @@
 	"type": "object",
 	"required": [
 		"id",
+		"problem_status",
+		"is_resolved",
+		"resolved_date",
+		"sectors_affected",
+		"sectors",
+		"product",
+		"source",
+		"other_source",
 		"barrier_type",
 		"barrier_title",
-		"summary",
-		"report",
+		"problem_description",
 		"current_status",
 		"reported_on",
-		"company",
 		"export_country",
 		"has_legal_infringement",
 		"wto_infringement",
@@ -23,47 +29,38 @@
 
 		"id": { "$ref": "$refs/common.json#/uuid" },
 
-		"barrier_type": {
-			"type": "object",
-			"required": [
-				"id",
-				"title"
-			],
-			"properties": {
-
-				"id": { "$ref": "$refs/common.json#/small-int" },
-				"title": { "$ref": "$refs/common.json#/words" }
-			}
+		"problem_status": {
+			"type": "number",
+			"enum": [ 1, 2 ]
 		},
+
+		"is_resolved": { "$ref": "$refs/common.json#/boolean" },
+		"resolved_date": { "$ref": "$refs/common.json#/past-date" },
+		"sectors_affected": { "$ref": "$refs/common.json#/boolean" },
+
+		"sectors": {
+			"type": "array",
+			"minItems": 0,
+			"maxItems": 5,
+			"items": { "$ref": "$refs/common.json#/uuid" }
+		},
+
+		"product": { "$ref": "$refs/common.json#/words" },
+
+		"source": {
+			"type": "string",
+			"enum": [ "COMPANY", "TRADE", "GOVT", "OTHER" ]
+		},
+
+		"other_source":{ "$ref": "$refs/common.json#/words" },
+		"barrier_type": { "$ref": "$refs/common.json#/barrier_type" },
 
 		"barrier_title": {
 			"type": "string",
 			"faker": "lorem.words"
 		},
 
-		"summary": { "$ref": "$refs/common.json#/paragraph" },
-
-		"report": {
-			"type": "object",
-			"required": [
-				"id",
-				"problem_status",
-				"company"
-			],
-			"properties": {
-
-				"id": { "$ref": "$refs/common.json#/small-int" },
-
-				"problem_status": {
-					"type": "number",
-					"enum": [ 1, 2, 3 ]
-				},
-
-				"company": {
-					"$ref": "#/refs/company"
-				}
-			}
-		},
+		"problem_description": { "$ref": "$refs/common.json#/paragraph" },
 
 		"current_status": {
 			"type": "object",
@@ -77,7 +74,6 @@
 		},
 
 		"reported_on": { "$ref": "$refs/common.json#/past-date" },
-		"company": { "$ref": "#/refs/company" },
 		"export_country": { "$ref": "$refs/common.json#/uuid" },
 
 		"has_legal_infringement": {
@@ -89,24 +85,5 @@
 		"fta_infringement": { "$ref": "$refs/common.json#/boolean" },
 		"other_infringement": { "$ref": "$refs/common.json#/boolean" },
 		"infringement_summary":  { "$ref": "$refs/common.json#/paragraph" }
-	},
-
-	"refs": {
-		"company": {
-			"type": "object",
-			"required": [
-				"id",
-				"name",
-				"sector_id",
-				"sector_name"
-			],
-			"properties": {
-
-				"id": { "$ref": "$refs/common.json#/uuid" },
-				"name": { "$ref": "$refs/common.json#/words" },
-				"sector_id": { "$ref": "$refs/common.json#/uuid" },
-				"sector_name": { "$ref": "$refs/common.json#/words" }
-			}
-		}
 	}
 }

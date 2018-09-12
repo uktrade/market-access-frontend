@@ -65,7 +65,6 @@ module.exports = ( csrfToken, report ) => {
 	const tasks = JSON.parse( JSON.stringify( metadata.reportTaskList ) );
 
 	addReportData( tasks, report );
-	//console.log( JSON.stringify( tasks, null, 2 ) );
 
 	return { csrfToken, tasks };
 };

@@ -127,7 +127,7 @@ Then( /^a task list with ([0-9]+) items?$/, async ( items ) => {
 	assert.equal( tasks.length, items );
 } );
 
-Then( /^there should be a ([a-zA-Z]+) button$/, async( text ) => {
+Then( /^there should be a ([a-zA-Z]+) button$/, async ( text ) => {
 
 	const button = await driver.byCss( '.govuk-button' );
 	const buttonText = await button.getAttribute( 'value' );
@@ -135,27 +135,9 @@ Then( /^there should be a ([a-zA-Z]+) button$/, async( text ) => {
 	assert.equal( buttonText, text );
 } );
 
-Then( /^it should (reveal|hide) the emergency question$/, async ( state ) => {
-
-	const isHidden = ( state === 'hide' );
-	const emergencyElem = await driver.byCss( '#report-barrier-emergency' );
-	const classes = await emergencyElem.getAttribute( 'class' );
-	const ariaHidden = await emergencyElem.getAttribute( 'aria-hidden' );
-
-	assert.equal( !!~classes.indexOf( ' visually-hidden' ), isHidden );
-	assert.equal( ariaHidden, '' + isHidden );
-} );
-
-When( /^I click the ([a-z]+) status radio$/, async ( position ) => {
-
-	const radioMap = {
-		first: 0,
-		second: 1,
-		third: 2
-	};
+When( /^there should ([0-9]+) radio inputs$/, async ( count ) => {
 
 	const radios = await driver.allByCss( '.problem-status .govuk-radios__input' );
-	const radioIndex = radioMap[ position ];
-	const radio = radios[ radioIndex ];
-	await radio.click();
+
+	assert.equal( radios.length, count );
 } );

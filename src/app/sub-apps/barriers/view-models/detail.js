@@ -8,24 +8,22 @@ const barrierStatus = {
 
 module.exports = ( barrier ) => {
 
-	const report = barrier.report;
 	const barrierStatusCode = barrier.current_status.status;
-	const company = report.company;
+	const sectors = ( barrier.sectors || [] ).map( metadata.getSector );
 
 	return {
 		barrier: {
 			id: barrier.id,
-			title: report.barrier_title,
-			summary: barrier.summary,
+			title: barrier.barrier_title,
+			problem: {
+				status: metadata.statusTypes[ barrier.problem_status ],
+				description: barrier.problem_description
+			},
 			type: barrier.barrier_type,
 			status: barrierStatus[ barrierStatusCode ],
 			reportedOn: barrier.reported_on,
-			company,
-			country: metadata.countries.find( ( country ) => country.id === report.export_country ),
-			sector: {
-				id: company.sector_id,
-				name: company.sector_name
-			},
+			country: metadata.getCountry( barrier.export_country ),
+			sectors,
 			legal: {
 				hasInfringements: ( barrier.has_legal_infringement == '1' ),
 				unknownInfringements: ( barrier.has_legal_infringement == '3' ),
@@ -36,6 +34,7 @@ module.exports = ( barrier ) => {
 				},
 				summary: barrier.infringement_summary
 			}
-		}
+		},
+		sectorsList: sectors.map( ( sector ) => (sector && { text: sector.name } || {}) )
 	};
 };

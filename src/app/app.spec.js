@@ -198,7 +198,7 @@ describe( 'App', function(){
 			} );
 		} );
 
-		describe( 'Reports', () => {
+		xdescribe( 'Reports', () => {
 			describe( 'Index page', () => {
 				it( 'Should render a list of reports', ( done ) => {
 

@@ -45,10 +45,8 @@ $govuk-images-path: "/govuk-public/images/";
 @import 'app-components/dash-button';
 @import 'app-components/task-list';
 @import 'app-components/details-list';
-@import 'app-components/company-card';
 @import 'app-components/search-form';
 @import 'app-components/table-standard';
-@import 'app-components/contact-list';
 @import 'app-components/callout';
 @import 'app-components/tabs';
 @import 'app-components/warning-icon';
@@ -59,6 +57,7 @@ $govuk-images-path: "/govuk-public/images/";
 
 @import 'pages/index';
 @import 'pages/report/detail';
+@import 'pages/report/sectors';
 
 .error-message {
 	@include govuk-font( 24 );
@@ -115,6 +114,11 @@ $govuk-images-path: "/govuk-public/images/";
 	outline: 1px solid $govuk-yellow-25;
 	border-top: 2px solid $govuk-yellow-25;
 	border-bottom: 2px solid $govuk-yellow-25;
+}
+
+.form-cancel {
+	line-height: 2.5;
+	margin-left: govuk-em( 10, 16 );
 }
 
 .button--secondary {

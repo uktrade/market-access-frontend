@@ -1,0 +1,40 @@
+{% from 'components/radios/macro.njk' import govukRadios %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Barrier - Define type of market access barrier{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.barriers.type.category( barrier.id ) },
+		caption: barrier.barrier_title,
+		text: 'Define type of market access barrier',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.barriers.type.list( barrier.id, category ) }}" method="POST" class="restrict-width">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{# Select a market access barrier type which most applies to the situation #}
+
+		{{ govukRadios( {
+
+			idPrefix: 'barrier-type',
+			name: 'barrierType',
+			classes: 'barrier-type',
+			fieldset: {
+				legend: {
+					text: title,
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: barrierType,
+			errorMessage: errors | errorForName( 'barrier-type-1' )
+			} )
+		}}
+
+		<input type="submit" class="govuk-button" value="Save and exit to barrier">
+	</form>
+{% endblock %}

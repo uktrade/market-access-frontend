@@ -5,8 +5,28 @@
 		<dl class="summary-group__list">
 			{% for item in params.items %}
 			<dt class="summary-group__list__key">{{ item.title }}</dt>
-			<dd class="summary-group__list__value">{{ item.text }}</dd>
+			<dd class="summary-group__list__value">
+			{% if item.html or item.text or ( item.items and item.items.length ) %}
+				{{- item.html | safe if item.html else item.text -}}
+				{{ summaryGroupList( item.items ) if item.items }}
+				{% if item.edit %}
+					<a class="summary-group__list__value__edit" href="{{ item.edit.href }}">{{ item.edit.text if item.edit.text else 'Edit' }}</a>
+				{% endif %}
+			{% elif item.add %}
+				<a href="{{ item.add.href }}" class="summary-group__list__value__add">{{ item.add.text }}</a>
+			{% endif %}
+			</dd>
 			{% endfor %}
 		</dl>
 	</section>
+{% endmacro %}
+
+{% macro summaryGroupList( items ) %}
+	{% if items.length %}
+		<ul class="summary-group__list__value__list">
+			{% for item in items %}
+				<li class="summary-group__list__value__list__item">{{ item.text }}</li>
+			{% endfor %}
+		</ul>
+	{% endif %}
 {% endmacro %}
