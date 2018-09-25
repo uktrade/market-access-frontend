@@ -27,6 +27,29 @@ function getHawkHeader( requestOptions ){
 	} );
 }
 
+function parseBody( uri, isJson, body ){
+
+	if( isJson ){
+
+		try {
+
+			body = JSON.parse( body );
+
+		} catch( e ){
+
+			reporter.captureException( e, { uri } );
+			logger.error( `Invalid JSON response for ${ uri }` );
+		}
+	}
+
+	if( config.isDebug ){
+
+		logger.debug( 'Response body: ' + ( isJson ? JSON.stringify( body, null, 2 ) : body ) );
+	}
+
+	return body;
+}
+
 function makeRequest( method, path, opts = {} ){
 
 	if( !path ){
@@ -81,7 +104,7 @@ function makeRequest( method, path, opts = {} ){
 			}
 		}
 
-		request( requestOptions, ( err, response, body ) => {
+		request( requestOptions, ( err, response, responseBody ) => {
 
 			if( err ){
 
@@ -90,17 +113,35 @@ function makeRequest( method, path, opts = {} ){
 			} else {
 
 				const statusCode = response.statusCode;
+				const isJson = ( response.headers[ 'content-type' ] === 'application/json' );
+
 				logger.verbose( `Response code: ${ response.statusCode } for ${ uri }` );
 
-				if( config.isDev ){
+				if( config.isDebug ){
+
 					logger.debug( 'Response headers: ' + JSON.stringify( response.headers, null, 2 ) );
 				}
 
 				if( clientHeader ){
 
-					// Authenticate the server's response
-					// must use raw response body here
-					const isValid = hawk.client.authenticate( response, credentials, clientHeader.artifacts, { payload: body } );
+					let isValid = false;
+
+					try {
+
+						// Authenticate the server's response
+						// must use raw response body here
+						isValid = hawk.client.authenticate( response, credentials, clientHeader.artifacts, { payload: responseBody } );
+
+					} catch ( e ){
+
+						const err = new Error( 'Unable to validate response' );
+						err.rootError = e;
+
+						logger.error( err );
+						parseBody( uri, isJson, responseBody );
+
+						return reject( err );
+					}
 
 					logger.verbose( `Response isValid:` + !!isValid );
 
@@ -110,24 +151,9 @@ function makeRequest( method, path, opts = {} ){
 					}
 				}
 
+				const body = parseBody( uri, isJson, responseBody );
+
 				response.isSuccess = ( statusCode >= 200 && statusCode <= 300 );
-
-				if( response.headers[ 'content-type' ] === 'application/json' ){
-
-					try {
-
-						body = JSON.parse( body );
-
-					} catch( e ){
-
-						reporter.captureException( e, { uri } );
-						logger.error( `Invalid JSON response for ${ uri }` );
-					}
-				}
-
-				if( config.isDev ){
-					logger.debug( 'Response body: ' + JSON.stringify( body, null, 2 ) );
-				}
 
 				if( response.isSuccess || statusCode === 404 || statusCode === 400 ){
 

@@ -50,13 +50,15 @@ const cpus = ( os.cpus().length || 1 );
 const isDev = ( ( process.env.NODE_ENV || 'development' ) === 'development' );
 const isCi = bool( 'CI', false );
 const vcapRedisUrl = vcap.parseRedis( env( 'VCAP_SERVICES' ) );
+const logLevel = env( 'LOG_LEVEL', 'warn' );
 
 let config = {
 	isDev,
 	isCi,
+	logLevel,
+	isDebug: ( logLevel === 'debug' ),
 	showErrors: isDev,
 	version: env( 'npm_package_version', 'unknown' ),
-	logLevel: env( 'LOG_LEVEL', 'warn' ),
 	sentryDsn: env( 'SENTRY_DSN' ),
 	analyticsId: env( 'ANALYTICS_ID' ),
 	feedbackEmail: requiredEnv( 'FEEDBACK_EMAIL' ),
