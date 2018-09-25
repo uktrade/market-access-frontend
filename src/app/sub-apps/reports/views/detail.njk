@@ -20,7 +20,7 @@
 			{{ callout( {
 				state: 'success',
 				heading: { text: 'All tasks completed for' },
-				text: report.company_name,
+				text: calloutText,
 				button: {
 					action: urls.reports.submit( report.id ),
 					csrfToken: csrfToken,
@@ -33,7 +33,7 @@
 			{{ callout( {
 				state: 'warn',
 				heading: { text: 'Unfinished report for' },
-				text: report.company_name,
+				text: calloutText,
 				button: {
 					href: tasks.next.href,
 					text: 'Continue'
@@ -45,18 +45,18 @@
 		<dl class="report-summary">
 			<div class="report-summary__group">
 				<dt class="report-summary__key">
-					Report started by
-				</dt>
-				<dd class="report-summary__value">
-					{{ report.created_by or '---' }}
-				</dd>
-			</div>
-			<div class="report-summary__group">
-				<dt class="report-summary__key">
 					Report started
 				</dt>
 				<dd class="report-summary__value">
 					{{ report.created_on | dateWithTime }}
+				</dd>
+			</div>
+			<div class="report-summary__group">
+				<dt class="report-summary__key">
+					Report started by
+				</dt>
+				<dd class="report-summary__value">
+					{{ report.created_by or '---' }}
 				</dd>
 			</div>
 		</dl>

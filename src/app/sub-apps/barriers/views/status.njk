@@ -106,10 +106,10 @@
 					classes: 'govuk-fieldset__legend--s'
 				}
 			},
-			items: status | addConditionalRadioHtml( {
-				'resolve': { html: isResolvedHtml },
-				'hibernate': { html: isHibernateHtml },
-				'open': { html: isOpenHtml }
+			items: status | addToRadio( {
+				'resolve': { conditional: { html: isResolvedHtml } },
+				'hibernate': { conditional: { html: isHibernateHtml } },
+				'open': { conditional: { html: isOpenHtml } }
 			} ),
 			errorMessage: errors | errorForName( 'status-1' )
 			} )

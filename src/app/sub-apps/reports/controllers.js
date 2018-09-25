@@ -410,7 +410,7 @@ module.exports = {
 
 			if( response.isSuccess ){
 
-				res.redirect( urls.reports.success() );
+				res.redirect( urls.reports.success( reportId ) );
 
 			} else {
 
@@ -423,5 +423,5 @@ module.exports = {
 		}
 	},
 
-	success: ( req, res ) => res.render( 'reports/views/success' )
+	success: ( req, res ) => res.render( 'reports/views/success', { uuid: req.uuid } )
 };

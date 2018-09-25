@@ -893,9 +893,13 @@ describe( 'Report controller', () => {
 	describe( 'success', () => {
 		it( 'Should render the success page', () => {
 
+			const id = uuid();
+
+			req.uuid = id;
+
 			controller.success( req, res );
 
-			expect( res.render ).toHaveBeenCalledWith( 'reports/views/success' );
+			expect( res.render ).toHaveBeenCalledWith( 'reports/views/success', { uuid: id } );
 		} );
 	} );
 } );

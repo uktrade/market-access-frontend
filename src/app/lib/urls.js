@@ -32,7 +32,7 @@ const reportUrl = {
 	removeSector: ( reportId ) => `/reports/${ reportId }/sectors/remove/`,
 	aboutProblem: ( reportId ) => `/reports/${ reportId }/problem/`,
 	submit: ( reportId ) => `/reports/${ reportId }/submit/`,
-	success: () => `/reports/new/success/`
+	success: ( reportId ) => `/reports/${ reportId }/success/`
 };
 
 module.exports = {

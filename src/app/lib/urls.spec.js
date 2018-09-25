@@ -187,15 +187,9 @@ describe( 'URLs', () => {
 					[ 'addSector', 'sectors/add' ],
 					[ 'removeSector', 'sectors/remove' ],
 					[ 'aboutProblem', 'problem' ],
-					[ 'submit', 'submit' ]
+					[ 'submit', 'submit' ],
+					[ 'success', 'success' ]
 				] );
-			} );
-		} );
-
-		describe( 'success', () => {
-			it( 'Should return the correct path', () => {
-
-				expect( urls.reports.success() ).toEqual( '/reports/new/success/' );
 			} );
 		} );
 	} );
