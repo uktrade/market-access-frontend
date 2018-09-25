@@ -18,6 +18,7 @@
 		"problem_description",
 		"current_status",
 		"reported_on",
+		"reported_by",
 		"export_country",
 		"has_legal_infringement",
 		"wto_infringement",
@@ -74,6 +75,10 @@
 		},
 
 		"reported_on": { "$ref": "$refs/common.json#/past-date" },
+		"reported_by": {
+			"type": "string",
+			"faker": "name.findName"
+		},
 		"export_country": { "$ref": "$refs/common.json#/uuid" },
 
 		"has_legal_infringement": {

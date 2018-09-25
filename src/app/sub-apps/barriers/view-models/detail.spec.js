@@ -30,7 +30,12 @@ describe( 'Barrier detail view model', () => {
 				'2': 'Problem status two'
 			},
 			getCountry: jasmine.createSpy( 'metadata.getCountry' ),
-			getSector: jasmine.createSpy( 'metadata.getSector' )
+			getSector: jasmine.createSpy( 'metadata.getSector' ),
+			barrierAwareness: {
+				'COMPANY': 'company',
+				'TRADE': 'trade',
+				'OTHER': 'other'
+			}
 		};
 
 		metadata.getCountry.and.callFake( () => metadata.countries[ 3 ] );
@@ -53,13 +58,20 @@ describe( 'Barrier detail view model', () => {
 
 			expect( outpuBarrier.id ).toEqual( inputBarrier.id );
 			expect( outpuBarrier.title ).toEqual( inputBarrier.barrier_title );
+			expect( outpuBarrier.product ).toEqual( inputBarrier.product );
 			expect( outpuBarrier.problem.status ).toEqual( metadata.statusTypes[ inputBarrier.problem_status ] );
 			expect( outpuBarrier.problem.description ).toEqual( inputBarrier.problem_description );
 			expect( outpuBarrier.type ).toEqual( inputBarrier.barrier_type );
 			expect( outpuBarrier.status ).toEqual( { name: 'Open', modifyer: 'assessment' } );
 			expect( outpuBarrier.reportedOn ).toEqual( inputBarrier.reported_on );
+			expect( outpuBarrier.reportedBy ).toEqual( inputBarrier.reported_by );
 			expect( outpuBarrier.country ).toEqual( metadata.getCountry( inputBarrier.export_country ) );
 			expect( outpuBarrier.sectors ).toEqual( barrierSectors );
+			expect( outpuBarrier.source ).toEqual( {
+				id: inputBarrier.source,
+				name: metadata.barrierAwareness[ inputBarrier.source ],
+				description: inputBarrier.other_source
+			} );
 			expect( outpuBarrier.legal ).toEqual( {
 				hasInfringements: ( inputBarrier.has_legal_infringement == '1' ),
 				unknownInfringements: ( inputBarrier.has_legal_infringement == '3' ),
