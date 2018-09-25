@@ -89,6 +89,10 @@ aliases:
       HAWK_KEY: 'abc123def456'
       RESOURCE_SERVER_INTROSPECTION_URL: 'http://localhost:5000/o/introspect/'
       RESOURCE_SERVER_AUTH_TOKEN: abc123
+      AUTHBROKER_URL: abc123
+      AUTHBROKER_CLIENT_ID: def123
+      AUTHBROKER_CLIENT_SECRET: ghi123
+      ALLOWED_ADMIN_IPS: 123.123.123.123
     command: ./start-wait-for-db.sh
 
 jobs:
