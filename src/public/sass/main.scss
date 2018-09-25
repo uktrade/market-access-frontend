@@ -42,6 +42,8 @@ $govuk-images-path: "/govuk-public/images/";
 @import 'layout';
 @import 'error';
 
+@import 'app-objects/headings';
+
 @import 'app-components/dash-button';
 @import 'app-components/task-list';
 @import 'app-components/details-list';

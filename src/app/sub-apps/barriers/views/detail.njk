@@ -12,6 +12,14 @@
 		},
 		items: [
 			{
+				title: 'Company or organisation affected',
+				text: '',
+				add: {
+					text: 'Add one or several companies/organisations',
+					href: '#'
+				}
+			},
+			{
 				title: ( 'Sector' + ( 's' if barrier.sectors.length !== 1 ) + ' affected' ),
 				items: sectorsList,
 				add: {
@@ -30,8 +38,17 @@
 					href: urls.barriers.type.category( barrier.id )
 				}
 			},{
-				title: 'Summary of barrier',
+				title: 'Product/service being exported',
+				text: barrier.product
+			},{
+				title: 'Description of problem',
 				text: barrier.problem.description
+			},{
+				title: 'Awareness of the problem',
+				html: barrier.source.name + ( ( '<br>' + barrier.source.description ) if barrier.source.description )
+			},{
+				title: 'Initial report made by',
+				text: barrier.reportedBy
 			}
 		]
 	} ) }}

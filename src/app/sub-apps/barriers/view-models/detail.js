@@ -15,6 +15,7 @@ module.exports = ( barrier ) => {
 		barrier: {
 			id: barrier.id,
 			title: barrier.barrier_title,
+			product: barrier.product,
 			problem: {
 				status: metadata.statusTypes[ barrier.problem_status ],
 				description: barrier.problem_description
@@ -22,8 +23,14 @@ module.exports = ( barrier ) => {
 			type: barrier.barrier_type,
 			status: barrierStatus[ barrierStatusCode ],
 			reportedOn: barrier.reported_on,
+			reportedBy: barrier.reported_by,
 			country: metadata.getCountry( barrier.export_country ),
 			sectors,
+			source: {
+				id: barrier.source,
+				name: metadata.barrierAwareness[ barrier.source ],
+				description: barrier.other_source
+			},
 			legal: {
 				hasInfringements: ( barrier.has_legal_infringement == '1' ),
 				unknownInfringements: ( barrier.has_legal_infringement == '3' ),
