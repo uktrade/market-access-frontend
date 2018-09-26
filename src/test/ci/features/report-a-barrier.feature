@@ -13,9 +13,9 @@ Feature: Report a barrier
 	Scenario: Navigate to start
 		Given I'm on the report a barrier page
 		When I navigate to the start page
-		Then the title should be Market Access - Report - Status of the problem
+		Then the title should be Market Access - Report - Status of the barrier
 		And the page should not have any accessibility violations
-		And the main heading should be Report a barrier Status of the problem
+		And the main heading should be Report a barrier Status of the barrier
 
 	Scenario: Start a report
 		Given I'm on the start a report page
