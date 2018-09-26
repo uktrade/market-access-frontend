@@ -3,14 +3,14 @@
 
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Report - List of sectors affected{% endblock %}
+{% block page_title %}{{ super() }} - Report - Choose sector affected by the barrier{% endblock %}
 
 {% block page_content %}
 
 	{{ heading({
 		back: { href: urls.reports.country( report.id ) },
 		caption: 'Report a barrier',
-		text: 'Sector(s) affected by the barrier',
+		text: 'Sectors affected by the barrier',
 		errors: errors
 	}) }}
 

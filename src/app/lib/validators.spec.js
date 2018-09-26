@@ -239,4 +239,59 @@ describe( 'validators', () => {
 			} );
 		} );
 	} );
+
+	describe( 'isDateNumeric', () => {
+		describe( 'When there is only a year and month', () => {
+			describe( 'When both month and year are numbers', () => {
+				it( 'Should return true', () => {
+
+					expect( validators.isDateNumeric( { year: '2000', month: '10' } ) ).toEqual( true );
+				} );
+			} );
+
+			describe( 'When month is a number but year is not', () => {
+				it( 'Should return false', () => {
+
+					expect( validators.isDateNumeric( { year: 'abc', month: '10' } ) ).toEqual( false );
+				} );
+			} );
+
+			describe( 'When year is a number but month is not', () => {
+				it( 'Should return false', () => {
+
+					expect( validators.isDateNumeric( { year: '2000', month: 'abc' } ) ).toEqual( false );
+				} );
+			} );
+		} );
+
+		describe( 'When there is a year, month and day', () => {
+			describe( 'When all are numbers', () => {
+				it( 'Should return true', () => {
+
+					expect( validators.isDateNumeric( { year: '2000', month: '10', day: '01' } ) ).toEqual( true );
+				} );
+			} );
+
+			describe( 'When day and month are numbers but year is not', () => {
+				it( 'Should return false', () => {
+
+					expect( validators.isDateNumeric( { year: 'abc', month: '10', day: '01' } ) ).toEqual( false );
+				} );
+			} );
+
+			describe( 'When year and day are numbers but month is not', () => {
+				it( 'Should return false', () => {
+
+					expect( validators.isDateNumeric( { year: '2000', month: 'abc', day: '01' } ) ).toEqual( false );
+				} );
+			} );
+
+			describe( 'When year and month are numbers but day is not', () => {
+				it( 'Should return false', () => {
+
+					expect( validators.isDateNumeric( { year: '2000', month: '10', day: 'abc' } ) ).toEqual( false );
+				} );
+			} );
+		} );
+	} );
 } );

@@ -56,10 +56,12 @@ $govuk-images-path: "/govuk-public/images/";
 @import 'app-components/side-nav';
 @import 'app-components/summary-group';
 @import 'app-components/event-list';
+@import 'app-components/checkmark';
 
 @import 'pages/index';
 @import 'pages/report/detail';
 @import 'pages/report/sectors';
+@import 'pages/barrier/detail';
 
 .error-message {
 	@include govuk-font( 24 );

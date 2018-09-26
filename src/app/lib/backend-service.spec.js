@@ -111,7 +111,7 @@ describe( 'Backend Service', () => {
 
 				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/resolve`, token, {
 					status_date: [ year, month, day ].join( '-' ) + 'T00:00',
-					summary: resolvedSummary
+					status_summary: resolvedSummary
 				} );
 			} );
 		} );
@@ -119,14 +119,14 @@ describe( 'Backend Service', () => {
 		describe( 'open', () => {
 			it( 'Should PUT to the correct path with the correct values', async () => {
 
-				const openSummary = 'my summary text';
+				const reopenSummary = 'my summary text';
 
 				await service.barriers.open( req, barrierId, {
-					openSummary
+					reopenSummary
 				} );
 
 				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/open`, token, {
-					summary: openSummary
+					status_summary: reopenSummary
 				} );
 			} );
 		} );
@@ -141,7 +141,7 @@ describe( 'Backend Service', () => {
 				} );
 
 				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/hibernate`, token, {
-					summary: hibernationSummary
+					status_summary: hibernationSummary
 				} );
 			} );
 		} );
@@ -242,20 +242,41 @@ describe( 'Backend Service', () => {
 					country = uuid();
 				} );
 
-				it( 'Should POST to the correct path with the values and sector as null', () => {
+				describe( 'When isResolved is true', () => {
+					it( 'Should POST to the correct path with the values and sector as null', () => {
 
-					service.reports.save( req, {
-						status,
-						isResolved,
-						resolvedDate,
-						country
+						service.reports.save( req, {
+							status,
+							isResolved,
+							resolvedDate,
+							country
+						} );
+
+						expect( backend.post ).toHaveBeenCalledWith( '/reports', token, {
+							problem_status: status,
+							is_resolved: isResolved,
+							resolved_date: '2018-02-01',
+							export_country: country
+						} );
 					} );
+				} );
 
-					expect( backend.post ).toHaveBeenCalledWith( '/reports', token, {
-						problem_status: status,
-						is_resolved: isResolved,
-						resolved_date: '2018-02-01',
-						export_country: country
+				describe( 'When isResolved is false', () => {
+					it( 'Should POST to the correct path with the values and sector as null', () => {
+
+						service.reports.save( req, {
+							status,
+							isResolved: false,
+							resolvedDate,
+							country
+						} );
+
+						expect( backend.post ).toHaveBeenCalledWith( '/reports', token, {
+							problem_status: status,
+							is_resolved: false,
+							resolved_date: '2018-02-01',
+							export_country: country
+						} );
 					} );
 				} );
 			} );
@@ -375,19 +396,22 @@ describe( 'Backend Service', () => {
 				const barrierTitle = 'c';
 				const barrierAwareness = 'd';
 				const barrierAwarenessOther = 'e';
+				const resolvedDescription = 'f';
 
 				checkWithAndWithoutValues( 'saveProblem', {
 					item,
 					description,
 					barrierTitle,
 					barrierAwareness,
-					barrierAwarenessOther
+					barrierAwarenessOther,
+					resolvedDescription
 				}, {
 					product: item,
 					problem_description: description,
 					barrier_title: barrierTitle,
 					source: barrierAwareness,
-					other_source: barrierAwarenessOther
+					other_source: barrierAwarenessOther,
+					status_summary: resolvedDescription
 				} );
 			} );
 		} );

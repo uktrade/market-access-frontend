@@ -78,7 +78,8 @@ describe( 'Report controller', () => {
 				saveNextSteps: jasmine.createSpy( 'backend.reports.saveNextSteps' ),
 				submit: jasmine.createSpy( 'backend.reports.submit' ),
 				getAll: jasmine.createSpy( 'backend.reports.getAll' ),
-				getAllUnfinished: jasmine.createSpy( 'backend.reports.getAllUnfinished' )
+				getAllUnfinished: jasmine.createSpy( 'backend.reports.getAllUnfinished' ),
+				saveHasSectors: jasmine.createSpy( 'backend.reports.saveHasSectors' )
 			}
 		};
 		datahub = {
@@ -93,7 +94,8 @@ describe( 'Report controller', () => {
 				sectors: jasmine.createSpy( 'urls.reports.sectors' ),
 				hasSectors: jasmine.createSpy( 'urls.reports.hasSectors' ),
 				detail: jasmine.createSpy( 'urls.reports.detail' ),
-				success: jasmine.createSpy( 'urls.reports.success' )
+				success: jasmine.createSpy( 'urls.reports.success' ),
+				addSector: jasmine.createSpy( 'urls.reports.addSector' )
 			}
 		};
 
@@ -116,7 +118,8 @@ describe( 'Report controller', () => {
 			isBarrierType: jasmine.createSpy( 'validators.isBarrierType' ),
 			isDateValue: jasmine.createSpy( 'validators.isDateValue' ),
 			isDateValid: jasmine.createSpy( 'validators.isDateValid' ),
-			isDateInPast: jasmine.createSpy( 'validators.isDateInPast' )
+			isDateInPast: jasmine.createSpy( 'validators.isDateInPast' ),
+			isDateNumeric: jasmine.createSpy( 'validators.isDateNumeric' )
 		};
 
 		controller = proxyquire( modulePath, {
@@ -373,11 +376,12 @@ describe( 'Report controller', () => {
 			expect( config.resolvedDate.type ).toEqual( Form.GROUP );
 			expect( config.resolvedDate.conditional ).toEqual( { name: 'isResolved', value: 'true' } );
 			expect( config.resolvedDate.errorField ).toEqual( 'resolved_date' );
-			expect( config.resolvedDate.validators.length ).toEqual( 4 );
+			expect( config.resolvedDate.validators.length ).toEqual( 5 );
 			expect( config.resolvedDate.validators[ 0 ].fn ).toEqual( monthResponse );
 			expect( config.resolvedDate.validators[ 1 ].fn ).toEqual( yearResponse );
-			expect( config.resolvedDate.validators[ 2 ].fn ).toEqual( validators.isDateValid );
-			expect( config.resolvedDate.validators[ 3 ].fn ).toEqual( validators.isDateInPast );
+			expect( config.resolvedDate.validators[ 2 ].fn ).toEqual( validators.isDateNumeric );
+			expect( config.resolvedDate.validators[ 3 ].fn ).toEqual( validators.isDateValid );
+			expect( config.resolvedDate.validators[ 4 ].fn ).toEqual( validators.isDateInPast );
 			expect( config.resolvedDate.items ).toEqual( {
 				month: {
 					values: [ '02' ]
@@ -515,13 +519,13 @@ describe( 'Report controller', () => {
 						report = {
 							id: 1,
 							problem_status: { a: 1 },
-							is_resolved: { b: 2 },
+							is_resolved: false,
 							resolved_date: { c: 3 }
 						};
 
 						saveValues = Object.assign( {}, {
 							status: report.problem_status,
-							isResolved: report.is_resolved,
+							isResolved: false,
 							resolvedDate: report.resolved_date
 						}, getValuesResponse );
 
@@ -640,6 +644,239 @@ describe( 'Report controller', () => {
 		} );
 	} );
 
+	describe( 'hasSectors', () => {
+
+		let report;
+
+		beforeEach( () => {
+
+			report = {
+				id: uuid(),
+				sectors: null,
+				sectors_affected: true
+			};
+			req.report = report;
+		} );
+
+		describe( 'Form config', () => {
+
+			let boolResponse;
+
+			beforeEach( () => {
+
+				boolResponse = { 'boolResponse': 'yes' };
+
+				validators.isMetadata.and.callFake( ( key ) => {
+
+					if( key === 'bool' ){ return boolResponse; }
+				} );
+			} );
+
+			it( 'Should setup the form correctly', async () => {
+
+				govukItemsFromObjResponse = [
+					{
+						value: 'true',
+						text: 'yes'
+					},{
+						value: 'false',
+						text: 'No'
+					}
+				];
+
+				await controller.hasSectors( req, res, next );
+
+				const args = Form.calls.argsFor( 0 );
+				const config = args[ 1 ];
+
+				expect( Form ).toHaveBeenCalled();
+				expect( args[ 0 ] ).toEqual( req );
+
+				expect( config.hasSectors ).toBeDefined();
+				expect( config.hasSectors.type ).toEqual( Form.RADIO );
+				expect( config.hasSectors.values ).toEqual( [ report.sectors_affected ] );
+				expect( config.hasSectors.validators[ 0 ].fn ).toEqual( boolResponse );
+				expect( config.hasSectors.items ).toEqual( [
+					{
+						value: 'true',
+						text: 'yes'
+					},{
+						value: 'false',
+						text: 'No, I don\'t know at the moment'
+					}
+				] );
+			} );
+		} );
+
+		describe( 'FormProcessor', () => {
+
+			let FormProcessor;
+			let processFn;
+			let args;
+
+			beforeEach( async () => {
+
+				FormProcessor = jasmine.createSpy( 'FormProcessor' );
+				processFn = jasmine.createSpy( 'FormProcessor.process' );
+
+				controller = proxyquire( modulePath, {
+					'../../lib/backend-service': backend,
+					'../../lib/urls': urls,
+					'../../lib/metadata': metadata,
+					'../../lib/Form': Form,
+					'../../lib/FormProcessor': FormProcessor,
+					'../../lib/validators': validators
+				} );
+
+				FormProcessor.and.callFake( () => ({
+					process: processFn
+				}) );
+
+				await controller.hasSectors( req, res, next );
+
+				args = FormProcessor.calls.argsFor( 0 )[ 0 ];
+			} );
+
+			it( 'Should setup the FormProcessor correctly', () => {
+
+				expect( args.form ).toEqual( form );
+				expect( typeof args.render ).toEqual( 'function' );
+				expect( typeof args.saveFormData ).toEqual( 'function' );
+				expect( typeof args.saved ).toEqual( 'function' );
+			} );
+
+			describe( 'render', () => {
+				it( 'Should render the template with the correct data', () => {
+
+					const template = 'reports/views/has-sectors';
+
+					args.render( getTemplateValuesResponse );
+
+					expect( res.render ).toHaveBeenCalledWith( template, getTemplateValuesResponse );
+				} );
+			} );
+
+			describe( 'safeFormData', () => {
+				it( 'Should call the correct method with the correct data', () => {
+
+					const myFormData = { a: true, b: false };
+
+					args.saveFormData( myFormData );
+
+					expect( backend.reports.saveHasSectors ).toHaveBeenCalledWith( req, report.id, myFormData );
+				} );
+			} );
+
+			describe( 'Saved', () => {
+				describe( 'When form.isExit is true', () => {
+					it( 'Should redirect to the correct URL', () => {
+
+						const detailResponse = '/a/path/detail';
+
+						urls.reports.detail.and.callFake( () => detailResponse );
+						form.isExit = true;
+
+						args.saved();
+
+						expect( urls.reports.detail ).toHaveBeenCalledWith( report.id  );
+						expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
+					} );
+				} );
+
+				describe( 'When hasSectors is true', () => {
+
+					beforeEach( () => {
+
+						getValuesResponse = { hasSectors: 'true' };
+					} );
+
+					describe( 'When there are sectors', () => {
+
+						afterEach( () => {
+
+
+							const sectorsResponse = '/sectors';
+
+							urls.reports.sectors.and.callFake( () => sectorsResponse );
+
+							args.saved();
+
+							expect( urls.reports.sectors ).toHaveBeenCalledWith( report.id );
+							expect( res.redirect ).toHaveBeenCalledWith( sectorsResponse );
+						} );
+
+						describe( 'When the sectors are in the report', () => {
+							it( 'Should call the correct url', () => {
+
+								report.sectors = [ uuid(), uuid() ];
+							} );
+						} );
+
+						describe( 'When the sectors are in the session', () => {
+							it( 'Should call the correct url', () => {
+
+								req.session.sectors = [ uuid(), uuid() ];
+							} );
+						} );
+					} );
+
+					describe( 'When there are NOT any sectors', () => {
+						it( 'Should redirect to the correct URL', () => {
+
+							const addSectorResponse = '/add/sector';
+
+							urls.reports.addSector.and.callFake( () => addSectorResponse );
+
+							args.saved();
+
+							expect( urls.reports.addSector ).toHaveBeenCalledWith( report.id );
+							expect( res.redirect ).toHaveBeenCalledWith( addSectorResponse );
+						} );
+					} );
+				} );
+
+				describe( 'When hasSectors is false', () => {
+					it( 'Should redirect to the correct URL', () => {
+
+						const aboutProblemResponse = '/about/sector';
+
+						urls.reports.aboutProblem.and.callFake( () => aboutProblemResponse );
+						getValuesResponse = { hasSectors: 'false' };
+
+						args.saved();
+
+						expect( urls.reports.aboutProblem ).toHaveBeenCalledWith( report.id );
+						expect( res.redirect ).toHaveBeenCalledWith( aboutProblemResponse );
+					} );
+				} );
+			} );
+
+			describe( 'Calling formProcessor.process', () => {
+				describe( 'When there are no errors', () => {
+					it( 'Should not call next', async () => {
+
+						await controller.hasSectors( req, res, next );
+
+						expect( next ).not.toHaveBeenCalledWith();
+					} );
+				} );
+
+				describe( 'When the formProcessor throws an error', () => {
+					it( 'Should call next with the error', async () => {
+
+						const err = new Error( 'Some random error' );
+
+						processFn.and.callFake( () => Promise.reject( err ) );
+
+						await controller.hasSectors( req, res, next );
+
+						expect( next ).toHaveBeenCalledWith( err );
+					} );
+				} );
+			} );
+		} );
+	} );
+
 	describe( 'aboutProblem', () => {
 
 		let report;
@@ -651,21 +888,17 @@ describe( 'Report controller', () => {
 				problem_description: 'a description',
 				barrier_title: 'barrier_title',
 				source: 'barrier_awareness',
-				other_source: 'barrier_awareness_other'
+				other_source: 'barrier_awareness_other',
+				resolution_summary: 'resolution_summary'
 			};
 			req.report = report;
 		} );
 
-		it( 'Should setup the form correctly', async () => {
+		describe( 'Form config', () => {
 
-			const barrierAwarenessResponse = { barrierAwarenessResponse: true };
+			let barrierAwarenessResponse;
 
-			validators.isMetadata.and.callFake( ( key ) => {
-
-				if( key === 'barrierAwareness' ){ return barrierAwarenessResponse; }
-			} );
-
-			function checkForm( args ){
+			function checkForm( args, isResolved ){
 
 				const config = args[ 1 ];
 
@@ -695,11 +928,44 @@ describe( 'Report controller', () => {
 				expect( config.barrierAwarenessOther ).toBeDefined();
 				expect( config.barrierAwarenessOther.conditional ).toEqual( { name: 'barrierAwareness', value: 'OTHER' } );
 				expect( config.barrierAwarenessOther.values ).toEqual( [ report.other_source ] );
+
+				if( isResolved ){
+
+					expect( config.resolvedDescription ).toBeDefined();
+					expect( config.resolvedDescription.values ).toEqual( [ report.status_summary ] );
+					expect( config.resolvedDescription.required ).toBeDefined();
+				}
 			}
 
-			await controller.aboutProblem( req, res, next );
+			beforeEach( () => {
 
-			checkForm( Form.calls.argsFor( 0 ) );
+				barrierAwarenessResponse = { barrierAwarenessResponse: true };
+
+				validators.isMetadata.and.callFake( ( key ) => {
+
+					if( key === 'barrierAwareness' ){ return barrierAwarenessResponse; }
+				} );
+			} );
+
+			describe( 'When the report is resolved', () => {
+				it( 'Should setup the form correctly', async () => {
+
+					req.report.is_resolved = true;
+
+					await controller.aboutProblem( req, res, next );
+
+					checkForm( Form.calls.argsFor( 0 ), true );
+				} );
+			} );
+
+			describe( 'When the report is NOT resolved', () => {
+				it( 'Should setup the form correctly', async () => {
+
+					await controller.aboutProblem( req, res, next );
+
+					checkForm( Form.calls.argsFor( 0 ) );
+				} );
+			} );
 		} );
 
 		describe( 'FormProcessor', () => {
@@ -726,6 +992,8 @@ describe( 'Report controller', () => {
 					process: processFn
 				}) );
 
+				req.report.is_resolved = true;
+
 				await controller.aboutProblem( req, res, next );
 
 				args = FormProcessor.calls.argsFor( 0 )[ 0 ];
@@ -748,7 +1016,7 @@ describe( 'Report controller', () => {
 
 						const myValues = { some: 'data' };
 						const sectorsResponse = 'sectors';
-						const renderValues = Object.assign( {}, myValues, { backHref: sectorsResponse } );
+						const renderValues = Object.assign( {}, myValues, { backHref: sectorsResponse, isResolved: true } );
 
 						urls.reports.sectors.and.callFake( () => sectorsResponse );
 						report.sectors_affected = true;
@@ -764,7 +1032,7 @@ describe( 'Report controller', () => {
 
 						const myValues = { some: 'data' };
 						const hasSectorsResponse = 'hasSectors';
-						const renderValues = Object.assign( {}, myValues, { backHref: hasSectorsResponse } );
+						const renderValues = Object.assign( {}, myValues, { backHref: hasSectorsResponse, isResolved: true } );
 
 						urls.reports.hasSectors.and.callFake( () => hasSectorsResponse );
 
@@ -893,9 +1161,13 @@ describe( 'Report controller', () => {
 	describe( 'success', () => {
 		it( 'Should render the success page', () => {
 
+			const id = uuid();
+
+			req.uuid = id;
+
 			controller.success( req, res );
 
-			expect( res.render ).toHaveBeenCalledWith( 'reports/views/success' );
+			expect( res.render ).toHaveBeenCalledWith( 'reports/views/success', { uuid: id } );
 		} );
 	} );
 } );

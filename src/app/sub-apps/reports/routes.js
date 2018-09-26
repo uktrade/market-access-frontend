@@ -4,6 +4,7 @@ const headerNav = require( '../../middleware/header-nav' );
 
 const controller = require( './controllers' );
 
+const uuidParam = require( '../../middleware/params/uuid' );
 const reportId = require( './middleware/params/report-id' );
 
 const hasStartFormValues = require( './middleware/has-start-form-values' );
@@ -15,13 +16,14 @@ module.exports = ( express, app ) => {
 
 	const parseBody = express.urlencoded( { extended: false } );
 
+	app.param( 'uuid', uuidParam );
 	app.param( 'reportId', reportId );
 
 	app.use( parseBody, csrfProtection );
 
 	app.get( '/', headerNav( { isDashboard: true } ), controller.index ),
 	app.get( '/new/', controller.new );
-	app.get( '/new/success/', controller.success );
+	app.get( '/:uuid/success/', controller.success );
 
 	app.get( '/:reportId?/start/', controller.start );
 	app.post( '/:reportId?/start/', controller.start );

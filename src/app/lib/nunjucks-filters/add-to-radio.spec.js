@@ -1,8 +1,8 @@
-const addConditionalRadioHtml = require( './add-conditional-radio-html' );
+const addToRadio = require( './add-to-radio' );
 
-describe( 'addConditionalRadioHtml', () => {
+describe( 'addToRadio', () => {
 	describe( 'When the data item matches', () => {
-		it( 'Should add an id and conditional property', () => {
+		it( 'Should add an id and any other properties', () => {
 
 			const radio1Html = '<foo>';
 			const radio2Html = '<bar>';
@@ -18,30 +18,33 @@ describe( 'addConditionalRadioHtml', () => {
 				}
 			];
 
+			const hint = { text: 'my hint text' };
+
 			const data = {
-				'1': { html: radio1Html },
-				'2': { id: 'my-item-2', html: radio2Html },
-				'3': { html: radio3Html }
+				'1': { conditional: { html: radio1Html } },
+				'2': { id: 'my-item-2', conditional: { html: radio2Html } },
+				'3': { conditional: { html: radio3Html }, hint }
 			};
 
-			const output = addConditionalRadioHtml( input, data );
+			const output = addToRadio( input, data );
 
 			expect( output[ 0 ] ).toEqual( {
-				id: input[ 0 ].id,
+				id: 'my-item',
 				value: input[ 0 ].value,
 				conditional: { html: radio1Html }
 			} );
 
 			expect( output[ 1 ] ).toEqual( {
-				id: data[ '2' ].id,
+				id: 'my-item-2',
 				value: input[ 1 ].value,
 				conditional: { html: radio2Html }
 			} );
 
 			expect( output[ 2 ] ).toEqual( {
-				id: input[ 2 ].value,
+				id: '3',
 				value: input[ 2 ].value,
-				conditional: { html: radio3Html }
+				conditional: { html: radio3Html },
+				hint
 			} );
 		} );
 	} );

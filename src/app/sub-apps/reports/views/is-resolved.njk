@@ -4,7 +4,7 @@
 
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Report - Status of the problem{% endblock %}
+{% block page_title %}{{ super() }} - Report - Status of the barrier{% endblock %}
 
 {% block body_script %}
 	<script>
@@ -17,7 +17,7 @@
 	{{ heading({
 		back: { href: urls.reports.start( report.id ) },
 		caption: 'Report a barrier',
-		text: 'Status of the problem',
+		text: 'Status of the barrier',
 		errors: errors
 	}) }}
 
@@ -30,7 +30,7 @@
 				id: 'resolved-date',
 				fieldset: {
 					legend: {
-						text: 'When was the barrier resolved',
+						text: 'When was the barrier resolved?',
 						classes: 'govuk-fieldset__legend--s'
 					}
 				},
@@ -59,8 +59,11 @@
 					classes: 'govuk-fieldset__legend--s'
 				}
 			},
-			items: isResolved | addConditionalRadioHtml( {
-				'true': { html: isResolvedHtml }
+			items: isResolved | addToRadio( {
+				'true': {
+					conditional: { html: isResolvedHtml },
+					hint: { text: 'Please continue to give us information, even if the barrier is resolved.' }
+				}
 			} ),
 			errorMessage: errors | errorForName( 'is-resolved-1' )
 			} )

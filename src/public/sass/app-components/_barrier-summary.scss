@@ -10,6 +10,7 @@
 	@include govuk-font( $size: 27, $weight: bold );
 	float: left;
 	width: 100%;
+	margin-top: 0;
 	margin-bottom: govuk-em( 15, 27 );
 
 	@include mq( $from: tablet ){

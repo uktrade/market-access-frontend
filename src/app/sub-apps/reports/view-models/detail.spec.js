@@ -52,15 +52,24 @@ const reportTaskList = [
 	}
 ];
 
+const statusTypes = {
+	'1': 'One',
+	'2': 'Two'
+};
+
 describe( 'Report detail view model', () => {
 
 	let viewModel;
 	let urls;
 	let csrfToken;
+	let getCountry;
+	let country;
 
 	beforeEach( () => {
 
 		csrfToken = uuid();
+		country = { name: 'a country', id: '1' };
+		getCountry = jasmine.createSpy( 'metadata.getCountry' ).and.callFake( () => country );
 
 		urls = {
 			reportStage: jasmine.createSpy( 'urls.reportStage' )
@@ -68,7 +77,7 @@ describe( 'Report detail view model', () => {
 
 		viewModel = proxyquire( modulePath, {
 			'../../../lib/urls': urls,
-			'../../../lib/metadata': { reportTaskList }
+			'../../../lib/metadata': { reportTaskList, statusTypes, getCountry }
 		} );
 	} );
 
@@ -79,6 +88,8 @@ describe( 'Report detail view model', () => {
 
 				const report = {
 					id: 1,
+					export_country: 'abc',
+					problem_status: '2',
 					progress: [
 						{
 							"stage_code": "1.1",
@@ -189,6 +200,7 @@ describe( 'Report detail view model', () => {
 
 				expect( output.csrfToken ).toEqual( csrfToken );
 				expect( output.tasks ).toEqual( expectedOutput );
+				expect( output.calloutText ).toEqual( `${ statusTypes[ '2' ] } in ${ country.name }` );
 			} );
 		} );
 

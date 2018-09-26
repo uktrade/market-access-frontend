@@ -17,9 +17,18 @@ describe( 'Date only filter', function(){
 		} );
 
 		describe( 'With a UTC timestamp', function(){
-			it( 'Should return the correct date', function(){
+			describe( 'With no params', () => {
+				it( 'Should return the correct date', function(){
 
-				expect( dateOnly( 1491004799 * 1000 ) ).toEqual( '31 March 2017' );
+					expect( dateOnly( 1491004799 * 1000 ) ).toEqual( '31 March 2017' );
+				} );
+			} );
+
+			describe( 'With day as false', () => {
+				it( 'Should return the correct date', function(){
+
+					expect( dateOnly( 1491004799 * 1000, { day: false } ) ).toEqual( 'March 2017' );
+				} );
 			} );
 		} );
 

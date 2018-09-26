@@ -62,7 +62,12 @@ describe( 'Barrier detail view model', () => {
 			expect( outpuBarrier.problem.status ).toEqual( metadata.statusTypes[ inputBarrier.problem_status ] );
 			expect( outpuBarrier.problem.description ).toEqual( inputBarrier.problem_description );
 			expect( outpuBarrier.type ).toEqual( inputBarrier.barrier_type );
-			expect( outpuBarrier.status ).toEqual( { name: 'Open', modifyer: 'assessment' } );
+			expect( outpuBarrier.status ).toEqual( {
+				name: 'Open',
+				modifyer: 'assessment',
+				date: inputBarrier.current_status.status_date,
+				description: inputBarrier.current_status.status_summary
+			} );
 			expect( outpuBarrier.reportedOn ).toEqual( inputBarrier.reported_on );
 			expect( outpuBarrier.reportedBy ).toEqual( inputBarrier.reported_by );
 			expect( outpuBarrier.country ).toEqual( metadata.getCountry( inputBarrier.export_country ) );
@@ -98,6 +103,10 @@ describe( 'Barrier detail view model', () => {
 
 			expect( outpuBarrier.sectors ).toEqual( [] );
 			expect( output.sectorsList ).toEqual( [] );
+
+			expect( outpuBarrier.isOpen ).toEqual( true );
+			expect( outpuBarrier.isResolved ).toEqual( false );
+			expect( outpuBarrier.isHibernated ).toEqual( false );
 		} );
 	} );
 
@@ -109,7 +118,16 @@ describe( 'Barrier detail view model', () => {
 			const output = viewModel( inputBarrier );
 			const outpuBarrier = output.barrier;
 
-			expect( outpuBarrier.status ).toEqual( { name: 'Resolved', modifyer: 'resolved' } );
+			expect( outpuBarrier.status ).toEqual( {
+				name: 'Resolved',
+				modifyer: 'resolved',
+				date: inputBarrier.current_status.status_date,
+				description: inputBarrier.current_status.status_summary
+			} );
+
+			expect( outpuBarrier.isOpen ).toEqual( false );
+			expect( outpuBarrier.isResolved ).toEqual( true );
+			expect( outpuBarrier.isHibernated ).toEqual( false );
 		} );
 	} );
 
@@ -121,7 +139,16 @@ describe( 'Barrier detail view model', () => {
 			const output = viewModel( inputBarrier );
 			const outpuBarrier = output.barrier;
 
-			expect( outpuBarrier.status ).toEqual( { name: 'Hibernated', modifyer: 'hibernated' } );
+			expect( outpuBarrier.status ).toEqual( {
+				name: 'Hibernated',
+				modifyer: 'hibernated',
+				date: inputBarrier.current_status.status_date,
+				description: inputBarrier.current_status.status_summary
+			} );
+
+			expect( outpuBarrier.isOpen ).toEqual( false );
+			expect( outpuBarrier.isResolved ).toEqual( false );
+			expect( outpuBarrier.isHibernated ).toEqual( true );
 		} );
 	} );
 } );

@@ -32,7 +32,7 @@ const reportUrl = {
 	removeSector: ( reportId ) => `/reports/${ reportId }/sectors/remove/`,
 	aboutProblem: ( reportId ) => `/reports/${ reportId }/problem/`,
 	submit: ( reportId ) => `/reports/${ reportId }/submit/`,
-	success: () => `/reports/new/success/`
+	success: ( reportId ) => `/reports/${ reportId }/success/`
 };
 
 module.exports = {
@@ -62,12 +62,10 @@ module.exports = {
 			case '1.1':
 				return reportUrl.start( report.id );
 			case '1.2':
-				return reportUrl.isResolved( report.id );
-			case '1.3':
 				return reportUrl.country( report.id );
-			case '1.4':
+			case '1.3':
 				return reportUrl.hasSectors( report.id );
-			case '1.5':
+			case '1.4':
 				return reportUrl.aboutProblem( report.id );
 			default:
 				return reportUrl.detail( report.id );

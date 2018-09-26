@@ -7,7 +7,9 @@ function getToken( req ){
 
 function getValue( value ){
 
-	return value || null;
+	const isBoolean = ( typeof value === 'boolean' );
+
+	return isBoolean ? value : ( value || null );
 }
 
 /*
@@ -108,14 +110,14 @@ module.exports = {
 
 			return backend.put( `/barriers/${ barrierId }/resolve`, getToken( req ), {
 				status_date: [ year, month, day ].join( '-' ) + 'T00:00',
-				summary: values.resolvedSummary
+				status_summary: values.resolvedSummary
 			} );
 		},
 		hibernate: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/hibernate`, getToken( req ), {
-			summary: values.hibernationSummary
+			status_summary: values.hibernationSummary
 		} ),
 		open: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/open`, getToken( req ), {
-			summary: values.openSummary
+			status_summary: values.reopenSummary
 		} ),
 		saveType: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }`, getToken( req ), {
 			barrier_type: getValue( values.barrierType )
@@ -148,7 +150,8 @@ module.exports = {
 			problem_description: getValue( values.description ),
 			barrier_title: getValue( values.barrierTitle ),
 			source: getValue( values.barrierAwareness ),
-			other_source: getValue( values.barrierAwarenessOther )
+			other_source: getValue( values.barrierAwarenessOther ),
+			status_summary: getValue( values.resolvedDescription )
 		} ),
 		submit: ( req, reportId ) => backend.put( `/reports/${ reportId }/submit`, getToken( req ) )
 	}
