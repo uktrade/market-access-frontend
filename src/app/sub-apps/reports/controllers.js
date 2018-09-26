@@ -226,7 +226,9 @@ module.exports = {
 		function getRedirectUrl(){
 
 			const { hasSectors } = form.getValues();
-			const urlMethod = ( hasSectors === 'true' ? 'addSector' : 'aboutProblem' );
+			const sectorsList = ( report.sectors || req.session.sectors );
+			const hasListOfSectors = ( Array.isArray( sectorsList ) && sectorsList.length > 0 );
+			const urlMethod = ( hasSectors === 'true' ? ( hasListOfSectors ? 'sectors' : 'addSector' ) : 'aboutProblem' );
 
 			return urls.reports[ urlMethod ]( report.id );
 		}
