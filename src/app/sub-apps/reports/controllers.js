@@ -379,7 +379,7 @@ module.exports = {
 		if( isResolved ){
 
 			formConfig.resolvedDescription = {
-				values: [ report.resolution_summary ],
+				values: [ report.status_summary ],
 				required: 'Enter an explanation of how you solved this barrier'
 			};
 		}

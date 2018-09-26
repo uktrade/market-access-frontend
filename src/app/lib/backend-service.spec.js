@@ -390,7 +390,7 @@ describe( 'Backend Service', () => {
 					barrier_title: barrierTitle,
 					source: barrierAwareness,
 					other_source: barrierAwarenessOther,
-					resolution_summary: resolvedDescription
+					status_summary: resolvedDescription
 				} );
 			} );
 		} );

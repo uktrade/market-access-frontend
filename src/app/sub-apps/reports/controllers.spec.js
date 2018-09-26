@@ -695,7 +695,7 @@ describe( 'Report controller', () => {
 				if( isResolved ){
 
 					expect( config.resolvedDescription ).toBeDefined();
-					expect( config.resolvedDescription.values ).toEqual( [ report.resolution_summary ] );
+					expect( config.resolvedDescription.values ).toEqual( [ report.status_summary ] );
 					expect( config.resolvedDescription.required ).toBeDefined();
 				}
 			}
