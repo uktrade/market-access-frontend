@@ -282,7 +282,7 @@ describe( 'Backend Request', () => {
 					const requestOptions = checkRequest( POST, path );
 					checkForMockResponse( responseData );
 					expect( hawk.client.header ).toHaveBeenCalledWith(
-						requestOptions.uri.replace( 'https', 'http' ),
+						requestOptions.uri,
 						requestOptions.method,
 						{
 							credentials: {
@@ -307,7 +307,7 @@ describe( 'Backend Request', () => {
 					const requestOptions = checkRequest( POST, path, { body } );
 					checkForMockResponse( responseData );
 					expect( hawk.client.header ).toHaveBeenCalledWith(
-						requestOptions.uri.replace( 'https', 'http' ),
+						requestOptions.uri,
 						requestOptions.method,
 						{
 							credentials: {
