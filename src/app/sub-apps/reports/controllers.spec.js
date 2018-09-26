@@ -517,13 +517,13 @@ describe( 'Report controller', () => {
 						report = {
 							id: 1,
 							problem_status: { a: 1 },
-							is_resolved: { b: 2 },
+							is_resolved: false,
 							resolved_date: { c: 3 }
 						};
 
 						saveValues = Object.assign( {}, {
 							status: report.problem_status,
-							isResolved: report.is_resolved,
+							isResolved: false,
 							resolvedDate: report.resolved_date
 						}, getValuesResponse );
 

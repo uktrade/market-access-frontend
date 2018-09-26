@@ -242,20 +242,41 @@ describe( 'Backend Service', () => {
 					country = uuid();
 				} );
 
-				it( 'Should POST to the correct path with the values and sector as null', () => {
+				describe( 'When isResolved is true', () => {
+					it( 'Should POST to the correct path with the values and sector as null', () => {
 
-					service.reports.save( req, {
-						status,
-						isResolved,
-						resolvedDate,
-						country
+						service.reports.save( req, {
+							status,
+							isResolved,
+							resolvedDate,
+							country
+						} );
+
+						expect( backend.post ).toHaveBeenCalledWith( '/reports', token, {
+							problem_status: status,
+							is_resolved: isResolved,
+							resolved_date: '2018-02-01',
+							export_country: country
+						} );
 					} );
+				} );
 
-					expect( backend.post ).toHaveBeenCalledWith( '/reports', token, {
-						problem_status: status,
-						is_resolved: isResolved,
-						resolved_date: '2018-02-01',
-						export_country: country
+				describe( 'When isResolved is false', () => {
+					it( 'Should POST to the correct path with the values and sector as null', () => {
+
+						service.reports.save( req, {
+							status,
+							isResolved: false,
+							resolvedDate,
+							country
+						} );
+
+						expect( backend.post ).toHaveBeenCalledWith( '/reports', token, {
+							problem_status: status,
+							is_resolved: false,
+							resolved_date: '2018-02-01',
+							export_country: country
+						} );
 					} );
 				} );
 			} );

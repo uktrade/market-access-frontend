@@ -7,7 +7,9 @@ function getToken( req ){
 
 function getValue( value ){
 
-	return value || null;
+	const isBoolean = ( typeof value === 'boolean' );
+
+	return isBoolean ? value : ( value || null );
 }
 
 /*
