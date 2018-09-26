@@ -1,19 +1,30 @@
 const metadata = require( '../../../lib/metadata' );
 
+const OPEN = 2;
+const RESOLVED = 4;
+const HIBERNATED = 5;
+
 const barrierStatus = {
-	2: { name: 'Open', modifyer: 'assessment' },
-	4: { name: 'Resolved', modifyer: 'resolved' },
-	5: { name: 'Hibernated', modifyer: 'hibernated' }
+	[ OPEN ]: { name: 'Open', modifyer: 'assessment' },
+	[ RESOLVED ]: { name: 'Resolved', modifyer: 'resolved' },
+	[ HIBERNATED ]: { name: 'Hibernated', modifyer: 'hibernated' }
 };
 
 module.exports = ( barrier ) => {
 
 	const barrierStatusCode = barrier.current_status.status;
 	const sectors = ( barrier.sectors || [] ).map( metadata.getSector );
+	const status = barrierStatus[ barrierStatusCode ] || {};
+
+	status.description = barrier.current_status.status_summary;
+	status.date = barrier.current_status.status_date;
 
 	return {
 		barrier: {
 			id: barrier.id,
+			isOpen: ( barrierStatusCode === OPEN ),
+			isResolved: ( barrierStatusCode === RESOLVED ),
+			isHibernated: ( barrierStatusCode === HIBERNATED ),
 			title: barrier.barrier_title,
 			product: barrier.product,
 			problem: {
@@ -21,7 +32,7 @@ module.exports = ( barrier ) => {
 				description: barrier.problem_description
 			},
 			type: barrier.barrier_type,
-			status: barrierStatus[ barrierStatusCode ],
+			status,
 			reportedOn: barrier.reported_on,
 			reportedBy: barrier.reported_by,
 			country: metadata.getCountry( barrier.export_country ),

@@ -61,6 +61,7 @@ $govuk-images-path: "/govuk-public/images/";
 @import 'pages/index';
 @import 'pages/report/detail';
 @import 'pages/report/sectors';
+@import 'pages/barrier/detail';
 
 .error-message {
 	@include govuk-font( 24 );

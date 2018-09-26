@@ -114,10 +114,10 @@ module.exports = {
 			} );
 		},
 		hibernate: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/hibernate`, getToken( req ), {
-			summary: values.hibernationSummary
+			status_summary: values.hibernationSummary
 		} ),
 		open: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/open`, getToken( req ), {
-			summary: values.openSummary
+			status_summary: values.reopenSummary
 		} ),
 		saveType: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }`, getToken( req ), {
 			barrier_type: getValue( values.barrierType )

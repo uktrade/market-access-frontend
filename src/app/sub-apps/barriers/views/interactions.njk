@@ -54,7 +54,7 @@
 			{% for item in interactions %}
 			<li class="event-list__item{{ ' event-list__item--pinned' if item.pinned }}">
 				<h4 class="event-list__item__heading">{{ item.created_on | dateWithTime }}</h4>
-				<p class="event-list__item__text">{{ item.text }}</p>
+				<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
 			</li>
 			{% endfor %}
 		</ol>

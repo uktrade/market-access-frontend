@@ -65,12 +65,13 @@
 
 		"current_status": {
 			"type": "object",
-			"required": [ "status" ],
+			"required": [ "status", "status_summary" ],
 			"properties": {
 				"status": {
 					"type": "number",
 					"enum": [ 1, 2, 3, 4 ]
-				}
+				},
+				"status_summary": { "$ref": "$refs/common.json#/paragraph" }
 			}
 		},
 
