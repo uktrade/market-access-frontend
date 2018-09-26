@@ -13,7 +13,6 @@ module.exports = function( datestr ){
 
 		date = new Date( datestr );
 		return dateFormat( date, 'GMT:d mmmm yyyy "at" h:MMtt' );
-
 	}
 
 	return datestr;

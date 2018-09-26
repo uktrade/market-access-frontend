@@ -110,7 +110,7 @@ module.exports = {
 
 			return backend.put( `/barriers/${ barrierId }/resolve`, getToken( req ), {
 				status_date: [ year, month, day ].join( '-' ) + 'T00:00',
-				summary: values.resolvedSummary
+				status_summary: values.resolvedSummary
 			} );
 		},
 		hibernate: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/hibernate`, getToken( req ), {

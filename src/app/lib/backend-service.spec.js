@@ -111,7 +111,7 @@ describe( 'Backend Service', () => {
 
 				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/resolve`, token, {
 					status_date: [ year, month, day ].join( '-' ) + 'T00:00',
-					summary: resolvedSummary
+					status_summary: resolvedSummary
 				} );
 			} );
 		} );
