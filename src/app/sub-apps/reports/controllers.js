@@ -339,7 +339,8 @@ module.exports = {
 	aboutProblem: async ( req, res, next ) => {
 
 		const report = req.report;
-		const form = new Form( req, {
+		const isResolved = report.is_resolved;
+		const formConfig = {
 
 			item: {
 				values: [ report.product ],
@@ -373,7 +374,17 @@ module.exports = {
 				conditional: { name: 'barrierAwareness', value: 'OTHER' },
 				required: 'Answer how you became aware'
 			},
-		} );
+		};
+
+		if( isResolved ){
+
+			formConfig.resolvedDescription = {
+				values: [ report.resolution_summary ],
+				required: 'Enter an explanation of how you solved this barrier'
+			};
+		}
+
+		const form = new Form( req, formConfig );
 
 		const processor = new FormProcessor( {
 			form,
@@ -383,6 +394,7 @@ module.exports = {
 				const urlMethod = ( hasSectors ? 'sectors' : 'hasSectors' );
 
 				templateValues.backHref =  urls.reports[ urlMethod ]( report.id );
+				templateValues.isResolved = isResolved;
 
 				res.render( 'reports/views/about-problem', templateValues );
 			},

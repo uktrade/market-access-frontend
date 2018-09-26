@@ -85,17 +85,50 @@
 			errorMessage: errors | errorForName( 'barrier-title' )
 		} ) }}
 
-		{{ govukTextarea( {
+		{% if isResolved %}
+
+			{{ govukTextarea( {
+
+				label: {
+					text: 'Provide a brief summary of the problem and how you became aware of it',
+					classes: 'govuk-label--s'
+				},
+				id: 'description',
+				name: 'description',
+				value: description,
+				errorMessage: errors | errorForName( 'description' )
+			} ) }}
+
+			{{ govukTextarea( {
 
 			label: {
-				text: "Provide a brief description of the problem",
+				text: 'Briefly explain how you resolved the issue',
 				classes: 'govuk-label--s'
 			},
-			id: 'description',
-			name: 'description',
-			value: description,
-			errorMessage: errors | errorForName( 'description' )
+			id: 'resolved-description',
+			name: 'resolvedDescription',
+			value: resolvedDescription,
+			errorMessage: errors | errorForName( 'resolved-description' )
 		} ) }}
+
+		{% else %}
+
+			{{ govukTextarea( {
+
+				label: {
+					text: 'Provide a brief description of the problem',
+					classes: 'govuk-label--s'
+				},
+				id: 'description',
+				name: 'description',
+				value: description,
+				hint: {
+					text: 'Include, for example, what you have done so far and who you have discussed the issue with'
+				},
+				errorMessage: errors | errorForName( 'description' )
+			} ) }}
+
+		{% endif %}
 
 		<input type="submit" class="govuk-button" value="Save and continue">
 		<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>

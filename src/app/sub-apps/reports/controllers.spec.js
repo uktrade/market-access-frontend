@@ -651,21 +651,17 @@ describe( 'Report controller', () => {
 				problem_description: 'a description',
 				barrier_title: 'barrier_title',
 				source: 'barrier_awareness',
-				other_source: 'barrier_awareness_other'
+				other_source: 'barrier_awareness_other',
+				resolution_summary: 'resolution_summary'
 			};
 			req.report = report;
 		} );
 
-		it( 'Should setup the form correctly', async () => {
+		describe( 'Form config', () => {
 
-			const barrierAwarenessResponse = { barrierAwarenessResponse: true };
+			let barrierAwarenessResponse;
 
-			validators.isMetadata.and.callFake( ( key ) => {
-
-				if( key === 'barrierAwareness' ){ return barrierAwarenessResponse; }
-			} );
-
-			function checkForm( args ){
+			function checkForm( args, isResolved ){
 
 				const config = args[ 1 ];
 
@@ -695,11 +691,44 @@ describe( 'Report controller', () => {
 				expect( config.barrierAwarenessOther ).toBeDefined();
 				expect( config.barrierAwarenessOther.conditional ).toEqual( { name: 'barrierAwareness', value: 'OTHER' } );
 				expect( config.barrierAwarenessOther.values ).toEqual( [ report.other_source ] );
+
+				if( isResolved ){
+
+					expect( config.resolvedDescription ).toBeDefined();
+					expect( config.resolvedDescription.values ).toEqual( [ report.resolution_summary ] );
+					expect( config.resolvedDescription.required ).toBeDefined();
+				}
 			}
 
-			await controller.aboutProblem( req, res, next );
+			beforeEach( () => {
 
-			checkForm( Form.calls.argsFor( 0 ) );
+				barrierAwarenessResponse = { barrierAwarenessResponse: true };
+
+				validators.isMetadata.and.callFake( ( key ) => {
+
+					if( key === 'barrierAwareness' ){ return barrierAwarenessResponse; }
+				} );
+			} );
+
+			describe( 'When the report is resolved', () => {
+				it( 'Should setup the form correctly', async () => {
+
+					req.report.is_resolved = true;
+
+					await controller.aboutProblem( req, res, next );
+
+					checkForm( Form.calls.argsFor( 0 ), true );
+				} );
+			} );
+
+			describe( 'When the report is NOT resolved', () => {
+				it( 'Should setup the form correctly', async () => {
+
+					await controller.aboutProblem( req, res, next );
+
+					checkForm( Form.calls.argsFor( 0 ) );
+				} );
+			} );
 		} );
 
 		describe( 'FormProcessor', () => {
@@ -726,6 +755,8 @@ describe( 'Report controller', () => {
 					process: processFn
 				}) );
 
+				req.report.is_resolved = true;
+
 				await controller.aboutProblem( req, res, next );
 
 				args = FormProcessor.calls.argsFor( 0 )[ 0 ];
@@ -748,7 +779,7 @@ describe( 'Report controller', () => {
 
 						const myValues = { some: 'data' };
 						const sectorsResponse = 'sectors';
-						const renderValues = Object.assign( {}, myValues, { backHref: sectorsResponse } );
+						const renderValues = Object.assign( {}, myValues, { backHref: sectorsResponse, isResolved: true } );
 
 						urls.reports.sectors.and.callFake( () => sectorsResponse );
 						report.sectors_affected = true;
@@ -764,7 +795,7 @@ describe( 'Report controller', () => {
 
 						const myValues = { some: 'data' };
 						const hasSectorsResponse = 'hasSectors';
-						const renderValues = Object.assign( {}, myValues, { backHref: hasSectorsResponse } );
+						const renderValues = Object.assign( {}, myValues, { backHref: hasSectorsResponse, isResolved: true } );
 
 						urls.reports.hasSectors.and.callFake( () => hasSectorsResponse );
 

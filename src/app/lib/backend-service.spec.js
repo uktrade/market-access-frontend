@@ -375,19 +375,22 @@ describe( 'Backend Service', () => {
 				const barrierTitle = 'c';
 				const barrierAwareness = 'd';
 				const barrierAwarenessOther = 'e';
+				const resolvedDescription = 'f';
 
 				checkWithAndWithoutValues( 'saveProblem', {
 					item,
 					description,
 					barrierTitle,
 					barrierAwareness,
-					barrierAwarenessOther
+					barrierAwarenessOther,
+					resolvedDescription
 				}, {
 					product: item,
 					problem_description: description,
 					barrier_title: barrierTitle,
 					source: barrierAwareness,
-					other_source: barrierAwarenessOther
+					other_source: barrierAwarenessOther,
+					resolution_summary: resolvedDescription
 				} );
 			} );
 		} );

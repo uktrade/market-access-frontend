@@ -202,10 +202,9 @@ describe( 'URLs', () => {
 			};
 
 			expect( urls.reportStage( '1.1', report ) ).toEqual( urls.reports.start( report.id ) );
-			expect( urls.reportStage( '1.2', report ) ).toEqual( urls.reports.isResolved( report.id ) );
-			expect( urls.reportStage( '1.3', report ) ).toEqual( urls.reports.country( report.id ) );
-			expect( urls.reportStage( '1.4', report ) ).toEqual( urls.reports.hasSectors( report.id ) );
-			expect( urls.reportStage( '1.5', report ) ).toEqual( urls.reports.aboutProblem( report.id ) );
+			expect( urls.reportStage( '1.2', report ) ).toEqual( urls.reports.country( report.id ) );
+			expect( urls.reportStage( '1.3', report ) ).toEqual( urls.reports.hasSectors( report.id ) );
+			expect( urls.reportStage( '1.4', report ) ).toEqual( urls.reports.aboutProblem( report.id ) );
 			expect( urls.reportStage( 'blah', report ) ).toEqual( urls.reports.detail( report.id ) );
 		} );
 	} );

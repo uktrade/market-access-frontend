@@ -148,7 +148,8 @@ module.exports = {
 			problem_description: getValue( values.description ),
 			barrier_title: getValue( values.barrierTitle ),
 			source: getValue( values.barrierAwareness ),
-			other_source: getValue( values.barrierAwarenessOther )
+			other_source: getValue( values.barrierAwarenessOther ),
+			resolution_summary: getValue( values.resolvedDescription )
 		} ),
 		submit: ( req, reportId ) => backend.put( `/reports/${ reportId }/submit`, getToken( req ) )
 	}
