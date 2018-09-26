@@ -5,6 +5,7 @@
 	{% set taskIndex = loop.index -%}
 	<li>
 		<h2 class="task-list__section-heading">
+			{{ taskItem.name }}
 		</h2>
 		<ul class="task-list__items">
 			{%- for item in taskItem.items %}
