@@ -1,5 +1,6 @@
 const metadata = require( './metadata' );
 const uuid = /^[a-zA-Z0-9-]+$/;
+const isNumeric = /^[0-9]+$/;
 
 module.exports = {
 	isDefined: ( value ) => {
@@ -29,5 +30,16 @@ module.exports = {
 	isBarrierType: ( value ) => metadata.barrierTypes.some( ( barrier ) => barrier.id == value ),
 	isDateValue: ( key ) => ( values ) => !!values[ key ],
 	isDateValid: ( values ) => !!Date.parse( [ values.year, values.month, values.day ].join( '-' ) ),
-	isDateInPast: ( values ) => ( Date.parse( [ values.year, values.month, values.day ].join( '-' ) ) < Date.now() )
+	isDateInPast: ( values ) => ( Date.parse( [ values.year, values.month, values.day ].join( '-' ) ) < Date.now() ),
+	isDateNumeric: ( values ) => {
+
+		let allValues = '';
+
+		for( let [ , value ] of Object.entries( values ) ){
+
+			allValues += value;
+		}
+
+		return isNumeric.test( allValues );
+	}
 };

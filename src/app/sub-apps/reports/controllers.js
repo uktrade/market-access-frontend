@@ -49,7 +49,7 @@ module.exports = {
 				items: govukItemsFromObj( metadata.statusTypes ),
 				validators: [{
 					fn: validators.isMetadata( 'statusTypes' ),
-					message: 'Select the current status of the problem'
+					message: 'Select a barrier urgency'
 				}]
 			}
 		} );
@@ -74,6 +74,7 @@ module.exports = {
 		const sessionValues = ( req.session.isResolvedFormValues || {} );
 		const report  = ( req.report || {} );
 		const resolvedDateValues = ( sessionValues.resolvedDate || getDateParts( report.resolved_date ) || {} );
+		const invalidDateMessage = 'Enter resolution date and include a month and year';
 		const form = new Form( req, {
 
 			isResolved: {
@@ -82,7 +83,7 @@ module.exports = {
 				items: govukItemsFromObj( metadata.bool ),
 				validators: [{
 					fn: validators.isMetadata( 'bool' ),
-					message: 'Answer if the barrier been resolved'
+					message: 'Select if the barrier is resolved or not'
 				}]
 			},
 
@@ -92,16 +93,19 @@ module.exports = {
 				errorField: 'resolved_date',
 				validators: [ {
 					fn: validators.isDateValue( 'month' ),
-					message: 'Enter a month'
+					message: invalidDateMessage
 				},{
 					fn: validators.isDateValue( 'year' ),
-					message: 'Enter a year'
+					message: invalidDateMessage
+				},{
+					fn: validators.isDateNumeric,
+					message: 'Resolution date must only include numbers'
 				},{
 					fn: validators.isDateValid,
-					message: 'Enter a valid date'
+					message: invalidDateMessage
 				},{
 					fn: validators.isDateInPast,
-					message: 'Enter a date that is in the past'
+					message: 'Resolution date must be this month or in the past'
 				} ],
 				items: {
 					month: {
@@ -141,7 +145,7 @@ module.exports = {
 				validators: [
 					{
 						fn: validators.isCountry,
-						message: 'Choose an export country/trading bloc'
+						message: 'Select a location for this barrier'
 					}
 				]
 			},
@@ -214,7 +218,7 @@ module.exports = {
 				values: [ report.sectors_affected ],
 				validators: [ {
 					fn: validators.isMetadata( 'bool' ),
-					message: 'Answer if you know which sector is affected'
+					message: 'Select if you are aware of a sector affected by the barrier'
 				} ]
 			}
 		} );
@@ -312,7 +316,7 @@ module.exports = {
 				items: metadata.affectedSectorsList,
 				validators: [ {
 					fn: validators.isSector,
-					message: 'Select a sector'
+					message: 'Select a sector affected by the barrier'
 				},{
 					fn: ( value ) => !sectors.includes( value ),
 					message: 'Sector already added, choose another'
@@ -344,17 +348,7 @@ module.exports = {
 
 			item: {
 				values: [ report.product ],
-				required: 'Enter the product or service being exported'
-			},
-
-			description: {
-				values: [ report.problem_description ],
-				required: 'Enter a brief description of the problem'
-			},
-
-			barrierTitle: {
-				values: [ report.barrier_title ],
-				required: 'Enter a barrier title'
+				required: 'Enter a product or service'
 			},
 
 			barrierAwareness: {
@@ -364,7 +358,7 @@ module.exports = {
 				validators: [
 					{
 						fn: validators.isMetadata( 'barrierAwareness' ),
-						message: 'Select an option'
+						message: 'Select how you became aware of the barrier'
 					}
 				]
 			},
@@ -372,7 +366,17 @@ module.exports = {
 			barrierAwarenessOther: {
 				values: [ report.other_source ],
 				conditional: { name: 'barrierAwareness', value: 'OTHER' },
-				required: 'Answer how you became aware'
+				required: 'Enter how you became aware of the barrier'
+			},
+
+			barrierTitle: {
+				values: [ report.barrier_title ],
+				required: 'Enter a title for this barrier'
+			},
+
+			description: {
+				values: [ report.problem_description ],
+				required: 'Enter a brief description for this barrier'
 			},
 		};
 
