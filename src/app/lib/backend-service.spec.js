@@ -10,6 +10,7 @@ describe( 'Backend Service', () => {
 	let backend;
 	let service;
 	let req;
+	let metadata;
 
 	beforeEach( () => {
 
@@ -20,27 +21,45 @@ describe( 'Backend Service', () => {
 			post: jasmine.createSpy( 'backend.post' ),
 			put: jasmine.createSpy( 'backend.put' )
 		};
+		metadata = {
+			getCountry: jasmine.createSpy( 'metadata.country' )
+		};
 
 		service = proxyquire( modulePath, {
-			'./backend-request': backend
+			'./backend-request': backend,
+			'./metadata': metadata
 		} );
 	} );
 
 	describe( 'getUser', () => {
-		it( 'Should call the correct path', async () => {
+		describe( 'When the response is a success', () => {
+			it( 'Should call the correct path and transform the response', async () => {
 
-			await service.getUser( req );
+				const body = { location: 'test' };
+				const countryResponse = 'a country';
 
-			expect( backend.get ).toHaveBeenCalledWith( '/whoami', token );
+				backend.get.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body }) );
+				metadata.getCountry.and.callFake( () => countryResponse );
+
+				await service.getUser( req );
+
+				expect( backend.get ).toHaveBeenCalledWith( '/whoami', token );
+				expect( body.country ).toEqual( countryResponse );
+			} );
 		} );
-	} );
 
-	describe( 'getMetadata', () => {
-		it( 'Should call the correct path', async () => {
+		describe( 'When the response is not a success', () => {
+			it( 'Should call the correct path and not transform the response', async () => {
 
-			await service.getMetadata();
+				const body = { location: 'test' };
 
-			expect( backend.get ).toHaveBeenCalledWith( '/metadata' );
+				backend.get.and.callFake( () => Promise.resolve( { response: { isSuccess: false }, body }) );
+
+				await service.getUser( req );
+
+				expect( backend.get ).toHaveBeenCalledWith( '/whoami', token );
+				expect( body.country ).not.toBeDefined();
+			} );
 		} );
 	} );
 
