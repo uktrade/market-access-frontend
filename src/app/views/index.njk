@@ -15,10 +15,10 @@
 				<tr class="standard-table__heading-row">
 					<th class="standard-table__heading standard-table__heading--active">Date reported</th>
 					<th class="standard-table__heading">Barrier title</th>
-					<th class="standard-table__heading">Company affected</th>
-					<th class="standard-table__heading">Export country</th>
+					<th class="standard-table__heading">Sectors affected</th>
+					<th class="standard-table__heading">Barrier location</th>
 					<th class="standard-table__heading">Resolved</th>
-					<th class="standard-table__heading">Support needed?</th>
+					{#<th class="standard-table__heading">Support needed?</th>#}
 				</tr>
 			</thead>
 			<tbody>
@@ -30,10 +30,10 @@
 							{{ barrier.barrier_title }}
 						</a>
 					</td>
-					<td class="standard-table__cell">{{ barrier.company.name }}</td>
+					<td class="standard-table__cell">{{ barrier.sectors | join( ', ' ) }}</td>
 					<td class="standard-table__cell">{{ barrier.country.name }}</td>
 					<td class="standard-table__cell">{{ 'Yes' if barrier.resolved else 'No' }}</td>
-					<td class="standard-table__cell">
+					{#<td class="standard-table__cell">
 						{% if barrier.supportNeeded -%}
 							<span class="warning-icon" aria-hidden="true">!</span>Yes
 							{% if not barrier.hasContributors -%}
@@ -44,7 +44,7 @@
 							No
 						{%- endif %}
 					</td>
-				</tr>
+				</tr>#}
 				{%- endfor %}
 			</tbody>
 		</table>
