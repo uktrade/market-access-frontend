@@ -6,6 +6,10 @@ describe( 'Dashboard view model', () => {
 	let viewModel;
 	let metadata;
 
+	function getSector(){
+		return { name: 'a sector' };
+	}
+
 	beforeEach( () => {
 
 		metadata = {
@@ -13,7 +17,8 @@ describe( 'Dashboard view model', () => {
 				{ id: 'abc-1', name: 'country 1' },
 				{ id: 'abc-2', name: 'country 2' },
 				{ id: 'abc-3', name: 'country 3' }
-			]
+			],
+			getSector
 		};
 
 		viewModel = proxyquire( modulePath, {
@@ -52,7 +57,7 @@ describe( 'Dashboard view model', () => {
 				resolved: false,
 				supportNeeded: false,
 				hasContributors: true,
-				sectors: barriers[ 0 ].sectors
+				sectors: [ getSector().name, getSector().name ]
 			} );
 
 			checkBarrier( 1, {
@@ -64,7 +69,7 @@ describe( 'Dashboard view model', () => {
 				resolved: false,
 				supportNeeded: false,
 				hasContributors: true,
-				sectors: []
+				sectors: [ 'Unknown' ]
 			} );
 
 			checkBarrier( 2, {
@@ -76,7 +81,7 @@ describe( 'Dashboard view model', () => {
 				resolved: false,
 				supportNeeded: false,
 				hasContributors: true,
-				sectors: [ 'c', 'd' ]
+				sectors: [ getSector().name, getSector().name ]
 			} );
 
 			checkBarrier( 3, {
@@ -88,7 +93,7 @@ describe( 'Dashboard view model', () => {
 				resolved: true,
 				supportNeeded: true,
 				hasContributors: false,
-				sectors: []
+				sectors: [ 'Unknown' ]
 			} );
 		} );
 	} );

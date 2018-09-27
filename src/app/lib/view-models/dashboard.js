@@ -1,5 +1,12 @@
 const metadata = require( '../metadata' );
 
+function getSector( sectorId ){
+
+	const sector = metadata.getSector( sectorId );
+
+	return ( sector && sector.name );
+}
+
 function update( item ){
 
 	const countryId = item.export_country;
@@ -10,7 +17,7 @@ function update( item ){
 		name: ( country && country.name )
 	};
 
-	item.sectors = ( item.sectors || [ 'Unknown' ] );
+	item.sectors = ( item.sectors && item.sectors.map( getSector ) || [ 'Unknown' ] );
 	item.resolved = ( item.current_status && item.current_status.status ) === 4;
 	item.supportNeeded = item.support_type === 1;
 	item.hasContributors = item.contributor_count > 0;
