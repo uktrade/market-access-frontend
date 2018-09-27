@@ -38,13 +38,16 @@
 					href: urls.reports.new(),
 					text: 'Report a barrier',
 					active: headerNav.isReport
-				},{
-					href: '#',
-					text: 'Find a barrier',
-					active: headerNav.isFind
 				}
 			]
 		}) }}
+		{#
+			{
+				href: '#',
+				text: 'Find a barrier',
+				active: headerNav.isFind
+			}
+		#}
 		<div class="header-wrapper__user" role="complementary">
 			<p class="header-wrapper__user__content">
 				{% if user %}

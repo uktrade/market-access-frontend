@@ -158,7 +158,7 @@ describe( 'App', function(){
 
 					app
 						.get( urls.barriers.interactions( barrierId ) )
-						.end( checkPage( 'Market Access - Barrier interactions', done ) );
+						.end( checkPage( 'Market Access - Barrier timeline and notes', done ) );
 				} );
 			} );
 

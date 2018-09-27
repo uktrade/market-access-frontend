@@ -1,4 +1,5 @@
 const backend = require( './backend-request' );
+const metadata = require( './metadata' );
 
 function getToken( req ){
 
@@ -91,10 +92,19 @@ function updateReport( token, reportId, data ){
 	return backend.put( `/reports/${ reportId }`, token, data );
 }
 
+function transformUser( { response, body } ){
+
+	if( response.isSuccess ){
+
+		body.country = metadata.getCountry( body.location );
+	}
+
+	return { response, body };
+}
+
 module.exports = {
 
-	getMetadata: () => backend.get( '/metadata' ),
-	getUser: ( req ) => backend.get( '/whoami', getToken( req ) ),
+	getUser: ( req ) => backend.get( '/whoami', getToken( req ) ).then( transformUser ),
 
 	barriers: {
 		getAll: ( req ) => backend.get( '/barriers', getToken( req ) ),
