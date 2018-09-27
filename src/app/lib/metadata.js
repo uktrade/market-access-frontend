@@ -1,4 +1,4 @@
-const backend = require( './backend-service' );
+const backend = require( './backend-request' );
 
 function notDisabled( item ){
 
@@ -86,7 +86,7 @@ module.exports.fetch = async () => {
 
 	try {
 
-		const { response, body } = await backend.getMetadata();
+		const { response, body } = await backend.get( '/metadata' );
 
 		if( response.isSuccess ){
 
