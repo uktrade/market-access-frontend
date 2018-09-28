@@ -31,6 +31,11 @@
 
 	{% endif %}
 
+	{% set barrierTypeHtml %}
+		{{ barrier.type.title }}
+		{{ barrier.type.description | safe }}
+	{% endset %}
+
 	{{ summaryGroup( {
 		heading: {
 			text: 'Barrier headlines'
@@ -43,7 +48,10 @@
 			},
 			{
 				title: 'Market access barrier type',
-				text: barrier.type.title,
+				heading: {
+					text: ( barrier.type.category + ':' ) | capitalize if barrier.type.category
+				},
+				html: barrierTypeHtml if barrier.type.title,
 				add: {
 					text: 'Add a type of Market Access Barrier',
 					href: urls.barriers.type.category( barrier.id )
@@ -52,7 +60,7 @@
 					href: urls.barriers.type.category( barrier.id )
 				}
 			},{
-				title: 'Product/service being exported',
+				title: 'Product or service being exported',
 				text: barrier.product
 			},{
 				title: 'Summary of the problem',

@@ -35,6 +35,11 @@
 	box-sizing: border-box;
 }
 
+.summary-group__list__value__heading {
+	@incude govuk-font( 16, $weight: bold );
+	margin: 0;
+}
+
 .summary-group__list__value__add {
 	border: 2px dashed $govuk-grey-2;
 	background-color: $govuk-grey-4;
@@ -46,6 +51,7 @@
 
 .summary-group__list__value__edit {
 	display: block;
+	margin-top: govuk-em( 5, 16 );
 }
 
 .summary-group__list__value__list {

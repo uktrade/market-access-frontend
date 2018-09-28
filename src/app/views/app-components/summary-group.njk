@@ -6,6 +6,9 @@
 			{% for item in params.items %}
 			<dt class="summary-group__list__key">{{ item.title }}</dt>
 			<dd class="summary-group__list__value">
+			{% if item.heading and item.heading.text %}
+				<h4 class="summary-group__list__value__heading">{{ item.heading.text }}</h4>
+			{% endif %}
 			{% if item.html or item.text or ( item.items and item.items.length ) %}
 				{{- item.html | safe if item.html else item.text -}}
 				{{ summaryGroupList( item.items ) if item.items }}
