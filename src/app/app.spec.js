@@ -158,7 +158,7 @@ describe( 'App', function(){
 
 					app
 						.get( urls.barriers.interactions( barrierId ) )
-						.end( checkPage( 'Market Access - Barrier timeline and notes', done ) );
+						.end( checkPage( 'Market Access - Barrier updates', done ) );
 				} );
 			} );
 
@@ -181,7 +181,7 @@ describe( 'App', function(){
 
 						app
 							.get( urls.barriers.statusHibernated( barrierId ) )
-							.end( checkPage( 'Market Access - Barrier hibernated', done ) );
+							.end( checkPage( 'Market Access - Barrier paused', done ) );
 					} );
 				} );
 

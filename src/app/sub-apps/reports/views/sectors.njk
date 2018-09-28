@@ -14,6 +14,8 @@
 		errors: errors
 	}) }}
 
+	<h3 class="report-sectors-heading">Save or add another sector</h3>
+
 	{{ reportSectors( report, sectors, csrfToken, addAnother = true ) }}
 
 	<form action="{{ urls.reports.sectors( report.id ) }}" method="POST">

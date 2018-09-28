@@ -7,7 +7,7 @@ const HIBERNATED = 5;
 const barrierStatus = {
 	[ OPEN ]: { name: 'Open', modifyer: 'assessment' },
 	[ RESOLVED ]: { name: 'Resolved', modifyer: 'resolved' },
-	[ HIBERNATED ]: { name: 'Hibernated', modifyer: 'hibernated' }
+	[ HIBERNATED ]: { name: 'Paused', modifyer: 'hibernated' }
 };
 
 module.exports = ( barrier ) => {
@@ -15,6 +15,7 @@ module.exports = ( barrier ) => {
 	const barrierStatusCode = barrier.current_status.status;
 	const sectors = ( barrier.sectors || [] ).map( metadata.getSector );
 	const status = barrierStatus[ barrierStatusCode ] || {};
+	const sectorsList = sectors.map( ( sector ) => (sector && { text: sector.name } || { text: 'Unknown' } ) );
 
 	status.description = barrier.current_status.status_summary;
 	status.date = barrier.current_status.status_date;
@@ -53,6 +54,6 @@ module.exports = ( barrier ) => {
 				summary: barrier.infringement_summary
 			}
 		},
-		sectorsList: sectors.map( ( sector ) => (sector && { text: sector.name } || {}) )
+		sectorsList
 	};
 };

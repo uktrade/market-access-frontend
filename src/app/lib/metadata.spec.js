@@ -263,7 +263,7 @@ describe( 'metadata', () => {
 
 					const affectedSectorsList = level0Sectors.map( ( sector ) => ({ value: sector.id, text: sector.name } ) );
 
-					affectedSectorsList.unshift( { value: '', text: 'Select a sector affected' } );
+					affectedSectorsList.unshift( { value: '', text: 'Select a sector' } );
 
 					expect( metadata.affectedSectorsList ).toEqual( affectedSectorsList );
 				} );

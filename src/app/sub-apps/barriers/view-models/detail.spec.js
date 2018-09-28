@@ -140,7 +140,7 @@ describe( 'Barrier detail view model', () => {
 			const outpuBarrier = output.barrier;
 
 			expect( outpuBarrier.status ).toEqual( {
-				name: 'Hibernated',
+				name: 'Paused',
 				modifyer: 'hibernated',
 				date: inputBarrier.current_status.status_date,
 				description: inputBarrier.current_status.status_summary

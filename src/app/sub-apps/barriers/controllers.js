@@ -167,7 +167,7 @@ module.exports = {
 			[ HIBERNATE ]: {
 				serviceMethod: 'hibernate',
 				successPage: 'statusHibernated',
-				label: 'Mark as <strong>hibernation</strong>',
+				label: 'Mark as <strong>paused</strong>',
 				fields: {
 					hibernationSummary: {
 						conditional: { name: 'status', value: HIBERNATE },
