@@ -5,6 +5,12 @@
 
 {% block page_title %}{{ super() }} - Barrier - Define type of market access barrier{% endblock %}
 
+{% block body_script %}
+	<script>
+		ma.pages.barrier.type();
+	</script>
+{% endblock %}
+
 {% block page_content %}
 
 	{{ heading({

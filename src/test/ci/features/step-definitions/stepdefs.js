@@ -92,11 +92,10 @@ Then( 'the footer links should be present', async () => {
 		[ 'View Data Hub', '/#' ],
 		[ 'Dashboard', '/' ],
 		[ 'Report a barrier', urls.reports.new() ],
-		[ 'Find a barrier', '/#' ],
 		[ 'What is a barrier?', '/#' ]
 	];
 
-	assert.equal( links.length, 5 );
+	assert.equal( links.length, 4 );
 
 	for( const [ index, link ] of links.entries() ){
 

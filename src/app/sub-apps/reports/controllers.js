@@ -315,7 +315,7 @@ module.exports = {
 
 			sectors: {
 				type: Form.SELECT,
-				items: metadata.affectedSectorsList,
+				items: metadata.affectedSectorsList.filter( ( sector ) => !sectors.includes( sector.value ) ),
 				validators: [ {
 					fn: validators.isSector,
 					message: 'Select a sector affected by the barrier'

@@ -39,12 +39,13 @@ function getInteractionsList( interactions ){
 
 function barrierTypeToRadio( item ){
 
-	const { id, title, category } = item;
+	const { id, title, category, description } = item;
 
 	return {
 		value: id,
 		text: title,
-		category
+		category,
+		conditional: { html: `<div class="conditional-barrier-type-content">${ description.replace( '\n', '<br>' ) }</div>` }
 	};
 }
 
