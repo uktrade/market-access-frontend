@@ -73,11 +73,11 @@
 		{{ govukInput( {
 
 			label: {
-				text: 'Suggest an appropriate title for this barrier',
+				text: 'Suggest a title for this barrier',
 				classes: 'govuk-label--s'
 			},
 			hint: {
-				text: 'Include both the product or service name and the country being exported to e.g. Import of steel rods into India'
+				text: 'Include both the product or service name and the country being exported to, for example, Import quotas for steel rods in India.'
 			},
 			id: 'barrier-title',
 			name: 'barrierTitle',
@@ -90,7 +90,7 @@
 			{{ govukTextarea( {
 
 				label: {
-					text: 'Provide a brief summary of the problem and how you became aware of it',
+					text: 'Provide a summary of the problem and how you became aware of it',
 					classes: 'govuk-label--s'
 				},
 				id: 'description',
@@ -102,7 +102,7 @@
 			{{ govukTextarea( {
 
 			label: {
-				text: 'Briefly explain how you resolved the issue',
+				text: 'How did you resolve the problem?',
 				classes: 'govuk-label--s'
 			},
 			id: 'resolved-description',
@@ -116,14 +116,14 @@
 			{{ govukTextarea( {
 
 				label: {
-					text: 'Provide a brief description of the problem',
+					text: 'Provide a summary of the problem',
 					classes: 'govuk-label--s'
 				},
 				id: 'description',
 				name: 'description',
 				value: description,
 				hint: {
-					text: 'Include, for example, what you have done so far and who you have discussed the issue with'
+					text: 'Include what you have done so far and who you have discussed the problem with.'
 				},
 				errorMessage: errors | errorForName( 'description' )
 			} ) }}

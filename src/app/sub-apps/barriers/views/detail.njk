@@ -24,12 +24,17 @@
 
 				{% endif %}
 			</span>
-			<h3 class="barrier-status-details__heading">Barrier {{ 'resolved' if barrier.isResolved else 'hiberated' }} <span class="barrier-status-details__heading__caption">in {{ barrier.status.date | dateOnly( day=false ) }}</span></h3>
-			<h4 class="barrier-status-details__sub-heading">Summary of {{ 'resolution' if barrier.isResolved else 'hibernation' }}</h4>
+			<h3 class="barrier-status-details__heading">Barrier {{ 'resolved' if barrier.isResolved else 'paused' }} <span class="barrier-status-details__heading__caption">in {{ barrier.status.date | dateOnly( day=false ) }}</span></h3>
+			<h4 class="barrier-status-details__sub-heading">Summary {{ ' of resolution' if barrier.isResolved }}</h4>
 			<p class="barrier-status-details__text">{{ barrier.status.description | escape | nl2br }}</p>
 		</div>
 
 	{% endif %}
+
+	{% set barrierTypeHtml %}
+		{{ barrier.type.title }}
+		{{ barrier.type.description | safe }}
+	{% endset %}
 
 	{{ summaryGroup( {
 		heading: {
@@ -37,24 +42,16 @@
 		},
 		items: [
 			{
-				title: 'Company or organisation affected',
-				text: '',
-				add: {
-					text: 'Add one or several companies/organisations',
-					href: '#'
-				}
-			},
-			{
 				title: ( 'Sector' + ( 's' if barrier.sectors.length !== 1 ) + ' affected' ),
-				items: sectorsList,
-				add: {
-					text: 'Add one or several sectors',
-					href: '#'
-				}
+				items: sectorsList if sectorsList.length,
+				text: 'Unknown' if not sectorsList.length
 			},
 			{
 				title: 'Market access barrier type',
-				text: barrier.type.title,
+				heading: {
+					text: ( barrier.type.category + ':' ) | capitalize if barrier.type.category
+				},
+				html: barrierTypeHtml if barrier.type.title,
 				add: {
 					text: 'Add a type of Market Access Barrier',
 					href: urls.barriers.type.category( barrier.id )
@@ -63,13 +60,13 @@
 					href: urls.barriers.type.category( barrier.id )
 				}
 			},{
-				title: 'Product/service being exported',
+				title: 'Product or service being exported',
 				text: barrier.product
 			},{
-				title: 'Description of problem',
+				title: 'Summary of the problem',
 				html: barrier.problem.description | escape | nl2br
 			},{
-				title: 'Awareness of the problem',
+				title: 'Finding out about the barrier',
 				html: barrier.source.name + ( ( '<br>' + barrier.source.description ) if barrier.source.description )
 			},{
 				title: 'Initial report made by',
