@@ -11,7 +11,8 @@
 }
 
 .dash-card__heading {
-	margin: govuk-em( 10, 16 ) 0 govuk-em( 5, 16 ) 0;
+	@include govuk-font( 24, $weight: bold );
+	margin: govuk-em( 10, 24 ) 0 govuk-em( 5, 24 ) 0;
 	line-height: 1.25;
 }
 
