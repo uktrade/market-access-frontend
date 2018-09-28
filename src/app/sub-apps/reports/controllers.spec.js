@@ -49,7 +49,20 @@ describe( 'Report controller', () => {
 				'A': 'a',
 				'B': 'b'
 			},
-			supportType: { '1': 'x', '2': 'y', '3': 'z' }
+			supportType: { '1': 'x', '2': 'y', '3': 'z' },
+			affectedSectorsList: [
+				{
+					value: 'id-1',
+					text: 'one'
+				},{
+					value: 'id-2',
+					text: 'two'
+				},{
+					value: 'id-3',
+					text: 'three'
+				}
+			],
+			getSector: jasmine.createSpy( 'metadata.getSector' )
 		};
 
 		req = {
@@ -119,7 +132,8 @@ describe( 'Report controller', () => {
 			isDateValue: jasmine.createSpy( 'validators.isDateValue' ),
 			isDateValid: jasmine.createSpy( 'validators.isDateValid' ),
 			isDateInPast: jasmine.createSpy( 'validators.isDateInPast' ),
-			isDateNumeric: jasmine.createSpy( 'validators.isDateNumeric' )
+			isDateNumeric: jasmine.createSpy( 'validators.isDateNumeric' ),
+			isSector: jasmine.createSpy( 'validators.isSector' )
 		};
 
 		controller = proxyquire( modulePath, {
@@ -872,6 +886,60 @@ describe( 'Report controller', () => {
 
 						expect( next ).toHaveBeenCalledWith( err );
 					} );
+				} );
+			} );
+		} );
+	} );
+
+	describe( 'addSector', () => {
+
+		let report;
+
+		beforeEach( () => {
+
+			report = {
+				id: uuid(),
+				sectors: null,
+			};
+			req.report = report;
+		} );
+
+		describe( 'Form config', () => {
+			describe( 'When there are not an sectors in the session', () => {
+				it( 'Should setup the form correctly with default values', async () => {
+
+					await controller.addSector( req, res, next );
+
+					const args = Form.calls.argsFor( 0 );
+					const config = args[ 1 ];
+
+					expect( Form ).toHaveBeenCalled();
+					expect( args[ 0 ] ).toEqual( req );
+
+					expect( config.sectors ).toBeDefined();
+					expect( config.sectors.type ).toEqual( Form.SELECT );
+					expect( config.sectors.items ).toEqual( metadata.affectedSectorsList );
+					expect( config.sectors.validators[ 0 ].fn ).toEqual( validators.isSector );
+				} );
+			} );
+
+			describe( 'When there is one sector in the session', () => {
+				it( 'Should setup the form correctly', async () => {
+
+					req.session.sectors = [ 2 ];
+
+					await controller.addSector( req, res, next );
+
+					const args = Form.calls.argsFor( 0 );
+					const config = args[ 1 ];
+
+					expect( Form ).toHaveBeenCalled();
+					expect( args[ 0 ] ).toEqual( req );
+
+					expect( config.sectors ).toBeDefined();
+					expect( config.sectors.type ).toEqual( Form.SELECT );
+					expect( config.sectors.items ).toEqual( metadata.affectedSectorsList.filter( ( sector ) => sector.value != 2 ) );
+					expect( config.sectors.validators[ 0 ].fn ).toEqual( validators.isSector );
 				} );
 			} );
 		} );
