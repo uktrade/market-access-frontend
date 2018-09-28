@@ -68,8 +68,8 @@ describe( 'Barriers controller', () => {
 
 		metadata = {
 			barrierTypes: [
-				{ id: 1, title: 'barrier 1', category: 'GOODS' },
-				{ id: 2, title: 'barrier 2', category: 'SERVICES' }
+				{ id: 1, title: 'barrier 1', category: 'GOODS', description: 'some text' },
+				{ id: 2, title: 'barrier 2', category: 'SERVICES', description: 'a bit more text' }
 			],
 			barrierTypeCategories: {
 				'GOODS': 'title 1',
@@ -883,8 +883,8 @@ describe( 'Barriers controller', () => {
 
 			getTemplateValuesResponse = {
 				barrierType: [
-					{ value: 1, text: 'barrier 1', category: 'GOODS' },
-					{ value: 2, text: 'barrier 2', category: 'SERVICES' }
+					{ value: 1, text: 'barrier 1', category: 'GOODS', description: 'some text' },
+					{ value: 2, text: 'barrier 2', category: 'SERVICES', description: 'a bit more text' }
 				]
 			};
 
@@ -911,7 +911,8 @@ describe( 'Barriers controller', () => {
 			expect( config.barrierType.items ).toEqual( [{
 				value: goodsBarrierType.id,
 				text: goodsBarrierType.title,
-				category: goodsBarrierType.category
+				category: goodsBarrierType.category,
+				conditional: { html: `<div class="conditional-barrier-type-content">${ goodsBarrierType.description }</div>` }
 			}] );
 			expect( config.barrierType.values ).toEqual( [ barrier.barrier_type.id ] );
 			expect( config.barrierType.validators[ 0 ].fn ).toEqual( validators.isBarrierType );
