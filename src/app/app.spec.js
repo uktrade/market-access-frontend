@@ -126,6 +126,15 @@ describe( 'App', function(){
 			} );
 		} );
 
+		describe( 'what is a barrier page', function(){
+			it( 'Should render the page', function( done ){
+
+				app
+					.get( urls.whatIsABarrier() )
+					.end( checkPage( 'Market Access - What is a barrier', done ) );
+			} );
+		} );
+
 		describe( 'Barriers', () => {
 			describe( 'Barrier detail', () => {
 				it( 'Should fetch the barrier and render the page', ( done ) => {

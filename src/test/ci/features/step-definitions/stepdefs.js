@@ -92,7 +92,7 @@ Then( 'the footer links should be present', async () => {
 		[ 'View Data Hub', '/#' ],
 		[ 'Dashboard', '/' ],
 		[ 'Report a barrier', urls.reports.new() ],
-		[ 'What is a barrier?', '/#' ]
+		[ 'What is a barrier?', urls.whatIsABarrier() ]
 	];
 
 	assert.equal( links.length, 4 );
