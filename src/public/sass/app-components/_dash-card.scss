@@ -1,0 +1,21 @@
+.dash-card {
+	display: inline-block;
+	border-top: 5px solid $govuk-black;
+	padding-right: govuk-em( 15, 16 );
+	box-sizing: border-box;
+
+	@include mq( $from: tablet ){
+		max-width: govuk-em( 300, 16 );
+		margin-left: govuk-em( 30, 16 );
+	}
+}
+
+.dash-card__heading {
+	margin: govuk-em( 10, 16 ) 0 govuk-em( 5, 16 ) 0;
+	line-height: 1.25;
+}
+
+.dash-card__text {
+	margin: 0;
+	line-height: 1.25;
+}

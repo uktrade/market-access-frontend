@@ -5,6 +5,7 @@
 	background-image: none;
 	padding-top: govuk-em( 15, 24 );
 	padding-right: 15px;
+	padding-bottom: govuk-em( 15, 24 );
 }
 
 .dash-button__heading {
@@ -23,6 +24,6 @@
 .dash-button__text {
 	@include govuk-font( $size: 14 );
 	display: block;
-	max-width: govuk-em( 250, 14 );
+	max-width: govuk-em( 270, 14 );
 	padding: govuk-em( 10, 14 ) 0;
 }
