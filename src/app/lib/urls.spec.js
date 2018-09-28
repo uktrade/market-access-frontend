@@ -17,6 +17,13 @@ describe( 'URLs', () => {
 		} );
 	} );
 
+	describe( 'What is a barrier', () => {
+		it( 'Should return the login path', () => {
+
+			expect( urls.whatIsABarrier() ).toEqual( '/what-is-a-barrier/' );
+		} );
+	} );
+
 	describe( 'Barier urls', () => {
 
 		let barrierId;

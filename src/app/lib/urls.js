@@ -39,6 +39,7 @@ module.exports = {
 
 	index: () => '/',
 	login: () => '/login/',
+	whatIsABarrier: () => '/what-is-a-barrier/',
 
 	barriers: {
 		detail: ( barrierId ) => `/barriers/${ barrierId }/`,

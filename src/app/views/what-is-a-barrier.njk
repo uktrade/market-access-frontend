@@ -1,0 +1,112 @@
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - What is a barrier{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		caption: 'Market access barriers',
+		text: 'What are market access barriers?'
+	}) }}
+
+	<div class="restrict-width">
+		<p class="leade">
+			Market access barriers are things that slow down or stop a UK company from doing business overseas. Market access barriers, also known as non-tariff barriers, are any obstacle to international trade that is not an import or export duty.
+		</p>
+
+		<p>
+			Non-tariff barriers cost the UK economy billions of pounds in trade opportunities worldwide. At DIT, it is one of our four core responsibilities to break down barriers to trade and investment. By sharing information about non-tariff barriers we can help more businesses to succeed.
+		</p>
+
+		<p>
+			There are two types of non-tariff barriers:
+
+			<ul class="paragraph-list">
+				<li class="paragraph-list__item"><strong>Procedural or short-term issues</strong> - for example, goods stuck at the border or documentation issue</li>
+				<li class="paragraph-list__item"><strong>Strategic or long-term issues</strong> - for example, a change of regulation</li>
+			</ul>
+		</p>
+
+		<h2 class="barrier-type-section-heading">
+			Non-tariff barriers
+		</h2>
+
+		<div class="barrier-type-card">
+			<h3 class="barrier-type-card__heading">
+				Procedural or short-term issues
+			</h3>
+
+			<p class='barrier-type-card__text'>
+				These are issues that can be resolved relatively quickly and may be day-to-day tasks. This could be a shipment that is stuck in customs due to incorrect customs documentation or a company needing assistance to fill out government forms.
+			</p>
+			<p class='barrier-type-card__text'>
+				Some of these issues might not be a big deal in their own right. However they may point to a bigger underlying problem, and are therefore important to record.
+			</p>
+		</div>
+
+		<div class="barrier-type-card">
+			<h3 class="barrier-type-card__heading">
+				Strategic or long-term issues
+			</h3>
+
+			<p class='barrier-type-card__text'>
+				A strategic or long term issue could be, for example, a change of regulation. These issues usually cannot be fixed quickly without a change of regulation or broader change to the business environment. A possible example is a ban on British products due to food safety regulations.
+			</p>
+			<p class='barrier-type-card__text'>
+				Strategic or long term issues may require engagement with local, national or UK government. These may violate World Trade Organisation (WTO) rules or other agreements, and can be resolved through the appropriate channels available under each respective agreement.
+			</p>
+		</div>
+
+		<h2 class="barrier-type-section-heading">
+			Why non-tariff barriers are important
+		</h2>
+
+		<p>
+			Non-tariff barriers (NTBs) cost the UK economy £billions in trade opportunities worldwide and HMT estimates that on average non-tariff barriers can add 2 to 3 times as much to the cost of traded goods as tariffs. NTBs are a priority for HMG; one of the four core responsibilities for Department for International Trade is to "bring together policy, promotion and financial expertise to break down barriers to trade and investment, and help businesses succeed"
+		</p>
+
+		<h2 class="barrier-type-section-heading">
+			Categories of Market Access Barriers
+		</h2>
+
+		<ul class="barrier-type-section-list">
+			<li class="barrier-type-section-list__item">- <a href="#goods-barriers">Barriers that affect Goods</a></li>
+			<li class="barrier-type-section-list__item">- <a href="#services-barriers">Barriers that affect Services</a></li>
+			<li class="barrier-type-section-list__item">- <a href="#goods-and-services-barriers">Barriers that affect both Goods and Services</a></li>
+		</ul>
+
+		{% macro barrierList( items ) %}
+			<div class="barrier-type-group">
+			{% for item in items %}
+				<h4>
+					{{ item.title }}
+				</h4>
+				{{ item.description | safe }}
+			{% endfor %}
+			</div>
+		{% endmacro %}
+
+		<h3 class="barrier-type-section-sub-heading" id="goods-barriers">
+			Barriers that affect Goods
+		</h3>
+
+		{{ barrierList( barrierTypes.goods ) }}
+
+		<h3 class="barrier-type-section-sub-heading" id="services-barriers">
+			Barriers that affect Services
+		</h3>
+
+		{{ barrierList( barrierTypes.services ) }}
+
+		<h3 class="barrier-type-section-sub-heading" id="goods-and-services-barriers">
+			Barriers that affect both goods and services
+		</h3>
+
+		{{ barrierList( barrierTypes.goodsAndServices ) }}
+
+		<a class="barrier-type-section-link" href="{{ urls.index() }}">View your dashboard</a>
+	</div>
+
+{% endblock %}
