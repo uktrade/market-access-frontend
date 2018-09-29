@@ -42,13 +42,14 @@ $govuk-images-path: "/govuk-public/images/";
 @import 'layout';
 @import 'error';
 
+@import 'app-objects/headings';
+
 @import 'app-components/dash-button';
+@import 'app-components/dash-card';
 @import 'app-components/task-list';
 @import 'app-components/details-list';
-@import 'app-components/company-card';
 @import 'app-components/search-form';
 @import 'app-components/table-standard';
-@import 'app-components/contact-list';
 @import 'app-components/callout';
 @import 'app-components/tabs';
 @import 'app-components/warning-icon';
@@ -56,9 +57,15 @@ $govuk-images-path: "/govuk-public/images/";
 @import 'app-components/side-nav';
 @import 'app-components/summary-group';
 @import 'app-components/event-list';
+@import 'app-components/checkmark';
+@import 'app-components/report-sectors';
 
 @import 'pages/index';
+@import 'pages/what-is-a-barrier';
 @import 'pages/report/detail';
+@import 'pages/report/sectors';
+@import 'pages/barrier/detail';
+@import 'pages/barrier/type';
 
 .error-message {
 	@include govuk-font( 24 );
@@ -73,9 +80,11 @@ $govuk-images-path: "/govuk-public/images/";
 }
 
 .no-results-message {
-	@include govuk-font( $size: 24 );
-	padding: govuk-em( 30, 24 );
+	@include govuk-font( 19 );
+	padding: govuk-em( 30, 19 );
 	text-align: center;
+	background-color: $govuk-grey-4;
+	margin: govuk-em( 30, 19 ) 0 0 0;
 }
 
 .conditional-content {
@@ -115,6 +124,11 @@ $govuk-images-path: "/govuk-public/images/";
 	outline: 1px solid $govuk-yellow-25;
 	border-top: 2px solid $govuk-yellow-25;
 	border-bottom: 2px solid $govuk-yellow-25;
+}
+
+.form-cancel {
+	line-height: 2.5;
+	margin-left: govuk-em( 10, 16 );
 }
 
 .button--secondary {

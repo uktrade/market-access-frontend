@@ -63,9 +63,11 @@ module.exports = ( csrfToken, report ) => {
 
 	//copy tasks before we mutate
 	const tasks = JSON.parse( JSON.stringify( metadata.reportTaskList ) );
+	const status = metadata.statusTypes[ report.problem_status ];
+	const country = metadata.getCountry( report.export_country );
+	const calloutText = ( status + ( country ? ` in ${ country.name }` : '' ) );
 
 	addReportData( tasks, report );
-	//console.log( JSON.stringify( tasks, null, 2 ) );
 
-	return { csrfToken, tasks };
+	return { csrfToken, tasks, calloutText };
 };

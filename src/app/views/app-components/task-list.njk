@@ -5,7 +5,7 @@
 	{% set taskIndex = loop.index -%}
 	<li>
 		<h2 class="task-list__section-heading">
-			<span class="task-list__section-number">{{ taskIndex }}. </span> {{ taskItem.name }}
+			{{ taskItem.name }}
 		</h2>
 		<ul class="task-list__items">
 			{%- for item in taskItem.items %}
@@ -19,7 +19,7 @@
 			{%- endif %}
 			<li class="task-list__item">
 				{%- if taskItem.number %}
-				<span class="task-list__item__number">{{ taskIndex }}.{{ loop.index }}</span>
+				<span class="task-list__item__number">{{ loop.index }}</span>
 				{% endif -%}
 
 				<{{ nameElem }} class="task-list__item__name"{% if item.href %} href="{{ item.href }}"{% endif %}{% if id %} aria-describedby="{{ id }}"{% endif %}>

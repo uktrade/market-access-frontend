@@ -1,32 +1,14 @@
 const urls = require( '../../lib/urls' );
 const metadata = require( '../../lib/metadata' );
 const backend = require( '../../lib/backend-service' );
-const datahub = require( '../../lib/datahub-service' );
 const Form = require( '../../lib/Form' );
 const FormProcessor = require( '../../lib/FormProcessor' );
 const govukItemsFromObj = require( '../../lib/govuk-items-from-object' );
 const validators = require( '../../lib/validators' );
+const getDateParts = require( '../../lib/get-date-parts' );
 
 const reportDetailViewModel = require( './view-models/detail' );
 const reportsViewModel = require( './view-models/reports' );
-
-function barrierTypeToRadio( item ){
-
-	const { id, title, category } = item;
-
-	return {
-		value: id,
-		text: title,
-		category
-	};
-}
-
-function isBarrierTypeCategory( category ){
-
-	return ( item ) => item.category === category;
-}
-
-let countryItems;
 
 module.exports = {
 
@@ -34,7 +16,7 @@ module.exports = {
 
 		try {
 
-			const { response, body } = await backend.reports.getAllUnfinished( req );
+			const { response, body } = await backend.reports.getAll( req );
 
 			if( response.isSuccess ){
 
@@ -67,18 +49,7 @@ module.exports = {
 				items: govukItemsFromObj( metadata.statusTypes ),
 				validators: [{
 					fn: validators.isMetadata( 'statusTypes' ),
-					message: 'Select the current status of the problem'
-				}]
-			},
-
-			emergency: {
-				type: Form.RADIO,
-				values: [ sessionValues.emergency, ( report.is_emergency + '' ) ],
-				items: govukItemsFromObj( metadata.bool ),
-				conditional: { name: 'status', values: [ '1', '2' ] },
-				validators: [{
-					fn: validators.isMetadata( 'bool' ),
-					message: 'Answer if the problem is an emergency'
+					message: 'Select a barrier urgency'
 				}]
 			}
 		} );
@@ -91,317 +62,182 @@ module.exports = {
 			if( !form.hasErrors() ){
 
 				req.session.startFormValues = form.getValues();
-				return res.redirect( urls.reports.companySearch( report.id ) );
+				return res.redirect( urls.reports.isResolved( report.id ) );
 			}
 		}
 
 		res.render( 'reports/views/start', form.getTemplateValues() );
 	},
 
-	companySearch: async ( req, res, next ) => {
+	isResolved: ( req, res ) => {
 
-		const hasQueryParam = ( typeof req.query.company !== 'undefined' );
-		const query = hasQueryParam && req.query.company;
-		const data = {};
-
-		//TODO: Validate search term
-		if( hasQueryParam && !query ){
-
-			req.error( 'company', 'Enter a search term' );
-		}
-
-		if( query ){
-
-			data.query = query;
-
-			try {
-
-				const { response, body } = await datahub.searchCompany( req, query );
-
-				if( response.isSuccess ){
-
-					data.results = body;
-
-				} else {
-
-					let message;
-
-					switch( response.statusCode ){
-
-						case 404:
-							message = 'No company found';
-						break;
-						case 403:
-							message = 'You do not have permission to search for a company, please contact Data Hub support.';
-						break;
-						default:
-							message = 'There was an error finding the company';
-					}
-
-					data.error = message;
-				}
-
-			} catch ( e ){
-
-				return next( e );
-			}
-		}
-
-		res.render( 'reports/views/company-search', data );
-	},
-
-	companyDetails: ( req, res ) => {
-
-		if( req.method === 'POST' ){
-
-			const companyId = req.body.companyId;
-			const reportId = ( req.report && req.report.id );
-
-			if( companyId === req.session.reportCompany.id ){
-
-				res.redirect( urls.reports.contacts( companyId, reportId ) );
-
-			} else {
-
-				res.redirect( urls.reports.companySearch( reportId ) );
-			}
-
-		} else {
-
-			const { id, name, sector } = req.company;
-			req.session.reportCompany = { id, name, sector };
-
-			res.render( 'reports/views/company-details', {
-				csrfToken: req.csrfToken()
-			} );
-		}
-	},
-
-	contacts: async ( req, res ) => res.render( 'reports/views/contacts' ),
-
-	contactDetails: ( req, res ) => {
-		req.session.reportContact = req.contact.id;
-		res.render( 'reports/views/contact-details', { csrfToken: req.csrfToken() } );
-	},
-
-	save: async ( req, res, next ) => {
-
-		const contactId = req.body.contactId;
-		const reportId = ( req.report && req.report.id );
-		const sessionStartForm = ( req.session.startFormValues || req.report && { status: req.report.problem_status, emergency: ( req.report.is_emergency + '' ) } );
-		const sessionCompany =  ( req.session.reportCompany || req.report && { id: req.report.company_id, name: req.report.company_name } );
-		const sessionContact = req.session.reportContact;
-		const isUpdate = !!reportId;
-		const isExit = req.body.action === 'exit';
-
-		if( !sessionContact ){ return res.redirect( urls.reports.contacts( sessionCompany.id ) ); }
-
-		if( contactId !== sessionContact ){
-			return next( new Error( 'Contact id doesn\'t match session' ) );
-		}
-
-		try {
-
-			let response;
-			let body;
-			let values = Object.assign( {}, sessionStartForm, { company: sessionCompany }, { contactId: sessionContact } );
-
-			if( isUpdate ){
-				({ response, body } = await backend.reports.update( req, reportId, values ));
-			} else {
-				({ response, body } = await backend.reports.save( req, values ));
-			}
-
-			delete req.session.startFormValues;
-			delete req.session.reportCompany;
-			delete req.session.reportContact;
-
-			if( response.isSuccess ){
-
-				if( !isUpdate && !body.id ){
-
-					next( new Error( 'No id created for report' ) );
-
-				} else {
-
-					// TODO: Can this be cached again?
-					//req.session.report = body;
-					res.redirect( isExit ? urls.reports.detail( body.id ) : urls.reports.aboutProblem( body.id ) );
-				}
-
-			} else {
-
-				next( new Error( `Unable to ${ isUpdate ? 'update' : 'save' } report, got ${ response.statusCode } response code` ) );
-			}
-
-		} catch( e ){
-
-			next( e );
-		}
-	},
-
-	aboutProblem: async ( req, res, next ) => {
-
-		if( !countryItems ){
-
-			countryItems = metadata.countries.map( ( country ) => ( {
-				value: country.id,
-				text: country.name
-			} ) );
-
-			countryItems.unshift( {	value: '', text: 'Choose a country' } );
-		}
-
-		const report = req.report;
+		const sessionValues = ( req.session.isResolvedFormValues || {} );
+		const report  = ( req.report || {} );
+		const resolvedDateValues = ( sessionValues.resolvedDate || getDateParts( report.resolved_date ) || {} );
+		const invalidDateMessage = 'Enter resolution date and include a month and year';
 		const form = new Form( req, {
 
-			item: {
-				values: [ report.product ],
-				required: 'Enter the product or service being exported'
+			isResolved: {
+				type: Form.RADIO,
+				values: [ sessionValues.isResolved, report.is_resolved ],
+				items: govukItemsFromObj( metadata.bool ),
+				validators: [{
+					fn: validators.isMetadata( 'bool' ),
+					message: 'Select if the barrier is resolved or not'
+				}]
 			},
 
-			commodityCode: {
-				values: [ report.commodity_codes ]
+			resolvedDate: {
+				type: Form.GROUP,
+				conditional: { name: 'isResolved', value: 'true' },
+				errorField: 'resolved_date',
+				validators: [ {
+					fn: validators.isDateValue( 'month' ),
+					message: invalidDateMessage
+				},{
+					fn: validators.isDateValue( 'year' ),
+					message: invalidDateMessage
+				},{
+					fn: validators.isDateNumeric,
+					message: 'Resolution date must only include numbers'
+				},{
+					fn: validators.isDateValid,
+					message: invalidDateMessage
+				},{
+					fn: validators.isDateInPast,
+					message: 'Resolution date must be this month or in the past'
+				} ],
+				items: {
+					month: {
+						values: [ resolvedDateValues.month ]
+					},
+					year: {
+						values: [ resolvedDateValues.year ]
+					}
+				}
 			},
+		} );
+
+		if( form.isPost ){
+
+			form.validate();
+			delete req.session.isResolvedFormValues;
+
+			if( !form.hasErrors() ){
+
+				req.session.isResolvedFormValues = form.getValues();
+				return res.redirect( urls.reports.country( report.id ) );
+			}
+		}
+
+		res.render( 'reports/views/is-resolved', form.getTemplateValues() );
+	},
+
+	country: async ( req, res, next ) => {
+
+		const report  = ( req.report || {} );
+		const form = new Form( req, {
 
 			country: {
 				type: Form.SELECT,
 				values: [ report.export_country ],
-				items: countryItems,
+				items: metadata.countryList,
 				validators: [
 					{
 						fn: validators.isCountry,
-						message: 'Choose an export country/trading bloc'
+						message: 'Select a location for this barrier'
 					}
 				]
 			},
-
-			description: {
-				values: [ report.problem_description ],
-				required: 'Enter a brief description of the problem'
-			},
-
-			barrierTitle: {
-				values: [ report.barrier_title ],
-				required: 'Enter a barrier title'
-			}
 		} );
 
-		const processor = new FormProcessor( {
-			form,
-			render: ( templateValues ) => res.render( 'reports/views/about-problem', templateValues ),
-			saveFormData: ( formValues ) => backend.reports.saveProblem( req, report.id, formValues ),
-			saved: () => res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.impact( report.id ) )
-		} );
+		if( form.isPost ){
 
-		try {
+			form.validate();
 
-			await processor.process();
+			if( !form.hasErrors() ){
 
-		} catch( e ){
+				try {
 
-			next( e );
-		}
-	},
+					const reportId = report.id;
+					const sessionStartForm = ( req.session.startFormValues || req.report && { status: req.report.problem_status } );
+					const sessionResolvedForm = ( req.session.isResolvedFormValues || req.report && { isResolved: req.report.is_resolved, resolvedDate: req.report.resolved_date } );
+					const isUpdate = !!reportId;
 
-	impact: async ( req, res, next ) => {
+					let response;
+					let body;
+					let values = Object.assign( {}, sessionStartForm, sessionResolvedForm, form.getValues() );
 
-		const report = req.report;
-		const form = new Form( req, {
-
-			impact: {
-				values: [ report.problem_impact ],
-				required: 'Describe the impact of the problem'
-			},
-
-			losses: {
-				type: Form.RADIO,
-				values: [ report.estimated_loss_range ],
-				items: govukItemsFromObj( metadata.lossScale ),
-				validators: [ {
-					fn: validators.isMetadata( 'lossScale' ),
-					message: 'Answer the value of losses'
-				} ]
-			},
-
-			otherCompanies: {
-				type: Form.RADIO,
-				values: [ report.other_companies_affected ],
-				items: govukItemsFromObj( metadata.boolScale ),
-				validators: [ {
-					fn: validators.isMetadata( 'boolScale' ),
-					message: 'Answer if any other companies are affected'
-				} ]
-			},
-
-			otherCompaniesInfo: {
-				values: [ report.other_companies_info ],
-				conditional: { name: 'otherCompanies', value: '1' },
-				required: 'Enter information on the other companies'
-			}
-		} );
-
-		const processor = new FormProcessor( {
-			form,
-			render: ( templateValues ) => res.render( 'reports/views/impact', templateValues ),
-			saveFormData: ( formValues ) => backend.reports.saveImpact( req, report.id, formValues ),
-			saved: () => res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.legal( report.id ) )
-		} );
-
-		try {
-
-			await processor.process();
-
-		} catch ( e ){
-
-			next( e );
-		}
-	},
-
-	legal: async ( req, res, next ) => {
-
-		const report = req.report;
-		const form = new Form( req, {
-			hasInfringed: {
-				type: Form.RADIO,
-				values: [ report.has_legal_infringement ],
-				items: govukItemsFromObj( metadata.boolScale ),
-				validators: [ {
-					fn: validators.isMetadata( 'boolScale' ),
-					message: 'Answer if any legal obligations have been infringed'
-				} ]
-			},
-			infringements: {
-				type: Form.CHECKBOXES,
-				conditional: { name: 'hasInfringed', value: '1' },
-				validators: [ {
-					fn: validators.isOneBoolCheckboxChecked,
-					message: 'Select at least one infringement'
-				} ],
-				items: {
-					wtoInfringement: {
-						values: [ report.wto_infringement ]
-					},
-					ftaInfringement: {
-						values: [ report.fta_infringement ]
-					},
-					otherInfringement: {
-						values: [ report.other_infringement ]
+					if( isUpdate ){
+						({ response, body } = await backend.reports.update( req, reportId, values ));
+					} else {
+						({ response, body } = await backend.reports.save( req, values ));
 					}
+
+					if( response.isSuccess ){
+
+						delete req.session.startFormValues;
+						delete req.session.isResolvedFormValues;
+
+						if( !isUpdate && !body.id ){
+
+							return next( new Error( 'No id created for report' ) );
+
+						} else {
+
+							// TODO: Can this be cached again?
+							//req.session.report = body;
+							return res.redirect( urls.reports.hasSectors( body.id ) );
+						}
+
+					} else {
+
+						return next( new Error( `Unable to ${ isUpdate ? 'update' : 'save' } report, got ${ response.statusCode } response code` ) );
+					}
+
+				} catch( e ){
+
+					return next( e );
 				}
-			},
-			infringementSummary: {
-				values: [ report.infringement_summary ],
-				conditional: { name: 'hasInfringed', value: '1' },
-				required: 'List the provisions infringed'
+			}
+		}
+
+		res.render( 'reports/views/country', form.getTemplateValues() );
+	},
+
+	hasSectors: async ( req, res, next ) => {
+
+		const boolItems = govukItemsFromObj( metadata.bool );
+		const items = boolItems.map( ( item ) => item.value === 'false' ? { value: item.value, text: 'No, I don\'t know at the moment' } : item );
+		const report = req.report;
+		const form = new Form( req, {
+
+			hasSectors: {
+				type: Form.RADIO,
+				items,
+				values: [ report.sectors_affected ],
+				validators: [ {
+					fn: validators.isMetadata( 'bool' ),
+					message: 'Select if you are aware of a sector affected by the barrier'
+				} ]
 			}
 		} );
 
+		function getRedirectUrl(){
+
+			const { hasSectors } = form.getValues();
+			const sectorsList = ( report.sectors || req.session.sectors );
+			const hasListOfSectors = ( Array.isArray( sectorsList ) && sectorsList.length > 0 );
+			const urlMethod = ( hasSectors === 'true' ? ( hasListOfSectors ? 'sectors' : 'addSector' ) : 'aboutProblem' );
+
+			return urls.reports[ urlMethod ]( report.id );
+		}
+
 		const processor = new FormProcessor( {
 			form,
-			render: ( templateValues ) => res.render( 'reports/views/legal', templateValues ),
-			saveFormData: ( formValues ) => backend.reports.saveLegal( req, report.id, formValues ),
-			saved: () => res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.typeCategory( report.id ) )
+			render: ( templateValues ) => res.render( 'reports/views/has-sectors', templateValues ),
+			saveFormData: ( formValues ) => backend.reports.saveHasSectors( req, report.id, formValues ),
+			saved: () => res.redirect( form.isExit ? urls.reports.detail( report.id ) : getRedirectUrl() )
 		} );
 
 		try {
@@ -414,19 +250,78 @@ module.exports = {
 		}
 	},
 
-	typeCategory: ( req, res ) => {
+	sectors: async ( req, res, next ) => {
 
 		const report = req.report;
-		const sessionValues = req.session.typeCategoryValues;
-		const categoryValue = ( sessionValues && sessionValues.category );
+		const reportId = report.id;
+		const isPost = req.method === 'POST';
+
+		if( !req.session.sectors ){
+			req.session.sectors = ( report.sectors || [] );
+		}
+
+		const sectors = req.session.sectors;
+
+		if( isPost ){
+
+			if( sectors && sectors.length ){
+
+				try {
+
+					delete req.session.sectors;
+
+					const { response } = await backend.reports.saveSectors( req, reportId, { sectors } );
+
+					if( response.isSuccess ){
+
+						const isExit = ( req.body.action === 'exit' );
+						return res.redirect( isExit ? urls.reports.detail( reportId ) : urls.reports.aboutProblem( reportId ) );
+
+					} else {
+
+						return next( new Error( `Unable to update report, got ${ response.statusCode } response code` ) );
+					}
+
+				} catch( e ){
+
+					return next( e );
+				}
+			}
+		}
+
+		res.render( 'reports/views/sectors', { sectors: sectors.map( metadata.getSector ), csrfToken: req.csrfToken() } );
+	},
+
+	removeSector: ( req, res ) => {
+
+		const sectorToRemove = req.body.sector;
+
+		req.session.sectors = req.session.sectors.filter( ( sector ) => sector !== sectorToRemove );
+
+		res.redirect( urls.reports.sectors( req.report.id ) );
+	},
+
+	addSector: ( req, res ) => {
+
+		const report = req.report;
+
+		if( !req.session.sectors ){
+
+			req.session.sectors = ( report.sectors || [] );
+		}
+
+		const sectors = req.session.sectors;
 		const form = new Form( req, {
-			category: {
-				type: Form.RADIO,
-				items: govukItemsFromObj( metadata.barrierTypeCategories ),
-				values: [ categoryValue, report.barrier_type_category ],
+
+			sectors: {
+				type: Form.SELECT,
+				items: metadata.affectedSectorsList.filter( ( sector ) => !sectors.includes( sector.value ) ),
 				validators: [ {
-					fn: validators.isMetadata( 'barrierTypeCategories' ),
-					message: 'Choose a barrier type category'
+					fn: validators.isSector,
+					message: 'Select a sector affected by the barrier'
+				},{
+					fn: ( value ) => !sectors.includes( value ),
+					message: 'Sector already added, choose another'
 				} ]
 			}
 		} );
@@ -434,205 +329,82 @@ module.exports = {
 		if( form.isPost ){
 
 			form.validate();
-			delete req.session.typeCategoryValues;
 
 			if( !form.hasErrors() ){
 
-				req.session.typeCategoryValues = form.getValues();
-				return res.redirect( urls.reports.type( report.id ) );
+				sectors.push( form.getValues().sectors );
+				req.session.sectors = sectors;
+
+				return res.redirect( urls.reports.sectors( report.id ) );
 			}
 		}
 
-		res.render( 'reports/views/type-category', form.getTemplateValues() );
+		res.render( 'reports/views/add-sector', Object.assign( form.getTemplateValues(), { currentSectors: sectors.map( metadata.getSector ) } ) );
 	},
 
-	type: async ( req, res, next ) => {
+	aboutProblem: async ( req, res, next ) => {
 
 		const report = req.report;
-		const category = req.session.typeCategoryValues.category;
-		const items = metadata.barrierTypes.filter( isBarrierTypeCategory( category ) ).map( barrierTypeToRadio );
-		const form = new Form( req, {
-			barrierType: {
+		const isResolved = report.is_resolved;
+		const formConfig = {
+
+			item: {
+				values: [ report.product ],
+				required: 'Enter a product or service'
+			},
+
+			barrierAwareness: {
 				type: Form.RADIO,
-				items,
-				values: [ report.barrier_type_id ],
-				validators: [ {
-					fn: validators.isBarrierType,
-					message: 'Select a barrier type'
-				} ]
-			}
-		} );
+				values: [ report.source ],
+				items: govukItemsFromObj( metadata.barrierAwareness ),
+				validators: [
+					{
+						fn: validators.isMetadata( 'barrierAwareness' ),
+						message: 'Select how you became aware of the barrier'
+					}
+				]
+			},
+
+			barrierAwarenessOther: {
+				values: [ report.other_source ],
+				conditional: { name: 'barrierAwareness', value: 'OTHER' },
+				required: 'Enter how you became aware of the barrier'
+			},
+
+			barrierTitle: {
+				values: [ report.barrier_title ],
+				required: 'Enter a title for this barrier'
+			},
+
+			description: {
+				values: [ report.problem_description ],
+				required: 'Enter a brief description for this barrier'
+			},
+		};
+
+		if( isResolved ){
+
+			formConfig.resolvedDescription = {
+				values: [ report.status_summary ],
+				required: 'Enter an explanation of how you solved this barrier'
+			};
+		}
+
+		const form = new Form( req, formConfig );
 
 		const processor = new FormProcessor( {
 			form,
 			render: ( templateValues ) => {
 
-				templateValues.title = metadata.barrierTypeCategories[ category ];
+				const hasSectors = ( report.sectors_affected === true );
+				const urlMethod = ( hasSectors ? 'sectors' : 'hasSectors' );
 
-				res.render( 'reports/views/type', templateValues );
+				templateValues.backHref =  urls.reports[ urlMethod ]( report.id );
+				templateValues.isResolved = isResolved;
+
+				res.render( 'reports/views/about-problem', templateValues );
 			},
-			saveFormData: ( formValues ) => backend.reports.saveBarrierType( req, report.id, formValues ),
-			saved: () => {
-
-				delete req.session.typeCategoryValues;
-				res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.support( report.id ) );
-			}
-		} );
-
-		try {
-
-			await processor.process();
-
-		} catch( e ){
-
-			next( e );
-		}
-	},
-
-	support: async ( req, res, next ) => {
-
-		const report = req.report;
-		const dateParts = ( report.resolved_date || '' ).split( '-' );
-		const form = new Form( req, {
-			resolved: {
-				type: Form.RADIO,
-				values: [ report.is_resolved ],
-				items: govukItemsFromObj( metadata.bool ),
-				validators: [ {
-					fn: validators.isMetadata( 'bool' ),
-					message: 'Answer if the barrier has been resolved'
-				} ]
-			},
-			supportType: {
-				type: Form.RADIO,
-				values: [ report.support_type ],
-				items: govukItemsFromObj( metadata.supportType ),
-				conditional: { name: 'resolved', value: 'false' },
-				validators: [ {
-					fn: validators.isMetadata( 'supportType' ),
-					message: 'Answer what type of support you would like'
-				} ]
-			},
-			stepsTaken: {
-				values: [ report.steps_taken ],
-				conditional: { name: 'resolved', value: 'false' },
-				required: 'Provide a summary of key steps/actions taken so far'
-			},
-			resolvedDate: {
-				type: Form.GROUP,
-				conditional: { name: 'resolved', value: 'true' },
-				validators: [ {
-					fn: validators.isDateValue( 'day' ),
-					message: 'Enter a value for resolved day'
-				},{
-					fn: validators.isDateValue( 'month' ),
-					message: 'Enter a value for resolved month'
-				},{
-					fn: validators.isDateValue( 'year' ),
-					message: 'Enter a value for resolved year'
-				},{
-					fn: validators.isDateValid,
-					message: 'Enter a valid resolved date'
-				},{
-					fn: validators.isDateInPast,
-					message: 'Enter a resolved date that is in the past'
-				} ],
-				items: {
-					day: {
-						values: [ dateParts[ 2 ] ]
-					},
-					month: {
-						values: [ dateParts[ 1 ] ]
-					},
-					year: {
-						values: [ dateParts[ 0 ] ]
-					}
-				}
-			},
-			resolvedSummary: {
-				values: [ report.resolution_summary ],
-				conditional: { name: 'resolved', value: 'true' },
-				required: 'Enter a summary for how the barrier was resolved'
-			},
-			politicalSensitivities: {
-				type: Form.RADIO,
-				values: [ report.is_politically_sensitive ],
-				items: govukItemsFromObj( metadata.bool ),
-				validators: [ {
-					fn: validators.isMetadata( 'bool' ),
-					message: 'Answer if there are any political sensitivities'
-				} ]
-			},
-			sensitivitiesDescription: {
-				values: [ report.political_sensitivity_summary ],
-				conditional: { name: 'politicalSensitivities', value: 'true' },
-				required: 'Describe the sensitivities'
-			}
-		} );
-
-		const processor = new FormProcessor( {
-			form,
-			render: ( templateValues ) => res.render( 'reports/views/support', templateValues ),
-			saveFormData: ( formValues ) => backend.reports.saveSupport( req, report.id, formValues ),
-			saved: () => res.redirect( form.isExit ? urls.reports.detail( report.id ) : urls.reports.nextSteps( report.id ) )
-		} );
-
-		try {
-
-			await processor.process();
-
-		} catch( e ){
-
-			next( e );
-		}
-	},
-
-	nextSteps: async ( req, res, next ) => {
-
-		const report = req.report;
-		const form = new Form( req, {
-
-			response: {
-				type: Form.RADIO,
-				values: [ report.govt_response_requested ],
-				items: govukItemsFromObj( metadata.govResponse ),
-				validators: [ {
-					fn: validators.isMetadata( 'govResponse' ),
-					message: 'Select a type of UK goverment response'
-				} ]
-			},
-
-			sensitivities: {
-				type: Form.RADIO,
-				values: [ report.is_commercially_sensitive ],
-				items: govukItemsFromObj( metadata.bool ),
-				validators: [ {
-					fn: validators.isMetadata( 'bool' ),
-					message: 'Answser if there are any sensitivities'
-				} ]
-			},
-
-			sensitivitiesText: {
-				values: [ report.commercial_sensitivity_summary ],
-				conditional: { name: 'sensitivities', value: 'true' },
-				required: 'Describe the sensitivities'
-			},
-
-			permission: {
-				type: Form.RADIO,
-				values: [ report.can_publish ],
-				items: govukItemsFromObj( metadata.publishResponse ),
-				validators: [ {
-					fn: validators.isMetadata( 'publishResponse' ),
-					message: 'Answer if we can publish the summary'
-				} ]
-			}
-		} );
-
-		const processor = new FormProcessor( {
-			form,
-			render: ( templateValues ) => res.render( 'reports/views/next-steps', templateValues ),
-			saveFormData: ( formValues ) => backend.reports.saveNextSteps( req, report.id, formValues ),
+			saveFormData: ( formValues ) => backend.reports.saveProblem( req, report.id, formValues ),
 			saved: () => res.redirect( urls.reports.detail( report.id ) )
 		} );
 
@@ -656,7 +428,7 @@ module.exports = {
 
 			if( response.isSuccess ){
 
-				res.redirect( urls.reports.success() );
+				res.redirect( urls.reports.success( reportId ) );
 
 			} else {
 
@@ -669,5 +441,5 @@ module.exports = {
 		}
 	},
 
-	success: ( req, res ) => res.render( 'reports/views/success' )
+	success: ( req, res ) => res.render( 'reports/views/success', { uuid: req.uuid } )
 };

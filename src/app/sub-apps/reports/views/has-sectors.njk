@@ -1,0 +1,39 @@
+{% from 'components/radios/macro.njk' import govukRadios %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Report - Choose sector affected by the barrier{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.reports.country( report.id ) },
+		caption: 'Report a barrier',
+		text: 'Sectors affected by the barrier',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.reports.hasSectors( report.id ) }}" method="POST">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{{ govukRadios( {
+
+			idPrefix: 'has-resolved',
+			name: 'hasSectors',
+			classes: 'has-resolved',
+			fieldset: {
+				legend: {
+					text: 'Do you know which sector is affected by the barrier?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: hasSectors,
+			errorMessage: errors | errorForName( 'has-resolved-1' )
+			} )
+		}}
+
+		<input type="submit" value="Save and continue" class="govuk-button">
+		<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>
+	</form>
+{% endblock %}

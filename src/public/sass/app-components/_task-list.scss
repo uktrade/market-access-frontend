@@ -23,18 +23,6 @@ $gutter: 30px;
 	padding-bottom: ($gutter / 6);
 }
 
-.task-list__section-number {
-
-	display: table-cell;
-	padding-right: ($gutter / 6);
-
-	@include mq( $from: tablet ){
-		min-width: $task-list-indent;
-		padding-right: 0;
-	}
-}
-
-
 .task-list__items {
 
 	@extend .govuk-list;
@@ -42,10 +30,6 @@ $gutter: 30px;
 
 	@include mq( $from: tablet ){
 		margin-bottom: ($gutter * 2);
-	}
-
-	@include mq( $from: tablet ){
-		padding-left: $task-list-indent;
 	}
 }
 
@@ -61,18 +45,17 @@ $gutter: 30px;
 	border-top: 1px solid $govuk-grey-2;
 }
 
-.task-list__item__number {
-	float: left;
-	padding-right: govuk-em( 15, 16 );
-}
-
 .task-list__item__name {
 	width: 66.66%;
 	float: left;
 }
 
-.task-list__item__banner {
+.task-list__item__number {
+	float: left;
+	margin-right: govuk-em( 15, 16 );
+}
 
+.task-list__item__banner {
 	@extend .govuk-tag;
 	float: right;
 	margin-right: 0;

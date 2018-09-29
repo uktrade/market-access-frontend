@@ -1,0 +1,36 @@
+{% from 'components/select/macro.njk' import govukSelect %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Report - Location of the barrier{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.reports.isResolved( report.id ) },
+		caption: 'Report a barrier',
+		text: 'Location of the barrier',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.reports.country( report.id ) }}" method="POST" class="restrict-width">
+
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{{ govukSelect( {
+
+			label: {
+				text: "Where did the barrier start? Please provide a country",
+				classes: 'govuk-label--s'
+			},
+			id: 'country',
+			name: 'country',
+			items: country,
+			errorMessage: errors | errorForName( 'country' )
+		} ) }}
+
+		<input type="submit" class="govuk-button" value="Continue">
+
+	</form>
+{% endblock %}

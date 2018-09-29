@@ -1,4 +1,5 @@
 {% from 'components/panel/macro.njk' import govukPanel %}
+{% from 'app-components/checkmark.njk' import checkmark %}
 
 {% extends 'layout.njk' %}
 
@@ -7,10 +8,28 @@
 {% block page_content %}
 
 	{{ govukPanel({
-		titleText: 'Report submitted',
-		text: 'The report has been submitted and you have created an instance of a market access barrier'
+		titleHtml: ( checkmark() + '<br>Complete' )
 	}) }}
 
-	<a href="{{ urls.index() }}" class="govuk-button button--secondary">View dashboard</a>
+	<h2>What happens next?</h2>
+
+	<p>
+		You must continue to manage the barrier if it is still active. If there are updates, please <a href="{{ urls.barriers.detail( uuid ) }}">add more information</a>.
+	</p>
+
+	<p>
+		You can add more information to a barrier you created by using the <a href="{{ urls.index() }}">dashboard</a>.
+	</p>
+
+	<h3>
+		How did you find this service?
+	</h3>
+
+	<p>
+		We can make this service better with your feedback. Please <a href="mailto:{{ feedbackEmail }}">give us feedback</a> based on your experience.
+	</p>
+
+	<a href="{{ urls.barriers.detail( uuid ) }}" class="govuk-button">View the barrier</a>
+	<a href="{{ urls.index() }}" class="govuk-button button--secondary">View your dashboard</a>
 
 {% endblock %}

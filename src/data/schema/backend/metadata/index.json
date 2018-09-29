@@ -3,17 +3,31 @@
 	"title": "Metadata",
 
 	"type": "object",
-	"required": [ "status_types", "loss_range", "adv_boolean", "govt_response", "publish_response", "report_stages", "support_type", "barrier_types", "countries", "barrier_type_categories" ],
+	"required": [
+		"status_types",
+		"loss_range",
+		"stage_status",
+		"adv_boolean",
+		"govt_response",
+		"publish_response",
+		"report_stages",
+		"support_type",
+		"barrier_types",
+		"countries",
+		"sectors",
+		"barrier_status",
+		"barrier_type_categories",
+		"barrier_source"
+	],
 	"properties": {
 
 		"status_types": {
 			"type": "object",
-			"required": [ "1", "2", "3" ],
+			"required": [ "1", "2" ],
 			"properties": {
 
 				"1": { "$ref": "$refs/common.json#/words" },
-				"2": { "$ref": "$refs/common.json#/words" },
-				"3": { "$ref": "$refs/common.json#/words" }
+				"2": { "$ref": "$refs/common.json#/words" }
 			}
 		},
 
@@ -26,6 +40,17 @@
 				"2": { "$ref": "$refs/common.json#/words" },
 				"3": { "$ref": "$refs/common.json#/words" },
 				"4": { "$ref": "$refs/common.json#/words" }
+			}
+		},
+
+		"stage_status": {
+			"type": "object",
+			"required": [ "1", "2", "3" ],
+			"properties": {
+
+				"1": { "$ref": "$refs/common.json#/word" },
+				"2": { "$ref": "$refs/common.json#/word" },
+				"3": { "$ref": "$refs/common.json#/word" }
 			}
 		},
 
@@ -95,28 +120,34 @@
 			"type": "array",
 			"minItems": 10,
 			"maxItems": 20,
-			"items": {
-				"type": "object",
-				"required": [ "id", "title", "description", "category" ],
-				"properties": {
-
-					"id": { "$ref": "$refs/common.json#/int" },
-					"title": { "$ref": "$refs/common.json#/words" },
-					"description": { "$ref": "$refs/common.json#/paragraph" },
-					"category": {
-						"type": "string",
-						"pattern": "GOODS|SERVICES"
-					}
-				}
-			}
+			"items": { "$ref": "$refs/common.json#/barrier_type" }
 		},
 
 		"countries": {
 			"type": "array",
 			"minItems": 20,
 			"maxItems": 50,
-			"items": {
-				"$ref": "#/refs/country"
+			"items": { "$ref": "$refs/common.json#/country" }
+		},
+
+		"sectors": {
+			"type": "array",
+			"minItems": 15,
+			"maxItems": 30,
+			"items": { "$ref": "$refs/common.json#/sector" }
+		},
+
+		"barrier_status": {
+			"type": "object",
+			"required": [ "1", "2", "3", "4", "5", "6" ],
+			"properties": {
+
+				"1": { "$ref": "$refs/common.json#/words" },
+				"2": { "$ref": "$refs/common.json#/words" },
+				"3": { "$ref": "$refs/common.json#/words" },
+				"4": { "$ref": "$refs/common.json#/words" },
+				"5": { "$ref": "$refs/common.json#/words" },
+				"6": { "$ref": "$refs/common.json#/words" }
 			}
 		},
 
@@ -127,31 +158,17 @@
 				"GOODS": { "$ref": "$refs/common.json#/words" },
 				"SERVICES": { "$ref": "$refs/common.json#/words" }
 			}
-		}
-	},
+		},
 
-	"refs": {
-		"country": {
+		"barrier_source": {
 			"type": "object",
-			"required": [ "id", "name", "disabled_on" ],
+			"required": [ "COMPANY", "TRADE", "GOVT", "OTHER" ],
 			"properties": {
 
-				"id": { "$ref": "$refs/common.json#/uuid" },
-
-				"name" : {
-					"type": "string",
-					"faker": "address.country"
-				},
-
-				"disabled_on": {
-					"oneOf": [
-						{ "type": "null" },
-						{
-							"type": "string",
-							"faker": "date.past"
-						}
-					]
-				}
+				"COMPANY": { "$ref": "$refs/common.json#/word" },
+				"TRADE": { "$ref": "$refs/common.json#/words" },
+				"GOVT": { "$ref": "$refs/common.json#/words" },
+				"OTHER": { "$ref": "$refs/common.json#/word" }
 			}
 		}
 	}

@@ -12,10 +12,11 @@
 		<table class="standard-table">
 			<thead>
 				<tr class="standard-table__heading-row">
-					<th class="standard-table__heading">Company affected</th>
-					<th class="standard-table__heading">Problem status</th>
-					<th class="standard-table__heading">Report started by</th>
 					<th class="standard-table__heading standard-table__heading--active">Report started</th>
+					<th class="standard-table__heading">Barrier location</th>
+					<th class="standard-table__heading">Resolved?</th>
+					<th class="standard-table__heading">Barrier urgency</th>
+					<th class="standard-table__heading">Report started by</th>
 					<th class="standard-table__heading">Action</th>
 				</tr>
 			</thead>
@@ -23,16 +24,19 @@
 				{% for report in reports %}
 				<tr class="standard-table__row">
 					<td class="standard-table__cell">
-						{{ report.company_name or '---' }}
+						{{ ( report.created_on | dateWithTime ) or '---' }}
+					</td>
+					<td class="standard-table__cell">
+						{{ report.country.name or '---' }}
+					</td>
+					<td class="standard-table__cell">
+						{{ 'Yes' if report.isResolved else 'No' }}
 					</td>
 					<td class="standard-table__cell">
 						{{ report.problem_status.name or '---' }}
 					</td>
 					<td class="standard-table__cell">
 						{{ report.created_by or '---' }}
-					</td>
-					<td class="standard-table__cell">
-						{{ ( report.created_on | dateWithTime ) or '---' }}
 					</td>
 					<td class="standard-table__cell">
 						<a href="{{ urls.reports.detail( report.id ) }}">Continue</a>
@@ -45,7 +49,7 @@
 	{%- else -%}
 
 		<p class="no-results-message">
-			There aren't any unfinished reports.
+			There are currently no unfinished market access barrier reports.
 		</p>
 
 	{%- endif %}

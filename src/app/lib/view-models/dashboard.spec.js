@@ -6,6 +6,10 @@ describe( 'Dashboard view model', () => {
 	let viewModel;
 	let metadata;
 
+	function getSector(){
+		return { name: 'a sector' };
+	}
+
 	beforeEach( () => {
 
 		metadata = {
@@ -13,7 +17,8 @@ describe( 'Dashboard view model', () => {
 				{ id: 'abc-1', name: 'country 1' },
 				{ id: 'abc-2', name: 'country 2' },
 				{ id: 'abc-3', name: 'country 3' }
-			]
+			],
+			getSector
 		};
 
 		viewModel = proxyquire( modulePath, {
@@ -25,9 +30,10 @@ describe( 'Dashboard view model', () => {
 		it( 'Should transform and sort them', () => {
 
 			const barriers = [
-				{ id: 1, export_country: 'abc-1', current_status: { status: 1 }, support_type: 2, contributor_count: 4, reported_on: 'Wed Nov 22 2017 10:45:25 GMT+0000 (GMT)' },
+				{ id: 1, export_country: 'abc-1', sectors: [ 'a', 'b' ], current_status: { status: 1 }, support_type: 2, contributor_count: 4, reported_on: 'Wed Nov 22 2017 10:45:25 GMT+0000 (GMT)' },
 				{ id: 2, export_country: 'abc-3', current_status: { status: 4 }, support_type: 1, contributor_count: 0, reported_on: 'Fri Jun 01 2018 01:43:07 GMT+0100 (BST)' },
-				{ id: 3, export_country: 'def-1', current_status: { status: 1 }, support_type: 2, contributor_count: 4, reported_on: 'Sat Mar 10 2018 12:51:35 GMT+0000 (GMT)' }
+				{ id: 3, export_country: 'def-1', sectors: [ 'c', 'd' ], current_status: { status: 1 }, support_type: 2, contributor_count: 4, reported_on: 'Sat Mar 10 2018 12:51:35 GMT+0000 (GMT)' },
+				{ id: 4, export_country: 'def-2', current_status: { status: 1 }, support_type: 2, contributor_count: 4, reported_on: 'Wed Nov 22 2017 10:45:25 GMT+0000 (GMT)' }
 			];
 
 			const output = viewModel( barriers );
@@ -50,10 +56,23 @@ describe( 'Dashboard view model', () => {
 				},
 				resolved: false,
 				supportNeeded: false,
-				hasContributors: true
+				hasContributors: true,
+				sectors: [ getSector().name, getSector().name ]
 			} );
 
 			checkBarrier( 1, {
+				id: 4,
+				country: {
+					id: barriers[ 3 ].export_country,
+					name: undefined
+				},
+				resolved: false,
+				supportNeeded: false,
+				hasContributors: true,
+				sectors: [ 'Unknown' ]
+			} );
+
+			checkBarrier( 2, {
 				id: 3,
 				country: {
 					id: barriers[ 2 ].export_country,
@@ -61,10 +80,11 @@ describe( 'Dashboard view model', () => {
 				},
 				resolved: false,
 				supportNeeded: false,
-				hasContributors: true
+				hasContributors: true,
+				sectors: [ getSector().name, getSector().name ]
 			} );
 
-			checkBarrier( 2, {
+			checkBarrier( 3, {
 				id: 2,
 				country: {
 					id: barriers[ 1 ].export_country,
@@ -72,7 +92,8 @@ describe( 'Dashboard view model', () => {
 				},
 				resolved: true,
 				supportNeeded: true,
-				hasContributors: false
+				hasContributors: false,
+				sectors: [ 'Unknown' ]
 			} );
 		} );
 	} );

@@ -3,6 +3,8 @@ const Form = require( '../../lib/Form' );
 const FormProcessor = require( '../../lib/FormProcessor' );
 const urls = require( '../../lib/urls' );
 const validators = require( '../../lib/validators' );
+const metadata = require( '../../lib/metadata' );
+const govukItemsFromObj = require( '../../lib/govuk-items-from-object' );
 const detailVieWModel = require( './view-models/detail' );
 
 function sortByDate( a, b ){
@@ -33,6 +35,23 @@ function getInteractionsList( interactions ){
 	other.sort( sortByDate );
 
 	return pinned.concat( other );
+}
+
+function barrierTypeToRadio( item ){
+
+	const { id, title, category, description } = item;
+
+	return {
+		value: id,
+		text: title,
+		category,
+		conditional: { html: `<div class="conditional-barrier-type-content">${ description.replace( '\n', '<br>' ) }</div>` }
+	};
+}
+
+function isBarrierTypeCategory( category ){
+
+	return ( item ) => item.category === category;
 }
 
 async function renderInteractions( req, res, next, data ){
@@ -148,7 +167,7 @@ module.exports = {
 			[ HIBERNATE ]: {
 				serviceMethod: 'hibernate',
 				successPage: 'statusHibernated',
-				label: 'Mark as <strong>hibernation</strong>',
+				label: 'Mark as <strong>paused</strong>',
 				fields: {
 					hibernationSummary: {
 						conditional: { name: 'status', value: HIBERNATE },
@@ -238,5 +257,83 @@ module.exports = {
 
 	statusResolved: ( req, res ) => res.render( 'barriers/views/status-resolved', { barrierId: req.uuid } ),
 	statusHibernated: ( req, res ) => res.render( 'barriers/views/status-hibernated', { barrierId: req.uuid } ),
-	statusOpen: ( req, res ) => res.render( 'barriers/views/status-open', { barrierId: req.uuid } )
+	statusOpen: ( req, res ) => res.render( 'barriers/views/status-open', { barrierId: req.uuid } ),
+
+	type: {
+
+		list: async ( req, res, next ) => {
+
+			const category = req.category;
+			const barrier = req.barrier;
+			const typeId = ( barrier.barrier_type && barrier.barrier_type.id );
+			const items = metadata.barrierTypes.filter( isBarrierTypeCategory( category ) ).map( barrierTypeToRadio );
+			const form = new Form( req, {
+				barrierType: {
+					type: Form.RADIO,
+					items,
+					values: [ typeId ],
+					validators: [ {
+						fn: validators.isBarrierType,
+						message: 'Select a barrier type'
+					} ]
+				}
+			} );
+
+			const processor = new FormProcessor( {
+				form,
+				render: ( templateValues ) => {
+
+					templateValues.title = metadata.barrierTypeCategories[ category ];
+					templateValues.category = category;
+
+					res.render( 'barriers/views/type', templateValues );
+				},
+				saveFormData: ( formValues ) => backend.barriers.saveType( req, barrier.id, formValues ),
+				saved: () => {
+
+					delete req.session.typeCategoryValues;
+					res.redirect( urls.barriers.detail( barrier.id ) );
+				}
+			} );
+
+			try {
+
+				await processor.process();
+
+			} catch( e ){
+
+				next( e );
+			}
+		},
+
+		category: ( req, res ) => {
+
+			const barrierId = req.barrier.id;
+			const category = ( req.barrier.barrier_type && req.barrier.barrier_type.category );
+			const form = new Form( req, {
+				category: {
+					type: Form.RADIO,
+					values: ( category ? [ category ] : [] ),
+					items: govukItemsFromObj( metadata.barrierTypeCategories ),
+					validators: [ {
+						fn: validators.isMetadata( 'barrierTypeCategories' ),
+						message: 'Choose a barrier type category'
+					} ]
+				}
+			} );
+
+			if( form.isPost ){
+
+				form.validate();
+
+				if( !form.hasErrors() ){
+
+					const category = form.getValues().category;
+					return res.redirect( urls.barriers.type.list( barrierId, category ) );
+				}
+			}
+
+			res.render( 'barriers/views/type-category', form.getTemplateValues() );
+		}
+	}
 };

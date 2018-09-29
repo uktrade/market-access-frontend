@@ -10,6 +10,7 @@ describe( 'Backend Service', () => {
 	let backend;
 	let service;
 	let req;
+	let metadata;
 
 	beforeEach( () => {
 
@@ -20,27 +21,45 @@ describe( 'Backend Service', () => {
 			post: jasmine.createSpy( 'backend.post' ),
 			put: jasmine.createSpy( 'backend.put' )
 		};
+		metadata = {
+			getCountry: jasmine.createSpy( 'metadata.country' )
+		};
 
 		service = proxyquire( modulePath, {
-			'./backend-request': backend
+			'./backend-request': backend,
+			'./metadata': metadata
 		} );
 	} );
 
 	describe( 'getUser', () => {
-		it( 'Should call the correct path', async () => {
+		describe( 'When the response is a success', () => {
+			it( 'Should call the correct path and transform the response', async () => {
 
-			await service.getUser( req );
+				const body = { location: 'test' };
+				const countryResponse = 'a country';
 
-			expect( backend.get ).toHaveBeenCalledWith( '/whoami', token );
+				backend.get.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body }) );
+				metadata.getCountry.and.callFake( () => countryResponse );
+
+				await service.getUser( req );
+
+				expect( backend.get ).toHaveBeenCalledWith( '/whoami', token );
+				expect( body.country ).toEqual( countryResponse );
+			} );
 		} );
-	} );
 
-	describe( 'getMetadata', () => {
-		it( 'Should call the correct path', async () => {
+		describe( 'When the response is not a success', () => {
+			it( 'Should call the correct path and not transform the response', async () => {
 
-			await service.getMetadata();
+				const body = { location: 'test' };
 
-			expect( backend.get ).toHaveBeenCalledWith( '/metadata' );
+				backend.get.and.callFake( () => Promise.resolve( { response: { isSuccess: false }, body }) );
+
+				await service.getUser( req );
+
+				expect( backend.get ).toHaveBeenCalledWith( '/whoami', token );
+				expect( body.country ).not.toBeDefined();
+			} );
 		} );
 	} );
 
@@ -81,7 +100,7 @@ describe( 'Backend Service', () => {
 		} );
 
 		describe( 'saveNote', () => {
-			it( 'Should POST to the correct path with the correct values', async () => {
+			it( 'Should PUT to the correct path with the correct values', async () => {
 
 				const note = 'my test note';
 				const pinned = 'true';
@@ -99,7 +118,7 @@ describe( 'Backend Service', () => {
 		} );
 
 		describe( 'resolve', () => {
-			it( 'Should POST to the correct path with the correct values', async () => {
+			it( 'Should PUT to the correct path with the correct values', async () => {
 
 				const [ day, month, year ] = [ '10', '11', '2000' ];
 				const resolvedSummary = 'my summary text';
@@ -109,30 +128,30 @@ describe( 'Backend Service', () => {
 					resolvedSummary
 				} );
 
-				expect( backend.post ).toHaveBeenCalledWith( `/barriers/${ barrierId }/resolve`, token, {
+				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/resolve`, token, {
 					status_date: [ year, month, day ].join( '-' ) + 'T00:00',
-					summary: resolvedSummary
+					status_summary: resolvedSummary
 				} );
 			} );
 		} );
 
 		describe( 'open', () => {
-			it( 'Should POST to the correct path with the correct values', async () => {
+			it( 'Should PUT to the correct path with the correct values', async () => {
 
-				const openSummary = 'my summary text';
+				const reopenSummary = 'my summary text';
 
 				await service.barriers.open( req, barrierId, {
-					openSummary
+					reopenSummary
 				} );
 
-				expect( backend.post ).toHaveBeenCalledWith( `/barriers/${ barrierId }/open`, token, {
-					summary: openSummary
+				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/open`, token, {
+					status_summary: reopenSummary
 				} );
 			} );
 		} );
 
 		describe( 'hibernate', () => {
-			it( 'Should POST to the correct path with the correct values', async () => {
+			it( 'Should PUT to the correct path with the correct values', async () => {
 
 				const hibernationSummary = 'my summary text';
 
@@ -140,8 +159,8 @@ describe( 'Backend Service', () => {
 					hibernationSummary
 				} );
 
-				expect( backend.post ).toHaveBeenCalledWith( `/barriers/${ barrierId }/hibernate`, token, {
-					summary: hibernationSummary
+				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/hibernate`, token, {
+					status_summary: hibernationSummary
 				} );
 			} );
 		} );
@@ -183,8 +202,9 @@ describe( 'Backend Service', () => {
 				it( 'Should call the correct path and sort the progress', () => {
 
 					const reportId = 1;
+					const report = getFakeData( '/backend/reports/report' );
 
-					backend.get.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body: {} } ) );
+					backend.get.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body: report } ) );
 
 					service.reports.get( req, reportId );
 
@@ -210,24 +230,18 @@ describe( 'Backend Service', () => {
 			describe( 'When the values are empty', () => {
 				it( 'Should POST to the correct path with null values', () => {
 
-					const company = { id: '', name: '', sector: null };
-					const contactId = '';
-
 					service.reports.save( req, {
 						status: '',
-						emergency: '',
-						company,
-						contactId
+						isResolved: '',
+						resolvedDate: '',
+						country: ''
 					} );
 
 					expect( backend.post ).toHaveBeenCalledWith( '/reports', token, {
 						problem_status: null,
-						is_emergency: null,
-						company_id: null,
-						company_name: null,
-						company_sector_id: null,
-						company_sector_name: null,
-						contact_id: null
+						is_resolved: null,
+						resolved_date: null,
+						export_country: null
 					} );
 				} );
 			} );
@@ -235,60 +249,52 @@ describe( 'Backend Service', () => {
 			describe( 'When the values are not empty', () => {
 
 				let status;
-				let emergency;
-				let company;
-				let contactId;
+				let isResolved;
+				let resolvedDate;
+				let country;
 
 				beforeEach( () => {
 
 					status = 1;
-					emergency = 2;
-					company = { id: 3, name: 'test company', sector: null };
-					contactId = '123-abc';
+					isResolved = true;
+					resolvedDate = { year: '2018', month:'02' };
+					country = uuid();
 				} );
 
-				describe( 'When there is a sector for the company', () => {
-					it( 'Should POST to the correct path with the values and the sector', () => {
-
-						company.sector = { id: 4, name: 'a sector' };
-
-						service.reports.save( req, {
-							status,
-							emergency,
-							company,
-							contactId
-						} );
-
-						expect( backend.post ).toHaveBeenCalledWith( '/reports', token, {
-							problem_status: status,
-							is_emergency: emergency,
-							company_id: company.id,
-							company_name: company.name,
-							company_sector_id: company.sector.id,
-							company_sector_name: company.sector.name,
-							contact_id: contactId
-						} );
-					} );
-				} );
-
-				describe( 'When there is not a sector for the company', () => {
+				describe( 'When isResolved is true', () => {
 					it( 'Should POST to the correct path with the values and sector as null', () => {
 
 						service.reports.save( req, {
 							status,
-							emergency,
-							company,
-							contactId
+							isResolved,
+							resolvedDate,
+							country
 						} );
 
 						expect( backend.post ).toHaveBeenCalledWith( '/reports', token, {
 							problem_status: status,
-							is_emergency: emergency,
-							company_id: company.id,
-							company_name: company.name,
-							company_sector_id: null,
-							company_sector_name: null,
-							contact_id: contactId
+							is_resolved: isResolved,
+							resolved_date: '2018-02-01',
+							export_country: country
+						} );
+					} );
+				} );
+
+				describe( 'When isResolved is false', () => {
+					it( 'Should POST to the correct path with the values and sector as null', () => {
+
+						service.reports.save( req, {
+							status,
+							isResolved: false,
+							resolvedDate,
+							country
+						} );
+
+						expect( backend.post ).toHaveBeenCalledWith( '/reports', token, {
+							problem_status: status,
+							is_resolved: false,
+							resolved_date: '2018-02-01',
+							export_country: country
 						} );
 					} );
 				} );
@@ -332,9 +338,9 @@ describe( 'Backend Service', () => {
 				describe( 'With non empty values', () => {
 					it( 'Should use the values', () => {
 
-					service.reports[ methodName ]( req, reportId, serviceData );
+						service.reports[ methodName ]( req, reportId, serviceData );
 
-					expect( backend.put ).toHaveBeenCalledWith( path, token, backendData );
+						expect( backend.put ).toHaveBeenCalledWith( path, token, backendData );
 					} );
 				} );
 			}
@@ -342,145 +348,89 @@ describe( 'Backend Service', () => {
 			describe( 'update', () => {
 
 				const status = 1;
-				const emergency = 2;
-				const company = { id: 3, name: 'test company', sector: { id: 4, name: 'another sector' } };
-				const contactId = '123-abc';
+				const isResolved = true;
+				const resolvedDate = { year: '2018', month:'02' };
+				const country = uuid();
 
-				checkWithAndWithoutValues( 'update', {
-					status,
-					emergency,
-					company,
-					contactId
+				describe( 'When the resolvedDate has a year and month', () => {
+
+					checkWithAndWithoutValues( 'update', {
+						status,
+						isResolved,
+						resolvedDate,
+						country
+					}, {
+						problem_status: status,
+						is_resolved: isResolved,
+						resolved_date: '2018-02-01',
+						export_country: country
+					} );
+				} );
+
+				describe( 'When the resolvedDate is an empty object', () => {
+
+					checkWithAndWithoutValues( 'update', {
+						status,
+						isResolved,
+						resolvedDate: {},
+						country
+					}, {
+						problem_status: status,
+						is_resolved: isResolved,
+						resolved_date: null,
+						export_country: country
+					} );
+				} );
+			} );
+
+			describe( 'saveHasSectors', () => {
+
+				const hasSectors = 'true';
+
+				checkWithAndWithoutValues( 'saveHasSectors', {
+					hasSectors
 				}, {
-					problem_status: status,
-					is_emergency: emergency,
-					company_id: company.id,
-					company_name: company.name,
-					company_sector_id: company.sector.id,
-					company_sector_name: company.sector.name,
-					contact_id: contactId
+					sectors_affected: hasSectors
+				} );
+			} );
+
+			describe( 'saveSectors', () => {
+
+				const sectors = [
+					uuid(),
+					uuid()
+				];
+
+				checkWithAndWithoutValues( 'saveSectors', {
+					sectors
+				}, {
+					sectors
 				} );
 			} );
 
 			describe( 'saveProblem', () => {
 
 				const item = '1';
-				const commodityCode = '1, 2';
-				const country = 'a';
 				const description = 'b';
 				const barrierTitle = 'c';
+				const barrierAwareness = 'd';
+				const barrierAwarenessOther = 'e';
+				const resolvedDescription = 'f';
 
 				checkWithAndWithoutValues( 'saveProblem', {
 					item,
-					commodityCode,
-					country,
 					description,
-					barrierTitle
+					barrierTitle,
+					barrierAwareness,
+					barrierAwarenessOther,
+					resolvedDescription
 				}, {
 					product: item,
-					commodity_codes: commodityCode,
-					export_country: country,
 					problem_description: description,
 					barrier_title: barrierTitle,
-				} );
-			} );
-
-			describe( 'saveImpact', () => {
-
-				const impact = '1';
-				const losses = '2';
-				const otherCompanies = '3';
-				const otherCompaniesInfo = 'test';
-
-				checkWithAndWithoutValues( 'saveImpact', {
-					impact,
-					losses,
-					otherCompanies,
-					otherCompaniesInfo
-				}, {
-					problem_impact: impact,
-					estimated_loss_range: losses,
-					other_companies_affected: otherCompanies,
-					other_companies_info: otherCompaniesInfo
-				} );
-			} );
-
-			describe( 'saveLegal', () => {
-
-				const hasInfringed = 'true';
-				const infringements = {
-					wtoInfringement: 'true',
-					ftaInfringement: '',
-					otherInfringement: 'true'
-				};
-				const infringementSummary = 'test';
-
-				checkWithAndWithoutValues( 'saveLegal', {
-					hasInfringed,
-					infringements,
-					infringementSummary
-				}, {
-					has_legal_infringement: hasInfringed,
-					wto_infringement: true,
-					fta_infringement: false,
-					other_infringement: true,
-					infringement_summary: infringementSummary
-				} );
-			} );
-
-			describe( 'saveBarrierType', () => {
-
-				const barrierType = '2';
-
-				checkWithAndWithoutValues( 'saveBarrierType', { barrierType }, { barrier_type: barrierType } );
-			} );
-
-			describe( 'saveSupport', () => {
-
-				const resolved = '1';
-				const supportType = '2';
-				const stepsTaken = '3';
-				const politicalSensitivities = '1';
-				const sensitivitiesDescription = 'test';
-				const resolvedDate = { year: '2016', month: '01', day: '01' };
-				const resolvedSummary = 'resolvedSummary';
-
-				checkWithAndWithoutValues( 'saveSupport', {
-					resolved,
-					supportType,
-					stepsTaken,
-					resolvedDate,
-					resolvedSummary,
-					politicalSensitivities,
-					sensitivitiesDescription
-				}, {
-					is_resolved: resolved,
-					support_type: supportType,
-					steps_taken: stepsTaken,
-					resolved_date: '2016-01-01',
-					resolution_summary: resolvedSummary,
-					is_politically_sensitive: politicalSensitivities,
-					political_sensitivity_summary: sensitivitiesDescription
-				} );
-			} );
-
-			describe( 'saveNextSteps', () => {
-
-				const response = '1';
-				const sensitivities = '2';
-				const sensitivitiesText = '3';
-				const permission = '4';
-
-				checkWithAndWithoutValues( 'saveNextSteps', {
-					response,
-					sensitivities,
-					sensitivitiesText,
-					permission
-				}, {
-					govt_response_requested: response,
-					is_commercially_sensitive: sensitivities,
-					commercial_sensitivity_summary: sensitivitiesText,
-					can_publish: permission
+					source: barrierAwareness,
+					other_source: barrierAwarenessOther,
+					status_summary: resolvedDescription
 				} );
 			} );
 		} );

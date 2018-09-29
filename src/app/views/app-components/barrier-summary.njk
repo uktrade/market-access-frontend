@@ -13,20 +13,12 @@
 				<dd class="barrier-summary__info__group__value">{{ barrier.reportedOn | dateOnly }}</dd>
 			</div>
 			<div class="barrier-summary__info__group">
-				<dt class="barrier-summary__info__group__key">Company affected</dt>
-				<dd class="barrier-summary__info__group__value">{{ barrier.company.name }}</dd>
-			</div>
-			<div class="barrier-summary__info__group">
-				<dt class="barrier-summary__info__group__key">Export country</dt>
+				<dt class="barrier-summary__info__group__key">Barrier location</dt>
 				<dd class="barrier-summary__info__group__value">{{ barrier.country.name }}</dd>
 			</div>
 			<div class="barrier-summary__info__group">
-				<dt class="barrier-summary__info__group__key">Barrier Type</dt>
-				<dd class="barrier-summary__info__group__value">{{ barrier.type.title }}</dd>
-			</div>
-			<div class="barrier-summary__info__group">
-				<dt class="barrier-summary__info__group__key">Sector</dt>
-				<dd class="barrier-summary__info__group__value">{{ barrier.sector.name or '---' }}</dd>
+				<dt class="barrier-summary__info__group__key">Barrier urgency</dt>
+				<dd class="barrier-summary__info__group__value">{{ barrier.problem.status }}</dd>
 			</div>
 		</dl>
 	</section>

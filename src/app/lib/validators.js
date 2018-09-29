@@ -1,4 +1,6 @@
 const metadata = require( './metadata' );
+const uuid = /^[a-zA-Z0-9-]+$/;
+const isNumeric = /^[0-9]+$/;
 
 module.exports = {
 	isDefined: ( value ) => {
@@ -10,9 +12,10 @@ module.exports = {
 		if( isString ){ return value.length > 0; }
 		return isDefined;
 	},
-	isUuid: ( value ) => /^[a-zA-Z0-9-]+$/.test( value ),
+	isUuid: ( value ) => uuid.test( value ),
 	isMetadata: ( key ) => ( value ) => Object.keys( metadata[ key ] ).includes( value ),
 	isCountry: ( value ) => metadata.countries.some( ( country ) => country.id === value ),
+	isSector: ( value ) => metadata.sectors.some( ( sector ) => sector.id === value ),
 	isOneBoolCheckboxChecked: ( values ) => {
 
 		for( let [ /* key */, value ] of Object.entries( values ) ){
@@ -27,5 +30,16 @@ module.exports = {
 	isBarrierType: ( value ) => metadata.barrierTypes.some( ( barrier ) => barrier.id == value ),
 	isDateValue: ( key ) => ( values ) => !!values[ key ],
 	isDateValid: ( values ) => !!Date.parse( [ values.year, values.month, values.day ].join( '-' ) ),
-	isDateInPast: ( values ) => ( Date.parse( [ values.year, values.month, values.day ].join( '-' ) ) < Date.now() )
+	isDateInPast: ( values ) => ( Date.parse( [ values.year, values.month, values.day ].join( '-' ) ) < Date.now() ),
+	isDateNumeric: ( values ) => {
+
+		let allValues = '';
+
+		for( let [ , value ] of Object.entries( values ) ){
+
+			allValues += value;
+		}
+
+		return isNumeric.test( allValues );
+	}
 };

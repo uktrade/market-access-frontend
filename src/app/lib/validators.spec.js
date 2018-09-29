@@ -161,16 +161,32 @@ describe( 'validators', () => {
 
 	describe( 'isDateValid', () => {
 		describe( 'With a valid date', () => {
-			it( 'Should return true', () => {
+			describe( 'When there is a year, month and day', () => {
+				it( 'Should return true', () => {
 
-				expect( validators.isDateValid( { year: '2016', month: '01', day: '01' } ) ).toEqual( true );
+					expect( validators.isDateValid( { year: '2016', month: '01', day: '01' } ) ).toEqual( true );
+				} );
+			} );
+			describe( 'When there is a year and month', () => {
+				it( 'Should return true', () => {
+
+					expect( validators.isDateValid( { year: '2016', month: '01' } ) ).toEqual( true );
+				} );
 			} );
 		} );
 
 		describe( 'With an invalid date', () => {
-			it( 'Should return false', () => {
+			describe( 'When there is a year, month and day', () => {
+				it( 'Should return false', () => {
 
-				expect( validators.isDateValid( { year: '2016', month: '20', day: '01' } ) ).toEqual( false );
+					expect( validators.isDateValid( { year: '2016', month: '20', day: '01' } ) ).toEqual( false );
+				} );
+			} );
+			describe( 'When there is a year and month', () => {
+				it( 'Should return false', () => {
+
+					expect( validators.isDateValid( { year: '2016', month: '20' } ) ).toEqual( false );
+				} );
 			} );
 		} );
 	} );
@@ -178,24 +194,103 @@ describe( 'validators', () => {
 	describe( 'isDateInPast', () => {
 		describe( 'With a valid date', () => {
 			describe( 'When the date is in the past', () => {
-				it( 'Should return true', () => {
+				describe( 'When there is a year, month and day', () => {
+					it( 'Should return true', () => {
 
-					expect( validators.isDateInPast( { year: '2016', month: '01', day: '01' } ) ).toEqual( true );
+						expect( validators.isDateInPast( { year: '2016', month: '01', day: '01' } ) ).toEqual( true );
+					} );
+				} );
+				describe( 'When there is a year and month', () => {
+					it( 'Should return true', () => {
+
+						expect( validators.isDateInPast( { year: '2016', month: '01' } ) ).toEqual( true );
+					} );
 				} );
 			} );
 
 			describe( 'When the date is in the future', () => {
-				it( 'Should return false', () => {
+				describe( 'When there is a year, month and day', () => {
+					it( 'Should return false', () => {
 
-					expect( validators.isDateInPast( { year: '2050', month: '01', day: '01' } ) ).toEqual( false );
+						expect( validators.isDateInPast( { year: '2050', month: '01', day: '01' } ) ).toEqual( false );
+					} );
+				} );
+				describe( 'When there is a year and month', () => {
+					it( 'Should return false', () => {
+
+						expect( validators.isDateInPast( { year: '2050', month: '01' } ) ).toEqual( false );
+					} );
 				} );
 			} );
 		} );
 
 		describe( 'With an invalid date', () => {
-			it( 'Should return false', () => {
+			describe( 'When there is a year, month and day', () => {
+				it( 'Should return false', () => {
 
-				expect( validators.isDateInPast( { year: '2016', month: '20', day: '01' } ) ).toEqual( false );
+					expect( validators.isDateInPast( { year: '2016', month: '20', day: '01' } ) ).toEqual( false );
+				} );
+			} );
+			describe( 'When there is a year and month', () => {
+				it( 'Should return false', () => {
+
+					expect( validators.isDateInPast( { year: '2016', month: '20' } ) ).toEqual( false );
+				} );
+			} );
+		} );
+	} );
+
+	describe( 'isDateNumeric', () => {
+		describe( 'When there is only a year and month', () => {
+			describe( 'When both month and year are numbers', () => {
+				it( 'Should return true', () => {
+
+					expect( validators.isDateNumeric( { year: '2000', month: '10' } ) ).toEqual( true );
+				} );
+			} );
+
+			describe( 'When month is a number but year is not', () => {
+				it( 'Should return false', () => {
+
+					expect( validators.isDateNumeric( { year: 'abc', month: '10' } ) ).toEqual( false );
+				} );
+			} );
+
+			describe( 'When year is a number but month is not', () => {
+				it( 'Should return false', () => {
+
+					expect( validators.isDateNumeric( { year: '2000', month: 'abc' } ) ).toEqual( false );
+				} );
+			} );
+		} );
+
+		describe( 'When there is a year, month and day', () => {
+			describe( 'When all are numbers', () => {
+				it( 'Should return true', () => {
+
+					expect( validators.isDateNumeric( { year: '2000', month: '10', day: '01' } ) ).toEqual( true );
+				} );
+			} );
+
+			describe( 'When day and month are numbers but year is not', () => {
+				it( 'Should return false', () => {
+
+					expect( validators.isDateNumeric( { year: 'abc', month: '10', day: '01' } ) ).toEqual( false );
+				} );
+			} );
+
+			describe( 'When year and day are numbers but month is not', () => {
+				it( 'Should return false', () => {
+
+					expect( validators.isDateNumeric( { year: '2000', month: 'abc', day: '01' } ) ).toEqual( false );
+				} );
+			} );
+
+			describe( 'When year and month are numbers but day is not', () => {
+				it( 'Should return false', () => {
+
+					expect( validators.isDateNumeric( { year: '2000', month: '10', day: 'abc' } ) ).toEqual( false );
+				} );
 			} );
 		} );
 	} );

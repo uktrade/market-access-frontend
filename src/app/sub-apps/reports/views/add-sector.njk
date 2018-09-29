@@ -1,0 +1,40 @@
+{% from 'components/select/macro.njk' import govukSelect %}
+{% from 'app-components/heading.njk' import heading %}
+{% from 'app-components/report-sectors.njk' import reportSectors %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Report - Add an affected sector{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.reports.hasSectors( report.id ) },
+		caption: 'Report a barrier',
+		text: 'Sectors affected by the barrier',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.reports.addSector( report.id ) }}" method="POST">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{{ govukSelect( {
+
+			label: {
+				text: "Which sector is affected by the barrier?",
+				classes: 'govuk-label--s'
+			},
+			id: 'sectors',
+			name: 'sectors',
+			items: sectors,
+			errorMessage: errors | errorForName( 'sectors' )
+		} ) }}
+
+		{% if currentSectors and currentSectors.length %}
+		{{ reportSectors( report, currentSectors ) }}
+		{% endif %}
+
+		<input type="submit" value="Add sector" class="govuk-button">
+		<a class="form-cancel" href="{{ urls.reports.sectors( report.id ) }}">cancel</a>
+	</form>
+{% endblock %}

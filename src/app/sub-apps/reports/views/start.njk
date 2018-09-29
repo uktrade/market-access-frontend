@@ -3,19 +3,13 @@
 
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Report - Status of the problem{% endblock %}
-
-{% block body_script %}
-	<script>
-		ma.pages.report.start();
-	</script>
-{% endblock %}
+{% block page_title %}{{ super() }} - Report - Status of the barrier{% endblock %}
 
 {% block page_content %}
 
 	{{ heading({
 		caption: 'Report a barrier',
-		text: 'Status of the problem',
+		text: 'Status of the barrier',
 		errors: errors
 	}) }}
 
@@ -27,31 +21,16 @@
 			classes: 'problem-status',
 			fieldset: {
 				legend: {
-					text: 'What is the current status of the problem?',
+					text: 'What is the urgency of the barrier?',
 					classes: 'govuk-fieldset__legend--s'
 				}
 			},
-			items: status,
+			items: status | addToRadio( {
+				'1': { hint: { text: 'for example, goods stuck at the border or documentation issue' } },
+				'2': { hint: { text: 'for example, a change of regulation' } }
+			} ),
 			errorMessage: errors | errorForName( 'status-1' )
 		}) }}
-
-		<div class="conditional-content paragraph-width" id="report-barrier-emergency">
-
-			{{ govukRadios({
-				name: 'emergency',
-				fieldset: {
-					legend: {
-						text: 'Is this an emergency?',
-						classes: 'govuk-fieldset__legend--s'
-					}
-				},
-				hint: {
-					text: 'Is an export facing significant and imminent financial or other loss and does government need to take action urgently?'
-				},
-				items: emergency,
-				errorMessage: errors | errorForName( 'emergency-1' )
-			}) }}
-		</div>
 
 		<input type="submit" value="Continue" class="govuk-button">
 	</form>

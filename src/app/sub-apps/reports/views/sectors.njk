@@ -1,0 +1,26 @@
+{% from 'app-components/heading.njk' import heading %}
+{% from 'app-components/report-sectors.njk' import reportSectors %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Report - Sectors affected by the barrier{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.reports.hasSectors( report.id ) },
+		caption: 'Report a barrier',
+		text: 'Sectors affected by the barrier',
+		errors: errors
+	}) }}
+
+	<h3 class="report-sectors-heading">Save or add another sector</h3>
+
+	{{ reportSectors( report, sectors, csrfToken, addAnother = true ) }}
+
+	<form action="{{ urls.reports.sectors( report.id ) }}" method="POST">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+		<input type="submit" value="Save and continue" class="govuk-button">
+		<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>
+	</form>
+{% endblock %}

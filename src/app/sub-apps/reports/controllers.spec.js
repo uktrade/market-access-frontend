@@ -21,10 +21,13 @@ describe( 'Report controller', () => {
 	let validators;
 	let reportDetailViewModel;
 	let reportsViewModel;
+	let govukItemsFromObj;
+	let govukItemsFromObjResponse;
 
 	beforeEach( () => {
 
 		csrfToken = uuid();
+		govukItemsFromObjResponse = [ { items: 1 } ];
 		metadata = {
 			reportTaskList: [ { a: 1, b: 2 }, { c: 3, d: 4 } ],
 			statusTypes: { a: 1, b: 2 },
@@ -37,15 +40,29 @@ describe( 'Report controller', () => {
 				{ id: 1, name: 'country 1' },
 				{ id: 2, name: 'country 2' }
 			],
-			barrierTypes: [
-				{ id: 1, title: 'barrier 1', category: 'GOODS' },
-				{ id: 2, title: 'barrier 2', category: 'SERVICES' }
+			countryList: [
+				{ id: 0, name: 'Choose one' },
+				{ id: 1, name: 'country 1' },
+				{ id: 2, name: 'country 2' }
 			],
-			barrierTypeCategories: {
-				'GOODS': 'title 1',
-				'SERVICES': 'title 2'
+			barrierAwareness: {
+				'A': 'a',
+				'B': 'b'
 			},
-			supportType: { '1': 'x', '2': 'y', '3': 'z' }
+			supportType: { '1': 'x', '2': 'y', '3': 'z' },
+			affectedSectorsList: [
+				{
+					value: 'id-1',
+					text: 'one'
+				},{
+					value: 'id-2',
+					text: 'two'
+				},{
+					value: 'id-3',
+					text: 'three'
+				}
+			],
+			getSector: jasmine.createSpy( 'metadata.getSector' )
 		};
 
 		req = {
@@ -61,6 +78,7 @@ describe( 'Report controller', () => {
 			redirect: jasmine.createSpy( 'res.redirect' )
 		};
 		next = jasmine.createSpy( 'next' );
+		govukItemsFromObj = jasmine.createSpy( 'govukItemsFromObj' ).and.callFake( () => govukItemsFromObjResponse );
 		backend = {
 			reports: {
 				save: jasmine.createSpy( 'backend.reports.save' ),
@@ -73,7 +91,8 @@ describe( 'Report controller', () => {
 				saveNextSteps: jasmine.createSpy( 'backend.reports.saveNextSteps' ),
 				submit: jasmine.createSpy( 'backend.reports.submit' ),
 				getAll: jasmine.createSpy( 'backend.reports.getAll' ),
-				getAllUnfinished: jasmine.createSpy( 'backend.reports.getAllUnfinished' )
+				getAllUnfinished: jasmine.createSpy( 'backend.reports.getAllUnfinished' ),
+				saveHasSectors: jasmine.createSpy( 'backend.reports.saveHasSectors' )
 			}
 		};
 		datahub = {
@@ -82,24 +101,21 @@ describe( 'Report controller', () => {
 		urls = {
 			index: jasmine.createSpy( 'urls.index' ),
 			reports: {
-				companySearch: jasmine.createSpy( 'urls.reports.companySearch' ),
-				companyDetails: jasmine.createSpy( 'urls.reports.companyDetails' ),
-				contacts: jasmine.createSpy( 'urls.reports.contacts' ),
+				isResolved: jasmine.createSpy( 'urls.reports.isResolved' ),
+				country: jasmine.createSpy( 'urls.reports.country' ),
 				aboutProblem: jasmine.createSpy( 'urls.reports.aboutProblem' ),
-				impact: jasmine.createSpy( 'urls.reports.impact' ),
-				legal: jasmine.createSpy( 'urls.reports.legal' ),
-				typeCategory: jasmine.createSpy( 'urls.reports.typeCategory' ),
-				type: jasmine.createSpy( 'urls.reports.type' ),
-				support: jasmine.createSpy( 'urls.reports.support' ),
-				nextSteps: jasmine.createSpy( 'urls.reports.nextSteps' ),
+				sectors: jasmine.createSpy( 'urls.reports.sectors' ),
+				hasSectors: jasmine.createSpy( 'urls.reports.hasSectors' ),
 				detail: jasmine.createSpy( 'urls.reports.detail' ),
-				success: jasmine.createSpy( 'urls.reports.success' )
+				success: jasmine.createSpy( 'urls.reports.success' ),
+				addSector: jasmine.createSpy( 'urls.reports.addSector' )
 			}
 		};
 
 		getValuesResponse = { a: 1, b: 2 };
 		getTemplateValuesResponse = { c: 3, d: 4 };
 		form = {
+			hasErrors: jasmine.createSpy( 'form.hasErrors' ),
 			validate: jasmine.createSpy( 'form.validate' ),
 			getValues: jasmine.createSpy( 'form.getValues' ).and.callFake( () => getValuesResponse ),
 			getTemplateValues: jasmine.createSpy( 'form.getTemplateValues' ).and.callFake( () => getTemplateValuesResponse )
@@ -112,7 +128,12 @@ describe( 'Report controller', () => {
 			isMetadata: jasmine.createSpy( 'validators.isMetaData' ),
 			isCountry: jasmine.createSpy( 'validators.isCountry' ),
 			isOneBoolCheckboxChecked: jasmine.createSpy( 'validators.isOneBoolCheckboxChecked' ),
-			isBarrierType: jasmine.createSpy( 'validators.isBarrierType' )
+			isBarrierType: jasmine.createSpy( 'validators.isBarrierType' ),
+			isDateValue: jasmine.createSpy( 'validators.isDateValue' ),
+			isDateValid: jasmine.createSpy( 'validators.isDateValid' ),
+			isDateInPast: jasmine.createSpy( 'validators.isDateInPast' ),
+			isDateNumeric: jasmine.createSpy( 'validators.isDateNumeric' ),
+			isSector: jasmine.createSpy( 'validators.isSector' )
 		};
 
 		controller = proxyquire( modulePath, {
@@ -123,29 +144,10 @@ describe( 'Report controller', () => {
 			'../../lib/Form': Form,
 			'../../lib/validators': validators,
 			'./view-models/detail': reportDetailViewModel,
-			'./view-models/reports': reportsViewModel
+			'./view-models/reports': reportsViewModel,
+			'../../lib/govuk-items-from-object': govukItemsFromObj
 		} );
 	} );
-
-	function checkFormError( ...errors ){
-
-		const calls = req.error.calls;
-		let i = 0;
-		let err;
-		let args;
-
-		expect( calls.count() ).toEqual( errors.length );
-
-		while( ( err = errors[ i ] ) ){
-
-			args = calls.argsFor( i );
-
-			expect( args[ 0 ] ).toEqual( err );
-			expect( args[ 1 ].length ).toBeGreaterThan( 0 );
-
-			i++;
-		}
-	}
 
 	describe( 'Index', () => {
 		describe( 'Without an error', () => {
@@ -161,12 +163,12 @@ describe( 'Report controller', () => {
 					const reportsViewModelResponse = { reports: true };
 
 					reportsViewModel.and.callFake( () => reportsViewModelResponse );
-					backend.reports.getAllUnfinished.and.callFake( () => Promise.resolve( unfinishedReportsResponse ) );
+					backend.reports.getAll.and.callFake( () => Promise.resolve( unfinishedReportsResponse ) );
 
 					await controller.index( req, res, next );
 
 					expect( next ).not.toHaveBeenCalled();
-					expect( backend.reports.getAllUnfinished ).toHaveBeenCalledWith( req );
+					expect( backend.reports.getAll ).toHaveBeenCalledWith( req );
 					expect( reportsViewModel ).toHaveBeenCalledWith( unfinishedReportsResponse.body.results );
 					expect( res.render ).toHaveBeenCalledWith( 'reports/views/index', reportsViewModelResponse );
 				} );
@@ -180,12 +182,12 @@ describe( 'Report controller', () => {
 						body: {}
 					};
 
-					backend.reports.getAllUnfinished.and.callFake( () => Promise.resolve( unfinishedReportsResponse ) );
+					backend.reports.getAll.and.callFake( () => Promise.resolve( unfinishedReportsResponse ) );
 
 					await controller.index( req, res, next );
 
 					expect( next ).toHaveBeenCalledWith( new Error( `Got ${ unfinishedReportsResponse.response.statusCode } response from backend` ) );
-					expect( backend.reports.getAllUnfinished ).toHaveBeenCalledWith( req );
+					expect( backend.reports.getAll ).toHaveBeenCalledWith( req );
 					expect( res.render ).not.toHaveBeenCalled();
 				} );
 			} );
@@ -196,7 +198,7 @@ describe( 'Report controller', () => {
 
 				const err = new Error( 'issue with backend' );
 
-				backend.reports.getAllUnfinished.and.callFake( () => Promise.reject( err ) );
+				backend.reports.getAll.and.callFake( () => Promise.reject( err ) );
 
 				await controller.index( req, res, next );
 
@@ -244,8 +246,7 @@ describe( 'Report controller', () => {
 			const statusTypesResponse = { status: 1 };
 			const boolResponse = { bool: 1 };
 			const report = {
-				problem_status: 'report status',
-				is_emergency: 'report emergency'
+				problem_status: 'report status'
 			};
 			const sessionValues = {
 				status: 'session status',
@@ -273,10 +274,7 @@ describe( 'Report controller', () => {
 			expect( config.status.values ).toEqual( [ sessionValues.status, report.problem_status ] );
 			expect( config.status.validators[ 0 ].fn ).toEqual( statusTypesResponse );
 
-			expect( config.emergency ).toBeDefined();
-			expect( config.emergency.values ).toEqual( [ sessionValues.emergency, report.is_emergency ] );
-			expect( config.emergency.conditional ).toEqual( { name: 'status', values: [ '1', '2' ] } );
-			expect( config.emergency.validators[ 0 ].fn ).toEqual( boolResponse );
+			expect( config.emergency ).not.toBeDefined();
 		} );
 
 		describe( 'When it is a POST', () => {
@@ -292,20 +290,20 @@ describe( 'Report controller', () => {
 
 				it( 'Should save the values and redirect to the next step', () => {
 
-					const companyUrl = 'my-url';
+					const isResolvedUrl = 'my-url';
 					const status = '123';
-					const emergency = '456';
 
-					req.body = { status, emergency };
+					req.body = { status };
 					form.hasErrors = () => false;
 
-					urls.reports.companySearch.and.callFake( () => companyUrl );
+					urls.reports.isResolved.and.callFake( () => isResolvedUrl );
 
 					controller.start( req, res );
 
 					expect( form.validate ).toHaveBeenCalled();
 					expect( req.session.startFormValues ).toEqual( getValuesResponse );
-					expect( res.redirect ).toHaveBeenCalledWith( companyUrl );
+					expect( urls.reports.isResolved ).toHaveBeenCalledWith( undefined );
+					expect( res.redirect ).toHaveBeenCalledWith( isResolvedUrl );
 				} );
 			} );
 
@@ -328,7 +326,7 @@ describe( 'Report controller', () => {
 		describe( 'When it is a GET', () => {
 			it( 'Should render the start page with the form values', () => {
 
-				const sessionValues = { status: 1, emergency: 2 };
+				const sessionValues = { status: 1 };
 
 				req.session.startFormValues = sessionValues;
 				req.report = { id: 1, test: 2 };
@@ -341,331 +339,306 @@ describe( 'Report controller', () => {
 		} );
 	} );
 
-	describe( 'Company Search', () => {
+	describe( 'isResolved', () => {
 
-		const template = 'reports/views/company-search';
+		const template = 'reports/views/is-resolved';
 
-		describe( 'Without a query', () => {
-			it( 'Should render the search page', () => {
+		it( 'Should setup the form correctly', () => {
 
-				controller.companySearch( req, res, next );
+			const monthResponse = { month: true };
+			const yearResponse = { year: true };
+			const boolResponse = { bool: true };
+			const sessionValues = {
+				isResolved: 'isResolved'
+			};
+			const report = {
+				is_resolved: 'is_resolved',
+				resolved_date: '2018-02-01'
+			};
 
-				expect( res.render ).toHaveBeenCalledWith( template, {} );
-				expect( next ).not.toHaveBeenCalled();
-			} );
-		} );
+			req.report = report;
+			req.session.isResolvedFormValues = sessionValues;
 
-		describe( 'With a query', () => {
+			validators.isMetadata.and.callFake( ( key ) => {
 
-			const query = 'a search term';
-
-			beforeEach( () => {
-
-				req.query.company = query;
-			} );
-
-			describe( 'When there is not an error', () => {
-				describe( 'When a company is found', () => {
-					it( 'Should render the results', async () => {
-
-						const body = {	some: 'data' };
-
-						const promise = Promise.resolve( { response: { isSuccess: true }, body } );
-
-						datahub.searchCompany.and.callFake( () => promise );
-
-						await controller.companySearch( req, res, next );
-
-						expect( res.render ).toHaveBeenCalledWith( template, { query, results: body } );
-					} );
-				} );
-
-				describe( 'When a company is not found', () => {
-					it( 'Should render an error message', async () => {
-
-						const promise = Promise.resolve( { response: { isSuccess: false, statusCode: 404 } } );
-
-						datahub.searchCompany.and.callFake( () => promise );
-
-						await controller.companySearch( req, res, next );
-
-						expect( res.render ).toHaveBeenCalledWith( template, { query, error: 'No company found' } );
-					} );
-				} );
-
-				describe( 'When the user does not have permission to use the API', () => {
-					it( 'Should render an error message', async () => {
-
-						const promise = Promise.resolve( { response: { isSuccess: false, statusCode: 403 } } );
-
-						datahub.searchCompany.and.callFake( () => promise );
-
-						await controller.companySearch( req, res, next );
-
-						expect( res.render ).toHaveBeenCalledWith( template, { query, error: 'You do not have permission to search for a company, please contact Data Hub support.' } );
-					} );
-				} );
-
-				describe( 'When there is an error with the request', () => {
-					it( 'Should render an error message', async () => {
-
-						const promise = Promise.resolve( { response: { isSuccess: false, statusCode: 400 } } );
-
-						datahub.searchCompany.and.callFake( () => promise );
-
-						await controller.companySearch( req, res, next );
-
-						expect( res.render ).toHaveBeenCalledWith( template, { query, error: 'There was an error finding the company' } );
-					} );
-				} );
+				if( key === 'bool' ){ return boolResponse; }
 			} );
 
-			describe( 'When there is an error', () => {
-				it( 'Should pass the error on', async () => {
+			validators.isDateValue.and.callFake( ( key ) => {
 
-					const err = new Error( 'some error state' );
-
-					const promise = Promise.reject( err );
-
-					datahub.searchCompany.and.callFake( () => promise );
-
-					await controller.companySearch( req, res, next );
-
-					expect( next ).toHaveBeenCalledWith( err );
-				} );
-			} );
-		} );
-
-		describe( 'When the query is empty', () => {
-			it( 'Should add an error', () => {
-
-				req.error = jasmine.createSpy( 'req.error' );
-				req.query.company = '';
-
-				controller.companySearch( req, res, next );
-
-				checkFormError( 'company' );
-			} );
-		} );
-	} );
-
-	describe( 'Company details', () => {
-		describe( 'When it is a POST', () => {
-			describe( 'When the companyId and sessionCompany id match', () => {
-				it( 'Should redirect to the contacts page', () => {
-
-					const companyId = 'abc';
-					const reportId = '1';
-					const contactResponse = '/a-link/';
-
-					req.method = 'POST';
-					req.body = { companyId };
-					req.session.reportCompany = { id: companyId };
-					req.report = { id: reportId };
-
-					urls.reports.contacts.and.callFake( () => contactResponse );
-
-					controller.companyDetails( req, res );
-
-					expect( res.redirect ).toHaveBeenCalledWith( contactResponse );
-					expect( urls.reports.contacts ).toHaveBeenCalledWith( companyId, reportId );
-				} );
+				if( key === 'month' ){ return monthResponse; }
+				if( key === 'year' ){ return yearResponse; }
 			} );
 
-			describe( 'When the ids do not match', () => {
-				it( 'Should redirect to the company search page', () => {
+			controller.isResolved( req, res );
 
-					const reportId = '2';
-					const searchResponse = '/another-link/';
+			const args = Form.calls.argsFor( 0 );
+			const config = args[ 1 ];
 
-					req.method = 'POST';
-					req.body = { companyId: '123' };
-					req.report = { id: reportId };
-					req.session.reportCompany = { id: '123-456' };
+			expect( Form ).toHaveBeenCalled();
+			expect( args[ 0 ] ).toEqual( req );
 
-					urls.reports.companySearch.and.callFake( () => searchResponse );
+			expect( config.isResolved ).toBeDefined();
+			expect( config.isResolved.type ).toEqual( Form.RADIO );
+			expect( config.isResolved.values ).toEqual( [ sessionValues.isResolved, report.is_resolved ] );
+			expect( config.isResolved.items ).toEqual( govukItemsFromObjResponse );
+			expect( govukItemsFromObj ).toHaveBeenCalledWith( metadata.bool );
+			expect( config.isResolved.validators.length ).toEqual( 1 );
+			expect( config.isResolved.validators[ 0 ].fn ).toEqual( boolResponse );
 
-					controller.companyDetails( req, res );
-
-					expect( res.redirect ).toHaveBeenCalledWith( searchResponse );
-					expect( urls.reports.companySearch ).toHaveBeenCalledWith( reportId );
-				} );
+			expect( config.resolvedDate ).toBeDefined();
+			expect( config.resolvedDate.type ).toEqual( Form.GROUP );
+			expect( config.resolvedDate.conditional ).toEqual( { name: 'isResolved', value: 'true' } );
+			expect( config.resolvedDate.errorField ).toEqual( 'resolved_date' );
+			expect( config.resolvedDate.validators.length ).toEqual( 5 );
+			expect( config.resolvedDate.validators[ 0 ].fn ).toEqual( monthResponse );
+			expect( config.resolvedDate.validators[ 1 ].fn ).toEqual( yearResponse );
+			expect( config.resolvedDate.validators[ 2 ].fn ).toEqual( validators.isDateNumeric );
+			expect( config.resolvedDate.validators[ 3 ].fn ).toEqual( validators.isDateValid );
+			expect( config.resolvedDate.validators[ 4 ].fn ).toEqual( validators.isDateInPast );
+			expect( config.resolvedDate.items ).toEqual( {
+				month: {
+					values: [ '02' ]
+				},
+				year: {
+					values: [ '2018' ]
+				}
 			} );
 		} );
 
 		describe( 'When it is a GET', () => {
-			it( 'Should save the company name and id in the session and render the details page', () => {
+			it( 'Should render the template', () => {
 
-				const company = {
-					id: 'abc-123',
-					name: 'a company name',
-					something: 'else',
-					another: 'thing',
-					sector: {
-						id: 1,
-						name: 'a sector'
-					}
-				};
+				controller.isResolved( req, res );
 
-				req.company = company;
-				controller.companyDetails( req, res );
+				expect( res.render ).toHaveBeenCalledWith( template, getTemplateValuesResponse );
+				expect( form.hasErrors ).not.toHaveBeenCalled();
+			} );
+		} );
 
-				expect( req.session.reportCompany ).toEqual( { id: company.id, name: company.name, sector: company.sector } );
-				expect( res.render ).toHaveBeenCalledWith( 'reports/views/company-details', { csrfToken } );
+		describe( 'When it is a POST', () => {
+
+			beforeEach( () => {
+
+				form.isPost = true;
+			} );
+
+			describe( 'When the form is valid', () => {
+				it( 'Should save the values to the session and redirect to the correct url', () => {
+
+					const countryUrlResponse = '/a/country/url';
+
+					urls.reports.country.and.callFake( () => countryUrlResponse );
+
+					controller.isResolved( req, res );
+
+					expect( form.validate ).toHaveBeenCalledWith();
+					expect( form.hasErrors ).toHaveBeenCalledWith();
+					expect( req.session.isResolvedFormValues ).toEqual( getValuesResponse );
+					expect( res.redirect ).toHaveBeenCalledWith( countryUrlResponse );
+					expect( res.render ).not.toHaveBeenCalled();
+				} );
+			} );
+
+			describe( 'When the form is not valid', () => {
+				it( 'Should save the values to the session and redirect to the correct url', () => {
+
+					form.hasErrors.and.callFake( () => true );
+
+					controller.isResolved( req, res );
+
+					expect( form.validate ).toHaveBeenCalledWith();
+					expect( form.hasErrors ).toHaveBeenCalledWith();
+					expect( typeof req.session.isResolvedFormValues ).toEqual( 'undefined' );
+					expect( res.redirect ).not.toHaveBeenCalled();
+					expect( res.render ).toHaveBeenCalledWith( template, getTemplateValuesResponse );
+				} );
 			} );
 		} );
 	} );
 
-	describe( 'Save', () => {
+	describe( 'country', () => {
 
-		beforeEach( () => {
+		const template = 'reports/views/country';
 
-			req.body = {};
+		it( 'Should setup the form correctly', async () => {
+
+			const report = {
+				export_country: [ 'a country' ]
+			};
+
+			req.report = report;
+
+			await controller.country( req, res, next );
+
+			const args = Form.calls.argsFor( 0 );
+			const config = args[ 1 ];
+
+			expect( Form ).toHaveBeenCalled();
+			expect( args[ 0 ] ).toEqual( req );
+
+			expect( config.country ).toBeDefined();
+			expect( config.country.type ).toEqual( Form.SELECT );
+			expect( config.country.values ).toEqual( [ report.export_country ] );
+			expect( config.country.items ).toEqual( metadata.countryList );
+			expect( config.country.validators.length ).toEqual( 1 );
+			expect( config.country.validators[ 0 ].fn ).toEqual( validators.isCountry );
 		} );
 
-		describe( 'When there is not a contact in the session', () => {
-			it( 'Should redirect to the contacts page', async () => {
+		describe( 'When it is a GET', () => {
+			it( 'Should render the correct template', async () => {
 
-				const contactsResponse = '/contacts';
-				const sessionCompany = { id: '123-456' };
+				await controller.country( req, res, next );
 
-				req.session.reportCompany = sessionCompany;
-
-				urls.reports.contacts.and.callFake( () => contactsResponse );
-
-				await controller.save( req, res, next );
-
-				expect( res.redirect ).toHaveBeenCalledWith( contactsResponse );
-				expect( urls.reports.contacts ).toHaveBeenCalledWith( sessionCompany.id );
+				expect( res.render ).toHaveBeenCalledWith( template, getTemplateValuesResponse );
 			} );
 		} );
 
-		describe( 'When the body contactId and session contactId do not match', () => {
-			it( 'Should call next with an error', async () => {
+		describe( 'When it is a POST', () => {
 
-				req.body.contactId = '123-456';
-				req.session.reportContact = '789';
-				req.session.reportCompany = { id: 1 };
-
-				await controller.save( req, res, next );
-
-				expect( next ).toHaveBeenCalledWith( new Error( "Contact id doesn't match session" ) );
-			} );
-		} );
-
-		describe( 'When the contactIds match', () => {
-
-			let contactId;
+			let sessionValues;
 
 			beforeEach( () => {
 
-				contactId = 'abc-123';
-				req.body.contactId = contactId;
-				req.session.startFormValues = { status: 1 };
-				req.session.reportContact = contactId;
-				req.session.reportCompany = { id: 1 };
+				form.isPost = true;
 			} );
 
-			function checkSession(){
+			describe( 'When the form has errors', () => {
+				it( 'Should render the template', async () => {
 
-				expect( req.session.startFormValues ).not.toBeDefined();
-				expect( req.session.reportContact ).not.toBeDefined();
-				expect( req.session.reportCompany ).not.toBeDefined();
-			}
+					sessionValues = {
+						startFormValues: { a: 1 },
+						isResolvedFormValues: { b: 2 }
+					};
 
-			describe( 'When there is NOT a report', () => {
-				describe( 'When there is an error thrown', () => {
-					it( 'Should call next with the error', async () => {
+					req.session = sessionValues;
 
-						const err = new Error( 'tester' );
+					form.hasErrors.and.callFake( () => true );
 
-						backend.reports.save.and.callFake( () => Promise.reject( err ) );
+					await controller.country( req, res, next );
 
-						await controller.save( req, res, next );
+					expect( res.render ).toHaveBeenCalledWith( template, getTemplateValuesResponse );
+					expect( req.session ).toEqual( sessionValues );
+				} );
+			} );
 
-						expect( next ).toHaveBeenCalledWith( err );
+			describe( 'When the form does not have errors', () => {
+				describe( 'When there is a report and no session data', () => {
+
+					let report;
+					let saveValues;
+
+					beforeEach( () => {
+
+						report = {
+							id: 1,
+							problem_status: { a: 1 },
+							is_resolved: false,
+							resolved_date: { c: 3 }
+						};
+
+						saveValues = Object.assign( {}, {
+							status: report.problem_status,
+							isResolved: false,
+							resolvedDate: report.resolved_date
+						}, getValuesResponse );
+
+						req.report = report;
+					} );
+
+					it( 'Should update the report with the report data', async () => {
+
+						await controller.country( req, res, next );
+
+						const args = backend.reports.update.calls.argsFor( 0 );
+
+						expect( args[ 0 ] ).toEqual( req );
+						expect( args[ 1 ] ).toEqual( report.id );
+						expect( args[ 2 ] ).toEqual( saveValues );
+					} );
+
+					describe( 'When the update throws an error', () => {
+						it( 'Should call next with the error', async () => {
+
+							const err = new Error( 'an update error' );
+
+							backend.reports.update.and.callFake( () => Promise.reject( err ) );
+
+							await controller.country( req, res, next );
+
+							expect( next ).toHaveBeenCalledWith( err );
+							expect( res.redirect ).not.toHaveBeenCalled();
+						} );
+					} );
+
+					describe( 'When the update does not throw an error', () => {
+						describe( 'When the response is a success', () => {
+							it( 'Should redirect to the correct url', async () => {
+
+								const hasSectorsResponse = '/a/sector/url';
+								const body = { id: 2 };
+
+								backend.reports.update.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body } ) );
+								urls.reports.hasSectors.and.callFake( () => hasSectorsResponse );
+
+								await controller.country( req, res, next );
+
+								expect( res.redirect ).toHaveBeenCalledWith( hasSectorsResponse );
+								expect( urls.reports.hasSectors ).toHaveBeenCalledWith( body.id );
+								expect( next ).not.toHaveBeenCalled();
+							} );
+						} );
 					} );
 				} );
 
-				describe( 'When there is not an error', () => {
+				describe( 'When there is only session data', () => {
+
+					beforeEach( () => {
+
+						sessionValues = {
+							startFormValues: { x: 1 },
+							isResolvedFormValues: { y: 2 }
+						};
+
+						req.session = sessionValues;
+					} );
+
 					describe( 'When the response is a success', () => {
 
-						afterEach( () => checkSession() );
+						const response = { isSuccess: true };
 
-						describe( 'When there is not an id in the body', () => {
+						it( 'Should delete the session data', async () => {
+
+							backend.reports.save.and.callFake( () => Promise.resolve( { response } ) );
+
+							await controller.country( req, res, next );
+
+							expect( req.session ).toEqual( {} );
+						} );
+
+						describe( 'When there is not a body with an id', () => {
 							it( 'Should call next with an error', async () => {
 
-								backend.reports.save.and.callFake( () => Promise.resolve( {
-									response: { isSuccess: true },
-									body: {}
-								} ) );
+								backend.reports.save.and.callFake( () => Promise.resolve( { response, body: {} } ) );
 
-								await controller.save( req, res, next );
+								await controller.country( req, res, next );
 
 								expect( next ).toHaveBeenCalledWith( new Error( 'No id created for report' ) );
 							} );
 						} );
 
-						describe( 'When there is an id in the body', () => {
+						describe( 'When there is a body with id', () => {
+							it( 'Should redirect to the correct url', async () => {
 
-							let responseBody;
+								const hasSectorsResponse = '/a/b/c';
 
-							beforeEach( () => {
+								urls.reports.hasSectors.and.callFake( () => hasSectorsResponse );
+								backend.reports.save.and.callFake( () => Promise.resolve( { response, body: { id: 10 } } ) );
 
-								responseBody = { id: 1, name: 2 };
-								backend.reports.save.and.callFake( () => Promise.resolve( {
-									response: { isSuccess: true },
-									body: responseBody
-								} ) );
-							} );
+								await controller.country( req, res, next );
 
-							describe( 'When the action is exit', () => {
-								it( 'Should put the body in the session and redirect', async () => {
-
-									const detailUrl = '/b-test';
-									req.body.action = 'exit';
-
-									urls.reports.detail.and.callFake( () => detailUrl );
-
-									await controller.save( req, res, next );
-
-									//expect( req.session.report ).toEqual( responseBody );
-									expect( res.redirect ).toHaveBeenCalledWith( detailUrl );
-									expect( urls.reports.detail ).toHaveBeenCalledWith( responseBody.id );
-								} );
-							} );
-
-							describe( 'When the action is NOT exit', () => {
-								it( 'Should call the correct backend method', async () => {
-
-									const values = Object.assign( {},
-										req.session.startFormValues,
-										{ company: req.session.reportCompany },
-										{ contactId }
-									);
-
-									await controller.save( req, res, next );
-
-									expect( backend.reports.save ).toHaveBeenCalled();
-
-									const args = backend.reports.save.calls.argsFor( 0 );
-
-									expect( args[ 0 ] ).toEqual( req );
-									expect( args[ 1 ] ).toEqual( values );
-								} );
-
-								it( 'Should put the body in the session and redirect', async () => {
-
-									const aboutProblemUrl = '/a-test';
-
-									urls.reports.aboutProblem.and.callFake( () => aboutProblemUrl );
-
-									await controller.save( req, res, next );
-
-									//expect( req.session.report ).toEqual( responseBody );
-									expect( res.redirect ).toHaveBeenCalledWith( aboutProblemUrl );
-									expect( urls.reports.aboutProblem ).toHaveBeenCalledWith( responseBody.id );
-								} );
+								expect( res.redirect ).toHaveBeenCalledWith( hasSectorsResponse  );
+								expect( urls.reports.hasSectors ).toHaveBeenCalledWith( 10 );
 							} );
 						} );
 					} );
@@ -673,102 +646,302 @@ describe( 'Report controller', () => {
 					describe( 'When the response is not a success', () => {
 						it( 'Should call next with an error', async () => {
 
-							const statusCode = 500;
+							backend.reports.save.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode: 123 } } ) );
 
-							backend.reports.save.and.callFake( () => Promise.resolve( {
-								response: { isSuccess: false, statusCode }
-							} ) );
+							await controller.country( req, res, next );
 
-							await controller.save( req, res, next );
-
-							const message = `Unable to save report, got ${ statusCode } response code`;
-							expect( next ).toHaveBeenCalledWith( new Error( message ) );
+							expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save report, got 123 response code' ) );
 						} );
-					} );
-				} );
-			} );
-
-			describe( 'When there is a report', () => {
-				describe( 'When the response is a success', () => {
-					it( 'Should call the update method', async () => {
-
-						const reportId = '3';
-
-						delete req.session.startFormValues;
-						delete req.session.reportCompany;
-
-						req.report = {
-							id: reportId,
-							problem_status: 1,
-							is_emergency: 2,
-							company_id: 3,
-							company_name: 'fred'
-						};
-
-						await controller.save( req, res, next );
-
-						expect( backend.reports.update ).toHaveBeenCalled();
-
-						const args = backend.reports.update.calls.argsFor( 0 );
-						expect( args[ 0 ] ).toEqual( req );
-						expect( args[ 1 ] ).toEqual( reportId );
-						expect( args[ 2 ] ).toEqual( {
-							status: req.report.problem_status,
-							emergency: ( req.report.is_emergency + '' ),
-							company: {
-								id: req.report.company_id,
-								name: req.report.company_name
-							},
-							contactId
-						} );
-					} );
-				} );
-
-				describe( 'When the response is not a success', () => {
-					it( 'Should call next with an error', async () => {
-
-						const statusCode = 500;
-
-						req.report = { id: 12 };
-
-						backend.reports.update.and.callFake( () => Promise.resolve( {
-							response: { isSuccess: false, statusCode }
-						} ) );
-
-						await controller.save( req, res, next );
-
-						const message = `Unable to update report, got ${ statusCode } response code`;
-						expect( next ).toHaveBeenCalledWith( new Error( message ) );
 					} );
 				} );
 			} );
 		} );
 	} );
 
-	describe( 'contacts', () => {
-		it( 'Should render the contact page', () => {
+	describe( 'hasSectors', () => {
 
-			controller.contacts( req, res );
+		let report;
 
-			expect( res.render ).toHaveBeenCalledWith( 'reports/views/contacts' );
-		} );
-	} );
+		beforeEach( () => {
 
-	describe( 'Contact details', () => {
-		it( 'Should save the company name and id in the session and render the details page', () => {
-
-			const contact = {
-				id: 'abc-123',
-				name: 'a contact name',
-				something: 'else',
-				another: 'thing'
+			report = {
+				id: uuid(),
+				sectors: null,
+				sectors_affected: true
 			};
+			req.report = report;
+		} );
 
-			req.contact = contact;
-			controller.contactDetails( req, res );
+		describe( 'Form config', () => {
 
-			expect( req.session.reportContact ).toEqual( contact.id );
-			expect( res.render ).toHaveBeenCalledWith( 'reports/views/contact-details', { csrfToken } );
+			let boolResponse;
+
+			beforeEach( () => {
+
+				boolResponse = { 'boolResponse': 'yes' };
+
+				validators.isMetadata.and.callFake( ( key ) => {
+
+					if( key === 'bool' ){ return boolResponse; }
+				} );
+			} );
+
+			it( 'Should setup the form correctly', async () => {
+
+				govukItemsFromObjResponse = [
+					{
+						value: 'true',
+						text: 'yes'
+					},{
+						value: 'false',
+						text: 'No'
+					}
+				];
+
+				await controller.hasSectors( req, res, next );
+
+				const args = Form.calls.argsFor( 0 );
+				const config = args[ 1 ];
+
+				expect( Form ).toHaveBeenCalled();
+				expect( args[ 0 ] ).toEqual( req );
+
+				expect( config.hasSectors ).toBeDefined();
+				expect( config.hasSectors.type ).toEqual( Form.RADIO );
+				expect( config.hasSectors.values ).toEqual( [ report.sectors_affected ] );
+				expect( config.hasSectors.validators[ 0 ].fn ).toEqual( boolResponse );
+				expect( config.hasSectors.items ).toEqual( [
+					{
+						value: 'true',
+						text: 'yes'
+					},{
+						value: 'false',
+						text: 'No, I don\'t know at the moment'
+					}
+				] );
+			} );
+		} );
+
+		describe( 'FormProcessor', () => {
+
+			let FormProcessor;
+			let processFn;
+			let args;
+
+			beforeEach( async () => {
+
+				FormProcessor = jasmine.createSpy( 'FormProcessor' );
+				processFn = jasmine.createSpy( 'FormProcessor.process' );
+
+				controller = proxyquire( modulePath, {
+					'../../lib/backend-service': backend,
+					'../../lib/urls': urls,
+					'../../lib/metadata': metadata,
+					'../../lib/Form': Form,
+					'../../lib/FormProcessor': FormProcessor,
+					'../../lib/validators': validators
+				} );
+
+				FormProcessor.and.callFake( () => ({
+					process: processFn
+				}) );
+
+				await controller.hasSectors( req, res, next );
+
+				args = FormProcessor.calls.argsFor( 0 )[ 0 ];
+			} );
+
+			it( 'Should setup the FormProcessor correctly', () => {
+
+				expect( args.form ).toEqual( form );
+				expect( typeof args.render ).toEqual( 'function' );
+				expect( typeof args.saveFormData ).toEqual( 'function' );
+				expect( typeof args.saved ).toEqual( 'function' );
+			} );
+
+			describe( 'render', () => {
+				it( 'Should render the template with the correct data', () => {
+
+					const template = 'reports/views/has-sectors';
+
+					args.render( getTemplateValuesResponse );
+
+					expect( res.render ).toHaveBeenCalledWith( template, getTemplateValuesResponse );
+				} );
+			} );
+
+			describe( 'safeFormData', () => {
+				it( 'Should call the correct method with the correct data', () => {
+
+					const myFormData = { a: true, b: false };
+
+					args.saveFormData( myFormData );
+
+					expect( backend.reports.saveHasSectors ).toHaveBeenCalledWith( req, report.id, myFormData );
+				} );
+			} );
+
+			describe( 'Saved', () => {
+				describe( 'When form.isExit is true', () => {
+					it( 'Should redirect to the correct URL', () => {
+
+						const detailResponse = '/a/path/detail';
+
+						urls.reports.detail.and.callFake( () => detailResponse );
+						form.isExit = true;
+
+						args.saved();
+
+						expect( urls.reports.detail ).toHaveBeenCalledWith( report.id  );
+						expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
+					} );
+				} );
+
+				describe( 'When hasSectors is true', () => {
+
+					beforeEach( () => {
+
+						getValuesResponse = { hasSectors: 'true' };
+					} );
+
+					describe( 'When there are sectors', () => {
+
+						afterEach( () => {
+
+
+							const sectorsResponse = '/sectors';
+
+							urls.reports.sectors.and.callFake( () => sectorsResponse );
+
+							args.saved();
+
+							expect( urls.reports.sectors ).toHaveBeenCalledWith( report.id );
+							expect( res.redirect ).toHaveBeenCalledWith( sectorsResponse );
+						} );
+
+						describe( 'When the sectors are in the report', () => {
+							it( 'Should call the correct url', () => {
+
+								report.sectors = [ uuid(), uuid() ];
+							} );
+						} );
+
+						describe( 'When the sectors are in the session', () => {
+							it( 'Should call the correct url', () => {
+
+								req.session.sectors = [ uuid(), uuid() ];
+							} );
+						} );
+					} );
+
+					describe( 'When there are NOT any sectors', () => {
+						it( 'Should redirect to the correct URL', () => {
+
+							const addSectorResponse = '/add/sector';
+
+							urls.reports.addSector.and.callFake( () => addSectorResponse );
+
+							args.saved();
+
+							expect( urls.reports.addSector ).toHaveBeenCalledWith( report.id );
+							expect( res.redirect ).toHaveBeenCalledWith( addSectorResponse );
+						} );
+					} );
+				} );
+
+				describe( 'When hasSectors is false', () => {
+					it( 'Should redirect to the correct URL', () => {
+
+						const aboutProblemResponse = '/about/sector';
+
+						urls.reports.aboutProblem.and.callFake( () => aboutProblemResponse );
+						getValuesResponse = { hasSectors: 'false' };
+
+						args.saved();
+
+						expect( urls.reports.aboutProblem ).toHaveBeenCalledWith( report.id );
+						expect( res.redirect ).toHaveBeenCalledWith( aboutProblemResponse );
+					} );
+				} );
+			} );
+
+			describe( 'Calling formProcessor.process', () => {
+				describe( 'When there are no errors', () => {
+					it( 'Should not call next', async () => {
+
+						await controller.hasSectors( req, res, next );
+
+						expect( next ).not.toHaveBeenCalledWith();
+					} );
+				} );
+
+				describe( 'When the formProcessor throws an error', () => {
+					it( 'Should call next with the error', async () => {
+
+						const err = new Error( 'Some random error' );
+
+						processFn.and.callFake( () => Promise.reject( err ) );
+
+						await controller.hasSectors( req, res, next );
+
+						expect( next ).toHaveBeenCalledWith( err );
+					} );
+				} );
+			} );
+		} );
+	} );
+
+	describe( 'addSector', () => {
+
+		let report;
+
+		beforeEach( () => {
+
+			report = {
+				id: uuid(),
+				sectors: null,
+			};
+			req.report = report;
+		} );
+
+		describe( 'Form config', () => {
+			describe( 'When there are not an sectors in the session', () => {
+				it( 'Should setup the form correctly with default values', async () => {
+
+					await controller.addSector( req, res, next );
+
+					const args = Form.calls.argsFor( 0 );
+					const config = args[ 1 ];
+
+					expect( Form ).toHaveBeenCalled();
+					expect( args[ 0 ] ).toEqual( req );
+
+					expect( config.sectors ).toBeDefined();
+					expect( config.sectors.type ).toEqual( Form.SELECT );
+					expect( config.sectors.items ).toEqual( metadata.affectedSectorsList );
+					expect( config.sectors.validators[ 0 ].fn ).toEqual( validators.isSector );
+				} );
+			} );
+
+			describe( 'When there is one sector in the session', () => {
+				it( 'Should setup the form correctly', async () => {
+
+					req.session.sectors = [ 2 ];
+
+					await controller.addSector( req, res, next );
+
+					const args = Form.calls.argsFor( 0 );
+					const config = args[ 1 ];
+
+					expect( Form ).toHaveBeenCalled();
+					expect( args[ 0 ] ).toEqual( req );
+
+					expect( config.sectors ).toBeDefined();
+					expect( config.sectors.type ).toEqual( Form.SELECT );
+					expect( config.sectors.items ).toEqual( metadata.affectedSectorsList.filter( ( sector ) => sector.value != 2 ) );
+					expect( config.sectors.validators[ 0 ].fn ).toEqual( validators.isSector );
+				} );
+			} );
 		} );
 	} );
 
@@ -780,1081 +953,207 @@ describe( 'Report controller', () => {
 
 			report = {
 				product: 'myProduct',
-				commodity_codes: 'code 1, code 2',
-				export_country: 'a country',
 				problem_description: 'a description',
 				barrier_title: 'barrier_title',
+				source: 'barrier_awareness',
+				other_source: 'barrier_awareness_other',
+				resolution_summary: 'resolution_summary'
 			};
 			req.report = report;
 		} );
 
-		it( 'Should setup the form correctly', () => {
+		describe( 'Form config', () => {
 
-			const lossScaleResponse = { lossScale: 1 };
-			const boolScaleResponse = { boolScale: 1 };
+			let barrierAwarenessResponse;
 
-			validators.isMetadata.and.callFake( ( key ) => {
+			function checkForm( args, isResolved ){
 
-				if( key === 'lossScale' ){ return lossScaleResponse; }
-				if( key === 'boolScale' ){ return boolScaleResponse; }
-			} );
+				const config = args[ 1 ];
 
-			controller.aboutProblem( req, res );
+				expect( Form ).toHaveBeenCalled();
+				expect( args[ 0 ] ).toEqual( req );
 
-			const args = Form.calls.argsFor( 0 );
-			const config = args[ 1 ];
+				expect( config.item ).toBeDefined();
+				expect( config.item.required ).toBeDefined();
+				expect( config.item.values ).toEqual( [ report.product ] );
 
-			expect( Form ).toHaveBeenCalled();
-			expect( args[ 0 ] ).toEqual( req );
+				expect( config.country ).not.toBeDefined();
 
-			expect( config.item ).toBeDefined();
-			expect( config.item.required ).toBeDefined();
-			expect( config.item.values ).toEqual( [ report.product ] );
+				expect( config.description ).toBeDefined();
+				expect( config.description.values ).toEqual( [ report.problem_description ] );
+				expect( config.description.required ).toBeDefined();
 
-			expect( config.commodityCode ).toBeDefined();
-			expect( config.commodityCode.values ).toEqual( [ report.commodity_codes ] );
+				expect( config.barrierTitle ).toBeDefined();
+				expect( config.barrierTitle.values ).toEqual( [ report.barrier_title ] );
+				expect( config.barrierTitle.required ).toBeDefined();
 
-			expect( config.country ).toBeDefined();
-			expect( config.country.values ).toEqual( [ report.export_country ] );
-			expect( config.country.validators[ 0 ].fn ).toEqual( validators.isCountry );
+				expect( config.barrierAwareness ).toBeDefined();
+				expect( config.barrierAwareness.type ).toEqual( Form.RADIO );
+				expect( config.barrierAwareness.values ).toEqual( [ report.source ] );
+				expect( config.barrierAwareness.validators[ 0 ].fn ).toEqual( barrierAwarenessResponse );
+				expect( Array.isArray( config.barrierAwareness.items ) ).toEqual( true );
 
-			expect( config.description ).toBeDefined();
-			expect( config.description.values ).toEqual( [ report.problem_description ] );
-			expect( config.description.required ).toBeDefined();
+				expect( config.barrierAwarenessOther ).toBeDefined();
+				expect( config.barrierAwarenessOther.conditional ).toEqual( { name: 'barrierAwareness', value: 'OTHER' } );
+				expect( config.barrierAwarenessOther.values ).toEqual( [ report.other_source ] );
 
-			expect( config.barrierTitle ).toBeDefined();
-			expect( config.barrierTitle.values ).toEqual( [ report.barrier_title ] );
-			expect( config.barrierTitle.required ).toBeDefined();
-		} );
+				if( isResolved ){
 
-		describe( 'When it is a GET', () => {
-			it( 'Should render the view with the viewModel', async () => {
-
-				await controller.aboutProblem( req, res, next );
-
-				expect( form.validate ).not.toHaveBeenCalled();
-				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'reports/views/about-problem', getTemplateValuesResponse );
-			} );
-		} );
-
-		describe( 'When it is a POST', () => {
+					expect( config.resolvedDescription ).toBeDefined();
+					expect( config.resolvedDescription.values ).toEqual( [ report.status_summary ] );
+					expect( config.resolvedDescription.required ).toBeDefined();
+				}
+			}
 
 			beforeEach( () => {
 
-				req.body = {};
-				form.isPost = true;
+				barrierAwarenessResponse = { barrierAwarenessResponse: true };
+
+				validators.isMetadata.and.callFake( ( key ) => {
+
+					if( key === 'barrierAwareness' ){ return barrierAwarenessResponse; }
+				} );
 			} );
 
-			afterEach( () => {
+			describe( 'When the report is resolved', () => {
+				it( 'Should setup the form correctly', async () => {
 
-				expect( form.validate ).toHaveBeenCalled();
-			} );
-
-			describe( 'When the required values are empty', () => {
-				it( 'Should render the template', async () => {
-
-					form.hasErrors = () => true;
+					req.report.is_resolved = true;
 
 					await controller.aboutProblem( req, res, next );
 
-					expect( res.render ).toHaveBeenCalledWith( 'reports/views/about-problem', getTemplateValuesResponse );
+					checkForm( Form.calls.argsFor( 0 ), true );
 				} );
 			} );
 
-			describe( 'When the required values are filled', () => {
-				describe( 'When the response is a success', () => {
+			describe( 'When the report is NOT resolved', () => {
+				it( 'Should setup the form correctly', async () => {
 
-					beforeEach( () => {
+					await controller.aboutProblem( req, res, next );
 
-						backend.reports.saveProblem.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+					checkForm( Form.calls.argsFor( 0 ) );
+				} );
+			} );
+		} );
 
-						req.report = { id: 1, b: 2 };
-						form.hasErrors = () => false;
-					} );
+		describe( 'FormProcessor', () => {
 
-					afterEach( () => {
+			let FormProcessor;
+			let processFn;
+			let args;
 
-						expect( next ).not.toHaveBeenCalled();
-						expect( backend.reports.saveProblem ).toHaveBeenCalledWith( req, req.report.id, getValuesResponse );
-					} );
+			beforeEach( async () => {
 
-					describe( 'When save and exit is used to submit the form', () => {
-						it( 'Should redirect to the report detail page', async () => {
+				FormProcessor = jasmine.createSpy( 'FormProcessor' );
+				processFn = jasmine.createSpy( 'FormProcessor.process' );
 
-							const reportDetailResponse = '/reportDetail';
-							urls.reports.detail.and.callFake( () => reportDetailResponse );
-							form.isExit = true;
+				controller = proxyquire( modulePath, {
+					'../../lib/backend-service': backend,
+					'../../lib/urls': urls,
+					'../../lib/metadata': metadata,
+					'../../lib/Form': Form,
+					'../../lib/FormProcessor': FormProcessor,
+					'../../lib/validators': validators
+				} );
 
-							await controller.aboutProblem( req, res, next );
+				FormProcessor.and.callFake( () => ({
+					process: processFn
+				}) );
 
-							expect( urls.reports.detail ).toHaveBeenCalledWith( req.report.id );
-							expect( res.redirect ).toHaveBeenCalledWith( reportDetailResponse );
-						} );
-					} );
+				req.report.is_resolved = true;
 
-					describe( 'When save and continue is used to submit the form', () => {
-						it( 'Should redirect', async () => {
+				await controller.aboutProblem( req, res, next );
 
-							const impactUrlResponse = '/impact/';
-							urls.reports.impact.and.callFake( () => impactUrlResponse );
+				args = FormProcessor.calls.argsFor( 0 )[ 0 ];
+			} );
 
-							await controller.aboutProblem( req, res, next );
+			it( 'Should setup the FormProcessor correctly', () => {
 
-							expect( urls.reports.impact ).toHaveBeenCalledWith( req.report.id );
-							expect( res.redirect ).toHaveBeenCalledWith( impactUrlResponse );
-						} );
+				expect( args.form ).toEqual( form );
+				expect( typeof args.render ).toEqual( 'function' );
+				expect( typeof args.saveFormData ).toEqual( 'function' );
+				expect( typeof args.saved ).toEqual( 'function' );
+			} );
+
+			describe( 'render', () => {
+
+				const template = 'reports/views/about-problem';
+
+				describe( 'When the report has sectors_affected', () => {
+					it( 'Should render the template with the correct data', () => {
+
+						const myValues = { some: 'data' };
+						const sectorsResponse = 'sectors';
+						const renderValues = Object.assign( {}, myValues, { backHref: sectorsResponse, isResolved: true } );
+
+						urls.reports.sectors.and.callFake( () => sectorsResponse );
+						report.sectors_affected = true;
+
+						args.render( myValues );
+
+						expect( res.render ).toHaveBeenCalledWith( template, renderValues );
 					} );
 				} );
 
-				describe( 'When the response is not a success', () => {
-					it( 'Should call next with an error', async () => {
+				describe( 'When the report does not have sectors_affected', () => {
+					it( 'Should render the template with the correct data', () => {
 
-						const statusCode = 500;
-						form.hasErrors = () => false;
-						backend.reports.saveProblem.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
+						const myValues = { some: 'data' };
+						const hasSectorsResponse = 'hasSectors';
+						const renderValues = Object.assign( {}, myValues, { backHref: hasSectorsResponse, isResolved: true } );
+
+						urls.reports.hasSectors.and.callFake( () => hasSectorsResponse );
+
+						args.render( myValues );
+
+						expect( res.render ).toHaveBeenCalledWith( template, renderValues );
+					} );
+				} );
+			} );
+
+			describe( 'safeFormData', () => {
+				it( 'Should call the correct method with the correct data', () => {
+
+					const myFormData = { a: true, b: false };
+
+					args.saveFormData( myFormData );
+
+					expect( backend.reports.saveProblem ).toHaveBeenCalledWith( req, report.id, myFormData );
+				} );
+			} );
+
+			describe( 'Saved', () => {
+				it( 'Should redirect to the correct URL', () => {
+
+					const detailResponse = '/a/path/detail';
+
+					urls.reports.detail.and.callFake( () => detailResponse );
+
+					args.saved();
+
+					expect( urls.reports.detail ).toHaveBeenCalledWith( report.id  );
+					expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
+				} );
+			} );
+
+			describe( 'Calling formProcessor.process', () => {
+				describe( 'When there are no errors', () => {
+					it( 'Should not call next', async () => {
 
 						await controller.aboutProblem( req, res, next );
 
-						expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save form - got 500 from backend' ) );
+						expect( next ).not.toHaveBeenCalledWith();
 					} );
 				} );
 
-				describe( 'When the request fails', () => {
+				describe( 'When the formProcessor throws an error', () => {
 					it( 'Should call next with the error', async () => {
 
-						const err = new Error( 'my test' );
-						form.hasErrors = () => false;
-						backend.reports.saveProblem.and.callFake( () => Promise.reject( err ) );
+						const err = new Error( 'Some random error' );
+
+						processFn.and.callFake( () => Promise.reject( err ) );
 
 						await controller.aboutProblem( req, res, next );
-
-						expect( next ).toHaveBeenCalledWith( err );
-					} );
-				} );
-			} );
-		} );
-	} );
-
-	describe( 'impact', () => {
-
-		let report;
-
-		beforeEach( () => {
-
-			report = {
-				problem_impact: 'problem_impact',
-				estimated_loss_range: 'estimated_loss_range',
-				other_companies_affected: 'other_companies_affected',
-				other_companies_info: 'other_companies_info'
-			};
-
-			req.report = report;
-		} );
-
-		it( 'Should setup the form correctly', () => {
-
-			const lossScaleResponse = { lossScaleResponse: 1 };
-			const boolScaleResponse = { boolScaleResponse: 2 };
-
-
-			validators.isMetadata.and.callFake( ( key ) => {
-
-				if( key === 'lossScale' ){ return lossScaleResponse; }
-				if( key === 'boolScale' ){ return boolScaleResponse; }
-			} );
-
-			controller.impact( req, res, next );
-
-			expect( Form ).toHaveBeenCalled();
-
-			const args = Form.calls.argsFor( 0 );
-			const config = args[ 1 ];
-
-			expect( args[ 0 ] ).toEqual( req );
-
-			expect( config.impact ).toBeDefined();
-			expect( config.impact.values ).toEqual( [ report.problem_impact ] );
-			expect( config.impact.required ).toEqual( 'Describe the impact of the problem' );
-
-			expect( config.losses ).toBeDefined();
-			expect( config.losses.type ).toEqual( Form.RADIO );
-			expect( config.losses.values ).toEqual( [ report.estimated_loss_range ] );
-			expect( config.losses.validators[ 0 ].fn ).toEqual( lossScaleResponse );
-
-			expect( config.otherCompanies ).toBeDefined();
-			expect( config.otherCompanies.type ).toEqual( Form.RADIO );
-			expect( config.otherCompanies.values ).toEqual( [ report.other_companies_affected ] );
-			expect( config.otherCompanies.validators[ 0 ].fn ).toEqual( boolScaleResponse );
-
-			expect( config.otherCompaniesInfo ).toBeDefined();
-			expect( config.otherCompaniesInfo.values ).toEqual( [ report.other_companies_info ] );
-			expect( config.otherCompaniesInfo.conditional ).toEqual( { name: 'otherCompanies', value: '1' } );
-			expect( config.otherCompaniesInfo.required ).toBeDefined();
-		} );
-
-		describe( 'When it is a GET', () => {
-			it( 'Should render the view with the viewModel', async () => {
-
-				await controller.impact( req, res, next );
-
-				expect( form.validate ).not.toHaveBeenCalled();
-				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'reports/views/impact', getTemplateValuesResponse );
-			} );
-		} );
-
-		describe( 'When it is a POST', () => {
-
-			beforeEach( () => {
-
-				req.body = {};
-				form.isPost = true;
-			} );
-
-			afterEach( () => {
-
-				expect( form.validate ).toHaveBeenCalled();
-			} );
-
-			describe( 'When the required values are empty', () => {
-				it( 'Should render the template', async () => {
-
-					form.hasErrors = () => true;
-
-					await controller.impact( req, res, next );
-
-					expect( res.render ).toHaveBeenCalledWith( 'reports/views/impact', getTemplateValuesResponse );
-				} );
-			} );
-
-			describe( 'When the required values are filled', () => {
-				describe( 'When the response is a success', () => {
-
-					beforeEach( () => {
-
-						backend.reports.saveImpact.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
-
-						req.report = { id: 1, b: 2 };
-						form.hasErrors = () => false;
-					} );
-
-					afterEach( () => {
-
-						expect( next ).not.toHaveBeenCalled();
-						expect( backend.reports.saveImpact ).toHaveBeenCalledWith( req, req.report.id, getValuesResponse );
-					} );
-
-					describe( 'When save and exit is used to submit the form', () => {
-						it( 'Should redirect to the report detail page', async () => {
-
-							const reportDetailResponse = '/reportDetail';
-							urls.reports.detail.and.callFake( () => reportDetailResponse );
-							form.isExit = true;
-
-							await controller.impact( req, res, next );
-
-							expect( urls.reports.detail ).toHaveBeenCalledWith( req.report.id );
-							expect( res.redirect ).toHaveBeenCalledWith( reportDetailResponse );
-						} );
-					} );
-
-					describe( 'When save and continue is used to submit the form', () => {
-						it( 'Should redirect', async () => {
-
-							const legalResponse = '/legal/';
-							urls.reports.legal.and.callFake( () => legalResponse );
-
-							await controller.impact( req, res, next );
-
-							expect( urls.reports.legal ).toHaveBeenCalledWith( req.report.id );
-							expect( res.redirect ).toHaveBeenCalledWith( legalResponse );
-						} );
-					} );
-				} );
-
-				describe( 'When the response is not a success', () => {
-					it( 'Should call next with an error', async () => {
-
-						const statusCode = 500;
-						form.hasErrors = () => false;
-						backend.reports.saveImpact.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
-
-						await controller.impact( req, res, next );
-
-						expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save form - got 500 from backend' ) );
-					} );
-				} );
-
-				describe( 'When the request fails', () => {
-					it( 'Should call next with the error', async () => {
-
-						const err = new Error( 'my test' );
-						form.hasErrors = () => false;
-						backend.reports.saveImpact.and.callFake( () => Promise.reject( err ) );
-
-						await controller.impact( req, res, next );
-
-						expect( next ).toHaveBeenCalledWith( err );
-					} );
-				} );
-			} );
-		} );
-	} );
-
-	describe( 'legal', () => {
-
-		let report;
-
-		beforeEach( () => {
-
-			report = {
-				has_legal_infringement: 'has_legal_infringement',
-				wto_infingment: 'wto_infingment',
-				fta_infingment: 'fta_infingment',
-				other_infingment: 'other_infingment',
-				infringement_summary: 'infringement_summary'
-			};
-
-			req.report = report;
-		} );
-
-		it( 'Should setup the form correctly', () => {
-
-			const boolScaleResponse = { boolScaleResponse: 2 };
-
-			validators.isMetadata.and.callFake( ( key ) => {
-
-				if( key === 'boolScale' ){ return boolScaleResponse; }
-			} );
-
-			controller.legal( req, res, next );
-
-			expect( Form ).toHaveBeenCalled();
-
-			const args = Form.calls.argsFor( 0 );
-			const config = args[ 1 ];
-
-			expect( args[ 0 ] ).toEqual( req );
-
-			expect( config.hasInfringed ).toBeDefined();
-			expect( config.hasInfringed.type ).toEqual( Form.RADIO );
-			expect( config.hasInfringed.values ).toEqual( [ report.has_legal_infringement ] );
-			expect( config.hasInfringed.validators[ 0 ].fn ).toEqual( boolScaleResponse );
-
-			expect( config.infringements ).toBeDefined();
-			expect( config.infringements.type ).toEqual( Form.CHECKBOXES );
-			expect( config.infringements.items.wtoInfringement.values ).toEqual( [ report.wto_infingement ] );
-			expect( config.infringements.items.ftaInfringement.values ).toEqual( [ report.fta_infingement ] );
-			expect( config.infringements.items.otherInfringement.values ).toEqual( [ report.other_infingement ] );
-			expect( config.infringements.validators[ 0 ].fn ).toEqual( validators.isOneBoolCheckboxChecked );
-
-			expect( config.infringementSummary ).toBeDefined();
-			expect( config.infringementSummary.values ).toEqual( [ report.infringement_summary ] );
-			expect( config.infringementSummary.conditional ).toEqual( { name: 'hasInfringed', value: '1' } );
-			expect( config.infringementSummary.required ).toBeDefined();
-		} );
-
-		describe( 'When it is a GET', () => {
-			it( 'Should render the view with the viewModel', async () => {
-
-				await controller.legal( req, res, next );
-
-				expect( form.validate ).not.toHaveBeenCalled();
-				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'reports/views/legal', getTemplateValuesResponse );
-			} );
-		} );
-
-		describe( 'When it is a POST', () => {
-
-			beforeEach( () => {
-
-				req.body = {};
-				form.isPost = true;
-			} );
-
-			afterEach( () => {
-
-				expect( form.validate ).toHaveBeenCalled();
-			} );
-
-			describe( 'When the required values are empty', () => {
-				it( 'Should render the template', async () => {
-
-					form.hasErrors = () => true;
-
-					await controller.legal( req, res, next );
-
-					expect( res.render ).toHaveBeenCalledWith( 'reports/views/legal', getTemplateValuesResponse );
-				} );
-			} );
-
-			describe( 'When the required values are filled', () => {
-				describe( 'When the response is a success', () => {
-
-					beforeEach( () => {
-
-						backend.reports.saveLegal.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
-
-						req.report = { id: 1, b: 2 };
-						form.hasErrors = () => false;
-					} );
-
-					afterEach( () => {
-
-						expect( next ).not.toHaveBeenCalled();
-						expect( backend.reports.saveLegal ).toHaveBeenCalledWith( req, req.report.id, getValuesResponse );
-					} );
-
-					describe( 'When save and exit is used to submit the form', () => {
-						it( 'Should redirect to the report detail page', async () => {
-
-							const reportDetailResponse = '/reportDetail';
-							urls.reports.detail.and.callFake( () => reportDetailResponse );
-							form.isExit = true;
-
-							await controller.legal( req, res, next );
-
-							expect( urls.reports.detail ).toHaveBeenCalledWith( req.report.id );
-							expect( res.redirect ).toHaveBeenCalledWith( reportDetailResponse );
-						} );
-					} );
-
-					describe( 'When save and continue is used to submit the form', () => {
-						it( 'Should redirect', async () => {
-
-							const typeCategoryResponse = '/type-category/';
-							urls.reports.typeCategory.and.callFake( () => typeCategoryResponse );
-
-							await controller.legal( req, res, next );
-
-							expect( urls.reports.typeCategory ).toHaveBeenCalledWith( req.report.id );
-							expect( res.redirect ).toHaveBeenCalledWith( typeCategoryResponse );
-						} );
-					} );
-				} );
-
-				describe( 'When the response is not a success', () => {
-					it( 'Should call next with an error', async () => {
-
-						const statusCode = 500;
-						form.hasErrors = () => false;
-						backend.reports.saveLegal.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
-
-						await controller.legal( req, res, next );
-
-						expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save form - got 500 from backend' ) );
-					} );
-				} );
-
-				describe( 'When the request fails', () => {
-					it( 'Should call next with the error', async () => {
-
-						const err = new Error( 'my test' );
-						form.hasErrors = () => false;
-						backend.reports.saveLegal.and.callFake( () => Promise.reject( err ) );
-
-						await controller.legal( req, res, next );
-
-						expect( next ).toHaveBeenCalledWith( err );
-					} );
-				} );
-			} );
-		} );
-	} );
-
-	describe( 'typeCategory', () => {
-
-		let ssoToken;
-		let report;
-
-		beforeEach( () => {
-
-			ssoToken = uuid();
-			req.session = { ssoToken };
-			report = {
-				id: 123,
-				barrier_type_category: 'barrier_type_category'
-			};
-			req.report = report;
-		} );
-
-		it( 'Should setup the form correctly', () => {
-
-			const barrierTypeCategories = { barrierTypeCategories: 1 };
-			const sessionValues = {
-				category: 'GOODS',
-			};
-
-			req.session.typeCategoryValues = sessionValues;
-
-			validators.isMetadata.and.callFake( () => barrierTypeCategories );
-
-			controller.typeCategory( req, res );
-
-			const args = Form.calls.argsFor( 0 );
-			const config = args[ 1 ];
-
-			expect( Form ).toHaveBeenCalled();
-			expect( args[ 0 ] ).toEqual( req );
-
-			expect( config.category ).toBeDefined();
-			expect( config.category.values ).toEqual( [ sessionValues.category, report.barrier_type_category ] );
-			expect( config.category.items.length ).toEqual( Object.entries( metadata.barrierTypeCategories ).length );
-			expect( config.category.validators[ 0 ].fn ).toEqual( barrierTypeCategories );
-		} );
-
-		describe( 'When it is a POST', () => {
-
-			beforeEach( () => {
-
-				req.method = 'POST';
-				req.body = {};
-				form.isPost = true;
-			} );
-
-			describe( 'When the input values are valid', () => {
-
-				it( 'Should save the values and redirect to the next step', () => {
-
-					const typeUrl = 'my-url';
-					const status = '123';
-					const emergency = '456';
-
-					req.body = { status, emergency };
-					form.hasErrors = () => false;
-
-					urls.reports.type.and.callFake( () => typeUrl );
-
-					controller.typeCategory( req, res );
-
-					expect( form.validate ).toHaveBeenCalled();
-					expect( req.session.typeCategoryValues ).toEqual( getValuesResponse );
-					expect( res.redirect ).toHaveBeenCalledWith( typeUrl );
-				} );
-			} );
-
-			describe( 'When no input values are given', () => {
-
-				beforeEach( () => {
-
-					req.session.typeCategoryValues = { test: 1 };
-					form.hasErrors = () => true;
-				} );
-
-				it( 'Should not save the values to the session', () => {
-
-					controller.typeCategory( req, res );
-					expect( req.session.typeCategoryValues ).not.toBeDefined();
-				} );
-			} );
-		} );
-
-		describe( 'When it is a GET', () => {
-			it( 'Should render the start page with the form values', () => {
-
-				const sessionValues = { category: 'GOODS' };
-
-				req.session.typeCategoryValues = sessionValues;
-
-				controller.typeCategory( req, res );
-
-				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'reports/views/type-category', getTemplateValuesResponse );
-			} );
-		} );
-	} );
-
-	describe( 'type', () => {
-
-		let report;
-		let templateData;
-
-		beforeEach( () => {
-
-			report = {
-				id: 123,
-				barrier_type_id: 456
-			};
-
-			req.report = report;
-			req.session.typeCategoryValues = { category: 'GOODS' };
-
-			getTemplateValuesResponse = {
-				barrierType: [
-					{ value: 1, text: 'barrier 1', category: 'GOODS' },
-					{ value: 2, text: 'barrier 2', category: 'SERVICES' }
-				]
-			};
-
-			templateData = Object.assign(
-				getTemplateValuesResponse,
-				{ title: metadata.barrierTypeCategories.GOODS }
-			);
-		} );
-
-		it( 'Should setup the form correctly', () => {
-
-			controller.type( req, res, next );
-
-			expect( Form ).toHaveBeenCalled();
-
-			const args = Form.calls.argsFor( 0 );
-			const config = args[ 1 ];
-			const goodsBarrierType = metadata.barrierTypes[ 0 ];
-
-			expect( args[ 0 ] ).toEqual( req );
-
-			expect( config.barrierType ).toBeDefined();
-			expect( config.barrierType.type ).toEqual( Form.RADIO );
-			expect( config.barrierType.items ).toEqual( [{
-				value: goodsBarrierType.id,
-				text: goodsBarrierType.title,
-				category: goodsBarrierType.category
-			}] );
-			expect( config.barrierType.values ).toEqual( [ report.barrier_type_id ] );
-			expect( config.barrierType.validators[ 0 ].fn ).toEqual( validators.isBarrierType );
-		} );
-
-		describe( 'When it is a GET', () => {
-			it( 'Should render the view with the viewModel', async () => {
-
-				await controller.type( req, res, next );
-
-				expect( form.validate ).not.toHaveBeenCalled();
-				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'reports/views/type', templateData );
-			} );
-		} );
-
-		describe( 'When it is a POST', () => {
-
-			beforeEach( () => {
-
-				req.body = {};
-				form.isPost = true;
-			} );
-
-			afterEach( () => {
-
-				expect( form.validate ).toHaveBeenCalled();
-			} );
-
-			describe( 'When the required values are empty', () => {
-				it( 'Should render the template', async () => {
-
-					form.hasErrors = () => true;
-
-					await controller.type( req, res, next );
-
-					expect( res.render ).toHaveBeenCalledWith( 'reports/views/type', templateData );
-				} );
-			} );
-
-			describe( 'When the required values are filled', () => {
-				describe( 'When the response is a success', () => {
-
-					beforeEach( () => {
-
-						backend.reports.saveBarrierType.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
-
-						req.report = { id: 1, b: 2 };
-						form.hasErrors = () => false;
-					} );
-
-					afterEach( () => {
-
-						expect( next ).not.toHaveBeenCalled();
-						expect( req.session.typeCategoryValues ).not.toBeDefined();
-						expect( backend.reports.saveBarrierType ).toHaveBeenCalledWith( req, req.report.id, getValuesResponse );
-					} );
-
-					describe( 'When save and exit is used to submit the form', () => {
-						it( 'Should redirect to the report detail page', async () => {
-
-							const reportDetailResponse = '/reportDetail';
-							urls.reports.detail.and.callFake( () => reportDetailResponse );
-							form.isExit = true;
-
-							await controller.type( req, res, next );
-
-							expect( urls.reports.detail ).toHaveBeenCalledWith( req.report.id );
-							expect( res.redirect ).toHaveBeenCalledWith( reportDetailResponse );
-						} );
-					} );
-
-					describe( 'When save and continue is used to submit the form', () => {
-						it( 'Should redirect', async () => {
-
-							const supportResponse = '/support/';
-							urls.reports.support.and.callFake( () => supportResponse );
-
-							await controller.type( req, res, next );
-
-							expect( urls.reports.support ).toHaveBeenCalledWith( req.report.id );
-							expect( res.redirect ).toHaveBeenCalledWith( supportResponse );
-						} );
-					} );
-				} );
-
-				describe( 'When the response is not a success', () => {
-					it( 'Should call next with an error', async () => {
-
-						const statusCode = 500;
-						form.hasErrors = () => false;
-						backend.reports.saveBarrierType.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
-
-						await controller.type( req, res, next );
-
-						expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save form - got 500 from backend' ) );
-					} );
-				} );
-
-				describe( 'When the request fails', () => {
-					it( 'Should call next with the error', async () => {
-
-						const err = new Error( 'my test' );
-						form.hasErrors = () => false;
-						backend.reports.saveBarrierType.and.callFake( () => Promise.reject( err ) );
-
-						await controller.type( req, res, next );
-
-						expect( next ).toHaveBeenCalledWith( err );
-					} );
-				} );
-			} );
-		} );
-	} );
-
-	describe( 'support', () => {
-
-		let report;
-
-		beforeEach( () => {
-
-			report = {
-				is_resolved: 'is_resolved',
-				support_type: 'support_type',
-				steps_taken: 'steps_taken',
-				is_politically_sensitive: 'is_politically_sensitive',
-				political_sensitivity_summary: 'political_sensitivity_summary'
-			};
-
-			req.report = report;
-		} );
-
-		it( 'Should setup the form correctly', () => {
-
-			const boolResponse = { boolResponse: 2 };
-			const supportTypeResponse = { supportTypeResponse: 2 };
-
-			validators.isMetadata.and.callFake( ( key ) => {
-
-				if( key === 'bool' ){ return boolResponse; }
-				if( key === 'supportType' ){ return supportTypeResponse; }
-			} );
-
-			controller.support( req, res, next );
-
-			expect( Form ).toHaveBeenCalled();
-
-			const args = Form.calls.argsFor( 0 );
-			const config = args[ 1 ];
-
-			expect( args[ 0 ] ).toEqual( req );
-
-			expect( config.resolved ).toBeDefined();
-			expect( config.resolved.type ).toEqual( Form.RADIO );
-			expect( config.resolved.values ).toEqual( [ report.is_resolved ] );
-			expect( config.resolved.validators[ 0 ].fn ).toEqual( boolResponse );
-
-			expect( config.supportType ).toBeDefined();
-			expect( config.supportType.type ).toEqual( Form.RADIO );
-			expect( config.supportType.values ).toEqual( [ report.support_type ] );
-			expect( config.supportType.conditional ).toEqual( { name: 'resolved', value: 'false' } );
-			expect( config.supportType.validators[ 0 ].fn ).toEqual( supportTypeResponse );
-
-			expect( config.stepsTaken ).toBeDefined();
-			expect( config.stepsTaken.values ).toEqual( [ report.steps_taken ] );
-			expect( config.stepsTaken.conditional ).toEqual( { name: 'resolved', value: 'false' } );
-			expect( config.stepsTaken.required ).toBeDefined();
-
-			expect( config.politicalSensitivities ).toBeDefined();
-			expect( config.politicalSensitivities.type ).toEqual( Form.RADIO );
-			expect( config.politicalSensitivities.values ).toEqual( [ report.is_politically_sensitive ] );
-			expect( config.politicalSensitivities.validators[ 0 ].fn ).toEqual( boolResponse );
-
-			expect( config.sensitivitiesDescription ).toBeDefined();
-			expect( config.sensitivitiesDescription.values ).toEqual( [ report.political_sensitivity_summary ] );
-			expect( config.sensitivitiesDescription.conditional ).toEqual( { name: 'politicalSensitivities', value: 'true' } );
-			expect( config.sensitivitiesDescription.required ).toBeDefined();
-		} );
-
-		describe( 'When it is a GET', () => {
-			it( 'Should render the view with the viewModel', async () => {
-
-				await controller.support( req, res, next );
-
-				expect( form.validate ).not.toHaveBeenCalled();
-				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'reports/views/support', getTemplateValuesResponse );
-			} );
-		} );
-
-		describe( 'When it is a POST', () => {
-
-			beforeEach( () => {
-
-				req.body = {};
-				form.isPost = true;
-			} );
-
-			afterEach( () => {
-
-				expect( form.validate ).toHaveBeenCalled();
-			} );
-
-			describe( 'When the required values are empty', () => {
-				it( 'Should render the template', async () => {
-
-					form.hasErrors = () => true;
-
-					await controller.support( req, res, next );
-
-					expect( res.render ).toHaveBeenCalledWith( 'reports/views/support', getTemplateValuesResponse );
-				} );
-			} );
-
-			describe( 'When the required values are filled', () => {
-				describe( 'When the response is a success', () => {
-
-					beforeEach( () => {
-
-						backend.reports.saveSupport.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
-
-						req.report = { id: 1, b: 2 };
-						form.hasErrors = () => false;
-					} );
-
-					afterEach( () => {
-
-						expect( next ).not.toHaveBeenCalled();
-						expect( backend.reports.saveSupport ).toHaveBeenCalledWith( req, req.report.id, getValuesResponse );
-					} );
-
-					describe( 'When save and exit is used to submit the form', () => {
-						it( 'Should redirect to the report detail page', async () => {
-
-							const reportDetailResponse = '/reportDetail';
-							urls.reports.detail.and.callFake( () => reportDetailResponse );
-							form.isExit = true;
-
-							await controller.support( req, res, next );
-
-							expect( urls.reports.detail ).toHaveBeenCalledWith( req.report.id );
-							expect( res.redirect ).toHaveBeenCalledWith( reportDetailResponse );
-						} );
-					} );
-
-					describe( 'When save and continue is used to submit the form', () => {
-						it( 'Should redirect', async () => {
-
-							const nextStepsResponse = '/next-steps/';
-							urls.reports.nextSteps.and.callFake( () => nextStepsResponse );
-
-							await controller.support( req, res, next );
-
-							expect( urls.reports.nextSteps ).toHaveBeenCalledWith( req.report.id );
-							expect( res.redirect ).toHaveBeenCalledWith( nextStepsResponse );
-						} );
-					} );
-				} );
-
-				describe( 'When the response is not a success', () => {
-					it( 'Should call next with an error', async () => {
-
-						const statusCode = 500;
-						form.hasErrors = () => false;
-						backend.reports.saveSupport.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
-
-						await controller.support( req, res, next );
-
-						expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save form - got 500 from backend' ) );
-					} );
-				} );
-
-				describe( 'When the request fails', () => {
-					it( 'Should call next with the error', async () => {
-
-						const err = new Error( 'my test' );
-						form.hasErrors = () => false;
-						backend.reports.saveSupport.and.callFake( () => Promise.reject( err ) );
-
-						await controller.support( req, res, next );
-
-						expect( next ).toHaveBeenCalledWith( err );
-					} );
-				} );
-			} );
-		} );
-	} );
-
-	describe( 'nextSteps', () => {
-
-		let next;
-		let report;
-
-		beforeEach( () => {
-
-			next = jasmine.createSpy( 'next' );
-			report = {
-				govt_response_requested: 'govt_response_requested',
-				is_commercially_sensitive: 'is_commercially_sensitive',
-				commercial_sensitivity_summary: 'a commercial_sensitivity_summary',
-				can_publish: 'a descan_publishcription'
-			};
-			req.report = report;
-		} );
-
-		it( 'Should setup the form correctly', () => {
-
-			const govResponseResponse = { govResponse: 1 };
-			const boolResponse = { bool: 1 };
-			const publishResponseResponse = { publishResponseResponse: 1 };
-
-			validators.isMetadata.and.callFake( ( key ) => {
-
-				if( key === 'govResponse' ){ return govResponseResponse; }
-				if( key === 'bool' ){ return boolResponse; }
-				if( key === 'publishResponse' ){ return publishResponseResponse; }
-			} );
-
-			controller.nextSteps( req, res );
-
-			const args = Form.calls.argsFor( 0 );
-			const config = args[ 1 ];
-
-			expect( Form ).toHaveBeenCalled();
-			expect( args[ 0 ] ).toEqual( req );
-
-			expect( config.response ).toBeDefined();
-			expect( config.response.values ).toEqual( [ report.govt_response_requested ] );
-			expect( config.response.validators[ 0 ].fn ).toEqual( govResponseResponse );
-
-			expect( config.sensitivities ).toBeDefined();
-			expect( config.sensitivities.values ).toEqual( [ report.is_commercially_sensitive ] );
-			expect( config.sensitivities.validators[ 0 ].fn ).toEqual( boolResponse );
-
-			expect( config.sensitivitiesText ).toBeDefined();
-			expect( config.sensitivitiesText.values ).toEqual( [ report.commercial_sensitivity_summary ] );
-			expect( config.sensitivitiesText.required ).toBeDefined();
-
-			expect( config.permission ).toBeDefined();
-			expect( config.permission.values ).toEqual( [ report.can_publish ] );
-			expect( config.permission.validators[ 0 ].fn ).toEqual( publishResponseResponse );
-		} );
-
-		describe( 'When it is a GET', () => {
-			it( 'Should render the view with the viewModel', async () => {
-
-				await controller.nextSteps( req, res, next );
-
-				expect( form.validate ).not.toHaveBeenCalled();
-				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'reports/views/next-steps', getTemplateValuesResponse );
-			} );
-		} );
-
-		describe( 'When it is a POST', () => {
-
-			beforeEach( () => {
-
-				req.body = {};
-				form.isPost = true;
-			} );
-
-			afterEach( () => {
-
-				expect( form.validate ).toHaveBeenCalled();
-			} );
-
-			describe( 'When the required values are empty', () => {
-				it( 'Should render the template', async () => {
-
-					form.hasErrors = () => true;
-
-					await controller.nextSteps( req, res, next );
-
-					expect( res.render ).toHaveBeenCalledWith( 'reports/views/next-steps', getTemplateValuesResponse );
-				} );
-			} );
-
-			describe( 'When the required values are filled', () => {
-
-				let reportDetailResponse;
-				describe( 'When the response is a success', () => {
-
-					beforeEach( () => {
-
-						reportDetailResponse = '/reportDetail';
-						urls.reports.detail.and.callFake( () => reportDetailResponse );
-						backend.reports.saveNextSteps.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
-
-						req.report = { id: 1, b: 2 };
-						form.hasErrors = () => false;
-					} );
-
-					afterEach( () => {
-
-						expect( next ).not.toHaveBeenCalled();
-						expect( backend.reports.saveNextSteps ).toHaveBeenCalledWith( req, req.report.id, getValuesResponse );
-					} );
-
-					describe( 'When save and exit is used to submit the form', () => {
-						it( 'Should redirect to the report detail page', async () => {
-
-							form.isExit = true;
-
-							await controller.nextSteps( req, res, next );
-
-							expect( urls.reports.detail ).toHaveBeenCalledWith( req.report.id );
-							expect( res.redirect ).toHaveBeenCalledWith( reportDetailResponse );
-						} );
-					} );
-
-					describe( 'When save and continue is used to submit the form', () => {
-						it( 'Should redirect', async () => {
-
-							await controller.nextSteps( req, res, next );
-
-							expect( urls.reports.detail ).toHaveBeenCalledWith( req.report.id );
-							expect( res.redirect ).toHaveBeenCalledWith( reportDetailResponse );
-						} );
-					} );
-				} );
-
-				describe( 'When the response is not a success', () => {
-					it( 'Should call next with an error', async () => {
-
-						const statusCode = 500;
-						form.hasErrors = () => false;
-						backend.reports.saveNextSteps.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
-
-						await controller.nextSteps( req, res, next );
-
-						expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save form - got 500 from backend' ) );
-					} );
-				} );
-
-				describe( 'When the request fails', () => {
-					it( 'Should call next with the error', async () => {
-
-						const err = new Error( 'my test' );
-						form.hasErrors = () => false;
-						backend.reports.saveNextSteps.and.callFake( () => Promise.reject( err ) );
-
-						await controller.nextSteps( req, res, next );
 
 						expect( next ).toHaveBeenCalledWith( err );
 					} );
@@ -1930,9 +1229,13 @@ describe( 'Report controller', () => {
 	describe( 'success', () => {
 		it( 'Should render the success page', () => {
 
+			const id = uuid();
+
+			req.uuid = id;
+
 			controller.success( req, res );
 
-			expect( res.render ).toHaveBeenCalledWith( 'reports/views/success' );
+			expect( res.render ).toHaveBeenCalledWith( 'reports/views/success', { uuid: id } );
 		} );
 	} );
 } );

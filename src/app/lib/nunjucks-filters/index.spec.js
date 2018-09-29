@@ -4,20 +4,32 @@ const modulePath = './index';
 describe( 'Nunjucks filters', function(){
 
 	let nunjucksFilters;
+	let spies;
+	let stubs;
+
+	const filters = [
+		[ './highlight', 'highlight' ],
+		[ './remove-empty', 'removeEmpty' ],
+		[ './date-only', 'dateOnly' ],
+		[ './date-with-time', 'dateWithTime' ],
+		[ './error-for-name', 'errorForName' ],
+		[ './metadata-name', 'metadataName' ],
+		[ './add-to-radio', 'addToRadio' ],
+	];
 
 	beforeEach( function(){
 
-		this.highlight = jasmine.createSpy( 'highlight' );
-		this.removeEmpty = jasmine.createSpy( 'removeEmpty' );
-		this.dateOnly = jasmine.createSpy( 'dateOnly' );
-		this.dateWithTime = jasmine.createSpy( 'dataWithTime' );
+		spies = {};
+		stubs = {};
 
-		nunjucksFilters = proxyquire( modulePath, {
-			'./highlight': this.highlight,
-			'./remove-empty': this.removeEmpty,
-			'./date-only': this.dateOnly,
-			'./date-with-time': this.dateWithTime
+		filters.forEach( ( [ path, filterName ] ) => {
+
+			spies[ filterName ] = jasmine.createSpy( filterName );
+			stubs[ path ] = spies[ filterName ];
 		} );
+
+
+		nunjucksFilters = proxyquire( modulePath, stubs );
 	} );
 
 	it( 'Should add all the filters', function(){
@@ -26,24 +38,12 @@ describe( 'Nunjucks filters', function(){
 
 		nunjucksFilters( { addFilter } );
 
-		let args = addFilter.calls.argsFor( 0 );
+		filters.forEach( ( [ , filterName ], index ) => {
 
-		expect( args[ 0 ] ).toEqual( 'highlight' );
-		expect( args[ 1 ] ).toEqual( this.highlight );
+			const args = addFilter.calls.argsFor( index );
 
-		args = addFilter.calls.argsFor( 1 );
-
-		expect( args[ 0 ] ).toEqual( 'removeEmpty' );
-		expect( args[ 1 ] ).toEqual( this.removeEmpty );
-
-		args = addFilter.calls.argsFor( 2 );
-
-		expect( args[ 0 ] ).toEqual( 'dateOnly' );
-		expect( args[ 1 ] ).toEqual( this.dateOnly );
-
-		args = addFilter.calls.argsFor( 3 );
-
-		expect( args[ 0 ] ).toEqual( 'dateWithTime' );
-		expect( args[ 1 ] ).toEqual( this.dateWithTime );
+			expect( args[ 0 ] ).toEqual( filterName );
+			expect( args[ 1 ] ).toEqual( spies[ filterName ] );
+		} );
 	} );
 } );

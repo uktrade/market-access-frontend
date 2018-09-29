@@ -1,9 +1,7 @@
 const backend = require( '../../../../lib/backend-service' );
 const isUuid = /^[0-9a-zA-Z-]+$/;
 
-module.exports = async ( req, res, next ) => {
-
-	const barrierId = req.params.barrierId;
+module.exports = async ( req, res, next, barrierId ) => {
 
 	if( isUuid.test( barrierId ) ){
 

@@ -6,14 +6,20 @@
 
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Report - About the problem{% endblock %}
+{% block page_title %}{{ super() }} - Report - About the barrier{% endblock %}
+
+{% block body_script %}
+	<script>
+		ma.pages.report.aboutProblem();
+	</script>
+{% endblock %}
 
 {% block page_content %}
 
 	{{ heading({
-		back: { href: urls.reports.contacts( report.company_id, report.id ) },
+		back: { href: backHref },
 		caption: 'Report a barrier',
-		text: 'About the problem',
+		text: 'About the barrier',
 		errors: errors
 	}) }}
 
@@ -24,7 +30,7 @@
 		{{ govukInput( {
 
 			label: {
-				text: "What's the product or service being exported or invested in abroad?",
+				text: "What product or service is being exported?",
 				classes: 'govuk-label--s'
 			},
 			id: 'item',
@@ -33,38 +39,45 @@
 			errorMessage: errors | errorForName( 'item' )
 		} ) }}
 
+		{% set barrierAwarenessOtherHtml %}
+
+			{{ govukInput( {
+
+				label: {
+					text: 'Please specify',
+					classes: 'govuk-label--s'
+				},
+				id: 'barrier-awareness-other',
+				name: 'barrierAwarenessOther',
+				value: barrierAwarenessOther,
+				errorMessage: errors | errorForName( 'barrier-awareness-other' )
+			} ) }}
+
+		{% endset %}
+
+		{{ govukRadios({
+			name: 'barrierAwareness',
+			classes: [ 'barrier-awareness' ],
+			fieldset: {
+				legend: {
+					text: 'How did you find out about the barrier?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: barrierAwareness | addToRadio( {
+				'OTHER': { conditional: { html: barrierAwarenessOtherHtml } }
+			} ),
+			errorMessage: errors | errorForName( 'barrier-awareness-1' )
+		}) }}
+
 		{{ govukInput( {
 
 			label: {
-				html: 'List the relevant commodity codes, if known <span class="govuk-!-font-weight-regular">(Optional)</span>',
-				classes: 'govuk-label--s'
-			},
-			id: 'commodity-code',
-			name: 'commodityCode',
-			value: commodityCode,
-			errorMessage: errors | errorForName( 'commodity-code' )
-		} ) }}
-
-		{{ govukSelect( {
-
-			label: {
-				text: "Which country/trading bloc are they trying to export to or invest in?",
-				classes: 'govuk-label--s'
-			},
-			id: 'country',
-			name: 'country',
-			items: country,
-			errorMessage: errors | errorForName( 'country' )
-		} ) }}
-
-		{{ govukInput( {
-
-			label: {
-				text: 'Suggest an appropriate title for this barrier',
+				text: 'Suggest a title for this barrier',
 				classes: 'govuk-label--s'
 			},
 			hint: {
-				text: 'Include both the product or service name and the country being exported to e.g. Import of steel rods into India'
+				text: 'Include both the product or service name and the country being exported to, for example, Import quotas for steel rods in India.'
 			},
 			id: 'barrier-title',
 			name: 'barrierTitle',
@@ -72,17 +85,50 @@
 			errorMessage: errors | errorForName( 'barrier-title' )
 		} ) }}
 
-		{{ govukTextarea( {
+		{% if isResolved %}
+
+			{{ govukTextarea( {
+
+				label: {
+					text: 'Provide a summary of the problem and how you became aware of it',
+					classes: 'govuk-label--s'
+				},
+				id: 'description',
+				name: 'description',
+				value: description,
+				errorMessage: errors | errorForName( 'description' )
+			} ) }}
+
+			{{ govukTextarea( {
 
 			label: {
-				text: "Provide a brief description of the problem",
+				text: 'How did you resolve the problem?',
 				classes: 'govuk-label--s'
 			},
-			id: 'description',
-			name: 'description',
-			value: description,
-			errorMessage: errors | errorForName( 'description' )
+			id: 'resolved-description',
+			name: 'resolvedDescription',
+			value: resolvedDescription,
+			errorMessage: errors | errorForName( 'resolved-description' )
 		} ) }}
+
+		{% else %}
+
+			{{ govukTextarea( {
+
+				label: {
+					text: 'Provide a summary of the problem',
+					classes: 'govuk-label--s'
+				},
+				id: 'description',
+				name: 'description',
+				value: description,
+				hint: {
+					text: 'Include what you have done so far and who you have discussed the problem with.'
+				},
+				errorMessage: errors | errorForName( 'description' )
+			} ) }}
+
+		{% endif %}
 
 		<input type="submit" class="govuk-button" value="Save and continue">
 		<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>

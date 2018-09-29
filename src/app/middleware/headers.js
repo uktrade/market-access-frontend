@@ -2,7 +2,7 @@ const cspValues = [
 
 	`default-src 'none'`,
 	`base-uri 'self'`,
-	`script-src 'self' 'unsafe-inline' www.google-analytics.com`,
+	`script-src 'self' 'unsafe-inline' www.google-analytics.com www.googletagmanager.com`,
 	`style-src 'self' 'unsafe-inline'`,
 	`font-src 'self'`,
 	`img-src 'self' www.google-analytics.com`,

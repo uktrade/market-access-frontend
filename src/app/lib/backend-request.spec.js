@@ -126,7 +126,7 @@ describe( 'Backend Request', () => {
 		describe( 'Without an error', () => {
 			describe( 'get', () => {
 				describe( 'With a 200 response', () => {
-					describe( 'An unspecified response tyoe', () => {
+					describe( 'An unspecified response type', () => {
 						it( 'Should return the response', async () => {
 
 							respondWithMocks();
@@ -148,18 +148,59 @@ describe( 'Backend Request', () => {
 						} );
 
 						describe( 'With a valid JSON body', () => {
-							it( 'Should return the response', async () => {
+
+							beforeEach( () => {
 
 								requestCallback( null, mockResponse, '{ "a": 1, "b": 2 }' );
+							} );
 
-								const path = '/whoami/';
+							describe( 'With a token', () => {
+								it( 'Should return the response', async () => {
 
-								const { response, body } = await backend.get( path, token );
+									const path = '/whoami/';
 
-								checkRequest( GET, path, { token } );
-								expect( response.isSuccess ).toEqual( true );
-								expect( response ).toEqual( mockResponse );
-								expect( body ).toEqual( { a: 1, b: 2 } );
+									const { response, body } = await backend.get( path, token );
+
+									checkRequest( GET, path, { token } );
+									expect( response.isSuccess ).toEqual( true );
+									expect( response ).toEqual( mockResponse );
+									expect( body ).toEqual( { a: 1, b: 2 } );
+								} );
+							} );
+
+							describe( 'With a valid hawk response', () => {
+								it( 'Should return the response', async () => {
+
+									const path = '/whoami/';
+
+									const { response, body } = await backend.get( path );
+
+									checkRequest( GET, path );
+									expect( response.isSuccess ).toEqual( true );
+									expect( response ).toEqual( mockResponse );
+									expect( body ).toEqual( { a: 1, b: 2 } );
+								} );
+							} );
+
+							describe( 'With an invalid hawk response', () => {
+								it( 'Should reject with an error', async () => {
+
+									let err;
+									const path = '/path';
+									hawk.client.authenticate.and.callFake( () => false );
+
+									try {
+
+										await backend.get( path );
+
+									} catch( e ){
+
+										err = e;
+									}
+
+									checkRequest( GET, path );
+									expect( err ).toEqual( new Error( 'Invalid response' ) );
+								} );
 							} );
 						} );
 
@@ -241,7 +282,7 @@ describe( 'Backend Request', () => {
 					const requestOptions = checkRequest( POST, path );
 					checkForMockResponse( responseData );
 					expect( hawk.client.header ).toHaveBeenCalledWith(
-						requestOptions.uri.replace( 'https', 'http' ),
+						requestOptions.uri,
 						requestOptions.method,
 						{
 							credentials: {
@@ -266,7 +307,7 @@ describe( 'Backend Request', () => {
 					const requestOptions = checkRequest( POST, path, { body } );
 					checkForMockResponse( responseData );
 					expect( hawk.client.header ).toHaveBeenCalledWith(
-						requestOptions.uri.replace( 'https', 'http' ),
+						requestOptions.uri,
 						requestOptions.method,
 						{
 							credentials: {

@@ -67,7 +67,7 @@
 		{{ govukTextarea( {
 
 			label: {
-				text: 'Provide a summary of why this barrier is being put into hibernation',
+				text: 'Provide a summary of why this barrier is being paused',
 				classes: 'govuk-label--s'
 			},
 			id: 'hibernation-summary',
@@ -106,10 +106,10 @@
 					classes: 'govuk-fieldset__legend--s'
 				}
 			},
-			items: status | addConditionalRadioHtml( {
-				'resolve': { html: isResolvedHtml },
-				'hibernate': { html: isHibernateHtml },
-				'open': { html: isOpenHtml }
+			items: status | addToRadio( {
+				'resolve': { conditional: { html: isResolvedHtml } },
+				'hibernate': { conditional: { html: isHibernateHtml } },
+				'open': { conditional: { html: isOpenHtml } }
 			} ),
 			errorMessage: errors | errorForName( 'status-1' )
 			} )

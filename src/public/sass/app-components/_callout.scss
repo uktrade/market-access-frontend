@@ -12,9 +12,13 @@
 
 .callout__heading {
 	@include govuk-font( $size: 19, $weight: bold );
+	margin-top: govuk-em( 4, 19 );
+	margin-bottom: 0;
 }
 
-//.callout__text {}
+.callout__text {
+	margin: govuk-em( 5, 16 ) 0 govuk-em( 10, 16 ) 0;
+}
 
 .callout__button {
 

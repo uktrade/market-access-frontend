@@ -1,16 +1,15 @@
 const backend = require( '../../../../lib/backend-service' );
-const isNumeric = /^[0-9]+$/;
+const { isUuid } = require( '../../../../lib/validators' );
+const maxUuidLength = 60;
 
-module.exports = async ( req, res, next ) => {
-
-	const reportId = req.params.reportId;
+module.exports = async ( req, res, next, reportId ) => {
 
 	if( reportId === 'new' ){
 
 		delete req.params.reportId;
 		next();
 
-	} else if( reportId.length < 10 && isNumeric.test( reportId ) ){
+	} else if( reportId.length <= maxUuidLength && isUuid( reportId ) ){
 
 		let report = req.session.report;
 

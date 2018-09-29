@@ -1,11 +1,12 @@
 .summary-group {
-	border-bottom: 1px solid $govuk-black;
-	padding-bottom: govuk-em( 15, 16 );
-	margin-bottom: govuk-em( 15, 16 );
+	margin-bottom: govuk-em( 30, 16 );
 }
 
 .summary-group__heading {
 	@include govuk-font( $size: 24, $weight: bold );
+	padding-bottom: govuk-em( 10, 24 );
+	margin-top: 0;
+	border-bottom: 4px solid $govuk-black;
 }
 
 .summary-group__heading--sub {
@@ -23,8 +24,14 @@
 }
 
 .summary-group__list__value {
+
 	width: 100%;
 	margin: 0;
+
+	ul {
+		list-style: inside;
+		padding: 0;
+	}
 }
 
 .summary-group__list__key,
@@ -32,6 +39,34 @@
 	border-bottom: 1px solid $govuk-grey-2;
 	padding: govuk-em( 10, 16 ) 0;
 	box-sizing: border-box;
+}
+
+.summary-group__list__value__heading {
+	@incude govuk-font( 16, $weight: bold );
+	margin: 0;
+}
+
+.summary-group__list__value__add {
+	border: 2px dashed $govuk-grey-2;
+	background-color: $govuk-grey-4;
+	width: 100%;
+	padding: govuk-em( 15, 16 );
+	display: block;
+	box-sizing: border-box;
+}
+
+.summary-group__list__value__edit {
+	display: block;
+	margin-top: govuk-em( 5, 16 );
+}
+
+.summary-group__list__value__list {
+	padding: 0;
+	margin: 0;
+}
+
+.summary-group__list__value__list__item {
+	list-style: inside;
 }
 
 @include mq( $from: tablet ){
@@ -42,24 +77,14 @@
 	}
 
 	.summary-group__list__key {
-
 		width: 35%;
 		padding-right: govuk-em( 30, 16 );
 		padding-left: govuk-em( 10, 16 );
 		background-color: transparent;
-
-		&:nth-of-type( odd ){
-			background-color: $govuk-grey-4;
-		}
 	}
 
 	.summary-group__list__value {
-
 		width: 65%;
-		padding-right: govuk-em( 10, 16 );
-
-		&:nth-of-type( odd ){
-			background-color: $govuk-grey-4;
-		}
+		//padding-right: govuk-em( 10, 16 );
 	}
 }

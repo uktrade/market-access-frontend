@@ -1,9 +1,11 @@
 const metadata = require( '../../../lib/metadata' );
 
-function updateStatus( item ){
+function update( item ){
 
 	const id = item.problem_status;
 
+	item.isResolved = item.is_resolved;
+	item.country = metadata.getCountry( item.export_country );
 	item.problem_status = {
 		id,
 		name: metadata.statusTypes[ id ],
@@ -17,7 +19,7 @@ module.exports = ( reports ) => {
 
 	if( reports && reports.length ){
 
-		reports = reports.map( updateStatus );
+		reports = reports.map( update );
 	}
 
 	reports.sort( ( a, b ) => {

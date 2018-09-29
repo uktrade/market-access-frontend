@@ -5,14 +5,14 @@
 
 {% set activeBarrierNav = 'interactions' %}
 
-{% block page_title %}{{ super() }} - Barrier interactions{% endblock %}
+{% block page_title %}{{ super() }} - Barrier updates{% endblock %}
 
 {% block barrier_content %}
-	<h2>
-		Interactions &amp; events
+	<h2 class="section-heading">
+		Updates
 	</h2>
 	<p class="barrier-section-intro">
-		Add to the narrative of this barrier instace. An interaction could be a meeting, call, email or another activity associated with solving this barrier.
+		Add to the narrative of this barrier instance. A note could be a meeting, call, email or another activity associated with solving this barrier.
 	</p>
 
 	{% if noteForm %}
@@ -54,7 +54,7 @@
 			{% for item in interactions %}
 			<li class="event-list__item{{ ' event-list__item--pinned' if item.pinned }}">
 				<h4 class="event-list__item__heading">{{ item.created_on | dateWithTime }}</h4>
-				<p class="event-list__item__text">{{ item.text }}</p>
+				<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
 			</li>
 			{% endfor %}
 		</ol>

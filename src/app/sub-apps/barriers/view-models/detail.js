@@ -1,35 +1,47 @@
 const metadata = require( '../../../lib/metadata' );
 
+const OPEN = 2;
+const RESOLVED = 4;
+const HIBERNATED = 5;
+
 const barrierStatus = {
-	2: { name: 'Open', modifyer: 'assessment' },
-	4: { name: 'Resolved', modifyer: 'resolved' },
-	5: { name: 'Hibernated', modifyer: 'hibernated' }
+	[ OPEN ]: { name: 'Open', modifyer: 'assessment' },
+	[ RESOLVED ]: { name: 'Resolved', modifyer: 'resolved' },
+	[ HIBERNATED ]: { name: 'Paused', modifyer: 'hibernated' }
 };
 
 module.exports = ( barrier ) => {
 
-	const report = barrier.report;
 	const barrierStatusCode = barrier.current_status.status;
-	const company = report.company;
+	const sectors = ( barrier.sectors || [] ).map( metadata.getSector );
+	const status = barrierStatus[ barrierStatusCode ] || {};
+	const sectorsList = sectors.map( ( sector ) => (sector && { text: sector.name } || { text: 'Unknown' } ) );
+
+	status.description = barrier.current_status.status_summary;
+	status.date = barrier.current_status.status_date;
 
 	return {
 		barrier: {
 			id: barrier.id,
-			title: report && report.barrier_title,
-			summary: barrier.summary,
-			type: barrier.barrier_type,
-			status: barrierStatus[ barrierStatusCode ],
-			reportedOn: barrier.reported_on,
-			company,
-			country: metadata.countries.find( ( country ) => country.id === report.export_country ),
-			sector: {
-				id: company.sector_id,
-				name: company.sector_name
+			isOpen: ( barrierStatusCode === OPEN ),
+			isResolved: ( barrierStatusCode === RESOLVED ),
+			isHibernated: ( barrierStatusCode === HIBERNATED ),
+			title: barrier.barrier_title,
+			product: barrier.product,
+			problem: {
+				status: metadata.statusTypes[ barrier.problem_status ],
+				description: barrier.problem_description
 			},
-			impact: {
-				loss: metadata.lossScale[ barrier.estimated_loss_range ],
-				summary: barrier.impact_summary,
-				companiesAffected: metadata.boolScale[ barrier.other_companies_affected ]
+			type: barrier.barrier_type,
+			status,
+			reportedOn: barrier.reported_on,
+			reportedBy: barrier.reported_by,
+			country: metadata.getCountry( barrier.export_country ),
+			sectors,
+			source: {
+				id: barrier.source,
+				name: metadata.barrierAwareness[ barrier.source ],
+				description: barrier.other_source
 			},
 			legal: {
 				hasInfringements: ( barrier.has_legal_infringement == '1' ),
@@ -41,6 +53,7 @@ module.exports = ( barrier ) => {
 				},
 				summary: barrier.infringement_summary
 			}
-		}
+		},
+		sectorsList
 	};
 };

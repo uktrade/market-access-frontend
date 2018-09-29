@@ -19,12 +19,35 @@ function getHawkHeader( requestOptions ){
 	const payload = requestOptions.body;
 
 	// Generate Authorization request header
-	// Always use http as the backend will be running in http mode behind an https proxy
-	return hawk.client.header( uri.replace( 'https', 'http' ), method, {
+	// Ensure backend is using same protocol for hash generation
+	return hawk.client.header( uri, method, {
 		credentials,
 		payload: ( payload || '' ),
 		contentType: ( payload ? 'application/json' : defaultHawkContentType )
 	} );
+}
+
+function parseBody( uri, isJson, body ){
+
+	if( isJson ){
+
+		try {
+
+			body = JSON.parse( body );
+
+		} catch( e ){
+
+			reporter.captureException( e, { uri } );
+			logger.error( `Invalid JSON response for ${ uri }` );
+		}
+	}
+
+	if( config.isDebug ){
+
+		logger.debug( 'Response body: ' + ( isJson ? JSON.stringify( body, null, 2 ) : body ) );
+	}
+
+	return body;
 }
 
 function makeRequest( method, path, opts = {} ){
@@ -69,9 +92,9 @@ function makeRequest( method, path, opts = {} ){
 
 	return new Promise( ( resolve, reject ) => {
 
-		logger.debug( `Sending ${ method } request to: ${ uri }` );
+		logger.verbose( `Sending ${ method } request to: ${ uri }` );
 
-		//if( config.isDev ){
+		if( config.isDev ){
 
 			logger.debug( 'With headers: ' + JSON.stringify( requestOptions.headers, null, 2 ) );
 
@@ -79,9 +102,9 @@ function makeRequest( method, path, opts = {} ){
 
 				logger.debug( 'With body: ' + requestOptions.body );
 			}
-		//}
+		}
 
-		request( requestOptions, ( err, response, body ) => {
+		request( requestOptions, ( err, response, responseBody ) => {
 
 			if( err ){
 
@@ -90,18 +113,37 @@ function makeRequest( method, path, opts = {} ){
 			} else {
 
 				const statusCode = response.statusCode;
+				const isJson = ( response.headers[ 'content-type' ] === 'application/json' );
 
-				//if( config.isDev ){
+				logger.verbose( `Response code: ${ response.statusCode } for ${ uri }` );
+
+				if( config.isDebug ){
+
 					logger.debug( 'Response headers: ' + JSON.stringify( response.headers, null, 2 ) );
-				//}
+				}
 
 				if( clientHeader ){
 
-					// Authenticate the server's response
-					// must use raw response body here
-					const isValid = hawk.client.authenticate( response, credentials, clientHeader.artifacts, { payload: body } );
+					let isValid = false;
 
-					logger.debug( `Response code: ${ response.statusCode } for ${ uri }, isValid:` + !!isValid );
+					try {
+
+						// Authenticate the server's response
+						// must use raw response body here
+						isValid = hawk.client.authenticate( response, credentials, clientHeader.artifacts, { payload: responseBody } );
+
+					} catch ( e ){
+
+						const err = new Error( 'Unable to validate response' );
+						err.rootError = e;
+
+						logger.error( err );
+						parseBody( uri, isJson, responseBody );
+
+						return reject( err );
+					}
+
+					logger.verbose( `Response isValid:` + !!isValid );
 
 					if( !isValid ){
 
@@ -109,20 +151,9 @@ function makeRequest( method, path, opts = {} ){
 					}
 				}
 
+				const body = parseBody( uri, isJson, responseBody );
+
 				response.isSuccess = ( statusCode >= 200 && statusCode <= 300 );
-
-				if( response.headers[ 'content-type' ] === 'application/json' ){
-
-					try {
-
-						body = JSON.parse( body );
-
-					} catch( e ){
-
-						reporter.captureException( e, { uri } );
-						logger.debug( `Invalid JSON response for ${ uri }` );
-					}
-				}
 
 				if( response.isSuccess || statusCode === 404 || statusCode === 400 ){
 

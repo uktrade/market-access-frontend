@@ -52,15 +52,24 @@ const reportTaskList = [
 	}
 ];
 
+const statusTypes = {
+	'1': 'One',
+	'2': 'Two'
+};
+
 describe( 'Report detail view model', () => {
 
 	let viewModel;
 	let urls;
 	let csrfToken;
+	let getCountry;
+	let country;
 
 	beforeEach( () => {
 
 		csrfToken = uuid();
+		country = { name: 'a country', id: '1' };
+		getCountry = jasmine.createSpy( 'metadata.getCountry' ).and.callFake( () => country );
 
 		urls = {
 			reportStage: jasmine.createSpy( 'urls.reportStage' )
@@ -68,17 +77,22 @@ describe( 'Report detail view model', () => {
 
 		viewModel = proxyquire( modulePath, {
 			'../../../lib/urls': urls,
-			'../../../lib/metadata': { reportTaskList }
+			'../../../lib/metadata': { reportTaskList, statusTypes, getCountry }
 		} );
 	} );
 
 	describe( 'With a report', () => {
 		describe( 'Without inProgress', () => {
 
-			it( 'Should return the correct data', () => {
+			let report;
+			let expectedOutput;
 
-				const report = {
+			beforeEach( () => {
+
+				report = {
 					id: 1,
+					export_country: 'abc',
+					problem_status: '2',
 					progress: [
 						{
 							"stage_code": "1.1",
@@ -109,9 +123,7 @@ describe( 'Report detail view model', () => {
 
 				urls.reportStage.and.callFake( () => reportStageResponse );
 
-				const output = viewModel( csrfToken, report );
-
-				const expectedOutput = [
+				expectedOutput = [
 					{
 						stage: '1.0',
 						name: 'labore ea voluptatem',
@@ -186,9 +198,30 @@ describe( 'Report detail view model', () => {
 
 				expectedOutput.complete = false;
 				expectedOutput.next = expectedOutput[ 1 ].items[ 0 ];
+			} );
 
-				expect( output.csrfToken ).toEqual( csrfToken );
-				expect( output.tasks ).toEqual( expectedOutput );
+			describe( 'When the company is matched', () => {
+				it( 'Should return the correct data', () => {
+
+					const output = viewModel( csrfToken, report );
+
+					expect( output.csrfToken ).toEqual( csrfToken );
+					expect( output.tasks ).toEqual( expectedOutput );
+					expect( output.calloutText ).toEqual( `${ statusTypes[ '2' ] } in ${ country.name }` );
+				} );
+			} );
+
+			describe( 'When the company is NOT matched', () => {
+				it( 'Should return the correct data', () => {
+
+					getCountry.and.callFake( () => {} );
+
+					const output = viewModel( csrfToken, report );
+
+					expect( output.csrfToken ).toEqual( csrfToken );
+					expect( output.tasks ).toEqual( expectedOutput );
+					expect( output.calloutText ).toEqual( `${ statusTypes[ '2' ] }` );
+				} );
 			} );
 		} );
 

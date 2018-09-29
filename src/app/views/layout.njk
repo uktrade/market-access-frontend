@@ -38,13 +38,16 @@
 					href: urls.reports.new(),
 					text: 'Report a barrier',
 					active: headerNav.isReport
-				},{
-					href: '#',
-					text: 'Find a barrier',
-					active: headerNav.isFind
 				}
 			]
 		}) }}
+		{#
+			{
+				href: '#',
+				text: 'Find a barrier',
+				active: headerNav.isFind
+			}
+		#}
 		<div class="header-wrapper__user" role="complementary">
 			<p class="header-wrapper__user__content">
 				{% if user %}
@@ -101,16 +104,19 @@
 						'href': urls.reports.new(),
 						'text': 'Report a barrier'
 					},{
-						'href': '#',
-						'text': 'Find a barrier'
-					},{
-						'href': '#',
+						'href': urls.whatIsABarrier(),
 						'text': 'What is a barrier?'
 					}
 				]
 			}
 		]
 	}) }}
+	{#
+	{
+		'href': '#',
+		'text': 'Find a barrier'
+	},
+	#}
 {% endblock %}
 
 {% block bodyEnd %}
@@ -122,12 +128,10 @@
 	<script src="/public/js/ma.CustomEvent.js"></script>
 	<script src="/public/js/components/Header.js"></script>
 	<script src="/public/js/components/ConditionalRadioContent.js"></script>
-	<script src="/public/js/pages/report/start.js"></script>
-	<script src="/public/js/pages/report/impact.js"></script>
-	<script src="/public/js/pages/report/legal.js"></script>
-	<script src="/public/js/pages/report/support.js"></script>
-	<script src="/public/js/pages/report/next-steps.js"></script>
+	<script src="/public/js/pages/report/is-resolved.js"></script>
+	<script src="/public/js/pages/report/about-problem.js"></script>
 	<script src="/public/js/pages/barrier/status.js"></script>
+	<script src="/public/js/pages/barrier/type.js"></script>
 	<!-- endbuild -->
 	<script>
 		if( ma.components.Header && jessie.queryOne ){
@@ -137,4 +141,15 @@
 		}
 	</script>
 	{% block body_script %}{% endblock %}
+	{% if analytics.enabled and analytics.id %}
+		<!-- Global site tag (gtag.js) - Google Analytics -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id={{ analytics.id }}"></script>
+		<script>
+			window.dataLayer = window.dataLayer || [];
+			function gtag(){dataLayer.push(arguments);}
+			gtag('js', new Date());
+
+			gtag('config', '{{ analytics.id }}');
+		</script>
+	{% endif %}
 {% endblock %}
