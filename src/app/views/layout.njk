@@ -141,4 +141,15 @@
 		}
 	</script>
 	{% block body_script %}{% endblock %}
+	{% if analytics.enabled and analytics.id %}
+		<!-- Global site tag (gtag.js) - Google Analytics -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id={{ analytics.id }}"></script>
+		<script>
+			window.dataLayer = window.dataLayer || [];
+			function gtag(){dataLayer.push(arguments);}
+			gtag('js', new Date());
+
+			gtag('config', '{{ analytics.id }}');
+		</script>
+	{% endif %}
 {% endblock %}
