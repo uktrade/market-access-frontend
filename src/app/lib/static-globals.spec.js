@@ -3,7 +3,7 @@ const modulePath = './static-globals';
 
 describe( 'Static globals', function(){
 
-	const analyticsId = 'abc123';
+	const analytics = { id: 'abc123', enabled: true };
 	const datahubDomain = 'https://some-domain.com';
 
 	let calls;
@@ -20,7 +20,7 @@ describe( 'Static globals', function(){
 
 		staticGlobals = proxyquire( modulePath, {
 			'../config': {
-				analyticsId,
+				analytics,
 				datahubDomain,
 				isDev,
 				feedbackEmail
@@ -36,12 +36,12 @@ describe( 'Static globals', function(){
 		calls = env.addGlobal.calls;
 	} );
 
-	it( 'Should add the analyticsId to the nunjucks env', function(){
+	it( 'Should add the analytics to the nunjucks env', function(){
 
 		const args = calls.argsFor( 0 );
 
-		expect( args[ 0 ] ).toEqual( 'analyticsId' );
-		expect( args[ 1 ] ).toEqual( analyticsId );
+		expect( args[ 0 ] ).toEqual( 'analytics' );
+		expect( args[ 1 ] ).toEqual( analytics );
 	} );
 
 	it( 'Should add the default service to the nunjucks env', function(){

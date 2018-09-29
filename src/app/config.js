@@ -60,7 +60,10 @@ let config = {
 	showErrors: isDev,
 	version: env( 'npm_package_version', 'unknown' ),
 	sentryDsn: env( 'SENTRY_DSN' ),
-	analyticsId: env( 'ANALYTICS_ID' ),
+	analytics: {
+		id: env( 'ANALYTICS_ID' ),
+		enabled: bool( 'ANALYTICS_ENABLED', true )
+	},
 	feedbackEmail: requiredEnv( 'FEEDBACK_EMAIL' ),
 	datahubDomain: env( 'DATA_HUB_DOMAIN', 'https://www.datahub.trade.gov.uk' ),
 	views: {

@@ -65,6 +65,7 @@ $govuk-images-path: "/govuk-public/images/";
 @import 'pages/report/detail';
 @import 'pages/report/sectors';
 @import 'pages/barrier/detail';
+@import 'pages/barrier/type';
 
 .error-message {
 	@include govuk-font( 24 );
@@ -79,9 +80,11 @@ $govuk-images-path: "/govuk-public/images/";
 }
 
 .no-results-message {
-	@include govuk-font( $size: 24 );
-	padding: govuk-em( 30, 24 );
+	@include govuk-font( 19 );
+	padding: govuk-em( 30, 19 );
 	text-align: center;
+	background-color: $govuk-grey-4;
+	margin: govuk-em( 30, 19 ) 0 0 0;
 }
 
 .conditional-content {
