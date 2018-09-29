@@ -24,8 +24,14 @@
 }
 
 .summary-group__list__value {
+
 	width: 100%;
 	margin: 0;
+
+	ul {
+		list-style: inside;
+		padding: 0;
+	}
 }
 
 .summary-group__list__key,
