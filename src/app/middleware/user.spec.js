@@ -47,7 +47,7 @@ describe( 'user middleware', () => {
 		} );
 
 		describe( 'When there is NOT an error thrown', () => {
-			it( 'Should fetch the info and store in the session', ( done ) => {
+			it( 'Should fetch the info and store it in the session', ( done ) => {
 
 				const userMock = { username: 'mock-user' };
 				const promise = new Promise( ( resolve ) => resolve( { response: {}, body: userMock } ) );
@@ -61,6 +61,7 @@ describe( 'user middleware', () => {
 					expect( backend.getUser ).toHaveBeenCalledWith( req );
 					expect( req.session.user ).toEqual( userMock );
 					expect( res.locals.user ).toEqual( userMock );
+					expect( req.user ).toEqual( userMock );
 					expect( next ).toHaveBeenCalled();
 					done();
 				} );
@@ -70,7 +71,7 @@ describe( 'user middleware', () => {
 	} );
 
 	describe( 'When the user info is in the session', () => {
-		it( 'Should put the user info into locals', () => {
+		it( 'Should put the user info into the req and locals', () => {
 
 			const sessionUser = { username: 'session-user' };
 
@@ -79,6 +80,7 @@ describe( 'user middleware', () => {
 			middleware( req, res, next );
 
 			expect( res.locals.user ).toEqual( sessionUser );
+			expect( req.user ).toEqual( sessionUser );
 			expect( next ).toHaveBeenCalled();
 		} );
 	} );

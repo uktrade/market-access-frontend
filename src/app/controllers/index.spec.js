@@ -16,13 +16,14 @@ describe( 'Index controller', () => {
 		ssoToken = 'abc-123';
 		backend = {
 			barriers: {
-				getAll: jasmine.createSpy( 'backend.barriers.getAll' )
+				getAll: jasmine.createSpy( 'backend.barriers.getAll' ),
+				getForCountry: jasmine.createSpy( 'backend.barriers.getForCountry' )
 			},
 			getReports: jasmine.createSpy( 'backend.getReports' )
 		};
 		dashboardViewModel = jasmine.createSpy( 'dashboard view model' );
 
-		req = { session: { ssoToken } };
+		req = { session: { ssoToken }, user: {} };
 		res = { render: jasmine.createSpy( 'res.render' ) };
 		next = jasmine.createSpy( 'next' );
 
@@ -32,59 +33,93 @@ describe( 'Index controller', () => {
 		} );
 	} );
 
-	describe( 'Without an error', () => {
-		describe( 'With a success response', () => {
-			it( 'Should get the reports and render the index page', async () => {
+	describe( 'Index', () => {
+		describe( 'Without an error', () => {
+			describe( 'With a success response', () => {
+				describe( 'When the user has a country', () => {
+					it( 'Should get the country reports and render the correct template', async () => {
 
-				const barriersResponse = {
-					response: { isSuccess: true  },
-					body: {
-						results: [ { id: 1 } ]
-					}
-				};
-				const dashboardViewModelResponse = { dashboard: true };
+						const country = { id: 2, name: 'test' };
+						const barriersResponse = {
+							response: { isSuccess: true  },
+							body: {
+								results: [ { id: 1 } ]
+							}
+						};
+						const dashboardViewModelResponse = { dashboard: true };
 
-				dashboardViewModel.and.callFake( () => dashboardViewModelResponse );
-				backend.barriers.getAll.and.callFake( () => Promise.resolve( barriersResponse ) );
+						req.user.country = country;
 
-				await controller( req, res, next );
+						dashboardViewModel.and.callFake( () => dashboardViewModelResponse );
+						backend.barriers.getForCountry.and.callFake( () => Promise.resolve( barriersResponse ) );
 
-				expect( next ).not.toHaveBeenCalled();
-				expect( backend.barriers.getAll ).toHaveBeenCalledWith( req );
-				expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results );
-				expect( res.render ).toHaveBeenCalledWith( 'index', dashboardViewModelResponse );
+						await controller.index( req, res, next );
+
+						expect( next ).not.toHaveBeenCalled();
+						expect( backend.barriers.getForCountry ).toHaveBeenCalledWith( req, country.id );
+						expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, country );
+						expect( res.render ).toHaveBeenCalledWith( 'my-country', dashboardViewModelResponse );
+					} );
+				} );
+
+				describe( 'When the user does NOT have a country', () => {
+					it( 'Should get all the reports and render the correct template', async () => {
+
+						const barriersResponse = {
+							response: { isSuccess: true  },
+							body: {
+								results: [ { id: 1 } ]
+							}
+						};
+						const dashboardViewModelResponse = { dashboard: true };
+
+						dashboardViewModel.and.callFake( () => dashboardViewModelResponse );
+						backend.barriers.getAll.and.callFake( () => Promise.resolve( barriersResponse ) );
+
+						await controller.index( req, res, next );
+
+						expect( next ).not.toHaveBeenCalled();
+						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req );
+						expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, req.user.country );
+						expect( res.render ).toHaveBeenCalledWith( 'index', dashboardViewModelResponse );
+					} );
+				} );
+			} );
+
+			describe( 'Without a success response', () => {
+				it( 'Should get the reports and render the index page', async () => {
+
+					const barriersResponse = {
+						response: { isSuccess: false  },
+						body: {}
+					};
+
+					backend.barriers.getAll.and.callFake( () => Promise.resolve( barriersResponse ) );
+
+					await controller.index( req, res, next );
+
+					expect( next ).toHaveBeenCalledWith( new Error( `Got ${ barriersResponse.response.statusCode } response from backend` ) );
+					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req );
+					expect( res.render ).not.toHaveBeenCalled();
+				} );
 			} );
 		} );
 
-		describe( 'Without a success response', () => {
-			it( 'Should get the reports and render the index page', async () => {
+		describe( 'With an error', () => {
+			it( 'Should call next with the error', async () => {
 
-				const barriersResponse = {
-					response: { isSuccess: false  },
-					body: {}
-				};
+				const err = new Error( 'issue with backend' );
 
-				backend.barriers.getAll.and.callFake( () => Promise.resolve( barriersResponse ) );
+				backend.barriers.getAll.and.callFake( () => Promise.reject( err ) );
 
-				await controller( req, res, next );
+				await controller.index( req, res, next );
 
-				expect( next ).toHaveBeenCalledWith( new Error( `Got ${ barriersResponse.response.statusCode } response from backend` ) );
-				expect( backend.barriers.getAll ).toHaveBeenCalledWith( req );
-				expect( res.render ).not.toHaveBeenCalled();
+				expect( next ).toHaveBeenCalledWith( err );
 			} );
 		} );
 	} );
 
-	describe( 'With an error', () => {
-		it( 'Should call next with the error', async () => {
+	describe( 'myCountry', () => {
 
-			const err = new Error( 'issue with backend' );
-
-			backend.barriers.getAll.and.callFake( () => Promise.reject( err ) );
-
-			await controller( req, res, next );
-
-			expect( next ).toHaveBeenCalledWith( err );
-		} );
 	} );
 } );

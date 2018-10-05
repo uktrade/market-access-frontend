@@ -1,6 +1,6 @@
 {% from 'app-components/tabs.njk' import tabs %}
 
-{% macro dashboardHeading( isBarriers = false, isReports = false ) %}
+{% macro dashboardHeading( data, isBarriers = false, isReports = false, isMyCountry = false ) %}
 
 	<h1 class="govuk-heading-l">
 		<span class="govuk-caption-m">Market access barriers</span> Dashboard
@@ -25,10 +25,16 @@
 	{{ tabs( [
 		{
 			text: 'All barriers',
-			href: urls.index() if not isBarriers
+			href: urls.index() if not isBarriers,
+			skip: not ( data.all.count >= 0 )
+		},{
+			text: 'My country',
+			href: urls.index() if not isMyCountry,
+			skip: not ( data.country.count >= 0 )
 		},{
 			text: 'Unfinished reports',
-			href: urls.reports.index() if not isReports
+			href: urls.reports.index() if not isReports,
+			skip: data.unfinished.count == 0
 		}
 	] ) }}
 {% endmacro %}

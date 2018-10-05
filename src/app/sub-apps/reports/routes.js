@@ -5,6 +5,7 @@ const headerNav = require( '../../middleware/header-nav' );
 const controller = require( './controllers' );
 
 const uuidParam = require( '../../middleware/params/uuid' );
+const dashboardTabs = require( '../../middleware/dashboard-tabs' );
 const reportId = require( './middleware/params/report-id' );
 
 const hasStartFormValues = require( './middleware/has-start-form-values' );
@@ -21,7 +22,7 @@ module.exports = ( express, app ) => {
 
 	app.use( parseBody, csrfProtection );
 
-	app.get( '/', headerNav( { isDashboard: true } ), controller.index ),
+	app.get( '/', headerNav( { isDashboard: true } ), dashboardTabs, controller.index ),
 	app.get( '/new/', controller.new );
 	app.get( '/:uuid/success/', controller.success );
 

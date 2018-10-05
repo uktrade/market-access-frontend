@@ -1,23 +1,41 @@
 const backend = require( '../lib/backend-service' );
 const dashboardViewModel = require( '../lib/view-models/dashboard' );
 
-module.exports = async ( req, res, next ) => {
+module.exports = {
 
-	try {
+	index: async ( req, res, next ) => {
 
-		const { response, body } = await backend.barriers.getAll( req );
+		const country = req.user.country;
+		const countryId = country && req.user.country.id;
+		let template = 'index';
+		let promise;
 
-		if( response.isSuccess ){
+		if( countryId ){
 
-			res.render( 'index', dashboardViewModel( body.results ) );
+			template = 'my-country';
+			promise = backend.barriers.getForCountry( req, countryId );
 
 		} else {
 
-			throw new Error( `Got ${ response.statusCode } response from backend` );
+			promise = backend.barriers.getAll( req );
 		}
 
-	} catch( e ){
+		try {
 
-		next( e );
+			const { response, body } = await promise;
+
+			if( response.isSuccess ){
+
+				res.render( template, dashboardViewModel( body.results, country ) );
+
+			} else {
+
+				throw new Error( `Got ${ response.statusCode } response from backend` );
+			}
+
+		} catch( e ){
+
+			next( e );
+		}
 	}
 };
