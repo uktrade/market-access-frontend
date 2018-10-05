@@ -74,7 +74,6 @@
 		<ul class="barrier-type-section-list">
 			<li class="barrier-type-section-list__item">- <a href="#goods-barriers">Barriers that affect Goods</a></li>
 			<li class="barrier-type-section-list__item">- <a href="#services-barriers">Barriers that affect Services</a></li>
-			<li class="barrier-type-section-list__item">- <a href="#goods-and-services-barriers">Barriers that affect both Goods and Services</a></li>
 		</ul>
 
 		{% macro barrierList( items ) %}
@@ -99,12 +98,6 @@
 		</h3>
 
 		{{ barrierList( barrierTypes.services ) }}
-
-		<h3 class="barrier-type-section-sub-heading" id="goods-and-services-barriers">
-			Barriers that affect both goods and services
-		</h3>
-
-		{{ barrierList( barrierTypes.goodsAndServices ) }}
 
 		<a class="barrier-type-section-link" href="{{ urls.index() }}">View your dashboard</a>
 	</div>
