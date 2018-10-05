@@ -124,8 +124,9 @@ module.exports = {
 		open: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/open`, getToken( req ), {
 			status_summary: values.reopenSummary
 		} ),
-		saveType: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }`, getToken( req ), {
-			barrier_type: getValue( values.barrierType )
+		saveType: ( req, barrierId, values, category ) => backend.put( `/barriers/${ barrierId }`, getToken( req ), {
+			barrier_type: getValue( values.barrierType ),
+			barrier_category: category
 		} )
 	},
 

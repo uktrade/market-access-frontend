@@ -10,6 +10,23 @@ const barrierStatus = {
 	[ HIBERNATED ]: { name: 'Paused', modifyer: 'hibernated' }
 };
 
+function getBarrierType( type ){
+
+	if( !type ){ return type; }
+
+	const { id, title, description, category } = type;
+
+	return {
+		id,
+		title,
+		description,
+		category: {
+			id: category,
+			name: metadata.barrierTypeCategories[ category ]
+		}
+	};
+}
+
 module.exports = ( barrier ) => {
 
 	const barrierStatusCode = barrier.current_status.status;
@@ -32,7 +49,7 @@ module.exports = ( barrier ) => {
 				status: metadata.statusTypes[ barrier.problem_status ],
 				description: barrier.problem_description
 			},
-			type: barrier.barrier_type,
+			type: getBarrierType( barrier.barrier_type ),
 			status,
 			reportedOn: barrier.reported_on,
 			reportedBy: barrier.reported_by,
