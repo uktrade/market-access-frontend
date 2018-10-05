@@ -120,16 +120,16 @@ describe( 'Backend Service', () => {
 		describe( 'resolve', () => {
 			it( 'Should PUT to the correct path with the correct values', async () => {
 
-				const [ day, month, year ] = [ '10', '11', '2000' ];
+				const [ month, year ] = [ '11', '2000' ];
 				const resolvedSummary = 'my summary text';
 
 				await service.barriers.resolve( req, barrierId, {
-					resolvedDate: { day, month, year },
+					resolvedDate: { month, year },
 					resolvedSummary
 				} );
 
 				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/resolve`, token, {
-					status_date: [ year, month, day ].join( '-' ) + 'T00:00',
+					status_date: [ year, month, '01' ].join( '-' ) + 'T00:00',
 					status_summary: resolvedSummary
 				} );
 			} );
