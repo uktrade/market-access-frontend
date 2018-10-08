@@ -126,7 +126,7 @@ module.exports = {
 		} ),
 		saveType: ( req, barrierId, values, category ) => backend.put( `/barriers/${ barrierId }`, getToken( req ), {
 			barrier_type: getValue( values.barrierType ),
-			barrier_category: category
+			barrier_type_category: category
 		} )
 	},
 

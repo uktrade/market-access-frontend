@@ -177,7 +177,7 @@ describe( 'Backend Service', () => {
 
 				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
 					barrier_type: barrierType,
-					barrier_category: category
+					barrier_type_category: category
 				} );
 			} );
 		} );
