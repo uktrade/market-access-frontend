@@ -124,6 +124,7 @@ module.exports = {
 
 		const barrier = req.barrier;
 		const currentStatus = barrier.current_status.status;
+		const invalidDateMessage = 'Enter resolution date and include a month and year';
 		const configItems = {
 			[ RESOLVE ]: {
 				serviceMethod: 'resolve',
@@ -135,23 +136,22 @@ module.exports = {
 						conditional: { name: 'status', value: RESOLVE },
 						errorField: 'status_date',
 						validators: [ {
-							fn: validators.isDateValue( 'day' ),
-							message: 'Enter a day'
-						},{
 							fn: validators.isDateValue( 'month' ),
-							message: 'Enter a month'
+							message: invalidDateMessage
 						},{
 							fn: validators.isDateValue( 'year' ),
-							message: 'Enter a year'
+							message: invalidDateMessage
+						},{
+							fn: validators.isDateNumeric,
+							message: 'Resolution date must only include numbers'
 						},{
 							fn: validators.isDateValid,
-							message: 'Enter a valid date'
+							message: invalidDateMessage
 						},{
 							fn: validators.isDateInPast,
-							message: 'Enter a date that is in the past'
+							message: 'Resolution date must be this month or in the past'
 						} ],
 						items: {
-							day: {},
 							month: {},
 							year: {}
 						}
