@@ -49,7 +49,7 @@
 			{
 				title: 'Market access barrier type',
 				heading: {
-					text: ( barrier.type.category + ':' ) | capitalize if barrier.type.category
+					text: ( barrier.type.category.name + ':' ) if barrier.type.category.name
 				},
 				html: barrierTypeHtml if barrier.type.title,
 				add: {
