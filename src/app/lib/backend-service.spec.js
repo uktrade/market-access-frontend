@@ -201,21 +201,6 @@ describe( 'Backend Service', () => {
 				} );
 			} );
 		} );
-
-		describe( 'saveType', () => {
-			it( 'Should PUT to the correct path with the correct values', async () => {
-
-				const barrierType = 'my summary text';
-
-				await service.barriers.saveType( req, barrierId, {
-					barrierType
-				} );
-
-				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
-					barrier_type: barrierType
-				} );
-			} );
-		} );
 	} );
 
 	describe( 'Reports', () => {
