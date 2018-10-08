@@ -155,6 +155,21 @@ describe( 'Backend Service', () => {
 			} );
 		} );
 
+		describe( 'hibernate', () => {
+			it( 'Should PUT to the correct path with the correct values', async () => {
+
+				const hibernationSummary = 'my summary text';
+
+				await service.barriers.hibernate( req, barrierId, {
+					hibernationSummary
+				} );
+
+				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/hibernate`, token, {
+					status_summary: hibernationSummary
+				} );
+			} );
+		} );
+
 		describe( 'open', () => {
 			it( 'Should PUT to the correct path with the correct values', async () => {
 
@@ -170,17 +185,19 @@ describe( 'Backend Service', () => {
 			} );
 		} );
 
-		describe( 'hibernate', () => {
+		describe( 'saveType', () => {
 			it( 'Should PUT to the correct path with the correct values', async () => {
 
-				const hibernationSummary = 'my summary text';
+				const barrierType = 'my type';
+				const category = 'my category';
 
-				await service.barriers.hibernate( req, barrierId, {
-					hibernationSummary
-				} );
+				await service.barriers.saveType( req, barrierId, {
+					barrierType
+				}, category );
 
-				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/hibernate`, token, {
-					status_summary: hibernationSummary
+				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+					barrier_type: barrierType,
+					barrier_type_category: category
 				} );
 			} );
 		} );

@@ -35,6 +35,10 @@ describe( 'Barrier detail view model', () => {
 				'COMPANY': 'company',
 				'TRADE': 'trade',
 				'OTHER': 'other'
+			},
+			barrierTypeCategories: {
+				GOODS: 'some goods',
+				SERVICES: 'some services'
 			}
 		};
 
@@ -61,7 +65,15 @@ describe( 'Barrier detail view model', () => {
 			expect( outpuBarrier.product ).toEqual( inputBarrier.product );
 			expect( outpuBarrier.problem.status ).toEqual( metadata.statusTypes[ inputBarrier.problem_status ] );
 			expect( outpuBarrier.problem.description ).toEqual( inputBarrier.problem_description );
-			expect( outpuBarrier.type ).toEqual( inputBarrier.barrier_type );
+			expect( outpuBarrier.type ).toEqual( {
+				id: inputBarrier.barrier_type.id,
+				title: inputBarrier.barrier_type.title,
+				description: inputBarrier.barrier_type.description,
+				category: {
+					id: inputBarrier.barrier_type.category,
+					name: metadata.barrierTypeCategories[ inputBarrier.barrier_type.category ]
+				}
+			} );
 			expect( outpuBarrier.status ).toEqual( {
 				name: 'Open',
 				modifyer: 'assessment',
@@ -107,6 +119,18 @@ describe( 'Barrier detail view model', () => {
 			expect( outpuBarrier.isOpen ).toEqual( true );
 			expect( outpuBarrier.isResolved ).toEqual( false );
 			expect( outpuBarrier.isHibernated ).toEqual( false );
+		} );
+	} );
+
+	describe( 'With barrier_type missing', () => {
+		it( 'Should create all the correct properties', () => {
+
+			inputBarrier.barrier_type = null;
+
+			const output = viewModel( inputBarrier );
+			const outpuBarrier = output.barrier;
+
+			expect( outpuBarrier.type ).toEqual( null );
 		} );
 	} );
 

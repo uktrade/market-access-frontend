@@ -969,7 +969,7 @@ describe( 'Barriers controller', () => {
 
 						expect( next ).not.toHaveBeenCalled();
 						expect( req.session.typeCategoryValues ).not.toBeDefined();
-						expect( backend.barriers.saveType ).toHaveBeenCalledWith( req, req.barrier.id, getValuesResponse );
+						expect( backend.barriers.saveType ).toHaveBeenCalledWith( req, req.barrier.id, getValuesResponse, category );
 					} );
 
 					describe( 'When save and exit is used to submit the form', () => {
