@@ -22,9 +22,32 @@
 		&:nth-child( 5 ){
 			width: 9%;
 		}
+	}
+}
 
-		//&:nth-child( 6 ){
-		//	width: 18%;
-		//}
+.standard-table--country-barriers {
+
+	.standard-table__heading,
+	.standard-table__cell{
+
+		&:nth-child( 1 ){
+			width: 18%;
+		}
+
+		&:nth-child( 2 ){
+			width: 30%;
+		}
+
+		&:nth-child( 3 ){
+			width: 26%;
+		}
+
+		&:nth-child( 4 ){
+			width: 17%;
+		}
+
+		&:nth-child( 5 ){
+			width: 9%;
+		}
 	}
 }

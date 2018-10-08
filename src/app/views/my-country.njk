@@ -2,23 +2,27 @@
 
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Homepage{% endblock %}
+{% block page_title %}{{ super() }} - My country barriers{% endblock %}
 
 {% block page_content %}
 
-	{{ dashboardHeading( tabData, isBarriers = true ) }}
+	{{ dashboardHeading( tabData, isMyCountry = true ) }}
+
 
 	{%- if barriers and barriers.length -%}
 
-		<table class="standard-table standard-table--barriers">
+		<h3 class="tab-heading">
+			Barriers in <strong>{{ country.name }}</strong>
+		</h3>
+
+		<table class="standard-table standard-table--country-barriers">
 			<thead>
 				<tr class="standard-table__heading-row">
 					<th class="standard-table__heading standard-table__heading--active">Date reported</th>
 					<th class="standard-table__heading">Barrier title</th>
 					<th class="standard-table__heading">Sectors affected</th>
-					<th class="standard-table__heading">Barrier location</th>
+					<th class="standard-table__heading">Barrier urgency</th>
 					<th class="standard-table__heading">Resolved</th>
-					{#<th class="standard-table__heading">Support needed?</th>#}
 				</tr>
 			</thead>
 			<tbody>
@@ -31,19 +35,8 @@
 						</a>
 					</td>
 					<td class="standard-table__cell">{{ barrier.sectors | join( ', ' ) }}</td>
-					<td class="standard-table__cell">{{ barrier.country.name }}</td>
+					<td class="standard-table__cell">{{ barrier.problemStatus }}</td>
 					<td class="standard-table__cell">{{ 'Yes' if barrier.resolved else 'No' }}</td>
-					{#<td class="standard-table__cell">
-						{% if barrier.supportNeeded -%}
-							<span class="warning-icon" aria-hidden="true">!</span>Yes
-							{% if not barrier.hasContributors -%}
-								<br>
-								<span class="warning-icon warning-icon--error" aria-hidden="true">!</span>No contributors
-							{%- endif %}
-						{%- else -%}
-							No
-						{%- endif %}
-					</td>#}
 				</tr>
 				{%- endfor %}
 			</tbody>
@@ -52,7 +45,7 @@
 	{%- else -%}
 
 		<p class="no-results-message">
-			There are currently no market access barriers.
+			There are currently no market access barriers in <strong>{{ country.name }}</strong>.
 		</p>
 
 	{%- endif %}

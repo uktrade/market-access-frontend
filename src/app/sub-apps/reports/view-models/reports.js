@@ -15,7 +15,7 @@ function update( item ){
 	return item;
 }
 
-module.exports = ( reports ) => {
+module.exports = ( reports, country ) => {
 
 	if( reports && reports.length ){
 
@@ -30,5 +30,5 @@ module.exports = ( reports ) => {
 		return ( aDate === bDate ? 0 : ( aDate < bDate ? -1 : 1 ) );
 	} );
 
-	return {	reports	};
+	return {	reports, country };
 };

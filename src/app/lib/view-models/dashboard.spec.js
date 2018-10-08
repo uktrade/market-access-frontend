@@ -18,6 +18,10 @@ describe( 'Dashboard view model', () => {
 				{ id: 'abc-2', name: 'country 2' },
 				{ id: 'abc-3', name: 'country 3' }
 			],
+			statusTypes: {
+				'1': 'type a',
+				'2': 'type b'
+			},
 			getSector
 		};
 
@@ -30,10 +34,10 @@ describe( 'Dashboard view model', () => {
 		it( 'Should transform and sort them', () => {
 
 			const barriers = [
-				{ id: 1, export_country: 'abc-1', sectors: [ 'a', 'b' ], current_status: { status: 1 }, support_type: 2, contributor_count: 4, reported_on: 'Wed Nov 22 2017 10:45:25 GMT+0000 (GMT)' },
-				{ id: 2, export_country: 'abc-3', current_status: { status: 4 }, support_type: 1, contributor_count: 0, reported_on: 'Fri Jun 01 2018 01:43:07 GMT+0100 (BST)' },
-				{ id: 3, export_country: 'def-1', sectors: [ 'c', 'd' ], current_status: { status: 1 }, support_type: 2, contributor_count: 4, reported_on: 'Sat Mar 10 2018 12:51:35 GMT+0000 (GMT)' },
-				{ id: 4, export_country: 'def-2', current_status: { status: 1 }, support_type: 2, contributor_count: 4, reported_on: 'Wed Nov 22 2017 10:45:25 GMT+0000 (GMT)' }
+				{ id: 1, problem_status: 1, export_country: 'abc-1', sectors: [ 'a', 'b' ], current_status: { status: 1 }, support_type: 2, contributor_count: 4, reported_on: 'Wed Nov 22 2017 10:45:25 GMT+0000 (GMT)' },
+				{ id: 2, problem_status: 2, export_country: 'abc-3', current_status: { status: 4 }, support_type: 1, contributor_count: 0, reported_on: 'Fri Jun 01 2018 01:43:07 GMT+0100 (BST)' },
+				{ id: 3, problem_status: 1, export_country: 'def-1', sectors: [ 'c', 'd' ], current_status: { status: 1 }, support_type: 2, contributor_count: 4, reported_on: 'Sat Mar 10 2018 12:51:35 GMT+0000 (GMT)' },
+				{ id: 4, problem_status: 2, export_country: 'def-2', current_status: { status: 1 }, support_type: 2, contributor_count: 4, reported_on: 'Wed Nov 22 2017 10:45:25 GMT+0000 (GMT)' }
 			];
 
 			const output = viewModel( barriers );
@@ -57,6 +61,7 @@ describe( 'Dashboard view model', () => {
 				resolved: false,
 				supportNeeded: false,
 				hasContributors: true,
+				problemStatus: metadata.statusTypes[ 1 ],
 				sectors: [ getSector().name, getSector().name ]
 			} );
 
@@ -69,6 +74,7 @@ describe( 'Dashboard view model', () => {
 				resolved: false,
 				supportNeeded: false,
 				hasContributors: true,
+				problemStatus: metadata.statusTypes[ 2 ],
 				sectors: [ 'Unknown' ]
 			} );
 
@@ -81,6 +87,7 @@ describe( 'Dashboard view model', () => {
 				resolved: false,
 				supportNeeded: false,
 				hasContributors: true,
+				problemStatus: metadata.statusTypes[ 1 ],
 				sectors: [ getSector().name, getSector().name ]
 			} );
 
@@ -93,18 +100,20 @@ describe( 'Dashboard view model', () => {
 				resolved: true,
 				supportNeeded: true,
 				hasContributors: false,
+				problemStatus: metadata.statusTypes[ 2 ],
 				sectors: [ 'Unknown' ]
 			} );
 		} );
 	} );
 
-	describe( 'When the list of barriers is empty', () => {
-		it( 'Should return the barriers', () => {
+	describe( 'When the list of barriers is empty and the country is undefined', () => {
+		it( 'Should return the barriers and country', () => {
 
 			const input = [];
-			const output = viewModel( input );
+			let country;
+			const output = viewModel( input, country );
 
-			expect( output ).toEqual( { barriers: input } );
+			expect( output ).toEqual( { barriers: input, country } );
 		} );
 	} );
 } );

@@ -58,7 +58,7 @@ describe( 'Backend Service', () => {
 				await service.getUser( req );
 
 				expect( backend.get ).toHaveBeenCalledWith( '/whoami', token );
-				expect( body.country ).not.toBeDefined();
+				expect( body.country ).toEqual( {} );
 			} );
 		} );
 	} );
@@ -78,6 +78,26 @@ describe( 'Backend Service', () => {
 				await service.barriers.getAll( req );
 
 				expect( backend.get ).toHaveBeenCalledWith( '/barriers', token );
+			} );
+		} );
+
+		describe( 'getCount', () => {
+			it( 'Should call the correct path', async () => {
+
+				await service.barriers.getCount( req );
+
+				expect( backend.get ).toHaveBeenCalledWith( '/barriers/count', token );
+			} );
+		} );
+
+		describe( 'getForCountry', () => {
+			it( 'Should call the correct path', async () => {
+
+				const countryId = 'abc-123';
+
+				await service.barriers.getForCountry( req, countryId );
+
+				expect( backend.get ).toHaveBeenCalledWith( `/barriers?country=${ countryId }`, token );
 			} );
 		} );
 
@@ -210,6 +230,40 @@ describe( 'Backend Service', () => {
 					await service.reports.getAll( req );
 
 					expect( backend.get ).toHaveBeenCalledWith( '/reports', token );
+				} );
+			} );
+		} );
+
+		describe( 'getForCountry', () => {
+
+			const countryId = 'def-789';
+			const countryUrl = `/reports?country=${ countryId }`;
+
+			describe( 'When the results are an array', () => {
+				it( 'Should call the correct path and sort the progress', async () => {
+
+					backend.get.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body: getFakeData( '/backend/reports/' ) } ) );
+
+					const { body } = await service.reports.getForCountry( req, countryId );
+
+					expect( backend.get ).toHaveBeenCalledWith( countryUrl, token );
+					expect( body.results[ 0 ].progress.map( ( item ) => item.stage_code ) ).toEqual( [ '1.3', '1.4', '1.4', '1.5', '2.4', '2.5', '3', '3.1' ] );
+				} );
+			} );
+
+			describe( 'When the results are NOT an array', () => {
+				it( 'Should call the correct path and NOT sort the progress', async () => {
+
+					const responseBody = {
+						"count": 1,
+						"results": 'test'
+					};
+
+					backend.get.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body: responseBody } ) );
+
+					await service.reports.getForCountry( req, countryId );
+
+					expect( backend.get ).toHaveBeenCalledWith( countryUrl, token );
 				} );
 			} );
 		} );

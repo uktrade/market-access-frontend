@@ -58,6 +58,7 @@ let config = {
 	logLevel,
 	isDebug: ( logLevel === 'debug' ),
 	showErrors: isDev,
+	assignDefaultCountry: bool( 'ASSIGN_DEFAULT_COUNTRY', false ),
 	version: env( 'npm_package_version', 'unknown' ),
 	sentryDsn: env( 'SENTRY_DSN' ),
 	analytics: {

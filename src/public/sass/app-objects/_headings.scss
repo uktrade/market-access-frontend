@@ -4,3 +4,8 @@
 	margin-top: 0;
 	border-bottom: 4px solid $govuk-black;
 }
+
+.tab-heading {
+	@include govuk-font( 19 );
+	margin: govuk-em( 30, 19 ) 0;
+}

@@ -15,7 +15,9 @@
 {% macro tabs( items ) %}
 	<ul class="page-tabs">
 		{%- for item in items %}
+			{% if not item.skip %}
 			{{- tab( item ) -}}
+			{% endif %}
 		{%- endfor %}
 	</ul>
 {% endmacro %}

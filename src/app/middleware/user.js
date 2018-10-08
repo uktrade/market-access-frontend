@@ -9,11 +9,12 @@ module.exports = async ( req, res, next ) => {
 			req.session.user = ( await backend.getUser( req ) ).body;
 
 		} catch( e ){
-			
+
 			return next( e );
 		}
 	}
 
+	req.user = req.session.user;
 	res.locals.user = req.session.user;
 	next();
 };

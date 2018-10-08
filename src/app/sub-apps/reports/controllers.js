@@ -14,13 +14,28 @@ module.exports = {
 
 	index: async ( req, res, next ) => {
 
+		const country = req.user.country;
+		const countryId = country && req.user.country.id;
+		let template = 'reports/views/index';
+		let promise;
+
+		if( countryId ){
+
+			template = 'reports/views/my-country';
+			promise = backend.reports.getForCountry( req, countryId );
+
+		} else {
+
+			promise = backend.reports.getAll( req );
+		}
+
 		try {
 
-			const { response, body } = await backend.reports.getAll( req );
+			const { response, body } = await promise;
 
 			if( response.isSuccess ){
 
-				res.render( 'reports/views/index', reportsViewModel( body.results ) );
+				res.render( template, reportsViewModel( body.results, country ) );
 
 			} else {
 

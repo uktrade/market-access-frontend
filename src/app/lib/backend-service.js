@@ -1,5 +1,7 @@
 const backend = require( './backend-request' );
 const metadata = require( './metadata' );
+const config = require( '../config' );
+const logger = require( './logger' );
 
 function getToken( req ){
 
@@ -99,6 +101,14 @@ function transformUser( { response, body } ){
 		body.country = metadata.getCountry( body.location );
 	}
 
+	if( config.assignDefaultCountry && !body.country ){
+
+		body.country = metadata.countries && metadata.countries[ 1 ];
+		logger.verbose( 'Assigning country to user ', body.country );
+	}
+
+	body.country = body.country || {};
+
 	return { response, body };
 }
 
@@ -108,6 +118,8 @@ module.exports = {
 
 	barriers: {
 		getAll: ( req ) => backend.get( '/barriers', getToken( req ) ),
+		getForCountry: ( req, countryId ) => backend.get( `/barriers?country=${ countryId }`, getToken( req ) ),
+		getCount: ( req ) => backend.get( '/barriers/count', getToken( req ) ),
 		get: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }`, getToken( req ) ),
 		getInteractions: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }/interactions`, getToken( req ) ),
 		saveNote: ( req, barrierId, values ) => backend.post( `/barriers/${ barrierId }/interactions`, getToken( req ), {
@@ -132,6 +144,7 @@ module.exports = {
 
 	reports: {
 		getAll: ( req ) => backend.get( '/reports', getToken( req ) ).then( transformReportList ),
+		getForCountry: ( req, countryId ) => backend.get( `/reports?country=${ countryId }`, getToken( req ) ).then( transformReportList ),
 		get: ( req, reportId ) => backend.get( `/reports/${ reportId }`, getToken( req ) ).then( transformSingleReport ),
 		save: ( req, values ) => backend.post( '/reports', getToken( req ), {
 			problem_status: getValue( values.status ),

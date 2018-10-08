@@ -133,10 +133,11 @@ describe( 'Reports view model', () => {
 	describe( 'When the list of reports is empty', () => {
 		it( 'Should return the reports', () => {
 
+			const country = { country: true };
 			const input = [];
-			const output = viewModel( input );
+			const output = viewModel( input, country );
 
-			expect( output ).toEqual( { reports: input } );
+			expect( output ).toEqual( { reports: input, country } );
 		} );
 	} );
 } );
