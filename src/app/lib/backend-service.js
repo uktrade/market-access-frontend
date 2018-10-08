@@ -114,15 +114,10 @@ module.exports = {
 			text: values.note,
 			pinned: ( values.pinned === 'true' )
 		} ),
-		resolve: ( req, barrierId, values ) => {
-
-			const { day, month, year } = values.resolvedDate;
-
-			return backend.put( `/barriers/${ barrierId }/resolve`, getToken( req ), {
-				status_date: [ year, month, day ].join( '-' ) + 'T00:00',
-				status_summary: values.resolvedSummary
-			} );
-		},
+		resolve: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/resolve`, getToken( req ), {
+			status_date: getDefaultedDate( values.resolvedDate ) + 'T00:00',
+			status_summary: values.resolvedSummary
+		} ),
 		hibernate: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/hibernate`, getToken( req ), {
 			status_summary: values.hibernationSummary
 		} ),
