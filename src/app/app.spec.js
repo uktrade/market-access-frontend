@@ -21,6 +21,25 @@ function getTitle( res ){
 	return title;
 }
 
+/*
+function getSelectOption( res, name ){
+
+	const startTag = new RegExp( '<select.*?name="' + name + '">' );
+	const optionWithValue = /<option.+?value="(.+)"/;
+
+	let text = res.text;
+
+	const selectPosition = text.search( startTag );
+
+	text = text.substring( selectPosition );
+
+	const selectEndPosition = text.indexOf( '</select>' );
+	const options = text.substring( 0, selectEndPosition );
+	const valueMatches = options.match( optionWithValue );
+
+	return valueMatches && valueMatches[ 1 ];
+}
+*/
 function checkResponse( res, statusCode ){
 
 	const headers = res.headers;
@@ -117,7 +136,7 @@ describe( 'App', function(){
 			it( 'Should render the index page', function( done ){
 
 				intercept.backend()
-					.get( '/barriers' )
+					.get( /\/barriers(\?country=[a-z0-9-]+)?$/ )
 					.reply( 200, intercept.stub( '/backend/barriers/' ) );
 
 				app
@@ -207,12 +226,12 @@ describe( 'App', function(){
 			} );
 		} );
 
-		xdescribe( 'Reports', () => {
+		describe( 'Reports', () => {
 			describe( 'Index page', () => {
 				it( 'Should render a list of reports', ( done ) => {
 
 					intercept.backend()
-					.get( '/reports/unfinished' )
+					.get( '/reports' )
 					.reply( 200, intercept.stub( '/backend/reports/' ) );
 
 					app
@@ -233,7 +252,7 @@ describe( 'App', function(){
 
 				describe( 'Start page', () => {
 
-					const title = 'Market Access - Report - Status of the problem';
+					const title = 'Market Access - Report - Status of the barrier';
 
 					describe( 'Without a reportId', () => {
 						it( 'Should render the start page', ( done ) => {
@@ -260,7 +279,114 @@ describe( 'App', function(){
 					} );
 				} );
 
-				describe( 'Company search page', () => {
+				describe( 'Is resolved page', () => {
+
+					const title = 'Market Access - Report - Status of the barrier';
+
+					let agent;
+
+					beforeEach( ( done ) => {
+
+						agent = supertest.agent( appInstance );
+
+						agent
+							.get( urls.reports.start() )
+							.end( ( err, res ) => {
+
+								const token = getCsrfToken( res, done.fail );
+
+								agent
+									.post( urls.reports.start() )
+									.send( `_csrf=${ token }&status=1` )
+									.expect( 302, done );
+							} );
+					} );
+
+					describe( 'Without a reportId', () => {
+						it( 'Should render the is resolved page', ( done ) => {
+
+							agent
+								.get( urls.reports.isResolved() )
+								.end( checkPage( title, done ) );
+						} );
+					} );
+
+					describe( 'With a reportId', () => {
+						it( 'Should fetch the report and render the is resolved page', ( done ) => {
+
+							const reportId = '1';
+
+							intercept.backend()
+								.get( `/reports/${ reportId }` )
+								.reply( 200, intercept.stub( '/backend/reports/report' ) );
+
+							agent
+								.get( urls.reports.isResolved( reportId ) )
+								.end( checkPage( title, done ) );
+						} );
+					} );
+				} );
+
+				describe( 'Barrier location page', () => {
+
+					const title = 'Market Access - Report - Location of the barrier';
+
+					let agent;
+
+					beforeEach( ( done ) => {
+
+						agent = supertest.agent( appInstance );
+
+						agent
+							.get( urls.reports.start() )
+							.end( ( err, res ) => {
+
+								const token = getCsrfToken( res, done.fail );
+
+								agent
+									.post( urls.reports.start() )
+									.send( `_csrf=${ token }&status=1` )
+									.expect( 302 )
+									.redirects( 1 )
+									.end( ( err, res ) => {
+
+										const token = getCsrfToken( res, done.fail );
+
+										agent
+											.post( urls.reports.isResolved() )
+											.send( `_csrf=${ token }&isResolved=false` )
+											.expect( 302 )
+											.end( done );
+									} );
+							} );
+					} );
+
+					describe( 'Without a reportId', () => {
+						it( 'Should render the barrier location page', ( done ) => {
+
+							agent
+								.get( urls.reports.country() )
+								.end( checkPage( title, done ) );
+						} );
+					} );
+
+					describe( 'With a reportId', () => {
+						it( 'Should fetch the report and render the barrier location page', ( done ) => {
+
+							const reportId = '1';
+
+							intercept.backend()
+								.get( `/reports/${ reportId }` )
+								.reply( 200, intercept.stub( '/backend/reports/report' ) );
+
+							agent
+								.get( urls.reports.country( reportId ) )
+								.end( checkPage( title, done ) );
+						} );
+					} );
+				} );
+
+				xdescribe( 'Company search page', () => {
 
 					let agent;
 
@@ -307,7 +433,7 @@ describe( 'App', function(){
 					} );
 				} );
 
-				describe( 'Company details', () => {
+				xdescribe( 'Company details', () => {
 
 					let companyId;
 					let agent;
@@ -381,7 +507,7 @@ describe( 'App', function(){
 					} );
 				} );
 
-				describe( 'Company contacts', () => {
+				xdescribe( 'Company contacts', () => {
 
 					let companyId;
 					let agent;
@@ -491,25 +617,16 @@ describe( 'App', function(){
 
 					afterEach( checkNock );
 
-					describe( 'About the problem', () => {
+					describe( 'About the barrier', () => {
 						it( 'Should fetch the report and render the page', ( done ) => {
 
 							app
 								.get( urls.reports.aboutProblem( reportId ) )
-								.end( checkPage( 'Market Access - Report - About the problem', done ) );
+								.end( checkPage( 'Market Access - Report - About the barrier', done ) );
 						} );
 					} );
 
-					describe( 'Legal obligations infringed', () => {
-						it( 'Should fetch the report and render the page', ( done ) => {
-
-							app
-								.get( urls.reports.legal( reportId ) )
-								.end( checkPage( 'Market Access - Report - Legal obligations infringed', done ) );
-						} );
-					} );
-
-					describe( 'Define type of market access barrier', () => {
+					xdescribe( 'Define type of market access barrier', () => {
 
 						describe( 'Selecting the category', () => {
 							it( 'Should fetch the report and render the category options', ( done ) => {

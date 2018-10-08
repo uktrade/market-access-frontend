@@ -288,7 +288,7 @@ module.exports = {
 
 					res.render( 'barriers/views/type', templateValues );
 				},
-				saveFormData: ( formValues ) => backend.barriers.saveType( req, barrier.id, formValues ),
+				saveFormData: ( formValues ) => backend.barriers.saveType( req, barrier.id, formValues, category ),
 				saved: () => {
 
 					delete req.session.typeCategoryValues;

@@ -21,11 +21,12 @@ function update( item ){
 	item.resolved = ( item.current_status && item.current_status.status ) === 4;
 	item.supportNeeded = item.support_type === 1;
 	item.hasContributors = item.contributor_count > 0;
+	item.problemStatus = metadata.statusTypes[ item.problem_status ];
 
 	return item;
 }
 
-module.exports = ( barriers ) => {
+module.exports = ( barriers, country ) => {
 
 	if( barriers && barriers.length ){
 
@@ -40,5 +41,5 @@ module.exports = ( barriers ) => {
 		} );
 	}
 
-	return {	barriers	};
+	return {	barriers, country	};
 };

@@ -70,6 +70,7 @@ describe( 'Report controller', () => {
 			csrfToken: () => csrfToken,
 			session: {},
 			params: {},
+			user: {},
 			error: jasmine.createSpy( 'req.error' ),
 			hasErrors: jasmine.createSpy( 'req.hasErrors' )
 		};
@@ -91,6 +92,7 @@ describe( 'Report controller', () => {
 				saveNextSteps: jasmine.createSpy( 'backend.reports.saveNextSteps' ),
 				submit: jasmine.createSpy( 'backend.reports.submit' ),
 				getAll: jasmine.createSpy( 'backend.reports.getAll' ),
+				getForCountry: jasmine.createSpy( 'backend.reports.getForCountry' ),
 				getAllUnfinished: jasmine.createSpy( 'backend.reports.getAllUnfinished' ),
 				saveHasSectors: jasmine.createSpy( 'backend.reports.saveHasSectors' )
 			}
@@ -152,25 +154,52 @@ describe( 'Report controller', () => {
 	describe( 'Index', () => {
 		describe( 'Without an error', () => {
 			describe( 'With a success response', () => {
-				it( 'Should get the reports and render the index page', async () => {
+				describe( 'When the user has a country', () => {
+					it( 'Should get the reports and render the index page', async () => {
 
-					const unfinishedReportsResponse = {
-						response: { isSuccess: true  },
-						body: {
-							results: [ { id: 1 } ]
-						}
-					};
-					const reportsViewModelResponse = { reports: true };
+						const country = { id: 1, name: 'test' };
+						const unfinishedReportsResponse = {
+							response: { isSuccess: true  },
+							body: {
+								results: [ { id: 1 } ]
+							}
+						};
+						const reportsViewModelResponse = { reports: true };
 
-					reportsViewModel.and.callFake( () => reportsViewModelResponse );
-					backend.reports.getAll.and.callFake( () => Promise.resolve( unfinishedReportsResponse ) );
+						req.user.country = country;
 
-					await controller.index( req, res, next );
+						reportsViewModel.and.callFake( () => reportsViewModelResponse );
+						backend.reports.getForCountry.and.callFake( () => Promise.resolve( unfinishedReportsResponse ) );
 
-					expect( next ).not.toHaveBeenCalled();
-					expect( backend.reports.getAll ).toHaveBeenCalledWith( req );
-					expect( reportsViewModel ).toHaveBeenCalledWith( unfinishedReportsResponse.body.results );
-					expect( res.render ).toHaveBeenCalledWith( 'reports/views/index', reportsViewModelResponse );
+						await controller.index( req, res, next );
+
+						expect( next ).not.toHaveBeenCalled();
+						expect( backend.reports.getForCountry ).toHaveBeenCalledWith( req, country.id );
+						expect( reportsViewModel ).toHaveBeenCalledWith( unfinishedReportsResponse.body.results, country );
+						expect( res.render ).toHaveBeenCalledWith( 'reports/views/my-country', reportsViewModelResponse );
+					} );
+				} );
+				describe( 'When the user does NOT have a country', () => {
+					it( 'Should get the reports and render the index page', async () => {
+
+						const unfinishedReportsResponse = {
+							response: { isSuccess: true  },
+							body: {
+								results: [ { id: 1 } ]
+							}
+						};
+						const reportsViewModelResponse = { reports: true };
+
+						reportsViewModel.and.callFake( () => reportsViewModelResponse );
+						backend.reports.getAll.and.callFake( () => Promise.resolve( unfinishedReportsResponse ) );
+
+						await controller.index( req, res, next );
+
+						expect( next ).not.toHaveBeenCalled();
+						expect( backend.reports.getAll ).toHaveBeenCalledWith( req );
+						expect( reportsViewModel ).toHaveBeenCalledWith( unfinishedReportsResponse.body.results, req.user.country );
+						expect( res.render ).toHaveBeenCalledWith( 'reports/views/index', reportsViewModelResponse );
+					} );
 				} );
 			} );
 
