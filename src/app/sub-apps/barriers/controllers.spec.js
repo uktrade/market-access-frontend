@@ -92,7 +92,8 @@ describe( 'Barriers controller', () => {
 			isDateValue: jasmine.createSpy( 'validators.isDateValue' ),
 			isDateValid: ( name ) => jasmine.createSpy( 'validators.isDateValid: ' + name ),
 			isDateInPast: jasmine.createSpy( 'validators.isDateInPast' ),
-			isMetadata: jasmine.createSpy( 'validators.metadata' )
+			isMetadata: jasmine.createSpy( 'validators.metadata' ),
+			isDateNumeric: jasmine.createSpy( 'validators.isDateNumeric' )
 		};
 
 		controller = proxyquire( modulePath, {
@@ -346,10 +347,10 @@ describe( 'Barriers controller', () => {
 			expect( config.resolvedDate ).toBeDefined();
 			expect( config.resolvedDate.type ).toEqual( GROUP );
 			expect( config.resolvedDate.conditional ).toEqual( { name: 'status', value: RESOLVE } );
-			expect( config.resolvedDate.items ).toEqual( { day: {}, month: {}, year: {} } );
-			expect( config.resolvedDate.validators[ 0 ].fn ).toEqual( dayValidator );
-			expect( config.resolvedDate.validators[ 1 ].fn ).toEqual( monthValidator );
-			expect( config.resolvedDate.validators[ 2 ].fn ).toEqual( yearValidator );
+			expect( config.resolvedDate.items ).toEqual( { month: {}, year: {} } );
+			expect( config.resolvedDate.validators[ 0 ].fn ).toEqual( monthValidator );
+			expect( config.resolvedDate.validators[ 1 ].fn ).toEqual( yearValidator );
+			expect( config.resolvedDate.validators[ 2 ].fn ).toEqual( validators.isDateNumeric );
 			expect( config.resolvedDate.validators[ 3 ].fn ).toEqual( validators.isDateValid );
 			expect( config.resolvedDate.validators[ 4 ].fn ).toEqual( validators.isDateInPast );
 
