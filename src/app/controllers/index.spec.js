@@ -1,4 +1,5 @@
 const proxyquire = require( 'proxyquire' );
+const uuid = require( 'uuid' );
 const modulePath = './index';
 
 let controller;
@@ -8,6 +9,7 @@ let backend;
 let ssoToken;
 let next;
 let dashboardViewModel;
+let urls;
 
 describe( 'Index controller', () => {
 
@@ -23,13 +25,27 @@ describe( 'Index controller', () => {
 		};
 		dashboardViewModel = jasmine.createSpy( 'dashboard view model' );
 
-		req = { session: { ssoToken }, user: {} };
-		res = { render: jasmine.createSpy( 'res.render' ) };
+		urls = {
+			me: jasmine.createSpy( 'urls.me' )
+		};
+
+		req = {
+			session: { ssoToken },
+			user: {},
+			csrfToken: jasmine.createSpy( 'csrfToken' )
+		};
+
+		res = {
+			render: jasmine.createSpy( 'res.render' ),
+			redirect: jasmine.createSpy( 'res.redirect' )
+		};
+
 		next = jasmine.createSpy( 'next' );
 
 		controller = proxyquire( modulePath, {
 			'../lib/backend-service': backend,
-			'../lib/view-models/dashboard': dashboardViewModel
+			'../lib/view-models/dashboard': dashboardViewModel,
+			'../lib/urls': urls
 		} );
 	} );
 
@@ -119,7 +135,34 @@ describe( 'Index controller', () => {
 		} );
 	} );
 
-	describe( 'myCountry', () => {
+	describe( 'me', () => {
+		describe( 'a GET', () => {
+			it( 'Should render the me page', () => {
 
+				const token = uuid();
+
+				req.csrfToken.and.callFake( () => token );
+
+				controller.me( req, res );
+
+				expect( res.render ).toHaveBeenCalledWith( 'me', { csrfToken: token } );
+			} );
+		} );
+
+		describe( 'A POST', () => {
+			it( 'Should delete the session user and redirect to the me page', () => {
+
+				const meResponse = '/me-response';
+
+				urls.me.and.callFake( () => meResponse );
+				req.method = 'POST';
+
+				controller.me( req, res );
+
+				expect( req.session.user ).not.toBeDefined();
+				expect( res.render ).not.toHaveBeenCalled();
+				expect( res.redirect ).toHaveBeenCalledWith( meResponse );
+			} );
+		} );
 	} );
 } );

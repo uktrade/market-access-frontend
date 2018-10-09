@@ -10,6 +10,13 @@ describe( 'URLs', () => {
 		} );
 	} );
 
+	describe( 'me', () => {
+		it( 'Should return the correct path', () => {
+
+			expect( urls.me() ).toEqual( '/me' );
+		} );
+	} );
+
 	describe( 'Login', () => {
 		it( 'Should return the login path', () => {
 

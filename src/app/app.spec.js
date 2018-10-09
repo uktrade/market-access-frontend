@@ -146,6 +146,15 @@ describe( 'App', function(){
 			} );
 		} );
 
+		describe( 'User page', function(){
+			it( 'Should render the me page', function( done ){
+
+				app
+					.get( urls.me() )
+					.end( checkPage( 'Market Access - About me', done ) );
+			} );
+		} );
+
 		describe( 'what is a barrier page', function(){
 			it( 'Should render the page', function( done ){
 
