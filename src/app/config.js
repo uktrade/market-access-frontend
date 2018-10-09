@@ -95,10 +95,10 @@ let config = {
 		port: number( 'REDIS_PORT' ),
 		password: env( 'REDIS_PASSWORD' ),
 		url: ( vcapRedisUrl || env( 'REDIS_URL', env( 'REDISTOGO_URL' ) ) ),
-		tls: bool( 'REDIS_USE_TLS' )
+		tls: bool( 'REDIS_USE_TLS', true )
 	},
 	session: {
-		ttl: ( 1000 * 60 * 60 * 2 ),//milliseconds for cookie
+		ttl: number( 'SESSION_TTL', ( 1000 * 60 * 60 * 2 ) ),//milliseconds for cookie
 		secret: requiredEnv( 'SESSION_SECRET' )
 	},
 	sso: {
