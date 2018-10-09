@@ -21,6 +21,7 @@ function getTitle( res ){
 	return title;
 }
 
+/*
 function getSelectOption( res, name ){
 
 	const startTag = new RegExp( '<select.*?name="' + name + '">' );
@@ -38,6 +39,7 @@ function getSelectOption( res, name ){
 
 	return valueMatches && valueMatches[ 1 ];
 }
+*/
 
 function checkResponse( res, statusCode ){
 
