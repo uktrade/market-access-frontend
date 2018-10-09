@@ -1,0 +1,68 @@
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - About me{% endblock %}
+
+{% block head_styles %}
+
+	<style>
+		dl {
+			width: 95%;
+			box-sizing: border-box;
+		}
+
+		@media( min-width: 410px ){
+
+			dl {
+				min-width: 400px;
+				width: 30%;
+			}
+		}
+
+		dt {
+			font-weight: bold;
+			margin: 0;
+			background-color: #eee;
+		}
+
+		dd {
+			margin: 0 0 1.25em 0;
+		}
+
+		dt, dd {
+			display: inline-block;
+			width: 100%;
+			padding: 0.25em 0.6em;
+		}
+	</style>
+{% endblock -%}
+
+{% block page_content %}
+
+	<h2>About you</h2>
+
+	<form action="{{ urls.me() }}" method="POST">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+		<input type="submit" value="Refresh" class="govuk-button">
+	</form>
+
+	<dl>
+		<dt>Id</dt>
+		<dd>{{ user.id }}</dd>
+
+		<dt>Username</dt>
+		<dd>{{ user.username }}</dd>
+
+		<dt>First name</dt>
+		<dd>{{ user.first_name }}</dd>
+
+		<dt>Last name</dt>
+		<dd>{{ user.last_name }}</dd>
+
+		<dt>Email</dt>
+		<dd>{{ user.email }}</dd>
+
+		<dt>Country</dt>
+		<dd>{% if user.country %}{{ user.country.name }} ({{ user.country.id }}){% else %}---{% endif %}</dd>
+	</dl>
+
+{% endblock %}

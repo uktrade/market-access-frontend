@@ -40,6 +40,7 @@ function getSelectOption( res, name ){
 	return valueMatches && valueMatches[ 1 ];
 }
 */
+
 function checkResponse( res, statusCode ){
 
 	const headers = res.headers;
@@ -142,6 +143,15 @@ describe( 'App', function(){
 				app
 					.get( urls.index() )
 					.end( checkPage( 'Market Access - Homepage', done ) );
+			} );
+		} );
+
+		describe( 'User page', function(){
+			it( 'Should render the me page', function( done ){
+
+				app
+					.get( urls.me() )
+					.end( checkPage( 'Market Access - About me', done ) );
 			} );
 		} );
 

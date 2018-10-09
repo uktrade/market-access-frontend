@@ -1,3 +1,4 @@
+const urls = require( '../lib/urls' );
 const backend = require( '../lib/backend-service' );
 const dashboardViewModel = require( '../lib/view-models/dashboard' );
 
@@ -36,6 +37,19 @@ module.exports = {
 		} catch( e ){
 
 			next( e );
+		}
+	},
+
+	me: ( req, res ) => {
+
+		if( req.method === 'POST' ){
+
+			delete req.session.user;
+			res.redirect( urls.me() );
+
+		} else {
+
+			res.render( 'me', { csrfToken: req.csrfToken() } );
 		}
 	}
 };
