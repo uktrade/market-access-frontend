@@ -36,5 +36,11 @@ module.exports = ( express, app ) => {
 	app.get( '/:barrierId/type/:barrierTypeCategory', controller.type.list );
 	app.post( '/:barrierId/type/:barrierTypeCategory', controller.type.list );
 
+	app.get( '/:barrierId/sectors/', controller.sectors.list );
+	app.post( '/:barrierId/sectors/', controller.sectors.list );
+	app.post( '/:barrierId/sectors/remove/', controller.sectors.remove );
+	app.get( '/:barrierId/sectors/add/', controller.sectors.add );
+	app.post( '/:barrierId/sectors/add/', controller.sectors.add );
+
 	return app;
 };

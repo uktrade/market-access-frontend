@@ -1,22 +1,22 @@
-.report-sectors {
+.sectors-list {
 	border: 1px solid $govuk-grey-2;
 	padding: govuk-em( 15, 16 );
 	margin-bottom: govuk-em( 30, 16 );
 }
 
-.report-sectors__add-button {
+.sectors-list__add-button {
 	margin-bottom: 0;
 }
 
-.report-sectors__heading {
+.sectors-list__heading {
 	margin: 0;
 }
 
-.report-sectors__list {
+.sectors-list__list {
 	padding: 0;
 }
 
-.report-sectors__list__item {
+.sectors-list__list__item {
 
 	list-style: none;
 	line-height: 1.5;
@@ -29,7 +29,7 @@
 	}
 }
 
-.report-sectors__list__item__number {
+.sectors-list__list__item__number {
 
 	&[ data-number ]:after {
 		content: attr( data-number );
@@ -48,13 +48,13 @@
 	}
 }
 
-.report-sectors__list__item__remove-form {
+.sectors-list__list__item__remove-form {
 	position: absolute;
 	bottom: govuk-em( 10, 16 );
 	right: 0;
 }
 
-.report-sectors__list__item__remove-form__submit {
+.sectors-list__list__item__remove-form__submit {
 	border: none;
 	text-decoration: underline;
 	color: $govuk-blue;

@@ -201,6 +201,34 @@ describe( 'Backend Service', () => {
 				} );
 			} );
 		} );
+
+		describe( 'saveSectors', () => {
+			describe( 'With no sectors', () => {
+				it( 'Should PUT to the correct path with a null value', async () => {
+
+					const sectors = [];
+
+					await service.barriers.saveSectors( req, barrierId, sectors );
+
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+						sectors: null
+					} );
+				} );
+			} );
+
+			describe( 'With a list of sectors', () => {
+				it( 'Should PUT to the correct path with the correct values', async () => {
+
+					const sectors = [ 'sector 1', 'sector 2' ];
+
+					await service.barriers.saveSectors( req, barrierId, sectors );
+
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+						sectors
+					} );
+				} );
+			} );
+		} );
 	} );
 
 	describe( 'Reports', () => {

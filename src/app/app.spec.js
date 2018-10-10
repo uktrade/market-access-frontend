@@ -2,6 +2,7 @@ const supertest = require( 'supertest' );
 const proxyquire = require( 'proxyquire' );
 //const winston = require( 'winston' );
 const nock = require( 'nock' );
+const uuid = require( 'uuid' );
 
 const urls = require( './lib/urls' );
 const logger = require( './lib/logger' );
@@ -165,46 +166,64 @@ describe( 'App', function(){
 		} );
 
 		describe( 'Barriers', () => {
-			describe( 'Barrier detail', () => {
-				it( 'Should fetch the barrier and render the page', ( done ) => {
 
-					const barrierId = 'abc-123';
+			let barrierId;
 
-					intercept.backend()
-						.get( `/barriers/${ barrierId }` )
-						.reply( 200, intercept.stub( '/backend/barriers/barrier' ) );
+			beforeEach( () => {
 
-					app
-						.get( urls.barriers.detail( barrierId ) )
-						.end( checkPage( 'Market Access - Barrier details', done ) );
-				} );
+				barrierId = uuid();
 			} );
 
-			describe( 'Barrier interactions', () => {
-				it( 'Should fetch the barrier and render the page', ( done ) => {
+			describe( 'With a barrier', () => {
 
-					const barrierId = 'abc-123';
-					const barrier = intercept.stub( '/backend/barriers/barrier' );
+				let barrier;
+
+				beforeEach( () => {
+
+					barrier = intercept.stub( '/backend/barriers/barrier' );
 
 					intercept.backend()
 						.get( `/barriers/${ barrierId }` )
 						.reply( 200, barrier );
+				} );
 
-					intercept.backend()
-						.get( `/barriers/${ barrier.id }/interactions` )
-						.reply( 200, intercept.stub( '/backend/barriers/interactions' ) );
+				describe( 'Barrier detail', () => {
+					it( 'Should fetch the barrier and render the page', ( done ) => {
 
-					app
-						.get( urls.barriers.interactions( barrierId ) )
-						.end( checkPage( 'Market Access - Barrier updates', done ) );
+						app
+							.get( urls.barriers.detail( barrierId ) )
+							.end( checkPage( 'Market Access - Barrier details', done ) );
+					} );
+				} );
+
+				describe( 'Barrier interactions', () => {
+					it( 'Should fetch the barrier and render the page', ( done ) => {
+
+						intercept.backend()
+							.get( `/barriers/${ barrier.id }/interactions` )
+							.reply( 200, intercept.stub( '/backend/barriers/interactions' ) );
+
+						app
+							.get( urls.barriers.interactions( barrierId ) )
+							.end( checkPage( 'Market Access - Barrier updates', done ) );
+					} );
+				} );
+
+				describe( 'Barrier sectors', () => {
+					describe( 'Listing the sectors', () => {
+						it( 'Should list the sectors', ( done ) => {
+
+							app
+								.get( urls.barriers.sectors.list( barrierId ) )
+								.end( checkPage( 'Market Access - Sectors affected by the barrier', done ) );
+						} );
+					} );
 				} );
 			} );
 
 			describe( 'Barrier status', () => {
 				describe( 'Resolved', () => {
 					it( 'Should render the page', ( done ) => {
-
-						const barrierId = 'abc-123';
 
 						app
 							.get( urls.barriers.statusResolved( barrierId ) )
@@ -215,8 +234,6 @@ describe( 'App', function(){
 				describe( 'Hibernated', () => {
 					it( 'Should render the page', ( done ) => {
 
-						const barrierId = 'abc-123';
-
 						app
 							.get( urls.barriers.statusHibernated( barrierId ) )
 							.end( checkPage( 'Market Access - Barrier paused', done ) );
@@ -225,8 +242,6 @@ describe( 'App', function(){
 
 				describe( 'Open', () => {
 					it( 'Should render the page', ( done ) => {
-
-						const barrierId = 'abc-123';
 
 						app
 							.get( urls.barriers.statusOpen( barrierId ) )
