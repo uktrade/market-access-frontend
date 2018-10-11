@@ -53,6 +53,11 @@ module.exports = {
 		type: {
 			category: ( barrierId ) => `/barriers/${ barrierId }/type/`,
 			list: ( barrierId, category ) => `/barriers/${ barrierId }/type/${ category }/`
+		},
+		sectors: {
+			list: ( barrierId ) => `/barriers/${ barrierId }/sectors/`,
+			add: ( barrierId ) => `/barriers/${ barrierId }/sectors/add/`,
+			remove: ( barrierId ) => `/barriers/${ barrierId }/sectors/remove/`
 		}
 	},
 

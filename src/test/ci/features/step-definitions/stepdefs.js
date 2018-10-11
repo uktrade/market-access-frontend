@@ -11,27 +11,55 @@ function getPath( href ){
 
 Given( 'I\'m on the homepage', async () => {
 
+	this.name = 'homepage';
+
 	await driver.fetch( urls.index() );
-	await driver.takeScreenshot( 'homepage' );
+	await driver.takeScreenshot( this.name );
 
 	this.driver = driver.getInstance();
 });
 
 Given( 'I\'m on the report a barrier page', async () => {
 
+	this.name = 'report-a-barrier';
+
 	await driver.fetch( urls.reports.new() );
-	await driver.takeScreenshot( 'report-a-barrier' );
+	await driver.takeScreenshot( this.name );
 
 	this.driver = driver.getInstance();
 });
 
 Given( 'I\'m on the start a report page', async () => {
 
+	this.name = 'report-a-barrier_start';
+
 	await driver.fetch( urls.reports.start() );
-	await driver.takeScreenshot( 'report-a-barrier_start' );
+	await driver.takeScreenshot( this.name );
 
 	this.driver = driver.getInstance();
 } );
+
+Given( 'I\'m on the barrier details page', async () => {
+
+	this.name = 'barrier-details';
+
+	await driver.fetch( urls.index() );
+	const link = await driver.byCss( '.standard-table__cell a' );
+	await link.click();
+	await driver.takeScreenshot( this.name );
+
+	this.driver = driver.getInstance();
+});
+
+Given( 'I\'m on the what is a barrier page', async () => {
+
+	this.name = 'what-is-a-barrier';
+
+	await driver.fetch( urls.whatIsABarrier() );
+	await driver.takeScreenshot( this.name );
+
+	this.driver = driver.getInstance();
+});
 
 When( 'I navigate to the report a barrier page', async () => {
 
@@ -54,7 +82,7 @@ Then( /^the title should be (.+)$/i, async ( title ) => {
 
 Then( 'the page should not have any accessibility violations', async () => {
 
-	const { violations } = await driver.accessibilityCheck( 'homepage' );
+	const { violations } = await driver.accessibilityCheck( this.name || 'unknown' );
 
 	assert.equal( violations, 0 );
 } );

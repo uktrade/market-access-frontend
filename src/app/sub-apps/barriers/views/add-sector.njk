@@ -4,18 +4,18 @@
 
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Report - Add an affected sector{% endblock %}
+{% block page_title %}{{ super() }} - Barrier - Add an affected sector{% endblock %}
 
 {% block page_content %}
 
 	{{ heading({
-		back: { href: urls.reports.hasSectors( report.id ) },
-		caption: 'Report a barrier',
+		back: { href: urls.barriers.detail( barrier.id ) },
+		caption: barrier.barrier_title,
 		text: 'Sectors affected by the barrier',
 		errors: errors
 	}) }}
 
-	<form action="{{ urls.reports.addSector( report.id ) }}" method="POST" class="restrict-width">
+	<form action="{{ urls.barriers.sectors.add( barrier.id ) }}" method="POST" class="restrict-width">
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
 		{{ govukSelect( {
@@ -35,6 +35,6 @@
 		{% endif %}
 
 		<input type="submit" value="Add sector" class="govuk-button">
-		<a class="form-cancel" href="{{ urls.reports.sectors( report.id ) }}">cancel</a>
+		<a class="form-cancel" href="{{ urls.barriers.sectors.list( barrier.id ) }}">cancel</a>
 	</form>
 {% endblock %}

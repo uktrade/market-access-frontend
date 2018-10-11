@@ -105,6 +105,29 @@ describe( 'URLs', () => {
 				} );
 			} );
 		} );
+
+		describe( 'sectors', () => {
+			describe( 'list', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.sectors.list( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/` );
+				} );
+			} );
+
+			describe( 'add', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.sectors.add( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/add/` );
+				} );
+			} );
+
+			describe( 'remove', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.sectors.remove( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/remove/` );
+				} );
+			} );
+		} );
 	} );
 
 	describe( 'Report urls', () => {

@@ -1,5 +1,5 @@
 {% from 'app-components/heading.njk' import heading %}
-{% from 'app-components/report-sectors.njk' import reportSectors %}
+{% from 'app-components/sectors-list.njk' import sectorsList %}
 
 {% extends 'layout.njk' %}
 
@@ -16,7 +16,12 @@
 
 	<h3 class="report-sectors-heading">Save or add another sector</h3>
 
-	{{ reportSectors( report, sectors, csrfToken, addAnother = true ) }}
+	{{ sectorsList( sectors, {
+			csrfToken: csrfToken,
+			add: urls.reports.addSector( report.id ),
+			remove: urls.reports.removeSector( report.id )
+		}
+	) }}
 
 	<form action="{{ urls.reports.sectors( report.id ) }}" method="POST">
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
