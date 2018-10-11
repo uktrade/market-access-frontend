@@ -18,17 +18,17 @@ module.exports = ( express, app ) => {
 	app.use( parseBody, csrfProtection );
 
 	app.get( '/:barrierId/', controller.barrier );
-	app.get( '/:barrierId/interactions/', controller.interactions );
+	app.get( '/:barrierId/interactions/', controller.interactions.list );
 
-	app.get( '/:barrierId/interactions/add-note/', controller.addNote );
-	app.post( '/:barrierId/interactions/add-note/', controller.addNote );
+	app.get( '/:barrierId/interactions/add-note/', controller.interactions.addNote );
+	app.post( '/:barrierId/interactions/add-note/', controller.interactions.addNote );
 
-	app.get( '/:barrierId/status/', controller.status );
-	app.post( '/:barrierId/status/', controller.status );
+	app.get( '/:barrierId/status/', controller.status.index );
+	app.post( '/:barrierId/status/', controller.status.index );
 
-	app.get( '/:uuid/status/resolved/', controller.statusResolved );
-	app.get( '/:uuid/status/hibernated/', controller.statusHibernated );
-	app.get( '/:uuid/status/open/', controller.statusOpen );
+	app.get( '/:uuid/status/resolved/', controller.status.resolved );
+	app.get( '/:uuid/status/hibernated/', controller.status.hibernated );
+	app.get( '/:uuid/status/open/', controller.status.open );
 
 	app.get( '/:barrierId/type/', controller.type.category );
 	app.post( '/:barrierId/type/', controller.type.category );
