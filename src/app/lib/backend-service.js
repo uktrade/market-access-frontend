@@ -115,6 +115,7 @@ function transformUser( { response, body } ){
 module.exports = {
 
 	getUser: ( req ) => backend.get( '/whoami', getToken( req ) ).then( transformUser ),
+	ping: () => backend.get( '/ping.xml' ),
 
 	barriers: {
 		getAll: ( req ) => backend.get( '/barriers', getToken( req ) ),

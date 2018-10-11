@@ -734,6 +734,10 @@ describe( 'App', function(){
 		describe( 'Ping', function(){
 			it( 'Should return a status of 200', function( done ){
 
+				intercept.backend()
+					.get( '/ping.xml' )
+					.reply( 200, 'OK' );
+
 				app
 					.get( '/ping/' )
 					.end( ( err, res ) => {

@@ -63,6 +63,17 @@ describe( 'Backend Service', () => {
 		} );
 	} );
 
+	describe( 'ping', () => {
+		it( 'Should call the correct path', async () => {
+
+			backend.get.and.callFake( () => Promise.resolve() );
+
+			await service.ping();
+
+			expect( backend.get ).toHaveBeenCalledWith( '/ping.xml' );
+		} );
+	} );
+
 	describe( 'Barriers', () => {
 
 		let barrierId;
