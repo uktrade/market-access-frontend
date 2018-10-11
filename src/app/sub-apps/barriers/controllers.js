@@ -236,7 +236,7 @@ module.exports = {
 		const form = new Form( req, formFields );
 		const processor = new FormProcessor( {
 			form,
-			render: ( templateValues ) => res.render( 'barriers/views/status', templateValues ),
+			render: ( templateValues ) => res.render( 'barriers/views/status/index', templateValues ),
 			saveFormData: ( formValues ) => {
 
 				configItem = configItems[ formValues.status ];
@@ -255,9 +255,9 @@ module.exports = {
 		}
 	},
 
-	statusResolved: ( req, res ) => res.render( 'barriers/views/status-resolved', { barrierId: req.uuid } ),
-	statusHibernated: ( req, res ) => res.render( 'barriers/views/status-hibernated', { barrierId: req.uuid } ),
-	statusOpen: ( req, res ) => res.render( 'barriers/views/status-open', { barrierId: req.uuid } ),
+	statusResolved: ( req, res ) => res.render( 'barriers/views/status/resolved', { barrierId: req.uuid } ),
+	statusHibernated: ( req, res ) => res.render( 'barriers/views/status/hibernated', { barrierId: req.uuid } ),
+	statusOpen: ( req, res ) => res.render( 'barriers/views/status/open', { barrierId: req.uuid } ),
 
 	type: {
 
@@ -286,7 +286,7 @@ module.exports = {
 					templateValues.title = metadata.barrierTypeCategories[ category ];
 					templateValues.category = category;
 
-					res.render( 'barriers/views/type', templateValues );
+					res.render( 'barriers/views/type/list', templateValues );
 				},
 				saveFormData: ( formValues ) => backend.barriers.saveType( req, barrier.id, formValues, category ),
 				saved: () => {
@@ -333,7 +333,7 @@ module.exports = {
 				}
 			}
 
-			res.render( 'barriers/views/type-category', form.getTemplateValues() );
+			res.render( 'barriers/views/type/category', form.getTemplateValues() );
 		}
 	},
 
@@ -373,7 +373,7 @@ module.exports = {
 				}
 			}
 
-			res.render( 'barriers/views/sectors', { sectors: sectors.map( metadata.getSector ), csrfToken: req.csrfToken() } );
+			res.render( 'barriers/views/sectors/list', { sectors: sectors.map( metadata.getSector ), csrfToken: req.csrfToken() } );
 		},
 
 		remove: ( req, res ) => {
@@ -423,7 +423,7 @@ module.exports = {
 				}
 			}
 
-			res.render( 'barriers/views/add-sector', Object.assign( form.getTemplateValues(), { currentSectors: sectors.map( metadata.getSector ) } ) );
+			res.render( 'barriers/views/sectors/add', Object.assign( form.getTemplateValues(), { currentSectors: sectors.map( metadata.getSector ) } ) );
 		}
 	}
 };

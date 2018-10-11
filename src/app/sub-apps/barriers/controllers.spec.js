@@ -343,7 +343,7 @@ describe( 'Barriers controller', () => {
 		const RESOLVE = 'resolve';
 		const HIBERNATE = 'hibernate';
 		const OPEN = 'open';
-		const TEMPLATE = 'barriers/views/status';
+		const TEMPLATE = 'barriers/views/status/index';
 
 		let barrier;
 		let dayValidator;
@@ -742,7 +742,7 @@ describe( 'Barriers controller', () => {
 
 			controller.statusResolved( req, res );
 
-			expect( res.render ).toHaveBeenCalledWith( 'barriers/views/status-resolved', { barrierId: req.uuid } );
+			expect( res.render ).toHaveBeenCalledWith( 'barriers/views/status/resolved', { barrierId: req.uuid } );
 		} );
 	} );
 
@@ -753,7 +753,18 @@ describe( 'Barriers controller', () => {
 
 			controller.statusHibernated( req, res );
 
-			expect( res.render ).toHaveBeenCalledWith( 'barriers/views/status-hibernated', { barrierId: req.uuid } );
+			expect( res.render ).toHaveBeenCalledWith( 'barriers/views/status/hibernated', { barrierId: req.uuid } );
+		} );
+	} );
+
+	describe( 'statusOpen', () => {
+		it( 'Should render the success page', () => {
+
+			req.uuid = 'test';
+
+			controller.statusOpen( req, res );
+
+			expect( res.render ).toHaveBeenCalledWith( 'barriers/views/status/open', { barrierId: req.uuid } );
 		} );
 	} );
 
@@ -867,7 +878,7 @@ describe( 'Barriers controller', () => {
 				it( 'Should render the template with the form values', () => {
 
 					controller.type.category( req, res );
-					expect( res.render ).toHaveBeenCalledWith( 'barriers/views/type-category', getTemplateValuesResponse );
+					expect( res.render ).toHaveBeenCalledWith( 'barriers/views/type/category', getTemplateValuesResponse );
 				} );
 			} );
 		} );
@@ -882,7 +893,7 @@ describe( 'Barriers controller', () => {
 				controller.type.category( req, res );
 
 				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'barriers/views/type-category', getTemplateValuesResponse );
+				expect( res.render ).toHaveBeenCalledWith( 'barriers/views/type/category', getTemplateValuesResponse );
 			} );
 		} );
 	} );
@@ -949,7 +960,7 @@ describe( 'Barriers controller', () => {
 
 				expect( form.validate ).not.toHaveBeenCalled();
 				expect( form.getTemplateValues ).toHaveBeenCalledWith();
-				expect( res.render ).toHaveBeenCalledWith( 'barriers/views/type', templateData );
+				expect( res.render ).toHaveBeenCalledWith( 'barriers/views/type/list', templateData );
 			} );
 		} );
 
@@ -973,7 +984,7 @@ describe( 'Barriers controller', () => {
 
 					await controller.type.list( req, res, next );
 
-					expect( res.render ).toHaveBeenCalledWith( 'barriers/views/type', templateData );
+					expect( res.render ).toHaveBeenCalledWith( 'barriers/views/type/list', templateData );
 				} );
 			} );
 
@@ -1054,7 +1065,7 @@ describe( 'Barriers controller', () => {
 
 	describe( 'Sectors', () => {
 
-		const template = 'barriers/views/sectors';
+		const template = 'barriers/views/sectors/list';
 		let sectorResponse;
 		let sectors;
 
@@ -1197,7 +1208,7 @@ describe( 'Barriers controller', () => {
 
 		describe( 'add', () => {
 
-			const template = 'barriers/views/add-sector';
+			const template = 'barriers/views/sectors/add';
 
 			function checkRender(){
 				expect( res.render ).toHaveBeenCalledWith( template, Object.assign(
