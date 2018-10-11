@@ -139,6 +139,9 @@ module.exports = {
 		saveType: ( req, barrierId, values, category ) => backend.put( `/barriers/${ barrierId }`, getToken( req ), {
 			barrier_type: getValue( values.barrierType ),
 			barrier_type_category: category
+		} ),
+		saveSectors: ( req, barrierId, sectors ) => backend.put( `/barriers/${ barrierId }`, getToken( req ), {
+			sectors: ( sectors && sectors.length ? sectors : null )
 		} )
 	},
 

@@ -1,0 +1,30 @@
+{% from 'app-components/heading.njk' import heading %}
+{% from 'app-components/sectors-list.njk' import sectorsList %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Sectors affected by the barrier{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.barriers.detail( barrier.id ) },
+		caption: barrier.barrier_title,
+		text: 'Sectors affected by the barrier',
+		errors: errors
+	}) }}
+
+	<h3 class="report-sectors-heading">Save or add another sector</h3>
+
+	{{ sectorsList( sectors, {
+			csrfToken: csrfToken,
+			add: urls.barriers.sectors.add( barrier.id ),
+			remove: urls.barriers.sectors.remove( barrier.id )
+		}
+	) }}
+
+	<form action="{{ urls.barriers.sectors.list( barrier.id ) }}" method="POST">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+		<input type="submit" value="Save and exit to barrier" class="govuk-button">
+	</form>
+{% endblock %}

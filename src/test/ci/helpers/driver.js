@@ -40,7 +40,7 @@ module.exports = {
 	},
 
 	byClass: ( className ) => driver.findElement( By.className( className ) ),
-	
+
 	allByCss: ( selector ) => driver.findElements( By.css( selector ) ),
 	byCss: ( selector ) => driver.findElement( By.css( selector ) ),
 
@@ -65,8 +65,9 @@ module.exports = {
 
 				return reject( 'Please specify a report name' );
 			}
-		
+
 			AxeBuilder( driver )
+				.disableRules( [ 'definition-list', 'dlitem' ] )// disable these rules as <div>s are allowed inside a <dl> but their rules are not updated yet!
 				.analyze( async ( results ) => {
 
 
@@ -85,9 +86,9 @@ module.exports = {
 						resolve( {
 							violations: violationCount
 						} );
-						
+
 					} catch( e ){
-						
+
 						reject( e );
 					}
 				} );
