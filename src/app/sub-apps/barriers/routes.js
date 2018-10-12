@@ -3,6 +3,7 @@ const controller = require( './controllers' );
 
 const barrierIdParam = require( './middleware/params/barrier-id' );
 const barrierTypeCategoryParam = require( './middleware/params/barrier-type-category' );
+const companyIdParam = require( './middleware/params/company-id' );
 const uuidParam = require( '../../middleware/params/uuid' );
 
 const csrfProtection = csurf();
@@ -14,6 +15,7 @@ module.exports = ( express, app ) => {
 	app.param( 'barrierId', barrierIdParam );
 	app.param( 'uuid', uuidParam );
 	app.param( 'barrierTypeCategory', barrierTypeCategoryParam );
+	app.param( 'companyId', companyIdParam );
 
 	app.use( parseBody, csrfProtection );
 
@@ -41,6 +43,14 @@ module.exports = ( express, app ) => {
 	app.post( '/:barrierId/sectors/remove/', controller.sectors.remove );
 	app.get( '/:barrierId/sectors/add/', controller.sectors.add );
 	app.post( '/:barrierId/sectors/add/', controller.sectors.add );
+
+	app.get( '/:barrierId/companies/', controller.companies.list );
+	app.post( '/:barrierId/companies/', controller.companies.list );
+	app.post( '/:barrierId/companies/remove/', controller.companies.remove );
+	app.get( '/:barrierId/companies/search/', controller.companies.search );
+	app.post( '/:barrierId/companies/search/', controller.companies.search );
+	app.get( '/:barrierId/companies/:companyId/', controller.companies.details );
+	app.post( '/:barrierId/companies/:companyId/', controller.companies.details );
 
 	return app;
 };

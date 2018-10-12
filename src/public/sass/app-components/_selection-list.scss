@@ -1,22 +1,22 @@
-.sectors-list {
+.selection-list {
 	border: 1px solid $govuk-grey-2;
 	padding: govuk-em( 15, 16 );
 	margin-bottom: govuk-em( 30, 16 );
 }
 
-.sectors-list__add-button {
+.selection-list__add-button {
 	margin-bottom: 0;
 }
 
-.sectors-list__heading {
+.selection-list__heading {
 	margin: 0;
 }
 
-.sectors-list__list {
+.selection-list__list {
 	padding: 0;
 }
 
-.sectors-list__list__item {
+.selection-list__list__item {
 
 	list-style: none;
 	line-height: 1.5;
@@ -29,7 +29,7 @@
 	}
 }
 
-.sectors-list__list__item__number {
+.selection-list__list__item__number {
 
 	&[ data-number ]:after {
 		content: attr( data-number );
@@ -48,13 +48,13 @@
 	}
 }
 
-.sectors-list__list__item__remove-form {
+.selection-list__list__item__remove-form {
 	position: absolute;
 	bottom: govuk-em( 10, 16 );
 	right: 0;
 }
 
-.sectors-list__list__item__remove-form__submit {
+.selection-list__list__item__remove-form__submit {
 	border: none;
 	text-decoration: underline;
 	color: $govuk-blue;

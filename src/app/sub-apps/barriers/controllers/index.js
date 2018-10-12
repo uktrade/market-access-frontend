@@ -5,5 +5,6 @@ module.exports = {
 	type: require( './type' ),
 	interactions: require( './interactions' ),
 	status: require( './status' ),
-	sectors: require( './sectors' )
+	sectors: require( './sectors' ),
+	companies: require( './companies' ),
 };

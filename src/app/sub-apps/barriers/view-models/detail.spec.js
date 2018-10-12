@@ -101,6 +101,8 @@ describe( 'Barrier detail view model', () => {
 			} );
 
 			expect( output.sectorsList ).toEqual( barrierSectors.map( ( sector ) => ( { text: sector.name } ) ) );
+			expect( output.companies ).toEqual( inputBarrier.companies );
+			expect( output.companiesList ).toEqual( inputBarrier.companies.map( ( company ) => ( { text: company.name } ) ) );
 		} );
 	} );
 

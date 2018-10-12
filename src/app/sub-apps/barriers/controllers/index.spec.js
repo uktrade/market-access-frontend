@@ -15,6 +15,7 @@ describe( 'Barriers controller', () => {
 	let interactions;
 	let status;
 	let sectors;
+	let companies;
 
 	beforeEach( () => {
 
@@ -23,6 +24,7 @@ describe( 'Barriers controller', () => {
 		interactions = jasmine.createSpy( 'interactions' );
 		status = jasmine.createSpy( 'status' );
 		sectors = jasmine.createSpy( 'sectors' );
+		companies = jasmine.createSpy( 'companies' );
 
 		req = {
 			barrier: {
@@ -44,6 +46,7 @@ describe( 'Barriers controller', () => {
 			'./interactions': interactions,
 			'./status': status,
 			'./sectors': sectors,
+			'./companies': companies,
 		} );
 	} );
 

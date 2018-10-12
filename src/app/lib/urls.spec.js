@@ -128,6 +128,38 @@ describe( 'URLs', () => {
 				} );
 			} );
 		} );
+
+		describe( 'companies', () => {
+			describe( 'list', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.companies.list( barrierId ) ).toEqual( `/barriers/${ barrierId }/companies/` );
+				} );
+			} );
+
+			describe( 'search', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.companies.search( barrierId ) ).toEqual( `/barriers/${ barrierId }/companies/search/` );
+				} );
+			} );
+
+			describe( 'remove', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.companies.remove( barrierId ) ).toEqual( `/barriers/${ barrierId }/companies/remove/` );
+				} );
+			} );
+
+			describe( 'details', () => {
+				it( 'Should return the correct path', () => {
+
+					const companyId = uuid();
+
+					expect( urls.barriers.companies.details( barrierId, companyId ) ).toEqual( `/barriers/${ barrierId }/companies/${ companyId }/` );
+				} );
+			} );
+		} );
 	} );
 
 	describe( 'Report urls', () => {

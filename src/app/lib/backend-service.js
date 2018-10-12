@@ -143,7 +143,10 @@ module.exports = {
 		} ),
 		saveSectors: ( req, barrierId, sectors ) => backend.put( `/barriers/${ barrierId }`, getToken( req ), {
 			sectors: ( sectors && sectors.length ? sectors : null )
-		} )
+		} ),
+		saveCompanies: ( req, barrierId, companies ) => backend.put( `/barriers/${ barrierId }`, getToken( req ), {
+			companies: ( companies && companies.length ? companies : null )
+		} ),
 	},
 
 	reports: {

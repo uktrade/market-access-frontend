@@ -240,6 +240,34 @@ describe( 'Backend Service', () => {
 				} );
 			} );
 		} );
+
+		describe( 'saveCompanies', () => {
+			describe( 'With no companies', () => {
+				it( 'Should PUT to the correct path with a null value', async () => {
+
+					const companies = [];
+
+					await service.barriers.saveCompanies( req, barrierId, companies );
+
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+						companies: null
+					} );
+				} );
+			} );
+
+			describe( 'With a list of companies', () => {
+				it( 'Should PUT to the correct path with the correct values', async () => {
+
+					const companies = [ 'sector 1', 'sector 2' ];
+
+					await service.barriers.saveCompanies( req, barrierId, companies );
+
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+						companies
+					} );
+				} );
+			} );
+		} );
 	} );
 
 	describe( 'Reports', () => {
