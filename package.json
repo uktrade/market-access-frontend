@@ -20,7 +20,7 @@
     "test:features:local": "npm run test:setup; export TEST_HOST=10.200.10.1; export TEST_BROWSER=chrome; cucumber-js src/test/ci/features --format progress-bar --format json:src/test/ci/output/test-reports/cucumber/results.cucumber",
     "watch": "run-p watch:*",
     "watch-stub": "export DATAHUB_STUB=true; npm run watch",
-    "watch:node": "export LOG_LEVEL=${LOG_LEVEL:-debug}; nodemon src/app/cluster.js --ignore 'src/public/**/*' --ignore 'src/test/**/*' --ignore 'src/app/**/*.spec.js'",
+    "watch:node": "export LOG_LEVEL=${LOG_LEVEL:-debug}; nodemon src/app/cluster.js --ignore 'src/public/**/*' --ignore 'src/test/**/*' --ignore 'src/app/**/*.spec.js' --ignore 'src/data/**/*'",
     "debug": "export LOG_LEVEL=debug; export SERVER_WORKERS=1; node --inspect src/app/cluster.js",
     "grunt": "grunt dist",
     "build:dist": "npm run govuk-assets && npm run sass:prod && grunt dist && npm run dist-install",

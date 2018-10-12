@@ -90,7 +90,7 @@ module.exports = {
 
 				} catch( e ){
 
-					next( e );
+					return next( e );
 				}
 			}
 		}

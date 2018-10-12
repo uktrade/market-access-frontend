@@ -18,7 +18,7 @@ module.exports = async ( req, res, next, id ) => {
 
 			} else if( response.statusCode === 403 ){
 
-				return res.render( 'barriers/views/data-hub-403' );
+				return res.status( 403 ).render( 'barriers/views/companies/data-hub-403' );
 
 			} else {
 

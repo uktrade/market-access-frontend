@@ -51,6 +51,12 @@ function makeRequest( method, path, token, opts = {} ){
 
 				const statusCode = response.statusCode;
 
+				if( config.isDebug ){
+
+					logger.debug( 'Response headers: ' + JSON.stringify( response.headers, null, 2 ) );
+					logger.debug( 'Response body: ' + ( response.headers[ 'content-type' ] === 'application/json' ? JSON.stringify( body, null, 2 ) : body ) );
+				}
+
 				response.isSuccess = ( statusCode >= 200 && statusCode <= 300 );
 
 				if( response.isSuccess || statusCode === 404 || statusCode === 403 ){

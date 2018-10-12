@@ -14,7 +14,11 @@ describe( 'Company Id param middleware', () => {
 	beforeEach( () => {
 
 		req = {};
-		res = { locals: {}, render: jasmine.createSpy( 'res.render' ) };
+		res = {
+			locals: {},
+			render: jasmine.createSpy( 'res.render' ),
+			status: jasmine.createSpy( 'res.status' ),
+		};
 		next = jasmine.createSpy( 'next' );
 		datahub = {
 			getCompany: jasmine.createSpy( 'datahub.getCompany' )
@@ -70,13 +74,15 @@ describe( 'Company Id param middleware', () => {
 					const promise = Promise.resolve( { response: { isSuccess: false, statusCode: 403 }, body: {} } );
 
 					datahub.getCompany.and.callFake( () => promise );
+					res.status.and.callFake( () => res );
 
 					await middleware( req, res, next, id );
 
 					expect( datahub.getCompany ).toHaveBeenCalledWith( req, id );
 					expect( req.company ).not.toBeDefined();
 					expect( res.locals.company ).not.toBeDefined();
-					expect( res.render ).toHaveBeenCalledWith( 'barriers/views/data-hub-403' );
+					expect( res.status ).toHaveBeenCalledWith( 403 );
+					expect( res.render ).toHaveBeenCalledWith( 'barriers/views/companies/data-hub-403' );
 				} );
 			} );
 		} );
