@@ -14,11 +14,11 @@ describe( 'metadata', () => {
 		fakeData = getFakeData( '/backend/metadata/' );
 
 		backend = {
-			getMetadata: jasmine.createSpy( 'backend.getMetadata' )
+			get: jasmine.createSpy( 'backend.get' )
 		};
 
 		metadata = proxyquire( modulePath, {
-			'./backend-service': backend
+			'./backend-request': backend
 		} );
 	} );
 
@@ -27,7 +27,7 @@ describe( 'metadata', () => {
 			describe( 'A successful response', () => {
 				it( 'Should report no errors', async () => {
 
-					backend.getMetadata.and.callFake( () => Promise.resolve( {
+					backend.get.and.callFake( () => Promise.resolve( {
 						response: { isSuccess: true },
 						body: fakeData
 					} ) );
@@ -39,7 +39,7 @@ describe( 'metadata', () => {
 			describe( 'An unsuccessful response', () => {
 				it( 'Should throw an error', async () => {
 
-					backend.getMetadata.and.callFake( () => Promise.resolve( {
+					backend.get.and.callFake( () => Promise.resolve( {
 						response: { isSuccess: false }
 					} ) );
 
@@ -60,7 +60,7 @@ describe( 'metadata', () => {
 
 				const theErr = new Error( 'test' );
 
-				backend.getMetadata.and.callFake( () => { throw theErr; } );
+				backend.get.and.callFake( () => { throw theErr; } );
 
 				try {
 
@@ -78,7 +78,7 @@ describe( 'metadata', () => {
 
 		beforeEach( async () => {
 
-			backend.getMetadata.and.callFake( () => Promise.resolve( {
+			backend.get.and.callFake( () => Promise.resolve( {
 				response: { isSuccess: true },
 				body: fakeData
 			} ) );
