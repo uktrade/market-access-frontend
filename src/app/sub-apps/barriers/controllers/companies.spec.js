@@ -349,4 +349,71 @@ describe( 'Barrier companies controller', () => {
 			} );
 		} );
 	} );
+
+	describe( 'details', () => {
+		describe( 'a GET', () => {
+			it( 'Should render the template', async () => {
+
+				await controller.details( req, res );
+
+				expect( res.render ).toHaveBeenCalledWith( 'barriers/views/companies/details', { csrfToken } );
+			} );
+		} );
+
+		describe( 'a POST', () => {
+
+			beforeEach( () => {
+
+				req.method = 'POST';
+			} );
+
+			describe( 'With companies in the session', () => {
+
+				let company;
+				const listResponse = '/company/list';
+
+				beforeEach( () => {
+
+					companies = createCompanies();
+					req.session.barrierCompanies = companies;
+
+					company = {
+						id: uuid(),
+						name: faker.lorem.words()
+					};
+					req.company = company;
+
+					urls.barriers.companies.list.and.callFake( () => listResponse );
+				} );
+
+				describe( 'When the POSTed company is NOT in the session', () => {
+					it( 'Should add the company to the list', () => {
+
+						const expected = companies.concat( [ company ] );
+
+						controller.details( req, res );
+
+						expect( req.session.barrierCompanies ).toEqual( expected );
+						expect( res.redirect ).toHaveBeenCalledWith( listResponse );
+						expect( res.render ).not.toHaveBeenCalled();
+					} );
+				} );
+
+				describe( 'When the POSTed company is in the session', () => {
+					it( 'Should NOT add the company to the list', () => {
+
+						companies.push( company );
+
+						const expected = companies.slice( 0 );
+
+						controller.details( req, res );
+
+						expect( req.session.barrierCompanies ).toEqual( expected );
+						expect( res.redirect ).toHaveBeenCalledWith( listResponse );
+						expect( res.render ).not.toHaveBeenCalled();
+					} );
+				} );
+			} );
+		} );
+	} );
 } );
