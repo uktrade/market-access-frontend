@@ -19,11 +19,13 @@ describe( 'Barrier companies controller', () => {
 	let getValuesResponse;
 	let getTemplateValuesResponse;
 	let barrierId;
+	let companies;
 
 	beforeEach( () => {
 
 		csrfToken = uuid();
 		barrierId = uuid();
+		companies = undefined;
 
 		req = {
 			barrier: {
@@ -73,19 +75,18 @@ describe( 'Barrier companies controller', () => {
 		} );
 	} );
 
+	function createCompanies(){
+
+		return [
+			{ id: uuid(), name: faker.lorem.words() },
+			{ id: uuid(), name: faker.lorem.words() },
+			{ id: uuid(), name: faker.lorem.words() },
+		];
+	}
+
 	describe( 'list', () => {
 
 		const template = 'barriers/views/companies/list';
-		let companies;
-
-		function createCompanies(){
-
-			return [
-				{ id: uuid(), name: faker.lorem.words() },
-				{ id: uuid(), name: faker.lorem.words() },
-				{ id: uuid(), name: faker.lorem.words() },
-			];
-		}
 
 		describe( 'a GET request', () => {
 			describe( 'With companies in the session', () => {
@@ -187,6 +188,163 @@ describe( 'Barrier companies controller', () => {
 
 					expect( next ).toHaveBeenCalledWith( err );
 					expect( res.render ).not.toHaveBeenCalled();
+				} );
+			} );
+		} );
+	} );
+
+	describe( 'search', () => {
+
+		const template = 'barriers/views/companies/search';
+		let results;
+		let error;
+
+		function getTemplateValues(){
+
+			return Object.assign( {}, getTemplateValuesResponse, { companies, results, error } );
+		}
+
+		beforeEach( () => {
+
+			results = undefined;
+			error = undefined;
+		} );
+
+		describe( 'a GET', () => {
+			it( 'Should setup the form correctly', async () => {
+
+				await controller.search( req, res, next );
+
+				const config = Form.calls.argsFor( 0 )[ 1 ];
+
+				expect( config.query ).toBeDefined();
+				expect( config.query.required ).toBeDefined();
+			} );
+
+			describe( 'With companies in the session', () => {
+				it( 'Should render the template', async () => {
+
+					companies = createCompanies();
+					req.session.barrierCompanies = companies;
+					const templateValues = getTemplateValues();
+
+					await controller.search( req, res, next );
+
+					expect( res.render ).toHaveBeenCalledWith( template, templateValues );
+				} );
+			} );
+
+			describe( 'With companies on the barrier', () => {
+				it( 'Should render the template', async () => {
+
+					companies = createCompanies();
+					req.barrier.companies = companies;
+					const templateValues = getTemplateValues();
+
+					await controller.search( req, res, next );
+
+					expect( res.render ).toHaveBeenCalledWith( template, templateValues );
+				} );
+			} );
+		} );
+
+		describe( 'a POST', () => {
+
+			beforeEach( () => {
+
+				form.isPost = true;
+			} );
+
+			describe( 'When the form has errors', () => {
+				it( 'Should render the template', async () => {
+
+					const templateValues = getTemplateValues();
+
+					form.hasErrors = () => true;
+
+					await controller.search( req, res, next );
+
+					expect( res.render ).toHaveBeenCalledWith( template, templateValues );
+					expect( datahub.searchCompany ).not.toHaveBeenCalled();
+				} );
+			} );
+
+			describe( 'When the form does not have errors', () => {
+
+				beforeEach( () => {
+
+					form.hasErrors = () => false;
+				} );
+
+				describe( 'When the service throws an error', () => {
+					it( 'Should call next with an erro', async () => {
+
+						const err = new Error( 'a service error' );
+
+						datahub.searchCompany.and.callFake( () => { throw err; } );
+
+						await controller.search( req, res, next );
+
+						expect( next ).toHaveBeenCalledWith( err );
+						expect( res.render ).not.toHaveBeenCalled();
+					} );
+				} );
+
+				describe( 'When the service retuns a success', () => {
+					it( 'Should render the template with the results', async () => {
+
+						results = [ { id: 1, name: 'one' } ];
+
+						const templateValues = getTemplateValues();
+
+						datahub.searchCompany.and.callFake( () => Promise.resolve( {
+							response: { isSuccess: true },
+							body: results
+						} ));
+
+						await controller.search( req, res, next );
+
+						expect( res.render ).toHaveBeenCalledWith( template, templateValues );
+					} );
+				} );
+
+				describe( 'When the service does not return a success', () => {
+
+					async function check( statusCode, errorMessage ){
+
+						error = errorMessage;
+
+						const templateValues = getTemplateValues();
+
+						datahub.searchCompany.and.callFake( () => Promise.resolve( {
+							response: { isSuccess: false, statusCode }
+						} ) );
+
+						await controller.search( req, res, next );
+
+						expect( res.render ).toHaveBeenCalledWith( template, templateValues );
+					}
+
+					describe( 'When it retuns a 404', () => {
+						it( 'Should render the template with an error', async () => {
+
+							await check( 404, 'No company found' );
+						} );
+					} );
+
+					describe( 'When it retuns a 403', () => {
+						it( 'Should render the template with an error', async () => {
+
+							await check( 403, 'You do not have permission to search for a company, please contact Data Hub support.' );
+						} );
+					} );
+
+					describe( 'When it retuns a 500', () => {
+						it( 'Should render the template with an error', async () => {
+
+							await check( 500, 'There was an error finding the company' );
+						} );
+					} );
 				} );
 			} );
 		} );
