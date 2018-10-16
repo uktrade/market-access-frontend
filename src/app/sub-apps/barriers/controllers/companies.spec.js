@@ -416,4 +416,23 @@ describe( 'Barrier companies controller', () => {
 			} );
 		} );
 	} );
+
+	describe( 'remove', () => {
+		it( 'Should remove the company and redirect', () => {
+
+			const companies = createCompanies();
+			const companyId = companies[ 1 ].id;
+			const expected = [ companies[ 0 ], companies[ 2 ] ];
+			const listResponse = '/list/company/';
+
+			req.body = { companyId };
+			req.session.barrierCompanies = companies;
+			urls.barriers.companies.list.and.callFake( () => listResponse );
+
+			controller.remove( req, res );
+
+			expect( req.session.barrierCompanies ).toEqual( expected );
+			expect( res.redirect ).toHaveBeenCalledWith( listResponse );
+		} );
+	} );
 } );
