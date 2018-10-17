@@ -4,7 +4,17 @@ const urls = require( '../../../lib/urls' );
 const validators = require( '../../../lib/validators' );
 const metadata = require( '../../../lib/metadata' );
 
+function renderSectors( req, res, sectors ){
+	res.render( 'barriers/views/sectors/list', { sectors: sectors.map( metadata.getSector ), csrfToken: req.csrfToken() } );
+}
+
 module.exports = {
+
+	edit: ( req, res ) => {
+
+		req.session.barrierSectors = ( req.barrier.sectors || [] );
+		renderSectors( req, res, req.session.barrierSectors );
+	},
 
 	list: async ( req, res, next ) => {
 
@@ -41,7 +51,7 @@ module.exports = {
 			}
 		}
 
-		res.render( 'barriers/views/sectors/list', { sectors: sectors.map( metadata.getSector ), csrfToken: req.csrfToken() } );
+		renderSectors( req, res, sectors );
 	},
 
 	remove: ( req, res ) => {

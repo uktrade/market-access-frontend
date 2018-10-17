@@ -107,6 +107,13 @@ describe( 'URLs', () => {
 		} );
 
 		describe( 'sectors', () => {
+			describe( 'edit', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.sectors.edit( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/edit/` );
+				} );
+			} );
+
 			describe( 'list', () => {
 				it( 'Should return the correct path', () => {
 

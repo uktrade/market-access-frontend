@@ -55,6 +55,7 @@ module.exports = {
 			list: ( barrierId, category ) => `/barriers/${ barrierId }/type/${ category }/`
 		},
 		sectors: {
+			edit: ( barrierId ) => `/barriers/${ barrierId }/sectors/edit/`,
 			list: ( barrierId ) => `/barriers/${ barrierId }/sectors/`,
 			add: ( barrierId ) => `/barriers/${ barrierId }/sectors/add/`,
 			remove: ( barrierId ) => `/barriers/${ barrierId }/sectors/remove/`

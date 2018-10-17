@@ -211,6 +211,14 @@ describe( 'App', function(){
 				} );
 
 				describe( 'Barrier sectors', () => {
+					describe( 'Editing the sectors', () => {
+						it( 'Should list the sectors', ( done ) => {
+
+							app
+								.get( urls.barriers.sectors.edit( barrierId ) )
+								.end( checkPage( 'Market Access - Sectors affected by the barrier', done ) );
+						} );
+					} );
 					describe( 'Listing the sectors', () => {
 						it( 'Should list the sectors', ( done ) => {
 
