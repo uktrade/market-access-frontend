@@ -14,7 +14,7 @@ function update( item ){
 	return item;
 }
 
-function sortAscending( a, b ){
+function sortDescending( a, b ){
 
 	const aDate = Date.parse( a.created_on );
 	const bDate = Date.parse( b.created_on );
@@ -29,7 +29,7 @@ module.exports = ( reports, country ) => {
 		reports = reports.map( update );
 	}
 
-	reports.sort( sortAscending );
+	reports.sort( sortDescending );
 
 	return {	reports, country };
 };
