@@ -9,10 +9,17 @@ function update( item ){
 	item.problem_status = {
 		id,
 		name: metadata.statusTypes[ id ],
-		isEmergency: item.is_emergency
 	};
 
 	return item;
+}
+
+function sortDescending( a, b ){
+
+	const aDate = Date.parse( a.created_on );
+	const bDate = Date.parse( b.created_on );
+
+	return ( aDate === bDate ? 0 : ( aDate > bDate ? -1 : 1 ) );
 }
 
 module.exports = ( reports, country ) => {
@@ -22,13 +29,7 @@ module.exports = ( reports, country ) => {
 		reports = reports.map( update );
 	}
 
-	reports.sort( ( a, b ) => {
-
-		const aDate = Date.parse( a.created_on );
-		const bDate = Date.parse( b.created_on );
-
-		return ( aDate === bDate ? 0 : ( aDate < bDate ? -1 : 1 ) );
-	} );
+	reports.sort( sortDescending );
 
 	return {	reports, country };
 };

@@ -28,10 +28,10 @@
 			<tbody>
 				{%- for barrier in barriers %}
 				<tr class="standard-table__row">
-					<td class="standard-table__cell">{{ barrier.reported_on | dateOnly }}</td>
+					<td class="standard-table__cell">{{ barrier.date.reported | dateOnly }}</td>
 					<td class="standard-table__cell">
 						<a href="{{ urls.barriers.detail( barrier.id ) }}">
-							{{ barrier.barrier_title }}
+							{{ barrier.title }}
 						</a>
 					</td>
 					<td class="standard-table__cell">{{ barrier.sectors | join( ', ' ) }}</td>
