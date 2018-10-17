@@ -18,6 +18,7 @@
 
 	{{ sectorsList( sectors, {
 			csrfToken: csrfToken,
+			inputName: 'sector',
 			add: urls.barriers.sectors.add( barrier.id ),
 			remove: urls.barriers.sectors.remove( barrier.id )
 		}
