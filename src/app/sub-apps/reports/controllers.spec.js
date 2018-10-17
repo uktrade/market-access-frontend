@@ -923,6 +923,7 @@ describe( 'Report controller', () => {
 	describe( 'addSector', () => {
 
 		let report;
+		const template = 'reports/views/add-sector';
 
 		beforeEach( () => {
 
@@ -933,42 +934,126 @@ describe( 'Report controller', () => {
 			req.report = report;
 		} );
 
-		describe( 'Form config', () => {
-			describe( 'When there are not an sectors in the session', () => {
-				it( 'Should setup the form correctly with default values', async () => {
+		function checkRender( sectors ){
 
-					await controller.addSector( req, res, next );
+			const expected = Object.assign( {}, getTemplateValuesResponse, { currentSectors: sectors.map( metadata.getSector ) } );
 
-					const args = Form.calls.argsFor( 0 );
-					const config = args[ 1 ];
+			controller.addSector( req, res );
 
-					expect( Form ).toHaveBeenCalled();
-					expect( args[ 0 ] ).toEqual( req );
+			expect( res.render ).toHaveBeenCalledWith( template, expected );
+		}
 
-					expect( config.sectors ).toBeDefined();
-					expect( config.sectors.type ).toEqual( Form.SELECT );
-					expect( config.sectors.items ).toEqual( metadata.affectedSectorsList );
-					expect( config.sectors.validators[ 0 ].fn ).toEqual( validators.isSector );
+		function createSectors(){
+			return [ uuid(), uuid(), uuid() ];
+		}
+
+		describe( 'a GET', () => {
+			describe( 'Form config', () => {
+				describe( 'When there are not an sectors in the session', () => {
+					it( 'Should setup the form correctly with default values', async () => {
+
+						await controller.addSector( req, res, next );
+
+						const args = Form.calls.argsFor( 0 );
+						const config = args[ 1 ];
+
+						expect( Form ).toHaveBeenCalled();
+						expect( args[ 0 ] ).toEqual( req );
+
+						expect( config.sectors ).toBeDefined();
+						expect( config.sectors.type ).toEqual( Form.SELECT );
+						expect( config.sectors.items ).toEqual( metadata.affectedSectorsList );
+						expect( config.sectors.validators[ 0 ].fn ).toEqual( validators.isSector );
+					} );
+				} );
+
+				describe( 'When there is one sector in the session', () => {
+					it( 'Should setup the form correctly', async () => {
+
+						req.session.sectors = [ 2 ];
+
+						await controller.addSector( req, res, next );
+
+						const args = Form.calls.argsFor( 0 );
+						const config = args[ 1 ];
+
+						expect( Form ).toHaveBeenCalled();
+						expect( args[ 0 ] ).toEqual( req );
+
+						expect( config.sectors ).toBeDefined();
+						expect( config.sectors.type ).toEqual( Form.SELECT );
+						expect( config.sectors.items ).toEqual( metadata.affectedSectorsList.filter( ( sector ) => sector.value != 2 ) );
+						expect( config.sectors.validators[ 0 ].fn ).toEqual( validators.isSector );
+					} );
 				} );
 			} );
 
-			describe( 'When there is one sector in the session', () => {
-				it( 'Should setup the form correctly', async () => {
+			describe( 'When there are sectors in the session', () => {
+				it( 'Should render with the session sectors', () => {
 
-					req.session.sectors = [ 2 ];
+					const mySectors = createSectors();
+					req.session.sectors = mySectors;
 
-					await controller.addSector( req, res, next );
+					checkRender( mySectors );
+				} );
+			} );
 
-					const args = Form.calls.argsFor( 0 );
-					const config = args[ 1 ];
+			describe( 'When there are NOT sectors in the session', () => {
+				it( 'Should render with the sectors from the report', () => {
 
-					expect( Form ).toHaveBeenCalled();
-					expect( args[ 0 ] ).toEqual( req );
+					const mySectors = createSectors();
+					req.report.sectors = mySectors;
 
-					expect( config.sectors ).toBeDefined();
-					expect( config.sectors.type ).toEqual( Form.SELECT );
-					expect( config.sectors.items ).toEqual( metadata.affectedSectorsList.filter( ( sector ) => sector.value != 2 ) );
-					expect( config.sectors.validators[ 0 ].fn ).toEqual( validators.isSector );
+					checkRender( mySectors );
+				} );
+			} );
+
+			describe( 'When there are not any sectors', () => {
+				it( 'Should render with an empty array', () => {
+
+					checkRender( [] );
+				} );
+			} );
+		} );
+
+		describe( 'a POST', () => {
+
+			beforeEach( () => {
+
+				form.isPost = true;
+				req.body = {};
+			} );
+
+			describe( 'When the form is not valid', () => {
+				it( 'Should render the page', () => {
+
+					form.hasErrors = () => true;
+
+					controller.addSector( req, res );
+
+					expect( res.redirect ).not.toHaveBeenCalled();
+					checkRender( [] );
+				} );
+			} );
+
+			describe( 'When the form is valid', () => {
+				it( 'Should add the sector to the list and redirect', () => {
+
+					const sector = uuid();
+					const sectors = createSectors();
+					const expected = sectors.concat( [ sector ] );
+					const sectorsResponse = '/list/sectors';
+
+					form.hasErrors = () => false;
+					form.getValues.and.callFake( () => ({ sectors: sector }) );
+					urls.reports.sectors.and.callFake( () => sectorsResponse );
+
+					req.session.sectors = sectors;
+
+					controller.addSector( req, res );
+
+					expect( req.session.sectors ).toEqual( expected );
+					expect( res.redirect ).toHaveBeenCalledWith( sectorsResponse );
 				} );
 			} );
 		} );
