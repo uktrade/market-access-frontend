@@ -1059,6 +1059,28 @@ describe( 'Report controller', () => {
 		} );
 	} );
 
+	describe( 'Remove sector', () => {
+		it( 'Should remove the sector in the session list and redirect', () => {
+
+			const sector = uuid();
+			const sectors = [ uuid(), uuid(), sector ];
+			const expected = sectors.slice( 0, 2 );
+			const sectorsResponse = '/to/sectors';
+			const reportId = '123';
+
+			urls.reports.sectors.and.callFake( () => sectorsResponse );
+			req.session.sectors = sectors;
+			req.body = { sector };
+			req.report = { id: reportId };
+
+			controller.removeSector( req, res );
+
+			expect( req.session.sectors ).toEqual( expected );
+			expect( res.redirect ).toHaveBeenCalledWith( sectorsResponse );
+			expect( urls.reports.sectors ).toHaveBeenCalledWith( reportId );
+		} );
+	} );
+
 	describe( 'aboutProblem', () => {
 
 		let report;
