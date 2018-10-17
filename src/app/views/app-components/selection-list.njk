@@ -1,0 +1,39 @@
+{% macro selectionList( items, params, config ) %}
+	<div class="selection-list restrict-width">
+		<h3 class="selection-list__heading">{{ config.heading.text }}</h3>
+	{% if items and items.length %}
+			<ul class="selection-list__list">
+		{% for item in items %}
+				<li class="selection-list__list__item">
+					<span class="selection-list__list__item__number" data-number="{{ loop.index }}"></span>{{ item.name }}
+					{% if params.csrfToken and params.remove %}
+					<form action="{{ params.remove }}" class="selection-list__list__item__remove-form" method="POST">
+						<input type="hidden" name="_csrf" value="{{ params.csrfToken }}">
+						<input type="hidden" name="{{ params.inputName if params.inputName else 'item' }}" value="{{ item.id }}">
+						<input type="submit" value="remove" class="selection-list__list__item__remove-form__submit">
+					</form>
+					{% endif %}
+				</li>
+		{% endfor %}
+			</ul>
+	{% endif %}
+
+	{% if params.add %}
+		<a href="{{ params.add }}" class="govuk-button button--secondary selection-list__add-button">{{ config.button.text }}</a>
+	{% endif %}
+	</div>
+{% endmacro %}
+
+{% macro sectorsList( sectors, params ) %}
+	{{ selectionList( sectors, params, {
+		heading: { text: 'Selected sectors' },
+		button: { text: 'Add another sector' }
+	}) }}
+{% endmacro %}
+
+{% macro companiesList( companies, params ) %}
+	{{ selectionList( companies, params, {
+		heading: { text: 'Selected companies' },
+		button: { text: 'Add another company' }
+	}) }}
+{% endmacro %}

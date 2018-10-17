@@ -1,0 +1,36 @@
+{% from 'app-components/search-form.njk' import searchForm %}
+{% from 'app-components/heading.njk' import heading %}
+{% from 'app-components/selection-list.njk' import companiesList %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Barrier - Save or add another affected company or organisation{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.barriers.detail( barrier.id ) },
+		caption: barrier.barrier_title,
+		text: 'Company or organisation affected',
+		errors: errors
+	}) }}
+
+	<div class="restrict-width">
+
+		<h3 class="">Save or add another company or organisation</h3>
+
+		{{ companiesList( companyList, {
+			csrfToken: csrfToken,
+			inputName: 'companyId',
+			remove: urls.barriers.companies.remove( barrier.id ),
+			add: urls.barriers.companies.search( barrier.id )
+		} ) }}
+
+		<form action="{{ urls.barriers.companies.list( barrier.id ) }}" method="POST">
+			<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+			<input type="submit" class="govuk-button" value="Save and exit to barrier">
+		</form>
+	</div>
+
+{% endblock %}
+

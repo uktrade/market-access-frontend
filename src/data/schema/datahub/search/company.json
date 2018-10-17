@@ -1,0 +1,11 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Details of a company",
+
+	"type": "array",
+	"minItems": 3,
+	"maxItems": 10,
+	"items": {
+		"$ref": "$refs/data-hub.json#/company"
+	}
+}

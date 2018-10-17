@@ -55,9 +55,17 @@ module.exports = {
 			list: ( barrierId, category ) => `/barriers/${ barrierId }/type/${ category }/`
 		},
 		sectors: {
+			edit: ( barrierId ) => `/barriers/${ barrierId }/sectors/edit/`,
 			list: ( barrierId ) => `/barriers/${ barrierId }/sectors/`,
 			add: ( barrierId ) => `/barriers/${ barrierId }/sectors/add/`,
 			remove: ( barrierId ) => `/barriers/${ barrierId }/sectors/remove/`
+		},
+		companies: {
+			edit: ( barrierId ) => `/barriers/${ barrierId }/companies/edit/`,
+			list: ( barrierId ) => `/barriers/${ barrierId }/companies/`,
+			details: ( barrierId, companyId ) => `/barriers/${ barrierId }/companies/${ companyId }/`,
+			search: ( barrierId ) => `/barriers/${ barrierId }/companies/search/`,
+			remove: ( barrierId ) => `/barriers/${ barrierId }/companies/remove/`
 		}
 	},
 

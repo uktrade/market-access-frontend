@@ -9,6 +9,20 @@
       "d929fa2c-b0ee-4cbb-ba4a-2fc7b6bbd4d3",
       "4a6929f4-eb00-4357-aa14-a0c2ee537e0f"
    ],
+   "companies": [
+      {
+         "id": "f3f8cd2c-f53c-43a4-9f95-2c72d69e6020",
+         "name": "eos est repellendus"
+      },
+      {
+         "id": "e72fd8f1-5a40-4195-81ea-0edf2b65aa8b",
+         "name": "laboriosam perferendis assumenda"
+      },
+      {
+         "id": "dcd4443e-afe1-4c27-887e-f1184b4aded6",
+         "name": "maiores voluptatibus quis"
+      }
+   ],
    "product": "quas quis est",
    "source": "TRADE",
    "other_source": "aliquid voluptatibus repellendus",

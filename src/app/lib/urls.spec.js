@@ -107,6 +107,13 @@ describe( 'URLs', () => {
 		} );
 
 		describe( 'sectors', () => {
+			describe( 'edit', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.sectors.edit( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/edit/` );
+				} );
+			} );
+
 			describe( 'list', () => {
 				it( 'Should return the correct path', () => {
 
@@ -125,6 +132,45 @@ describe( 'URLs', () => {
 				it( 'Should return the correct path', () => {
 
 					expect( urls.barriers.sectors.remove( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/remove/` );
+				} );
+			} );
+		} );
+
+		describe( 'companies', () => {
+			describe( 'edit', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.companies.edit( barrierId ) ).toEqual( `/barriers/${ barrierId }/companies/edit/` );
+				} );
+			} );
+
+			describe( 'list', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.companies.list( barrierId ) ).toEqual( `/barriers/${ barrierId }/companies/` );
+				} );
+			} );
+
+			describe( 'search', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.companies.search( barrierId ) ).toEqual( `/barriers/${ barrierId }/companies/search/` );
+				} );
+			} );
+
+			describe( 'remove', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.companies.remove( barrierId ) ).toEqual( `/barriers/${ barrierId }/companies/remove/` );
+				} );
+			} );
+
+			describe( 'details', () => {
+				it( 'Should return the correct path', () => {
+
+					const companyId = uuid();
+
+					expect( urls.barriers.companies.details( barrierId, companyId ) ).toEqual( `/barriers/${ barrierId }/companies/${ companyId }/` );
 				} );
 			} );
 		} );

@@ -30,9 +30,11 @@ function getBarrierType( type ){
 module.exports = ( barrier ) => {
 
 	const barrierStatusCode = barrier.current_status.status;
-	const sectors = ( barrier.sectors || [] ).map( metadata.getSector );
 	const status = barrierStatus[ barrierStatusCode ] || {};
-	const sectorsList = sectors.map( ( sector ) => (sector && { text: sector.name } || { text: 'Unknown' } ) );
+	const sectors = ( barrier.sectors || [] ).map( metadata.getSector );
+	const sectorsList = sectors.map( ( sector ) => ( sector && { text: sector.name } || { text: 'Unknown' } ) );
+	const companies = barrier.companies || [];
+	const companiesList = companies.map( ( company ) => ( { text: company.name } ) );
 
 	status.description = barrier.current_status.status_summary;
 	status.date = barrier.current_status.status_date;
@@ -71,6 +73,8 @@ module.exports = ( barrier ) => {
 				summary: barrier.infringement_summary
 			}
 		},
-		sectorsList
+		sectorsList,
+		companies,
+		companiesList
 	};
 };

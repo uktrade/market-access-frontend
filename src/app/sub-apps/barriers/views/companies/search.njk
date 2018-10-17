@@ -1,0 +1,99 @@
+{% from 'app-components/search-form.njk' import searchForm %}
+{% from 'app-components/heading.njk' import heading %}
+{% from 'app-components/selection-list.njk' import companiesList %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Barrier - Add an affected company or organisation{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.barriers.detail( barrier.id ) },
+		caption: barrier.barrier_title,
+		text: 'Company or organisation affected',
+		errors: errors
+	}) }}
+
+	<div class="restrict-width">
+
+		{% if companies %}
+			{{ companiesList( companies ) }}
+		{% endif %}
+
+		{{ searchForm( {
+				action: urls.barriers.companies.search( barrier.id ),
+				label: {
+					text: 'Find the company or organisation record'
+				},
+				hint: {
+					text: 'Search for the registered company name, company number or address'
+				},
+				csrfToken: csrfToken,
+				input: {
+					id: 'company',
+					name: 'query',
+					value: query,
+					placeholder: 'Search for company',
+					error: errors | errorForName( 'query' )
+				}
+			} )
+		}}
+
+		{% if error %}
+			<p class="error-message">{{ error }}</p>
+		{% endif %}
+
+		{% if results %}
+
+			<h2 class="results-count">
+				<span class="results-count__number">{{ results.count }}</span>
+				companies match <span class="highlight">{{ query }}</span>
+			</h2>
+
+			<ul class="company-card-list">
+			{% for company in results.results %}
+				<li class="company-card">
+					<a href="{{ urls.barriers.companies.details( barrier.id, company.id ) }}" class="company-card__link">
+
+						<h3 class="company-card__heading">{{ company.name | highlight( query ) | safe }}</h3>
+						<dl class="company-card__values">
+							<dt class="company-card__values__key">Companies house no.</dt>
+							<dd class="company-card__values__value">{{ company.company_number | highlight( query ) | safe }}</dd>
+
+							<dt class="company-card__values__key">Type</dt>
+							<dd class="company-card__values__value">{{ company.headquarter_type | highlight( query ) | safe }}</dd>
+
+							<dt class="company-card__values__key">Sector</dt>
+							<dd class="company-card__values__value">{{ company.sector.name | highlight( query ) | safe }}</dd>
+
+							<dt class="company-card__values__key">Incorporated on</dt>
+							<dd class="company-card__values__value">{{ company.created_on | dateOnly }}</dd>
+
+							<dt class="company-card__values__key">Primary address</dt>
+							<dd class="company-card__values__value">
+								{{ [
+									company.registered_address_1 | highlight( query ),
+									company.registered_address_2 | highlight( query ),
+									company.registered_address_town | highlight( query ),
+									company.registered_address_county | highlight( query ),
+									company.registered_address_postcode | highlight( query ),
+									company.registered_address_country.name | highlight( query )
+								] | removeEmpty | join( ', ' ) | safe }}
+							</dd>
+						</dl>
+
+					</a>
+				</li>
+			{% endfor %}
+			</ul>
+
+		{% else %}
+
+			<a href="{{ urls.barriers.detail( barrier.id ) }}" class="govuk-button button--secondary">Exit to barrier</a>
+
+		{% endif %}
+	</div>
+
+{% endblock %}
+

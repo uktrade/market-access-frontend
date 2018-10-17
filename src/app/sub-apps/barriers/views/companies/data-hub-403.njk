@@ -1,0 +1,22 @@
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Data Hub Error{% endblock %}
+
+{% block page_content %}
+
+	<h1 class="govuk-heading-l">Restricted page</h1>
+
+	<p>
+		You are not permitted to see this page.
+	</p>
+
+	<p>
+		This page is restricted to certain users only.
+	</p>
+
+	<p>
+		If you are having a consistent problem, <a href="mailto:{{ feedbackEmail }}">share your feedback</a>
+	</p>
+
+	<a href="{{ urls.index() }}" class="govuk-button">Return to dashboard</a>
+{% endblock %}
