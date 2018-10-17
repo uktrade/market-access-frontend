@@ -238,6 +238,15 @@ describe( 'App', function(){
 							.reply( 200, intercept.stub( '/datahub/company/detail' ) );
 					}
 
+					describe( 'Editing a list of companies', () => {
+						it( 'Should render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.companies.edit( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier - Save or add another affected company or organisation', done ) );
+						} );
+					} );
+
 					describe( 'Listing the companies', () => {
 						it( 'Should render the page', ( done ) => {
 

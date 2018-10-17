@@ -44,6 +44,7 @@ module.exports = ( express, app ) => {
 	app.get( '/:barrierId/sectors/add/', controller.sectors.add );
 	app.post( '/:barrierId/sectors/add/', controller.sectors.add );
 
+	app.get( '/:barrierId/companies/edit/', controller.companies.edit );
 	app.get( '/:barrierId/companies/', controller.companies.list );
 	app.post( '/:barrierId/companies/', controller.companies.list );
 	app.post( '/:barrierId/companies/remove/', controller.companies.remove );

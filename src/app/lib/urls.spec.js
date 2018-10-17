@@ -130,6 +130,13 @@ describe( 'URLs', () => {
 		} );
 
 		describe( 'companies', () => {
+			describe( 'edit', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.companies.edit( barrierId ) ).toEqual( `/barriers/${ barrierId }/companies/edit/` );
+				} );
+			} );
+
 			describe( 'list', () => {
 				it( 'Should return the correct path', () => {
 

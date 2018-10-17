@@ -193,6 +193,61 @@ describe( 'Barrier companies controller', () => {
 		} );
 	} );
 
+	describe( 'edit', () => {
+
+		const template = 'barriers/views/companies/list';
+
+		describe( 'a GET request', () => {
+			describe( 'With companies in the session', () => {
+				it( 'Should overwrite the session companies and render the templste', async () => {
+
+					companies = createCompanies();
+
+					req.session.barrierCompanies = createCompanies();
+					req.barrier.companies = companies;
+
+					await controller.edit( req, res, next );
+
+					expect( req.session.barrierCompanies ).toEqual( companies );
+					expect( res.render ).toHaveBeenCalledWith( template, {
+						csrfToken,
+						companyList: companies
+					} );
+				} );
+			} );
+
+			describe( 'With companies on the barrier', () => {
+				it( 'Should put the companies in the session and render the template', async () => {
+
+					companies = createCompanies();
+
+					req.barrier.companies = companies;
+
+					await controller.edit( req, res, next );
+
+					expect( req.session.barrierCompanies ).toEqual( companies );
+					expect( res.render ).toHaveBeenCalledWith( template, {
+						csrfToken,
+						companyList: companies
+					} );
+				} );
+			} );
+
+			describe( 'With no companies', () => {
+				it( 'Should create an empty array and render the template', async () => {
+
+					await controller.edit( req, res, next );
+
+					expect( req.session.barrierCompanies ).toEqual( [] );
+					expect( res.render ).toHaveBeenCalledWith( template, {
+						csrfToken,
+						companyList: []
+					} );
+				} );
+			} );
+		} );
+	} );
+
 	describe( 'search', () => {
 
 		const template = 'barriers/views/companies/search';

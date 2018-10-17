@@ -60,6 +60,7 @@ module.exports = {
 			remove: ( barrierId ) => `/barriers/${ barrierId }/sectors/remove/`
 		},
 		companies: {
+			edit: ( barrierId ) => `/barriers/${ barrierId }/companies/edit/`,
 			list: ( barrierId ) => `/barriers/${ barrierId }/companies/`,
 			details: ( barrierId, companyId ) => `/barriers/${ barrierId }/companies/${ companyId }/`,
 			search: ( barrierId ) => `/barriers/${ barrierId }/companies/search/`,

@@ -3,7 +3,19 @@ const datahub = require( '../../../lib/datahub-service' );
 const Form = require( '../../../lib/Form' );
 const urls = require( '../../../lib/urls' );
 
+const LIST_TEMPLATE = 'barriers/views/companies/list';
+
 module.exports = {
+
+	edit: ( req, res ) => {
+
+		req.session.barrierCompanies = ( req.barrier.companies || [] );
+
+		res.render( LIST_TEMPLATE, {
+			csrfToken: req.csrfToken(),
+			companyList: req.session.barrierCompanies
+		} );
+	},
 
 	list: async ( req, res, next ) => {
 
@@ -41,7 +53,7 @@ module.exports = {
 
 		} else {
 
-			res.render( 'barriers/views/companies/list', {
+			res.render( LIST_TEMPLATE, {
 				csrfToken: req.csrfToken(),
 				companyList: companies
 			} );
