@@ -33,7 +33,7 @@ aliases:
       - store_test_results:
           path: src/test/ci/output/test-reports
   - &node
-    image: circleci/node:8.11
+    image: circleci/node:8.12
     environment:
       SERVER_WORKERS: 2
       BACKEND_URL: 'http://localhost:8000'
