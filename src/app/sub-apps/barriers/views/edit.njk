@@ -7,6 +7,12 @@
 
 {% block page_title %}{{ super() }} - Barrier - Edit{% endblock %}
 
+{% block body_script %}
+	<script>
+		ma.pages.barrier.edit();
+	</script>
+{% endblock %}
+
 {% block page_content %}
 
 	{{ heading({
