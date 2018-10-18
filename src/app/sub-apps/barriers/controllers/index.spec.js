@@ -10,6 +10,7 @@ describe( 'Barriers controller', () => {
 	let res;
 	let barrierDetailViewModel;
 	let barrierId;
+	let config;
 
 	let type;
 	let interactions;
@@ -25,13 +26,15 @@ describe( 'Barriers controller', () => {
 		status = jasmine.createSpy( 'status' );
 		sectors = jasmine.createSpy( 'sectors' );
 		companies = jasmine.createSpy( 'companies' );
+		config = {};
 
 		req = {
 			barrier: {
 				id: barrierId
 			},
 			session: {},
-			params: {}
+			params: {},
+			query: {}
 		};
 		res = {
 			render: jasmine.createSpy( 'res.render' ),
@@ -41,6 +44,7 @@ describe( 'Barriers controller', () => {
 		barrierDetailViewModel = jasmine.createSpy( 'barrierDetailViewModel' );
 
 		controller = proxyquire( modulePath, {
+			'../../../config': config,
 			'../view-models/detail': barrierDetailViewModel,
 			'./type': type,
 			'./interactions': interactions,
@@ -59,16 +63,70 @@ describe( 'Barriers controller', () => {
 	} );
 
 	describe( 'Barrier', () => {
-		it( 'Should render the barrier detail page', () => {
 
-			const barierDetailViewModelResponse = { a: 1, b: 2 };
+		let barierDetailViewModelResponse;
+
+		beforeEach( () => {
+
+			barierDetailViewModelResponse = { a: 1, b: 2 };
 
 			barrierDetailViewModel.and.callFake( () => barierDetailViewModelResponse );
+		} );
+
+		function check( addCompany ){
 
 			controller.barrier( req, res );
 
-			expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier );
+			expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier, addCompany );
 			expect( res.render ).toHaveBeenCalledWith( 'barriers/views/detail', barierDetailViewModelResponse );
+		}
+
+		describe( 'With config.addCompany set to true', () => {
+
+			beforeEach( () => {
+
+				config.addCompany = true;
+			} );
+
+			describe( 'With no query', () => {
+				it( 'Should render the barrier detail page with addCompany true', () => {
+
+					check( true );
+				} );
+			} );
+
+			describe( 'With query set to true', () => {
+				it( 'Should render the barrier detail page with addCompany true', () => {
+
+					req.query.addCompany = true;
+
+					check( true );
+				} );
+			} );
+		} );
+
+		describe( 'With config.addCompany set to false', () => {
+
+			beforeEach( () => {
+
+				config.addCompany = false;
+			} );
+
+			describe( 'With no query', () => {
+				it( 'Should render the barrier detail page with addCompany false', () => {
+
+					check( false );
+				} );
+			} );
+
+			describe( 'With query set to true', () => {
+				it( 'Should render the barrier detail page with addCompany true', () => {
+
+					req.query.addCompany = true;
+
+					check( true );
+				} );
+			} );
 		} );
 	} );
 } );
