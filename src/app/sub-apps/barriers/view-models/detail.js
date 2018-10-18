@@ -27,7 +27,7 @@ function getBarrierType( type ){
 	};
 }
 
-module.exports = ( barrier ) => {
+module.exports = ( barrier, addCompany = false ) => {
 
 	const barrierStatusCode = barrier.current_status.status;
 	const status = barrierStatus[ barrierStatusCode ] || {};
@@ -40,6 +40,7 @@ module.exports = ( barrier ) => {
 	status.date = barrier.current_status.status_date;
 
 	return {
+		addCompany,
 		barrier: {
 			id: barrier.id,
 			isOpen: ( barrierStatusCode === OPEN ),

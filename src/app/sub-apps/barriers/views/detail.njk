@@ -52,7 +52,7 @@
 				edit: {
 					href: urls.barriers.companies.edit( barrier.id )
 				}
-			},
+			} if addCompany,
 			{
 				title: ( 'Sector' + ( 's' if barrier.sectors.length !== 1 ) + ' affected' ),
 				items: sectorsList if sectorsList.length,

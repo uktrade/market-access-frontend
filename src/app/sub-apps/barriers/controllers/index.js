@@ -1,7 +1,13 @@
+const config = require( '../../../config' );
 const detailVieWModel = require( '../view-models/detail' );
 
 module.exports = {
-	barrier: ( req, res ) => res.render( 'barriers/views/detail', detailVieWModel( req.barrier ) ),
+	barrier: ( req, res ) => {
+
+		let addCompany = ( config.addCompany || !!req.query.addCompany );
+
+		res.render( 'barriers/views/detail', detailVieWModel( req.barrier, addCompany ) );
+	},
 	type: require( './type' ),
 	interactions: require( './interactions' ),
 	status: require( './status' ),
