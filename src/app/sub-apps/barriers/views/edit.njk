@@ -1,0 +1,67 @@
+{% from 'components/input/macro.njk' import govukInput %}
+{% from 'components/select/macro.njk' import govukSelect %}
+{% from 'components/radios/macro.njk' import govukRadios %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Barrier - Edit{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.barriers.detail( barrier.id ) },
+		caption: barrier.barrier_title,
+		text: 'Edit barrier header',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.barriers.edit( barrier.id ) }}" method="POST" class="restrict-width">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{{ govukInput( {
+
+			label: {
+				text: 'Suggest a title for this barrier',
+				classes: 'govuk-label--s'
+			},
+			hint: {
+				text: 'Include both the product or service name and the country being exported to, for example, Import quotas for steel rods in India.'
+			},
+			id: 'title',
+			name: 'title',
+			value: title,
+			errorMessage: errors | errorForName( 'title' )
+		} ) }}
+
+		{{ govukSelect( {
+
+			label: {
+				text: "Where did the barrier start? Please provide a country",
+				classes: 'govuk-label--s'
+			},
+			id: 'country',
+			name: 'country',
+			items: country,
+			errorMessage: errors | errorForName( 'country' )
+		} ) }}
+
+		{{ govukRadios({
+
+			name: 'status',
+			fieldset: {
+				legend: {
+					text: 'What is the urgency of the barrier?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: status | addToRadio( {
+				'1': { hint: { text: 'for example, goods stuck at the border or documentation issue' } },
+				'2': { hint: { text: 'for example, a change of regulation' } }
+			} ),
+			errorMessage: errors | errorForName( 'status-1' )
+		}) }}
+
+		<input type="submit" value="Save and exit to barrier" class="govuk-button">
+	</form>
+{% endblock %}

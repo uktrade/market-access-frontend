@@ -7,22 +7,30 @@
 
 .barrier-summary__heading {
 
-	@include govuk-font( $size: 27, $weight: bold );
 	float: left;
 	width: 100%;
-	margin-top: 0;
-	margin-bottom: govuk-em( 15, 27 );
+	margin-bottom: govuk-em( 15, 16 );
 
 	@include mq( $from: tablet ){
 
 		width: 60%;
-		margin-buttom: 0;
+		margin-bottom: 0;
 	}
 
 	@include mq( $from: 850px ){
 
 		width: 70%;
 	}
+}
+
+.barrier-summary__heading__text {
+	@include govuk-font( $size: 27, $weight: bold );
+	margin-top: 0;
+	margin-bottom: govuk-em( 5, 27 );
+}
+
+.barrier-summary__heading__link {
+
 }
 
 .barrier-summary__status {

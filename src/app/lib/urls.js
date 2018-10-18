@@ -19,6 +19,7 @@ function getReportLastCompletedStage( progress ){
 function getReportPath( reportId ){
 	return ( reportId ? reportId : 'new' );
 }
+
 const reportUrl = {
 	index: () => '/reports/',
 	detail: ( reportId ) => `/reports/${ reportId }/`,
@@ -44,6 +45,7 @@ module.exports = {
 
 	barriers: {
 		detail: ( barrierId ) => `/barriers/${ barrierId }/`,
+		edit: ( barrierId ) => `/barriers/${ barrierId }/edit/`,
 		interactions: ( barrierId ) => `/barriers/${ barrierId }/interactions/`,
 		addNote: ( barrierId ) => `/barriers/${ barrierId }/interactions/add-note/`,
 		status: ( barrierId ) => `/barriers/${ barrierId }/status/`,

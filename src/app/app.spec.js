@@ -197,6 +197,15 @@ describe( 'App', function(){
 					} );
 				} );
 
+				describe( 'Edit barrier', () => {
+					it( 'Should fetch the barrier and render the page', ( done ) => {
+
+						app
+							.get( urls.barriers.edit( barrierId ) )
+							.end( checkPage( 'Market Access - Barrier - Edit', done ) );
+					} );
+				} );
+
 				describe( 'Barrier interactions', () => {
 					it( 'Should fetch the barrier and render the page', ( done ) => {
 
