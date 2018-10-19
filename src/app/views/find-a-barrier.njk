@@ -1,0 +1,14 @@
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Find a barrier{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		caption: 'Market access barriers',
+		text: 'Find a barrier'
+	}) }}
+
+{% endblock %}

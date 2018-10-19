@@ -3,6 +3,7 @@ const csurf = require( 'csurf' );
 const ssoController = require( './controllers/sso' );
 const indexController = require( './controllers/index' );
 const whatIsABarrierController = require( './controllers/what-is-a-barrier' );
+const findABarrierController = require( './controllers/find-a-barrier' );
 const reportRoutes = require( './sub-apps/reports/routes' );
 const barrierRoutes = require( './sub-apps/barriers/routes' );
 
@@ -30,4 +31,5 @@ module.exports = function( express, app ){
 	app.use( '/reports/', headerNav( { isReport: true } ), reportRoutes( express, express.Router() ) );
 	app.use( '/barriers/', barrierRoutes( express, express.Router() ) );
 	app.get( '/what-is-a-barrier/', whatIsABarrierController );
+	app.get( '/find-a-barrier/', headerNav( { isFind: true } ), findABarrierController );
 };

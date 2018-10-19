@@ -38,16 +38,16 @@
 					href: urls.reports.new(),
 					text: 'Report a barrier',
 					active: headerNav.isReport
+				},
+				{
+					href: urls.findABarrier(),
+					text: 'Find a barrier',
+					active: headerNav.isFind
 				}
 			]
 		}) }}
-		{#
-			{
-				href: '#',
-				text: 'Find a barrier',
-				active: headerNav.isFind
-			}
-		#}
+
+
 		<div class="header-wrapper__user" role="complementary">
 			<p class="header-wrapper__user__content">
 				{% if user %}
@@ -103,6 +103,9 @@
 					},{
 						'href': urls.reports.new(),
 						'text': 'Report a barrier'
+					},{
+						'href': urls.findABarrier(),
+						'text': 'Find a barrier'
 					},{
 						'href': urls.whatIsABarrier(),
 						'text': 'What is a barrier?'

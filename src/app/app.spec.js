@@ -165,6 +165,15 @@ describe( 'App', function(){
 			} );
 		} );
 
+		describe( 'Find a barrier page', function(){
+			it( 'Should render the page', function( done ){
+
+				app
+					.get( urls.findABarrier() )
+					.end( checkPage( 'Market Access - Find a barrier', done ) );
+			} );
+		} );
+
 		describe( 'Barriers', () => {
 
 			let barrierId;
