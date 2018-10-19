@@ -147,6 +147,11 @@ module.exports = {
 		saveCompanies: ( req, barrierId, companies ) => backend.put( `/barriers/${ barrierId }`, getToken( req ), {
 			companies: ( companies && companies.length ? companies : null )
 		} ),
+		saveDetails: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }`, getToken( req ), {
+			barrier_title: values.title,
+			export_country: values.country,
+			problem_status: values.status
+		} ),
 	},
 
 	reports: {

@@ -47,6 +47,13 @@ describe( 'URLs', () => {
 			} );
 		} );
 
+		describe( 'edit', () => {
+			it( 'Should return the correct path', () => {
+
+				expect( urls.barriers.edit( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/` );
+			} );
+		} );
+
 		describe( 'Interactions', () => {
 			it( 'Should return the correct path', () => {
 

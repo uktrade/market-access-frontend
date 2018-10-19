@@ -268,6 +268,27 @@ describe( 'Backend Service', () => {
 				} );
 			} );
 		} );
+
+		describe( 'saveDetails', () => {
+			it( 'Should PUT to the correct path with the correct values', async () => {
+
+				const title = 'my title';
+				const country = uuid();
+				const status = '1';
+
+				await service.barriers.saveDetails( req, barrierId, {
+					title,
+					country,
+					status
+				} );
+
+				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+					barrier_title: title,
+					export_country: country,
+					problem_status: status
+				} );
+			} );
+		} );
 	} );
 
 	describe( 'Reports', () => {
