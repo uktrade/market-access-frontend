@@ -174,6 +174,19 @@ describe( 'App', function(){
 				barrierId = uuid();
 			} );
 
+			describe( 'When the barrier cannot be found', () => {
+				it( 'Should render a 404 page', ( done ) => {
+
+					intercept.backend()
+						.get( `/barriers/${ barrierId }` )
+						.reply( 404 );
+
+					app
+						.get( urls.barriers.detail( barrierId ) )
+						.end( checkPage( 'Market Access - Not found', done, 404 ) );
+				} );
+			} );
+
 			describe( 'With a barrier', () => {
 
 				let barrier;
@@ -733,6 +746,10 @@ describe( 'App', function(){
 
 		describe( 'Ping', function(){
 			it( 'Should return a status of 200', function( done ){
+
+				intercept.backend()
+					.get( '/ping.xml' )
+					.reply( 200, 'OK' );
 
 				app
 					.get( '/ping/' )
