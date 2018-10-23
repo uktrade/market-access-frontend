@@ -14,20 +14,27 @@ module.exports = async ( req, res, next, barrierId ) => {
 			if( response.isSuccess ){
 
 				barrier = body;
+				req.barrier = barrier;
+				res.locals.barrier = barrier;
+				next();
 
 			} else {
 
-				next( new Error( 'Error response getting barrier' ) );
+				if( response.statusCode === 404 ){
+
+					res.status( 404 );
+					res.render( 'error/404' );
+
+				} else {
+
+					next( new Error( 'Error response getting barrier' ) );
+				}
 			}
 
 		} catch( e ){
 
 			next( e );
 		}
-
-		req.barrier = barrier;
-		res.locals.barrier = barrier;
-		next();
 
 	} else {
 
