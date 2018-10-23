@@ -13,7 +13,11 @@ describe( 'Barrier Id param middleware', () => {
 	beforeEach( () => {
 
 		req = { session: {} };
-		res = { locals: {} };
+		res = {
+			locals: {},
+			status: jasmine.createSpy( 'res.status' ),
+			render: jasmine.createSpy( 'res.render' ),
+		};
 		next = jasmine.createSpy( 'next' );
 		backend = {
 			barriers: { get: jasmine.createSpy( 'backend.barriers.get' ) }
@@ -67,6 +71,24 @@ describe( 'Barrier Id param middleware', () => {
 				expect( req.barrier ).not.toBeDefined();
 				expect( res.locals.barrier ).not.toBeDefined();
 				expect( next ).toHaveBeenCalledWith( new Error( 'Error response getting barrier' ) );
+				expect( next.calls.count() ).toEqual( 1 );
+			} );
+
+			describe( 'When the response statusCode is 404', () => {
+				it( 'Should render the 404 page', async () => {
+
+					backend.barriers.get.and.callFake( () => Promise.resolve( {
+						response: { isSuccess: false, statusCode: 404 }
+					} ) );
+
+					await middleware( req, res, next, barrierId );
+
+					expect( req.barrier ).not.toBeDefined();
+					expect( res.locals.barrier ).not.toBeDefined();
+					expect( next ).not.toHaveBeenCalled();
+					expect( res.status ).toHaveBeenCalledWith( 404 );
+					expect( res.render ).toHaveBeenCalledWith( 'error/404' );
+				} );
 			} );
 		} );
 
@@ -80,6 +102,7 @@ describe( 'Barrier Id param middleware', () => {
 				await middleware( req, res, next, barrierId );
 
 				expect( next ).toHaveBeenCalledWith( err );
+				expect( next.calls.count() ).toEqual( 1 );
 				expect( req.barrier ).not.toBeDefined();
 				expect( res.locals.barrier ).not.toBeDefined();
 			} );
@@ -94,6 +117,7 @@ describe( 'Barrier Id param middleware', () => {
 			expect( res.locals.barrier ).not.toBeDefined();
 			expect( req.barrier ).not.toBeDefined();
 			expect( next ).toHaveBeenCalledWith( new Error( 'Invalid barrierId' ) );
+			expect( next.calls.count() ).toEqual( 1 );
 		} );
 	} );
 } );

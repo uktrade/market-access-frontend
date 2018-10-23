@@ -120,13 +120,21 @@ module.exports = {
 
 			if( data.access_token ){
 
-				logger.debug( 'Callback data:' );
-				logger.debug( Object.assign( {}, data, { access_token: '' } ) );
-
 				req.session.ssoToken = data.access_token;
 				delete req.session.oauthStateId;
 
 				res.redirect( req.session.returnPath || '/' );
+
+				logger.debug( 'Callback data:' );
+
+				try {
+
+					logger.debug( JSON.stringify( Object.assign( {}, data, { access_token: '' } ), null, 2 ) );
+
+				} catch( e ){
+
+					logger.debug( e );
+				}
 
 			} else {
 
