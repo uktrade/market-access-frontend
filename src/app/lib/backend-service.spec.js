@@ -74,6 +74,15 @@ describe( 'Backend Service', () => {
 		} );
 	} );
 
+	describe( 'getCounts', () => {
+		it( 'Should call the correct path', async () => {
+
+			await service.getCounts( req );
+
+			expect( backend.get ).toHaveBeenCalledWith( '/counts', token );
+		} );
+	} );
+
 	describe( 'Barriers', () => {
 
 		let barrierId;
@@ -92,14 +101,7 @@ describe( 'Backend Service', () => {
 			} );
 		} );
 
-		describe( 'getCount', () => {
-			it( 'Should call the correct path', async () => {
 
-				await service.barriers.getCount( req );
-
-				expect( backend.get ).toHaveBeenCalledWith( '/barriers/count', token );
-			} );
-		} );
 
 		describe( 'getForCountry', () => {
 			it( 'Should call the correct path', async () => {

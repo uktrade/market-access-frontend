@@ -14,8 +14,12 @@
 
 .page-tabs__tab__text {
 	@include govuk-font( $size: 19 );
-	padding: govuk-em( 12, 19 ) govuk-em( 25, 19 );
+	padding: govuk-em( 15, 19 ) govuk-em( 10, 19 ) govuk-em( 15, 19 ) govuk-em( 15, 19 );
 	display: inline-block;
+}
+
+.page-tabs__tab__number {
+	margin-right: govuk-em( 15, 16 );
 }
 
 .page-tabs__tab--active {

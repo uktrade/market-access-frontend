@@ -1,0 +1,57 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Counts",
+
+	"type": "object",
+	"required": [
+		"barriers",
+		"reports",
+		"user"
+	],
+	"properties": {
+
+		"barriers": {
+			"type": "object",
+			"required": [
+				"total",
+				"open",
+				"resolved"
+			],
+			"properties": {
+
+				"total": { "$ref": "$refs/common.json#/small-int" },
+				"open": { "$ref": "$refs/common.json#/small-int" },
+				"resolved": { "$ref": "$refs/common.json#/small-int" }
+			}
+		},
+
+		"reports": { "$ref": "$refs/common.json#/small-int" },
+
+		"user": {
+			"type": "object",
+			"required": [
+				"barriers",
+				"reports",
+				"country"
+			],
+			"properties": {
+
+				"barriers": { "$ref": "$refs/common.json#/small-int" },
+				"reports": { "$ref": "$refs/common.json#/small-int" },
+
+				"country": {
+					"type": "object",
+					"required": [
+						"barriers",
+						"reports"
+					],
+					"properties": {
+
+						"barriers": { "$ref": "$refs/common.json#/small-int" },
+						"reports": { "$ref": "$refs/common.json#/small-int" }
+					}
+				}
+			}
+		}
+	}
+}

@@ -60,12 +60,6 @@ function transformReport( report ){
 
 	sortReportProgress( report );
 
-	if( report.barrier_type ){
-
-		report.barrier_type_id = report.barrier_type.id;
-		report.barrier_type_category =report.barrier_type.category;
-	}
-
 	return report;
 }
 
@@ -116,11 +110,21 @@ module.exports = {
 
 	getUser: ( req ) => backend.get( '/whoami', getToken( req ) ).then( transformUser ),
 	ping: () => backend.get( '/ping.xml' ),
+	getCounts: ( req ) => backend.get( '/counts', getToken( req ) ),
 
 	barriers: {
-		getAll: ( req ) => backend.get( '/barriers', getToken( req ) ),
+		getAll: async ( req ) => backend.get( '/barriers', getToken( req ) ),
+		getAllWithFilter( req, filters ){
+
+			const filters = [
+				'country',
+				'start_date',
+				'end_date',
+				'barrier_type',
+				'sector'
+			];
+		},
 		getForCountry: ( req, countryId ) => backend.get( `/barriers?country=${ countryId }`, getToken( req ) ),
-		getCount: ( req ) => backend.get( '/barriers/count', getToken( req ) ),
 		get: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }`, getToken( req ) ),
 		getInteractions: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }/interactions`, getToken( req ) ),
 		saveNote: ( req, barrierId, values ) => backend.post( `/barriers/${ barrierId }/interactions`, getToken( req ), {

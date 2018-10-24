@@ -6,6 +6,7 @@ const OUTPUT_PATH = path.resolve( __dirname, 'output/backend' );
 
 const jsonFiles = {
 	'metadata/index': generateSchema( '/backend/metadata/index' ),
+	'counts/index': generateSchema( '/backend/counts/index' ),
 	'reports/index': generateSchema( '/backend/reports/index' ),
 	'reports/report': generateSchema( '/backend/reports/report' ),
 	'barriers/index': generateSchema( '/backend/barriers/index' ),

@@ -10,7 +10,7 @@ const barrierRoutes = require( './sub-apps/barriers/routes' );
 const headerNav = require( './middleware/header-nav' );
 const user = require( './middleware/user' );
 const formErrors = require( './middleware/form-errors' );
-const dashboardTabs = require( './middleware/dashboard-tabs' );
+const dashboardData = require( './middleware/dashboard-data' );
 
 const csrfProtection = csurf();
 
@@ -27,7 +27,7 @@ module.exports = function( express, app ){
 	app.get( '/me', csrfProtection, indexController.me );
 	app.post( '/me', parseBody, csrfProtection, indexController.me );
 
-	app.get( '/', headerNav( { isDashboard: true } ), dashboardTabs, indexController.index );
+	app.get( '/', headerNav( { isDashboard: true } ), dashboardData, indexController.index );
 	app.use( '/reports/', headerNav( { isReport: true } ), reportRoutes( express, express.Router() ) );
 	app.use( '/barriers/', barrierRoutes( express, express.Router() ) );
 	app.get( '/what-is-a-barrier/', whatIsABarrierController );
