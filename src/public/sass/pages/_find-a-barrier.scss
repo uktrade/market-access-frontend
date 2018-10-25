@@ -1,0 +1,46 @@
+.filter-list-title {
+	@include govuk-font( $size: 19, $line-height: 1 );
+	color: $govuk-grey-1;
+}
+
+.filter-items {
+	.govuk-form-group {
+		padding: govuk-em( 10, 16 );
+		background: $govuk-grey-3;
+		margin-bottom: govuk-em( 10, 16 );
+	}
+}
+
+.filter-items__label {
+	@include govuk-font( 16, $weight: bold );
+}
+
+.filter-items__clear {
+	display: block;
+	margin-bottom: govuk-em( 10, 16 );
+}
+
+.filter-results-title {
+	@include govuk-font( 27, $weight: bold );
+	border-bottom: 5px solid $govuk-black;
+	padding: 0 0 govuk-em( 5, 27 ) 0;
+}
+
+.filter-results-title__caption {
+	@include govuk-font( 19 );
+}
+
+.filter-results-list {
+	list-style: none;
+	padding: 0;
+}
+
+.filter-results-list__item {
+
+	border-bottom: 1px solid $govuk-grey-1;
+	padding: govuk-em( 10, 16 ) 0;
+
+	&:first-of-type {
+		border-top: 1px solid $govuk-grey-1;
+	}
+}

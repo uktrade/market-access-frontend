@@ -44,6 +44,7 @@ $govuk-images-path: "/govuk-public/images/";
 
 @import 'app-objects/headings';
 @import 'app-objects/number-marker';
+@import 'app-objects/buttons';
 
 @import 'app-components/dash-button';
 @import 'app-components/dash-card';
@@ -68,6 +69,7 @@ $govuk-images-path: "/govuk-public/images/";
 @import 'pages/report/sectors';
 @import 'pages/barrier/detail';
 @import 'pages/barrier/type';
+@import 'pages/find-a-barrier';
 
 .error-message {
 	@include govuk-font( 24 );

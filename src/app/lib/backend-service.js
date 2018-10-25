@@ -113,18 +113,31 @@ module.exports = {
 	getCounts: ( req ) => backend.get( '/counts', getToken( req ) ),
 
 	barriers: {
-		getAll: async ( req ) => backend.get( '/barriers', getToken( req ) ),
-		getAllWithFilter( req, filters ){
+		getAll: async ( req, filters = {} ) => {
 
-			const filters = [
-				'country',
-				'start_date',
-				'end_date',
-				'barrier_type',
-				'sector'
-			];
+			/*const filterMap = {
+				'export_country': 'country',
+				'start_date': 'date-start',
+				'end_date': 'date-end',
+				'barrier_type': 'type',
+				'sector': 'sector'
+			};*/
+
+			const query = [];
+			let path = '/barriers';
+
+			if( filters.country ){
+
+				query.push( `export_country=${ filters.country }` );
+			}
+
+			if( query.length ){
+
+				path += '?' + query.join( '&' );
+			}
+
+			return backend.get( path, getToken( req ) );
 		},
-		getForCountry: ( req, countryId ) => backend.get( `/barriers?country=${ countryId }`, getToken( req ) ),
 		get: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }`, getToken( req ) ),
 		getInteractions: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }/interactions`, getToken( req ) ),
 		saveNote: ( req, barrierId, values ) => backend.post( `/barriers/${ barrierId }/interactions`, getToken( req ), {

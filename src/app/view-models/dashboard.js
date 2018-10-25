@@ -1,4 +1,4 @@
-const metadata = require( '../metadata' );
+const metadata = require( '../lib/metadata' );
 
 function getSector( sectorId ){
 

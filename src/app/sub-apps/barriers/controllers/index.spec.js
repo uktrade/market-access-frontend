@@ -42,11 +42,11 @@ describe( 'Barriers controller', () => {
 		config = {};
 
 		metadata = {
-			countryList: [ 'country one', 'country two' ],
 			statusTypes: {
 				'1': 'minima aspernatur optio',
 				'2': 'veritatis alias maxime'
-			}
+			},
+			getCountryList: () =>  [ 'country one', 'country two' ]
 		};
 
 		govukItemsFromObjResponse = { a: 1, b: 2 };
@@ -220,7 +220,7 @@ describe( 'Barriers controller', () => {
 			expect( config.country ).toBeDefined();
 			expect( config.country.type ).toEqual( SELECT );
 			expect( config.country.values ).toEqual( [ barrier.export_country ] );
-			expect( config.country.items ).toEqual( metadata.countryList );
+			expect( config.country.items ).toEqual( metadata.getCountryList() );
 			expect( config.country.validators.length ).toEqual( 1 );
 			expect( config.country.validators[ 0 ].fn ).toEqual( validators.isCountry );
 

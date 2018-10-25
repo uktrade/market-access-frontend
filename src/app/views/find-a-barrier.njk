@@ -1,4 +1,5 @@
 {% from 'app-components/heading.njk' import heading %}
+{% from 'components/select/macro.njk' import govukSelect %}
 
 {% extends 'layout.njk' %}
 
@@ -10,5 +11,38 @@
 		caption: 'Market access barriers',
 		text: 'Find a barrier'
 	}) }}
+
+	<section class="govuk-grid-row">
+		<div class="govuk-grid-column-one-quarter">
+			<h2 class="filter-list-title">Filter barriers by:</h2>
+			<form action="{{ urls.findABarrier() }}" method="GET" class="filter-items">
+
+				{{ govukSelect({
+					name: 'country',
+					label: {
+						text: 'Barrier location',
+						classes: 'filter-items__label'
+					},
+					items: filters.country
+				}) }}
+
+				<a class="filter-items__clear" href="{{ urls.findABarrier() }}">Clear filters</a>
+
+				<input type="submit" value="Apply filters" class="govuk-button govuk-button--full-width">
+			</form>
+		</div>
+		<div class="govuk-grid-column-three-quarters">
+
+			<h2 class="filter-results-title">{{ count }} <span class="filter-results-title__caption">barrier{{ 's' if count != 1 }}</span></h2>
+			<ol class="filter-results-list">
+				{% for barrier in barriers %}
+					<li class='filter-results-list__item'>
+						<h3><a href="{{ urls.barriers.detail( barrier.id ) }}">{{ barrier.name }}</a></h3>
+						{{ barrier.country.name }}
+					</li>
+				{% endfor %}
+			</ol>
+		</div>
+	</section>
 
 {% endblock %}

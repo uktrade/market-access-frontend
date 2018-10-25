@@ -156,7 +156,7 @@ module.exports = {
 			country: {
 				type: Form.SELECT,
 				values: [ report.export_country ],
-				items: metadata.countryList,
+				items: metadata.getCountryList(),
 				validators: [
 					{
 						fn: validators.isCountry,
@@ -330,7 +330,7 @@ module.exports = {
 
 			sectors: {
 				type: Form.SELECT,
-				items: metadata.affectedSectorsList.filter( ( sector ) => !sectors.includes( sector.value ) ),
+				items: metadata.getSectorList().filter( ( sector ) => !sectors.includes( sector.value ) ),
 				validators: [ {
 					fn: validators.isSector,
 					message: 'Select a sector affected by the barrier'
