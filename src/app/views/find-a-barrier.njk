@@ -18,6 +18,7 @@
 			<form action="{{ urls.findABarrier() }}" method="GET" class="filter-items">
 
 				{{ govukSelect({
+					id: 'country',
 					name: 'country',
 					label: {
 						text: 'Barrier location',
@@ -37,8 +38,27 @@
 			<ol class="filter-results-list">
 				{% for barrier in barriers %}
 					<li class='filter-results-list__item'>
-						<h3><a href="{{ urls.barriers.detail( barrier.id ) }}">{{ barrier.name }}</a></h3>
-						{{ barrier.country.name }}
+						<div class="filter-results-list__item__main-content">
+							<h3 class='filter-results-list__item__heading'><a href="{{ urls.barriers.detail( barrier.id ) }}">{{ barrier.name }}</a></h3>
+							<dl class="filter-results-list__item__definitions">
+								<dt class="filter-results-list__item__definitions__key">Sector{{ 's' if barrier.sectorsList.length != 1 }} affected:</dt>
+								<dd class="filter-results-list__item__definitions__value">{{ barrier.sectorsList | join( ', ' ) }}</dd>
+
+								<dt class="filter-results-list__item__definitions__key">Barrier location:</dt>
+								<dd class="filter-results-list__item__definitions__value">{{ barrier.country.name }}</dd>
+							</dl>
+						</div>
+
+						<ul class="filter-results-list__item__sub-content">
+							<li class="filter-results-list__item__sub-content__item">
+								<span class="barrier-status-badge barrier-status-badge--compact barrier-status-badge--{{ barrier.status.modifyer }}">
+									Status: <strong>{{ barrier.status.name }}</strong>
+								</span>
+							</li>
+							<li class="filter-results-list__item__sub-content__item">
+								<span class="muted">Reported </span>{{ barrier.date.reported | dateOnly }}
+							</li>
+						</ul>
 					</li>
 				{% endfor %}
 			</ol>

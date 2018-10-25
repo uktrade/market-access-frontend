@@ -1,5 +1,7 @@
 const metadata = require( '../lib/metadata' );
 
+const barrierStatusTypeInfo = metadata.barrier.status.typeInfo;
+
 function isSelected( value ){
 
 	return ( item ) => {
@@ -20,10 +22,20 @@ module.exports = function( params ){
 
 	for( let barrier of barriers ){
 
+		const sectors = ( barrier.sectors && barrier.sectors.map( metadata.getSector ) || [] );
+		const barrierStatusCode = barrier.current_status.status;
+		const status = barrierStatusTypeInfo[ barrierStatusCode ] || {};
+
 		barrierList.push( {
 			id: barrier.id,
 			name: barrier.barrier_title,
-			country: metadata.getCountry( barrier.export_country )
+			country: metadata.getCountry( barrier.export_country ),
+			sectors,
+			sectorsList: sectors.map( ( sector ) => sector.name ),
+			status,
+			date: {
+				reported: barrier.reported_on
+			}
 		} );
 	}
 

@@ -38,9 +38,80 @@
 .filter-results-list__item {
 
 	border-bottom: 1px solid $govuk-grey-1;
-	padding: govuk-em( 10, 16 ) 0;
+	padding: govuk-em( 15, 16 ) 0;
+	display: flex;
+	flex-wrap: wrap;
+
+	@include mq( $from: 410px ){
+
+		flex-wrap: no-wrap;
+	}
 
 	&:first-of-type {
 		border-top: 1px solid $govuk-grey-1;
+	}
+}
+
+.filter-results-list__item__main-content {
+	flex: 1;
+	min-width: 150px;
+}
+
+.filter-results-list__item__sub-content {
+
+	min-width: 200px;
+	margin-top: govuk-em( 10, 16 );
+	list-style: none;
+	padding: 0;
+	@include govuk-font( 16 );
+
+	@include mq( $from: 410px ){
+		margin-top: 0;
+		text-align: right;
+	}
+}
+
+.filter-results-list__item__sub-content__item {
+
+	margin-bottom: govuk-em( 5, 16 );
+
+	&:last-of-type {
+		margin-bottom: 0;
+	}
+}
+
+.filter-results-list__item__heading {
+	@include govuk-font( 19, $weight: bold );
+	margin: 0 0 govuk-em( 15, 19 ) 0;
+}
+
+.filter-results-list__item__definitions {
+	@include govuk-font( 16 );
+	display: flex;
+	flex-wrap: wrap;
+	margin: 0;
+}
+
+.filter-results-list__item__definitions__key {
+
+	display: inline-block;
+	min-width: 110px;
+	color: $govuk-grey-1;
+
+	@include mq( $from: tablet ){
+		min-width: 125px;
+	}
+}
+
+.filter-results-list__item__definitions__value {
+
+	display: inline-block;
+	margin: 0;
+	flex-grow: 1;
+	width: 55%;
+	margin-bottom: govuk-em( 5, 16 );
+
+	@include mq( $from: tablet ){
+		margin-bottom: 0;
 	}
 }

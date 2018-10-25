@@ -129,3 +129,22 @@ module.exports.getCountryList = () => createCountryList( countries, 'Choose a co
 module.exports.getSectorList = () => createSectorsList( level0Sectors, 'Select a sector' );
 module.exports.getSector = ( sectorId ) => sectors.find( ( sector ) => sector.id === sectorId );
 module.exports.getCountry = ( countryId ) => countries.find( ( country ) => country.id === countryId );
+
+const OPEN = 2;
+const RESOLVED = 4;
+const HIBERNATED = 5;
+
+module.exports.barrier = {
+	status: {
+		types: {
+			OPEN,
+			RESOLVED,
+			HIBERNATED
+		},
+		typeInfo: {
+			[ OPEN ]: { name: 'Open', modifyer: 'assessment' },
+			[ RESOLVED ]: { name: 'Resolved', modifyer: 'resolved' },
+			[ HIBERNATED ]: { name: 'Paused', modifyer: 'hibernated' }
+		}
+	}
+};
