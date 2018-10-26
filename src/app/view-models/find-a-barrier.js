@@ -47,6 +47,7 @@ module.exports = function( params ){
 	return {
 		count,
 		barriers: barrierList,
+		hasFilters: !!Object.keys( filters ).length,
 		filters: {
 			country: metadata.getCountryList( 'All locations' ).map( isSelected( filters.country ) )
 		}

@@ -5,6 +5,12 @@
 
 {% block page_title %}{{ super() }} - Find a barrier{% endblock %}
 
+{% block body_script %}
+	<script>
+		ma.pages.findABarrier();
+	</script>
+{% endblock %}
+
 {% block page_content %}
 
 	{{ heading({
@@ -20,6 +26,7 @@
 				{{ govukSelect({
 					id: 'country',
 					name: 'country',
+					classes: 'js-filter',
 					label: {
 						text: 'Barrier location',
 						classes: 'filter-items__label'
@@ -27,9 +34,11 @@
 					items: filters.country
 				}) }}
 
-				<a class="filter-items__clear" href="{{ urls.findABarrier() }}">Clear filters</a>
+				{% if hasFilters %}
+				<a class="filter-items__clear js-filter-clear" href="{{ urls.findABarrier() }}">Clear filters</a>
+				{% endif %}
 
-				<input type="submit" value="Apply filters" class="govuk-button govuk-button--full-width">
+				<input type="submit" value="Apply filters" class="govuk-button govuk-button--full-width js-filter-submit">
 			</form>
 		</div>
 		<div class="govuk-grid-column-three-quarters">

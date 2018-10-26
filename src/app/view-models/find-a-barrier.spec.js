@@ -11,6 +11,39 @@ describe( 'Find a barrier view model', () => {
 
 	let metadata;
 	let viewModel;
+	let mockSector;
+	let mockCountry;
+	let barriers;
+
+	function getExpectedBarrierOutput( barriers ){
+
+		const expected = [];
+
+		for( let barrier of barriers ){
+
+			const sectors = ( barrier.sectors ? barrier.sectors.map( () => mockSector ) : [] );
+			const barrierStatusCode = barrier.current_status.status;
+			const status = metadata.barrier.status.typeInfo[ barrierStatusCode ] || {};
+
+			expected.push({
+				id: barrier.id,
+				title: barrier.barrier_title,
+				isOpen: ( barrierStatusCode === OPEN ),
+				isResolved: ( barrierStatusCode === RESOLVED ),
+				isHibernated: ( barrierStatusCode === HIBERNATED ),
+				country: mockCountry,
+				sectors,
+				sectorsList: sectors.map( () => mockSector.name ),
+				status,
+				date: {
+					reported: barrier.reported_on,
+					status: barrier.current_status.status_date
+				}
+			});
+		}
+
+		return expected;
+	}
 
 	beforeEach( () => {
 
@@ -34,71 +67,74 @@ describe( 'Find a barrier view model', () => {
 			getCountryList: jasmine.createSpy( 'metadata.getCountryList' )
 		};
 
+		mockSector = { id: uuid(), name: faker.lorem.words() };
+		mockCountry = { id: uuid(), name: faker.address.country() };
+		barriers = jasmine.helpers.getFakeData( '/backend/barriers/find-a-barrier' );
+
+		metadata.getSector.and.callFake( () => mockSector );
+		metadata.getCountry.and.callFake( () => mockCountry );
+
 		viewModel = proxyquire( modulePath, {
 			'../lib/metadata': metadata
 		} );
 	} );
 
-	it( 'Should return the correct data', () => {
+	describe( 'Without any filters', () => {
+		it( 'Should return the correct data', () => {
 
-		const barriers = jasmine.helpers.getFakeData( '/backend/barriers/find-a-barrier' );
-		const count = 10;
-		const filters = {
-			country: uuid()
-		};
+			const count = 20;
+			const filters = {};
 
-		const countryList = [
-			{ value: uuid(), name: faker.address.country() },
-			{ value: uuid(), name: faker.address.country() },
-			{ value: filters.country, name: faker.address.country() },
-		];
-		const mockSector = { id: uuid(), name: faker.lorem.words() };
-		const mockCountry = { id: uuid(), name: faker.address.country() };
+			const countryList = [
+				{ value: uuid(), name: faker.address.country() },
+				{ value: uuid(), name: faker.address.country() },
+				{ value: uuid(), name: faker.address.country() },
+			];
 
-		metadata.getCountryList.and.callFake( () => countryList );
-		metadata.getSector.and.callFake( () => mockSector );
-		metadata.getCountry.and.callFake( () => mockCountry );
+			metadata.getCountryList.and.callFake( () => countryList );
 
-		const output = viewModel( {
-			count,
-			barriers,
-			filters
+			const output = viewModel( {
+				count,
+				barriers,
+				filters
+			} );
+
+			expect( output.count ).toEqual( count );
+			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
+			expect( output.filters ).toEqual( {	country: countryList	} );
+			expect( metadata.getCountryList ).toHaveBeenCalledWith( 'All locations' );
+			expect( output.hasFilters ).toEqual( false );
 		} );
+	} );
 
-		function getExpectedBarrierOutput( barriers ){
+	describe( 'With a country filter', () => {
+		it( 'Should return the correct data', () => {
 
-			const expected = [];
+			const count = 10;
+			const filters = {
+				country: uuid()
+			};
 
-			for( let barrier of barriers ){
+			const countryList = [
+				{ value: uuid(), name: faker.address.country() },
+				{ value: uuid(), name: faker.address.country() },
+				{ value: filters.country, name: faker.address.country() },
+			];
 
-				const sectors = ( barrier.sectors ? barrier.sectors.map( () => mockSector ) : [] );
-				const barrierStatusCode = barrier.current_status.status;
-				const status = metadata.barrier.status.typeInfo[ barrierStatusCode ] || {};
+			metadata.getCountryList.and.callFake( () => countryList );
 
-				expected.push({
-					id: barrier.id,
-					title: barrier.barrier_title,
-					isOpen: ( barrierStatusCode === OPEN ),
-					isResolved: ( barrierStatusCode === RESOLVED ),
-					isHibernated: ( barrierStatusCode === HIBERNATED ),
-					country: mockCountry,
-					sectors,
-					sectorsList: sectors.map( () => mockSector.name ),
-					status,
-					date: {
-						reported: barrier.reported_on,
-						status: barrier.current_status.status_date
-					}
-				});
-			}
+			const output = viewModel( {
+				count,
+				barriers,
+				filters
+			} );
 
-			return expected;
-		}
-
-		expect( output.count ).toEqual( count );
-		expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
-		expect( output.filters ).toEqual( {	country: countryList	} );
-		expect( countryList[ 2 ].selected ).toEqual( true );
-		expect( metadata.getCountryList ).toHaveBeenCalledWith( 'All locations' );
+			expect( output.count ).toEqual( count );
+			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
+			expect( output.filters ).toEqual( {	country: countryList	} );
+			expect( countryList[ 2 ].selected ).toEqual( true );
+			expect( metadata.getCountryList ).toHaveBeenCalledWith( 'All locations' );
+			expect( output.hasFilters ).toEqual( true );
+		} );
 	} );
 } );
