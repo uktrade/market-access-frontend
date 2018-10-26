@@ -1,5 +1,6 @@
 const metadata = require( '../lib/metadata' );
 
+const { OPEN, RESOLVED, HIBERNATED } = metadata.barrier.status.types;
 const barrierStatusTypeInfo = metadata.barrier.status.typeInfo;
 
 function isSelected( value ){
@@ -28,13 +29,17 @@ module.exports = function( params ){
 
 		barrierList.push( {
 			id: barrier.id,
-			name: barrier.barrier_title,
+			title: barrier.barrier_title,
+			isOpen: ( barrierStatusCode === OPEN ),
+			isResolved: ( barrierStatusCode === RESOLVED ),
+			isHibernated: ( barrierStatusCode === HIBERNATED ),
 			country: metadata.getCountry( barrier.export_country ),
 			sectors,
 			sectorsList: sectors.map( ( sector ) => sector.name ),
 			status,
 			date: {
-				reported: barrier.reported_on
+				reported: barrier.reported_on,
+				status: barrier.current_status.status_date
 			}
 		} );
 	}
@@ -43,7 +48,7 @@ module.exports = function( params ){
 		count,
 		barriers: barrierList,
 		filters: {
-			country: metadata.getCountryList().map( isSelected( filters.country ) )
+			country: metadata.getCountryList( 'All locations' ).map( isSelected( filters.country ) )
 		}
 	};
 };

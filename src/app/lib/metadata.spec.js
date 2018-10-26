@@ -123,17 +123,35 @@ describe( 'metadata', () => {
 		} );
 
 		describe( 'getCountryList', () => {
-			it( 'Should create a country list for use with a select with a choose option', () => {
+			describe( 'Without specifying the default text', () => {
+				it( 'Should create a country list for use with a select - with a default choose option', () => {
 
-				const countries = metadata.getCountryList();
+					const countries = metadata.getCountryList();
 
-				expect( countries.length ).toEqual( metadata.countries.length + 1 );
-				expect( countries[ 0 ] ).toEqual( { value: '', text: 'Choose a country' } );
+					expect( countries.length ).toEqual( metadata.countries.length + 1 );
+					expect( countries[ 0 ] ).toEqual( { value: '', text: 'Choose a country' } );
 
-				countries.forEach( ( country ) => {
-					expect( country.value ).toBeDefined();
-					expect( country.text ).toBeDefined();
-				});
+					countries.forEach( ( country ) => {
+						expect( country.value ).toBeDefined();
+						expect( country.text ).toBeDefined();
+					});
+				} );
+			} );
+
+			describe( 'Specifying the default text', () => {
+				it( 'Should create a country list for use with a select - with the specified choose option', () => {
+
+					const text = 'Select an option';
+					const countries = metadata.getCountryList( text );
+
+					expect( countries.length ).toEqual( metadata.countries.length + 1 );
+					expect( countries[ 0 ] ).toEqual( { value: '', text } );
+
+					countries.forEach( ( country ) => {
+						expect( country.value ).toBeDefined();
+						expect( country.text ).toBeDefined();
+					});
+				} );
 			} );
 		} );
 

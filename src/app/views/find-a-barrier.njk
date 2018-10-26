@@ -39,11 +39,12 @@
 				{% for barrier in barriers %}
 					<li class='filter-results-list__item'>
 						<div class="filter-results-list__item__main-content">
-							<h3 class='filter-results-list__item__heading'><a href="{{ urls.barriers.detail( barrier.id ) }}">{{ barrier.name }}</a></h3>
+							<h3 class='filter-results-list__item__heading'><a href="{{ urls.barriers.detail( barrier.id ) }}">{{ barrier.title }}</a></h3>
 							<dl class="filter-results-list__item__definitions">
+								{% if barrier.sectors.length %}
 								<dt class="filter-results-list__item__definitions__key">Sector{{ 's' if barrier.sectorsList.length != 1 }} affected:</dt>
 								<dd class="filter-results-list__item__definitions__value">{{ barrier.sectorsList | join( ', ' ) }}</dd>
-
+								{% endif %}
 								<dt class="filter-results-list__item__definitions__key">Barrier location:</dt>
 								<dd class="filter-results-list__item__definitions__value">{{ barrier.country.name }}</dd>
 							</dl>
@@ -56,7 +57,11 @@
 								</span>
 							</li>
 							<li class="filter-results-list__item__sub-content__item">
+								{% if barrier.isResolved %}
+								<span class="muted">Resolved </span>{{ barrier.date.status | dateOnly( { day: false } ) }}
+								{% else %}
 								<span class="muted">Reported </span>{{ barrier.date.reported | dateOnly }}
+								{% endif %}
 							</li>
 						</ul>
 					</li>
