@@ -59,4 +59,5 @@
 	text-decoration: underline;
 	color: $govuk-blue;
 	@include govuk-font( 14 );
+	background: none; /* for Edge/IE 8 */
 }
