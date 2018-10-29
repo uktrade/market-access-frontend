@@ -49,7 +49,8 @@ module.exports = function( params ){
 		barriers: barrierList,
 		hasFilters: !!Object.keys( filters ).length,
 		filters: {
-			country: metadata.getCountryList( 'All locations' ).map( isSelected( filters.country ) )
+			country: metadata.getCountryList( 'All locations' ).map( isSelected( filters.country ) ),
+			sector: metadata.getSectorList( 'All sectors' ).map( isSelected( filters.sector ) ),
 		}
 	};
 };

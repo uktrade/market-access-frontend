@@ -112,6 +112,17 @@ describe( 'Backend Service', () => {
 					expect( backend.get ).toHaveBeenCalledWith( `/barriers?export_country=${ country }`, token );
 				} );
 			} );
+
+			describe( 'with a sector filter', () => {
+				it( 'Should call the correct path', async () => {
+
+					const sector = uuid();
+
+					await service.barriers.getAll( req, { sector } );
+
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers?sector=${ sector }`, token );
+				} );
+			} );
 		} );
 
 		describe( 'get', () => {

@@ -291,14 +291,27 @@ describe( 'metadata', () => {
 			} );
 
 			describe( 'getSectorList', () => {
+				describe( 'Without specifying the default text', () => {
+					it( 'Should return all sectors that are not disabled and have a level of 0 in a govuk formate', () => {
 
-				it( 'Should return all sectors that are not disabled and have a level of 0 in a govuk formate', () => {
+						const affectedSectorsList = level0Sectors.map( ( sector ) => ({ value: sector.id, text: sector.name } ) );
 
-					const affectedSectorsList = level0Sectors.map( ( sector ) => ({ value: sector.id, text: sector.name } ) );
+						affectedSectorsList.unshift( { value: '', text: 'Select a sector' } );
 
-					affectedSectorsList.unshift( { value: '', text: 'Select a sector' } );
+						expect( metadata.getSectorList() ).toEqual( affectedSectorsList );
+					} );
+				} );
 
-					expect( metadata.getSectorList() ).toEqual( affectedSectorsList );
+				describe( 'Specifying the default text', () => {
+					it( 'Should return all sectors that are not disabled and have a level of 0 in a govuk format', () => {
+
+						const text = 'All sectors';
+						const affectedSectorsList = level0Sectors.map( ( sector ) => ({ value: sector.id, text: sector.name } ) );
+
+						affectedSectorsList.unshift( { value: '', text } );
+
+						expect( metadata.getSectorList( text ) ).toEqual( affectedSectorsList );
+					} );
 				} );
 			} );
 		} );

@@ -126,7 +126,7 @@ module.exports.fetch = async () => {
 };
 
 module.exports.getCountryList = ( defaultText = 'Choose a country' ) => createCountryList( countries, defaultText );
-module.exports.getSectorList = () => createSectorsList( level0Sectors, 'Select a sector' );
+module.exports.getSectorList = ( defaultText = 'Select a sector' ) => createSectorsList( level0Sectors, defaultText );
 module.exports.getSector = ( sectorId ) => sectors.find( ( sector ) => sector.id === sectorId );
 module.exports.getCountry = ( countryId ) => countries.find( ( country ) => country.id === countryId );
 

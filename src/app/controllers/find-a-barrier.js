@@ -4,11 +4,15 @@ const viewModel = require( '../view-models/find-a-barrier' );
 
 module.exports = async function( req, res, next ){
 
-	const { country } = req.query;
+	const { country, sector } = req.query;
 	const filters = {};
 
 	if( country && validators.isCountry( country ) ){
 		filters.country = country;
+	}
+
+	if( sector && validators.isSector( sector ) ){
+		filters.sector = sector;
 	}
 
 	try {
