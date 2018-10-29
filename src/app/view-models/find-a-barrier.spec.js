@@ -16,6 +16,7 @@ describe( 'Find a barrier view model', () => {
 	let barriers;
 	let countryList;
 	let sectorList;
+	let barrierTypeList;
 
 	function getExpectedBarrierOutput( barriers ){
 
@@ -68,6 +69,11 @@ describe( 'Find a barrier view model', () => {
 			getCountry: jasmine.createSpy( 'metadata.getCountry' ),
 			getCountryList: jasmine.createSpy( 'metadata.getCountryList' ),
 			getSectorList: jasmine.createSpy( 'metadata.getSectorList' ),
+			barrierTypes: [
+				{ id: 1, title: faker.lorem.words(), category: 'ONE' },
+				{ id: 2, title: faker.lorem.words(), category: 'TWO' },
+				{ id: 3, title: faker.lorem.words(), category: 'ONE' },
+			],
 		};
 
 		mockSector = { id: uuid(), name: faker.lorem.words() };
@@ -75,16 +81,18 @@ describe( 'Find a barrier view model', () => {
 		barriers = jasmine.helpers.getFakeData( '/backend/barriers/find-a-barrier' );
 
 		countryList = [
-			{ value: uuid(), name: faker.address.country() },
-			{ value: uuid(), name: faker.address.country() },
-			{ value: uuid(), name: faker.address.country() },
+			{ value: uuid(), text: faker.address.country() },
+			{ value: uuid(), text: faker.address.country() },
+			{ value: uuid(), text: faker.address.country() },
 		];
 
 		sectorList = [
-			{ value: uuid(), name: faker.lorem.words() },
-			{ value: uuid(), name: faker.lorem.words() },
-			{ value: uuid(), name: faker.lorem.words() },
+			{ value: uuid(), text: faker.lorem.words() },
+			{ value: uuid(), text: faker.lorem.words() },
+			{ value: uuid(), text: faker.lorem.words() },
 		];
+
+		barrierTypeList = metadata.barrierTypes.map( ( { id, title } ) => ({ value: id, text: title }) );
 
 		metadata.getCountryList.and.callFake( () => countryList );
 		metadata.getSectorList.and.callFake( () => sectorList );
@@ -92,7 +100,7 @@ describe( 'Find a barrier view model', () => {
 		metadata.getCountry.and.callFake( () => mockCountry );
 
 		viewModel = proxyquire( modulePath, {
-			'../lib/metadata': metadata
+			'../lib/metadata': metadata,
 		} );
 	} );
 
@@ -116,7 +124,11 @@ describe( 'Find a barrier view model', () => {
 
 			expect( output.count ).toEqual( count );
 			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
-			expect( output.filters ).toEqual( {	country: countryList, sector: sectorList	} );
+			expect( output.filters ).toEqual( {
+				country: countryList,
+				sector: sectorList,
+				type: barrierTypeList
+			} );
 			expect( output.hasFilters ).toEqual( false );
 		} );
 	} );
@@ -137,7 +149,11 @@ describe( 'Find a barrier view model', () => {
 
 			expect( output.count ).toEqual( count );
 			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
-			expect( output.filters ).toEqual( {	country: countryList, sector: sectorList	} );
+			expect( output.filters ).toEqual( {
+				country: countryList,
+				sector: sectorList,
+				type: barrierTypeList,
+			} );
 			expect( countryList[ 2 ].selected ).toEqual( true );
 			expect( output.hasFilters ).toEqual( true );
 		} );
@@ -159,8 +175,43 @@ describe( 'Find a barrier view model', () => {
 
 			expect( output.count ).toEqual( count );
 			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
-			expect( output.filters ).toEqual( {	country: countryList, sector: sectorList	} );
+			expect( output.filters ).toEqual( {
+				country: countryList,
+				sector: sectorList,
+				type: barrierTypeList,
+			} );
 			expect( sectorList[ 2 ].selected ).toEqual( true );
+			expect( output.hasFilters ).toEqual( true );
+		} );
+	} );
+
+	describe( 'With a barrier type filter', () => {
+		it( 'Should return the correct data', () => {
+
+			const count = 5;
+			const filters = { type: 3 };
+
+			barrierTypeList[ 2 ].value = filters.type;
+
+			const output = viewModel( {
+				count,
+				barriers,
+				filters
+			} );
+
+			expect( output.count ).toEqual( count );
+			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
+			expect( output.filters ).toEqual( {
+				country: countryList,
+				sector: sectorList,
+				type: barrierTypeList.map( ( item ) => {
+					if( item.value == filters.type ){
+						item.selected = true;
+					}
+
+					return item;
+				} ),
+			} );
 			expect( output.hasFilters ).toEqual( true );
 		} );
 	} );

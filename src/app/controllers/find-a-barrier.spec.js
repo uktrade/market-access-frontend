@@ -1,5 +1,6 @@
 const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
+const faker = require( 'faker' );
 const modulePath = './find-a-barrier';
 
 describe( 'Find a barrier controller', () => {
@@ -31,7 +32,8 @@ describe( 'Find a barrier controller', () => {
 		viewModel = jasmine.createSpy( 'view-model' );
 		validators = {
 			isCountry: jasmine.createSpy( 'validators.isCountry' ),
-			isSector: jasmine.createSpy( 'validators.isSector' )
+			isSector: jasmine.createSpy( 'validators.isSector' ),
+			isBarrierType: jasmine.createSpy( 'validators.isBarrierType' ),
 		};
 
 		controller = proxyquire( modulePath, {
@@ -151,6 +153,54 @@ describe( 'Find a barrier controller', () => {
 				it( 'Should render the template without filters', async () => {
 
 					validators.isSector.and.callFake( () => false );
+
+					await controller( req, res, next );
+
+					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, {} );
+				} );
+			} );
+		} );
+
+		describe( 'With a type filter', () => {
+
+			let type;
+			let viewModelResponse;
+
+			beforeEach( () => {
+
+				type = faker.lorem.word().toUpperCase();
+				req.query.type = type;
+				viewModelResponse = { a: 1, b: 2 };
+
+				viewModel.and.callFake( () => viewModelResponse );
+
+				backend.barriers.getAll.and.callFake( () => ({
+					response: { isSuccess: true },
+					body: jasmine.helpers.getFakeData( '/backend/barriers/' )
+				}) );
+			} );
+
+			afterEach( () => {
+
+				expect( res.render ).toHaveBeenCalledWith( template, viewModelResponse );
+				expect( next ).not.toHaveBeenCalled();
+			} );
+
+			describe( 'When the type is valid', () => {
+				it( 'Should render the template with a filter', async () => {
+
+					validators.isBarrierType.and.callFake( () => true );
+
+					await controller( req, res, next );
+
+					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { type } );
+				} );
+			} );
+
+			describe( 'When the type is NOT valid', () => {
+				it( 'Should render the template without filters', async () => {
+
+					validators.isBarrierType.and.callFake( () => false );
 
 					await controller( req, res, next );
 

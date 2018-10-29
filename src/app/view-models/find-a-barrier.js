@@ -51,6 +51,7 @@ module.exports = function( params ){
 		filters: {
 			country: metadata.getCountryList( 'All locations' ).map( isSelected( filters.country ) ),
 			sector: metadata.getSectorList( 'All sectors' ).map( isSelected( filters.sector ) ),
+			type: metadata.barrierTypes.map( ( { id, title } ) => ({ value: id, text: title }) ).map( isSelected( filters.type ) ),
 		}
 	};
 };
