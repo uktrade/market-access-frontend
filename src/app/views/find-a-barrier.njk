@@ -68,6 +68,8 @@
 							<li class="filter-results-list__item__sub-content__item">
 								{% if barrier.isResolved %}
 								<span class="muted">Resolved </span>{{ barrier.date.status | dateOnly( { day: false } ) }}
+								{% elif barrier.isHibernated %}
+								<span class="muted">Paused </span>{{ barrier.date.status | dateOnly( { day: false } ) }}
 								{% else %}
 								<span class="muted">Reported </span>{{ barrier.date.reported | dateOnly }}
 								{% endif %}
