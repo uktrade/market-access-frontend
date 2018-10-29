@@ -74,6 +74,15 @@ describe( 'Backend Service', () => {
 		} );
 	} );
 
+	describe( 'getCounts', () => {
+		it( 'Should call the correct path', async () => {
+
+			await service.getCounts( req );
+
+			expect( backend.get ).toHaveBeenCalledWith( '/counts', token );
+		} );
+	} );
+
 	describe( 'Barriers', () => {
 
 		let barrierId;
@@ -84,31 +93,24 @@ describe( 'Backend Service', () => {
 		} );
 
 		describe( 'getAll', () => {
-			it( 'Should call the correct path', async () => {
+			describe( 'With no filters', () => {
+				it( 'Should call the correct path', async () => {
 
-				await service.barriers.getAll( req );
+					await service.barriers.getAll( req );
 
-				expect( backend.get ).toHaveBeenCalledWith( '/barriers', token );
+					expect( backend.get ).toHaveBeenCalledWith( '/barriers', token );
+				} );
 			} );
-		} );
 
-		describe( 'getCount', () => {
-			it( 'Should call the correct path', async () => {
+			describe( 'with a country filter', () => {
+				it( 'Should call the correct path', async () => {
 
-				await service.barriers.getCount( req );
+					const country = uuid();
 
-				expect( backend.get ).toHaveBeenCalledWith( '/barriers/count', token );
-			} );
-		} );
+					await service.barriers.getAll( req, { country } );
 
-		describe( 'getForCountry', () => {
-			it( 'Should call the correct path', async () => {
-
-				const countryId = 'abc-123';
-
-				await service.barriers.getForCountry( req, countryId );
-
-				expect( backend.get ).toHaveBeenCalledWith( `/barriers?country=${ countryId }`, token );
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers?export_country=${ country }`, token );
+				} );
 			} );
 		} );
 

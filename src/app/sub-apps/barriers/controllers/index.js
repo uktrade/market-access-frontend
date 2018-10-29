@@ -29,7 +29,7 @@ module.exports = {
 			country: {
 				type: Form.SELECT,
 				values: [ barrier.export_country ],
-				items: metadata.countryList,
+				items: metadata.getCountryList(),
 				validators: [
 					{
 						fn: validators.isCountry,

@@ -42,6 +42,7 @@ module.exports = {
 	login: () => '/login/',
 	me: () => '/me',
 	whatIsABarrier: () => '/what-is-a-barrier/',
+	findABarrier: () => '/find-a-barrier/',
 
 	barriers: {
 		detail: ( barrierId ) => `/barriers/${ barrierId }/`,

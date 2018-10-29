@@ -38,16 +38,16 @@
 					href: urls.reports.new(),
 					text: 'Report a barrier',
 					active: headerNav.isReport
+				},
+				{
+					href: urls.findABarrier(),
+					text: 'Find a barrier',
+					active: headerNav.isFind
 				}
 			]
 		}) }}
-		{#
-			{
-				href: '#',
-				text: 'Find a barrier',
-				active: headerNav.isFind
-			}
-		#}
+
+
 		<div class="header-wrapper__user" role="complementary">
 			<p class="header-wrapper__user__content">
 				{% if user %}
@@ -104,6 +104,9 @@
 						'href': urls.reports.new(),
 						'text': 'Report a barrier'
 					},{
+						'href': urls.findABarrier(),
+						'text': 'Find a barrier'
+					},{
 						'href': urls.whatIsABarrier(),
 						'text': 'What is a barrier?'
 					}
@@ -133,6 +136,7 @@
 	<script src="/public/js/pages/barrier/status.js"></script>
 	<script src="/public/js/pages/barrier/type.js"></script>
 	<script src="/public/js/pages/barrier/edit.js"></script>
+	<script src="/public/js/pages/find-a-barrier.js"></script>
 	<!-- endbuild -->
 	<script>
 		if( ma.components.Header && jessie.queryOne ){

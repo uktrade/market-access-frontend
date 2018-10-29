@@ -13,6 +13,15 @@
 		</span>
 	</a>
 
+	{%- set isPlural = ( data.counts.barriers.open !== 1 ) %}
+
+	<a href="{{ urls.findABarrier() }}" role="button" class="dash-button">
+		<span class="dash-button__heading">Find a barrier</span>
+		<span class="dash-button__text">
+			There {{ 'are' if isPlural else 'is' }} <strong>{{ data.counts.barriers.open }}</strong> market access barrier{{ 's' if isPlural }} currently open.
+		</span>
+	</a>
+
 	<div class="dash-card">
 		<h2 class="dash-card__heading">
 			What are market access barriers?
@@ -26,15 +35,18 @@
 		{
 			text: 'All barriers',
 			href: urls.index() if not isBarriers,
-			skip: not ( data.all.count >= 0 )
+			skip: data.tabs.all.skip,
+			count: data.tabs.all.count
 		},{
 			text: 'My country',
 			href: urls.index() if not isMyCountry,
-			skip: not ( data.country.count >= 0 )
+			skip: data.tabs.country.skip,
+			count: data.tabs.country.count
 		},{
 			text: 'Unfinished reports',
 			href: urls.reports.index() if not isReports,
-			skip: data.unfinished.count == 0
+			skip: data.tabs.unfinished.skip,
+			count: data.tabs.unfinished.count
 		}
 	] ) }}
 {% endmacro %}

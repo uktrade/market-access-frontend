@@ -66,7 +66,7 @@ describe( 'Barrier sectors controller', () => {
 				'SERVICES': 'title 2'
 			},
 			getSector: jasmine.createSpy( 'metadata.getSector' ),
-			affectedSectorsList: [
+			getSectorList: () => [
 				{
 					value: 'value1',
 					text: 'text 1'
@@ -114,6 +114,7 @@ describe( 'Barrier sectors controller', () => {
 
 		let sectorResponse;
 		let sectors;
+		let sectorsList;
 
 		beforeEach( () => {
 
@@ -124,7 +125,10 @@ describe( 'Barrier sectors controller', () => {
 
 			sectors = createSectors();
 			metadata.getSector.and.callFake( () => sectorResponse );
-			metadata.affectedSectorsList.push( { value: sectors[ 0 ], name: 'sector 1' } );
+			sectorsList = metadata.getSectorList();
+			sectorsList.push( { value: sectors[ 0 ], name: 'sector 1' } );
+
+			metadata.getSectorList = () => sectorsList;
 		} );
 
 		describe( 'list', () => {
@@ -339,7 +343,7 @@ describe( 'Barrier sectors controller', () => {
 
 						controller.add( req, res );
 
-						checkFormConfig( metadata.affectedSectorsList );
+						checkFormConfig( sectorsList );
 						checkRender();
 					} );
 				} );
@@ -351,7 +355,7 @@ describe( 'Barrier sectors controller', () => {
 
 						controller.add( req, res );
 
-						checkFormConfig( metadata.affectedSectorsList.filter( ( sector ) => !sectors.includes( sector.value ) ) );
+						checkFormConfig( sectorsList.filter( ( sector ) => !sectors.includes( sector.value ) ) );
 						checkRender();
 					} );
 				} );
@@ -363,7 +367,7 @@ describe( 'Barrier sectors controller', () => {
 
 						controller.add( req, res );
 
-						checkFormConfig( metadata.affectedSectorsList.filter( ( sector ) => !sectors.includes( sector.value ) ) );
+						checkFormConfig( sectorsList.filter( ( sector ) => !sectors.includes( sector.value ) ) );
 						checkRender();
 						expect( req.session.barrierSectors ).toEqual( sectors );
 					} );

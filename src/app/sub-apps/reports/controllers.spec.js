@@ -40,7 +40,7 @@ describe( 'Report controller', () => {
 				{ id: 1, name: 'country 1' },
 				{ id: 2, name: 'country 2' }
 			],
-			countryList: [
+			getCountryList: () => [
 				{ id: 0, name: 'Choose one' },
 				{ id: 1, name: 'country 1' },
 				{ id: 2, name: 'country 2' }
@@ -50,7 +50,7 @@ describe( 'Report controller', () => {
 				'B': 'b'
 			},
 			supportType: { '1': 'x', '2': 'y', '3': 'z' },
-			affectedSectorsList: [
+			getSectorList: () => [
 				{
 					value: 'id-1',
 					text: 'one'
@@ -510,7 +510,7 @@ describe( 'Report controller', () => {
 			expect( config.country ).toBeDefined();
 			expect( config.country.type ).toEqual( Form.SELECT );
 			expect( config.country.values ).toEqual( [ report.export_country ] );
-			expect( config.country.items ).toEqual( metadata.countryList );
+			expect( config.country.items ).toEqual( metadata.getCountryList() );
 			expect( config.country.validators.length ).toEqual( 1 );
 			expect( config.country.validators[ 0 ].fn ).toEqual( validators.isCountry );
 		} );
@@ -1122,7 +1122,7 @@ describe( 'Report controller', () => {
 
 						expect( config.sectors ).toBeDefined();
 						expect( config.sectors.type ).toEqual( Form.SELECT );
-						expect( config.sectors.items ).toEqual( metadata.affectedSectorsList );
+						expect( config.sectors.items ).toEqual( metadata.getSectorList() );
 						expect( config.sectors.validators[ 0 ].fn ).toEqual( validators.isSector );
 					} );
 				} );
@@ -1142,7 +1142,7 @@ describe( 'Report controller', () => {
 
 						expect( config.sectors ).toBeDefined();
 						expect( config.sectors.type ).toEqual( Form.SELECT );
-						expect( config.sectors.items ).toEqual( metadata.affectedSectorsList.filter( ( sector ) => sector.value != 2 ) );
+						expect( config.sectors.items ).toEqual( metadata.getSectorList().filter( ( sector ) => sector.value != 2 ) );
 						expect( config.sectors.validators[ 0 ].fn ).toEqual( validators.isSector );
 					} );
 				} );

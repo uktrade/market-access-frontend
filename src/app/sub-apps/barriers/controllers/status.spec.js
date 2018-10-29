@@ -79,22 +79,6 @@ describe( 'Barrier status controller', () => {
 				'GOODS': 'title 1',
 				'SERVICES': 'title 2'
 			},
-			getSector: jasmine.createSpy( 'metadata.getSector' ),
-			affectedSectorsList: [
-				{
-					value: 'value1',
-					text: 'text 1'
-				},{
-					value: 'value2',
-					text: 'text 2'
-				},{
-					value: 'value3',
-					text: 'text 3'
-				},{
-					value: 'value4',
-					text: 'text 4'
-				}
-			]
 		};
 
 		getValuesResponse = { a: 1, b: 2 };

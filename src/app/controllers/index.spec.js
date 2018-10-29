@@ -19,7 +19,6 @@ describe( 'Index controller', () => {
 		backend = {
 			barriers: {
 				getAll: jasmine.createSpy( 'backend.barriers.getAll' ),
-				getForCountry: jasmine.createSpy( 'backend.barriers.getForCountry' )
 			},
 			getReports: jasmine.createSpy( 'backend.getReports' )
 		};
@@ -44,8 +43,8 @@ describe( 'Index controller', () => {
 
 		controller = proxyquire( modulePath, {
 			'../lib/backend-service': backend,
-			'../lib/view-models/dashboard': dashboardViewModel,
-			'../lib/urls': urls
+			'../lib/urls': urls,
+			'../view-models/dashboard': dashboardViewModel,
 		} );
 	} );
 
@@ -67,12 +66,12 @@ describe( 'Index controller', () => {
 						req.user.country = country;
 
 						dashboardViewModel.and.callFake( () => dashboardViewModelResponse );
-						backend.barriers.getForCountry.and.callFake( () => Promise.resolve( barriersResponse ) );
+						backend.barriers.getAll.and.callFake( () => Promise.resolve( barriersResponse ) );
 
 						await controller.index( req, res, next );
 
 						expect( next ).not.toHaveBeenCalled();
-						expect( backend.barriers.getForCountry ).toHaveBeenCalledWith( req, country.id );
+						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { country: country.id } );
 						expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, country );
 						expect( res.render ).toHaveBeenCalledWith( 'my-country', dashboardViewModelResponse );
 					} );
@@ -95,7 +94,7 @@ describe( 'Index controller', () => {
 						await controller.index( req, res, next );
 
 						expect( next ).not.toHaveBeenCalled();
-						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req );
+						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, {} );
 						expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, req.user.country );
 						expect( res.render ).toHaveBeenCalledWith( 'index', dashboardViewModelResponse );
 					} );
@@ -115,7 +114,7 @@ describe( 'Index controller', () => {
 					await controller.index( req, res, next );
 
 					expect( next ).toHaveBeenCalledWith( new Error( `Got ${ barriersResponse.response.statusCode } response from backend` ) );
-					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req );
+					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, {} );
 					expect( res.render ).not.toHaveBeenCalled();
 				} );
 			} );

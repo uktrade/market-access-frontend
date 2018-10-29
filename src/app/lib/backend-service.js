@@ -60,12 +60,6 @@ function transformReport( report ){
 
 	sortReportProgress( report );
 
-	if( report.barrier_type ){
-
-		report.barrier_type_id = report.barrier_type.id;
-		report.barrier_type_category =report.barrier_type.category;
-	}
-
 	return report;
 }
 
@@ -116,11 +110,34 @@ module.exports = {
 
 	getUser: ( req ) => backend.get( '/whoami', getToken( req ) ).then( transformUser ),
 	ping: () => backend.get( '/ping.xml' ),
+	getCounts: ( req ) => backend.get( '/counts', getToken( req ) ),
 
 	barriers: {
-		getAll: ( req ) => backend.get( '/barriers', getToken( req ) ),
-		getForCountry: ( req, countryId ) => backend.get( `/barriers?country=${ countryId }`, getToken( req ) ),
-		getCount: ( req ) => backend.get( '/barriers/count', getToken( req ) ),
+		getAll: async ( req, filters = {} ) => {
+
+			/*const filterMap = {
+				'export_country': 'country',
+				'start_date': 'date-start',
+				'end_date': 'date-end',
+				'barrier_type': 'type',
+				'sector': 'sector'
+			};*/
+
+			const query = [];
+			let path = '/barriers';
+
+			if( filters.country ){
+
+				query.push( `export_country=${ filters.country }` );
+			}
+
+			if( query.length ){
+
+				path += '?' + query.join( '&' );
+			}
+
+			return backend.get( path, getToken( req ) );
+		},
 		get: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }`, getToken( req ) ),
 		getInteractions: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }/interactions`, getToken( req ) ),
 		saveNote: ( req, barrierId, values ) => backend.post( `/barriers/${ barrierId }/interactions`, getToken( req ), {

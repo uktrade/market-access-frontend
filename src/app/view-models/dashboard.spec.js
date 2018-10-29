@@ -27,7 +27,7 @@ describe( 'Dashboard view model', () => {
 		};
 
 		viewModel = proxyquire( modulePath, {
-			'../metadata': metadata
+			'../lib/metadata': metadata
 		} );
 	} );
 

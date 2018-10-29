@@ -61,6 +61,16 @@ Given( 'I\'m on the what is a barrier page', async () => {
 	this.driver = driver.getInstance();
 });
 
+Given( 'I\'m on the find a barrier page', async () => {
+
+	this.name = 'find-a-barrier';
+
+	await driver.fetch( urls.findABarrier() );
+	await driver.takeScreenshot( this.name );
+
+	this.driver = driver.getInstance();
+});
+
 When( 'I navigate to the report a barrier page', async () => {
 
 	const button = await driver.byCss( '.dash-button' );
@@ -120,14 +130,14 @@ Then( 'the footer links should be present', async () => {
 		[ 'View Data Hub', '/#' ],
 		[ 'Dashboard', '/' ],
 		[ 'Report a barrier', urls.reports.new() ],
+		[ 'Find a barrier', urls.findABarrier() ],
 		[ 'What is a barrier?', urls.whatIsABarrier() ]
 	];
 
-	assert.equal( links.length, 4 );
+	assert.equal( links.length, info.length );
 
 	for( const [ index, link ] of links.entries() ){
 
-		//const link = links[ index ];
 		const text = await link.getText();
 		const href = await link.getAttribute( 'href' );
 		const [ infoText, infoPath ] = info[ index ];

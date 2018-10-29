@@ -55,14 +55,14 @@ function createTaskList( reportStages ){
 	return tasks;
 }
 
-function createCountryList( countries ){
+function createCountryList( countries, text ){
 
 	const countryList = countries.map( ( country ) => ( {
 		value: country.id,
 		text: country.name
 	} ) );
 
-	countryList.unshift( { value: '', text: 'Choose a country' } );
+	countryList.unshift( { value: '', text } );
 
 	return countryList;
 }
@@ -81,6 +81,7 @@ function createSectorsList( sectors, text ){
 
 let countries;
 let sectors;
+let level0Sectors;
 
 module.exports.fetch = async () => {
 
@@ -92,14 +93,12 @@ module.exports.fetch = async () => {
 
 			countries = body.countries.filter( notDisabled ).map( cleanCountry );
 			sectors = body.sectors.filter( notDisabled );
-
-			const level0Sectors = sectors.filter( ( sector ) => sector.level === 0 );
+			level0Sectors = sectors.filter( ( sector ) => sector.level === 0 );
 
 			module.exports.statusTypes = body.status_types;
 			module.exports.lossScale = body.loss_range;
 			module.exports.boolScale = body.adv_boolean;
 			module.exports.countries = countries;
-			module.exports.countryList = createCountryList( module.exports.countries );
 			module.exports.govResponse = body.govt_response;
 			module.exports.publishResponse = body.publish_response;
 			module.exports.reportStages = body.report_stages;
@@ -109,7 +108,6 @@ module.exports.fetch = async () => {
 			module.exports.supportType = body.support_type;
 			module.exports.sectors = sectors;
 			module.exports.level0Sectors = level0Sectors;
-			module.exports.affectedSectorsList = createSectorsList( level0Sectors, 'Select a sector' );
 			module.exports.barrierAwareness = body.barrier_source;
 			module.exports.bool = {
 				'true': 'Yes',
@@ -127,5 +125,26 @@ module.exports.fetch = async () => {
 	}
 };
 
+module.exports.getCountryList = ( defaultText = 'Choose a country' ) => createCountryList( countries, defaultText );
+module.exports.getSectorList = () => createSectorsList( level0Sectors, 'Select a sector' );
 module.exports.getSector = ( sectorId ) => sectors.find( ( sector ) => sector.id === sectorId );
 module.exports.getCountry = ( countryId ) => countries.find( ( country ) => country.id === countryId );
+
+const OPEN = 2;
+const RESOLVED = 4;
+const HIBERNATED = 5;
+
+module.exports.barrier = {
+	status: {
+		types: {
+			OPEN,
+			RESOLVED,
+			HIBERNATED
+		},
+		typeInfo: {
+			[ OPEN ]: { name: 'Open', modifyer: 'assessment' },
+			[ RESOLVED ]: { name: 'Resolved', modifyer: 'resolved' },
+			[ HIBERNATED ]: { name: 'Paused', modifyer: 'hibernated' }
+		}
+	}
+};

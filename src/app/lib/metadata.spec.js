@@ -122,6 +122,39 @@ describe( 'metadata', () => {
 			} );
 		} );
 
+		describe( 'getCountryList', () => {
+			describe( 'Without specifying the default text', () => {
+				it( 'Should create a country list for use with a select - with a default choose option', () => {
+
+					const countries = metadata.getCountryList();
+
+					expect( countries.length ).toEqual( metadata.countries.length + 1 );
+					expect( countries[ 0 ] ).toEqual( { value: '', text: 'Choose a country' } );
+
+					countries.forEach( ( country ) => {
+						expect( country.value ).toBeDefined();
+						expect( country.text ).toBeDefined();
+					});
+				} );
+			} );
+
+			describe( 'Specifying the default text', () => {
+				it( 'Should create a country list for use with a select - with the specified choose option', () => {
+
+					const text = 'Select an option';
+					const countries = metadata.getCountryList( text );
+
+					expect( countries.length ).toEqual( metadata.countries.length + 1 );
+					expect( countries[ 0 ] ).toEqual( { value: '', text } );
+
+					countries.forEach( ( country ) => {
+						expect( country.value ).toBeDefined();
+						expect( country.text ).toBeDefined();
+					});
+				} );
+			} );
+		} );
+
 		describe( 'govResponse', () => {
 			it( 'Should return the data', () => {
 
@@ -257,7 +290,7 @@ describe( 'metadata', () => {
 				} );
 			} );
 
-			describe( 'affectedSectorsList', () => {
+			describe( 'getSectorList', () => {
 
 				it( 'Should return all sectors that are not disabled and have a level of 0 in a govuk formate', () => {
 
@@ -265,7 +298,7 @@ describe( 'metadata', () => {
 
 					affectedSectorsList.unshift( { value: '', text: 'Select a sector' } );
 
-					expect( metadata.affectedSectorsList ).toEqual( affectedSectorsList );
+					expect( metadata.getSectorList() ).toEqual( affectedSectorsList );
 				} );
 			} );
 		} );
