@@ -30,7 +30,8 @@ describe( 'Find a barrier controller', () => {
 		};
 		viewModel = jasmine.createSpy( 'view-model' );
 		validators = {
-			isCountry: jasmine.createSpy( 'validators.isCountry' )
+			isCountry: jasmine.createSpy( 'validators.isCountry' ),
+			isSector: jasmine.createSpy( 'validators.isSector' )
 		};
 
 		controller = proxyquire( modulePath, {
@@ -102,6 +103,54 @@ describe( 'Find a barrier controller', () => {
 				it( 'Should render the template without filters', async () => {
 
 					validators.isCountry.and.callFake( () => false );
+
+					await controller( req, res, next );
+
+					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, {} );
+				} );
+			} );
+		} );
+
+		describe( 'With a sector filter', () => {
+
+			let sector;
+			let viewModelResponse;
+
+			beforeEach( () => {
+
+				sector = uuid();
+				req.query.sector = sector;
+				viewModelResponse = { a: 1, b: 2 };
+
+				viewModel.and.callFake( () => viewModelResponse );
+
+				backend.barriers.getAll.and.callFake( () => ({
+					response: { isSuccess: true },
+					body: jasmine.helpers.getFakeData( '/backend/barriers/' )
+				}) );
+			} );
+
+			afterEach( () => {
+
+				expect( res.render ).toHaveBeenCalledWith( template, viewModelResponse );
+				expect( next ).not.toHaveBeenCalled();
+			} );
+
+			describe( 'When the sector is valid', () => {
+				it( 'Should render the template with a filter', async () => {
+
+					validators.isSector.and.callFake( () => true );
+
+					await controller( req, res, next );
+
+					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { sector } );
+				} );
+			} );
+
+			describe( 'When the sector is NOT valid', () => {
+				it( 'Should render the template without filters', async () => {
+
+					validators.isSector.and.callFake( () => false );
 
 					await controller( req, res, next );
 

@@ -34,6 +34,17 @@
 					items: filters.country
 				}) }}
 
+				{{ govukSelect({
+					id: 'sector',
+					name: 'sector',
+					classes: 'js-filter',
+					label: {
+						text: 'Sector',
+						classes: 'filter-items__label'
+					},
+					items: filters.sector
+				}) }}
+
 				{% if hasFilters %}
 				<a class="filter-items__clear js-filter-clear" href="{{ urls.findABarrier() }}">Clear filters</a>
 				{% endif %}

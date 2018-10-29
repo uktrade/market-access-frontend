@@ -131,6 +131,11 @@ module.exports = {
 				query.push( `export_country=${ filters.country }` );
 			}
 
+			if( filters.sector ){
+
+				query.push( `sector=${ filters.sector }` );
+			}
+
 			if( query.length ){
 
 				path += '?' + query.join( '&' );

@@ -14,6 +14,8 @@ describe( 'Find a barrier view model', () => {
 	let mockSector;
 	let mockCountry;
 	let barriers;
+	let countryList;
+	let sectorList;
 
 	function getExpectedBarrierOutput( barriers ){
 
@@ -64,13 +66,28 @@ describe( 'Find a barrier view model', () => {
 			},
 			getSector: jasmine.createSpy( 'metadata.getSector' ),
 			getCountry: jasmine.createSpy( 'metadata.getCountry' ),
-			getCountryList: jasmine.createSpy( 'metadata.getCountryList' )
+			getCountryList: jasmine.createSpy( 'metadata.getCountryList' ),
+			getSectorList: jasmine.createSpy( 'metadata.getSectorList' ),
 		};
 
 		mockSector = { id: uuid(), name: faker.lorem.words() };
 		mockCountry = { id: uuid(), name: faker.address.country() };
 		barriers = jasmine.helpers.getFakeData( '/backend/barriers/find-a-barrier' );
 
+		countryList = [
+			{ value: uuid(), name: faker.address.country() },
+			{ value: uuid(), name: faker.address.country() },
+			{ value: uuid(), name: faker.address.country() },
+		];
+
+		sectorList = [
+			{ value: uuid(), name: faker.lorem.words() },
+			{ value: uuid(), name: faker.lorem.words() },
+			{ value: uuid(), name: faker.lorem.words() },
+		];
+
+		metadata.getCountryList.and.callFake( () => countryList );
+		metadata.getSectorList.and.callFake( () => sectorList );
 		metadata.getSector.and.callFake( () => mockSector );
 		metadata.getCountry.and.callFake( () => mockCountry );
 
@@ -79,19 +96,17 @@ describe( 'Find a barrier view model', () => {
 		} );
 	} );
 
+	afterEach( () => {
+
+		expect( metadata.getCountryList ).toHaveBeenCalledWith( 'All locations' );
+		expect( metadata.getSectorList ).toHaveBeenCalledWith( 'All sectors' );
+	} );
+
 	describe( 'Without any filters', () => {
 		it( 'Should return the correct data', () => {
 
 			const count = 20;
 			const filters = {};
-
-			const countryList = [
-				{ value: uuid(), name: faker.address.country() },
-				{ value: uuid(), name: faker.address.country() },
-				{ value: uuid(), name: faker.address.country() },
-			];
-
-			metadata.getCountryList.and.callFake( () => countryList );
 
 			const output = viewModel( {
 				count,
@@ -101,8 +116,7 @@ describe( 'Find a barrier view model', () => {
 
 			expect( output.count ).toEqual( count );
 			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
-			expect( output.filters ).toEqual( {	country: countryList	} );
-			expect( metadata.getCountryList ).toHaveBeenCalledWith( 'All locations' );
+			expect( output.filters ).toEqual( {	country: countryList, sector: sectorList	} );
 			expect( output.hasFilters ).toEqual( false );
 		} );
 	} );
@@ -111,17 +125,9 @@ describe( 'Find a barrier view model', () => {
 		it( 'Should return the correct data', () => {
 
 			const count = 10;
-			const filters = {
-				country: uuid()
-			};
+			const filters = { country: uuid() };
 
-			const countryList = [
-				{ value: uuid(), name: faker.address.country() },
-				{ value: uuid(), name: faker.address.country() },
-				{ value: filters.country, name: faker.address.country() },
-			];
-
-			metadata.getCountryList.and.callFake( () => countryList );
+			countryList[ 2 ].value = filters.country;
 
 			const output = viewModel( {
 				count,
@@ -131,9 +137,30 @@ describe( 'Find a barrier view model', () => {
 
 			expect( output.count ).toEqual( count );
 			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
-			expect( output.filters ).toEqual( {	country: countryList	} );
+			expect( output.filters ).toEqual( {	country: countryList, sector: sectorList	} );
 			expect( countryList[ 2 ].selected ).toEqual( true );
-			expect( metadata.getCountryList ).toHaveBeenCalledWith( 'All locations' );
+			expect( output.hasFilters ).toEqual( true );
+		} );
+	} );
+
+	describe( 'With a sector filter', () => {
+		it( 'Should return the correct data', () => {
+
+			const count = 5;
+			const filters = { sector: uuid() };
+
+			sectorList[ 2 ].value = filters.sector;
+
+			const output = viewModel( {
+				count,
+				barriers,
+				filters
+			} );
+
+			expect( output.count ).toEqual( count );
+			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
+			expect( output.filters ).toEqual( {	country: countryList, sector: sectorList	} );
+			expect( sectorList[ 2 ].selected ).toEqual( true );
 			expect( output.hasFilters ).toEqual( true );
 		} );
 	} );
