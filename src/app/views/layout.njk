@@ -146,7 +146,7 @@
 		}
 	</script>
 	{% block body_script %}{% endblock %}
-	{% if analytics.enabled and analytics.id %}
+	{% if not user.internal and analytics.enabled and analytics.id %}
 		<!-- Global site tag (gtag.js) - Google Analytics -->
 		<script async src="https://www.googletagmanager.com/gtag/js?id={{ analytics.id }}"></script>
 		<script>

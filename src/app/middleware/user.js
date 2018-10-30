@@ -6,7 +6,16 @@ module.exports = async ( req, res, next ) => {
 
 		try {
 
-			req.session.user = ( await backend.getUser( req ) ).body;
+			const { response, body } = ( await backend.getUser( req ) );
+
+			if( response.isSuccess ){
+
+				req.session.user = body;
+
+			} else {
+
+				next( new Error( `Unable to get user info, got ${ response.statusCode } response code` ) );
+			}
 
 		} catch( e ){
 
