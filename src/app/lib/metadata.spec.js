@@ -316,6 +316,16 @@ describe( 'metadata', () => {
 			} );
 		} );
 
+		describe( 'getBarrierTypeList', () => {
+			it( 'Should return the list', () => {
+
+				const expected = fakeData.barrier_types.map( ( { id, title } ) => ({ value: id, text: title }) );
+				expected.unshift( { value: '', text: 'All barrier types' } );
+
+				expect( metadata.getBarrierTypeList() ).toEqual( expected );
+			} );
+		} );
+
 		describe( 'barrierAwareness', () => {
 			it( 'Should return a list', () => {
 

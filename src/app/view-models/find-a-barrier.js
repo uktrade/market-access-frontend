@@ -7,7 +7,9 @@ function isSelected( value ){
 
 	return ( item ) => {
 
-		if( item.value === value ){
+		// need to use Abstract Equality Comparison
+		// query params are always strings so ensure they match numbers etc
+		if( item.value == value ){
 
 			item.selected = true;
 		}
@@ -51,7 +53,7 @@ module.exports = function( params ){
 		filters: {
 			country: metadata.getCountryList( 'All locations' ).map( isSelected( filters.country ) ),
 			sector: metadata.getSectorList( 'All sectors' ).map( isSelected( filters.sector ) ),
-			type: metadata.barrierTypes.map( ( { id, title } ) => ({ value: id, text: title }) ).map( isSelected( filters.type ) ),
+			type: metadata.getBarrierTypeList().map( isSelected( filters.type ) ),
 		}
 	};
 };

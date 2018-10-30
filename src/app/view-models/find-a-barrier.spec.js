@@ -69,11 +69,7 @@ describe( 'Find a barrier view model', () => {
 			getCountry: jasmine.createSpy( 'metadata.getCountry' ),
 			getCountryList: jasmine.createSpy( 'metadata.getCountryList' ),
 			getSectorList: jasmine.createSpy( 'metadata.getSectorList' ),
-			barrierTypes: [
-				{ id: 1, title: faker.lorem.words(), category: 'ONE' },
-				{ id: 2, title: faker.lorem.words(), category: 'TWO' },
-				{ id: 3, title: faker.lorem.words(), category: 'ONE' },
-			],
+			getBarrierTypeList: jasmine.createSpy( 'jasmine.getBarrierTypeList' ),
 		};
 
 		mockSector = { id: uuid(), name: faker.lorem.words() };
@@ -92,12 +88,17 @@ describe( 'Find a barrier view model', () => {
 			{ value: uuid(), text: faker.lorem.words() },
 		];
 
-		barrierTypeList = metadata.barrierTypes.map( ( { id, title } ) => ({ value: id, text: title }) );
+		barrierTypeList = [
+			{ value: 1, text: faker.lorem.words() },
+			{ value: 2, text: faker.lorem.words() },
+			{ value: 3, text: faker.lorem.words() },
+		],
 
 		metadata.getCountryList.and.callFake( () => countryList );
 		metadata.getSectorList.and.callFake( () => sectorList );
 		metadata.getSector.and.callFake( () => mockSector );
 		metadata.getCountry.and.callFake( () => mockCountry );
+		metadata.getBarrierTypeList.and.callFake( () => barrierTypeList );
 
 		viewModel = proxyquire( modulePath, {
 			'../lib/metadata': metadata,
@@ -108,6 +109,7 @@ describe( 'Find a barrier view model', () => {
 
 		expect( metadata.getCountryList ).toHaveBeenCalledWith( 'All locations' );
 		expect( metadata.getSectorList ).toHaveBeenCalledWith( 'All sectors' );
+		expect( metadata.getBarrierTypeList ).toHaveBeenCalledWith();
 	} );
 
 	describe( 'Without any filters', () => {
