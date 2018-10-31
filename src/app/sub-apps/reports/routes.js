@@ -5,7 +5,7 @@ const headerNav = require( '../../middleware/header-nav' );
 const controller = require( './controllers' );
 
 const uuidParam = require( '../../middleware/params/uuid' );
-const dashboardTabs = require( '../../middleware/dashboard-tabs' );
+const dashboardData = require( '../../middleware/dashboard-data' );
 const reportId = require( './middleware/params/report-id' );
 
 const hasStartFormValues = require( './middleware/has-start-form-values' );
@@ -22,7 +22,7 @@ module.exports = ( express, app ) => {
 
 	app.use( parseBody, csrfProtection );
 
-	app.get( '/', headerNav( { isDashboard: true } ), dashboardTabs, controller.index ),
+	app.get( '/', headerNav( { isDashboard: true } ), dashboardData, controller.index ),
 	app.get( '/new/', controller.new );
 	app.get( '/:uuid/success/', controller.success );
 
@@ -49,7 +49,7 @@ module.exports = ( express, app ) => {
 	app.post( '/:reportId/problem/', controller.aboutProblem );
 
 	app.post( '/:reportId/submit/', controller.submit );
-	// detail muse be last route
+	// detail must be last route
 	app.get( '/:reportId/', controller.report );
 
 	return app;

@@ -1,0 +1,16 @@
+{
+   "barriers": {
+      "total": 1,
+      "open": 5,
+      "resolved": 17
+   },
+   "reports": 15,
+   "user": {
+      "barriers": 1,
+      "reports": 4,
+      "country": {
+         "barriers": 9,
+         "reports": 5
+      }
+   }
+}

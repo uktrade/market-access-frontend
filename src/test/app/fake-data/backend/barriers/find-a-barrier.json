@@ -1,0 +1,80 @@
+[
+  {
+    "id": "074552b8-fa52-4ee7-be87-473792a48651",
+    "reported_on": "2018-10-25T22:31:39.643863Z",
+    "reported_by": null,
+    "problem_status": 2,
+    "is_resolved": false,
+    "resolved_date": null,
+    "barrier_title": "qui ipsam ea",
+    "sectors_affected": false,
+    "sectors": null,
+    "export_country": "5e770e3c-be4e-469f-a672-e2c2fa1c28e7",
+    "current_status": {
+      "status": 2,
+      "status_date": "2018-10-25T22:32:08.990877Z",
+      "status_summary": null
+    },
+    "created_on": "2018-10-25T22:31:39.642695Z"
+  },
+  {
+    "id": "a614fb94-ae8a-4506-9a8c-dd6f0f3a704f",
+    "reported_on": "2018-10-11T18:44:17.400190Z",
+    "reported_by": null,
+    "problem_status": 2,
+    "is_resolved": false,
+    "resolved_date": null,
+    "barrier_title": "omnis repudiandae magni",
+    "sectors_affected": true,
+    "sectors": [
+      "9faafaff-b1a1-4c30-91a3-d25f53f77386"
+    ],
+    "export_country": "31c3c90a-ae59-4125-9716-75a371c3bf83",
+    "current_status": {
+      "status": 2,
+      "status_date": "2018-10-17T06:13:03.281595Z",
+      "status_summary": null
+    },
+    "created_on": "2018-10-11T18:44:17.399990Z"
+  },
+  {
+    "id": "37070f02-6329-4579-92a7-c0bf147b9bc7",
+    "reported_on": "2018-10-23T08:17:25.022548Z",
+    "reported_by": null,
+    "problem_status": 1,
+    "is_resolved": false,
+    "resolved_date": null,
+    "barrier_title": "qui molestias quis",
+    "sectors_affected": true,
+    "sectors": [
+      "cb82a100-2798-4bef-87ef-a76af96a369b"
+    ],
+    "export_country": "f02b6158-3a3c-46c7-af41-80ce0fa589ca",
+    "current_status": {
+      "status": 5,
+      "status_date": "2018-10-24T19:45:55.114785Z",
+      "status_summary": "Paused summary"
+    },
+    "created_on": "2018-10-23T08:17:25.022437Z"
+  },
+  {
+    "id": "9623ffd6-8eb3-42d6-9eb1-d1854fb5b6c5",
+    "reported_on": "2018-10-18T17:18:54.856397Z",
+    "reported_by": null,
+    "problem_status": 2,
+    "is_resolved": false,
+    "resolved_date": null,
+    "barrier_title": "nemo nobis ut",
+    "sectors_affected": false,
+    "sectors": [
+      "bebd0f10-6fda-43de-9306-f51dffae3c75"
+    ],
+    "export_country": "34cbdd69-3061-4e49-8d3d-2042ce02b25f",
+    "current_status": {
+      "status": 4,
+      "status_date": "2018-02-01T00:00:00Z",
+      "status_summary": "test resolved summary"
+    },
+    "created_on": "2018-10-18T17:18:54.856257Z"
+  }
+]

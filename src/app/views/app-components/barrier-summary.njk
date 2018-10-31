@@ -1,11 +1,14 @@
 {% macro barrierSummary( barrier ) %}
 	<section class="barrier-summary">
-		<h1 class="barrier-summary__heading">{{ barrier.title }}</h1>
+		<div class='barrier-summary__heading'>
+			<h1 class="barrier-summary__heading__text">{{ barrier.title }}</h1>
+			<a class="barrier-summary__heading__link" href="{{ urls.barriers.edit( barrier.id ) }}">Edit barrier header</a>
+		</div>
 		<div class="barrier-summary__status">
-			<span class="barrier-summary__status__badge barrier-summary__status__badge--{{ barrier.status.modifyer }}">
+			<span class="barrier-status-badge barrier-status-badge--{{ barrier.status.modifyer }}">
 				Status: <strong>{{ barrier.status.name }}</strong>
 			</span>
-			<a class="barrier-summary__status__link" href="{{ urls.barriers.status( barrier.id ) }}">edit</a>
+			<a class="barrier-summary__status__link" href="{{ urls.barriers.status( barrier.id ) }}">change</a>
 		</div>
 		<dl class="barrier-summary__info">
 			<div class="barrier-summary__info__group">

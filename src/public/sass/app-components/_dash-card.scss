@@ -3,20 +3,25 @@
 	border-top: 5px solid $govuk-black;
 	padding-right: govuk-em( 15, 16 );
 	box-sizing: border-box;
+	width: 100%;
 
-	@include mq( $from: tablet ){
-		max-width: govuk-em( 300, 16 );
-		margin-left: govuk-em( 30, 16 );
+	@include mq( $from: $dash-button-from-tablet-width ){
+		width: ( $dash-button-width * 2 ) + $dash-button-margin;
+	}
+
+	@include mq( $from: $dash-button-from-desktop-width ){
+		width: $dash-button-width;
+		margin-left: $dash-button-margin;
 	}
 }
 
 .dash-card__heading {
-	@include govuk-font( 24, $weight: bold );
-	margin: govuk-em( 10, 24 ) 0 govuk-em( 5, 24 ) 0;
+	@include govuk-font( 24, $weight: bold, $line-height: 1.2 );
+	margin: govuk-em( 5, 24 ) 0;
 	line-height: 1.25;
 }
 
 .dash-card__text {
 	margin: 0;
-	line-height: 1.25;
+	@include govuk-font( 14 );
 }

@@ -43,6 +43,17 @@
 		},
 		items: [
 			{
+				title: 'Company or organisation affected',
+				items: companiesList if companiesList.length,
+				add: {
+					text: 'Add one or more companies',
+					href: urls.barriers.companies.search( barrier.id )
+				},
+				edit: {
+					href: urls.barriers.companies.edit( barrier.id )
+				}
+			} if addCompany,
+			{
 				title: ( 'Sector' + ( 's' if barrier.sectors.length !== 1 ) + ' affected' ),
 				items: sectorsList if sectorsList.length,
 				add: {
@@ -50,7 +61,7 @@
 					href: urls.barriers.sectors.add( barrier.id )
 				},
 				edit: {
-					href: urls.barriers.sectors.list( barrier.id )
+					href: urls.barriers.sectors.edit( barrier.id )
 				}
 			},
 			{

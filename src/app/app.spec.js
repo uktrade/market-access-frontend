@@ -165,6 +165,19 @@ describe( 'App', function(){
 			} );
 		} );
 
+		describe( 'Find a barrier page', function(){
+			it( 'Should render the page', function( done ){
+
+				intercept.backend()
+					.get( `/barriers` )
+					.reply( 200, intercept.stub( '/backend/barriers/' ) );
+
+				app
+					.get( urls.findABarrier() )
+					.end( checkPage( 'Market Access - Find a barrier', done ) );
+			} );
+		} );
+
 		describe( 'Barriers', () => {
 
 			let barrierId;
@@ -197,7 +210,8 @@ describe( 'App', function(){
 
 					intercept.backend()
 						.get( `/barriers/${ barrierId }` )
-						.reply( 200, barrier );
+						.reply( 200, barrier )
+						.persist();
 				} );
 
 				describe( 'Barrier detail', () => {
@@ -206,6 +220,15 @@ describe( 'App', function(){
 						app
 							.get( urls.barriers.detail( barrierId ) )
 							.end( checkPage( 'Market Access - Barrier details', done ) );
+					} );
+				} );
+
+				describe( 'Edit barrier', () => {
+					it( 'Should fetch the barrier and render the page', ( done ) => {
+
+						app
+							.get( urls.barriers.edit( barrierId ) )
+							.end( checkPage( 'Market Access - Barrier - Edit', done ) );
 					} );
 				} );
 
@@ -223,12 +246,214 @@ describe( 'App', function(){
 				} );
 
 				describe( 'Barrier sectors', () => {
+					describe( 'Editing the sectors', () => {
+						it( 'Should list the sectors', ( done ) => {
+
+							app
+								.get( urls.barriers.sectors.edit( barrierId ) )
+								.end( checkPage( 'Market Access - Sectors affected by the barrier', done ) );
+						} );
+					} );
 					describe( 'Listing the sectors', () => {
 						it( 'Should list the sectors', ( done ) => {
 
 							app
 								.get( urls.barriers.sectors.list( barrierId ) )
 								.end( checkPage( 'Market Access - Sectors affected by the barrier', done ) );
+						} );
+					} );
+					describe( 'Adding a sector', () => {
+						it( 'Should render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.sectors.add( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier - Add an affected sector', done ) );
+						} );
+					} );
+				} );
+
+				describe( 'Barrier companies', () => {
+
+					function interceptCompany( url ){
+
+						intercept.datahub()
+							.get( url )
+							.reply( 200, intercept.stub( '/datahub/company/detail' ) );
+					}
+
+					describe( 'Editing a list of companies', () => {
+						it( 'Should render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.companies.edit( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier - Save or add another affected company or organisation', done ) );
+						} );
+					} );
+
+					describe( 'Listing the companies', () => {
+						it( 'Should render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.companies.list( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier - Save or add another affected company or organisation', done ) );
+						} );
+					} );
+
+					describe( 'Searching for a company', () => {
+						describe( 'a GET', () => {
+								it( 'Should render the page', ( done ) => {
+
+								app
+									.get( urls.barriers.companies.search( barrierId ) )
+									.end( checkPage( 'Market Access - Barrier - Add an affected company or organisation', done ) );
+							} );
+						} );
+
+						describe( 'a POST', () => {
+
+							let agent;
+							let token;
+							let url;
+
+							beforeEach( ( done ) => {
+
+								agent = supertest.agent( appInstance );
+								url = urls.barriers.companies.search( barrierId );
+
+								agent
+									.get( url )
+									.end( ( err, res ) => {
+
+										token = getCsrfToken( res, done.fail );
+										done();
+									} );
+							} );
+
+							function doPost( code, cb ){
+								agent
+									.post( url )
+									.send( `_csrf=${ token }&query=${ uuid() }` )
+									.expect( code )
+									.end( cb );
+							}
+
+							describe( 'With a success from datahub', () => {
+								it( 'Should render the page', ( done ) => {
+
+									intercept.datahub()
+										.post( '/v3/search/company' )
+										.reply( 200, intercept.stub( '/datahub/search/company' ) );
+
+										doPost( 200, checkPage( 'Market Access - Barrier - Add an affected company or organisation', done ) );
+								} );
+							} );
+
+							describe( 'With a 500 error from datahub', () => {
+								it( 'Should render an error page', ( done ) => {
+
+									intercept.datahub()
+										.post( '/v3/search/company' )
+										.reply( 500, {} );
+
+									doPost( 500, checkPage( 'Market Access - Error', done, 500 ) );
+								} );
+							} );
+
+							describe( 'With a 403 error from datahub', () => {
+								it( 'Should render an error page', ( done ) => {
+
+									intercept.datahub()
+										.post( '/v3/search/company' )
+										.reply( 403, {} );
+
+									doPost( 200, checkPage( 'Market Access - Barrier - Add an affected company or organisation', done ) );
+								} );
+							} );
+						} );
+					} );
+
+					describe( 'Details of a company', () => {
+
+						let companyId;
+						let barrierUrl;
+						let datahubUrl;
+
+						beforeEach( () => {
+
+							companyId = uuid();
+							barrierUrl = urls.barriers.companies.details( barrierId, companyId );
+							datahubUrl = `/v3/company/${ companyId }`;
+						} );
+
+						describe( 'a GET', () => {
+								it( 'Should render the page', ( done ) => {
+
+								interceptCompany( datahubUrl );
+
+								app
+									.get( barrierUrl )
+									.end( checkPage( 'Market Access - Barrier - Company or organisation details', done ) );
+							} );
+						} );
+
+						describe( 'a POST', () => {
+
+							let agent;
+							let token;
+
+							beforeEach( ( done ) => {
+
+								agent = supertest.agent( appInstance );
+
+								interceptCompany( datahubUrl );
+
+								agent
+									.get( barrierUrl )
+									.end( ( err, res ) => {
+
+										token = getCsrfToken( res, done.fail );
+										done();
+									} );
+							} );
+
+							function doPost( code, cb ){
+								agent
+									.post( barrierUrl )
+									.send( `_csrf=${ token }` )
+									.expect( code )
+									.end( cb );
+							}
+
+							describe( 'With a success from datahub', () => {
+								it( 'Should render the page', ( done ) => {
+
+									interceptCompany( datahubUrl );
+
+									doPost( 302, done );
+								} );
+							} );
+
+							describe( 'With a 500 error from datahub', () => {
+								it( 'Should render an error page', ( done ) => {
+
+									intercept.datahub()
+										.get( datahubUrl )
+										.reply( 500, {} );
+
+									doPost( 500, checkPage( 'Market Access - Error', done, 500 ) );
+								} );
+							} );
+
+							describe( 'With a 403 error from datahub', () => {
+								it( 'Should render an error page', ( done ) => {
+
+									intercept.datahub()
+										.get( datahubUrl )
+										.reply( 403, {} );
+
+									doPost( 403, checkPage( 'Market Access - Data Hub Error', done, 403 ) );
+								} );
+							} );
 						} );
 					} );
 				} );
@@ -420,225 +645,6 @@ describe( 'App', function(){
 							agent
 								.get( urls.reports.country( reportId ) )
 								.end( checkPage( title, done ) );
-						} );
-					} );
-				} );
-
-				xdescribe( 'Company search page', () => {
-
-					let agent;
-
-					beforeAll( async ( done ) => {
-
-						agent = supertest.agent( appInstance );
-
-						agent
-							.get( urls.reports.start() )
-							.end( ( err, res ) => {
-
-								const token = getCsrfToken( res, done.fail );
-
-								agent
-									.post( urls.reports.start() )
-									.send( `_csrf=${ token }&status=1&emergency=true` )
-									.expect( 302, done );
-							} );
-					} );
-
-					describe( 'Without a report id', () => {
-						it( 'Should render the company search page', ( done ) => {
-
-							agent
-								.get( urls.reports.companySearch() )
-								.end( checkPage( 'Market Access - Report - Search for company', done ) );
-						} );
-					} );
-
-					describe( 'With a report id', () => {
-
-						afterEach( checkNock );
-
-						it( 'Should fetch the report and render the company search page', ( done ) => {
-
-							const reportId = '1234';
-
-							interceptReport( reportId );
-
-							agent
-								.get( urls.reports.companySearch( reportId ) )
-								.end( checkPage( 'Market Access - Report - Search for company', done ) );
-						} );
-					} );
-				} );
-
-				xdescribe( 'Company details', () => {
-
-					let companyId;
-					let agent;
-
-					beforeEach( ( done ) => {
-
-						companyId = 'd829a9c6-cffb-4d6a-953b-3e02a2b33028';
-
-						agent = supertest.agent( appInstance );
-
-						agent
-							.get( urls.reports.start() )
-							.end( ( err, res ) => {
-
-								const token = getCsrfToken( res, done.fail );
-
-								agent
-									.post( urls.reports.start() )
-									.send( `_csrf=${ token }&status=1&emergency=false` )
-									.expect( 302, done );
-							} );
-					} );
-
-					afterEach( checkNock );
-
-					describe( 'With a success', () => {
-
-						const title = 'Market Access - Report - Company details';
-
-						beforeEach( () => {
-
-							intercept.datahub()
-								.get( `/v3/company/${ companyId }` )
-								.reply( 200, intercept.stub( '/datahub/company/detail' ) );
-						} );
-
-						describe( 'Without a report id', () => {
-							it( 'Should render the details of a company', ( done ) => {
-
-								agent
-									.get( urls.reports.companyDetails( companyId ) )
-									.end( checkPage( title, done ) );
-							} );
-						} );
-
-						describe( 'With a report id', () => {
-							it( 'Should fetch the report and render the details of a company', ( done ) => {
-
-								const reportId = '789';
-
-								interceptReport( reportId );
-
-								agent
-									.get( urls.reports.companyDetails( companyId, reportId ) )
-									.end( checkPage( title, done ) );
-							} );
-						} );
-					} );
-
-					describe( 'With an error', () => {
-						it( 'Should render the error page', ( done ) => {
-
-							intercept.datahub()
-								.get( `/v3/company/${ companyId }` )
-								.reply( 500, {} );
-
-							app
-								.get( urls.reports.companyDetails( companyId ) )
-								.end( checkPage( 'Market Access - Error', done, 500 ) );
-						} );
-					} );
-				} );
-
-				xdescribe( 'Company contacts', () => {
-
-					let companyId;
-					let agent;
-
-					beforeEach( ( done ) => {
-
-						companyId = 'd829a9c6-cffb-4d6a-953b-3e02a2b33028';
-
-						intercept.datahub()
-							.get( `/v3/company/${ companyId }` )
-							.reply( 200, intercept.stub( '/datahub/company/detail' ) );
-
-						agent = supertest.agent( appInstance );
-
-						agent
-							.get( urls.reports.start() )
-							.end( ( err, res ) => {
-
-								if( err ){ return done.fail( err ); }
-
-								const token = getCsrfToken( res, done.fail );
-
-								agent
-									.post( urls.reports.start() )
-									.send( `_csrf=${ token }&status=1&emergency=false` )
-									.expect( 302 )
-									.end( ( err ) => {
-
-										if( err ){ return done.fail( err ); }
-
-										agent
-											.get( urls.reports.companyDetails( companyId ) )
-											.expect( 200 )
-											.end( ( err, res ) => {
-
-												if( err ){ return done.fail( err ); }
-
-												const token = getCsrfToken( res, done.fail );
-
-												agent
-													.post( urls.reports.companySearch() )
-													.send( `_csrf=${ token }&companyId=${ companyId }` )
-													.expect( 302, done );
-											} );
-									} );
-							} );
-					} );
-
-					afterEach( checkNock );
-
-					it( 'Should render the contacts page', ( done ) => {
-
-						intercept.datahub()
-							.get( `/v3/company/${ companyId }` )
-							.reply( 200, intercept.stub( '/datahub/company/detail' ) );
-
-						agent
-							.get( urls.reports.contacts( companyId ) )
-							.end( checkPage( 'Market Access - Report - Company contacts', done ) );
-					} );
-
-					describe( 'Viewing a contact', () => {
-
-						const contactId = 'abc-123';
-						const title = 'Market Access - Report - Contact details';
-
-						beforeEach( () => {
-
-							intercept.datahub()
-								.get( `/v3/contact/${ contactId }` )
-								.reply( 200, intercept.stub( '/datahub/contact/detail' ) );
-						} );
-
-						describe( 'Without a report id', () => {
-							it( 'Should fetch the contact and render the page', ( done ) => {
-
-								agent
-									.get( urls.reports.viewContact( contactId ) )
-									.end( checkPage( title, done ) );
-							} );
-						} );
-
-						describe( 'With a report id', () => {
-							it( 'Should fetch the report and the contact and render the page', ( done ) => {
-
-								const reportId = '123';
-
-								interceptReport( reportId );
-
-								agent
-									.get( urls.reports.viewContact( contactId, reportId ) )
-									.end( checkPage( title, done ) );
-							} );
 						} );
 					} );
 				} );

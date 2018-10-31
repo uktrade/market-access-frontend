@@ -1,6 +1,6 @@
 const urls = require( '../lib/urls' );
 const backend = require( '../lib/backend-service' );
-const dashboardViewModel = require( '../lib/view-models/dashboard' );
+const dashboardViewModel = require( '../view-models/dashboard' );
 
 module.exports = {
 
@@ -9,21 +9,17 @@ module.exports = {
 		const country = req.user.country;
 		const countryId = country && req.user.country.id;
 		let template = 'index';
-		let promise;
+		const filters = {};
 
 		if( countryId ){
 
 			template = 'my-country';
-			promise = backend.barriers.getForCountry( req, countryId );
-
-		} else {
-
-			promise = backend.barriers.getAll( req );
+			filters.country = countryId;
 		}
 
 		try {
 
-			const { response, body } = await promise;
+			const { response, body } = await backend.barriers.getAll( req, filters );
 
 			if( response.isSuccess ){
 

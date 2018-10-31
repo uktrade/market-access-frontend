@@ -60,12 +60,6 @@ function transformReport( report ){
 
 	sortReportProgress( report );
 
-	if( report.barrier_type ){
-
-		report.barrier_type_id = report.barrier_type.id;
-		report.barrier_type_category =report.barrier_type.category;
-	}
-
 	return report;
 }
 
@@ -112,15 +106,50 @@ function transformUser( { response, body } ){
 	return { response, body };
 }
 
+function getFilterParams( filters ){
+
+	const filterMap = {
+		'export_country': 'country',
+		'sector': 'sector',
+		'barrier_type': 'type',
+		//'start_date': 'date-start',
+		//'end_date': 'date-end',
+	};
+
+	const params = [];
+
+	for( let [ paramKey, filterKey ] of Object.entries( filterMap ) ){
+
+		const value = filters[ filterKey ];
+
+		if( value ){
+
+			params.push( `${ paramKey }=${ value }` );
+		}
+	}
+
+	return params;
+}
+
 module.exports = {
 
 	getUser: ( req ) => backend.get( '/whoami', getToken( req ) ).then( transformUser ),
 	ping: () => backend.get( '/ping.xml' ),
+	getCounts: ( req ) => backend.get( '/counts', getToken( req ) ),
 
 	barriers: {
-		getAll: ( req ) => backend.get( '/barriers', getToken( req ) ),
-		getForCountry: ( req, countryId ) => backend.get( `/barriers?country=${ countryId }`, getToken( req ) ),
-		getCount: ( req ) => backend.get( '/barriers/count', getToken( req ) ),
+		getAll: async ( req, filters = {} ) => {
+
+			const params = getFilterParams( filters );
+			let path = '/barriers';
+
+			if( params.length ){
+
+				path += '?' + params.join( '&' );
+			}
+
+			return backend.get( path, getToken( req ) );
+		},
 		get: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }`, getToken( req ) ),
 		getInteractions: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }/interactions`, getToken( req ) ),
 		saveNote: ( req, barrierId, values ) => backend.post( `/barriers/${ barrierId }/interactions`, getToken( req ), {
@@ -143,7 +172,15 @@ module.exports = {
 		} ),
 		saveSectors: ( req, barrierId, sectors ) => backend.put( `/barriers/${ barrierId }`, getToken( req ), {
 			sectors: ( sectors && sectors.length ? sectors : null )
-		} )
+		} ),
+		saveCompanies: ( req, barrierId, companies ) => backend.put( `/barriers/${ barrierId }`, getToken( req ), {
+			companies: ( companies && companies.length ? companies : null )
+		} ),
+		saveDetails: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }`, getToken( req ), {
+			barrier_title: values.title,
+			export_country: values.country,
+			problem_status: values.status
+		} ),
 	},
 
 	reports: {

@@ -1,11 +1,11 @@
 {
   "name": "market-access-frontend",
-  "version": "5.3.1",
+  "version": "5.4.0",
   "description": "A front end for Market Access",
   "main": "server.js",
   "engines": {
-    "node": "8.11.3",
-    "npm": "5.6.0"
+    "node": "8.12.0",
+    "npm": "6.4.1"
   },
   "scripts": {
     "preversion": "npm run lint:app && npm run lint:public && npm test && npm run coverage",
@@ -20,7 +20,7 @@
     "test:features:local": "npm run test:setup; export TEST_HOST=10.200.10.1; export TEST_BROWSER=chrome; cucumber-js src/test/ci/features --format progress-bar --format json:src/test/ci/output/test-reports/cucumber/results.cucumber",
     "watch": "run-p watch:*",
     "watch-stub": "export DATAHUB_STUB=true; npm run watch",
-    "watch:node": "export LOG_LEVEL=${LOG_LEVEL:-debug}; nodemon src/app/cluster.js --ignore 'src/public/**/*' --ignore 'src/test/**/*' --ignore 'src/app/**/*.spec.js'",
+    "watch:node": "export LOG_LEVEL=${LOG_LEVEL:-debug}; nodemon src/app/cluster.js --ignore 'src/public/**/*' --ignore 'src/test/**/*' --ignore 'src/app/**/*.spec.js' --ignore 'src/data/**/*'",
     "debug": "export LOG_LEVEL=debug; export SERVER_WORKERS=1; node --inspect src/app/cluster.js",
     "grunt": "grunt dist",
     "build:dist": "npm run govuk-assets && npm run sass:prod && grunt dist && npm run dist-install",
@@ -53,33 +53,33 @@
   "homepage": "https://github.com/uktrade/market-access-frontend#readme",
   "dependencies": {
     "compression": "^1.7.3",
-    "connect-redis": "^3.3.3",
+    "connect-redis": "^3.4.0",
     "csurf": "^1.9.0",
     "dateformat": "^3.0.3",
-    "express": "^4.16.3",
+    "express": "^4.16.4",
     "express-session": "^1.15.6",
     "govuk-frontend": "^1.3.0",
     "hawk": "^7.0.7",
-    "morgan": "^1.9.0",
+    "morgan": "^1.9.1",
     "nunjucks": "^3.1.3",
-    "raven": "^2.6.3",
+    "raven": "^2.6.4",
     "redis": "^2.8.0",
     "request": "^2.88.0",
     "uuid": "^3.3.2",
-    "winston": "^3.0.0"
+    "winston": "^3.1.0"
   },
   "devDependencies": {
     "axe-webdriverjs": "^2.0.1",
-    "backstopjs": "^3.5.4",
+    "backstopjs": "^3.8.2",
     "cucumber": "^4.2.1",
-    "eslint": "^5.4.0",
+    "eslint": "^5.6.1",
     "faker": "^4.1.0",
     "grunt": "^1.0.3",
-    "grunt-contrib-clean": "^1.1.0",
+    "grunt-contrib-clean": "^2.0.0",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-copy": "^1.0.0",
-    "grunt-contrib-cssmin": "^2.2.1",
-    "grunt-contrib-uglify": "^3.4.0",
+    "grunt-contrib-cssmin": "^3.0.0",
+    "grunt-contrib-uglify": "^4.0.0",
     "grunt-filerev": "^2.3.1",
     "grunt-mkdir": "^1.0.0",
     "grunt-usemin": "^3.1.1",
@@ -89,11 +89,11 @@
     "load-grunt-tasks": "^4.0.0",
     "nock": "^9.6.1",
     "node-sass": "^4.9.3",
-    "nodemon": "^1.18.3",
+    "nodemon": "^1.18.4",
     "npm-run-all": "^4.1.3",
     "nyc": "^11.9.0",
-    "proxyquire": "^2.0.1",
+    "proxyquire": "^2.1.0",
     "selenium-webdriver": "^4.0.0-alpha.1",
-    "supertest": "^3.1.0"
+    "supertest": "^3.3.0"
   }
 }

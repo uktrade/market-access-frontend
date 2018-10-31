@@ -34,99 +34,83 @@ describe( 'Reports view model', () => {
 
 			reports = [
 				{
+					id: 1,
 					problem_status: '1',
-					is_emergency: true,
 					is_resolved: true,
 					export_country: 'a'
 				},{
+					id: 2,
 					problem_status: '2',
-					is_emergency: true,
 					is_resolved: true,
 					export_country: 'b'
 				},{
+					id: 3,
 					problem_status: '3',
-					is_emergency: false,
 					is_resolved: false,
 					export_country: 'c'
 				},{
+					id: 4,
 					problem_status: '3',
-					is_emergency: false,
 					is_resolved: false,
 					export_country: 'd'
 				}
 			];
 		} );
 
+		function getReports(){
+			return JSON.parse( JSON.stringify( reports ) );
+		}
+
+		function getReport( id ){
+
+			return reports.find( ( report ) => report.id == id );
+		}
+
 		it( 'Should transform them', () => {
 
-			const output = viewModel( reports );
+			const output = viewModel( getReports() );
 
-			expect( output.reports[ 3 ] ).toEqual( {
-				export_country: reports[ 0 ].export_country,
-				country: getCountry(),
-				is_resolved: true,
-				isResolved: true,
-				is_emergency: true,
-				problem_status: {
-					id: '1',
-					name: 'test',
-					isEmergency: true
-				}
-			} );
+			function getOutputReport( id ){
 
-			expect( output.reports[ 2 ] ).toEqual( {
-				export_country: reports[ 1 ].export_country,
-				country: getCountry(),
-				is_resolved: true,
-				isResolved: true,
-				is_emergency: true,
-				problem_status: {
-					id: '2',
-					name: 'testing',
-					isEmergency: true
-				}
-			} );
+				return output.reports.find( ( report ) => report.id == id );
+			}
 
-			expect( output.reports[ 1 ] ).toEqual( {
-				export_country: reports[ 2 ].export_country,
-				country: getCountry(),
-				is_resolved: false,
-				isResolved: false,
-				is_emergency: false,
-				problem_status: {
-					id: '3',
-					name: 'more tests',
-					isEmergency: false
-				}
-			} );
+			function createExpectation( id ){
 
-			expect( output.reports[ 0 ] ).toEqual( {
-				export_country: reports[ 3 ].export_country,
-				country: getCountry(),
-				is_resolved: false,
-				isResolved: false,
-				is_emergency: false,
-				problem_status: {
-					id: '3',
-					name: 'more tests',
-					isEmergency: false
-				}
-			} );
+				const report = getReport( id );
+
+				return {
+					id,
+					export_country: report.export_country,
+					country: getCountry(),
+					is_resolved: report.is_resolved,
+					isResolved: report.is_resolved,
+					problem_status: {
+						id: report.problem_status,
+						name: metadata.statusTypes[ report.problem_status ]
+					}
+				};
+			}
+
+			for ( let i = 1; i <= 4; i++ ){
+
+				expect( getOutputReport( i ) ).toEqual( createExpectation( i ) );
+			}
 		} );
 
 		it( 'Should sort them', () => {
 
-			reports[ 0 ].created_on = 'Tue, 28 Aug 2018 08:19:05 GMT';
-			reports[ 1 ].created_on = 'Mon, 27 Aug 2018 08:10:00 GMT';
-			reports[ 2 ].created_on = 'Tue, 28 Aug 2018 08:19:05 GMT';
 			reports[ 3 ].created_on = 'Thur, 30 Aug 2018 08:19:05 GMT';
+			reports[ 0 ].created_on = 'Tue, 28 Aug 2018 08:19:05 GMT';
+			reports[ 2 ].created_on = 'Tue, 28 Aug 2018 08:19:05 GMT';
+			reports[ 1 ].created_on = 'Mon, 27 Aug 2018 08:10:00 GMT';
 
-			const output = viewModel( reports );
+			const output = viewModel( getReports() );
 
-			expect( output.reports[ 0 ].problem_status.id ).toEqual( '2' );
-			expect( output.reports[ 1 ].problem_status.id ).toEqual( '1' );
-			expect( output.reports[ 2 ].problem_status.id ).toEqual( '3' );
-			expect( output.reports[ 3 ].problem_status.id ).toEqual( '3' );
+			expect( output.reports[ 0 ].id ).toEqual( 4 );
+			expect( output.reports[ 1 ].id ).toEqual( 1 );
+			expect( output.reports[ 2 ].id ).toEqual( 3 );
+			expect( output.reports[ 3 ].id ).toEqual( 2 );
 		} );
 	} );
 

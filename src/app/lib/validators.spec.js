@@ -1,4 +1,5 @@
 const proxyquire = require( 'proxyquire' );
+const uuid = require( 'uuid/v4' );
 const modulePath = './validators';
 
 describe( 'validators', () => {
@@ -14,7 +15,8 @@ describe( 'validators', () => {
 				'test-value-2': 'another value'
 			},
 			countries: [ { id: 'abc-123' }, { id: 'def-456' } ],
-			barrierTypes: [ { id: 1 }, { id: 2}, { id: 4 } ]
+			barrierTypes: [ { id: 1 }, { id: 2}, { id: 4 } ],
+			sectors: [ { id: uuid() }, { id: uuid() } ],
 		};
 
 		validators = proxyquire( modulePath, {
@@ -89,6 +91,22 @@ describe( 'validators', () => {
 			it( 'Should return true', () => {
 
 				expect( validators.isCountry( 'xyz-123' ) ).toEqual( false );
+			} );
+		} );
+	} );
+
+	describe( 'isSector', () => {
+		describe( 'With a valid country', () => {
+			it( 'Should return true', () => {
+
+				expect( validators.isSector( metadata.sectors[ 0 ].id ) ).toEqual( true );
+			} );
+		} );
+
+		describe( 'With a valid country', () => {
+			it( 'Should return true', () => {
+
+				expect( validators.isSector( 'xyz-123' ) ).toEqual( false );
 			} );
 		} );
 	} );

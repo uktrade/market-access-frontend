@@ -1,14 +1,7 @@
 const metadata = require( '../../../lib/metadata' );
 
-const OPEN = 2;
-const RESOLVED = 4;
-const HIBERNATED = 5;
-
-const barrierStatus = {
-	[ OPEN ]: { name: 'Open', modifyer: 'assessment' },
-	[ RESOLVED ]: { name: 'Resolved', modifyer: 'resolved' },
-	[ HIBERNATED ]: { name: 'Paused', modifyer: 'hibernated' }
-};
+const { OPEN, RESOLVED, HIBERNATED } = metadata.barrier.status.types;
+const barrierStatusTypeInfo = metadata.barrier.status.typeInfo;
 
 function getBarrierType( type ){
 
@@ -27,17 +20,20 @@ function getBarrierType( type ){
 	};
 }
 
-module.exports = ( barrier ) => {
+module.exports = ( barrier, addCompany = false ) => {
 
 	const barrierStatusCode = barrier.current_status.status;
+	const status = barrierStatusTypeInfo[ barrierStatusCode ] || {};
 	const sectors = ( barrier.sectors || [] ).map( metadata.getSector );
-	const status = barrierStatus[ barrierStatusCode ] || {};
-	const sectorsList = sectors.map( ( sector ) => (sector && { text: sector.name } || { text: 'Unknown' } ) );
+	const sectorsList = sectors.map( ( sector ) => ( sector && { text: sector.name } || { text: 'Unknown' } ) );
+	const companies = barrier.companies || [];
+	const companiesList = companies.map( ( company ) => ( { text: company.name } ) );
 
 	status.description = barrier.current_status.status_summary;
 	status.date = barrier.current_status.status_date;
 
 	return {
+		addCompany,
 		barrier: {
 			id: barrier.id,
 			isOpen: ( barrierStatusCode === OPEN ),
@@ -71,6 +67,8 @@ module.exports = ( barrier ) => {
 				summary: barrier.infringement_summary
 			}
 		},
-		sectorsList
+		sectorsList,
+		companies,
+		companiesList
 	};
 };

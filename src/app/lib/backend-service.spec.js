@@ -1,5 +1,6 @@
 const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
+const faker = require( 'faker' );
 const modulePath = './backend-service';
 
 const getFakeData = jasmine.helpers.getFakeData;
@@ -74,6 +75,15 @@ describe( 'Backend Service', () => {
 		} );
 	} );
 
+	describe( 'getCounts', () => {
+		it( 'Should call the correct path', async () => {
+
+			await service.getCounts( req );
+
+			expect( backend.get ).toHaveBeenCalledWith( '/counts', token );
+		} );
+	} );
+
 	describe( 'Barriers', () => {
 
 		let barrierId;
@@ -84,31 +94,46 @@ describe( 'Backend Service', () => {
 		} );
 
 		describe( 'getAll', () => {
-			it( 'Should call the correct path', async () => {
+			describe( 'With no filters', () => {
+				it( 'Should call the correct path', async () => {
 
-				await service.barriers.getAll( req );
+					await service.barriers.getAll( req );
 
-				expect( backend.get ).toHaveBeenCalledWith( '/barriers', token );
+					expect( backend.get ).toHaveBeenCalledWith( '/barriers', token );
+				} );
 			} );
-		} );
 
-		describe( 'getCount', () => {
-			it( 'Should call the correct path', async () => {
+			describe( 'With a country filter', () => {
+				it( 'Should call the correct path', async () => {
 
-				await service.barriers.getCount( req );
+					const country = uuid();
 
-				expect( backend.get ).toHaveBeenCalledWith( '/barriers/count', token );
+					await service.barriers.getAll( req, { country } );
+
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers?export_country=${ country }`, token );
+				} );
 			} );
-		} );
 
-		describe( 'getForCountry', () => {
-			it( 'Should call the correct path', async () => {
+			describe( 'With a sector filter', () => {
+				it( 'Should call the correct path', async () => {
 
-				const countryId = 'abc-123';
+					const sector = uuid();
 
-				await service.barriers.getForCountry( req, countryId );
+					await service.barriers.getAll( req, { sector } );
 
-				expect( backend.get ).toHaveBeenCalledWith( `/barriers?country=${ countryId }`, token );
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers?sector=${ sector }`, token );
+				} );
+			} );
+
+			describe( 'With a type filter', () => {
+				it( 'Should call the correct path', async () => {
+
+					const type = faker.lorem.word().toUpperCase();
+
+					await service.barriers.getAll( req, { type } );
+
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers?barrier_type=${ type }`, token );
+				} );
 			} );
 		} );
 
@@ -237,6 +262,55 @@ describe( 'Backend Service', () => {
 					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
 						sectors
 					} );
+				} );
+			} );
+		} );
+
+		describe( 'saveCompanies', () => {
+			describe( 'With no companies', () => {
+				it( 'Should PUT to the correct path with a null value', async () => {
+
+					const companies = [];
+
+					await service.barriers.saveCompanies( req, barrierId, companies );
+
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+						companies: null
+					} );
+				} );
+			} );
+
+			describe( 'With a list of companies', () => {
+				it( 'Should PUT to the correct path with the correct values', async () => {
+
+					const companies = [ 'sector 1', 'sector 2' ];
+
+					await service.barriers.saveCompanies( req, barrierId, companies );
+
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+						companies
+					} );
+				} );
+			} );
+		} );
+
+		describe( 'saveDetails', () => {
+			it( 'Should PUT to the correct path with the correct values', async () => {
+
+				const title = 'my title';
+				const country = uuid();
+				const status = '1';
+
+				await service.barriers.saveDetails( req, barrierId, {
+					title,
+					country,
+					status
+				} );
+
+				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+					barrier_title: title,
+					export_country: country,
+					problem_status: status
 				} );
 			} );
 		} );

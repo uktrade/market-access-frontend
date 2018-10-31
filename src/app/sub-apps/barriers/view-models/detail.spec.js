@@ -7,6 +7,7 @@ describe( 'Barrier detail view model', () => {
 	let viewModel;
 	let metadata;
 	let inputBarrier;
+	let config;
 
 	beforeEach( () => {
 
@@ -42,11 +43,14 @@ describe( 'Barrier detail view model', () => {
 			}
 		};
 
+		config = { addCompany: false };
+
 		metadata.getCountry.and.callFake( () => metadata.countries[ 3 ] );
 		metadata.getSector.and.callFake( () => metadata.sectors[ 1 ] );
 
 		viewModel = proxyquire( modulePath, {
-			'../../../lib/metadata': metadata
+			'../../../lib/metadata': metadata,
+			'../../../config': config
 		} );
 	} );
 
@@ -101,6 +105,8 @@ describe( 'Barrier detail view model', () => {
 			} );
 
 			expect( output.sectorsList ).toEqual( barrierSectors.map( ( sector ) => ( { text: sector.name } ) ) );
+			expect( output.companies ).toEqual( inputBarrier.companies );
+			expect( output.companiesList ).toEqual( inputBarrier.companies.map( ( company ) => ( { text: company.name } ) ) );
 		} );
 	} );
 
@@ -173,6 +179,26 @@ describe( 'Barrier detail view model', () => {
 			expect( outpuBarrier.isOpen ).toEqual( false );
 			expect( outpuBarrier.isResolved ).toEqual( false );
 			expect( outpuBarrier.isHibernated ).toEqual( true );
+		} );
+	} );
+
+	describe( 'addCompany flag', () => {
+		describe( 'When it is true', () => {
+			it( 'Should set addCompany to true', () => {
+
+				const output = viewModel( inputBarrier, true );
+
+				expect( output.addCompany ).toEqual( true );
+			} );
+		} );
+
+		describe( 'When it is false', () => {
+			it( 'Should set addCompany to true', () => {
+
+				const output = viewModel( inputBarrier, false );
+
+				expect( output.addCompany ).toEqual( false );
+			} );
 		} );
 	} );
 } );

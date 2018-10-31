@@ -202,6 +202,27 @@ describe( 'Backend Request', () => {
 									expect( err ).toEqual( new Error( 'Invalid response' ) );
 								} );
 							} );
+
+							describe( 'With an error checking the hawk response', () => {
+								it( 'Should reject with an error', async () => {
+
+									let err;
+									const path = '/path';
+									hawk.client.authenticate.and.callFake( () => { throw new Error( 'fail' ); } );
+
+									try {
+
+										await backend.get( path );
+
+									} catch( e ){
+
+										err = e;
+									}
+
+									checkRequest( GET, path );
+									expect( err ).toEqual( new Error( 'Unable to validate response' ) );
+								} );
+							} );
 						} );
 
 						describe( 'With an invalid JSON body', () => {

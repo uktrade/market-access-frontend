@@ -19,6 +19,7 @@ function getReportLastCompletedStage( progress ){
 function getReportPath( reportId ){
 	return ( reportId ? reportId : 'new' );
 }
+
 const reportUrl = {
 	index: () => '/reports/',
 	detail: ( reportId ) => `/reports/${ reportId }/`,
@@ -41,9 +42,11 @@ module.exports = {
 	login: () => '/login/',
 	me: () => '/me',
 	whatIsABarrier: () => '/what-is-a-barrier/',
+	findABarrier: () => '/find-a-barrier/',
 
 	barriers: {
 		detail: ( barrierId ) => `/barriers/${ barrierId }/`,
+		edit: ( barrierId ) => `/barriers/${ barrierId }/edit/`,
 		interactions: ( barrierId ) => `/barriers/${ barrierId }/interactions/`,
 		addNote: ( barrierId ) => `/barriers/${ barrierId }/interactions/add-note/`,
 		status: ( barrierId ) => `/barriers/${ barrierId }/status/`,
@@ -55,9 +58,17 @@ module.exports = {
 			list: ( barrierId, category ) => `/barriers/${ barrierId }/type/${ category }/`
 		},
 		sectors: {
+			edit: ( barrierId ) => `/barriers/${ barrierId }/sectors/edit/`,
 			list: ( barrierId ) => `/barriers/${ barrierId }/sectors/`,
 			add: ( barrierId ) => `/barriers/${ barrierId }/sectors/add/`,
 			remove: ( barrierId ) => `/barriers/${ barrierId }/sectors/remove/`
+		},
+		companies: {
+			edit: ( barrierId ) => `/barriers/${ barrierId }/companies/edit/`,
+			list: ( barrierId ) => `/barriers/${ barrierId }/companies/`,
+			details: ( barrierId, companyId ) => `/barriers/${ barrierId }/companies/${ companyId }/`,
+			search: ( barrierId ) => `/barriers/${ barrierId }/companies/search/`,
+			remove: ( barrierId ) => `/barriers/${ barrierId }/companies/remove/`
 		}
 	},
 

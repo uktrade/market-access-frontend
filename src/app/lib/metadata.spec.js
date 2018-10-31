@@ -14,11 +14,11 @@ describe( 'metadata', () => {
 		fakeData = getFakeData( '/backend/metadata/' );
 
 		backend = {
-			getMetadata: jasmine.createSpy( 'backend.getMetadata' )
+			get: jasmine.createSpy( 'backend.get' )
 		};
 
 		metadata = proxyquire( modulePath, {
-			'./backend-service': backend
+			'./backend-request': backend
 		} );
 	} );
 
@@ -27,7 +27,7 @@ describe( 'metadata', () => {
 			describe( 'A successful response', () => {
 				it( 'Should report no errors', async () => {
 
-					backend.getMetadata.and.callFake( () => Promise.resolve( {
+					backend.get.and.callFake( () => Promise.resolve( {
 						response: { isSuccess: true },
 						body: fakeData
 					} ) );
@@ -39,7 +39,7 @@ describe( 'metadata', () => {
 			describe( 'An unsuccessful response', () => {
 				it( 'Should throw an error', async () => {
 
-					backend.getMetadata.and.callFake( () => Promise.resolve( {
+					backend.get.and.callFake( () => Promise.resolve( {
 						response: { isSuccess: false }
 					} ) );
 
@@ -60,7 +60,7 @@ describe( 'metadata', () => {
 
 				const theErr = new Error( 'test' );
 
-				backend.getMetadata.and.callFake( () => { throw theErr; } );
+				backend.get.and.callFake( () => { throw theErr; } );
 
 				try {
 
@@ -76,9 +76,15 @@ describe( 'metadata', () => {
 
 	describe( 'With fakeData', () => {
 
+		let originalBarrierTypes;
+
 		beforeEach( async () => {
 
-			backend.getMetadata.and.callFake( () => Promise.resolve( {
+			originalBarrierTypes = getFakeData( '/backend/metadata/' ).barrier_types;
+
+			fakeData.barrier_types.push( originalBarrierTypes[ 0 ], originalBarrierTypes[ 1 ]);
+
+			backend.get.and.callFake( () => Promise.resolve( {
 				response: { isSuccess: true },
 				body: fakeData
 			} ) );
@@ -119,6 +125,39 @@ describe( 'metadata', () => {
 				].map( ( { id, name } ) => ({ id, name }) );
 
 				expect( metadata.countries ).toEqual( output );
+			} );
+		} );
+
+		describe( 'getCountryList', () => {
+			describe( 'Without specifying the default text', () => {
+				it( 'Should create a country list for use with a select - with a default choose option', () => {
+
+					const countries = metadata.getCountryList();
+
+					expect( countries.length ).toEqual( metadata.countries.length + 1 );
+					expect( countries[ 0 ] ).toEqual( { value: '', text: 'Choose a country' } );
+
+					countries.forEach( ( country ) => {
+						expect( country.value ).toBeDefined();
+						expect( country.text ).toBeDefined();
+					});
+				} );
+			} );
+
+			describe( 'Specifying the default text', () => {
+				it( 'Should create a country list for use with a select - with the specified choose option', () => {
+
+					const text = 'Select an option';
+					const countries = metadata.getCountryList( text );
+
+					expect( countries.length ).toEqual( metadata.countries.length + 1 );
+					expect( countries[ 0 ] ).toEqual( { value: '', text } );
+
+					countries.forEach( ( country ) => {
+						expect( country.value ).toBeDefined();
+						expect( country.text ).toBeDefined();
+					});
+				} );
 			} );
 		} );
 
@@ -257,16 +296,40 @@ describe( 'metadata', () => {
 				} );
 			} );
 
-			describe( 'affectedSectorsList', () => {
+			describe( 'getSectorList', () => {
+				describe( 'Without specifying the default text', () => {
+					it( 'Should return all sectors that are not disabled and have a level of 0 in a govuk formate', () => {
 
-				it( 'Should return all sectors that are not disabled and have a level of 0 in a govuk formate', () => {
+						const affectedSectorsList = level0Sectors.map( ( sector ) => ({ value: sector.id, text: sector.name } ) );
 
-					const affectedSectorsList = level0Sectors.map( ( sector ) => ({ value: sector.id, text: sector.name } ) );
+						affectedSectorsList.unshift( { value: '', text: 'Select a sector' } );
 
-					affectedSectorsList.unshift( { value: '', text: 'Select a sector' } );
-
-					expect( metadata.affectedSectorsList ).toEqual( affectedSectorsList );
+						expect( metadata.getSectorList() ).toEqual( affectedSectorsList );
+					} );
 				} );
+
+				describe( 'Specifying the default text', () => {
+					it( 'Should return all sectors that are not disabled and have a level of 0 in a govuk format', () => {
+
+						const text = 'All sectors';
+						const affectedSectorsList = level0Sectors.map( ( sector ) => ({ value: sector.id, text: sector.name } ) );
+
+						affectedSectorsList.unshift( { value: '', text } );
+
+						expect( metadata.getSectorList( text ) ).toEqual( affectedSectorsList );
+					} );
+				} );
+			} );
+		} );
+
+		describe( 'getBarrierTypeList', () => {
+			it( 'Should return the list', () => {
+
+				const expected = originalBarrierTypes.map( ( { id, title } ) => ({ value: id, text: title }) );
+
+				expected.unshift( { value: '', text: 'All barrier types' } );
+
+				expect( metadata.getBarrierTypeList() ).toEqual( expected );
 			} );
 		} );
 

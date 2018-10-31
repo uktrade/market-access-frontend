@@ -1,0 +1,71 @@
+{% from 'app-components/search-form.njk' import searchForm %}
+{% from 'app-components/heading.njk' import heading %}
+{% from 'app-components/selection-list.njk' import companiesList %}
+{% from 'app-components/details-list.njk' import detailsList %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Barrier - Company or organisation details{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.barriers.companies.search( barrier.id ) },
+		caption: barrier.barrier_title,
+		text: 'Company or organisation affected',
+		errors: errors
+	}) }}
+
+	<section class="restrict-width">
+
+		<h2 class="govuk-heading-s">Review and confirm</h2>
+
+		{{ detailsList( [
+			{
+				key: 'Registered name',
+				value: company.name
+			},{
+				key: 'Companies house no.',
+				value: company.company_number
+			},{
+				key: 'Primary address',
+				value: [
+						company.registered_address_1,
+						company.registered_address_2,
+						company.registered_address_town,
+						company.registered_address_county,
+						company.registered_address_postcode,
+						company.registered_address_country.name
+					] | removeEmpty | join( ', ' )
+			},{
+				key: 'Sector',
+				value: company.sector.name
+			},{
+				key: 'Incorporated on',
+				value: company.created_on | dateOnly
+			},{
+				key: 'Type',
+				value: company.business_type.name
+			},{
+				key: 'Scale of company',
+				value: company.turnover_range.name
+			},{
+				key: 'Number of employees',
+				value: company.employee_range.name
+			}
+		] ) }}
+
+		<form action="{{ urls.barriers.companies.details( barrier.id, company.id ) }}" method="POST">
+			<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+			<input type="hidden" name="companyId" value="{{ company.id }}">
+			<input type="submit" class="govuk-button" value="Select company">
+		</form>
+
+	</section>
+
+	<span class="govuk-heading-s">Or</span>
+
+	<a href="{{ urls.barriers.companies.search( barrier.id ) }}">Search again</a>
+
+{% endblock %}
+

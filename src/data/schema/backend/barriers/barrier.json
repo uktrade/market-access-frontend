@@ -10,6 +10,7 @@
 		"resolved_date",
 		"sectors_affected",
 		"sectors",
+		"companies",
 		"product",
 		"source",
 		"other_source",
@@ -44,6 +45,23 @@
 			"minItems": 0,
 			"maxItems": 5,
 			"items": { "$ref": "$refs/common.json#/uuid" }
+		},
+
+		"companies": {
+			"type": "array",
+			"minItems": 0,
+			"maxItems": 5,
+			"items": {
+				"type": "object",
+				"required": [
+					"id",
+					"name"
+				],
+				"properties": {
+					"id": { "$ref": "$refs/common.json#/uuid" },
+					"name": { "$ref": "$refs/common.json#/words" }
+				}
+			}
 		},
 
 		"product": { "$ref": "$refs/common.json#/words" },

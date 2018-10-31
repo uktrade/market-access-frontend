@@ -25,60 +25,66 @@ describe( 'user middleware', () => {
 	} );
 
 	describe( 'When the user info is not in the session', () => {
-		describe( 'When there is an error thrown', () => {
-			it( 'Should call next with the error', ( done ) => {
-
-				const err = new Error( 'Fake error' );
-				const promise = new Promise( ( resolve, reject ) => {
-
-					reject( err );
-				} );
-
-				backend.getUser.and.callFake( () => promise );
-
-				middleware( req, res, next );
-
-				process.nextTick( () => {
-
-					expect( next ).toHaveBeenCalledWith( err );
-					done();
-				} );
-			} );
-		} );
-
-		describe( 'When there is NOT an error thrown', () => {
-			it( 'Should fetch the info and store it in the session', ( done ) => {
+		describe( 'When the response is a success', () => {
+			it( 'Should fetch the info and store it in the session', async () => {
 
 				const userMock = { username: 'mock-user' };
-				const promise = new Promise( ( resolve ) => resolve( { response: {}, body: userMock } ) );
 
-				backend.getUser.and.callFake( () => promise );
+				backend.getUser.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body: userMock } ) );
 
-				middleware( req, res, next );
+				await middleware( req, res, next );
 
-				promise.then( () => {
-
-					expect( backend.getUser ).toHaveBeenCalledWith( req );
-					expect( req.session.user ).toEqual( userMock );
-					expect( res.locals.user ).toEqual( userMock );
-					expect( req.user ).toEqual( userMock );
-					expect( next ).toHaveBeenCalled();
-					done();
-				} );
+				expect( backend.getUser ).toHaveBeenCalledWith( req );
+				expect( req.session.user ).toEqual( userMock );
+				expect( res.locals.user ).toEqual( userMock );
+				expect( req.user ).toEqual( userMock );
+				expect( next ).toHaveBeenCalled();
 			} );
 		} );
 
+		describe( 'When the response is NOT a success', () => {
+			it( 'Should call next with an error', async () => {
+
+				const statusCode = 500;
+
+				backend.getUser.and.callFake( () => Promise.resolve( {
+					response: { isSuccess: false, statusCode },
+				} ) );
+
+				await middleware( req, res, next );
+
+				expect( backend.getUser ).toHaveBeenCalledWith( req );
+				expect( req.session.user ).not.toBeDefined();
+				expect( res.locals.user ).not.toBeDefined();
+				expect( req.user ).not.toBeDefined();
+				expect( next ).toHaveBeenCalledWith( new Error( `Unable to get user info, got ${ statusCode } response code` ) );
+			} );
+		} );
+
+		describe( 'When there is an error thrown', () => {
+			it( 'Should call next with the error', async () => {
+
+				const err = new Error( 'Fake error' );
+
+				backend.getUser.and.callFake( () => Promise.reject( err ) );
+
+				await middleware( req, res, next );
+
+				expect( next ).toHaveBeenCalledWith( err );
+			} );
+		} );
 	} );
 
 	describe( 'When the user info is in the session', () => {
-		it( 'Should put the user info into the req and locals', () => {
+		it( 'Should put the user info into the req and locals', async () => {
 
 			const sessionUser = { username: 'session-user' };
 
 			req.session.user = sessionUser;
 
-			middleware( req, res, next );
+			await middleware( req, res, next );
 
+			expect( backend.getUser ).not.toHaveBeenCalled();
 			expect( res.locals.user ).toEqual( sessionUser );
 			expect( req.user ).toEqual( sessionUser );
 			expect( next ).toHaveBeenCalled();

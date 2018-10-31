@@ -43,6 +43,9 @@ $govuk-images-path: "/govuk-public/images/";
 @import 'error';
 
 @import 'app-objects/headings';
+@import 'app-objects/number-marker';
+@import 'app-objects/buttons';
+@import 'app-objects/barrier-status-badge';
 
 @import 'app-components/dash-button';
 @import 'app-components/dash-card';
@@ -58,7 +61,8 @@ $govuk-images-path: "/govuk-public/images/";
 @import 'app-components/summary-group';
 @import 'app-components/event-list';
 @import 'app-components/checkmark';
-@import 'app-components/sectors-list';
+@import 'app-components/selection-list';
+@import 'app-components/company-card';
 
 @import 'pages/index';
 @import 'pages/what-is-a-barrier';
@@ -66,12 +70,17 @@ $govuk-images-path: "/govuk-public/images/";
 @import 'pages/report/sectors';
 @import 'pages/barrier/detail';
 @import 'pages/barrier/type';
+@import 'pages/find-a-barrier';
 
 .error-message {
 	@include govuk-font( 24 );
 	border: 4px solid $govuk-red;
 	padding: govuk-em( 30, 24 );
 	background-color: $govuk-red-5;
+}
+
+.muted {
+	color: $govuk-grey-1;
 }
 
 .message-panel {
@@ -127,31 +136,6 @@ $govuk-images-path: "/govuk-public/images/";
 }
 
 .form-cancel {
-	line-height: 2.5;
-	margin-left: govuk-em( 10, 16 );
-}
-
-.button--secondary {
-
-	background-color: $govuk-grey-3;
-	box-shadow: 0 2px 0 $govuk-grey-1;
-	color: $govuk-grey-1;
-	display: inline-block;
-
-	&:link,
-	&:visited,
-	&:active,
-	&:hover {
-		color: $govuk-grey-1;
-	}
-
-	&:focus,
-	&:hover {
-		background-color: $govuk-grey-4;
-	}
-}
-
-.button-cancel {
 	line-height: 2.5;
 	margin-left: govuk-em( 10, 16 );
 }

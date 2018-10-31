@@ -2,45 +2,5 @@
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"title": "Details of a company",
 
-	"type": "object",
-	"required": [ "id", "name", "sector", "registered_address_1", "registered_address_town", "registered_address_county", "registered_address_postcode", "registered_address_country" ],
-	"properties": {
-		"id": { "$ref": "$refs/common.json#/uuid" },
-		"name": { "$ref": "$refs/common.json#/words" },
-		"sector": {
-			"type": "object",
-			"required": [ "id", "name" ],
-			"properties": {
-				"id": { "$ref": "$refs/common.json#/uuid" },
-				"name": { "$ref": "$refs/common.json#/words" }
-			}
-		},
-		"registered_address_1": {
-			"type": "string",
-			"faker": "address.streetName"
-		},
-		"registered_address_town": {
-			"type": "string",
-			"faker": "address.city"
-		},
-		"registered_address_county": {
-			"type": "string",
-			"faker": "address.county"
-		},
-		"registered_address_country": {
-			"type": "object",
-			"required": [ "id", "name" ],
-			"properties": {
-				"id": { "$ref": "$refs/common.json#/uuid" },
-				"name": {
-					"type": "string",
-					"faker": "address.country"
-				}
-			}
-		},
-		"registered_address_postcode": {
-			"type": "string",
-			"faker": "address.zipCode"
-		}
-	}
+	"$ref": "$refs/data-hub.json#/company"
 }
