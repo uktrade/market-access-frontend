@@ -106,6 +106,31 @@ function transformUser( { response, body } ){
 	return { response, body };
 }
 
+function getFilterParams( filters ){
+
+	const filterMap = {
+		'export_country': 'country',
+		'sector': 'sector',
+		'barrier_type': 'type',
+		//'start_date': 'date-start',
+		//'end_date': 'date-end',
+	};
+
+	const params = [];
+
+	for( let [ paramKey, filterKey ] of Object.entries( filterMap ) ){
+
+		const value = filters[ filterKey ];
+
+		if( value ){
+
+			params.push( `${ paramKey }=${ value }` );
+		}
+	}
+
+	return params;
+}
+
 module.exports = {
 
 	getUser: ( req ) => backend.get( '/whoami', getToken( req ) ).then( transformUser ),
@@ -115,30 +140,12 @@ module.exports = {
 	barriers: {
 		getAll: async ( req, filters = {} ) => {
 
-			/*const filterMap = {
-				'export_country': 'country',
-				'start_date': 'date-start',
-				'end_date': 'date-end',
-				'barrier_type': 'type',
-				'sector': 'sector'
-			};*/
-
-			const query = [];
+			const params = getFilterParams( filters );
 			let path = '/barriers';
 
-			if( filters.country ){
+			if( params.length ){
 
-				query.push( `export_country=${ filters.country }` );
-			}
-
-			if( filters.sector ){
-
-				query.push( `sector=${ filters.sector }` );
-			}
-
-			if( query.length ){
-
-				path += '?' + query.join( '&' );
+				path += '?' + params.join( '&' );
 			}
 
 			return backend.get( path, getToken( req ) );

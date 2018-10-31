@@ -76,7 +76,13 @@ describe( 'metadata', () => {
 
 	describe( 'With fakeData', () => {
 
+		let originalBarrierTypes;
+
 		beforeEach( async () => {
+
+			originalBarrierTypes = getFakeData( '/backend/metadata/' ).barrier_types;
+
+			fakeData.barrier_types.push( originalBarrierTypes[ 0 ], originalBarrierTypes[ 1 ]);
 
 			backend.get.and.callFake( () => Promise.resolve( {
 				response: { isSuccess: true },
@@ -313,6 +319,17 @@ describe( 'metadata', () => {
 						expect( metadata.getSectorList( text ) ).toEqual( affectedSectorsList );
 					} );
 				} );
+			} );
+		} );
+
+		describe( 'getBarrierTypeList', () => {
+			it( 'Should return the list', () => {
+
+				const expected = originalBarrierTypes.map( ( { id, title } ) => ({ value: id, text: title }) );
+
+				expected.unshift( { value: '', text: 'All barrier types' } );
+
+				expect( metadata.getBarrierTypeList() ).toEqual( expected );
 			} );
 		} );
 

@@ -2,18 +2,32 @@ const backend = require( '../lib/backend-service' );
 const validators = require( '../lib/validators' );
 const viewModel = require( '../view-models/find-a-barrier' );
 
-module.exports = async function( req, res, next ){
+const FILTERS = {
+	country: validators.isCountry,
+	sector: validators.isSector,
+	type: validators.isBarrierType
+};
 
-	const { country, sector } = req.query;
+function getFilters( query ){
+
 	const filters = {};
 
-	if( country && validators.isCountry( country ) ){
-		filters.country = country;
+	for( let [ name, validator ] of Object.entries( FILTERS ) ){
+
+		const value = query[ name ];
+
+		if( value && validator( value ) ){
+
+			filters[ name ] = value;
+		}
 	}
 
-	if( sector && validators.isSector( sector ) ){
-		filters.sector = sector;
-	}
+	return filters;
+}
+
+module.exports = async function( req, res, next ){
+
+	const filters = getFilters( req.query );
 
 	try {
 

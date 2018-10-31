@@ -1,5 +1,6 @@
 const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
+const faker = require( 'faker' );
 const modulePath = './backend-service';
 
 const getFakeData = jasmine.helpers.getFakeData;
@@ -102,7 +103,7 @@ describe( 'Backend Service', () => {
 				} );
 			} );
 
-			describe( 'with a country filter', () => {
+			describe( 'With a country filter', () => {
 				it( 'Should call the correct path', async () => {
 
 					const country = uuid();
@@ -113,7 +114,7 @@ describe( 'Backend Service', () => {
 				} );
 			} );
 
-			describe( 'with a sector filter', () => {
+			describe( 'With a sector filter', () => {
 				it( 'Should call the correct path', async () => {
 
 					const sector = uuid();
@@ -121,6 +122,17 @@ describe( 'Backend Service', () => {
 					await service.barriers.getAll( req, { sector } );
 
 					expect( backend.get ).toHaveBeenCalledWith( `/barriers?sector=${ sector }`, token );
+				} );
+			} );
+
+			describe( 'With a type filter', () => {
+				it( 'Should call the correct path', async () => {
+
+					const type = faker.lorem.word().toUpperCase();
+
+					await service.barriers.getAll( req, { type } );
+
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers?barrier_type=${ type }`, token );
 				} );
 			} );
 		} );
