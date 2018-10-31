@@ -17,6 +17,7 @@ describe( 'Find a barrier view model', () => {
 	let countryList;
 	let sectorList;
 	let barrierTypeList;
+	let sortGovukItems;
 
 	function getExpectedBarrierOutput( barriers ){
 
@@ -92,7 +93,7 @@ describe( 'Find a barrier view model', () => {
 			{ value: 1, text: faker.lorem.words() },
 			{ value: 2, text: faker.lorem.words() },
 			{ value: 3, text: faker.lorem.words() },
-		],
+		];
 
 		metadata.getCountryList.and.callFake( () => countryList );
 		metadata.getSectorList.and.callFake( () => sectorList );
@@ -100,8 +101,13 @@ describe( 'Find a barrier view model', () => {
 		metadata.getCountry.and.callFake( () => mockCountry );
 		metadata.getBarrierTypeList.and.callFake( () => barrierTypeList );
 
+		sortGovukItems = {
+			alphabetical: jasmine.createSpy( 'sortGovukItems.alphabetical' ).and.callFake( () => 0 ),
+		};
+
 		viewModel = proxyquire( modulePath, {
 			'../lib/metadata': metadata,
+			'../lib/sort-govuk-items': sortGovukItems,
 		} );
 	} );
 
@@ -110,6 +116,7 @@ describe( 'Find a barrier view model', () => {
 		expect( metadata.getCountryList ).toHaveBeenCalledWith( 'All locations' );
 		expect( metadata.getSectorList ).toHaveBeenCalledWith( 'All sectors' );
 		expect( metadata.getBarrierTypeList ).toHaveBeenCalledWith();
+		expect( sortGovukItems.alphabetical ).toHaveBeenCalled();
 	} );
 
 	describe( 'Without any filters', () => {
@@ -207,6 +214,7 @@ describe( 'Find a barrier view model', () => {
 				country: countryList,
 				sector: sectorList,
 				type: barrierTypeList.map( ( item ) => {
+
 					if( item.value == filters.type ){
 						item.selected = true;
 					}

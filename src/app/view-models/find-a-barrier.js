@@ -1,4 +1,5 @@
 const metadata = require( '../lib/metadata' );
+const sortGovukItems = require( '../lib/sort-govuk-items' );
 
 const { OPEN, RESOLVED, HIBERNATED } = metadata.barrier.status.types;
 const barrierStatusTypeInfo = metadata.barrier.status.typeInfo;
@@ -53,7 +54,7 @@ module.exports = function( params ){
 		filters: {
 			country: metadata.getCountryList( 'All locations' ).map( isSelected( filters.country ) ),
 			sector: metadata.getSectorList( 'All sectors' ).map( isSelected( filters.sector ) ),
-			type: metadata.getBarrierTypeList().map( isSelected( filters.type ) ),
+			type: metadata.getBarrierTypeList().sort( sortGovukItems.alphabetical ).map( isSelected( filters.type ) ),
 		}
 	};
 };

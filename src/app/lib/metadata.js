@@ -79,10 +79,28 @@ function createSectorsList( sectors, text ){
 	return sectorList;
 }
 
+function dedupeBarrierTypes( barrierTypes ){
+
+	const typeIds = [];
+	const types = [];
+
+	barrierTypes.forEach( ( type ) => {
+
+		if( !typeIds.includes( type.id ) ){
+
+			typeIds.push( type.id );
+			types.push( type );
+		}
+	} );
+
+	return types;
+}
+
 let countries;
 let sectors;
 let level0Sectors;
 let barrierTypes;
+let uniqueBarrierTypes;
 
 module.exports.fetch = async () => {
 
@@ -96,6 +114,7 @@ module.exports.fetch = async () => {
 			sectors = body.sectors.filter( notDisabled );
 			level0Sectors = sectors.filter( ( sector ) => sector.level === 0 );
 			barrierTypes = body.barrier_types;
+			uniqueBarrierTypes = dedupeBarrierTypes( barrierTypes );
 
 			module.exports.statusTypes = body.status_types;
 			module.exports.lossScale = body.loss_range;
@@ -134,7 +153,7 @@ module.exports.getCountry = ( countryId ) => countries.find( ( country ) => coun
 
 module.exports.getBarrierTypeList = () => {
 
-	const list = barrierTypes.map( ( { id, title } ) => ({ value: id, text: title }) );
+	const list = uniqueBarrierTypes.map( ( { id, title } ) => ({ value: id, text: title }) );
 
 	list.unshift( { value: '', text: 'All barrier types' } );
 
