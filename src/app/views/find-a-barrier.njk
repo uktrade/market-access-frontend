@@ -45,6 +45,17 @@
 					items: filters.sector
 				}) }}
 
+				{{ govukSelect({
+					id: 'type',
+					name: 'type',
+					classes: 'js-filter',
+					label: {
+						text: 'Barrier type',
+						classes: 'filter-items__label'
+					},
+					items: filters.type
+				}) }}
+
 				{% if hasFilters %}
 				<a class="filter-items__clear js-filter-clear" href="{{ urls.findABarrier() }}">Clear filters</a>
 				{% endif %}

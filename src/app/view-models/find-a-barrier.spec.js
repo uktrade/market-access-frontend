@@ -16,6 +16,8 @@ describe( 'Find a barrier view model', () => {
 	let barriers;
 	let countryList;
 	let sectorList;
+	let barrierTypeList;
+	let sortGovukItems;
 
 	function getExpectedBarrierOutput( barriers ){
 
@@ -68,6 +70,7 @@ describe( 'Find a barrier view model', () => {
 			getCountry: jasmine.createSpy( 'metadata.getCountry' ),
 			getCountryList: jasmine.createSpy( 'metadata.getCountryList' ),
 			getSectorList: jasmine.createSpy( 'metadata.getSectorList' ),
+			getBarrierTypeList: jasmine.createSpy( 'jasmine.getBarrierTypeList' ),
 		};
 
 		mockSector = { id: uuid(), name: faker.lorem.words() };
@@ -75,24 +78,36 @@ describe( 'Find a barrier view model', () => {
 		barriers = jasmine.helpers.getFakeData( '/backend/barriers/find-a-barrier' );
 
 		countryList = [
-			{ value: uuid(), name: faker.address.country() },
-			{ value: uuid(), name: faker.address.country() },
-			{ value: uuid(), name: faker.address.country() },
+			{ value: uuid(), text: faker.address.country() },
+			{ value: uuid(), text: faker.address.country() },
+			{ value: uuid(), text: faker.address.country() },
 		];
 
 		sectorList = [
-			{ value: uuid(), name: faker.lorem.words() },
-			{ value: uuid(), name: faker.lorem.words() },
-			{ value: uuid(), name: faker.lorem.words() },
+			{ value: uuid(), text: faker.lorem.words() },
+			{ value: uuid(), text: faker.lorem.words() },
+			{ value: uuid(), text: faker.lorem.words() },
+		];
+
+		barrierTypeList = [
+			{ value: 1, text: faker.lorem.words() },
+			{ value: 2, text: faker.lorem.words() },
+			{ value: 3, text: faker.lorem.words() },
 		];
 
 		metadata.getCountryList.and.callFake( () => countryList );
 		metadata.getSectorList.and.callFake( () => sectorList );
 		metadata.getSector.and.callFake( () => mockSector );
 		metadata.getCountry.and.callFake( () => mockCountry );
+		metadata.getBarrierTypeList.and.callFake( () => barrierTypeList );
+
+		sortGovukItems = {
+			alphabetical: jasmine.createSpy( 'sortGovukItems.alphabetical' ).and.callFake( () => 0 ),
+		};
 
 		viewModel = proxyquire( modulePath, {
-			'../lib/metadata': metadata
+			'../lib/metadata': metadata,
+			'../lib/sort-govuk-items': sortGovukItems,
 		} );
 	} );
 
@@ -100,6 +115,8 @@ describe( 'Find a barrier view model', () => {
 
 		expect( metadata.getCountryList ).toHaveBeenCalledWith( 'All locations' );
 		expect( metadata.getSectorList ).toHaveBeenCalledWith( 'All sectors' );
+		expect( metadata.getBarrierTypeList ).toHaveBeenCalledWith();
+		expect( sortGovukItems.alphabetical ).toHaveBeenCalled();
 	} );
 
 	describe( 'Without any filters', () => {
@@ -116,7 +133,11 @@ describe( 'Find a barrier view model', () => {
 
 			expect( output.count ).toEqual( count );
 			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
-			expect( output.filters ).toEqual( {	country: countryList, sector: sectorList	} );
+			expect( output.filters ).toEqual( {
+				country: countryList,
+				sector: sectorList,
+				type: barrierTypeList
+			} );
 			expect( output.hasFilters ).toEqual( false );
 		} );
 	} );
@@ -137,7 +158,11 @@ describe( 'Find a barrier view model', () => {
 
 			expect( output.count ).toEqual( count );
 			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
-			expect( output.filters ).toEqual( {	country: countryList, sector: sectorList	} );
+			expect( output.filters ).toEqual( {
+				country: countryList,
+				sector: sectorList,
+				type: barrierTypeList,
+			} );
 			expect( countryList[ 2 ].selected ).toEqual( true );
 			expect( output.hasFilters ).toEqual( true );
 		} );
@@ -159,8 +184,44 @@ describe( 'Find a barrier view model', () => {
 
 			expect( output.count ).toEqual( count );
 			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
-			expect( output.filters ).toEqual( {	country: countryList, sector: sectorList	} );
+			expect( output.filters ).toEqual( {
+				country: countryList,
+				sector: sectorList,
+				type: barrierTypeList,
+			} );
 			expect( sectorList[ 2 ].selected ).toEqual( true );
+			expect( output.hasFilters ).toEqual( true );
+		} );
+	} );
+
+	describe( 'With a barrier type filter', () => {
+		it( 'Should return the correct data', () => {
+
+			const count = 5;
+			const filters = { type: 3 };
+
+			barrierTypeList[ 2 ].value = filters.type;
+
+			const output = viewModel( {
+				count,
+				barriers,
+				filters
+			} );
+
+			expect( output.count ).toEqual( count );
+			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
+			expect( output.filters ).toEqual( {
+				country: countryList,
+				sector: sectorList,
+				type: barrierTypeList.map( ( item ) => {
+
+					if( item.value == filters.type ){
+						item.selected = true;
+					}
+
+					return item;
+				} ),
+			} );
 			expect( output.hasFilters ).toEqual( true );
 		} );
 	} );
