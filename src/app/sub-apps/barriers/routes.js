@@ -20,8 +20,10 @@ module.exports = ( express, app ) => {
 	app.use( parseBody, csrfProtection );
 
 	app.get( '/:barrierId/', controller.barrier );
-	app.get( '/:barrierId/edit/', controller.edit );
-	app.post( '/:barrierId/edit/', controller.edit );
+	app.get( '/:barrierId/edit/', controller.edit.headlines );
+	app.post( '/:barrierId/edit/', controller.edit.headlines );
+	app.get( '/:barrierId/edit/product/', controller.edit.product );
+	app.post( '/:barrierId/edit/product/', controller.edit.product );
 	app.get( '/:barrierId/interactions/', controller.interactions.list );
 
 	app.get( '/:barrierId/interactions/add-note/', controller.interactions.addNote );

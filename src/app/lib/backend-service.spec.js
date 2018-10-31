@@ -314,6 +314,21 @@ describe( 'Backend Service', () => {
 				} );
 			} );
 		} );
+
+		describe( 'saveProduct', () => {
+			it( 'Should PUT to the correct path with the correct values', async () => {
+
+				const product = 'my title';
+
+				await service.barriers.saveProduct( req, barrierId, {
+					product,
+				} );
+
+				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+					product,
+				} );
+			} );
+		} );
 	} );
 
 	describe( 'Reports', () => {

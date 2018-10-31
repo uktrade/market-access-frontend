@@ -2,7 +2,7 @@
 	<section class="barrier-summary">
 		<div class='barrier-summary__heading'>
 			<h1 class="barrier-summary__heading__text">{{ barrier.title }}</h1>
-			<a class="barrier-summary__heading__link" href="{{ urls.barriers.edit( barrier.id ) }}">Edit barrier header</a>
+			<a class="barrier-summary__heading__link" href="{{ urls.barriers.edit.headlines( barrier.id ) }}">Edit barrier header</a>
 		</div>
 		<div class="barrier-summary__status">
 			<span class="barrier-status-badge barrier-status-badge--{{ barrier.status.modifyer }}">

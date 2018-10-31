@@ -17,51 +17,82 @@ module.exports = {
 		res.render( 'barriers/views/detail', detailVieWModel( req.barrier, addCompany ) );
 	},
 
-	edit: async ( req, res, next ) => {
+	edit: {
 
-		const barrier = req.barrier;
+		headlines: async ( req, res, next ) => {
 
-		const form = new Form( req, {
-			title: {
-				values: [ barrier.barrier_title ],
-				required: 'Enter a title for this barrier'
-			},
-			country: {
-				type: Form.SELECT,
-				values: [ barrier.export_country ],
-				items: metadata.getCountryList(),
-				validators: [
-					{
-						fn: validators.isCountry,
-						message: 'Select a location for this barrier'
-					}
-				]
-			},
-			status: {
-				type: Form.RADIO,
-				values: [ barrier.problem_status ],
-				items: govukItemsFromObj( metadata.statusTypes ),
-				validators: [{
-					fn: validators.isMetadata( 'statusTypes' ),
-					message: 'Select a barrier urgency'
-				}]
+			const barrier = req.barrier;
+
+			const form = new Form( req, {
+				title: {
+					values: [ barrier.barrier_title ],
+					required: 'Enter a title for this barrier'
+				},
+				country: {
+					type: Form.SELECT,
+					values: [ barrier.export_country ],
+					items: metadata.getCountryList(),
+					validators: [
+						{
+							fn: validators.isCountry,
+							message: 'Select a location for this barrier'
+						}
+					]
+				},
+				status: {
+					type: Form.RADIO,
+					values: [ barrier.problem_status ],
+					items: govukItemsFromObj( metadata.statusTypes ),
+					validators: [{
+						fn: validators.isMetadata( 'statusTypes' ),
+						message: 'Select a barrier urgency'
+					}]
+				}
+			} );
+
+			const processor = new FormProcessor( {
+				form,
+				render: ( templateValues ) => res.render( 'barriers/views/edit/headlines', templateValues ),
+				saveFormData: ( formValues ) => backend.barriers.saveDetails( req, barrier.id, formValues ),
+				saved: () => res.redirect( urls.barriers.detail( barrier.id ) )
+			} );
+
+			try {
+
+				await processor.process();
+
+			} catch( e ){
+
+				next( e );
 			}
-		} );
+		},
 
-		const processor = new FormProcessor( {
-			form,
-			render: ( templateValues ) => res.render( 'barriers/views/edit', templateValues ),
-			saveFormData: ( formValues ) => backend.barriers.saveDetails( req, barrier.id, formValues ),
-			saved: () => res.redirect( urls.barriers.detail( barrier.id ) )
-		} );
+		product: async ( req, res, next ) => {
 
-		try {
+			const barrier = req.barrier;
+			const form = new Form( req, {
 
-			await processor.process();
+				product: {
+					values: [ barrier.product ],
+					required: 'Enter a product or service'
+				},
+			} );
 
-		} catch( e ){
+			const processor = new FormProcessor( {
+				form,
+				render: ( templateValues ) => res.render( 'barriers/views/edit/product', templateValues ),
+				saveFormData: ( formValues ) => backend.barriers.saveProduct( req, barrier.id, formValues ),
+				saved: () => res.redirect( urls.barriers.detail( barrier.id ) )
+			} );
 
-			next( e );
+			try {
+
+				await processor.process();
+
+			} catch( e ){
+
+				next( e );
+			}
 		}
 	},
 

@@ -55,9 +55,18 @@ describe( 'URLs', () => {
 		} );
 
 		describe( 'edit', () => {
-			it( 'Should return the correct path', () => {
+			describe( 'headlines', () => {
+				it( 'Should return the correct path', () => {
 
-				expect( urls.barriers.edit( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/` );
+					expect( urls.barriers.edit.headlines( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/` );
+				} );
+			} );
+
+			describe( 'product', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.edit.product( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/product/` );
+				} );
 			} );
 		} );
 

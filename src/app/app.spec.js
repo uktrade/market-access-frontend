@@ -224,11 +224,21 @@ describe( 'App', function(){
 				} );
 
 				describe( 'Edit barrier', () => {
-					it( 'Should fetch the barrier and render the page', ( done ) => {
+					describe( 'headlines', () => {
+						it( 'Should fetch the barrier and render the page', ( done ) => {
 
-						app
-							.get( urls.barriers.edit( barrierId ) )
-							.end( checkPage( 'Market Access - Barrier - Edit', done ) );
+							app
+								.get( urls.barriers.edit.headlines( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier - Edit', done ) );
+						} );
+					} );
+					describe( 'product', () => {
+						it( 'Should fetch the barrier and render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.edit.product( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier - Edit product or service', done ) );
+						} );
 					} );
 				} );
 

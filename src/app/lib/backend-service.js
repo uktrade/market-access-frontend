@@ -88,6 +88,11 @@ function updateReport( token, reportId, data ){
 	return backend.put( `/reports/${ reportId }`, token, data );
 }
 
+function updateBarrier( token, barrierId, data ){
+
+	return backend.put( `/barriers/${ barrierId }`, token, data );
+}
+
 function transformUser( { response, body } ){
 
 	if( response.isSuccess ){
@@ -166,20 +171,23 @@ module.exports = {
 		open: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/open`, getToken( req ), {
 			status_summary: values.reopenSummary
 		} ),
-		saveType: ( req, barrierId, values, category ) => backend.put( `/barriers/${ barrierId }`, getToken( req ), {
+		saveType: ( req, barrierId, values, category ) => updateBarrier( getToken( req ), barrierId, {
 			barrier_type: getValue( values.barrierType ),
 			barrier_type_category: category
 		} ),
-		saveSectors: ( req, barrierId, sectors ) => backend.put( `/barriers/${ barrierId }`, getToken( req ), {
+		saveSectors: ( req, barrierId, sectors ) => updateBarrier( getToken( req ), barrierId, {
 			sectors: ( sectors && sectors.length ? sectors : null )
 		} ),
-		saveCompanies: ( req, barrierId, companies ) => backend.put( `/barriers/${ barrierId }`, getToken( req ), {
+		saveCompanies: ( req, barrierId, companies ) => updateBarrier( getToken( req ), barrierId, {
 			companies: ( companies && companies.length ? companies : null )
 		} ),
-		saveDetails: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }`, getToken( req ), {
+		saveDetails: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
 			barrier_title: values.title,
 			export_country: values.country,
 			problem_status: values.status
+		} ),
+		saveProduct: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
+			product: values.product
 		} ),
 	},
 

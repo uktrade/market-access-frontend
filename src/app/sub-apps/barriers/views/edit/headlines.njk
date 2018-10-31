@@ -22,7 +22,7 @@
 		errors: errors
 	}) }}
 
-	<form action="{{ urls.barriers.edit( barrier.id ) }}" method="POST" class="restrict-width">
+	<form action="{{ urls.barriers.edit.headlines( barrier.id ) }}" method="POST" class="restrict-width">
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
 		{{ govukInput( {
