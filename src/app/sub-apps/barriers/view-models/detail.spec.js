@@ -128,6 +128,22 @@ describe( 'Barrier detail view model', () => {
 		} );
 	} );
 
+	describe( 'When getSector does not match the sector on an open barrier', () => {
+		it( 'Should create all the correct properties', () => {
+
+			metadata.getSector.and.callFake( () => null );
+
+			inputBarrier.current_status.status = 2;
+			inputBarrier.sectors = [ null ];
+
+			const output = viewModel( inputBarrier );
+			const outpuBarrier = output.barrier;
+
+			expect( outpuBarrier.sectors ).toEqual( [ null ] );
+			expect( output.sectorsList ).toEqual( [ { text: 'Unknown' } ] );
+		} );
+	} );
+
 	describe( 'With barrier_type missing', () => {
 		it( 'Should create all the correct properties', () => {
 
@@ -137,6 +153,18 @@ describe( 'Barrier detail view model', () => {
 			const outpuBarrier = output.barrier;
 
 			expect( outpuBarrier.type ).toEqual( null );
+		} );
+	} );
+
+	describe( 'With companies missing', () => {
+		it( 'Should create all the correct properties', () => {
+
+			delete inputBarrier.companies;
+
+			const output = viewModel( inputBarrier );
+			const outpuBarrier = output.barrier;
+
+			expect( outpuBarrier.companies ).toEqual();
 		} );
 	} );
 
