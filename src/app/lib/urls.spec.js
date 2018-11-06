@@ -68,6 +68,13 @@ describe( 'URLs', () => {
 					expect( urls.barriers.edit.product( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/product/` );
 				} );
 			} );
+
+			describe( 'description', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.edit.description( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/description/` );
+				} );
+			} );
 		} );
 
 		describe( 'Interactions', () => {

@@ -49,6 +49,7 @@ module.exports = {
 		edit: {
 			headlines: ( barrierId ) => `/barriers/${ barrierId }/edit/`,
 			product: ( barrierId ) => `/barriers/${ barrierId }/edit/product/`,
+			description: ( barrierId ) => `/barriers/${ barrierId }/edit/description/`,
 		},
 		interactions: ( barrierId ) => `/barriers/${ barrierId }/interactions/`,
 		addNote: ( barrierId ) => `/barriers/${ barrierId }/interactions/add-note/`,

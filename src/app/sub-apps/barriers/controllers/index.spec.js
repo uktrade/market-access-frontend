@@ -72,6 +72,7 @@ describe( 'Barriers controller', () => {
 			barriers: {
 				saveDetails: jasmine.createSpy( 'backend.barriers.saveDetails' ),
 				saveProduct: jasmine.createSpy( 'backend.barriers.saveProduct' ),
+				saveDescription: jasmine.createSpy( 'backend.barriers.saveDescription' ),
 			}
 		};
 
@@ -359,6 +360,82 @@ describe( 'Barriers controller', () => {
 					processor.process.and.callFake( () => { throw err; } );
 
 					await controller.edit.product( req, res, next );
+
+					expect( next ).toHaveBeenCalledWith( err );
+				} );
+			} );
+		} );
+
+		describe( 'description', () => {
+
+			const template = 'barriers/views/edit/description';
+			let barrier;
+
+			beforeEach( () => {
+
+				barrier = jasmine.helpers.getFakeData( '/backend/barriers/barrier' );
+
+				req.barrier = barrier;
+			} );
+
+			it( 'Should configure the Form correctly', async () => {
+
+				await controller.edit.description( req, res, next );
+
+				const config = Form.calls.argsFor( 0 )[ 1 ];
+
+				expect( config.description ).toBeDefined();
+				expect( config.description.values ).toEqual( [ barrier.problem_description ] );
+				expect( config.description.required ).toBeDefined();
+			} );
+
+			it( 'Should configure the FormProcessor correctly', async () => {
+
+				await controller.edit.description( req, res );
+
+				const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
+				const templateValues = { abc: '123' };
+				const formValues = { def: 456 };
+				const detailResponse = '/barrier/details';
+
+				expect( config.form ).toEqual( form );
+				expect( typeof config.render ).toEqual( 'function' );
+				expect( typeof config.saveFormData ).toEqual( 'function' );
+				expect( typeof config.saved ).toEqual( 'function' );
+
+				config.render( templateValues );
+
+				expect( res.render ).toHaveBeenCalledWith( template, templateValues );
+
+				config.saveFormData( formValues );
+
+				expect( backend.barriers.saveDescription ).toHaveBeenCalledWith( req, barrier.id, formValues );
+
+				urls.barriers.detail.and.callFake( () => detailResponse );
+
+				config.saved();
+
+				expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
+				expect( urls.barriers.detail ).toHaveBeenCalledWith( barrier.id );
+			} );
+
+			describe( 'When the processor does not throw an error', () => {
+				it( 'Should not call next', async () => {
+
+					await controller.edit.description( req, res, next );
+
+					expect( next ).not.toHaveBeenCalled();
+				} );
+			} );
+
+			describe( 'When the processor throws an errror', () => {
+				it( 'Should call next with the error', async () => {
+
+					const err = new Error( 'a random error' );
+
+					processor.process.and.callFake( () => { throw err; } );
+
+					await controller.edit.description( req, res, next );
 
 					expect( next ).toHaveBeenCalledWith( err );
 				} );

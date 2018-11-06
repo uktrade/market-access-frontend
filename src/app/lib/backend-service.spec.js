@@ -329,6 +329,21 @@ describe( 'Backend Service', () => {
 				} );
 			} );
 		} );
+
+		describe( 'saveDescription', () => {
+			it( 'Should PUT to the correct path with the correct values', async () => {
+
+				const description = 'my long description';
+
+				await service.barriers.saveDescription( req, barrierId, {
+					description,
+				} );
+
+				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+					problem_description: description,
+				} );
+			} );
+		} );
 	} );
 
 	describe( 'Reports', () => {

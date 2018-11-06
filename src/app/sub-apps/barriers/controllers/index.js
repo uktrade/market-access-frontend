@@ -93,7 +93,35 @@ module.exports = {
 
 				next( e );
 			}
-		}
+		},
+
+		description: async ( req, res, next ) => {
+
+			const barrier = req.barrier;
+			const form = new Form( req, {
+
+				description: {
+					values: [ barrier.problem_description ],
+					required: 'Enter a brief description for this barrier'
+				},
+			} );
+
+			const processor = new FormProcessor( {
+				form,
+				render: ( templateValues ) => res.render( 'barriers/views/edit/description', templateValues ),
+				saveFormData: ( formValues ) => backend.barriers.saveDescription( req, barrier.id, formValues ),
+				saved: () => res.redirect( urls.barriers.detail( barrier.id ) )
+			} );
+
+			try {
+
+				await processor.process();
+
+			} catch( e ){
+
+				next( e );
+			}
+		},
 	},
 
 	type: require( './type' ),

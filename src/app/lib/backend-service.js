@@ -189,6 +189,9 @@ module.exports = {
 		saveProduct: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
 			product: values.product
 		} ),
+		saveDescription: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
+			problem_description: values.description
+		} ),
 	},
 
 	reports: {

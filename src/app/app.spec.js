@@ -240,6 +240,15 @@ describe( 'App', function(){
 								.end( checkPage( 'Market Access - Barrier - Edit product or service', done ) );
 						} );
 					} );
+
+					describe( 'description', () => {
+						it( 'Should fetch the barrier and render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.edit.description( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier - Edit summary', done ) );
+						} );
+					} );
 				} );
 
 				describe( 'Barrier interactions', () => {
