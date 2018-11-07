@@ -91,7 +91,10 @@
 				}
 			},{
 				title: 'Finding out about the barrier',
-				html: barrier.source.name + ( ( '<br>' + barrier.source.description ) if barrier.source.description )
+				html: barrier.source.name + ( ( '<br>' + barrier.source.description ) if barrier.source.description ),
+				edit: {
+					href: urls.barriers.edit.source( barrier.id )
+				}
 			},{
 				title: 'Initial report made by',
 				text: barrier.reportedBy

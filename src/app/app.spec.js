@@ -249,6 +249,15 @@ describe( 'App', function(){
 								.end( checkPage( 'Market Access - Barrier - Edit summary', done ) );
 						} );
 					} );
+
+					describe( 'source', () => {
+						it( 'Should fetch the barrier and render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.edit.source( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier - Edit source', done ) );
+						} );
+					} );
 				} );
 
 				describe( 'Barrier interactions', () => {

@@ -39,7 +39,7 @@
 			errorMessage: errors | errorForName( 'item' )
 		} ) }}
 
-		{% set barrierAwarenessOtherHtml %}
+		{% set barrierSourceOtherHtml %}
 
 			{{ govukInput( {
 
@@ -47,27 +47,28 @@
 					text: 'Please specify',
 					classes: 'govuk-label--s'
 				},
-				id: 'barrier-awareness-other',
-				name: 'barrierAwarenessOther',
-				value: barrierAwarenessOther,
-				errorMessage: errors | errorForName( 'barrier-awareness-other' )
+				id: 'barrier-source-other',
+				name: 'barrierSourceOther',
+				value: barrierSourceOther,
+				errorMessage: errors | errorForName( 'barrier-source-other' )
 			} ) }}
 
 		{% endset %}
 
 		{{ govukRadios({
-			name: 'barrierAwareness',
-			classes: [ 'barrier-awareness' ],
+			name: 'barrierSource',
+			classes: [ 'barrier-source' ],
+			idPrefix: 'barrier-source',
 			fieldset: {
 				legend: {
 					text: 'How did you find out about the barrier?',
 					classes: 'govuk-fieldset__legend--s'
 				}
 			},
-			items: barrierAwareness | addToRadio( {
-				'OTHER': { conditional: { html: barrierAwarenessOtherHtml } }
+			items: barrierSource | addToRadio( {
+				'OTHER': { conditional: { html: barrierSourceOtherHtml } }
 			} ),
-			errorMessage: errors | errorForName( 'barrier-awareness-1' )
+			errorMessage: errors | errorForName( 'barrier-source-1' )
 		}) }}
 
 		{{ govukInput( {

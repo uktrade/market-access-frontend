@@ -59,6 +59,7 @@ describe( 'Edit barrier controller', () => {
 				saveDetails: jasmine.createSpy( 'backend.barriers.saveDetails' ),
 				saveProduct: jasmine.createSpy( 'backend.barriers.saveProduct' ),
 				saveDescription: jasmine.createSpy( 'backend.barriers.saveDescription' ),
+				saveSource: jasmine.createSpy( 'backend.barriers.saveSource' ),
 			}
 		};
 
@@ -336,6 +337,96 @@ describe( 'Edit barrier controller', () => {
 				processor.process.and.callFake( () => { throw err; } );
 
 				await controller.description( req, res, next );
+
+				expect( next ).toHaveBeenCalledWith( err );
+			} );
+		} );
+	} );
+
+	describe( 'source', () => {
+
+		const template = 'barriers/views/edit/source';
+		let barrier;
+
+		beforeEach( () => {
+
+			barrier = jasmine.helpers.getFakeData( '/backend/barriers/barrier' );
+
+			req.barrier = barrier;
+		} );
+
+		it( 'Should configure the Form correctly', async () => {
+
+			const isMetadataResponse = { ab: '12', cd: '34' };
+
+			validators.isMetadata.and.callFake( () => isMetadataResponse );
+
+			await controller.source( req, res, next );
+
+			const config = Form.calls.argsFor( 0 )[ 1 ];
+
+			expect( config.source ).toBeDefined();
+			expect( config.source.values ).toEqual( [ barrier.source ] );
+			expect( config.source.items ).toEqual( govukItemsFromObjResponse );
+			expect( config.source.validators.length ).toEqual( 1 );
+			expect( config.source.validators[ 0 ].fn ).toEqual( isMetadataResponse );
+
+			expect( govukItemsFromObj ).toHaveBeenCalledWith( metadata.barrierSource );
+			expect( validators.isMetadata ).toHaveBeenCalledWith( 'barrierSource' );
+
+			expect( config.sourceOther ).toBeDefined();
+			expect( config.sourceOther.values ).toEqual( [ barrier.other_source ] );
+			expect( config.sourceOther.conditional ).toEqual( { name: 'source', value: 'OTHER' } );
+			expect( config.sourceOther.required ).toBeDefined();
+		} );
+
+		it( 'Should configure the FormProcessor correctly', async () => {
+
+			await controller.source( req, res );
+
+			const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
+			const templateValues = { abc: '123' };
+			const formValues = { def: 456 };
+			const detailResponse = '/barrier/details';
+
+			expect( config.form ).toEqual( form );
+			expect( typeof config.render ).toEqual( 'function' );
+			expect( typeof config.saveFormData ).toEqual( 'function' );
+			expect( typeof config.saved ).toEqual( 'function' );
+
+			config.render( templateValues );
+
+			expect( res.render ).toHaveBeenCalledWith( template, templateValues );
+
+			config.saveFormData( formValues );
+
+			expect( backend.barriers.saveSource ).toHaveBeenCalledWith( req, barrier.id, formValues );
+
+			urls.barriers.detail.and.callFake( () => detailResponse );
+
+			config.saved();
+
+			expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
+			expect( urls.barriers.detail ).toHaveBeenCalledWith( barrier.id );
+		} );
+
+		describe( 'When the processor does not throw an error', () => {
+			it( 'Should not call next', async () => {
+
+				await controller.source( req, res, next );
+
+				expect( next ).not.toHaveBeenCalled();
+			} );
+		} );
+
+		describe( 'When the processor throws an errror', () => {
+			it( 'Should call next with the error', async () => {
+
+				const err = new Error( 'a random error' );
+
+				processor.process.and.callFake( () => { throw err; } );
+
+				await controller.source( req, res, next );
 
 				expect( next ).toHaveBeenCalledWith( err );
 			} );

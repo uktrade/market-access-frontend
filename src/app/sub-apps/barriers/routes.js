@@ -27,6 +27,8 @@ module.exports = ( express, app ) => {
 	app.post( '/:barrierId/edit/product/', controller.edit.product );
 	app.get( '/:barrierId/edit/description/', controller.edit.description );
 	app.post( '/:barrierId/edit/description/', controller.edit.description );
+	app.get( '/:barrierId/edit/source/', controller.edit.source );
+	app.post( '/:barrierId/edit/source/', controller.edit.source );
 
 	app.get( '/:barrierId/interactions/', controller.interactions.list );
 	app.get( '/:barrierId/interactions/add-note/', controller.interactions.addNote );

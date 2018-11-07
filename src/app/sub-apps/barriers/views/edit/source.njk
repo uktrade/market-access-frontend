@@ -1,0 +1,61 @@
+{% from 'components/input/macro.njk' import govukInput %}
+{% from 'components/select/macro.njk' import govukSelect %}
+{% from 'components/radios/macro.njk' import govukRadios %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Barrier - Edit source{% endblock %}
+
+{% block body_script %}
+	<script>
+		ma.pages.barrier.edit.source();
+	</script>
+{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.barriers.detail( barrier.id ) },
+		caption: barrier.barrier_title,
+		text: 'Edit barrier header',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.barriers.edit.source( barrier.id ) }}" method="POST" class="restrict-width">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{% set sourceOtherHtml %}
+
+			{{ govukInput( {
+
+				label: {
+					text: 'Please specify',
+					classes: 'govuk-label--s'
+				},
+				id: 'source-other',
+				name: 'sourceOther',
+				value: sourceOther,
+				errorMessage: errors | errorForName( 'source-other' )
+			} ) }}
+
+		{% endset %}
+
+		{{ govukRadios({
+			name: 'source',
+			classes: [ 'source' ],
+			fieldset: {
+				legend: {
+					text: 'How did you find out about the barrier?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: source | addToRadio( {
+				'OTHER': { conditional: { html: sourceOtherHtml } }
+			} ),
+			errorMessage: errors | errorForName( 'source-1' )
+		}) }}
+
+		<input type="submit" value="Save and exit to barrier" class="govuk-button">
+	</form>
+{% endblock %}

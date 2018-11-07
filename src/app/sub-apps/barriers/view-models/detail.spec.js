@@ -32,7 +32,7 @@ describe( 'Barrier detail view model', () => {
 			},
 			getCountry: jasmine.createSpy( 'metadata.getCountry' ),
 			getSector: jasmine.createSpy( 'metadata.getSector' ),
-			barrierAwareness: {
+			barrierSource: {
 				'COMPANY': 'company',
 				'TRADE': 'trade',
 				'OTHER': 'other'
@@ -90,7 +90,7 @@ describe( 'Barrier detail view model', () => {
 			expect( outpuBarrier.sectors ).toEqual( barrierSectors );
 			expect( outpuBarrier.source ).toEqual( {
 				id: inputBarrier.source,
-				name: metadata.barrierAwareness[ inputBarrier.source ],
+				name: metadata.barrierSource[ inputBarrier.source ],
 				description: inputBarrier.other_source
 			} );
 			expect( outpuBarrier.legal ).toEqual( {

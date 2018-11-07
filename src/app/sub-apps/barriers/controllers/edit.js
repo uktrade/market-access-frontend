@@ -111,4 +111,44 @@ module.exports = {
 			next( e );
 		}
 	},
+
+	source:  async ( req, res, next ) => {
+
+		const barrier = req.barrier;
+		const form = new Form( req, {
+			source: {
+				type: Form.RADIO,
+				values: [ barrier.source ],
+				items: govukItemsFromObj( metadata.barrierSource ),
+				validators: [
+					{
+						fn: validators.isMetadata( 'barrierSource' ),
+						message: 'Select how you became aware of the barrier'
+					}
+				]
+			},
+
+			sourceOther: {
+				values: [ barrier.other_source ],
+				conditional: { name: 'source', value: 'OTHER' },
+				required: 'Enter how you became aware of the barrier'
+			},
+		} );
+
+		const processor = new FormProcessor( {
+			form,
+			render: ( templateValues ) => res.render( 'barriers/views/edit/source', templateValues ),
+			saveFormData: ( formValues ) => backend.barriers.saveSource( req, barrier.id, formValues ),
+			saved: () => res.redirect( urls.barriers.detail( barrier.id ) )
+		} );
+
+		try {
+
+			await processor.process();
+
+		} catch( e ){
+
+			next( e );
+		}
+	},
 };

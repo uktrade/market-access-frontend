@@ -50,6 +50,7 @@ module.exports = {
 			headlines: ( barrierId ) => `/barriers/${ barrierId }/edit/`,
 			product: ( barrierId ) => `/barriers/${ barrierId }/edit/product/`,
 			description: ( barrierId ) => `/barriers/${ barrierId }/edit/description/`,
+			source: ( barrierId ) => `/barriers/${ barrierId }/edit/source/`,
 		},
 		interactions: ( barrierId ) => `/barriers/${ barrierId }/interactions/`,
 		addNote: ( barrierId ) => `/barriers/${ barrierId }/interactions/add-note/`,

@@ -53,7 +53,7 @@ module.exports = ( barrier, addCompany = false ) => {
 			sectors,
 			source: {
 				id: barrier.source,
-				name: metadata.barrierAwareness[ barrier.source ],
+				name: metadata.barrierSource[ barrier.source ],
 				description: barrier.other_source
 			},
 			legal: {

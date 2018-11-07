@@ -333,11 +333,11 @@ describe( 'metadata', () => {
 			} );
 		} );
 
-		describe( 'barrierAwareness', () => {
+		describe( 'barrierSource', () => {
 			it( 'Should return a list', () => {
 
-				expect( metadata.barrierAwareness ).toBeDefined();
-				expect( metadata.barrierAwareness ).toEqual( fakeData.barrier_source );
+				expect( metadata.barrierSource ).toBeDefined();
+				expect( metadata.barrierSource ).toEqual( fakeData.barrier_source );
 			} );
 		} );
 	} );

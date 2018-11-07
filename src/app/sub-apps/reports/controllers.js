@@ -368,21 +368,21 @@ module.exports = {
 				required: 'Enter a product or service'
 			},
 
-			barrierAwareness: {
+			barrierSource: {
 				type: Form.RADIO,
 				values: [ report.source ],
-				items: govukItemsFromObj( metadata.barrierAwareness ),
+				items: govukItemsFromObj( metadata.barrierSource ),
 				validators: [
 					{
-						fn: validators.isMetadata( 'barrierAwareness' ),
+						fn: validators.isMetadata( 'barrierSource' ),
 						message: 'Select how you became aware of the barrier'
 					}
 				]
 			},
 
-			barrierAwarenessOther: {
+			barrierSourceOther: {
 				values: [ report.other_source ],
-				conditional: { name: 'barrierAwareness', value: 'OTHER' },
+				conditional: { name: 'barrierSource', value: 'OTHER' },
 				required: 'Enter how you became aware of the barrier'
 			},
 

@@ -75,6 +75,13 @@ describe( 'URLs', () => {
 					expect( urls.barriers.edit.description( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/description/` );
 				} );
 			} );
+
+			describe( 'source', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.edit.source( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/source/` );
+				} );
+			} );
 		} );
 
 		describe( 'Interactions', () => {

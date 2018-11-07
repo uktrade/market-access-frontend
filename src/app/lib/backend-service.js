@@ -192,6 +192,10 @@ module.exports = {
 		saveDescription: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
 			problem_description: values.description
 		} ),
+		saveSource: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
+			source: values.source,
+			other_source: getValue( values.sourceOther )
+		} ),
 	},
 
 	reports: {
@@ -220,8 +224,8 @@ module.exports = {
 			product: getValue( values.item ),
 			problem_description: getValue( values.description ),
 			barrier_title: getValue( values.barrierTitle ),
-			source: getValue( values.barrierAwareness ),
-			other_source: getValue( values.barrierAwarenessOther ),
+			source: getValue( values.barrierSource ),
+			other_source: getValue( values.barrierSourceOther ),
 			status_summary: getValue( values.resolvedDescription )
 		} ),
 		submit: ( req, reportId ) => backend.put( `/reports/${ reportId }/submit`, getToken( req ) )

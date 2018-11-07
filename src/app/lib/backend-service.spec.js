@@ -344,6 +344,43 @@ describe( 'Backend Service', () => {
 				} );
 			} );
 		} );
+
+		describe( 'saveSource', () => {
+			describe( 'When source and other have a value', () => {
+				it( 'Should PUT to the correct path with the correct values', async () => {
+
+					const source = '1';
+					const sourceOther = 'my source description';
+
+					await service.barriers.saveSource( req, barrierId, {
+						source,
+						sourceOther,
+					} );
+
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+						source: source,
+						other_source: sourceOther
+					} );
+				} );
+			} );
+
+			describe( 'When only source has a value', () => {
+				it( 'Should PUT to the correct path with the correct values', async () => {
+
+					const source = '1';
+
+					await service.barriers.saveSource( req, barrierId, {
+						source,
+						sourceOther: ''
+					} );
+
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+						source: source,
+						other_source: null
+					} );
+				} );
+			} );
+		} );
 	} );
 
 	describe( 'Reports', () => {
@@ -627,23 +664,23 @@ describe( 'Backend Service', () => {
 				const item = '1';
 				const description = 'b';
 				const barrierTitle = 'c';
-				const barrierAwareness = 'd';
-				const barrierAwarenessOther = 'e';
+				const barrierSource = 'd';
+				const barrierSourceOther = 'e';
 				const resolvedDescription = 'f';
 
 				checkWithAndWithoutValues( 'saveProblem', {
 					item,
 					description,
 					barrierTitle,
-					barrierAwareness,
-					barrierAwarenessOther,
+					barrierSource,
+					barrierSourceOther,
 					resolvedDescription
 				}, {
 					product: item,
 					problem_description: description,
 					barrier_title: barrierTitle,
-					source: barrierAwareness,
-					other_source: barrierAwarenessOther,
+					source: barrierSource,
+					other_source: barrierSourceOther,
 					status_summary: resolvedDescription
 				} );
 			} );
