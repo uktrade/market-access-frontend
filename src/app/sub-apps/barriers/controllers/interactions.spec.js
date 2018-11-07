@@ -95,7 +95,7 @@ describe( 'Barrier interactions controller', () => {
 				it( 'Should get the barriers and render the index page', async () => {
 
 					const results = [
-						{ id: 1, text: 'one', pinned: false, created_on: 'Mon Sep 11 2017 06:16:40 GMT+0100 (BST)' },
+						{ id: 1, text: 'one', pinned: false, created_on: 'Tue Sep 11 2018 06:16:40 GMT+0100 (BST)' },
 						{ id: 2, text: 'two', pinned: true, created_on: 'Fri Jun 01 2018 01:43:07 GMT+0100 (BST)' },
 						{ id: 3, text: 'three', pinned: false, created_on: 'Wed Nov 22 2017 10:45:25 GMT+0000 (GMT)' },
 						{ id: 4, text: 'four', pinned: true, created_on: 'Fri Dec 08 2017 08:25:17 GMT+0000 (GMT)' },
@@ -122,7 +122,10 @@ describe( 'Barrier interactions controller', () => {
 
 					expect( renderArgs[ 0 ] ).toEqual( 'barriers/views/interactions' );
 					expect( renderArgs[ 1 ].barrier ).toBeDefined();
-					expect( renderArgs[ 1 ].interactions ).toEqual( [ results[ 1 ], results[ 3 ], results[ 4 ], results[ 2 ], results[ 0 ] ] );
+					//separate pinned and non pinned
+					//expect( renderArgs[ 1 ].interactions ).toEqual( [ results[ 1 ], results[ 3 ], results[ 4 ], results[ 0 ], results[ 2 ] ] );
+					//one list
+					expect( renderArgs[ 1 ].interactions ).toEqual( [ results[ 0 ], results[ 1 ], results[ 3 ], results[ 4 ], results[ 2 ] ] );
 				} );
 			} );
 
