@@ -79,13 +79,22 @@
 				}
 			},{
 				title: 'Product or service being exported',
-				text: barrier.product
+				text: barrier.product,
+				edit: {
+					href: urls.barriers.edit.product( barrier.id )
+				}
 			},{
 				title: 'Summary of the problem',
-				html: barrier.problem.description | escape | nl2br
+				html: barrier.problem.description | escape | nl2br,
+				edit: {
+					href: urls.barriers.edit.description( barrier.id )
+				}
 			},{
 				title: 'Finding out about the barrier',
-				html: barrier.source.name + ( ( '<br>' + barrier.source.description ) if barrier.source.description )
+				html: barrier.source.name + ( ( '<br>' + barrier.source.description ) if barrier.source.description ),
+				edit: {
+					href: urls.barriers.edit.source( barrier.id )
+				}
 			},{
 				title: 'Initial report made by',
 				text: barrier.reportedBy

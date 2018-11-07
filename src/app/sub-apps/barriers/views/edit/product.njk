@@ -1,0 +1,34 @@
+{% from 'components/input/macro.njk' import govukInput %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Barrier - Edit product or service{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.barriers.detail( barrier.id ) },
+		caption: barrier.barrier_title,
+		text: 'About the barrier',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.barriers.edit.product( barrier.id ) }}" method="POST" class="restrict-width">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{{ govukInput( {
+
+			label: {
+				text: 'What product or service is being exported?',
+				classes: 'govuk-label--s'
+			},
+			id: 'product',
+			name: 'product',
+			value: product,
+			errorMessage: errors | errorForName( 'product' )
+		} ) }}
+
+		<input type="submit" value="Save and exit to barrier" class="govuk-button">
+	</form>
+{% endblock %}

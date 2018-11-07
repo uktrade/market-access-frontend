@@ -1,15 +1,30 @@
-ma.pages.barrier.edit = function(){
+ma.pages.barrier.edit = {
 
-	if( !( jessie.queryOne && jessie.attachListener ) ){ return; }
+	headlines: function(){
 
-	var heading = jessie.queryOne( '.js-heading-caption' );
-	var input = jessie.queryOne( '#title' );
+		if( !( jessie.queryOne && jessie.attachListener ) ){ return; }
 
-	if( input && heading ){
+		var heading = jessie.queryOne( '.js-heading-caption' );
+		var input = jessie.queryOne( '#title' );
 
-		jessie.attachListener( input, 'keyup', function(){
+		if( input && heading ){
 
-			heading.innerText = input.value;
-		} );
+			jessie.attachListener( input, 'keyup', function(){
+
+				heading.innerText = input.value;
+			} );
+		}
+	},
+
+	source: function(){
+
+		if( !ma.components.ConditionalRadioContent ){ return; }
+
+		new ma.components.ConditionalRadioContent({
+			inputContainer: '.source',
+			inputName: 'source',
+			conditionalElem: '#conditional-OTHER',
+			shouldShow: function( value ){ return ( value === 'OTHER' ); }
+		});
 	}
 };

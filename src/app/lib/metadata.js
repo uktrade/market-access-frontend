@@ -129,7 +129,7 @@ module.exports.fetch = async () => {
 			module.exports.supportType = body.support_type;
 			module.exports.sectors = sectors;
 			module.exports.level0Sectors = level0Sectors;
-			module.exports.barrierAwareness = body.barrier_source;
+			module.exports.barrierSource = body.barrier_source;
 			module.exports.bool = {
 				'true': 'Yes',
 				'false': 'No'
