@@ -66,7 +66,8 @@ module.exports = {
 			edit: ( barrierId ) => `/barriers/${ barrierId }/sectors/edit/`,
 			list: ( barrierId ) => `/barriers/${ barrierId }/sectors/`,
 			add: ( barrierId ) => `/barriers/${ barrierId }/sectors/add/`,
-			remove: ( barrierId ) => `/barriers/${ barrierId }/sectors/remove/`
+			remove: ( barrierId ) => `/barriers/${ barrierId }/sectors/remove/`,
+			new: ( barrierId ) => `/barriers/${ barrierId }/sectors/new/`,
 		},
 		companies: {
 			edit: ( barrierId ) => `/barriers/${ barrierId }/companies/edit/`,

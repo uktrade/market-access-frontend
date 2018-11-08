@@ -53,6 +53,8 @@ module.exports = ( express, app ) => {
 	app.post( '/:barrierId/sectors/remove/', controller.sectors.remove );
 	app.get( '/:barrierId/sectors/add/', controller.sectors.add );
 	app.post( '/:barrierId/sectors/add/', controller.sectors.add );
+	app.get( '/:barrierId/sectors/new/', controller.sectors.new );
+	app.post( '/:barrierId/sectors/new/', controller.sectors.new );
 
 	app.get( '/:barrierId/companies/edit/', controller.companies.edit );
 	app.get( '/:barrierId/companies/', controller.companies.list );

@@ -171,6 +171,13 @@ describe( 'URLs', () => {
 					expect( urls.barriers.sectors.remove( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/remove/` );
 				} );
 			} );
+
+			describe( 'new', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.sectors.new( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/new/` );
+				} );
+			} );
 		} );
 
 		describe( 'companies', () => {
