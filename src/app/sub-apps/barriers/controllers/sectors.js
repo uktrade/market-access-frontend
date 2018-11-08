@@ -8,6 +8,45 @@ function renderSectors( req, res, sectors ){
 	res.render( 'barriers/views/sectors/list', { sectors: sectors.map( metadata.getSector ), csrfToken: req.csrfToken() } );
 }
 
+function addSectorForm( req, res, href ){
+
+	const barrier = req.barrier;
+	const sectors = req.session.barrierSectors;
+	const form = new Form( req, {
+
+		sectors: {
+			type: Form.SELECT,
+			items: metadata.getSectorList().filter( ( sector ) => !sectors.includes( sector.value ) ),
+			validators: [ {
+				fn: validators.isSector,
+				message: 'Select a sector affected by the barrier'
+			},{
+				fn: ( value ) => !sectors.includes( value ),
+				message: 'Sector already added, choose another'
+			} ]
+		}
+	} );
+
+	if( form.isPost ){
+
+		form.validate();
+
+		if( !form.hasErrors() ){
+
+			sectors.push( form.getValues().sectors );
+			req.session.barrierSectors = sectors;
+
+			return res.redirect( urls.barriers.sectors.list( barrier.id ) );
+		}
+	}
+
+	res.render( 'barriers/views/sectors/add', Object.assign(
+		form.getTemplateValues(),
+		{ currentSectors: sectors.map( metadata.getSector ) },
+		{ href }
+	) );
+}
+
 module.exports = {
 
 	edit: ( req, res ) => {
@@ -66,41 +105,29 @@ module.exports = {
 	add: ( req, res ) => {
 
 		const barrier = req.barrier;
+		const href = {
+			cancel: urls.barriers.sectors.list( barrier.id ),
+			form: urls.barriers.sectors.add( barrier.id )
+		};
 
 		if( !req.session.barrierSectors ){
 
 			req.session.barrierSectors = ( barrier.sectors || [] );
 		}
 
-		const sectors = req.session.barrierSectors;
-		const form = new Form( req, {
+		addSectorForm( req, res, href );
+	},
 
-			sectors: {
-				type: Form.SELECT,
-				items: metadata.getSectorList().filter( ( sector ) => !sectors.includes( sector.value ) ),
-				validators: [ {
-					fn: validators.isSector,
-					message: 'Select a sector affected by the barrier'
-				},{
-					fn: ( value ) => !sectors.includes( value ),
-					message: 'Sector already added, choose another'
-				} ]
-			}
-		} );
+	new: ( req, res ) => {
 
-		if( form.isPost ){
+		const barrier = req.barrier;
+		const href = {
+			cancel: urls.barriers.detail( barrier.id ),
+			form: urls.barriers.sectors.new( barrier.id )
+		};
 
-			form.validate();
+		req.session.barrierSectors = [];
 
-			if( !form.hasErrors() ){
-
-				sectors.push( form.getValues().sectors );
-				req.session.barrierSectors = sectors;
-
-				return res.redirect( urls.barriers.sectors.list( barrier.id ) );
-			}
-		}
-
-		res.render( 'barriers/views/sectors/add', Object.assign( form.getTemplateValues(), { currentSectors: sectors.map( metadata.getSector ) } ) );
+		addSectorForm( req, res, href );
 	}
 };

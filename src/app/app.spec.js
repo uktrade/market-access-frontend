@@ -282,6 +282,7 @@ describe( 'App', function(){
 								.end( checkPage( 'Market Access - Sectors affected by the barrier', done ) );
 						} );
 					} );
+
 					describe( 'Listing the sectors', () => {
 						it( 'Should list the sectors', ( done ) => {
 
@@ -290,11 +291,21 @@ describe( 'App', function(){
 								.end( checkPage( 'Market Access - Sectors affected by the barrier', done ) );
 						} );
 					} );
+
 					describe( 'Adding a sector', () => {
 						it( 'Should render the page', ( done ) => {
 
 							app
 								.get( urls.barriers.sectors.add( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier - Add an affected sector', done ) );
+						} );
+					} );
+
+					describe( 'New sectors', () => {
+						it( 'Should render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.sectors.new( barrierId ) )
 								.end( checkPage( 'Market Access - Barrier - Add an affected sector', done ) );
 						} );
 					} );
