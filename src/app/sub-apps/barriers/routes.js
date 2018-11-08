@@ -20,10 +20,17 @@ module.exports = ( express, app ) => {
 	app.use( parseBody, csrfProtection );
 
 	app.get( '/:barrierId/', controller.barrier );
-	app.get( '/:barrierId/edit/', controller.edit );
-	app.post( '/:barrierId/edit/', controller.edit );
-	app.get( '/:barrierId/interactions/', controller.interactions.list );
 
+	app.get( '/:barrierId/edit/', controller.edit.headlines );
+	app.post( '/:barrierId/edit/', controller.edit.headlines );
+	app.get( '/:barrierId/edit/product/', controller.edit.product );
+	app.post( '/:barrierId/edit/product/', controller.edit.product );
+	app.get( '/:barrierId/edit/description/', controller.edit.description );
+	app.post( '/:barrierId/edit/description/', controller.edit.description );
+	app.get( '/:barrierId/edit/source/', controller.edit.source );
+	app.post( '/:barrierId/edit/source/', controller.edit.source );
+
+	app.get( '/:barrierId/interactions/', controller.interactions.list );
 	app.get( '/:barrierId/interactions/add-note/', controller.interactions.addNote );
 	app.post( '/:barrierId/interactions/add-note/', controller.interactions.addNote );
 
@@ -46,6 +53,8 @@ module.exports = ( express, app ) => {
 	app.post( '/:barrierId/sectors/remove/', controller.sectors.remove );
 	app.get( '/:barrierId/sectors/add/', controller.sectors.add );
 	app.post( '/:barrierId/sectors/add/', controller.sectors.add );
+	app.get( '/:barrierId/sectors/new/', controller.sectors.new );
+	app.post( '/:barrierId/sectors/new/', controller.sectors.new );
 
 	app.get( '/:barrierId/companies/edit/', controller.companies.edit );
 	app.get( '/:barrierId/companies/', controller.companies.list );

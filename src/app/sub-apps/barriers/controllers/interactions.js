@@ -4,7 +4,7 @@ const FormProcessor = require( '../../../lib/FormProcessor' );
 const urls = require( '../../../lib/urls' );
 const detailVieWModel = require( '../view-models/detail' );
 
-function sortByDate( a, b ){
+function sortByDateDescending( a, b ){
 
 	const aDate = Date.parse( a.created_on );
 	const bDate = Date.parse( b.created_on );
@@ -28,10 +28,11 @@ function getInteractionsList( interactions ){
 		}
 	}
 
-	pinned.sort( sortByDate );
-	other.sort( sortByDate );
+	//pinned.sort( sortByDateDescending );
+	//other.sort( sortByDateDescending );
+	//return pinned.concat( other );
 
-	return pinned.concat( other );
+	return pinned.concat( other ).sort( sortByDateDescending );
 }
 
 async function renderInteractions( req, res, next, data ){

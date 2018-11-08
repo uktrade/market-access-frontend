@@ -45,7 +45,7 @@ describe( 'Report controller', () => {
 				{ id: 1, name: 'country 1' },
 				{ id: 2, name: 'country 2' }
 			],
-			barrierAwareness: {
+			barrierSource: {
 				'A': 'a',
 				'B': 'b'
 			},
@@ -1260,7 +1260,7 @@ describe( 'Report controller', () => {
 
 		describe( 'Form config', () => {
 
-			let barrierAwarenessResponse;
+			let barrierSourceResponse;
 
 			function checkForm( args, isResolved ){
 
@@ -1283,15 +1283,15 @@ describe( 'Report controller', () => {
 				expect( config.barrierTitle.values ).toEqual( [ report.barrier_title ] );
 				expect( config.barrierTitle.required ).toBeDefined();
 
-				expect( config.barrierAwareness ).toBeDefined();
-				expect( config.barrierAwareness.type ).toEqual( Form.RADIO );
-				expect( config.barrierAwareness.values ).toEqual( [ report.source ] );
-				expect( config.barrierAwareness.validators[ 0 ].fn ).toEqual( barrierAwarenessResponse );
-				expect( Array.isArray( config.barrierAwareness.items ) ).toEqual( true );
+				expect( config.barrierSource ).toBeDefined();
+				expect( config.barrierSource.type ).toEqual( Form.RADIO );
+				expect( config.barrierSource.values ).toEqual( [ report.source ] );
+				expect( config.barrierSource.validators[ 0 ].fn ).toEqual( barrierSourceResponse );
+				expect( Array.isArray( config.barrierSource.items ) ).toEqual( true );
 
-				expect( config.barrierAwarenessOther ).toBeDefined();
-				expect( config.barrierAwarenessOther.conditional ).toEqual( { name: 'barrierAwareness', value: 'OTHER' } );
-				expect( config.barrierAwarenessOther.values ).toEqual( [ report.other_source ] );
+				expect( config.barrierSourceOther ).toBeDefined();
+				expect( config.barrierSourceOther.conditional ).toEqual( { name: 'barrierSource', value: 'OTHER' } );
+				expect( config.barrierSourceOther.values ).toEqual( [ report.other_source ] );
 
 				if( isResolved ){
 
@@ -1303,11 +1303,11 @@ describe( 'Report controller', () => {
 
 			beforeEach( () => {
 
-				barrierAwarenessResponse = { barrierAwarenessResponse: true };
+				barrierSourceResponse = { barrierSourceResponse: true };
 
 				validators.isMetadata.and.callFake( ( key ) => {
 
-					if( key === 'barrierAwareness' ){ return barrierAwarenessResponse; }
+					if( key === 'barrierSource' ){ return barrierSourceResponse; }
 				} );
 			} );
 

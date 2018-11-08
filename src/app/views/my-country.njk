@@ -22,7 +22,7 @@
 					<th class="standard-table__heading">Barrier title</th>
 					<th class="standard-table__heading">Sectors affected</th>
 					<th class="standard-table__heading">Barrier urgency</th>
-					<th class="standard-table__heading">Resolved</th>
+					<th class="standard-table__heading">Status</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -36,7 +36,7 @@
 					</td>
 					<td class="standard-table__cell">{{ barrier.sectors | join( ', ' ) }}</td>
 					<td class="standard-table__cell">{{ barrier.problemStatus }}</td>
-					<td class="standard-table__cell">{{ 'Yes' if barrier.resolved else 'No' }}</td>
+					<td class="standard-table__cell"><span class="barrier-status-table-badge barrier-status-table-badge--{{ barrier.status.modifyer }}">{{ barrier.status.name }}</span></td>
 				</tr>
 				{%- endfor %}
 			</tbody>

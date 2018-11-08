@@ -94,13 +94,18 @@ describe( 'Barrier interactions controller', () => {
 			describe( 'With a success response', () => {
 				it( 'Should get the barriers and render the index page', async () => {
 
+					const results = [
+						{ id: 1, text: 'one', pinned: false, created_on: 'Tue Sep 11 2018 06:16:40 GMT+0100 (BST)' },
+						{ id: 2, text: 'two', pinned: true, created_on: 'Fri Jun 01 2018 01:43:07 GMT+0100 (BST)' },
+						{ id: 3, text: 'three', pinned: false, created_on: 'Wed Nov 22 2017 10:45:25 GMT+0000 (GMT)' },
+						{ id: 4, text: 'four', pinned: true, created_on: 'Fri Dec 08 2017 08:25:17 GMT+0000 (GMT)' },
+						{ id: 5, text: 'five', pinned: true, created_on: 'Fri Dec 08 2017 08:25:17 GMT+0000 (GMT)' },
+					];
 					const interactionsResponse = {
 						response: { isSuccess: true  },
-						body: {
-							results: [ { id: 1 } ]
-						}
+						body: { results }
 					};
-					const barrierDetailViewModelResponse = { barriers: true };
+					const barrierDetailViewModelResponse = { barrier: true };
 
 					barrierDetailViewModel.and.callFake( () => barrierDetailViewModelResponse );
 					backend.barriers.getInteractions.and.callFake( () => Promise.resolve( interactionsResponse ) );
@@ -110,10 +115,17 @@ describe( 'Barrier interactions controller', () => {
 					expect( next ).not.toHaveBeenCalled();
 					expect( backend.barriers.getInteractions ).toHaveBeenCalledWith( req, barrierId );
 					expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier );
-					expect( res.render ).toHaveBeenCalledWith( 'barriers/views/interactions', Object.assign(
-						barrierDetailViewModelResponse,
-						{ interactions: interactionsResponse }
-					) );
+
+					// For some reason .toHaveBeenCalledWith() does not match the interations,
+					// once they have been sorted, so have to check each property individually
+					const renderArgs = res.render.calls.argsFor( 0 );
+
+					expect( renderArgs[ 0 ] ).toEqual( 'barriers/views/interactions' );
+					expect( renderArgs[ 1 ].barrier ).toBeDefined();
+					//separate pinned and non pinned
+					//expect( renderArgs[ 1 ].interactions ).toEqual( [ results[ 1 ], results[ 3 ], results[ 4 ], results[ 0 ], results[ 2 ] ] );
+					//one list
+					expect( renderArgs[ 1 ].interactions ).toEqual( [ results[ 0 ], results[ 1 ], results[ 3 ], results[ 4 ], results[ 2 ] ] );
 				} );
 			} );
 

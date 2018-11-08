@@ -23,7 +23,15 @@ describe( 'Dashboard view model', () => {
 				'1': 'type a',
 				'2': 'type b'
 			},
-			getSector
+			getSector,
+			barrier: {
+				status: {
+					typeInfo: {
+						1: { name: faker.lorem.words() },
+						4: { name: faker.lorem.words() },
+					}
+				}
+			}
 		};
 
 		viewModel = proxyquire( modulePath, {
@@ -60,7 +68,7 @@ describe( 'Dashboard view model', () => {
 						id: barrier.export_country,
 						name: ( country && country.name )
 					},
-					resolved: ( ( barrier.current_status && barrier.current_status.status ) === 4 ),
+					status: metadata.barrier.status.typeInfo[ barrier.current_status.status ],
 					supportNeeded: barrier.support_type === 1,
 					hasContributors: barrier.contributor_count > 0,
 					problemStatus: metadata.statusTypes[ barrier.problem_status ],

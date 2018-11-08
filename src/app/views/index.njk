@@ -17,8 +17,7 @@
 					<th class="standard-table__heading">Barrier title</th>
 					<th class="standard-table__heading">Sectors affected</th>
 					<th class="standard-table__heading">Barrier location</th>
-					<th class="standard-table__heading">Resolved</th>
-					{#<th class="standard-table__heading">Support needed?</th>#}
+					<th class="standard-table__heading">Status</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -32,18 +31,7 @@
 					</td>
 					<td class="standard-table__cell">{{ barrier.sectors | join( ', ' ) }}</td>
 					<td class="standard-table__cell">{{ barrier.country.name }}</td>
-					<td class="standard-table__cell">{{ 'Yes' if barrier.resolved else 'No' }}</td>
-					{#<td class="standard-table__cell">
-						{% if barrier.supportNeeded -%}
-							<span class="warning-icon" aria-hidden="true">!</span>Yes
-							{% if not barrier.hasContributors -%}
-								<br>
-								<span class="warning-icon warning-icon--error" aria-hidden="true">!</span>No contributors
-							{%- endif %}
-						{%- else -%}
-							No
-						{%- endif %}
-					</td>#}
+					<td class="standard-table__cell"><span class="barrier-status-table-badge barrier-status-table-badge--{{ barrier.status.modifyer }}">{{ barrier.status.name }}</span></td>
 				</tr>
 				{%- endfor %}
 			</tbody>

@@ -46,7 +46,12 @@ module.exports = {
 
 	barriers: {
 		detail: ( barrierId ) => `/barriers/${ barrierId }/`,
-		edit: ( barrierId ) => `/barriers/${ barrierId }/edit/`,
+		edit: {
+			headlines: ( barrierId ) => `/barriers/${ barrierId }/edit/`,
+			product: ( barrierId ) => `/barriers/${ barrierId }/edit/product/`,
+			description: ( barrierId ) => `/barriers/${ barrierId }/edit/description/`,
+			source: ( barrierId ) => `/barriers/${ barrierId }/edit/source/`,
+		},
 		interactions: ( barrierId ) => `/barriers/${ barrierId }/interactions/`,
 		addNote: ( barrierId ) => `/barriers/${ barrierId }/interactions/add-note/`,
 		status: ( barrierId ) => `/barriers/${ barrierId }/status/`,
@@ -61,7 +66,8 @@ module.exports = {
 			edit: ( barrierId ) => `/barriers/${ barrierId }/sectors/edit/`,
 			list: ( barrierId ) => `/barriers/${ barrierId }/sectors/`,
 			add: ( barrierId ) => `/barriers/${ barrierId }/sectors/add/`,
-			remove: ( barrierId ) => `/barriers/${ barrierId }/sectors/remove/`
+			remove: ( barrierId ) => `/barriers/${ barrierId }/sectors/remove/`,
+			new: ( barrierId ) => `/barriers/${ barrierId }/sectors/new/`,
 		},
 		companies: {
 			edit: ( barrierId ) => `/barriers/${ barrierId }/companies/edit/`,

@@ -1,5 +1,7 @@
 const metadata = require( '../lib/metadata' );
 
+const barrierStatusTypeInfo = metadata.barrier.status.typeInfo;
+
 function getSector( sectorId ){
 
 	const sector = metadata.getSector( sectorId );
@@ -11,6 +13,8 @@ function update( barrier ){
 
 	const countryId = barrier.export_country;
 	const country = metadata.countries.find( ( country ) => country.id === countryId );
+	const barrierStatusCode = barrier.current_status.status;
+	const status = barrierStatusTypeInfo[ barrierStatusCode ] || {};
 
 	return {
 		id: barrier.id,
@@ -20,10 +24,10 @@ function update( barrier ){
 			name: ( country && country.name )
 		},
 		sectors: ( barrier.sectors && barrier.sectors.map( getSector ) || [ 'Unknown' ] ),
-		resolved: ( barrier.current_status && barrier.current_status.status ) === 4,
 		supportNeeded: barrier.support_type === 1,
 		hasContributors: barrier.contributor_count > 0,
 		problemStatus: metadata.statusTypes[ barrier.problem_status ],
+		status,
 		date: {
 			reported: barrier.reported_on
 		},
