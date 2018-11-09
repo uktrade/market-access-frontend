@@ -31,8 +31,10 @@ module.exports = ( express, app ) => {
 	app.post( '/:barrierId/edit/source/', controller.edit.source );
 
 	app.get( '/:barrierId/interactions/', controller.interactions.list );
-	app.get( '/:barrierId/interactions/add-note/', controller.interactions.addNote );
-	app.post( '/:barrierId/interactions/add-note/', controller.interactions.addNote );
+	app.get( '/:barrierId/interactions/add-note/', controller.interactions.notes.add );
+	app.post( '/:barrierId/interactions/add-note/', controller.interactions.notes.add );
+	app.get( '/:barrierId/interactions/edit-note/:noteId', controller.interactions.notes.edit );
+	app.post( '/:barrierId/interactions/edit-note/:noteId', controller.interactions.notes.edit );
 
 	app.get( '/:barrierId/status/', controller.status.index );
 	app.post( '/:barrierId/status/', controller.status.index );

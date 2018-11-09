@@ -91,10 +91,20 @@ describe( 'URLs', () => {
 			} );
 		} );
 
-		describe( 'Add note', () => {
-			it( 'Should return the correct path', () => {
+		describe( 'Notes', () => {
+			describe( 'Add note', () => {
+				it( 'Should return the correct path', () => {
 
-				expect( urls.barriers.addNote( barrierId ) ).toEqual( `/barriers/${ barrierId }/interactions/add-note/` );
+					expect( urls.barriers.notes.add( barrierId ) ).toEqual( `/barriers/${ barrierId }/interactions/add-note/` );
+				} );
+			} );
+
+			describe( 'Edit note', () => {
+				it( 'Should return the correct path', () => {
+
+					const noteId = 23;
+					expect( urls.barriers.notes.edit( barrierId, noteId ) ).toEqual( `/barriers/${ barrierId }/interactions/edit-note/${ noteId }/` );
+				} );
 			} );
 		} );
 

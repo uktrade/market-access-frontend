@@ -53,7 +53,10 @@ module.exports = {
 			source: ( barrierId ) => `/barriers/${ barrierId }/edit/source/`,
 		},
 		interactions: ( barrierId ) => `/barriers/${ barrierId }/interactions/`,
-		addNote: ( barrierId ) => `/barriers/${ barrierId }/interactions/add-note/`,
+		notes: {
+			add: ( barrierId ) => `/barriers/${ barrierId }/interactions/add-note/`,
+			edit: ( barrierId, noteId ) => `/barriers/${ barrierId }/interactions/edit-note/${ noteId }/`,
+		},
 		status: ( barrierId ) => `/barriers/${ barrierId }/status/`,
 		statusResolved: ( barrierId ) => `/barriers/${ barrierId }/status/resolved/`,
 		statusHibernated: ( barrierId ) => `/barriers/${ barrierId }/status/hibernated/`,

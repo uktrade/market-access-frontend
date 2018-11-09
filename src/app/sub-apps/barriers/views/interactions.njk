@@ -1,5 +1,5 @@
 {% from "components/textarea/macro.njk" import govukTextarea %}
-{% from "components/checkboxes/macro.njk" import govukCheckboxes %}
+{#% from "components/checkboxes/macro.njk" import govukCheckboxes %#}
 
 {% extends './barrier-layout.njk' %}
 
@@ -17,7 +17,7 @@
 
 	{% if noteForm %}
 		<div class="interaction-panel">
-			<form action="{{ urls.barriers.addNote( barrier.id ) }}" method="POST">
+			<form action="{{ urls.barriers.notes.add( barrier.id ) }}" method="POST">
 
 				<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
@@ -27,6 +27,9 @@
 					label: {
 						text: 'Add notes on an interaction or event',
 						classes: 'govuk-!-font-weight-bold'
+					},
+					attributes: {
+						autofocus: ''
 					},
 					errorMessage: errors | errorForName( 'note' )
 				}) }}
@@ -46,15 +49,39 @@
 			</form>
 		</div>
 	{% else %}
-		<a class="govuk-button button--secondary" href="{{ urls.barriers.addNote( barrier.id ) }}">Add note</a>
+		<a class="govuk-button button--secondary" href="{{ urls.barriers.notes.add( barrier.id ) }}">Add note</a>
 	{% endif %}
 
 	{% if interactions and interactions.length %}
 		<ol class="event-list">
 			{% for item in interactions %}
 			<li class="event-list__item{#{ ' event-list__item--pinned' if item.pinned }#}">
+
 				<h4 class="event-list__item__heading">{{ item.created_on | dateWithTime }}</h4>
-				<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
+
+				{% if item.edit %}
+					<form action="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}" method="POST">
+						<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+						{{ govukTextarea({
+							name: 'note',
+							id: 'note',
+							label: {
+								text: 'Add notes on an interaction or event',
+								classes: 'visually-hidden'
+							},
+							value: item.text,
+							attributes: {
+								autofocus: ''
+							},
+							errorMessage: errors | errorForName( 'note' )
+						}) }}
+						<input type="submit" value="Save note" class="govuk-button">
+						<a href="{{ urls.barriers.interactions( barrier.id ) }}" class="form-cancel">Cancel</a>
+					</form>
+				{% else %}
+					<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
+					<a href="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}">edit</a>
+				{% endif %}
 			</li>
 			{% endfor %}
 		</ol>

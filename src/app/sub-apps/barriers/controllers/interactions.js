@@ -2,6 +2,7 @@ const backend = require( '../../../lib/backend-service' );
 const Form = require( '../../../lib/Form' );
 const FormProcessor = require( '../../../lib/FormProcessor' );
 const urls = require( '../../../lib/urls' );
+const validators = require( '../../../lib/validators' );
 const detailVieWModel = require( '../view-models/detail' );
 
 function sortByDateDescending( a, b ){
@@ -12,7 +13,7 @@ function sortByDateDescending( a, b ){
 	return ( aDate === bDate ? 0 : ( aDate > bDate ? -1 : 1 ) );
 }
 
-function getInteractionsList( interactions ){
+function getInteractionsList( interactions, editId ){
 
 	const pinned = [];
 	const other = [];
@@ -20,6 +21,11 @@ function getInteractionsList( interactions ){
 	for( let item of interactions ){
 
 		if( !item.text ){ continue; }
+
+		if( item.id == editId ){
+
+			item.edit = true;
+		}
 
 		if( item.pinned ){
 			pinned.push( item );
@@ -35,7 +41,7 @@ function getInteractionsList( interactions ){
 	return pinned.concat( other ).sort( sortByDateDescending );
 }
 
-async function renderInteractions( req, res, next, data ){
+async function renderInteractions( req, res, next, opts = {} ){
 
 	try {
 
@@ -45,8 +51,8 @@ async function renderInteractions( req, res, next, data ){
 
 			res.render( 'barriers/views/interactions', Object.assign(
 				detailVieWModel( req.barrier ),
-				{ interactions: getInteractionsList( body.results ) },
-				data
+				{ interactions: getInteractionsList( body.results, opts.editId ) },
+				opts.data
 			) );
 
 		} else {
@@ -64,34 +70,70 @@ module.exports = {
 
 	list: async ( req, res, next ) => renderInteractions( req, res, next ),
 
-	addNote: async ( req, res, next ) => {
+	notes: {
 
-		const barrier = req.barrier;
+		add: async ( req, res, next ) => {
 
-		const form = new Form( req, {
-			note: {
-				required: 'Add some text for the note.'
-			},
-			pinned: {}
-		} );
+			const barrier = req.barrier;
 
-		const processor = new FormProcessor( {
-			form,
-			render: ( templateValues ) => renderInteractions( req, res, next, Object.assign( {},
-				{ noteForm: true },
-				templateValues
-			) ),
-			saveFormData: ( formValues ) => backend.barriers.saveNote( req, barrier.id, formValues ),
-			saved: () => res.redirect( urls.barriers.interactions( barrier.id ) )
-		} );
+			const form = new Form( req, {
+				note: {
+					required: 'Add some text for the note.'
+				},
+				pinned: {}
+			} );
 
-		try {
+			const processor = new FormProcessor( {
+				form,
+				render: ( templateValues ) => renderInteractions( req, res, next, { data: Object.assign(
+					{ noteForm: true },
+					templateValues
+				) } ),
+				saveFormData: ( formValues ) => backend.barriers.notes.save( req, barrier.id, formValues ),
+				saved: () => res.redirect( urls.barriers.interactions( barrier.id ) )
+			} );
 
-			await processor.process();
+			try {
 
-		} catch( e ){
+				await processor.process();
 
-			next( e );
+			} catch( e ){
+
+				next( e );
+			}
+		},
+
+		edit: async ( req, res, next ) => {
+
+			const barrier = req.barrier;
+			const noteId = req.params.noteId;
+			const noteIdIsNumeric = ( !!noteId && validators.isNumeric( noteId ) );
+			const editId = noteIdIsNumeric ? noteId : null;
+
+			const form = new Form( req, {
+				note: {
+					required: 'Add some text for the note.'
+				}
+			} );
+
+			const processor = new FormProcessor( {
+				form,
+				render: ( templateValues ) => renderInteractions( req, res, next, {
+					editId,
+					data: templateValues
+				} ),
+				saveFormData: ( formValues ) => backend.barriers.notes.update( req, editId, formValues ),
+				saved: () => res.redirect( urls.barriers.interactions( barrier.id ) )
+			} );
+
+			try {
+
+				await processor.process();
+
+			} catch( e ){
+
+				next( e );
+			}
 		}
 	},
 };
