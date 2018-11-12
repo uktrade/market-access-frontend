@@ -28,7 +28,7 @@
 						<a class="dashboard-table__barrier-title" href="{{ urls.barriers.detail( barrier.id ) }}">
 							{{ barrier.title }}
 						</a>
-						<span class="dashboard-table__barrier-code">{{ barrier.code }}</span>
+						{{ barrier.code }}
 					</td>
 					<td class="standard-table__cell">{{ barrier.sectors | join( ', ' ) }}</td>
 					<td class="standard-table__cell">{{ barrier.country.name }}</td>
