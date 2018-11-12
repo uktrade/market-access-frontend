@@ -1,6 +1,7 @@
 {% macro barrierSummary( barrier ) %}
 	<section class="barrier-summary">
 		<div class='barrier-summary__heading'>
+			{{ barrier.code }}
 			<h1 class="barrier-summary__heading__text">{{ barrier.title }}</h1>
 			<a class="barrier-summary__heading__link" href="{{ urls.barriers.edit.headlines( barrier.id ) }}">Edit barrier header</a>
 		</div>

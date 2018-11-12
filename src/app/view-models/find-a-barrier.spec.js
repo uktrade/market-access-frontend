@@ -31,6 +31,7 @@ describe( 'Find a barrier view model', () => {
 
 			expected.push({
 				id: barrier.id,
+				code: barrier.code,
 				title: barrier.barrier_title,
 				isOpen: ( barrierStatusCode === OPEN ),
 				isResolved: ( barrierStatusCode === RESOLVED ),

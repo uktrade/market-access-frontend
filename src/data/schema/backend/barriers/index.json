@@ -23,6 +23,7 @@
 			"type": "object",
 			"required": [
 				"id",
+				"code",
 				"report_id",
 				"reported_on",
 				"barrier_title",
@@ -35,6 +36,7 @@
 			"properties": {
 
 				"id": { "$ref": "$refs/common.json#/uuid" },
+				"code": { "$ref": "$refs/common.json#/barrier-code" },
 
 				"report_id": { "$ref": "$refs/common.json#/small-int" },
 				"reported_on": { "$ref": "$refs/common.json#/past-date" },

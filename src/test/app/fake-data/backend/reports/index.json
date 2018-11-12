@@ -3,6 +3,7 @@
    "results": [
       {
          "id": 68,
+         "code": "B-83-3LX",
          "company_name": "suscipit cumque ut",
          "problem_status": 2,
          "company_id": "88bd47e8-4c59-4ff4-9b89-bc5cf817c61d",
@@ -60,6 +61,7 @@
       },
       {
          "id": 35,
+         "code": "B-83-4ZX",
          "company_name": "aut culpa ut",
          "problem_status": 1,
          "company_id": "0a185e81-0353-4913-9b07-f54a0322a330",
@@ -81,6 +83,7 @@
       },
       {
          "id": 69,
+         "code": "B-83-5YX",
          "company_name": "sed aperiam delectus",
          "problem_status": 2,
          "company_id": "bac7265e-d7a1-446a-8d90-6543e6a2ff2c",
@@ -108,6 +111,7 @@
       },
       {
          "id": 95,
+         "code": "B-83-6AX",
          "company_name": "dolor iure odit",
          "problem_status": 2,
          "company_id": "80ee01c4-e545-4bf1-81be-9a0d25e6a1fc",

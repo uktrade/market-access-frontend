@@ -65,6 +65,7 @@ describe( 'Barrier detail view model', () => {
 			const barrierSectors = inputBarrier.sectors.map( metadata.getSector );
 
 			expect( outpuBarrier.id ).toEqual( inputBarrier.id );
+			expect( outpuBarrier.code ).toEqual( inputBarrier.code );
 			expect( outpuBarrier.title ).toEqual( inputBarrier.barrier_title );
 			expect( outpuBarrier.product ).toEqual( inputBarrier.product );
 			expect( outpuBarrier.problem.status ).toEqual( metadata.statusTypes[ inputBarrier.problem_status ] );

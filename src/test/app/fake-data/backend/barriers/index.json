@@ -3,6 +3,7 @@
    "results": [
       {
          "id": "e60b7f08-a9f5-40ea-82e8-6e48a306ee7a",
+         "code": "B-17-KU6",
          "report_id": 11,
          "reported_on": "Wed Nov 22 2017 10:45:25 GMT+0000 (GMT)",
          "barrier_title": "qui ipsam ea",
@@ -22,6 +23,7 @@
       },
       {
          "id": "cd59c6c1-9af8-4774-a008-67547108d4c4",
+         "code": "B-83-3LX",
          "report_id": 15,
          "reported_on": "Sun Jul 08 2018 08:34:56 GMT+0100 (BST)",
          "barrier_title": "omnis repudiandae magni",
@@ -41,6 +43,7 @@
       },
       {
          "id": "1b1d0391-61c5-4abf-83e7-700252a6b43d",
+         "code": "B-83-9LX",
          "report_id": 6,
          "reported_on": "Sat Jul 14 2018 07:56:37 GMT+0100 (BST)",
          "barrier_title": "qui molestias quis",
