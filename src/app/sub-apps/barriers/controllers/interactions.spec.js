@@ -302,156 +302,169 @@ describe( 'Barrier interactions controller', () => {
 		} );
 
 		describe( 'edit', () => {
+			describe( 'When the noteId is invalid', () => {
+				it( 'Should call next with an error', async () => {
 
-			let editId;
+					req.params.noteId = 'abc';
 
-			beforeEach( () => {
+					await controller.notes.edit( req, res, next );
 
-				editId = 34;
+					expect( next ).toHaveBeenCalledWith( new Error( 'Invalid noteId' ) );
+					expect( res.render ).not.toHaveBeenCalled();
+				} );
 			} );
 
-			it( 'Should setup the form correctly', () => {
+			describe( 'When the noteId is valid', () => {
 
-				controller.notes.edit( req, res, next );
-
-				const args = Form.calls.argsFor( 0 );
-				const config = args[ 1 ];
-
-				expect( Form ).toHaveBeenCalled();
-				expect( args[ 0 ] ).toEqual( req );
-
-				expect( config.note ).toBeDefined();
-				expect( config.note.required ).toBeDefined();
-			} );
-
-			describe( 'When it is a POST', () => {
+				let editId;
 
 				beforeEach( () => {
 
-					req.body = {};
-					form.isPost = true;
+					editId = 34;
+					req.params.noteId = editId;
+					validators.isNumeric.and.callFake( () => true );
 				} );
 
-				describe( 'When the input values are valid', () => {
-					describe( 'When the response is a success', () => {
+				it( 'Should setup the form correctly', () => {
 
-						beforeEach( () => {
+					controller.notes.edit( req, res, next );
 
-							req.params.noteId = editId;
-							validators.isNumeric.and.callFake( () => true );
-							backend.barriers.notes.update.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
-							form.hasErrors = () => false;
+					const args = Form.calls.argsFor( 0 );
+					const config = args[ 1 ];
+
+					expect( Form ).toHaveBeenCalled();
+					expect( args[ 0 ] ).toEqual( req );
+
+					expect( config.note ).toBeDefined();
+					expect( config.note.required ).toBeDefined();
+				} );
+
+				describe( 'When it is a POST', () => {
+
+					beforeEach( () => {
+
+						req.body = {};
+						form.isPost = true;
+					} );
+
+
+					describe( 'When the input values are valid', () => {
+						describe( 'When the response is a success', () => {
+
+							beforeEach( () => {
+
+								backend.barriers.notes.update.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+								form.hasErrors = () => false;
+							} );
+
+							afterEach( () => {
+
+								expect( next ).not.toHaveBeenCalled();
+								expect( backend.barriers.notes.update ).toHaveBeenCalledWith( req, editId, getValuesResponse );
+							} );
+
+							describe( 'When the form is saved', () => {
+								it( 'Should redirect', async () => {
+
+									const interactionsUrl = '/interactions/';
+									urls.barriers.interactions.and.callFake( () => interactionsUrl );
+
+									await controller.notes.edit( req, res, next );
+
+									expect( form.validate ).toHaveBeenCalled();
+									expect( urls.barriers.interactions ).toHaveBeenCalledWith( req.barrier.id );
+									expect( res.redirect ).toHaveBeenCalledWith( interactionsUrl );
+								} );
+							} );
 						} );
 
-						afterEach( () => {
+						describe( 'When the response is not a success', () => {
+							it( 'Should call next with an error', async () => {
 
-							expect( next ).not.toHaveBeenCalled();
-							expect( backend.barriers.notes.update ).toHaveBeenCalledWith( req, editId, getValuesResponse );
-						} );
-
-						describe( 'When the form is saved', () => {
-							it( 'Should redirect', async () => {
-
-								const interactionsUrl = '/interactions/';
-								urls.barriers.interactions.and.callFake( () => interactionsUrl );
+								const statusCode = 500;
+								form.hasErrors = () => false;
+								backend.barriers.notes.update.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
 
 								await controller.notes.edit( req, res, next );
 
-								expect( form.validate ).toHaveBeenCalled();
-								expect( urls.barriers.interactions ).toHaveBeenCalledWith( req.barrier.id );
-								expect( res.redirect ).toHaveBeenCalledWith( interactionsUrl );
+								expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save form - got 500 from backend' ) );
+							} );
+						} );
+
+						describe( 'When the request fails', () => {
+							it( 'Should call next with the error', async () => {
+
+								const err = new Error( 'my test' );
+								form.hasErrors = () => false;
+								backend.barriers.notes.update.and.callFake( () => Promise.reject( err ) );
+
+								await controller.notes.edit( req, res, next );
+
+								expect( next ).toHaveBeenCalledWith( err );
 							} );
 						} );
 					} );
 
-					describe( 'When the response is not a success', () => {
-						it( 'Should call next with an error', async () => {
+					describe( 'When the input values are invalid', () => {
+						it( 'Should render the page', async () => {
 
-							const statusCode = 500;
-							form.hasErrors = () => false;
-							backend.barriers.notes.update.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
+							const barrierDetailViewModelResponse = { a: 1 };
+							const interactionsResponse = { response: { isSuccess: true }, body: { results: [ { b: 2 } ] } };
 
-							await controller.notes.edit( req, res, next );
+							barrierDetailViewModel.and.callFake( () => barrierDetailViewModelResponse );
+							backend.barriers.getInteractions.and.callFake( () => interactionsResponse );
 
-							expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save form - got 500 from backend' ) );
-						} );
-					} );
-
-					describe( 'When the request fails', () => {
-						it( 'Should call next with the error', async () => {
-
-							const err = new Error( 'my test' );
-							form.hasErrors = () => false;
-							backend.barriers.notes.update.and.callFake( () => Promise.reject( err ) );
+							form.isPost = true;
+							form.hasErrors = () => true;
 
 							await controller.notes.edit( req, res, next );
 
-							expect( next ).toHaveBeenCalledWith( err );
+							expect( res.render ).toHaveBeenCalledWith( 'barriers/views/interactions', Object.assign(
+								barrierDetailViewModelResponse,
+								{ interactions: interactionsResponse },
+								getTemplateValuesResponse
+							) );
+							expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier );
+							expect( next ).not.toHaveBeenCalled();
 						} );
 					} );
 				} );
 
-				describe( 'When the input values are invalid', () => {
-					it( 'Should render the page', async () => {
+				describe( 'When it is a GET', () => {
+					it( 'Should render the interactions page with the form', async () => {
 
-						const barrierDetailViewModelResponse = { a: 1 };
-						const interactionsResponse = { response: { isSuccess: true }, body: { results: [ { b: 2 } ] } };
+						const interactionsResponse = {
+							response: { isSuccess: true },
+							body: { results: [
+								{ id: 1, text: 'one', created_on: 'Tue Sep 11 2018 06:16:40 GMT+0100 (BST)' },
+								{ id: editId, text: 'edit item', created_on: 'Wed Nov 22 2017 10:45:25 GMT+0000 (GMT)' }
+							] }
+						};
+						const barierDetailViewModelResponse = { a: 1, b: 2 };
+						const expectedInteractions = interactionsResponse.body.results.map( ( item ) => {
 
-						barrierDetailViewModel.and.callFake( () => barrierDetailViewModelResponse );
+							const newItem = Object.assign( {}, item );
+
+							if( item.id == editId ){
+
+								newItem.edit = true;
+							}
+
+							return newItem;
+						} );
+
+						barrierDetailViewModel.and.callFake( () => Object.assign( {}, barierDetailViewModelResponse ) );
 						backend.barriers.getInteractions.and.callFake( () => interactionsResponse );
-
-						form.isPost = true;
-						form.hasErrors = () => true;
 
 						await controller.notes.edit( req, res, next );
 
-						expect( res.render ).toHaveBeenCalledWith( 'barriers/views/interactions', Object.assign(
-							barrierDetailViewModelResponse,
-							{ interactions: interactionsResponse },
-							getTemplateValuesResponse
+						expect( form.getTemplateValues ).toHaveBeenCalledWith();
+						expect( res.render ).toHaveBeenCalledWith( 'barriers/views/interactions', Object.assign( {},
+							barierDetailViewModelResponse,
+							{ interactions: expectedInteractions },
+							getTemplateValuesResponse,
 						) );
-						expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier );
-						expect( next ).not.toHaveBeenCalled();
 					} );
-				} );
-			} );
-
-			describe( 'When it is a GET', () => {
-				it( 'Should render the interactions page with the form', async () => {
-
-					const interactionsResponse = {
-						response: { isSuccess: true },
-						body: { results: [
-							{ id: 1, text: 'one', created_on: 'Tue Sep 11 2018 06:16:40 GMT+0100 (BST)' },
-							{ id: editId, text: 'edit item', created_on: 'Wed Nov 22 2017 10:45:25 GMT+0000 (GMT)' }
-						] }
-					};
-					const barierDetailViewModelResponse = { a: 1, b: 2 };
-					const expectedInteractions = interactionsResponse.body.results.map( ( item ) => {
-
-						const newItem = Object.assign( {}, item );
-
-						if( item.id == editId ){
-
-							newItem.edit = true;
-						}
-
-						return newItem;
-					} );
-
-					barrierDetailViewModel.and.callFake( () => Object.assign( {}, barierDetailViewModelResponse ) );
-					backend.barriers.getInteractions.and.callFake( () => interactionsResponse );
-					validators.isNumeric.and.callFake( () => true );
-					req.params.noteId = editId;
-
-					await controller.notes.edit( req, res, next );
-
-					expect( form.getTemplateValues ).toHaveBeenCalledWith();
-					expect( res.render ).toHaveBeenCalledWith( 'barriers/views/interactions', Object.assign( {},
-						barierDetailViewModelResponse,
-						{ interactions: expectedInteractions },
-						getTemplateValuesResponse,
-					) );
 				} );
 			} );
 		} );

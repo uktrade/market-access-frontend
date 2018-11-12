@@ -108,31 +108,37 @@ module.exports = {
 			const barrier = req.barrier;
 			const noteId = req.params.noteId;
 			const noteIdIsNumeric = ( !!noteId && validators.isNumeric( noteId ) );
-			const editId = noteIdIsNumeric ? noteId : null;
 
-			const form = new Form( req, {
-				note: {
-					required: 'Add some text for the note.'
+			if( noteIdIsNumeric ){
+
+				const form = new Form( req, {
+					note: {
+						required: 'Add some text for the note.'
+					}
+				} );
+
+				const processor = new FormProcessor( {
+					form,
+					render: ( templateValues ) => renderInteractions( req, res, next, {
+						editId: noteId,
+						data: templateValues
+					} ),
+					saveFormData: ( formValues ) => backend.barriers.notes.update( req, noteId, formValues ),
+					saved: () => res.redirect( urls.barriers.interactions( barrier.id ) )
+				} );
+
+				try {
+
+					await processor.process();
+
+				} catch( e ){
+
+					next( e );
 				}
-			} );
 
-			const processor = new FormProcessor( {
-				form,
-				render: ( templateValues ) => renderInteractions( req, res, next, {
-					editId,
-					data: templateValues
-				} ),
-				saveFormData: ( formValues ) => backend.barriers.notes.update( req, editId, formValues ),
-				saved: () => res.redirect( urls.barriers.interactions( barrier.id ) )
-			} );
+			} else {
 
-			try {
-
-				await processor.process();
-
-			} catch( e ){
-
-				next( e );
+				next( new Error( 'Invalid noteId' ) );
 			}
 		}
 	},
