@@ -155,6 +155,15 @@ describe( 'Backend Service', () => {
 			} );
 		} );
 
+		describe( 'getStatusHistory', () => {
+			it( 'Should call the correct path', async () => {
+
+				await service.barriers.getStatusHistory( req, barrierId );
+
+				expect( backend.get ).toHaveBeenCalledWith( `/barriers/${ barrierId }/status_history`, token );
+			} );
+		} );
+
 		describe( 'notes', () => {
 			describe( 'save', () => {
 				it( 'Should POST to the correct path with the correct values', async () => {

@@ -15,6 +15,7 @@ describe( 'Nunjucks filters', function(){
 		[ './error-for-name', 'errorForName' ],
 		[ './metadata-name', 'metadataName' ],
 		[ './add-to-radio', 'addToRadio' ],
+		[ './time', 'time' ],
 	];
 
 	beforeEach( function(){

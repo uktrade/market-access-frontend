@@ -57,31 +57,67 @@
 			{% for item in interactions %}
 			<li class="event-list__item{#{ ' event-list__item--pinned' if item.pinned }#}">
 
-				<h4 class="event-list__item__heading">{{ item.created_on | dateWithTime }}</h4>
+				<h4 class="event-list__item__heading">{{ item.date | dateOnly }}<span class="event-list__item__heading__time"> at {{ item.date | time }} (GMT)</span></h4>
 
-				{% if item.edit %}
-					<form action="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}" method="POST">
-						<input type="hidden" name="_csrf" value="{{ csrfToken }}">
-						{{ govukTextarea({
-							name: 'note',
-							id: 'note',
-							label: {
-								text: 'Add notes on an interaction or event',
-								classes: 'visually-hidden'
-							},
-							value: item.text,
-							attributes: {
-								autofocus: ''
-							},
-							errorMessage: errors | errorForName( 'note' )
-						}) }}
-						<input type="submit" value="Save note" class="govuk-button">
-						<a href="{{ urls.barriers.interactions( barrier.id ) }}" class="form-cancel">Cancel</a>
-					</form>
-				{% else %}
-					<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
-					<a href="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}">edit</a>
-				{% endif %}
+				{%- if item.isNote -%}
+
+					{% if item.edit -%}
+
+						<form action="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}" method="POST">
+							<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+							{{ govukTextarea({
+								name: 'note',
+								id: 'note',
+								label: {
+									text: 'Add notes on an interaction or event',
+									classes: 'visually-hidden'
+								},
+								value: item.text,
+								attributes: {
+									autofocus: ''
+								},
+								errorMessage: errors | errorForName( 'note' )
+							}) }}
+							<input type="submit" value="Save note" class="govuk-button">
+							<a href="{{ urls.barriers.interactions( barrier.id ) }}" class="form-cancel">Cancel</a>
+						</form>
+
+					{%- else -%}
+
+						<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
+						<a href="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}">edit</a>
+
+					{%- endif %}
+
+				{%- elif item.isStatus -%}
+
+					<p class="event-list__item__text">
+
+					{%- if item.event === 'REPORT_CREATED' -%}
+
+						Report of barrier started by <strong>{{ item.user.name }}</strong>
+
+					{%- elif item.event === 'BARRIER_CREATED' -%}
+
+						Barrier created by <strong>{{ item.user.name }}</strong>
+
+					{%- elif item.event === 'BARRIER_STATUS_CHANGE' -%}
+
+						Barrier status changed from <strong>{{ item.state.from }}</strong> to <strong>{{ item.state.to }}</strong>{{ ' by ' + item.user.name if item.user.name }}.
+
+						{%- if item.state.isResolved %}
+
+							 Resolved date set as <strong>{{ item.state.date | dateOnly( day = false ) }}</strong>.
+
+						{%- endif %}
+					{%- endif %}
+					</p>
+
+					{% if item.event === 'BARRIER_STATUS_CHANGE' -%}
+						<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
+					{% endif -%}
+
+				{%- endif %}
 			</li>
 			{% endfor %}
 		</ol>

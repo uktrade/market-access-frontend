@@ -9,6 +9,11 @@
 		"pattern": "B-[0-9]{2}-[A-Z0-9]{3}"
 	},
 
+	"barrier-event": {
+		"type": "string",
+		"pattern": "REPORT_CREATED|BARRIER_CREATED|BARRIER_STATUS_CHANGE"
+	},
+
 	"word": {
 		"type": "string",
 		"faker": "lorem.word"
