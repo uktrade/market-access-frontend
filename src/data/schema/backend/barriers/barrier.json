@@ -5,6 +5,7 @@
 	"type": "object",
 	"required": [
 		"id",
+		"code",
 		"problem_status",
 		"is_resolved",
 		"resolved_date",
@@ -30,6 +31,7 @@
 	"properties": {
 
 		"id": { "$ref": "$refs/common.json#/uuid" },
+		"code": { "$ref": "$refs/common.json#/barrier-code" },
 
 		"problem_status": {
 			"type": "number",

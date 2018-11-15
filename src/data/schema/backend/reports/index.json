@@ -26,7 +26,7 @@
 	"refs": {
 		"report": {
 			"type": "object",
-			"required": [ "id", "company_name", "problem_status", "company_id", "contact_id", "progress" ],
+			"required": [ "id", "code", "company_name", "problem_status", "company_id", "contact_id", "progress" ],
 			"properties": {
 
 				"id": {
@@ -35,6 +35,8 @@
 						"finance.amount": [ 0, 100, 0 ]
 					}
 				},
+
+				"code": { "$ref": "$refs/common.json#/barrier-code" },
 
 				"company_name": {
 					"type": "string",
