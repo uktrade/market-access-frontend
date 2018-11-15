@@ -11,16 +11,32 @@
 	position: relative;
 	margin-left: govuk-em( 30, 16 );
 
-	&::before {
+	&:before {
 		content: '';
 		position: absolute;
 		top: govuk-em( 17, 16 );
 		left: govuk-em( -35, 16 );
 		display: inline-block;
-		border: 5px solid $govuk-grey-2;
+		border: 5px solid $govuk-grey-3;
 		border-radius: 50%;
 		width: 10px;
 		height: 10px;
+		z-index: 10;
+		background: white;
+	}
+
+	&:after {
+		content: '';
+		border-left: 3px solid $govuk-grey-3;
+		height: 120%;
+		display: inline-block;
+		position: absolute;
+		top: govuk-em( 17, 16 );
+		left: govuk-em( -27, 16 );
+	}
+
+	&:last-of-type:after {
+		border-color: white;
 	}
 }
 
