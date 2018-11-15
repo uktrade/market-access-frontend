@@ -18,6 +18,7 @@ function update( barrier ){
 
 	return {
 		id: barrier.id,
+		code: barrier.code,
 		title: barrier.barrier_title,
 		country: {
 			id: countryId,

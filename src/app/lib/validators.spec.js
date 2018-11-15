@@ -24,6 +24,22 @@ describe( 'validators', () => {
 		} );
 	} );
 
+	describe( 'isNumeric', () => {
+		describe( 'With a number', () => {
+			it( 'Shoud return true', () => {
+
+				expect( validators.isNumeric( '1' ) ).toEqual( true );
+			} );
+		} );
+
+		describe( 'With a number and a character', () => {
+			it( 'Should return false', () => {
+
+				expect( validators.isNumeric( '12a' ) ).toEqual( false );
+			} );
+		} );
+	} );
+
 	describe( 'isDefined', () => {
 		describe( 'With an emptry string', () => {
 			it( 'Should return false', () => {

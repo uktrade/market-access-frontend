@@ -36,6 +36,7 @@ module.exports = ( barrier, addCompany = false ) => {
 		addCompany,
 		barrier: {
 			id: barrier.id,
+			code: barrier.code,
 			isOpen: ( barrierStatusCode === OPEN ),
 			isResolved: ( barrierStatusCode === RESOLVED ),
 			isHibernated: ( barrierStatusCode === HIBERNATED ),

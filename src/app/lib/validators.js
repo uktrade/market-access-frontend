@@ -3,6 +3,7 @@ const uuid = /^[a-zA-Z0-9-]+$/;
 const isNumeric = /^[0-9]+$/;
 
 module.exports = {
+	isNumeric: ( value ) => isNumeric.test( value ),
 	isDefined: ( value ) => {
 
 		const type = ( typeof value );

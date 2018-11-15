@@ -73,7 +73,8 @@
 
 .filter-results-list__item__sub-content__item {
 
-	margin-bottom: govuk-em( 5, 16 );
+	margin-bottom: govuk-em( 10, 16 );
+	line-height: 1;
 
 	&:last-of-type {
 		margin-bottom: 0;

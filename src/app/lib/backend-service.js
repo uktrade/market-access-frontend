@@ -157,10 +157,15 @@ module.exports = {
 		},
 		get: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }`, getToken( req ) ),
 		getInteractions: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }/interactions`, getToken( req ) ),
-		saveNote: ( req, barrierId, values ) => backend.post( `/barriers/${ barrierId }/interactions`, getToken( req ), {
-			text: values.note,
-			pinned: ( values.pinned === 'true' )
-		} ),
+		notes: {
+			save: ( req, barrierId, values ) => backend.post( `/barriers/${ barrierId }/interactions`, getToken( req ), {
+				text: values.note,
+				pinned: ( values.pinned === 'true' )
+			} ),
+			update: ( req, noteId, values ) => backend.put( `/barriers/interactions/${ noteId }`, getToken( req ), {
+				text: values.note
+			} ),
+		},
 		resolve: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/resolve`, getToken( req ), {
 			status_date: getDefaultedDate( values.resolvedDate ) + 'T00:00',
 			status_summary: values.resolvedSummary

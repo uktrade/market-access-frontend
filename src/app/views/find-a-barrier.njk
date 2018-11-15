@@ -88,6 +88,9 @@
 								</span>
 							</li>
 							<li class="filter-results-list__item__sub-content__item">
+								<span class="visually-hidden">ID: </span>{{ barrier.code }}
+							</li>
+							<li class="filter-results-list__item__sub-content__item">
 								{% if barrier.isResolved %}
 								<span class="muted">Resolved </span>{{ barrier.date.status | dateOnly( { day: false } ) }}
 								{% elif barrier.isHibernated %}

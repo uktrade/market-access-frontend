@@ -155,20 +155,38 @@ describe( 'Backend Service', () => {
 			} );
 		} );
 
-		describe( 'saveNote', () => {
-			it( 'Should PUT to the correct path with the correct values', async () => {
+		describe( 'notes', () => {
+			describe( 'save', () => {
+				it( 'Should POST to the correct path with the correct values', async () => {
 
-				const note = 'my test note';
-				const pinned = 'true';
+					const note = 'my test note';
+					const pinned = 'true';
 
-				await service.barriers.saveNote( req, barrierId, {
-					note,
-					pinned
+					await service.barriers.notes.save( req, barrierId, {
+						note,
+						pinned
+					} );
+
+					expect( backend.post ).toHaveBeenCalledWith( `/barriers/${ barrierId }/interactions`, token, {
+						text: note,
+						pinned: true
+					} );
 				} );
+			} );
 
-				expect( backend.post ).toHaveBeenCalledWith( `/barriers/${ barrierId }/interactions`, token, {
-					text: note,
-					pinned: true
+			describe( 'update', () => {
+				it( 'Should PUT to the correct path with the correct values', async () => {
+
+					const noteId = '123';
+					const note = 'my test note';
+
+					await service.barriers.notes.update( req, noteId, {
+						note,
+					} );
+
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/interactions/${ noteId }`, token, {
+						text: note,
+					} );
 				} );
 			} );
 		} );
