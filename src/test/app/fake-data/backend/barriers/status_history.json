@@ -1,0 +1,64 @@
+{
+   "status_history": [
+      {
+         "date": "Thu Apr 19 2018 05:18:44 GMT+0100 (BST)",
+         "status_date": "Sun Apr 08 2018 08:49:42 GMT+0100 (BST)",
+         "event": "REPORT_CREATED",
+         "old_status": null,
+         "new_status": 0,
+         "status_summary": "praesentium reiciendis aut",
+         "user": {
+            "id": 6,
+            "name": "accusamus"
+         }
+      },
+      {
+         "date": "Wed May 02 2018 23:10:35 GMT+0100 (BST)",
+         "status_date": "Tue Apr 10 2018 10:00:36 GMT+0100 (BST)",
+         "event": "BARRIER_CREATED",
+         "old_status": 0,
+         "new_status": 2,
+         "status_summary": "exercitationem nobis eum",
+         "user": {
+            "id": 11,
+            "name": "aut"
+         }
+      },
+      {
+         "date": "Mon Nov 05 2018 17:58:16 GMT+0000 (GMT)",
+         "status_date": "Wed Nov 22 2017 22:43:57 GMT+0000 (GMT)",
+         "event": "BARRIER_STATUS_CHANGE",
+         "old_status": 4,
+         "new_status": 2,
+         "status_summary": "officiis ipsa eligendi",
+         "user": {
+            "id": 18,
+            "name": "nisi"
+         }
+      },
+      {
+         "date": "Wed Jun 13 2018 17:29:38 GMT+0100 (BST)",
+         "status_date": "Tue Mar 06 2018 02:23:36 GMT+0000 (GMT)",
+         "event": "BARRIER_STATUS_CHANGE",
+         "old_status": 2,
+         "new_status": 4,
+         "status_summary": "voluptatibus quia aspernatur",
+         "user": {
+            "id": 9,
+            "name": "voluptatem"
+         }
+      },
+      {
+         "date": "Wed Sep 05 2018 09:40:54 GMT+0100 (BST)",
+         "status_date": "Mon Jun 18 2018 15:19:15 GMT+0100 (BST)",
+         "event": "BARRIER_STATUS_CHANGE",
+         "old_status": 2,
+         "new_status": 5,
+         "status_summary": "consectetur deserunt velit",
+         "user": {
+            "id": 19,
+            "name": "aspernatur"
+         }
+      }
+   ]
+}

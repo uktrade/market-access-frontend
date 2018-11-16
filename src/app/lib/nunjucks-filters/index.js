@@ -7,4 +7,5 @@ module.exports = function( env ){
 	env.addFilter( 'errorForName', require( './error-for-name' ) );
 	env.addFilter( 'metadataName', require( './metadata-name' ) );
 	env.addFilter( 'addToRadio', require( './add-to-radio' ) );
+	env.addFilter( 'time', require( './time' ) );
 };
