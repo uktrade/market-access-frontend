@@ -4,61 +4,48 @@ const FormProcessor = require( '../../../lib/FormProcessor' );
 const urls = require( '../../../lib/urls' );
 const validators = require( '../../../lib/validators' );
 const detailVieWModel = require( '../view-models/detail' );
+const interactionsViewModel = require( '../view-models/interactions' );
 
-function sortByDateDescending( a, b ){
+function getTimelineData( req, barrierId ){
 
-	const aDate = Date.parse( a.created_on );
-	const bDate = Date.parse( b.created_on );
+	return new Promise( async ( resolve, reject ) => {
 
-	return ( aDate === bDate ? 0 : ( aDate > bDate ? -1 : 1 ) );
-}
+		try {
 
-function getInteractionsList( interactions, editId ){
 
-	const pinned = [];
-	const other = [];
+			const [ interactions, statusHistory ] = await Promise.all( [
+				backend.barriers.getInteractions( req, barrierId ),
+				backend.barriers.getStatusHistory( req, barrierId )
+			]);
 
-	for( let item of interactions ){
+			if( interactions.response.isSuccess && statusHistory.response.isSuccess ){
 
-		if( !item.text ){ continue; }
+				resolve( {
+					interactions: interactions.body,
+					statusHistory: statusHistory.body
+				} );
 
-		if( item.id == editId ){
+			} else {
 
-			item.edit = true;
+				reject( new Error( `Unable to get interactions and statusHistory, got ${ interactions.response.statusCode } from interactions and ${ statusHistory.response.statusCode } from statusHistory` ) );
+			}
+
+		} catch( e ){
+
+			reject( e );
 		}
-
-		if( item.pinned ){
-			pinned.push( item );
-		} else {
-			other.push( item );
-		}
-	}
-
-	//pinned.sort( sortByDateDescending );
-	//other.sort( sortByDateDescending );
-	//return pinned.concat( other );
-
-	return pinned.concat( other ).sort( sortByDateDescending );
+	} );
 }
 
 async function renderInteractions( req, res, next, opts = {} ){
 
 	try {
 
-		const { response, body } = await backend.barriers.getInteractions( req, req.barrier.id );
-
-		if( response.isSuccess ){
-
-			res.render( 'barriers/views/interactions', Object.assign(
-				detailVieWModel( req.barrier ),
-				{ interactions: getInteractionsList( body.results, opts.editId ) },
-				opts.data
-			) );
-
-		} else {
-
-			next( new Error( `Unable to get interactions, got ${ response.statusCode } response from backend` ) );
-		}
+		res.render( 'barriers/views/interactions', Object.assign(
+			detailVieWModel( req.barrier ),
+			{ interactions: interactionsViewModel( await getTimelineData( req, req.barrier.id ), opts.editId ) },
+			opts.data
+		) );
 
 	} catch( e ){
 
@@ -68,7 +55,7 @@ async function renderInteractions( req, res, next, opts = {} ){
 
 module.exports = {
 
-	list: async ( req, res, next ) => renderInteractions( req, res, next ),
+	list: async ( req, res, next ) => await renderInteractions( req, res, next ),
 
 	notes: {
 
@@ -85,10 +72,9 @@ module.exports = {
 
 			const processor = new FormProcessor( {
 				form,
-				render: ( templateValues ) => renderInteractions( req, res, next, { data: Object.assign(
-					{ noteForm: true },
-					templateValues
-				) } ),
+				render: async ( templateValues ) => await renderInteractions( req, res, next, {
+					data: Object.assign(	{ noteForm: true }, templateValues )
+				} ),
 				saveFormData: ( formValues ) => backend.barriers.notes.save( req, barrier.id, formValues ),
 				saved: () => res.redirect( urls.barriers.interactions( barrier.id ) )
 			} );
@@ -119,7 +105,7 @@ module.exports = {
 
 				const processor = new FormProcessor( {
 					form,
-					render: ( templateValues ) => renderInteractions( req, res, next, {
+					render: async ( templateValues ) => await renderInteractions( req, res, next, {
 						editId: noteId,
 						data: templateValues
 					} ),

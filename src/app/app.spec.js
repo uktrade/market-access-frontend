@@ -267,6 +267,10 @@ describe( 'App', function(){
 							.get( `/barriers/${ barrier.id }/interactions` )
 							.reply( 200, intercept.stub( '/backend/barriers/interactions' ) );
 
+						intercept.backend()
+							.get( `/barriers/${ barrier.id }/status_history` )
+							.reply( 200, intercept.stub( '/backend/barriers/status_history' ) );
+
 						app
 							.get( urls.barriers.interactions( barrierId ) )
 							.end( checkPage( 'Market Access - Barrier updates', done ) );
