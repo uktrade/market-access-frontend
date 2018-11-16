@@ -57,9 +57,13 @@
 			{% for item in interactions %}
 			<li class="event-list__item{#{ ' event-list__item--pinned' if item.pinned }#}">
 
-				<h4 class="event-list__item__heading">{{ item.date | dateOnly }}<span class="event-list__item__heading__time"> at {{ item.date | time }} (GMT)</span></h4>
-
 				{%- if item.isNote -%}
+
+					<h4 class="event-list__item__heading">{{ item.date | dateOnly }}<span class="event-list__item__heading__recede"> at {{ item.date | time }} (GMT)</span>
+						{%- if item.user.name -%}
+						<span class="event-list__item__heading__recede"> by </span>{{ item.user.name }}
+						{%- endif -%}
+					</h4>
 
 					{% if item.edit -%}
 
@@ -91,15 +95,17 @@
 
 				{%- elif item.isStatus -%}
 
+					<h4 class="event-list__item__heading">{{ item.date | dateOnly }}<span class="event-list__item__heading__recede"> at {{ item.date | time }} (GMT)</span></h4>
+
 					<p class="event-list__item__text">
 
 					{%- if item.event === 'REPORT_CREATED' -%}
 
-						Report of barrier started by <strong>{{ item.user.name }}</strong>
+						Report of barrier started{% if item.user.name %} by <strong>{{ item.user.name }}</strong>{% endif %}
 
 					{%- elif item.event === 'BARRIER_CREATED' -%}
 
-						Barrier created by <strong>{{ item.user.name }}</strong>
+						Barrier created{% if item.user.name %} by <strong>{{ item.user.name }}</strong>{% endif %}
 
 					{%- elif item.event === 'BARRIER_STATUS_CHANGE' -%}
 
