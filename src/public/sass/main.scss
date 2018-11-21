@@ -36,6 +36,7 @@ $govuk-images-path: "/govuk-public/images/";
 @import 'components/error-message/error-message';
 @import 'components/panel/panel';
 @import 'components/date-input/date-input';
+@import 'components/file-upload/file-upload';
 
 @import 'app-settings/colours';
 
@@ -47,6 +48,7 @@ $govuk-images-path: "/govuk-public/images/";
 @import 'app-objects/buttons';
 @import 'app-objects/barrier-status-badge';
 @import 'app-objects/barrier-status-table-badge';
+@import 'app-objects/file-upload';
 
 @import 'app-components/dash-button';
 @import 'app-components/dash-card';

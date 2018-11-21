@@ -3,6 +3,8 @@ var ma = {
 	components: {},
 	pages: {
 		report: {},
-		barrier: {}
+		barrier: {
+			interactions: {}
+		}
 	}
 };

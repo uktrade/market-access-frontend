@@ -12,7 +12,6 @@ function getTimelineData( req, barrierId ){
 
 		try {
 
-
 			const [ interactions, statusHistory ] = await Promise.all( [
 				backend.barriers.getInteractions( req, barrierId ),
 				backend.barriers.getStatusHistory( req, barrierId )
@@ -67,7 +66,16 @@ module.exports = {
 				note: {
 					required: 'Add some text for the note.'
 				},
-				pinned: {}
+				pinned: {},
+				document: {
+					type: Form.FILE,
+					validators: [
+						{
+							fn: validators.isValidFile,
+							message: 'This type of document is not supported'
+						}
+					]
+				}
 			} );
 
 			const processor = new FormProcessor( {

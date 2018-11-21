@@ -1,4 +1,5 @@
 {% from "components/textarea/macro.njk" import govukTextarea %}
+{% from "components/file-upload/macro.njk" import govukFileUpload %}
 {#% from "components/checkboxes/macro.njk" import govukCheckboxes %#}
 
 {% extends './barrier-layout.njk' %}
@@ -6,6 +7,14 @@
 {% set activeBarrierNav = 'interactions' %}
 
 {% block page_title %}{{ super() }} - Barrier updates{% endblock %}
+
+{% if noteForm %}
+	{% block body_script %}
+		<script>
+			ma.pages.barrier.interactions.addNote();
+		</script>
+	{% endblock %}
+{% endif %}
 
 {% block barrier_content %}
 	<h2 class="section-heading">
@@ -17,9 +26,7 @@
 
 	{% if noteForm %}
 		<div class="interaction-panel">
-			<form action="{{ urls.barriers.notes.add( barrier.id ) }}" method="POST">
-
-				<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+			<form action="{{ urls.barriers.notes.add( barrier.id ) }}?_csrf={{ csrfToken }}" method="POST" enctype="multipart/form-data">
 
 				{{ govukTextarea({
 					name: 'note',
@@ -43,6 +50,21 @@
 						}
 					]
 				}) }#}
+
+				{{ govukFileUpload({
+					id: 'document',
+					name: 'document',
+					classes: 'file-upload',
+					label: {
+						text: 'Attach a document',
+						classes: 'visually-hidden'
+					},
+					hint: {
+						classes: 'file-upload-size-limit',
+						html: '(file size limit <strong>' + maxFileSize + '</strong>)'
+					},
+					errorMessage: errors | errorForName( 'document' )
+				}) }}
 
 				<input type="submit" value="Save note" class="govuk-button">
 				<a class="button-cancel" href="{{ urls.barriers.interactions( barrier.id ) }}">Cancel</a>

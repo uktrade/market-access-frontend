@@ -1,5 +1,6 @@
 const config = require( '../config' );
 const urls = require( './urls' );
+const fileSize = require( './file-size' );
 
 module.exports = function( env ){
 
@@ -10,4 +11,5 @@ module.exports = function( env ){
 	env.addGlobal( 'urls', urls );
 	env.addGlobal( 'showErrors', config.isDev );
 	env.addGlobal( 'feedbackEmail', config.feedbackEmail );
+	env.addGlobal( 'maxFileSize', fileSize( config.files.maxSize ) );
 };

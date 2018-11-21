@@ -1,6 +1,7 @@
 const csurf = require( 'csurf' );
 const controller = require( './controllers' );
 
+const fileUpload = require( './middleware/file-upload' );
 const barrierIdParam = require( './middleware/params/barrier-id' );
 const barrierTypeCategoryParam = require( './middleware/params/barrier-type-category' );
 const companyIdParam = require( './middleware/params/company-id' );
@@ -32,7 +33,7 @@ module.exports = ( express, app ) => {
 
 	app.get( '/:barrierId/interactions/', controller.interactions.list );
 	app.get( '/:barrierId/interactions/add-note/', controller.interactions.notes.add );
-	app.post( '/:barrierId/interactions/add-note/', controller.interactions.notes.add );
+	app.post( '/:barrierId/interactions/add-note/', fileUpload, controller.interactions.notes.add );
 	app.get( '/:barrierId/interactions/edit-note/:noteId', controller.interactions.notes.edit );
 	app.post( '/:barrierId/interactions/edit-note/:noteId', controller.interactions.notes.edit );
 

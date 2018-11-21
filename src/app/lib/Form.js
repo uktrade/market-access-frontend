@@ -4,6 +4,8 @@ const RADIO = 'radio';
 const SELECT = 'select';
 const CHECKBOXES = 'checkbox';
 const GROUP = 'group';
+const FILE = 'file';
+
 const isDefined = validators.isDefined;
 
 function camelCaseToDash( str ) {
@@ -129,7 +131,11 @@ Form.prototype.passedConditions = function( name ){
 
 Form.prototype.shouldValidate = function( field, value ){
 
-	if( this.isExit ){
+	if( field.type === FILE ){
+
+		return ( value.size > 0 );
+
+	} else if( this.isExit ){
 
 		if( field.type === CHECKBOXES || field.type === GROUP ){
 
@@ -285,5 +291,6 @@ Form.RADIO = RADIO;
 Form.SELECT = SELECT;
 Form.CHECKBOXES = CHECKBOXES;
 Form.GROUP = GROUP;
+Form.FILE = FILE;
 
 module.exports = Form;

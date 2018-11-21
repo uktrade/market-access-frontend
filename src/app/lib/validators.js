@@ -1,3 +1,4 @@
+const config = require( '../config' );
 const metadata = require( './metadata' );
 const uuid = /^[a-zA-Z0-9-]+$/;
 const isNumeric = /^[0-9]+$/;
@@ -42,5 +43,6 @@ module.exports = {
 		}
 
 		return isNumeric.test( allValues );
-	}
+	},
+	isValidFile: ( file ) => config.files.types.includes( file.type )
 };

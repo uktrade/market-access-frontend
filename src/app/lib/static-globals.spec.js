@@ -11,26 +11,39 @@ describe( 'Static globals', function(){
 	let urls;
 	let isDev;
 	let feedbackEmail;
+	let maxFileSize;
+	let fileSize;
+	let fileSizeResponse;
 
 	beforeEach( function(){
 
 		urls = { mySpy: true };
 		isDev = false;
 		feedbackEmail = 'test@test.com';
+		maxFileSize = ( 5 * 1024 * 2014 );
+		fileSizeResponse = '123 MB';
+
+		fileSize = jasmine.createSpy( 'fileSize' );
 
 		staticGlobals = proxyquire( modulePath, {
 			'../config': {
 				analytics,
 				datahubDomain,
 				isDev,
-				feedbackEmail
+				feedbackEmail,
+				files: {
+					maxSize: maxFileSize
+				},
 			},
-			'./urls': urls
+			'./urls': urls,
+			'./file-size': fileSize,
 		} );
 
 		const env = {
 			addGlobal: jasmine.createSpy( 'env.addGlobal' )
 		};
+
+		fileSize.and.callFake( () => fileSizeResponse );
 
 		staticGlobals( env );
 		calls = env.addGlobal.calls;
@@ -90,5 +103,15 @@ describe( 'Static globals', function(){
 
 		expect( args[ 0 ] ).toEqual( 'feedbackEmail' );
 		expect( args[ 1 ] ).toEqual( feedbackEmail );
+	} );
+
+	it( 'Should set maxFileSize', () => {
+
+		const args = calls.argsFor( 7 );
+
+		expect( args[ 0 ] ).toEqual( 'maxFileSize' );
+		expect( args[ 1 ] ).toEqual( fileSizeResponse );
+
+		expect( fileSize ).toHaveBeenCalledWith( maxFileSize );
 	} );
 } );
