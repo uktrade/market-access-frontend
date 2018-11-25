@@ -73,7 +73,7 @@ let config = {
 	},
 	files: {
 		maxSize: number( 'FILE_MAX_SIZE', ( 5 * 1024 * 1024 ) ),
-		types: env( 'FILE_TYPES', 'image/jpg' ).split( ',' ),
+		types: env( 'FILE_TYPES', 'image/jpg,image/jpeg' ).split( ',' ),
 	},
 	backend: {
 		url: requiredEnv( 'BACKEND_URL' ),

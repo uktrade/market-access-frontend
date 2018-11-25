@@ -22,7 +22,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 
 /*
 Return URI:
-http://127.0.0.1:1337/?addClass=1&hasClass=1&removeClass=1&toggleClass=1&getDescendantsByClassName=1&query=1&queryOne=1&setAriaAttribute=1&attachListener=1&bind=2&getInputValue=1&toArray=2
+http://127.0.0.1:1337/?addClass=1&hasClass=1&removeClass=1&toggleClass=1&getDescendantsByClassName=1&query=1&queryOne=1&setAriaAttribute=1&attachListener=1&cancelDefault=1&bind=2&getInputValue=1&toArray=2
 */
 
 var jessie;
@@ -210,6 +210,31 @@ else if (canCall && Array.prototype.slice) {
 
 /*
 Description:
+Cutting edge only
+*/
+
+/*
+Degrades:
+IE8, IE7, IE6, IE5.5, IE5, IE4, IE3, Opera 7.6
+*/
+
+/*
+Author:
+Adam Silver
+*/
+
+var cancelDefault;
+
+if(html && isHostMethod(html, 'addEventListener')) {
+	cancelDefault = function(e) {
+		e.preventDefault();
+	};
+}
+
+
+
+/*
+Description:
 Cutting edge
 */
 
@@ -331,6 +356,7 @@ jessie.hasClass = hasClass;
 jessie.addClass = addClass;
 jessie.getInputValue = getInputValue;
 jessie.bind = bind;
+jessie.cancelDefault = cancelDefault;
 jessie.attachListener = attachListener;
 jessie.setAriaAttribute = setAriaAttribute;
 jessie.queryOne = queryOne;

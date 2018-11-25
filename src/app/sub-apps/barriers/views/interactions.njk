@@ -54,13 +54,16 @@
 				{{ govukFileUpload({
 					id: 'document',
 					name: 'document',
-					classes: 'file-upload',
+					classes: 'file-upload__input js-file-input',
+					formGroup: {
+						classes: 'file-upload'
+					},
 					label: {
 						text: 'Attach a document',
 						classes: 'visually-hidden'
 					},
 					hint: {
-						classes: 'file-upload-size-limit',
+						classes: 'file-upload__size-limit js-max-file-size',
 						html: '(file size limit <strong>' + maxFileSize + '</strong>)'
 					},
 					errorMessage: errors | errorForName( 'document' )

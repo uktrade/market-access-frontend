@@ -142,6 +142,14 @@ module.exports = {
 	ping: () => backend.get( '/ping.xml' ),
 	getCounts: ( req ) => backend.get( '/counts', getToken( req ) ),
 
+	documents: {
+		create: ( req, fileName ) => backend.post( '/documents', getToken( req ), {
+			original_filename: fileName
+		} ),
+		getStatus: ( req, documentId ) => backend.post( `/documents/${ documentId }/upload-callback`, getToken( req ) ),
+		uploadComplete: ( req, documentId ) => backend.post( `/documents/${ documentId }/upload-callback`, getToken( req ) ),
+	},
+
 	barriers: {
 		getAll: async ( req, filters = {} ) => {
 
@@ -161,7 +169,8 @@ module.exports = {
 		notes: {
 			save: ( req, barrierId, values ) => backend.post( `/barriers/${ barrierId }/interactions`, getToken( req ), {
 				text: values.note,
-				pinned: ( values.pinned === 'true' )
+				pinned: ( values.pinned === 'true' ),
+				documents: ( values.documentId ? [ values.documentId ] : null ),
 			} ),
 			update: ( req, noteId, values ) => backend.put( `/barriers/interactions/${ noteId }`, getToken( req ), {
 				text: values.note

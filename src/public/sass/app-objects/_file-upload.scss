@@ -1,9 +1,28 @@
 .file-upload {
 	padding-left: 25px;
-	background: transparent url( '/public/img/attachment_45.png' ) 0 3px no-repeat;
+	background: transparent url( '/public/img/attachment_45.png' ) 0 0 no-repeat;
 	background-size: 21px 20px;
 }
 
-.file-upload-size-limit {
+.file-upload__input {
+	max-width: 60%;
+	width: 100%;
+}
+
+.file-upload__size-limit {
+
 	color: $govuk-black;
+
+	@include mq( $from: desktop ){
+
+		margin-right: govuk-em( 30, 16 ); //keep the submit button underneath
+	}
+}
+
+.file-upload__size-limit--js {
+
+	display: inline;
+}
+
+.js-attach-file {
 }
