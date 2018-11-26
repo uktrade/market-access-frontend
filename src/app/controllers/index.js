@@ -57,9 +57,9 @@ module.exports = {
 
 			const { response, body } = await backend.documents.download( req, documentId );
 
-			if( response.isSuccess && body.signed_url ){
+			if( response.isSuccess && body.document_url ){
 
-				res.redirect( body.signed_url );
+				res.redirect( body.document_url );
 
 			} else {
 
