@@ -20,11 +20,25 @@ function sortByDateDescending( a, b ){
 	return ( aDate === bDate ? 0 : ( aDate > bDate ? -1 : 1 ) );
 }
 
+function getDocument( doc ){
+
+	const canDownload = doc.status === 'virus_scanned';
+
+	return {
+		id: doc.id,
+		name: doc.name,
+		canDownload,
+		status: metadata.documentStatus[ doc.status ]
+	};
+}
+
 function getNotes( items, editId ){
 
 	const notes = [];
 
 	for( let item of items ){
+
+		const hasDocuments = ( !!item.documents && !!item.documents.length );
 
 		notes.push( {
 			id: item.id,
@@ -32,7 +46,9 @@ function getNotes( items, editId ){
 			edit: ( item.id == editId ),
 			date: item.created_on,
 			text: item.text,
-			user: item.created_by
+			user: item.created_by,
+			hasDocuments,
+			documents: ( hasDocuments ? item.documents.map( getDocument ) : [] )
 		} );
 	}
 

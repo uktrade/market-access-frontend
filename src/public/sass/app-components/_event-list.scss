@@ -40,6 +40,10 @@
 	}
 }
 
+.event-list__item--documents {
+
+}
+
 /*
 .event-list__item--pinned {
 
@@ -71,4 +75,22 @@
 	&:last-of-type {
 		margin-bottom: 0;
 	}
+}
+
+.event-list__item__document-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.event-list__item__document-list__item {
+	display: inline;
+}
+
+.event-list__item__document-list__item__name {
+
+}
+
+.event-list__item__document-list__item__status {
+	color: $govuk-grey-1;
 }

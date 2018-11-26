@@ -148,6 +148,7 @@ module.exports = {
 		} ),
 		getStatus: ( req, documentId ) => backend.post( `/documents/${ documentId }/upload-callback`, getToken( req ) ),
 		uploadComplete: ( req, documentId ) => backend.post( `/documents/${ documentId }/upload-callback`, getToken( req ) ),
+		download: ( req, documentId ) => backend.get( `/documents/${ documentId }/download`, getToken( req ) ),
 	},
 
 	barriers: {

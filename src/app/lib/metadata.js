@@ -134,6 +134,14 @@ module.exports.fetch = async () => {
 				'true': 'Yes',
 				'false': 'No'
 			};
+			module.exports.documentStatus = {
+				not_virus_scanned: 'Not virus scanned',
+				virus_scanning_scheduled: 'Virus scanning scheduled',
+				virus_scanning_in_progress: 'Virus scanning in progress',
+				virus_scanning_failed: 'Virus scanning failed.',
+				virus_scanned: 'Virus scanned',
+				deletion_pending: 'Deletion pending',
+			};
 
 		} else {
 

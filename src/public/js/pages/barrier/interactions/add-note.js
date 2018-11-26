@@ -8,9 +8,10 @@ ma.pages.barrier.interactions.addNote = (function( doc, jessie ){
 
 		var input = jessie.queryOne( '.js-file-input' );
 		var limitText = jessie.queryOne( '.js-max-file-size' );
-		var xhr2 = ma.xhr2();
+		var form = input.form;
 
-		if( !input || !limitText ){ console.log( 'all elements not found' ); return; }
+		if( !form.action ){ console.log( 'No action on form' ); return; }
+		if( !input || !limitText ){ console.log( 'All elements not found' ); return; }
 
 		console.dir( 'Add note running' );
 
@@ -30,36 +31,40 @@ ma.pages.barrier.interactions.addNote = (function( doc, jessie ){
 			input.click();
 		}
 
-		function inputChange( e ){
-
-			var form = input.form;
-			var formData = new FormData();
-
-			formData.append( 'document', input.files[ 0 ] );
-		}
-
 		function updateProgress( e ){
-
+			console.log( 'progress', e );
 		}
 
 		function transferComplete( e ){
-
+			console.log( 'complete' );
 		}
 
 		function transferFailed( e ){
-
+			console.log( 'failed' );
 		}
 
 		function transferCanceled( e ){
+			console.log( 'cancelled' );
+		}
 
+		function inputChange( e ){
+
+			var xhr2 = ma.xhr2();
+			var formData = new FormData();
+
+			formData.append( 'document', input.files[ 0 ] );
+
+			xhr2.addEventListener( 'progress', updateProgress );
+			xhr2.addEventListener( 'load', transferComplete );
+			xhr2.addEventListener( 'error', transferFailed );
+			xhr2.addEventListener( 'abort', transferCanceled );
+
+			xhr2.open( 'POST', form.action, true );
+			xhr2.send( formData );
 		}
 
 		jessie.attachListener( link, 'click', selectDocument );
 		jessie.attachListener( input, 'change', inputChange );
-		xhr2.addEventListener( 'progress', updateProgress );
-		xhr2.addEventListener( 'load', transferComplete );
-		xhr2.addEventListener( 'error', transferFailed );
-		xhr2.addEventListener( 'abort', transferCanceled );
 	};
 
 }( document, jessie ));

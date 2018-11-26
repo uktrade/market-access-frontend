@@ -47,5 +47,28 @@ module.exports = {
 
 			res.render( 'me', { csrfToken: req.csrfToken() } );
 		}
+	},
+
+	download: async ( req, res, next ) => {
+
+		const documentId = req.params.uuid;
+
+		try {
+
+			const { response, body } = await backend.documents.download( req, documentId );
+
+			if( response.isSuccess && body.signed_url ){
+
+				res.redirect( body.signed_url );
+
+			} else {
+
+				next( new Error( 'Unable to get document download link' ) );
+			}
+
+		} catch( e ){
+
+			next( e );
+		}
 	}
 };

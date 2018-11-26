@@ -79,8 +79,9 @@
 
 	{% if interactions and interactions.length %}
 		<ol class="event-list">
-			{% for item in interactions %}
-			<li class="event-list__item{#{ ' event-list__item--pinned' if item.pinned }#}">
+			{% for item in interactions -%}
+
+			<li class="event-list__item{{ ' event-list__item--documents' if item.hasDocuments }}{#{ ' event-list__item--pinned' if item.pinned }#}">
 
 				{%- if item.isNote -%}
 
@@ -116,6 +117,29 @@
 						<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
 						<a href="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}">edit</a>
 
+						{% if item.hasDocuments -%}
+
+							<ul class="event-list__item__document-list">
+								{% for doc in item.documents -%}
+
+									<li class="event-list__item__document-list__item">
+
+										{%- if doc.canDownload -%}
+
+											<a class="event-list__item__document-list__item__name" href="{{ urls.documents.download( doc.id ) }}">{{ doc.name }}</a>
+
+										{%- else -%}
+
+											<span class="event-list__item__document-list__item__name">{{ doc.name }}</span>
+											<span class="event-list__item__document-list__item__status">({{ doc.status }})</span>
+
+										{%- endif %}
+									</li>
+
+								{%- endfor %}
+							</ul>
+
+						{%- endif %}
 					{%- endif %}
 
 				{%- elif item.isStatus -%}

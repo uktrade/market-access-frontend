@@ -44,6 +44,10 @@ module.exports = {
 	whatIsABarrier: () => '/what-is-a-barrier/',
 	findABarrier: () => '/find-a-barrier/',
 
+	documents: {
+		download: ( documentId ) => `/documents/download/${ documentId }/`
+	},
+
 	barriers: {
 		detail: ( barrierId ) => `/barriers/${ barrierId }/`,
 		edit: {

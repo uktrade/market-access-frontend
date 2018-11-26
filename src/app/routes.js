@@ -11,12 +11,15 @@ const headerNav = require( './middleware/header-nav' );
 const user = require( './middleware/user' );
 const formErrors = require( './middleware/form-errors' );
 const dashboardData = require( './middleware/dashboard-data' );
+const uuidParam = require( './middleware/params/uuid' );
 
 const csrfProtection = csurf();
 
 module.exports = function( express, app ){
 
 	const parseBody = express.urlencoded( { extended: false } );
+
+	app.param( 'uuid', uuidParam );
 
 	app.get( '/login/', ssoController.authRedirect );
 	app.get( '/login/callback/', ssoController.callback );
@@ -26,6 +29,8 @@ module.exports = function( express, app ){
 
 	app.get( '/me', csrfProtection, indexController.me );
 	app.post( '/me', parseBody, csrfProtection, indexController.me );
+
+	app.get( '/documents/download/:uuid/', indexController.download ),
 
 	app.get( '/', headerNav( { isDashboard: true } ), dashboardData, indexController.index );
 	app.use( '/reports/', headerNav( { isReport: true } ), reportRoutes( express, express.Router() ) );
