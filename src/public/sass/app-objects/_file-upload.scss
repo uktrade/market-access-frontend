@@ -24,5 +24,8 @@
 	display: inline;
 }
 
-.js-attach-file {
+.file-upload__link,
+.file-upload__progress,
+.file-upload__delete {
+	@include govuk-font( 19 );
 }

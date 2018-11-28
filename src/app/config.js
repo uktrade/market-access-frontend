@@ -74,6 +74,10 @@ let config = {
 	files: {
 		maxSize: number( 'FILE_MAX_SIZE', ( 5 * 1024 * 1024 ) ),
 		types: env( 'FILE_TYPES', 'image/jpg,image/jpeg' ).split( ',' ),
+		scan: {
+			maxWaitTime: number( 'FILE_SCAN_MAX_WAIT_TIME', 15000 ),
+			statusCheckInterval: number( 'FILE_SCAN_STATUS_CHECK_INTERVAL', 500 ),
+		},
 	},
 	backend: {
 		url: requiredEnv( 'BACKEND_URL' ),

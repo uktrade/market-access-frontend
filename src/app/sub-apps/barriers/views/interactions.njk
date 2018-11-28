@@ -26,7 +26,7 @@
 
 	{% if noteForm %}
 		<div class="interaction-panel">
-			<form action="{{ urls.barriers.notes.add( barrier.id ) }}?_csrf={{ csrfToken }}" method="POST" enctype="multipart/form-data">
+			<form action="{{ urls.barriers.notes.add( barrier.id ) }}?_csrf={{ csrfToken }}" method="POST" enctype="multipart/form-data" data-xhr-upload="{{ urls.barriers.notes.documents.add( barrier.id ) }}?_csrf={{ csrfToken }}">
 
 				{{ govukTextarea({
 					name: 'note',
@@ -68,6 +68,14 @@
 					},
 					errorMessage: errors | errorForName( 'document' )
 				}) }}
+
+				{% if documentId %}
+					{#
+						Output the hidden document id - <input type="hidden" name="documentId" value="{{ documentId }}" class="js-document-id">
+						Show the name and size of the file
+						Add a delete link - should work with and without JS
+					#}
+				{% endif %}
 
 				<input type="submit" value="Save note" class="govuk-button">
 				<a class="button-cancel" href="{{ urls.barriers.interactions( barrier.id ) }}">Cancel</a>

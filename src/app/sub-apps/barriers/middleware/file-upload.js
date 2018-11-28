@@ -12,8 +12,5 @@ module.exports = ( req, res, next ) => {
 		Object.assign( req.body, fields, files );
 
 		next();
-
-		console.log( JSON.stringify( fields, null, 2 ) );
-		console.log( JSON.stringify( files, null, 2 ) );
 	} );
 };

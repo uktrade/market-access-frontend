@@ -133,7 +133,7 @@ Form.prototype.shouldValidate = function( field, value ){
 
 	if( field.type === FILE ){
 
-		return ( value.size > 0 );
+		return ( value && value.size > 0 );
 
 	} else if( this.isExit ){
 

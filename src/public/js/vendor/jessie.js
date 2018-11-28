@@ -22,7 +22,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 
 /*
 Return URI:
-http://127.0.0.1:1337/?addClass=1&hasClass=1&removeClass=1&toggleClass=1&getDescendantsByClassName=1&query=1&queryOne=1&setAriaAttribute=1&attachListener=1&cancelDefault=1&bind=2&getInputValue=1&toArray=2
+http://127.0.0.1:1337/?addClass=1&hasClass=1&removeClass=1&toggleClass=1&getDescendantsByClassName=1&getElementData=3&query=1&queryOne=1&setAriaAttribute=1&setElementData=3&attachListener=1&cancelDefault=1&detachListener=1&bind=2&getInputValue=1&toArray=2
 */
 
 var jessie;
@@ -210,6 +210,31 @@ else if (canCall && Array.prototype.slice) {
 
 /*
 Description:
+Cutting edge (W3 compliant)
+*/
+
+/*
+Degrades:
+IE8, IE7, IE6, IE5.5, IE5, IE4, IE3, NN4, Opera 7.6
+*/
+
+/*
+Author:
+David Mark
+*/
+
+var detachListener;
+
+if(html && isHostMethod(html, 'removeEventListener')) {
+	detachListener = function(el, eventType, fn) {
+		el.removeEventListener(eventType, fn, false);
+	};
+}
+
+
+
+/*
+Description:
 Cutting edge only
 */
 
@@ -256,6 +281,56 @@ if(html && isHostMethod(html, 'addEventListener')) {
 		return fn;
 	};
 }
+
+
+
+/*
+ Description:
+ Relies on el.dataset or el.setAttribute
+ */
+
+/*
+ Degrades:
+ IE5-
+ */
+
+/*
+ Author:
+ Graham Veal
+ */
+
+var setElementData;
+
+if( html && isHostObjectProperty( html, "dataset" ) ){
+
+	(function(){
+
+		var reGetDashAndLetter = /-([a-z])/g;
+
+		function convertDataName( match, letter ){
+
+			return letter.toUpperCase();
+		}
+
+		setElementData = function( el, dataName, dataValue ){
+
+			//convert the dataName to lowercase
+			//then remove the dash and replace the character next to the dash with the upper case version
+			dataName = dataName.toLowerCase().replace( reGetDashAndLetter, convertDataName );
+
+			el.dataset[ dataName ] = dataValue;
+		};
+
+	}());
+
+} else if( html && isHostMethod( html, "setAttribute" ) ){
+
+	setElementData = function( el, dataName, dataValue ){
+
+		el.setAttribute( 'data-' + dataName, dataValue );
+	};
+}
+
 
 
 
@@ -313,6 +388,55 @@ if(globalDocument && isHostMethod(globalDocument, 'querySelectorAll') && toArray
 
 
 /*
+ Description:
+ Relies on el.dataset or el.getAttribute for the most support
+ */
+
+/*
+ Degrades:
+ IE5-
+ */
+
+/*
+ Author:
+ Graham Veal
+ */
+
+var getElementData;
+
+if( html && isHostObjectProperty( html, "dataset" ) ){
+
+	(function(){
+
+		var reGetDashAndLetter = /-([a-z])/g;
+
+		function convertDataName( match, letter ){
+
+			return letter.toUpperCase();
+		}
+
+		getElementData = function( el, dataName ){
+
+			//convert the dataName to lowercase
+			//then remove the dash and replace the character next to the dash with the upper case version
+			dataName = dataName.toLowerCase().replace( reGetDashAndLetter, convertDataName );
+
+			return el.dataset[ dataName ];
+		};
+
+	}());
+
+} else if( html && isHostMethod( html, "getAttribute" ) ){
+
+	getElementData = function( el, dataName ){
+
+		return el.getAttribute( 'data-' + dataName );
+	};
+}
+
+
+
+/*
 Description:
 Relies on 'document.getElementsByClassName'
 */
@@ -356,11 +480,14 @@ jessie.hasClass = hasClass;
 jessie.addClass = addClass;
 jessie.getInputValue = getInputValue;
 jessie.bind = bind;
+jessie.detachListener = detachListener;
 jessie.cancelDefault = cancelDefault;
 jessie.attachListener = attachListener;
+jessie.setElementData = setElementData;
 jessie.setAriaAttribute = setAriaAttribute;
 jessie.queryOne = queryOne;
 jessie.query = query;
+jessie.getElementData = getElementData;
 jessie.getDescendantsByClassName = getDescendantsByClassName;
 jessie.toggleClass = toggleClass;
 

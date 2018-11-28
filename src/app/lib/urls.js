@@ -57,9 +57,15 @@ module.exports = {
 			source: ( barrierId ) => `/barriers/${ barrierId }/edit/source/`,
 		},
 		interactions: ( barrierId ) => `/barriers/${ barrierId }/interactions/`,
+		documents: {
+			checkStatus: ( documentId ) => `/barriers/documents/${ documentId }/check-status/`,
+		},
 		notes: {
 			add: ( barrierId ) => `/barriers/${ barrierId }/interactions/add-note/`,
 			edit: ( barrierId, noteId ) => `/barriers/${ barrierId }/interactions/edit-note/${ noteId }/`,
+			documents: {
+				add: ( barrierId ) => `/barriers/${ barrierId }/interactions/documents/add/`,
+			},
 		},
 		status: ( barrierId ) => `/barriers/${ barrierId }/status/`,
 		statusResolved: ( barrierId ) => `/barriers/${ barrierId }/status/resolved/`,
