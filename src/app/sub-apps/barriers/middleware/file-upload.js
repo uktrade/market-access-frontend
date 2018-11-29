@@ -9,7 +9,14 @@ module.exports = ( req, res, next ) => {
 
 	form.parse( req, ( err, fields, files ) => {
 
-		Object.assign( req.body, fields, files );
+		if( err ){
+
+			console.log( err.message );
+
+		} else {
+
+			Object.assign( req.body, fields, files );
+		}
 
 		next();
 	} );

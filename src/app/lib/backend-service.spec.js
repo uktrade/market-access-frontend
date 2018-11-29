@@ -84,6 +84,54 @@ describe( 'Backend Service', () => {
 		} );
 	} );
 
+	describe( 'Documents', () => {
+		describe( 'create', () => {
+			it( 'Should call the correct API', async () => {
+
+				const fileName = 'abc.csv';
+
+				await service.documents.create( req, fileName );
+
+				expect( backend.post ).toHaveBeenCalledWith( '/documents', token, {
+					original_filename: fileName
+				} );
+			} );
+		} );
+
+		describe( 'getStatus', () => {
+			it( 'Should call the correct API', async () => {
+
+				const documentId = uuid();
+
+				await service.documents.getStatus( req, documentId );
+
+				expect( backend.post ).toHaveBeenCalledWith( `/documents/${ documentId }/upload-callback`, token );
+			} );
+		} );
+
+		describe( 'uploadComplete', () => {
+			it( 'Should call the correct API', async () => {
+
+				const documentId = uuid();
+
+				await service.documents.uploadComplete( req, documentId );
+
+				expect( backend.post ).toHaveBeenCalledWith( `/documents/${ documentId }/upload-callback`, token );
+			} );
+		} );
+
+		describe( 'download', () => {
+			it( 'Should call the correct API', async () => {
+
+				const documentId = uuid();
+
+				await service.documents.download( req, documentId );
+
+				expect( backend.get ).toHaveBeenCalledWith( `/documents/${ documentId }/download`, token );
+			} );
+		} );
+	} );
+
 	describe( 'Barriers', () => {
 
 		let barrierId;
@@ -166,19 +214,43 @@ describe( 'Backend Service', () => {
 
 		describe( 'notes', () => {
 			describe( 'save', () => {
-				it( 'Should POST to the correct path with the correct values', async () => {
+				describe( 'Without a documentId', () => {
+					it( 'Should POST to the correct path with the correct values', async () => {
 
-					const note = 'my test note';
-					const pinned = 'true';
+						const note = 'my test note';
+						const pinned = 'true';
 
-					await service.barriers.notes.save( req, barrierId, {
-						note,
-						pinned
+						await service.barriers.notes.save( req, barrierId, {
+							note,
+							pinned,
+						} );
+
+						expect( backend.post ).toHaveBeenCalledWith( `/barriers/${ barrierId }/interactions`, token, {
+							text: note,
+							pinned: true,
+							documents: null,
+						} );
 					} );
+				} );
 
-					expect( backend.post ).toHaveBeenCalledWith( `/barriers/${ barrierId }/interactions`, token, {
-						text: note,
-						pinned: true
+				describe( 'With a documentId', () => {
+					it( 'Should POST to the correct path with the correct values', async () => {
+
+						const note = 'my test note';
+						const pinned = 'true';
+						const documentId = 'abc-123';
+
+						await service.barriers.notes.save( req, barrierId, {
+							note,
+							pinned,
+							documentId
+						} );
+
+						expect( backend.post ).toHaveBeenCalledWith( `/barriers/${ barrierId }/interactions`, token, {
+							text: note,
+							pinned: true,
+							documents: [ documentId ]
+						} );
 					} );
 				} );
 			} );
