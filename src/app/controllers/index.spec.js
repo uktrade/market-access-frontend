@@ -5,9 +5,9 @@ const modulePath = './index';
 let controller;
 let req;
 let res;
+let next;
 let backend;
 let ssoToken;
-let next;
 let dashboardViewModel;
 let urls;
 
@@ -20,7 +20,9 @@ describe( 'Index controller', () => {
 			barriers: {
 				getAll: jasmine.createSpy( 'backend.barriers.getAll' ),
 			},
-			getReports: jasmine.createSpy( 'backend.getReports' )
+			documents: {
+				download: jasmine.createSpy( 'backend.documents.download' )
+			}
 		};
 		dashboardViewModel = jasmine.createSpy( 'dashboard view model' );
 
@@ -31,6 +33,7 @@ describe( 'Index controller', () => {
 		req = {
 			session: { ssoToken },
 			user: {},
+			params: {},
 			csrfToken: jasmine.createSpy( 'csrfToken' )
 		};
 
@@ -161,6 +164,74 @@ describe( 'Index controller', () => {
 				expect( req.session.user ).not.toBeDefined();
 				expect( res.render ).not.toHaveBeenCalled();
 				expect( res.redirect ).toHaveBeenCalledWith( meResponse );
+			} );
+		} );
+	} );
+
+	describe( 'download', () => {
+
+		const errorMessage = 'Unable to get document download link';
+
+		describe( 'When the backend call throws an error', () => {
+			it( 'Should call next with the error', async () => {
+
+				const err = new Error( 'fail' );
+				backend.documents.download.and.callFake( () => Promise.reject( err ) );
+
+				await controller.download( req, res, next );
+
+				expect( next ).toHaveBeenCalledWith( err );
+			} );
+		} );
+
+		describe( 'When the backend returns a response', () => {
+			describe( 'When it is a success', () => {
+				describe( 'When there is a document_url', () => {
+					it( 'Should redirect to the url', async () => {
+
+						const url = '/a/b/c/';
+
+						backend.documents.download.and.callFake( () => Promise.resolve( {
+							response: { isSuccess: true },
+							body: { document_url: url },
+						} ) );
+
+						await controller.download( req, res, next );
+
+						expect( res.redirect ).toHaveBeenCalledWith( url );
+						expect( next ).not.toHaveBeenCalled();
+					} );
+				} );
+
+				describe( 'When there is NOT a document_url', () => {
+					it( 'Should call next with an error', async () => {
+
+						backend.documents.download.and.callFake( () => Promise.resolve( {
+							response: { isSuccess: true },
+							body: {},
+						} ) );
+
+						await controller.download( req, res, next );
+
+						expect( res.redirect ).not.toHaveBeenCalled();
+						expect( next ).toHaveBeenCalledWith( new Error( errorMessage ));
+					} );
+				} );
+			} );
+
+			describe( 'When it is NOT a success', () => {
+				it( 'Should call next with an error', async () => {
+
+					backend.documents.download.and.callFake( () => Promise.resolve( {
+						response: { isSuccess: false },
+						body: {},
+					} ) );
+
+					await controller.download( req, res, next );
+
+					expect( res.redirect ).not.toHaveBeenCalled();
+					expect( next ).toHaveBeenCalledWith( new Error( errorMessage ));
+				} );
 			} );
 		} );
 	} );
