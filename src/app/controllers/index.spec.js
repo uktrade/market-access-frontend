@@ -168,69 +168,71 @@ describe( 'Index controller', () => {
 		} );
 	} );
 
-	describe( 'download', () => {
+	describe( 'Documents', () => {
+		describe( 'download', () => {
 
-		const errorMessage = 'Unable to get document download link';
+			const errorMessage = 'Unable to get document download link';
 
-		describe( 'When the backend call throws an error', () => {
-			it( 'Should call next with the error', async () => {
+			describe( 'When the backend call throws an error', () => {
+				it( 'Should call next with the error', async () => {
 
-				const err = new Error( 'fail' );
-				backend.documents.download.and.callFake( () => Promise.reject( err ) );
+					const err = new Error( 'fail' );
+					backend.documents.download.and.callFake( () => Promise.reject( err ) );
 
-				await controller.download( req, res, next );
+					await controller.documents.download( req, res, next );
 
-				expect( next ).toHaveBeenCalledWith( err );
+					expect( next ).toHaveBeenCalledWith( err );
+				} );
 			} );
-		} );
 
-		describe( 'When the backend returns a response', () => {
-			describe( 'When it is a success', () => {
-				describe( 'When there is a document_url', () => {
-					it( 'Should redirect to the url', async () => {
+			describe( 'When the backend returns a response', () => {
+				describe( 'When it is a success', () => {
+					describe( 'When there is a document_url', () => {
+						it( 'Should redirect to the url', async () => {
 
-						const url = '/a/b/c/';
+							const url = '/a/b/c/';
 
-						backend.documents.download.and.callFake( () => Promise.resolve( {
-							response: { isSuccess: true },
-							body: { document_url: url },
-						} ) );
+							backend.documents.download.and.callFake( () => Promise.resolve( {
+								response: { isSuccess: true },
+								body: { document_url: url },
+							} ) );
 
-						await controller.download( req, res, next );
+							await controller.documents.download( req, res, next );
 
-						expect( res.redirect ).toHaveBeenCalledWith( url );
-						expect( next ).not.toHaveBeenCalled();
+							expect( res.redirect ).toHaveBeenCalledWith( url );
+							expect( next ).not.toHaveBeenCalled();
+						} );
+					} );
+
+					describe( 'When there is NOT a document_url', () => {
+						it( 'Should call next with an error', async () => {
+
+							backend.documents.download.and.callFake( () => Promise.resolve( {
+								response: { isSuccess: true },
+								body: {},
+							} ) );
+
+							await controller.documents.download( req, res, next );
+
+							expect( res.redirect ).not.toHaveBeenCalled();
+							expect( next ).toHaveBeenCalledWith( new Error( errorMessage ));
+						} );
 					} );
 				} );
 
-				describe( 'When there is NOT a document_url', () => {
+				describe( 'When it is NOT a success', () => {
 					it( 'Should call next with an error', async () => {
 
 						backend.documents.download.and.callFake( () => Promise.resolve( {
-							response: { isSuccess: true },
+							response: { isSuccess: false },
 							body: {},
 						} ) );
 
-						await controller.download( req, res, next );
+						await controller.documents.download( req, res, next );
 
 						expect( res.redirect ).not.toHaveBeenCalled();
 						expect( next ).toHaveBeenCalledWith( new Error( errorMessage ));
 					} );
-				} );
-			} );
-
-			describe( 'When it is NOT a success', () => {
-				it( 'Should call next with an error', async () => {
-
-					backend.documents.download.and.callFake( () => Promise.resolve( {
-						response: { isSuccess: false },
-						body: {},
-					} ) );
-
-					await controller.download( req, res, next );
-
-					expect( res.redirect ).not.toHaveBeenCalled();
-					expect( next ).toHaveBeenCalledWith( new Error( errorMessage ));
 				} );
 			} );
 		} );

@@ -28,7 +28,15 @@ describe( 'Backend Service', () => {
 
 		service = proxyquire( modulePath, {
 			'./backend-request': backend,
-			'./metadata': metadata
+			'./metadata': metadata,
+			'../config': {
+				files: {
+					scan: {
+						statusCheckInterval: 10, //make the test run faster
+						maxWaitTime: 2000,
+					}
+				}
+			}
 		} );
 	} );
 
@@ -98,17 +106,6 @@ describe( 'Backend Service', () => {
 			} );
 		} );
 
-		describe( 'getStatus', () => {
-			it( 'Should call the correct API', async () => {
-
-				const documentId = uuid();
-
-				await service.documents.getStatus( req, documentId );
-
-				expect( backend.post ).toHaveBeenCalledWith( `/documents/${ documentId }/upload-callback`, token );
-			} );
-		} );
-
 		describe( 'uploadComplete', () => {
 			it( 'Should call the correct API', async () => {
 
@@ -128,6 +125,24 @@ describe( 'Backend Service', () => {
 				await service.documents.download( req, documentId );
 
 				expect( backend.get ).toHaveBeenCalledWith( `/documents/${ documentId }/download`, token );
+			} );
+		} );
+
+		describe( 'getScanStatus', () => {
+			it( 'Should call the correct API', async () => {
+
+				const documentId = uuid();
+
+				backend.post.and.callFake( () => Promise.resolve( {
+					response: { isSuccess: true },
+					body: { status: 'virus_scanned' },
+				} ) );
+
+				const { status, passed } = await service.documents.getScanStatus( req, documentId );
+
+				expect( backend.post ).toHaveBeenCalledWith( `/documents/${ documentId }/upload-callback`, token );
+				expect( status ).toEqual( 'virus_scanned' );
+				expect( passed ).toEqual( true );
 			} );
 		} );
 	} );

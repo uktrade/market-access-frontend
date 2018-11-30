@@ -37,7 +37,6 @@ module.exports = ( express, app ) => {
 	app.get( '/:barrierId/interactions/edit-note/:noteId', controller.interactions.notes.edit );
 	app.post( '/:barrierId/interactions/edit-note/:noteId', controller.interactions.notes.edit );
 	app.post( '/:uuid/interactions/documents/add/', fileUpload, controller.interactions.notes.documents.add );
-	app.get( '/documents/:uuid/check-status/', controller.interactions.notes.documents.checkScanStatus );
 
 	app.get( '/:barrierId/status/', controller.status.index );
 	app.post( '/:barrierId/status/', controller.status.index );

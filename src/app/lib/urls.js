@@ -22,7 +22,7 @@ function getReportPath( reportId ){
 
 const reportUrl = {
 	index: () => '/reports/',
-	detail: ( reportId ) => `/reports/${ reportId }/`,
+detail: ( reportId ) => `/reports/${ reportId }/`,
 	new: () => '/reports/new/',
 	start: ( reportId ) => `/reports/${ getReportPath( reportId ) }/start/`,
 	isResolved: ( reportId ) => `/reports/${ getReportPath( reportId ) }/is-resolved/`,
@@ -45,7 +45,8 @@ module.exports = {
 	findABarrier: () => '/find-a-barrier/',
 
 	documents: {
-		download: ( documentId ) => `/documents/download/${ documentId }/`
+		download: ( documentId ) => `/documents/${ documentId }/download/`,
+		getScanStatus: ( documentId ) => `/documents/${ documentId }/status/`,
 	},
 
 	barriers: {
@@ -57,9 +58,6 @@ module.exports = {
 			source: ( barrierId ) => `/barriers/${ barrierId }/edit/source/`,
 		},
 		interactions: ( barrierId ) => `/barriers/${ barrierId }/interactions/`,
-		documents: {
-			checkStatus: ( documentId ) => `/barriers/documents/${ documentId }/check-status/`,
-		},
 		notes: {
 			add: ( barrierId ) => `/barriers/${ barrierId }/interactions/add-note/`,
 			edit: ( barrierId, noteId ) => `/barriers/${ barrierId }/interactions/edit-note/${ noteId }/`,

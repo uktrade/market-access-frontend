@@ -30,7 +30,8 @@ module.exports = function( express, app ){
 	app.get( '/me', csrfProtection, indexController.me );
 	app.post( '/me', parseBody, csrfProtection, indexController.me );
 
-	app.get( '/documents/download/:uuid/', indexController.download ),
+	app.get( '/documents/:uuid/download/', indexController.documents.download ),
+	app.get( '/documents/:uuid/status/', indexController.documents.getScanStatus ),
 
 	app.get( '/', headerNav( { isDashboard: true } ), dashboardData, indexController.index );
 	app.use( '/reports/', headerNav( { isReport: true } ), reportRoutes( express, express.Router() ) );

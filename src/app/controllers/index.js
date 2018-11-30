@@ -49,26 +49,43 @@ module.exports = {
 		}
 	},
 
-	download: async ( req, res, next ) => {
+	documents: {
+		download: async ( req, res, next ) => {
 
-		const documentId = req.params.uuid;
+			const documentId = req.params.uuid;
 
-		try {
+			try {
 
-			const { response, body } = await backend.documents.download( req, documentId );
+				const { response, body } = await backend.documents.download( req, documentId );
 
-			if( response.isSuccess && body.document_url ){
+				if( response.isSuccess && body.document_url ){
 
-				res.redirect( body.document_url );
+					res.redirect( body.document_url );
 
-			} else {
+				} else {
 
-				next( new Error( 'Unable to get document download link' ) );
+					next( new Error( 'Unable to get document download link' ) );
+				}
+
+			} catch( e ){
+
+				next( e );
 			}
+		},
 
-		} catch( e ){
+		getScanStatus: async ( req, res ) => {
 
-			next( e );
-		}
+			const documentId = req.uuid;
+
+			try {
+
+				res.json( await backend.documents.getScanStatus( req, documentId ) );
+
+			} catch( e ){
+
+				res.status( 500 );
+				res.json( { message: e.message } );
+			}
+		},
 	}
 };

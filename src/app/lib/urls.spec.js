@@ -38,6 +38,24 @@ describe( 'URLs', () => {
 		} );
 	} );
 
+	describe( 'Documents', () => {
+		describe( 'download', () => {
+			it( 'Should return the correct path', () => {
+
+				const documentId = uuid();
+				expect( urls.documents.download( documentId ) ).toEqual( `/documents/${ documentId }/download/` );
+			} );
+		} );
+
+		describe( 'getScanStatus', () => {
+			it( 'Should return the correct path', () => {
+
+				const documentId = uuid();
+				expect( urls.documents.getScanStatus( documentId ) ).toEqual( `/documents/${ documentId }/status/` );
+			} );
+		} );
+	} );
+
 	describe( 'Barier urls', () => {
 
 		let barrierId;

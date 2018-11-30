@@ -1,4 +1,4 @@
-const config = require( '../../../config' );
+const reporter = require( '../../../lib/reporter' );
 const backend = require( '../../../lib/backend-service' );
 const uploadFile = require( '../../../lib/upload-file' );
 const Form = require( '../../../lib/Form' );
@@ -8,9 +8,6 @@ const validators = require( '../../../lib/validators' );
 const fileSize = require( '../../../lib/file-size' );
 const detailVieWModel = require( '../view-models/detail' );
 const interactionsViewModel = require( '../view-models/interactions' );
-
-const SCAN_CHECK_INTERVAL = config.files.scan.statusCheckInterval;
-const SCAN_MAX_ATTEMPTS = Math.round( config.files.scan.maxWaitTime / SCAN_CHECK_INTERVAL );
 
 function getTimelineData( req, barrierId ){
 
@@ -58,51 +55,6 @@ async function renderInteractions( req, res, next, opts = {} ){
 	}
 }
 
-function checkScanStatus( req, documentId ){
-
-	return new Promise( ( resolve, reject ) => {
-
-		let attempts = 0;
-		const interval = setInterval( async () => {
-
-			attempts++;
-
-			if( attempts > SCAN_MAX_ATTEMPTS ){
-
-				clearInterval( interval );
-				return reject( new Error( 'Virus scan took too long' ) );
-			}
-
-			try {
-
-				const { response, body } = await backend.documents.getStatus( req, documentId );
-
-				if( response.isSuccess ){
-
-					const { status } = body;
-					const passed = ( status === 'virus_scanned' );
-
-					if( passed || status === 'virus_scanning_failed' ){
-
-						clearInterval( interval );
-						resolve( { status, passed } );
-					}
-
-				} else {
-
-					reject( new Error( 'Not a successful response from the backend, got ' + response.statusCode ) );
-				}
-
-			} catch( e ){
-
-				clearInterval( interval );
-				reject( e );
-			}
-
-		}, SCAN_CHECK_INTERVAL );
-	} );
-}
-
 function uploadDocument( req, file ) {
 
 	return new Promise( async ( resolve, reject ) => {
@@ -121,25 +73,36 @@ function uploadDocument( req, file ) {
 
 					if( response.isSuccess ){
 
-						try {
+						resolve( id );
 
-							resolve( id );
+					} else {
 
-						} catch( e ){
+						const err = new Error( 'Unable to complete upload' );
+						reject( err );
 
-							reject( e );
-						}
+						reporter.captureException( err, { response: {
+							statusCode: response.statusCode,
+							documentId: id,
+						} } );
 					}
 
 				} else {
 
-					console.log( 'Response from S3 upload:' );
-					console.log( response.statusCode );
-					console.log( body );
 					reject( new Error( 'Unable to upload to S3' ) );
+					reporter.captureException( new Error( 'Unable to upload to S3' ), {
+						response: {
+							statusCode: response.statusCode,
+							body,
+							documentId: id,
+						}
+					} );
 				}
 
-			} ).catch( reject );
+			} ).catch( ( e ) => {
+
+				reject( e );
+				reporter.captureException( e, { documentId: id } );
+			} );
 
 		} else {
 
@@ -186,7 +149,7 @@ module.exports = {
 						sendJson( {
 							documentId,
 							file: { name: document.name, size: fileSize( document.size ) },
-							checkUrl: urls.barriers.documents.checkStatus( documentId ),
+							checkUrl: urls.documents.getScanStatus( documentId ),
 						} );
 
 					} catch( e ){
@@ -199,21 +162,6 @@ module.exports = {
 
 					res.status( 400 );
 					sendJson( { message: 'Invalid document' } );
-				}
-			},
-
-			checkScanStatus: async ( req, res ) => {
-
-				const documentId = req.uuid;
-
-				try {
-
-					res.json( await checkScanStatus( req, documentId ) );
-
-				} catch( e ){
-
-					res.status( 500 );
-					res.json( { message: e.message } );
 				}
 			},
 		},
@@ -269,7 +217,12 @@ module.exports = {
 
 							const id = await uploadDocument( req, formValues.document );
 							values.documentId = id;
-							await checkScanStatus( req, id );
+							const { passed } = await backend.documents.getScanStatus( req, id );
+
+							if( !passed ){
+
+								throw new Error( 'Virus found in file.' );
+							}
 
 						} catch ( e ){
 

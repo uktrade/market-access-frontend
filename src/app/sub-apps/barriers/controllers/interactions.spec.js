@@ -48,7 +48,7 @@ describe( 'Barrier interactions controller', () => {
 			documents: {
 				create: jasmine.createSpy( 'backend.documents.create' ),
 				uploadComplete: jasmine.createSpy( 'backend.documents.uploadComplete' ),
-				getStatus: jasmine.createSpy( 'backend.documents.getStatus' ),
+				getScanStatus: jasmine.createSpy( 'backend.documents.getScanStatus' ),
 			},
 			barriers: {
 				getInteractions: jasmine.createSpy( 'backend.barriers.getInteractions' ),
@@ -339,7 +339,7 @@ describe( 'Barrier interactions controller', () => {
 				} );
 
 				describe( 'With a document', () => {
-					describe( 'When uploadDocument and checkScanStatus return success', () => {
+					describe( 'When uploadDocument and getScanStatus return success', () => {
 						it( 'Should configure the saveFormData correctly', async () => {
 
 							await controller.notes.add( req, res, next );
@@ -368,9 +368,9 @@ describe( 'Barrier interactions controller', () => {
 								response: { isSuccess: true },
 							} ) );
 
-							backend.documents.getStatus.and.callFake( () => Promise.resolve( {
-								response: { isSuccess: true },
-								body: { status: 'virus_scanned' },
+							backend.documents.getScanStatus.and.callFake( () => Promise.resolve( {
+								status: 'virus_scanned',
+								passed: true,
 							} ) );
 
 							await config.saveFormData( formValues );
@@ -378,14 +378,12 @@ describe( 'Barrier interactions controller', () => {
 							expect( backend.documents.create ).toHaveBeenCalledWith( req, formValues.document.name );
 							expect( uploadFile ).toHaveBeenCalledWith( signed_upload_url, formValues.document );
 							expect( backend.documents.uploadComplete ).toHaveBeenCalledWith( req, documentId );
-							expect( backend.documents.getStatus ).toHaveBeenCalledWith( req, documentId );
+							expect( backend.documents.getScanStatus ).toHaveBeenCalledWith( req, documentId );
 							expect( backend.barriers.notes.save ).toHaveBeenCalledWith( req, req.barrier.id, {
 								note: formValues.note,
 								pinned: formValues.pinned,
 								documentId
 							} );
-
-
 							expect( next ).not.toHaveBeenCalled();
 						} );
 					} );
