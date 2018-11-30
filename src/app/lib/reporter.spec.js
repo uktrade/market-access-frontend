@@ -177,7 +177,7 @@ describe( 'Error reporter', function(){
 
 				reporter.captureException( err );
 
-				expect( logger.error ).toHaveBeenCalledWith( err );
+				expect( logger.error ).toHaveBeenCalledWith( err, undefined );
 				expect( raven.captureException ).not.toHaveBeenCalled();
 			} );
 		} );

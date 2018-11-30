@@ -11,6 +11,14 @@ if( useSentry ){
 
 module.exports = {
 
+	levels: {
+		debug: 'debug',
+		info: 'info',
+		warning: 'warning',
+		error: 'error',
+		fatal: 'fatal',
+	},
+
 	setup: function( app ){
 
 		if( useSentry ){
@@ -50,7 +58,7 @@ module.exports = {
 
 		} else {
 
-			logger.error( err );
+			logger.error( err, JSON.stringify( extra ) );
 		}
 	}
 };
