@@ -88,7 +88,7 @@ function uploadDocument( req, file ) {
 
 				} else {
 
-					reject( new Error( 'Unable to upload to S3' ) );
+					reject( new Error( 'Unable to upload document.' ) );
 					reporter.captureException( new Error( 'Unable to upload to S3' ), {
 						response: {
 							statusCode: response.statusCode,

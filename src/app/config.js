@@ -74,6 +74,12 @@ let config = {
 	files: {
 		maxSize: number( 'FILE_MAX_SIZE', ( 5 * 1024 * 1024 ) ),
 		types: env( 'FILE_TYPES', 'image/jpg,image/jpeg' ).split( ',' ),
+		s3: {
+			encryption: {
+				header: env( 'FILE_S3_ENCRYPTION_HEADER', 'x-amz-server-side-encryption' ),
+				value: env( 'FILE_S3_ENCRYPTION_VALUE', 'AES256' ),
+			},
+		},
 		scan: {
 			maxWaitTime: number( 'FILE_SCAN_MAX_WAIT_TIME', 15000 ),
 			statusCheckInterval: number( 'FILE_SCAN_STATUS_CHECK_INTERVAL', 500 ),
