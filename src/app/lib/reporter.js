@@ -46,7 +46,8 @@ module.exports = {
 
 		} else {
 
-			logger.warn( msg, JSON.stringify( extra ) );
+			logger.warn( msg );
+			if( extra ){ logger.warn( JSON.stringify( extra ) ); }
 		}
 	},
 
@@ -58,7 +59,8 @@ module.exports = {
 
 		} else {
 
-			logger.error( err, JSON.stringify( extra ) );
+			logger.error( err.stack );
+			if( extra ){ logger.error( JSON.stringify( extra ) ); }
 		}
 	}
 };

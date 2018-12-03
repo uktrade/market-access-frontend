@@ -7,15 +7,6 @@ const S3_VALUE = config.files.s3.encryption.value;
 
 module.exports = ( url, file ) => new Promise( ( resolve, reject ) => {
 
-	/*
-	const req = request.post( url );
-
-	req.on( 'response', resolve );
-	req.on( 'error', reject );
-
-	fs.createReadStream( file.path ).pipe( req );
-	*/
-
 	const doc = fs.readFileSync( file.path );
 
 	request( {

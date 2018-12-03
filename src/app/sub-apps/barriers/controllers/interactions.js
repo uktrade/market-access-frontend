@@ -65,7 +65,7 @@ function uploadDocument( req, file ) {
 
 			const { id, signed_upload_url } = body;
 
-			uploadFile( signed_upload_url, file ).then( async ( { response, body } ) => {
+			uploadFile( signed_upload_url, file ).then( async ( { response } ) => {
 
 				if( response.statusCode === 200 ){
 
@@ -78,8 +78,8 @@ function uploadDocument( req, file ) {
 					} else {
 
 						const err = new Error( 'Unable to complete upload' );
-						reject( err );
 
+						reject( err );
 						reporter.captureException( err, { response: {
 							statusCode: response.statusCode,
 							documentId: id,
@@ -88,11 +88,13 @@ function uploadDocument( req, file ) {
 
 				} else {
 
-					reject( new Error( 'Unable to upload document.' ) );
-					reporter.captureException( new Error( 'Unable to upload to S3' ), {
+					const err = new Error( 'Unable to upload document' ); //message gets seen by user
+
+					reject( err );
+					reporter.captureException( err, {
 						response: {
 							statusCode: response.statusCode,
-							body,
+							body: response.body,
 							documentId: id,
 						}
 					} );
