@@ -38,6 +38,7 @@
 					attributes: {
 						autofocus: ''
 					},
+					value: note,
 					errorMessage: errors | errorForName( 'note' )
 				}) }}
 
@@ -56,7 +57,7 @@
 					name: 'document',
 					classes: 'file-upload__input js-file-input',
 					formGroup: {
-						classes: 'file-upload js-form-group'
+						classes: 'file-upload js-form-group' + ( ' file-upload--hide' if documentId )
 					},
 					label: {
 						text: 'Attach a document',
@@ -70,14 +71,15 @@
 				}) }}
 
 				{% if documentId %}
+					<input type="hidden" name="documentId" value="{{ documentId }}" class="js-document-id">
 					{#
-						Output the hidden document id - <input type="hidden" name="documentId" value="{{ documentId }}" class="js-document-id">
+						Output the hidden document id
 						Show the name and size of the file
 						Add a delete link - should work with and without JS
 					#}
 				{% endif %}
 
-				<input type="submit" value="Save note" class="govuk-button">
+				<input type="submit" value="Save note" class="govuk-button js-submit-button">
 				<a class="button-cancel" href="{{ urls.barriers.interactions( barrier.id ) }}">Cancel</a>
 			</form>
 		</div>

@@ -10,6 +10,7 @@ ma.pages.barrier.interactions.addNote = (function( doc, jessie ){
 			input: '.js-file-input',
 			limitText: '.js-max-file-size'
 		} );
+		var submit = jessie.queryOne( '.js-submit-button' );
 
 		function setDocumentId( id ){
 
@@ -27,7 +28,15 @@ ma.pages.barrier.interactions.addNote = (function( doc, jessie ){
 		function updateProgress( e ){
 
 			if( e.lengthComputable ){
-				fileUpload.setProgress( 'uploading file... ' + Math.floor( ( e.loaded / e.total ) * 100 ) + '%' );
+
+				if( e.loaded === e.total ){
+
+					fileUpload.setProgress( 'processing file...' );
+
+				} else {
+
+					fileUpload.setProgress( 'uploading file... ' + Math.floor( ( e.loaded / e.total ) * 100 ) + '%' );
+				}
 			}
 		}
 
@@ -37,7 +46,7 @@ ma.pages.barrier.interactions.addNote = (function( doc, jessie ){
 		}
 
 		function transferCanceled(){
-			fileUpload.setError( 'Failed to upload document' );
+			fileUpload.setError( 'Upload of document cancelled, try again' );
 			fileUpload.showLink();
 		}
 
@@ -94,6 +103,8 @@ ma.pages.barrier.interactions.addNote = (function( doc, jessie ){
 			var responseCode = xhr.status;
 			var data;
 
+			submit.disabled = false;
+
 			try {
 
 				data = JSON.parse( xhr.response );
@@ -133,6 +144,7 @@ ma.pages.barrier.interactions.addNote = (function( doc, jessie ){
 			var xhr2 = ma.xhr2();
 			var formData = new FormData();
 
+			submit.disabled = true;
 			formData.append( 'document', file );
 
 			if( xhr2.upload ){

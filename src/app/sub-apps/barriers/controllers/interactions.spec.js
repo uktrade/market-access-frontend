@@ -350,7 +350,7 @@ describe( 'Barrier interactions controller', () => {
 							const formValues = {
 								note: faker.lorem.words(),
 								pinned: true,
-								document: { name: 'a document' },
+								document: { name: 'a document', size: 12 },
 							};
 
 							backend.documents.create.and.callFake( () => Promise.resolve( { response: {

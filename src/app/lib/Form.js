@@ -278,7 +278,7 @@ Form.prototype.addErrors = function( fields ){
 		if( this.passedConditions( name ) ){
 
 			const field = this.fields[ name ];
-			const message = fields[ field.errorField ];
+			const message = fields[ ( field.errorField || name ) ];
 
 			if( message ){
 				this.errors.push( { id: field.id, message } );

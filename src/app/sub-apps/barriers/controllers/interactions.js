@@ -1,3 +1,4 @@
+const config = require( '../../../config' );
 const reporter = require( '../../../lib/reporter' );
 const backend = require( '../../../lib/backend-service' );
 const uploadFile = require( '../../../lib/upload-file' );
@@ -8,6 +9,9 @@ const validators = require( '../../../lib/validators' );
 const fileSize = require( '../../../lib/file-size' );
 const detailVieWModel = require( '../view-models/detail' );
 const interactionsViewModel = require( '../view-models/interactions' );
+
+const MAX_FILE_SIZE = fileSize( config.files.maxSize );
+const OVERSIZE_FILE_MESSAGE = `File size exceeds the ${ MAX_FILE_SIZE } limit. Reduce file size and upload the document again.`;
 
 function getTimelineData( req, barrierId ){
 
@@ -88,7 +92,7 @@ function uploadDocument( req, file ) {
 
 				} else {
 
-					const err = new Error( 'Unable to upload document' ); //message gets seen by user
+					const err = new Error( 'Unable to upload document to S3' );
 
 					reject( err );
 					reporter.captureException( err, {
@@ -120,6 +124,11 @@ function getUploadedDocuments( sessionDocuments, id ){
 	return uploadedDocuments.filter( ( { barrierId } ) => barrierId === id ).map( ( { documentId } ) => documentId );
 }
 
+function isFileOverSize( err ){
+
+	return ( err.message.indexOf( 'maxFileSize exceeded' ) >= 0 );
+}
+
 module.exports = {
 
 	list: async ( req, res, next ) => await renderInteractions( req, res, next ),
@@ -133,13 +142,15 @@ module.exports = {
 
 				function sendJson( data ){
 
-					res.json( {
-						...data,
-						csrfToken: req.csrfToken(),
-					} );
+					res.json( data );
 				}
 
-				if( document && validators.isValidFile( document ) ){
+				if( req.formError ){
+
+					res.status( 400 );
+					sendJson( { message: ( isFileOverSize( req.formError ) ? OVERSIZE_FILE_MESSAGE : '' ) } );
+
+				} else if( document && validators.isValidFile( document ) ){
 
 					try {
 
@@ -157,7 +168,7 @@ module.exports = {
 					} catch( e ){
 
 						res.status( 500 );
-						sendJson( { message: e.message } );
+						sendJson( { message: 'Unable to upload document, try again' } );
 					}
 
 				} else {
@@ -190,6 +201,11 @@ module.exports = {
 				}
 			} );
 
+			if( req.formError && isFileOverSize( req.formError ) ){
+
+				form.addErrors( { document: OVERSIZE_FILE_MESSAGE } );
+			}
+
 			const processor = new FormProcessor( {
 				form,
 				render: async ( templateValues ) => await renderInteractions( req, res, next, {
@@ -213,7 +229,7 @@ module.exports = {
 							) );
 						}
 
-					} else if( formValues.document ){
+					} else if( formValues.document && formValues.document.size > 0 ){
 
 						try {
 

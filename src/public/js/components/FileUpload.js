@@ -194,6 +194,7 @@ ma.components.FileUpload = (function( doc, jessie ){
 		}
 
 		this.error.innerText = message;
+		this.input.value = '';
 		this.link.parentNode.insertBefore( this.error, this.link );
 		addClass( this.formGroup, GROUP_ERROR_CLASS );
 		addClass( this.input, INPUT_ERROR_CLASS );
