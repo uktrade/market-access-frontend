@@ -1,16 +1,37 @@
 ma.pages.barrier.interactions.addNote = (function( doc, jessie ){
 
-	return function(){
+	return function( opts ){
 
-		if( !( ma.components.FileUpload && ma.xhr2 && ( typeof FormData !== 'undefined' ) && jessie.hasFeatures( 'queryOne' ) ) ){ return; }
+		if( !( ma.components.FileUpload && ma.xhr2 && ( typeof FormData !== 'undefined' ) && jessie.hasFeatures( 'queryOne', 'cancelDefault' ) ) ){ return; }
+
+		var fileUpload;
+		var note;
+
+		try {
+
+			fileUpload = new ma.components.FileUpload( {
+				group: '.js-form-group',
+				input: '.js-file-input',
+				limitText: '.js-max-file-size'
+			} );
+
+		} catch( e ) { return; }
+
+		try {
+
+			note = new ma.components.TextArea( {
+				group: '.js-note-group',
+				input: '.js-note-text'
+			} );
+
+		} catch( e ){ return; }
 
 		var documentIdInput;// = jessie.queryOne( '.js-document-id' );
-		var fileUpload = new ma.components.FileUpload( {
-			group: '.js-form-group',
-			input: '.js-file-input',
-			limitText: '.js-max-file-size'
-		} );
 		var submit = jessie.queryOne( '.js-submit-button' );
+		var form = fileUpload.form;
+
+		if( !submit ){ console.log( 'No submit' ); return; }
+		if( !form ){	console.log( 'No form' ); return; }
 
 		function setDocumentId( id ){
 
@@ -162,6 +183,16 @@ ma.pages.barrier.interactions.addNote = (function( doc, jessie ){
 			fileUpload.setProgress( 'uploading file... 0%' );
 		}
 
+		function handleFormSubmit( e ){
+
+			if( !note.hasValue() ){
+
+				jessie.cancelDefault( e );
+				note.setError( opts.noteErrorText );
+				note.focus();
+			}
+		}
+
 		fileUpload.events.file.subscribe( newFile );
 		fileUpload.events.delete.subscribe( function(){
 
@@ -169,6 +200,8 @@ ma.pages.barrier.interactions.addNote = (function( doc, jessie ){
 				documentIdInput.value = '';
 			}
 		} );
+
+		jessie.attachListener( form, 'submit', handleFormSubmit );
 	};
 
 }( document, jessie ));

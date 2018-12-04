@@ -2,7 +2,7 @@ ma.components.FileUpload = (function( doc, jessie ){
 
 	if( !jessie.hasFeatures(
 			'attachListener', 'bind', 'queryOne', 'addClass', 'removeClass', 'cancelDefault', 'getElementData'
-	) ) { return; }
+	) ){ return; }
 
 	var attachListener = jessie.attachListener;
 	var bind = jessie.bind;
@@ -11,9 +11,9 @@ ma.components.FileUpload = (function( doc, jessie ){
 	var removeClass = jessie.removeClass;
 	var cancelDefault = jessie.cancelDefault;
 
-	var GROUP_ERROR_CLASS = 'govuk-form-group--error';
-	var INPUT_ERROR_CLASS = 'govuk-file-upload--error';
-	var ERROR_CLASS = 'govuk-error-message';
+	var GROUP_ERROR_CLASS = ma.FORM_GROUP_ERROR_CLASS;
+	var INPUT_ERROR_CLASS = ma.FORM_INPUT_ERROR_CLASS;
+	var ERROR_CLASS = ma.FORM_ERROR_CLASS;
 
 	function FileUpload( opts ){
 

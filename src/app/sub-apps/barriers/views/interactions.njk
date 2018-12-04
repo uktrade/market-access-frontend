@@ -11,7 +11,9 @@
 {% if noteForm %}
 	{% block body_script %}
 		<script>
-			ma.pages.barrier.interactions.addNote();
+			ma.pages.barrier.interactions.addNote( {
+				noteErrorText: '{{ noteErrorText }}'
+			} );
 		</script>
 	{% endblock %}
 {% endif %}
@@ -31,6 +33,10 @@
 				{{ govukTextarea({
 					name: 'note',
 					id: 'note',
+					classes: 'js-note-text',
+					formGroup: {
+						classes: 'js-note-group'
+					},
 					label: {
 						text: 'Add notes on an interaction or event',
 						classes: 'govuk-!-font-weight-bold'

@@ -287,7 +287,7 @@ describe( 'Barrier interactions controller', () => {
 						expect( res.render ).toHaveBeenCalledWith( template, Object.assign( {},
 							barrierDetailViewModelResponse,
 							{ interactions: interactionsViewModelResponse },
-							{ noteForm: true },
+							{ noteForm: true, noteErrorText: 'Add text for the note.' },
 							templateValues
 						) );
 

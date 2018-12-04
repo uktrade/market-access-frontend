@@ -12,6 +12,7 @@ const interactionsViewModel = require( '../view-models/interactions' );
 
 const MAX_FILE_SIZE = fileSize( config.files.maxSize );
 const OVERSIZE_FILE_MESSAGE = `File size exceeds the ${ MAX_FILE_SIZE } limit. Reduce file size and upload the document again.`;
+const NOTE_ERROR = 'Add text for the note.';
 
 function getTimelineData( req, barrierId ){
 
@@ -184,7 +185,7 @@ module.exports = {
 			const barrier = req.barrier;
 			const form = new Form( req, {
 				note: {
-					required: 'Add some text for the note.'
+					required: NOTE_ERROR
 				},
 				pinned: {},
 				documentId: {
@@ -209,7 +210,7 @@ module.exports = {
 			const processor = new FormProcessor( {
 				form,
 				render: async ( templateValues ) => await renderInteractions( req, res, next, {
-					data: Object.assign(	{ noteForm: true }, templateValues )
+					data: Object.assign(	{ noteForm: true, noteErrorText: NOTE_ERROR }, templateValues )
 				} ),
 				saveFormData: async ( formValues ) => {
 
