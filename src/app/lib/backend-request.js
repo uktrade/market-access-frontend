@@ -175,5 +175,6 @@ module.exports = {
 
 	get: ( path, token ) => makeRequest( 'GET', path, { token } ),
 	post: ( path, token, body ) => makeRequest( 'POST', path, { token, body } ),
-	put: ( path, token, body ) => makeRequest( 'PUT', path, { token, body } )
+	put: ( path, token, body ) => makeRequest( 'PUT', path, { token, body } ),
+	delete: ( path, token, body ) => makeRequest( 'DELETE', path, { token, body } ),
 };

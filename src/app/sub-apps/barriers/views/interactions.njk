@@ -28,7 +28,7 @@
 
 	{% if noteForm %}
 		<div class="interaction-panel">
-			<form action="{{ urls.barriers.notes.add( barrier.id ) }}?_csrf={{ csrfToken }}" method="POST" enctype="multipart/form-data" data-xhr-upload="{{ urls.barriers.notes.documents.add( barrier.id ) }}?_csrf={{ csrfToken }}">
+			<form action="{{ urls.barriers.notes.add( barrier.id ) }}?_csrf={{ csrfToken }}" method="POST" enctype="multipart/form-data" data-xhr-upload="{{ urls.barriers.notes.documents.add( barrier.id ) }}?_csrf={{ csrfToken }}" data-xhr-delete="{{ urls.documents.delete( ':uuid' ) }}">
 
 				{{ govukTextarea({
 					name: 'note',

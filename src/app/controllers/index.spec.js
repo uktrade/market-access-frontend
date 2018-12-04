@@ -21,7 +21,9 @@ describe( 'Index controller', () => {
 				getAll: jasmine.createSpy( 'backend.barriers.getAll' ),
 			},
 			documents: {
-				download: jasmine.createSpy( 'backend.documents.download' )
+				download: jasmine.createSpy( 'backend.documents.download' ),
+				getScanStatus: jasmine.createSpy( 'backend.documents.getScanStatus' ),
+				delete: jasmine.createSpy( 'backend.documents.delete' ),
 			}
 		};
 		dashboardViewModel = jasmine.createSpy( 'dashboard view model' );
@@ -39,7 +41,10 @@ describe( 'Index controller', () => {
 
 		res = {
 			render: jasmine.createSpy( 'res.render' ),
-			redirect: jasmine.createSpy( 'res.redirect' )
+			redirect: jasmine.createSpy( 'res.redirect' ),
+			status: jasmine.createSpy( 'res.status' ),
+			json: jasmine.createSpy( 'res.json' ),
+			send: jasmine.createSpy( 'res.send' ),
 		};
 
 		next = jasmine.createSpy( 'next' );
@@ -234,6 +239,60 @@ describe( 'Index controller', () => {
 						expect( next ).toHaveBeenCalledWith( new Error( errorMessage ));
 					} );
 				} );
+			} );
+		} );
+
+		describe( 'getScanStatus', () => {
+
+			let documentId;
+
+			beforeEach( () => {
+
+				documentId = uuid();
+				req.uuid = documentId;
+			} );
+
+			describe( 'When the service returns a success', () => {
+				it( 'Should return the status', async () => {
+
+					const response = { status: 'virus_scanned', passed: true };
+
+					backend.documents.getScanStatus.and.callFake( () => Promise.resolve( response ) );
+
+					await controller.documents.getScanStatus( req, res );
+
+					expect( backend.documents.getScanStatus ).toHaveBeenCalledWith( req, documentId );
+					expect( res.json ).toHaveBeenCalledWith( response );
+				} );
+			} );
+
+			describe( 'When the service returns an error', () => {
+				it( 'Should return the message', async () => {
+
+					const message = 'foo bar';
+					const err = new Error( message );
+
+					backend.documents.getScanStatus.and.callFake( () => Promise.reject( err ) );
+
+					await controller.documents.getScanStatus( req, res );
+
+					expect( backend.documents.getScanStatus ).toHaveBeenCalledWith( req, documentId );
+					expect( res.status ).toHaveBeenCalledWith( 500 );
+					expect( res.json ).toHaveBeenCalledWith( { message } );
+				} );
+			} );
+		} );
+
+		describe( 'delete', () => {
+			it( 'Should call the backend service', () => {
+
+				const documentId = uuid();
+				req.uuid = documentId;
+
+				controller.documents.delete( req, res );
+
+				expect( backend.documents.delete ).toHaveBeenCalledWith( req, documentId );
+				expect( res.send ).toHaveBeenCalledWith();
 			} );
 		} );
 	} );

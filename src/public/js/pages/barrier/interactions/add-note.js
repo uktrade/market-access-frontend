@@ -2,7 +2,9 @@ ma.pages.barrier.interactions.addNote = (function( doc, jessie ){
 
 	return function( opts ){
 
-		if( !( ma.components.FileUpload && ma.xhr2 && ( typeof FormData !== 'undefined' ) && jessie.hasFeatures( 'queryOne', 'cancelDefault' ) ) ){ return; }
+		if( !( ma.components.FileUpload && ma.components.TextArea && ma.xhr2 && ( typeof FormData !== 'undefined' ) && jessie.hasFeatures(
+			'queryOne', 'cancelDefault', 'getElementData'
+		) ) ){ return; }
 
 		var fileUpload;
 		var note;
@@ -30,8 +32,10 @@ ma.pages.barrier.interactions.addNote = (function( doc, jessie ){
 		var submit = jessie.queryOne( '.js-submit-button' );
 		var form = fileUpload.form;
 
-		if( !submit ){ console.log( 'No submit' ); return; }
-		if( !form ){	console.log( 'No form' ); return; }
+		if( !submit ){ return; }
+		if( !form ){ return; }
+
+		var deleteUrl = jessie.getElementData( form, 'xhr-delete' );
 
 		function setDocumentId( id ){
 
@@ -193,11 +197,26 @@ ma.pages.barrier.interactions.addNote = (function( doc, jessie ){
 			}
 		}
 
+		function deleteDocument( documentId ){
+
+			if( !documentId ){ return; }
+
+			var xhr = ma.xhr2();
+			var url = deleteUrl.replace( ':uuid', documentId );
+
+			xhr.open( 'POST', url, true );
+			xhr.send();
+		}
+
 		fileUpload.events.file.subscribe( newFile );
 		fileUpload.events.delete.subscribe( function(){
 
 			if( documentIdInput ){
+
+				var documentId = documentIdInput.value;
+
 				documentIdInput.value = '';
+				deleteDocument( documentId );
 			}
 		} );
 

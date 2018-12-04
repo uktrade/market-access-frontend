@@ -22,7 +22,7 @@ function getReportPath( reportId ){
 
 const reportUrl = {
 	index: () => '/reports/',
-detail: ( reportId ) => `/reports/${ reportId }/`,
+	detail: ( reportId ) => `/reports/${ reportId }/`,
 	new: () => '/reports/new/',
 	start: ( reportId ) => `/reports/${ getReportPath( reportId ) }/start/`,
 	isResolved: ( reportId ) => `/reports/${ getReportPath( reportId ) }/is-resolved/`,
@@ -47,6 +47,7 @@ module.exports = {
 	documents: {
 		download: ( documentId ) => `/documents/${ documentId }/download/`,
 		getScanStatus: ( documentId ) => `/documents/${ documentId }/status/`,
+		delete: ( documentId ) => `/documents/${ documentId }/delete/`,
 	},
 
 	barriers: {

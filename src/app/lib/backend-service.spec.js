@@ -20,7 +20,8 @@ describe( 'Backend Service', () => {
 		backend = {
 			get: jasmine.createSpy( 'backend.get' ),
 			post: jasmine.createSpy( 'backend.post' ),
-			put: jasmine.createSpy( 'backend.put' )
+			put: jasmine.createSpy( 'backend.put' ),
+			delete: jasmine.createSpy( 'backend.delete' ),
 		};
 		metadata = {
 			getCountry: jasmine.createSpy( 'metadata.country' )
@@ -103,6 +104,17 @@ describe( 'Backend Service', () => {
 				expect( backend.post ).toHaveBeenCalledWith( '/documents', token, {
 					original_filename: fileName
 				} );
+			} );
+		} );
+
+		describe( 'delete', () => {
+			it( 'Should call the correct API', async () => {
+
+				const documentId = uuid();
+
+				await service.documents.delete( req, documentId );
+
+				expect( backend.delete ).toHaveBeenCalledWith( `/documents/${ documentId }`, token );
 			} );
 		} );
 

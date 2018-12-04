@@ -87,5 +87,14 @@ module.exports = {
 				res.json( { message: e.message } );
 			}
 		},
+
+		delete: ( req, res ) => {
+
+			const documentId = req.uuid;
+
+			backend.documents.delete( req, documentId );
+
+			res.send();
+		}
 	}
 };

@@ -149,6 +149,7 @@ module.exports = {
 		create: ( req, fileName ) => backend.post( '/documents', getToken( req ), {
 			original_filename: fileName
 		} ),
+		delete: ( req, documentId ) => backend.delete( `/documents/${ documentId }`, getToken( req ) ),
 		uploadComplete: ( req, documentId ) => backend.post( `/documents/${ documentId }/upload-callback`, getToken( req ) ),
 		download: ( req, documentId ) => backend.get( `/documents/${ documentId }/download`, getToken( req ) ),
 		getScanStatus: ( req, documentId ) => new Promise( ( resolve, reject ) => {
