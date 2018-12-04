@@ -127,7 +127,18 @@ function getUploadedDocuments( sessionDocuments, id ){
 
 function isFileOverSize( err ){
 
-	return ( err.message.indexOf( 'maxFileSize exceeded' ) >= 0 );
+	const message = err.message;
+	const isOverSize = ( message.indexOf( 'maxFileSize exceeded' ) >= 0 );
+
+	if( isOverSize ){
+		reporter.message( 'info', err.message );
+	}
+
+	return isOverSize;
+}
+
+function reportInvalidFile( file ){
+	reporter.message( 'info', 'Invalid document type: ' + file.type, { size: file.size, name: file.name } );
 }
 
 module.exports = {
@@ -176,6 +187,7 @@ module.exports = {
 
 					res.status( 400 );
 					sendJson( { message: 'Invalid document' } );
+					reportInvalidFile( document );
 				}
 			},
 		},
@@ -195,7 +207,17 @@ module.exports = {
 					type: Form.FILE,
 					validators: [
 						{
-							fn: validators.isValidFile,
+							fn: ( file ) => {
+
+								const isValid = validators.isValidFile( file );
+
+								if( !isValid ){
+
+									reportInvalidFile( file );
+								}
+
+								return isValid;
+							},
 							message: 'This type of document is not supported'
 						}
 					]
