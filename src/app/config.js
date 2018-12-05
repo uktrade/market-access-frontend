@@ -73,7 +73,7 @@ let config = {
 	},
 	files: {
 		maxSize: number( 'FILE_MAX_SIZE', ( 5 * 1024 * 1024 ) ),
-		types: env( 'FILE_TYPES', 'image/jpg,image/jpeg' ).split( ',' ),
+		types: env( 'FILE_TYPES', 'image/jpeg,text/csv' ).split( ',' ),
 		s3: {
 			encryption: {
 				header: env( 'FILE_S3_ENCRYPTION_HEADER', 'x-amz-server-side-encryption' ),

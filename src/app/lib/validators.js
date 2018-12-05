@@ -20,7 +20,7 @@ module.exports = {
 	isSector: ( value ) => metadata.sectors.some( ( sector ) => sector.id === value ),
 	isOneBoolCheckboxChecked: ( values ) => {
 
-		for( let [ /* key */, value ] of Object.entries( values ) ){
+		for( let value of Object.values( values ) ){
 
 			if( value === 'true' ){
 				return true;
@@ -35,12 +35,7 @@ module.exports = {
 	isDateInPast: ( values ) => ( Date.parse( [ values.year, values.month, values.day ].join( '-' ) ) < Date.now() ),
 	isDateNumeric: ( values ) => {
 
-		let allValues = '';
-
-		for( let [ , value ] of Object.entries( values ) ){
-
-			allValues += value;
-		}
+		const allValues = Object.values( values ).reduce( ( str, value ) => ( str + value ), '' );
 
 		return isNumeric.test( allValues );
 	},

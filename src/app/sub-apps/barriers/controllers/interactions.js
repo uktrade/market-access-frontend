@@ -1,4 +1,5 @@
 const config = require( '../../../config' );
+const metadata = require( '../../../lib/metadata' );
 const reporter = require( '../../../lib/reporter' );
 const backend = require( '../../../lib/backend-service' );
 const uploadFile = require( '../../../lib/upload-file' );
@@ -13,6 +14,25 @@ const interactionsViewModel = require( '../view-models/interactions' );
 const MAX_FILE_SIZE = fileSize( config.files.maxSize );
 const OVERSIZE_FILE_MESSAGE = `File size exceeds the ${ MAX_FILE_SIZE } limit. Reduce file size and upload the document again.`;
 const NOTE_ERROR = 'Add text for the note.';
+const INVALID_FILE_TYPE_MESSAGE = `Unsupported file format. The following file formats are accepted ${ getValidTypes() }`;
+
+function getValidTypes(){
+
+	const types = [];
+
+	config.files.types.forEach( ( type ) => {
+
+		const file = metadata.mimeTypes[ type ];
+
+		if( file ){ types.push( file ); return; }
+
+		reporter.message( 'info', 'No file extension mapping found for valid type: ' + type );
+
+		types.push( type );
+	} );
+
+	return types.join( ', ' );
+}
 
 function getTimelineData( req, barrierId ){
 
@@ -180,13 +200,13 @@ module.exports = {
 					} catch( e ){
 
 						res.status( 500 );
-						sendJson( { message: 'Unable to upload document, try again' } );
+						sendJson( { message: 'A system error has occured, so the file has not been uploaded. Try again.' } );
 					}
 
 				} else {
 
 					res.status( 400 );
-					sendJson( { message: 'Invalid document' } );
+					sendJson( { message: INVALID_FILE_TYPE_MESSAGE } );
 					reportInvalidFile( document );
 				}
 			},
@@ -218,7 +238,7 @@ module.exports = {
 
 								return isValid;
 							},
-							message: 'This type of document is not supported'
+							message: INVALID_FILE_TYPE_MESSAGE
 						}
 					]
 				}
@@ -262,7 +282,7 @@ module.exports = {
 
 							if( !passed ){
 
-								throw new Error( 'Virus found in file.' );
+								throw new Error( 'This file may be infected with a virus and will not be accepted.' );
 							}
 
 						} catch ( e ){
@@ -296,7 +316,7 @@ module.exports = {
 
 				const form = new Form( req, {
 					note: {
-						required: 'Add some text for the note.'
+						required: 'Add text for the note.'
 					}
 				} );
 

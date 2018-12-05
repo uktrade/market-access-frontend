@@ -66,12 +66,12 @@ ma.pages.barrier.interactions.addNote = (function( doc, jessie ){
 		}
 
 		function transferFailed(){
-			fileUpload.setError( 'Failed to upload document' );
+			fileUpload.setError( 'Upload of document cancelled, try again.' );
 			fileUpload.showLink();
 		}
 
 		function transferCanceled(){
-			fileUpload.setError( 'Upload of document cancelled, try again' );
+			fileUpload.setError( 'Upload of document cancelled, try again.' );
 			fileUpload.showLink();
 		}
 
@@ -101,7 +101,7 @@ ma.pages.barrier.interactions.addNote = (function( doc, jessie ){
 
 					if( !passed ){
 
-						fileUpload.setError( 'File has a virus, please upload a different file' );
+						fileUpload.setError( 'This file may be infected with a virus and will not be accepted.' );
 						fileUpload.showLink();
 						return;
 					}
@@ -111,7 +111,7 @@ ma.pages.barrier.interactions.addNote = (function( doc, jessie ){
 
 				} else {
 
-					var message = ( data.message || 'There was an unexpected error, try again' );
+					var message = ( data.message || 'A system error has occured, so the file has not been uploaded. Try again.' );
 					fileUpload.setError( message );
 					fileUpload.showLink();
 				}
@@ -158,7 +158,7 @@ ma.pages.barrier.interactions.addNote = (function( doc, jessie ){
 
 			} else {
 
-				var message = ( data.message || 'There was an unexpected error, try again' );
+				var message = ( data.message || 'A system error has occured, so the file has not been uploaded. Try again.' );
 				fileUpload.setError( message );
 				fileUpload.showLink();
 			}
