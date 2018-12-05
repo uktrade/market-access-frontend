@@ -97,7 +97,7 @@
 		<ol class="event-list">
 			{% for item in interactions -%}
 
-			<li class="event-list__item{{ ' event-list__item--documents' if item.hasDocuments }}{#{ ' event-list__item--pinned' if item.pinned }#}">
+			<li class="event-list__item{#{ ' event-list__item--pinned' if item.pinned }#}">
 
 				{%- if item.isNote -%}
 
@@ -130,30 +130,37 @@
 
 					{%- else -%}
 
-						<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
-						<a href="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}">edit</a>
-
 						{% if item.hasDocuments -%}
 
-							<ul class="event-list__item__document-list">
-								{% for doc in item.documents -%}
+							<div class="event-list__item__document">
+								<ul class="event-list__item__document__list">
+									{% for doc in item.documents -%}
 
-									<li class="event-list__item__document-list__item">
+										<li class="event-list__item__document__list__item">
 
-										{%- if doc.canDownload -%}
+											{%- if doc.canDownload -%}
 
-											<a class="event-list__item__document-list__item__name" href="{{ urls.documents.download( doc.id ) }}">{{ doc.name }}</a>
+												<a class="event-list__item__document__list__item__name" href="{{ urls.documents.download( doc.id ) }}">{{ doc.name }}</a>
 
-										{%- else -%}
+											{%- else -%}
 
-											<span class="event-list__item__document-list__item__name">{{ doc.name }}</span>
-											<span class="event-list__item__document-list__item__status">({{ doc.status }})</span>
+												<span class="event-list__item__document__list__item__name">{{ doc.name }}</span>
+												<span class="event-list__item__document__list__item__status">({{ doc.status }})</span>
 
-										{%- endif %}
-									</li>
+											{%- endif %}
+										</li>
 
-								{%- endfor %}
-							</ul>
+									{%- endfor %}
+								</ul>
+
+								<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
+								<a href="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}">edit</a>
+							</div>
+
+						{%- else -%}
+
+							<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
+							<a href="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}">edit</a>
 
 						{%- endif %}
 					{%- endif %}
