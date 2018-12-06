@@ -1,0 +1,11 @@
+.priority-marker {
+	border-radius: 50%;
+	background-color: red;
+	width: govuk-em( 18, 16 );
+	height: govuk-em( 18, 16 );
+	display: inline-block;
+	margin-right: govuk-em( 5, 16 );
+	position: relative;
+	top: 4px;
+	left: 0;
+}

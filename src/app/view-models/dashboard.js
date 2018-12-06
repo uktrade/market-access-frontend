@@ -15,6 +15,10 @@ function update( barrier ){
 	const country = metadata.countries.find( ( country ) => country.id === countryId );
 	const barrierStatusCode = barrier.current_status.status;
 	const status = barrierStatusTypeInfo[ barrierStatusCode ] || {};
+	const priority = {
+		...barrier.priority,
+		modifyer: barrier.priority.code.toLowerCase(),
+	};
 
 	return {
 		id: barrier.id,
@@ -29,6 +33,7 @@ function update( barrier ){
 		hasContributors: barrier.contributor_count > 0,
 		problemStatus: metadata.statusTypes[ barrier.problem_status ],
 		status,
+		priority,
 		date: {
 			reported: barrier.reported_on
 		},

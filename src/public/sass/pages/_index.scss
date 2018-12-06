@@ -4,19 +4,22 @@
 
 .standard-table--barriers {
 
+	min-width: govuk-em( 950, 16 );
+
 	.standard-table__heading,
 	.standard-table__cell{
 
 		&:nth-child( 1 ){
-			width: 18%;
+			min-width: govuk-em( 90, 16 );
 		}
 
 		&:nth-child( 2 ){
-			width: 30%;
+			max-width: govuk-em( 150, 16 );
+			width: 15%;
 		}
 
 		&:nth-child( 3 ){
-			width: 23%;
+			width: 30%;
 		}
 
 		&:nth-child( 4 ){
@@ -24,34 +27,45 @@
 		}
 
 		&:nth-child( 5 ){
-			width: 9%;
+			width: 20%;
+		}
+
+		&:nth-child( 6 ){
+			min-width: govuk-em( 90, 16 );
 		}
 	}
 }
 
 .standard-table--country-barriers {
 
+	min-width: govuk-em( 950, 16 );
+
 	.standard-table__heading,
 	.standard-table__cell{
 
 		&:nth-child( 1 ){
-			width: 18%;
+			min-width: govuk-em( 90, 16 );
 		}
 
 		&:nth-child( 2 ){
-			width: 30%;
+			max-width: govuk-em( 150, 16 );
+			width: 15%;
 		}
 
 		&:nth-child( 3 ){
-			width: 26%;
+			width: 30%;
 		}
 
 		&:nth-child( 4 ){
-			width: 17%;
+			width: 20%;
 		}
 
 		&:nth-child( 5 ){
-			width: 9%;
+			width: 20%;
+		}
+
+		&:nth-child( 6 ){
+			min-width: govuk-em( 90, 16 );
 		}
 	}
 }
