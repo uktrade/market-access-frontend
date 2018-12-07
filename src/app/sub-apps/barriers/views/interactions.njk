@@ -78,11 +78,6 @@
 
 				{% if documentId %}
 					<input type="hidden" name="documentId" value="{{ documentId }}" class="js-document-id">
-					{#
-						Output the hidden document id
-						Show the name and size of the file
-						Add a delete link - should work with and without JS
-					#}
 				{% endif %}
 
 				<input type="submit" value="Save note" class="govuk-button js-submit-button">
@@ -108,6 +103,17 @@
 					</h4>
 
 					{% if item.edit -%}
+
+						{% for document in item.documents %}
+							<form action="{{ urls.barriers.notes.documents.delete( barrier.id, item.id ) }}" method="POST">
+								<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+								<input type="hidden" name="documentId" value="{{ document.id }}">
+								<div class="govuk-form-group file-upload">
+									<span class="file-upload__progress"><strong>{{ document.name }}</strong> - {{ document.size }}</span>
+									<input type="submit" class="file-upload__delete" value="delete">
+								</div>
+							</form>
+						{% endfor %}
 
 						<form action="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}" method="POST">
 							<input type="hidden" name="_csrf" value="{{ csrfToken }}">
@@ -140,7 +146,7 @@
 
 											{%- if doc.canDownload -%}
 
-												<a class="event-list__item__document__list__item__name" href="{{ urls.documents.download( doc.id ) }}">{{ doc.name }}</a>
+												<a class="event-list__item__document__list__item__name" href="{{ urls.documents.download( doc.id ) }}">{{ doc.name }}</a> - {{ doc.size }}
 
 											{%- else -%}
 

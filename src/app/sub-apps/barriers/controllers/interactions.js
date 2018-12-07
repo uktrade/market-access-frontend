@@ -84,7 +84,7 @@ function uploadDocument( req, file ) {
 
 	return new Promise( async ( resolve, reject ) => {
 
-		const { response, body } = await backend.documents.create( req, file.name );
+		const { response, body } = await backend.documents.create( req, file.name, file.size );
 
 		if( response.isSuccess ){
 
@@ -210,6 +210,33 @@ module.exports = {
 					reportInvalidFile( document );
 				}
 			},
+
+			delete: async ( req, res, next ) => {
+
+				const { uuid: barrierId, note } = req;
+				const { documentId } = req.body;
+				const document = note.documents && note.documents.find( ( doc ) => doc.id === documentId );
+
+				if( document ){
+
+					try {
+
+						const { response } = await backend.documents.delete( req, documentId );
+
+						if( response.isSuccess ){
+
+							res.redirect( urls.barriers.notes.edit( barrierId, note.id ) );
+
+						} else {
+							throw new Error( `Unable to delete document ${ documentId }, got ${ response.statusCode } from backend` );
+						}
+
+					} catch ( e ){ next( e ); }
+
+				} else {
+					throw new Error( `No matching document for barrier %{ barrierId } note ${ note.id } and document ${ documentId }` );
+				}
+			},
 		},
 
 		add: async ( req, res, next ) => {
@@ -309,7 +336,7 @@ module.exports = {
 		edit: async ( req, res, next ) => {
 
 			const barrier = req.barrier;
-			const noteId = req.params.noteId;
+			const noteId = req.params.id;
 			const noteIdIsNumeric = ( !!noteId && validators.isNumeric( noteId ) );
 
 			if( noteIdIsNumeric ){

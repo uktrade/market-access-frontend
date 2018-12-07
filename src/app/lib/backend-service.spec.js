@@ -98,11 +98,13 @@ describe( 'Backend Service', () => {
 			it( 'Should call the correct API', async () => {
 
 				const fileName = 'abc.csv';
+				const size = 1234;
 
-				await service.documents.create( req, fileName );
+				await service.documents.create( req, fileName, size );
 
 				expect( backend.post ).toHaveBeenCalledWith( '/documents', token, {
-					original_filename: fileName
+					original_filename: fileName,
+					size
 				} );
 			} );
 		} );

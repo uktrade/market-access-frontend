@@ -1,4 +1,5 @@
 const metadata = require( '../../../lib/metadata' );
+const fileSize = require( '../../../lib/file-size' );
 
 function getStatusType( id ){
 
@@ -27,6 +28,7 @@ function getDocument( doc ){
 	return {
 		id: doc.id,
 		name: doc.name,
+		size: fileSize( doc.size ),
 		canDownload,
 		status: metadata.documentStatus[ doc.status ]
 	};

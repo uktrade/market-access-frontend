@@ -375,7 +375,7 @@ describe( 'Barrier interactions controller', () => {
 
 							await config.saveFormData( formValues );
 
-							expect( backend.documents.create ).toHaveBeenCalledWith( req, formValues.document.name );
+							expect( backend.documents.create ).toHaveBeenCalledWith( req, formValues.document.name, formValues.document.size );
 							expect( uploadFile ).toHaveBeenCalledWith( signed_upload_url, formValues.document );
 							expect( backend.documents.uploadComplete ).toHaveBeenCalledWith( req, documentId );
 							expect( backend.documents.getScanStatus ).toHaveBeenCalledWith( req, documentId );
@@ -434,7 +434,7 @@ describe( 'Barrier interactions controller', () => {
 				beforeEach( () => {
 
 					editId = 34;
-					req.params.noteId = editId;
+					req.params.id = editId;
 					validators.isNumeric.and.callFake( () => true );
 				} );
 

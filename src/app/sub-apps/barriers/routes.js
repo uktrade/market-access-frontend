@@ -3,6 +3,7 @@ const controller = require( './controllers' );
 
 const fileUpload = require( './middleware/file-upload' );
 const barrierIdParam = require( './middleware/params/barrier-id' );
+const noteIdParam = require( './middleware/params/note-id' );
 const barrierTypeCategoryParam = require( './middleware/params/barrier-type-category' );
 const companyIdParam = require( './middleware/params/company-id' );
 const uuidParam = require( '../../middleware/params/uuid' );
@@ -14,6 +15,7 @@ module.exports = ( express, app ) => {
 	const parseBody = express.urlencoded( { extended: false } );
 
 	app.param( 'barrierId', barrierIdParam );
+	app.param( 'noteId', noteIdParam );
 	app.param( 'uuid', uuidParam );
 	app.param( 'barrierTypeCategory', barrierTypeCategoryParam );
 	app.param( 'companyId', companyIdParam );
@@ -34,9 +36,10 @@ module.exports = ( express, app ) => {
 	app.get( '/:barrierId/interactions/', controller.interactions.list );
 	app.get( '/:barrierId/interactions/add-note/', controller.interactions.notes.add );
 	app.post( '/:barrierId/interactions/add-note/', fileUpload, controller.interactions.notes.add );
-	app.get( '/:barrierId/interactions/edit-note/:noteId', controller.interactions.notes.edit );
-	app.post( '/:barrierId/interactions/edit-note/:noteId', controller.interactions.notes.edit );
+	app.get( '/:barrierId/interactions/edit-note/:id', controller.interactions.notes.edit );
+	app.post( '/:barrierId/interactions/edit-note/:id', controller.interactions.notes.edit );
 	app.post( '/:uuid/interactions/documents/add/', fileUpload, controller.interactions.notes.documents.add );
+	app.post( '/:uuid/interactions/notes/:noteId/documents/delete/', controller.interactions.notes.documents.delete );
 
 	app.get( '/:barrierId/status/', controller.status.index );
 	app.post( '/:barrierId/status/', controller.status.index );

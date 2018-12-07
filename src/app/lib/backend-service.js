@@ -146,8 +146,9 @@ module.exports = {
 	getCounts: ( req ) => backend.get( '/counts', getToken( req ) ),
 
 	documents: {
-		create: ( req, fileName ) => backend.post( '/documents', getToken( req ), {
-			original_filename: fileName
+		create: ( req, fileName, fileSize ) => backend.post( '/documents', getToken( req ), {
+			original_filename: fileName,
+			size: fileSize
 		} ),
 		delete: ( req, documentId ) => backend.delete( `/documents/${ documentId }`, getToken( req ) ),
 		uploadComplete: ( req, documentId ) => backend.post( `/documents/${ documentId }/upload-callback`, getToken( req ) ),
