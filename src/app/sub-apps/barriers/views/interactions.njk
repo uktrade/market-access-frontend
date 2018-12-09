@@ -104,17 +104,6 @@
 
 					{% if item.edit -%}
 
-						{% for document in item.documents %}
-							<form action="{{ urls.barriers.notes.documents.delete( barrier.id, item.id ) }}" method="POST">
-								<input type="hidden" name="_csrf" value="{{ csrfToken }}">
-								<input type="hidden" name="documentId" value="{{ document.id }}">
-								<div class="govuk-form-group file-upload">
-									<span class="file-upload__progress"><strong>{{ document.name }}</strong> - {{ document.size }}</span>
-									<input type="submit" class="file-upload__delete" value="delete">
-								</div>
-							</form>
-						{% endfor %}
-
 						<form action="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}" method="POST">
 							<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 							{{ govukTextarea({
@@ -130,6 +119,14 @@
 								},
 								errorMessage: errors | errorForName( 'note' )
 							}) }}
+
+							{%-for document in item.documents %}
+								<div class="govuk-form-group file-upload">
+									<span class="file-upload__progress"><strong>{{ document.name }}</strong> - {{ document.size }}</span>
+									<a href="{{ urls.barriers.notes.documents.delete( barrier.id, item.id, document.id ) }}" class="file-upload__delete">delete</a>
+								</div>
+							{% endfor %}
+
 							<input type="submit" value="Save note" class="govuk-button">
 							<a href="{{ urls.barriers.interactions( barrier.id ) }}" class="form-cancel">Cancel</a>
 						</form>

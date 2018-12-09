@@ -2,7 +2,7 @@ const backend = require( '../../../../lib/backend-service' );
 
 module.exports = async ( req, res, next, noteId ) => {
 
-	const barrierId = req.uuid;
+	const barrierId = ( req.barrier && req.barrier.id ) || req.uuid;
 
 	try {
 

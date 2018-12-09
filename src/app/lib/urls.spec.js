@@ -147,7 +147,9 @@ describe( 'URLs', () => {
 
 						const barrierId = uuid();
 						const noteId = 234;
-						expect( urls.barriers.notes.documents.delete( barrierId, noteId ) ).toEqual( `/barriers/${ barrierId }/interactions/notes/${ noteId }/documents/delete/` );
+						const documentId = uuid();
+
+						expect( urls.barriers.notes.documents.delete( barrierId, noteId, documentId ) ).toEqual( `/barriers/${ barrierId }/interactions/notes/${ noteId }/documents/${ documentId }/delete/` );
 					} );
 				} );
 			} );

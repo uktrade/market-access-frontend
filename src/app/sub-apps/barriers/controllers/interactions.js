@@ -211,31 +211,33 @@ module.exports = {
 				}
 			},
 
+			deleteConfirmation: ( req, res ) => {
+
+				const note = req.note;
+				const document = req.document;
+
+				res.render( 'barriers/views/delete-document', { note, document, csrfToken: req.csrfToken() } );
+			},
+
 			delete: async ( req, res, next ) => {
 
 				const { uuid: barrierId, note } = req;
-				const { documentId } = req.body;
-				const document = note.documents && note.documents.find( ( doc ) => doc.id === documentId );
+				const documentId = req.document.id;
 
-				if( document ){
+				try {
 
-					try {
+					const { response } = await backend.documents.delete( req, documentId );
 
-						const { response } = await backend.documents.delete( req, documentId );
+					if( response.isSuccess ){
 
-						if( response.isSuccess ){
+						res.redirect( urls.barriers.notes.edit( barrierId, note.id ) );
 
-							res.redirect( urls.barriers.notes.edit( barrierId, note.id ) );
+					} else {
 
-						} else {
-							throw new Error( `Unable to delete document ${ documentId }, got ${ response.statusCode } from backend` );
-						}
+						throw new Error( `Unable to delete document ${ documentId }, got ${ response.statusCode } from backend` );
+					}
 
-					} catch ( e ){ next( e ); }
-
-				} else {
-					throw new Error( `No matching document for barrier %{ barrierId } note ${ note.id } and document ${ documentId }` );
-				}
+				} catch ( e ){ next( e ); }
 			},
 		},
 
