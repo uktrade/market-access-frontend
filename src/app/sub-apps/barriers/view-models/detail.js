@@ -66,10 +66,14 @@ module.exports = ( barrier, addCompany = false ) => {
 					other: barrier.other_infringement
 				},
 				summary: barrier.infringement_summary
-			}
+			},
+			priority: {
+				...barrier.priority,
+				modifyer: barrier.priority.code.toLowerCase()
+			},
 		},
 		sectorsList,
 		companies,
-		companiesList
+		companiesList,
 	};
 };

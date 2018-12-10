@@ -46,5 +46,10 @@
    "wto_infringement": true,
    "fta_infringement": true,
    "other_infringement": false,
-   "infringement_summary": "Iure sequi vel et deserunt voluptatem qui et minima. Placeat iure voluptatem nulla repellendus occaecati quia inventore. Omnis eaque facilis omnis facere deleniti. Eum dolores dolorem occaecati inventore molestias."
+	"infringement_summary": "Iure sequi vel et deserunt voluptatem qui et minima. Placeat iure voluptatem nulla repellendus occaecati quia inventore. Omnis eaque facilis omnis facere deleniti. Eum dolores dolorem occaecati inventore molestias.",
+	"priority": {
+      "code": "DEF",
+      "name": "dolorem",
+      "order": 0
+   }
 }
