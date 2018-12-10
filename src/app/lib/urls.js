@@ -57,6 +57,7 @@ module.exports = {
 			product: ( barrierId ) => `/barriers/${ barrierId }/edit/product/`,
 			description: ( barrierId ) => `/barriers/${ barrierId }/edit/description/`,
 			source: ( barrierId ) => `/barriers/${ barrierId }/edit/source/`,
+			priority: ( barrierId ) => `/barriers/${ barrierId }/edit/priority/`,
 		},
 		interactions: ( barrierId ) => `/barriers/${ barrierId }/interactions/`,
 		notes: {

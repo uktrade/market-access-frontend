@@ -1,6 +1,6 @@
 .priority-marker {
 	border-radius: 50%;
-	background-color: red;
+	background-color: $priority-unknown;
 	width: govuk-em( 18, 16 );
 	height: govuk-em( 18, 16 );
 	display: inline-block;
@@ -8,4 +8,16 @@
 	position: relative;
 	top: 4px;
 	left: 0;
+}
+
+.priority-marker--high {
+	background-color: $priority-high;
+}
+
+.priority-marker--medium {
+	background-color: $priority-medium;
+}
+
+.priority-marker--low {
+	background-color: $priority-low;
 }

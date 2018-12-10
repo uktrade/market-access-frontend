@@ -332,6 +332,15 @@ describe( 'App', function(){
 								.end( checkPage( 'Market Access - Barrier - Edit source', done ) );
 						} );
 					} );
+
+					describe( 'priority', () => {
+						it( 'Should fetch the barrier and render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.edit.priority( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier - Edit priority', done ) );
+						} );
+					} );
 				} );
 
 				describe( 'Barrier interactions', () => {

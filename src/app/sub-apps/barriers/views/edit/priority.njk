@@ -1,0 +1,45 @@
+{% from 'components/textarea/macro.njk' import govukTextarea %}
+{% from 'components/radios/macro.njk' import govukRadios %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Barrier - Edit priority{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.barriers.detail( barrier.id ) },
+		caption: barrier.barrier_title,
+		text: 'Change priority of the barrier',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.barriers.edit.priority( barrier.id ) }}" method="POST" class="restrict-width">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{{ govukRadios({
+			name: 'priority',
+			fieldset: {
+				legend: {
+					text: 'What is the priority of the barrier?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: priority,
+			errorMessage: errors | errorForName( 'priority-1' )
+		}) }}
+
+		{{ govukTextarea({
+
+			name: 'priorityDescription',
+			label: {
+				text: 'Why did the priority change? (optional)',
+				classes: 'govuk-label--s'
+			}
+		}) }}
+
+		<input type="submit" value="Save and exit to barrier" class="govuk-button">
+		<a href="{{ urls.barriers.detail( barrier.id ) }}" class="govuk-button button--secondary">Cancel</a>
+	</form>
+{% endblock %}

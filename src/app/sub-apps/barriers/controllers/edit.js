@@ -151,4 +151,40 @@ module.exports = {
 			next( e );
 		}
 	},
+
+	priority: async ( req, res, next ) => {
+
+		const barrier = req.barrier;
+		const form = new Form( req, {
+			priority: {
+				type: Form.RADIO,
+				values: [ barrier.priority.code ],
+				items: metadata.getBarrierPrioritiesList(),
+				validators: [
+					{
+						fn: validators.isBarrierPriority,
+						message: 'Select a barrier priority'
+					}
+				]
+			},
+
+			priorityDescription: {},
+		} );
+
+		const processor = new FormProcessor( {
+			form,
+			render: ( templateValues ) => res.render( 'barriers/views/edit/priority', templateValues ),
+			saveFormData: ( formValues ) => backend.barriers.savePriority( req, barrier.id, formValues ),
+			saved: () => res.redirect( urls.barriers.detail( barrier.id ) )
+		} );
+
+		try {
+
+			await processor.process();
+
+		} catch( e ){
+
+			next( e );
+		}
+	},
 };

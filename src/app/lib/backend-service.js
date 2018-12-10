@@ -259,6 +259,10 @@ module.exports = {
 			source: values.source,
 			other_source: getValue( values.sourceOther )
 		} ),
+		savePriority: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
+			priority: values.priority,
+			priority_summary: getValue( values.priorityDescription )
+		} ),
 	},
 
 	reports: {

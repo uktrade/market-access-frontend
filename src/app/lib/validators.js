@@ -39,5 +39,6 @@ module.exports = {
 
 		return isNumeric.test( allValues );
 	},
-	isValidFile: ( file ) => config.files.types.includes( file.type )
+	isValidFile: ( file ) => config.files.types.includes( file.type ),
+	isBarrierPriority: ( value ) => metadata.barrierPriorities.some( ( priority ) => priority.code === value ),
 };

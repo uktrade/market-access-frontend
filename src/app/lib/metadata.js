@@ -96,11 +96,19 @@ function dedupeBarrierTypes( barrierTypes ){
 	return types;
 }
 
+function sortPriority( { order: orderA }, { order: orderB } ){
+
+	if( orderA === orderB ){ return 0; }
+
+	return ( orderA > orderB ? 1 : -1 );
+}
+
 let countries;
 let sectors;
 let level0Sectors;
 let barrierTypes;
 let uniqueBarrierTypes;
+let barrierPriorities;
 
 module.exports.fetch = async () => {
 
@@ -115,6 +123,7 @@ module.exports.fetch = async () => {
 			level0Sectors = sectors.filter( ( sector ) => sector.level === 0 );
 			barrierTypes = body.barrier_types;
 			uniqueBarrierTypes = dedupeBarrierTypes( barrierTypes );
+			barrierPriorities = body.barrier_priorities.sort( sortPriority );
 
 			module.exports.statusTypes = body.status_types;
 			module.exports.lossScale = body.loss_range;
@@ -130,6 +139,7 @@ module.exports.fetch = async () => {
 			module.exports.sectors = sectors;
 			module.exports.level0Sectors = level0Sectors;
 			module.exports.barrierSource = body.barrier_source;
+			module.exports.barrierPriorities = barrierPriorities;
 			module.exports.bool = {
 				'true': 'Yes',
 				'false': 'No'
@@ -167,6 +177,11 @@ module.exports.getBarrierTypeList = () => {
 
 	return list;
 };
+
+module.exports.getBarrierPrioritiesList = () => barrierPriorities.map( ( { code, name } ) => ({
+	value: code,
+	html: `<span class="priority-marker priority-marker--${ code.toLowerCase() }"></span><strong>${ name }</strong> priority`
+}) );
 
 const OPEN = 2;
 const RESOLVED = 4;

@@ -13,7 +13,7 @@
 				<span class="priority-marker priority-marker--{{ barrier.priority.modifyer }}"></span><strong>{{ barrier.priority.name }}</strong> priority
 			</span>
 			<a class="barrier-summary__status__link" href="{{ urls.barriers.status( barrier.id ) }}">change status</a>
-			<a class="barrier-summary__status__link" href="{{ urls.barriers.status( barrier.id ) }}">change priority</a>
+			<a class="barrier-summary__status__link" href="{{ urls.barriers.edit.priority( barrier.id ) }}">change priority</a>
 		</div>
 		<dl class="barrier-summary__info">
 			<div class="barrier-summary__info__group">
