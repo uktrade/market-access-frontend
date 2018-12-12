@@ -582,7 +582,7 @@ describe( 'Backend Service', () => {
 		describe( 'getForCountry', () => {
 
 			const countryId = 'def-789';
-			const countryUrl = `/reports?country=${ countryId }`;
+			const countryUrl = `/reports?export_country=${ countryId }`;
 
 			describe( 'When the results are an array', () => {
 				it( 'Should call the correct path and sort the progress', async () => {

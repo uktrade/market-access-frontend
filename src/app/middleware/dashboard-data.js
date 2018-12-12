@@ -29,7 +29,7 @@ module.exports = async ( req, res, next ) => {
 			const reports = body.reports;
 
 			all = ( barriers && barriers.total );
-			country = ( user && user.country && user.country.barriers );
+			country = ( user && user.country );
 			unfinished = reports;
 
 			counts = body;
@@ -48,8 +48,10 @@ module.exports = async ( req, res, next ) => {
 
 		tabs.country = {
 			skip: false,
-			count: country
+			count: ( country && country.barriers )
 		};
+
+		unfinished = ( country && country.reports );
 
 	} else {
 
