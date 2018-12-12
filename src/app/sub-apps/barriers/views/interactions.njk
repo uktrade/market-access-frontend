@@ -10,6 +10,7 @@
 
 {% if noteForm %}
 	{% block body_script %}
+		{{ super() }}
 		<script>
 			ma.pages.barrier.interactions.addNote( {
 				noteErrorText: '{{ noteErrorText }}'
