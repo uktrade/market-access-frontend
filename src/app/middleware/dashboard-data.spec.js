@@ -63,11 +63,11 @@ describe( 'Dashboard tabs', () => {
 
 					expect( res.locals.dashboard.tabs.country ).toBeDefined();
 					expect( res.locals.dashboard.tabs.country.skip ).toEqual( false );
-					expect( res.locals.dashboard.tabs.country.count ).toBeDefined();
+					expect( res.locals.dashboard.tabs.country.count ).toEqual( 9 );
 
 					expect( res.locals.dashboard.tabs.unfinished ).toBeDefined();
 					expect( res.locals.dashboard.tabs.unfinished.skip ).toEqual( false );
-					expect( res.locals.dashboard.tabs.unfinished.count ).toBeDefined();
+					expect( res.locals.dashboard.tabs.unfinished.count ).toEqual( 5 );
 				} );
 			} );
 
@@ -80,11 +80,11 @@ describe( 'Dashboard tabs', () => {
 
 					expect( res.locals.dashboard.tabs.all ).toBeDefined();
 					expect( res.locals.dashboard.tabs.all.skip ).toEqual( false );
-					expect( res.locals.dashboard.tabs.all.count ).toBeDefined();
+					expect( res.locals.dashboard.tabs.all.count ).toEqual( 22 );
 
 					expect( res.locals.dashboard.tabs.unfinished ).toBeDefined();
 					expect( res.locals.dashboard.tabs.unfinished.skip ).toEqual( false );
-					expect( res.locals.dashboard.tabs.unfinished.count ).toBeDefined();
+					expect( res.locals.dashboard.tabs.unfinished.count ).toEqual( 15 );
 				} );
 			} );
 		} );
@@ -114,11 +114,11 @@ describe( 'Dashboard tabs', () => {
 
 					expect( res.locals.dashboard.tabs.country ).toBeDefined();
 					expect( res.locals.dashboard.tabs.country.skip ).toEqual( false );
-					expect( res.locals.dashboard.tabs.country.count ).toBeDefined();
+					expect( res.locals.dashboard.tabs.country.count ).toEqual( 9 );
 
 					expect( res.locals.dashboard.tabs.unfinished ).toBeDefined();
-					expect( res.locals.dashboard.tabs.unfinished.skip ).toEqual( true );
-					expect( res.locals.dashboard.tabs.unfinished.count ).toBeDefined();
+					expect( res.locals.dashboard.tabs.unfinished.skip ).toEqual( false );
+					expect( res.locals.dashboard.tabs.unfinished.count ).toEqual( 5 );
 				} );
 			} );
 
@@ -131,11 +131,11 @@ describe( 'Dashboard tabs', () => {
 
 					expect( res.locals.dashboard.tabs.all ).toBeDefined();
 					expect( res.locals.dashboard.tabs.all.skip ).toEqual( false );
-					expect( res.locals.dashboard.tabs.all.count ).toBeDefined();
+					expect( res.locals.dashboard.tabs.all.count ).toEqual( 22 );
 
 					expect( res.locals.dashboard.tabs.unfinished ).toBeDefined();
 					expect( res.locals.dashboard.tabs.unfinished.skip ).toEqual( true );
-					expect( res.locals.dashboard.tabs.unfinished.count ).toBeDefined();
+					expect( res.locals.dashboard.tabs.unfinished.count ).toEqual( 0 );
 				} );
 			} );
 		} );
