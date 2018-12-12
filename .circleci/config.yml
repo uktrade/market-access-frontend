@@ -94,6 +94,7 @@ aliases:
       AUTHBROKER_CLIENT_ID: def123
       AUTHBROKER_CLIENT_SECRET: ghi123
       ALLOWED_ADMIN_IPS: 123.123.123.123
+      REDIS_BASE_URL: redis://localhost
     command: ./start-wait-for-db.sh
 
 jobs:
