@@ -346,21 +346,31 @@ describe( 'metadata', () => {
 			let expectedOrder;
 
 			beforeEach( () => {
-				
+
 				const list = fakeData.barrier_priorities;
-				expectedOrder = [ list[ 2 ], list[ 3 ], list[ 0 ], list[ 1 ] ];
+				expectedOrder = [ list[ 2 ], list[ 3 ], list[ 0 ], list[ 1 ] ].map( ( item ) => ({ ...item, modifyer: item.code.toLowerCase() }) );
 			} );
 
-			it( 'Should return the list in the correct order', () => {
+			it( 'Should return the list in the correct order with a modifyer property added', () => {
 
-				
 				expect( metadata.barrierPriorities ).toBeDefined();
 				expect( metadata.barrierPriorities ).toEqual( expectedOrder );
 			} );
 
+			it( 'Should create a map of the priorities', () => {
+
+				expect( metadata.barrierPrioritiesMap ).toEqual( expectedOrder.reduce( ( map, item ) => {
+
+					map[ item.code ] = item;
+
+					return map;
+
+				}, {} ) );
+			} );
+
 			describe( 'getBarrierPrioritiesList', () => {
 				it( 'Should return the list in the correct order', () => {
-					
+
 					expect( metadata.getBarrierPrioritiesList() ).toEqual( expectedOrder.map( ( { code, name } ) => ({
 						value: code,
 						html: `<span class="priority-marker priority-marker--${ code.toLowerCase() }"></span><strong>${ name }</strong> priority`

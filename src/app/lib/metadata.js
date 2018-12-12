@@ -103,6 +103,14 @@ function sortPriority( { order: orderA }, { order: orderB } ){
 	return ( orderA > orderB ? 1 : -1 );
 }
 
+function barrierPriority( priority ){
+
+	return {
+		...priority,
+		modifyer: priority.code.toLowerCase()
+	}
+}
+
 let countries;
 let sectors;
 let level0Sectors;
@@ -123,7 +131,7 @@ module.exports.fetch = async () => {
 			level0Sectors = sectors.filter( ( sector ) => sector.level === 0 );
 			barrierTypes = body.barrier_types;
 			uniqueBarrierTypes = dedupeBarrierTypes( barrierTypes );
-			barrierPriorities = body.barrier_priorities.sort( sortPriority );
+			barrierPriorities = body.barrier_priorities.map( barrierPriority ).sort( sortPriority );
 
 			module.exports.statusTypes = body.status_types;
 			module.exports.lossScale = body.loss_range;
@@ -140,6 +148,12 @@ module.exports.fetch = async () => {
 			module.exports.level0Sectors = level0Sectors;
 			module.exports.barrierSource = body.barrier_source;
 			module.exports.barrierPriorities = barrierPriorities;
+			module.exports.barrierPrioritiesMap = barrierPriorities.reduce( ( map, item ) => {
+
+				map[ item.code ] = item;
+
+				return map;
+			}, {} );
 			module.exports.bool = {
 				'true': 'Yes',
 				'false': 'No'

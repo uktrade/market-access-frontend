@@ -232,12 +232,12 @@ describe( 'Backend Service', () => {
 			} );
 		} );
 
-		describe( 'getStatusHistory', () => {
+		describe( 'getHistory', () => {
 			it( 'Should call the correct path', async () => {
 
-				await service.barriers.getStatusHistory( req, barrierId );
+				await service.barriers.getHistory( req, barrierId );
 
-				expect( backend.get ).toHaveBeenCalledWith( `/barriers/${ barrierId }/status_history`, token );
+				expect( backend.get ).toHaveBeenCalledWith( `/barriers/${ barrierId }/history`, token );
 			} );
 		} );
 

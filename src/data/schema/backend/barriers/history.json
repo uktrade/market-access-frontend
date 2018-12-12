@@ -1,0 +1,93 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "List of barrier status history",
+
+	"type": "object",
+	"required": [ "history" ],
+	"properties": {
+
+		"history": {
+			"type": "array",
+			"minItems": 5,
+			"maxItems": 10,
+			"items": {
+				"anyOf": [
+					{
+						"$ref": "#/refs/status-item"
+					},{
+						"$ref": "#/refs/priority-item"
+					}
+				]
+			}
+		}
+	},
+
+	"refs": {
+
+		"user": {
+			"type": "object",
+			"required": [ "id", "name" ],
+			"properties": {
+				"id": { "$ref": "$refs/common.json#/small-int" },
+				"name": { "$ref": "$refs/common.json#/word" }
+			}
+		},
+
+		"status-item": {
+			"type": "object",
+			"required": [
+				"date",
+				"old_value",
+				"new_value",
+				"field_info",
+				"user"
+			],
+			"properties": {
+
+				"date": { "$ref": "$refs/common.json#/past-date" },
+				"old_value": { "$ref": "$refs/common.json#/small-int" },
+				"new_value": { "$ref": "$refs/common.json#/small-int" },
+				"field_info": {
+					"type": "object",
+					"required": [ "status_date", "status_summary", "event" ],
+					"properties": {
+						"status_date": { "$ref": "$refs/common.json#/past-date" },
+						"status_summary": { "$ref": "$refs/common.json#/words" },
+						"event": { "$ref": "$refs/common.json#/barrier-event" }
+					}
+				},
+				"user": {
+					"$ref": "#/refs/user"
+				}
+			}
+		},
+
+		"priority-item": {
+			"type": "object",
+			"required": [
+				"date",
+				"old_value",
+				"new_value",
+				"field_info",
+				"user"
+			],
+			"properties": {
+
+				"date": { "$ref": "$refs/common.json#/past-date" },
+				"old_value": { "$ref": "$refs/common.json#/priority-code" },
+				"new_value": { "$ref": "$refs/common.json#/priority-code" },
+				"field_info": {
+					"type": "object",
+					"required": [ "priority_date", "priority_summary" ],
+					"properties": {
+						"priority_date": { "$ref": "$refs/common.json#/past-date" },
+						"priority_summary": { "$ref": "$refs/common.json#/words" }
+					}
+				},
+				"user": {
+					"$ref": "#/refs/user"
+				}
+			}
+		}
+	}
+}

@@ -40,21 +40,21 @@ function getTimelineData( req, barrierId ){
 
 		try {
 
-			const [ interactions, statusHistory ] = await Promise.all( [
+			const [ interactions, history ] = await Promise.all( [
 				backend.barriers.getInteractions( req, barrierId ),
-				backend.barriers.getStatusHistory( req, barrierId )
+				backend.barriers.getHistory( req, barrierId )
 			]);
 
-			if( interactions.response.isSuccess && statusHistory.response.isSuccess ){
+			if( interactions.response.isSuccess && history.response.isSuccess ){
 
 				resolve( {
 					interactions: interactions.body,
-					statusHistory: statusHistory.body
+					history: history.body
 				} );
 
 			} else {
 
-				reject( new Error( `Unable to get interactions and statusHistory, got ${ interactions.response.statusCode } from interactions and ${ statusHistory.response.statusCode } from statusHistory` ) );
+				reject( new Error( `Unable to get interactions and history, got ${ interactions.response.statusCode } from interactions and ${ history.response.statusCode } from history` ) );
 			}
 
 		} catch( e ){

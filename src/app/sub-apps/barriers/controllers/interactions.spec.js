@@ -52,7 +52,7 @@ describe( 'Barrier interactions controller', () => {
 			},
 			barriers: {
 				getInteractions: jasmine.createSpy( 'backend.barriers.getInteractions' ),
-				getStatusHistory: jasmine.createSpy( 'backend.barriers.getStatusHistory' ),
+				getHistory: jasmine.createSpy( 'backend.barriers.getHistory' ),
 				notes: {
 					save: jasmine.createSpy( 'backend.barriers.notes.save' ),
 					update: jasmine.createSpy( 'backend.barriers.notes.update' ),
@@ -123,15 +123,15 @@ describe( 'Barrier interactions controller', () => {
 				{ id: 2, text: 'two', pinned: true, created_on: 'Fri Jun 01 2018 01:43:07 GMT+0100 (BST)' },
 			] }
 		};
-		const statusHistoryResponse = {
+		const historyResponse = {
 			response: { isSuccess: true },
-			body: getFakeData( '/backend/barriers/status_history' )
+			body: getFakeData( '/backend/barriers/history' )
 		};
 
 		backend.barriers.getInteractions.and.callFake( () => Promise.resolve( interactionsResponse ) );
-		backend.barriers.getStatusHistory.and.callFake( () => Promise.resolve( statusHistoryResponse ) );
+		backend.barriers.getHistory.and.callFake( () => Promise.resolve( historyResponse ) );
 
-		return { interactionsResponse, statusHistoryResponse };
+		return { interactionsResponse, historyResponse };
 	}
 
 	function returnViewModels(){
@@ -150,18 +150,18 @@ describe( 'Barrier interactions controller', () => {
 			describe( 'With a success response', () => {
 				it( 'Should get the interactions and render the page', async () => {
 
-					const { interactionsResponse, statusHistoryResponse } = returnSuccessResponses();
+					const { interactionsResponse, historyResponse } = returnSuccessResponses();
 					const { barrierDetailViewModelResponse, interactionsViewModelResponse } = returnViewModels();
 
 					await controller.list( req, res, next );
 
 					expect( next ).not.toHaveBeenCalled();
 					expect( backend.barriers.getInteractions ).toHaveBeenCalledWith( req, barrierId );
-					expect( backend.barriers.getStatusHistory ).toHaveBeenCalledWith( req, barrierId );
+					expect( backend.barriers.getHistory ).toHaveBeenCalledWith( req, barrierId );
 					expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier );
 					expect( interactionsViewModel ).toHaveBeenCalledWith( {
 						interactions: interactionsResponse.body,
-						statusHistory: statusHistoryResponse.body
+						history: historyResponse.body
 					}, undefined );
 
 					expect( res.render ).toHaveBeenCalledWith( 'barriers/views/interactions', Object.assign( {},
@@ -179,40 +179,40 @@ describe( 'Barrier interactions controller', () => {
 							response: { isSuccess: false, statusCode: 500 },
 							body: {}
 						};
-						const statusHistoryResponse = {
+						const historyResponse = {
 							response: { isSuccess: true, statusCode: 200 },
-							body: getFakeData( '/backend/barriers/status_history' )
+							body: getFakeData( '/backend/barriers/history' )
 						};
 
 						backend.barriers.getInteractions.and.callFake( () => Promise.resolve( interactionsResponse ) );
-						backend.barriers.getStatusHistory.and.callFake( () => Promise.resolve( statusHistoryResponse ) );
+						backend.barriers.getHistory.and.callFake( () => Promise.resolve( historyResponse ) );
 
 						await controller.list( req, res, next );
 
-						expect( next ).toHaveBeenCalledWith( new Error( `Unable to get interactions and statusHistory, got ${ interactionsResponse.response.statusCode } from interactions and ${ statusHistoryResponse.response.statusCode } from statusHistory` ) );
+						expect( next ).toHaveBeenCalledWith( new Error( `Unable to get interactions and history, got ${ interactionsResponse.response.statusCode } from interactions and ${ historyResponse.response.statusCode } from history` ) );
 						expect( backend.barriers.getInteractions ).toHaveBeenCalledWith( req, req.barrier.id );
 						expect( res.render ).not.toHaveBeenCalled();
 					} );
 				} );
 
-				describe( 'When the status_history returns a 500', () => {
+				describe( 'When the history returns a 500', () => {
 					it( 'Should call next with an error', async () => {
 
 						const interactionsResponse = {
 							response: { isSuccess: true, statusCode: 200 },
 							body: getFakeData( '/backend/barriers/interactions' )
 						};
-						const statusHistoryResponse = {
+						const historyResponse = {
 							response: { isSuccess: false, statusCode: 500 },
-							body: getFakeData( '/backend/barriers/status_history' )
+							body: getFakeData( '/backend/barriers/history' )
 						};
 
 						backend.barriers.getInteractions.and.callFake( () => Promise.resolve( interactionsResponse ) );
-						backend.barriers.getStatusHistory.and.callFake( () => Promise.resolve( statusHistoryResponse ) );
+						backend.barriers.getHistory.and.callFake( () => Promise.resolve( historyResponse ) );
 
 						await controller.list( req, res, next );
 
-						expect( next ).toHaveBeenCalledWith( new Error( `Unable to get interactions and statusHistory, got ${ interactionsResponse.response.statusCode } from interactions and ${ statusHistoryResponse.response.statusCode } from statusHistory` ) );
+						expect( next ).toHaveBeenCalledWith( new Error( `Unable to get interactions and history, got ${ interactionsResponse.response.statusCode } from interactions and ${ historyResponse.response.statusCode } from history` ) );
 						expect( backend.barriers.getInteractions ).toHaveBeenCalledWith( req, req.barrier.id );
 						expect( res.render ).not.toHaveBeenCalled();
 					} );
@@ -267,7 +267,7 @@ describe( 'Barrier interactions controller', () => {
 				describe( 'With no document', () => {
 					it( 'Should configure the FormProcessor correctly', async () => {
 
-						const { interactionsResponse, statusHistoryResponse } = returnSuccessResponses();
+						const { interactionsResponse, historyResponse } = returnSuccessResponses();
 						const { barrierDetailViewModelResponse, interactionsViewModelResponse } = returnViewModels();
 
 						await controller.notes.add( req, res, next );
@@ -294,7 +294,7 @@ describe( 'Barrier interactions controller', () => {
 						expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier );
 						expect( interactionsViewModel ).toHaveBeenCalledWith( {
 							interactions: interactionsResponse.body,
-							statusHistory: statusHistoryResponse.body
+							history: historyResponse.body
 						}, undefined );
 
 						config.saveFormData( formValues );
@@ -454,7 +454,7 @@ describe( 'Barrier interactions controller', () => {
 
 				it( 'Should configure the FormProcessor correctly', async () => {
 
-					const { interactionsResponse, statusHistoryResponse } = returnSuccessResponses();
+					const { interactionsResponse, historyResponse } = returnSuccessResponses();
 					const { barrierDetailViewModelResponse, interactionsViewModelResponse } = returnViewModels();
 
 					await controller.notes.edit( req, res );
@@ -480,7 +480,7 @@ describe( 'Barrier interactions controller', () => {
 					expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier );
 					expect( interactionsViewModel ).toHaveBeenCalledWith( {
 						interactions: interactionsResponse.body,
-						statusHistory: statusHistoryResponse.body
+						history: historyResponse.body
 					}, editId );
 
 					config.saveFormData( formValues );

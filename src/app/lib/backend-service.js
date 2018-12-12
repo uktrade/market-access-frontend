@@ -213,7 +213,7 @@ module.exports = {
 		},
 		get: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }`, getToken( req ) ),
 		getInteractions: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }/interactions`, getToken( req ) ),
-		getStatusHistory: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }/status_history`, getToken( req ) ),
+		getHistory: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }/history`, getToken( req ) ),
 		notes: {
 			save: ( req, barrierId, values ) => backend.post( `/barriers/${ barrierId }/interactions`, getToken( req ), {
 				text: values.note,

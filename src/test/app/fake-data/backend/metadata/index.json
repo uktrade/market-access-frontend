@@ -267,22 +267,22 @@
 	},
 	"barrier_priorities": [
       {
-         "code": "DEF",
+         "code": "MEDIUM",
          "name": "quisquam",
          "order": 2
       },
       {
-         "code": "GHI",
+         "code": "HIGH",
          "name": "repellendus",
          "order": 3
       },
       {
-         "code": "DEF",
+         "code": "UNKNOWN",
          "name": "repellat",
          "order": 0
       },
       {
-         "code": "ABC",
+         "code": "LOW",
          "name": "et",
          "order": 1
       }

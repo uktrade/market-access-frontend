@@ -351,8 +351,8 @@ describe( 'App', function(){
 							.reply( 200, intercept.stub( '/backend/barriers/interactions' ) );
 
 						intercept.backend()
-							.get( `/barriers/${ barrier.id }/status_history` )
-							.reply( 200, intercept.stub( '/backend/barriers/status_history' ) );
+							.get( `/barriers/${ barrier.id }/history` )
+							.reply( 200, intercept.stub( '/backend/barriers/history' ) );
 
 						app
 							.get( urls.barriers.interactions( barrierId ) )
