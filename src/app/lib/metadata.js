@@ -108,7 +108,7 @@ function barrierPriority( priority ){
 	return {
 		...priority,
 		modifyer: priority.code.toLowerCase()
-	}
+	};
 }
 
 let countries;
