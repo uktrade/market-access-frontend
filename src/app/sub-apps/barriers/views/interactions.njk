@@ -1,4 +1,5 @@
 {% from "components/textarea/macro.njk" import govukTextarea %}
+{% from "components/file-upload/macro.njk" import govukFileUpload %}
 {#% from "components/checkboxes/macro.njk" import govukCheckboxes %#}
 
 {% extends './barrier-layout.njk' %}
@@ -6,6 +7,16 @@
 {% set activeBarrierNav = 'interactions' %}
 
 {% block page_title %}{{ super() }} - Barrier updates{% endblock %}
+
+{% if noteForm %}
+	{% block body_script %}
+		<script>
+			ma.pages.barrier.interactions.addNote( {
+				noteErrorText: '{{ noteErrorText }}'
+			} );
+		</script>
+	{% endblock %}
+{% endif %}
 
 {% block barrier_content %}
 	<h2 class="section-heading">
@@ -17,13 +28,15 @@
 
 	{% if noteForm %}
 		<div class="interaction-panel">
-			<form action="{{ urls.barriers.notes.add( barrier.id ) }}" method="POST">
-
-				<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+			<form action="{{ urls.barriers.notes.add( barrier.id ) }}?_csrf={{ csrfToken }}" method="POST" enctype="multipart/form-data" data-xhr-upload="{{ urls.barriers.notes.documents.add( barrier.id ) }}?_csrf={{ csrfToken }}" data-xhr-delete="{{ urls.documents.delete( ':uuid' ) }}">
 
 				{{ govukTextarea({
 					name: 'note',
 					id: 'note',
+					classes: 'js-note-text',
+					formGroup: {
+						classes: 'js-note-group'
+					},
 					label: {
 						text: 'Add notes on an interaction or event',
 						classes: 'govuk-!-font-weight-bold'
@@ -31,6 +44,7 @@
 					attributes: {
 						autofocus: ''
 					},
+					value: note,
 					errorMessage: errors | errorForName( 'note' )
 				}) }}
 
@@ -44,7 +58,29 @@
 					]
 				}) }#}
 
-				<input type="submit" value="Save note" class="govuk-button">
+				{{ govukFileUpload({
+					id: 'document',
+					name: 'document',
+					classes: 'file-upload__input js-file-input',
+					formGroup: {
+						classes: 'file-upload js-form-group' + ( ' file-upload--hide' if documentId )
+					},
+					label: {
+						text: 'Attach a document',
+						classes: 'visually-hidden'
+					},
+					hint: {
+						classes: 'file-upload__size-limit js-max-file-size',
+						html: '(file size limit <strong>' + maxFileSize + '</strong>)'
+					},
+					errorMessage: errors | errorForName( 'document' )
+				}) }}
+
+				{% if documentId %}
+					<input type="hidden" name="documentId" value="{{ documentId }}" class="js-document-id">
+				{% endif %}
+
+				<input type="submit" value="Save note" class="govuk-button js-submit-button">
 				<a class="button-cancel" href="{{ urls.barriers.interactions( barrier.id ) }}">Cancel</a>
 			</form>
 		</div>
@@ -54,7 +90,8 @@
 
 	{% if interactions and interactions.length %}
 		<ol class="event-list">
-			{% for item in interactions %}
+			{% for item in interactions -%}
+
 			<li class="event-list__item{#{ ' event-list__item--pinned' if item.pinned }#}">
 
 				{%- if item.isNote -%}
@@ -82,15 +119,53 @@
 								},
 								errorMessage: errors | errorForName( 'note' )
 							}) }}
+
+							{%-for document in item.documents %}
+								<div class="govuk-form-group file-upload">
+									<span class="file-upload__progress"><strong>{{ document.name }}</strong> - {{ document.size }}</span>
+									<a href="{{ urls.barriers.notes.documents.delete( barrier.id, item.id, document.id ) }}" class="file-upload__delete">delete</a>
+								</div>
+							{% endfor %}
+
 							<input type="submit" value="Save note" class="govuk-button">
 							<a href="{{ urls.barriers.interactions( barrier.id ) }}" class="form-cancel">Cancel</a>
 						</form>
 
 					{%- else -%}
 
-						<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
-						<a href="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}">edit</a>
+						{% if item.hasDocuments -%}
 
+							<div class="event-list__item__document">
+								<ul class="event-list__item__document__list">
+									{% for doc in item.documents -%}
+
+										<li class="event-list__item__document__list__item">
+
+											{%- if doc.canDownload -%}
+
+												<a class="event-list__item__document__list__item__name" href="{{ urls.documents.download( doc.id ) }}">{{ doc.name }}</a> - {{ doc.size }}
+
+											{%- else -%}
+
+												<span class="event-list__item__document__list__item__name">{{ doc.name }}</span>
+												<span class="event-list__item__document__list__item__status">({{ doc.status }})</span>
+
+											{%- endif %}
+										</li>
+
+									{%- endfor %}
+								</ul>
+
+								<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
+								<a href="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}">edit</a>
+							</div>
+
+						{%- else -%}
+
+							<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
+							<a href="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}">edit</a>
+
+						{%- endif %}
 					{%- endif %}
 
 				{%- elif item.isStatus -%}

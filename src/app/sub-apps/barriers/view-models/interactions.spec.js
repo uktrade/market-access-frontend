@@ -16,6 +16,9 @@ describe( 'Interactions view model', () => {
 	} );
 
 	function createNote( item, edit = false ){
+
+		const hasDocuments = ( !!item.documents && !!item.documents.length );
+
 		return {
 			id: item.id,
 			isNote: true,
@@ -23,6 +26,8 @@ describe( 'Interactions view model', () => {
 			date: item.created_on,
 			text: item.text,
 			user: item.created_by,
+			hasDocuments,
+			documents: []
 		};
 	}
 

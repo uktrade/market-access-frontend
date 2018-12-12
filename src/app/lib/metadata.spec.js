@@ -341,4 +341,14 @@ describe( 'metadata', () => {
 			} );
 		} );
 	} );
+
+	describe( 'static data', () => {
+		describe( 'mimeTypes', () => {
+			it( 'Should create a map of types to extension', () => {
+
+				expect( metadata.mimeTypes ).toBeDefined();
+				expect( metadata.mimeTypes[ 'text/plain' ] ).toEqual( '.txt' );
+			} );
+		} );
+	} );
 } );

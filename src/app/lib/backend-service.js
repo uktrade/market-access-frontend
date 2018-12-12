@@ -3,6 +3,9 @@ const metadata = require( './metadata' );
 const config = require( '../config' );
 const logger = require( './logger' );
 
+const SCAN_CHECK_INTERVAL = config.files.scan.statusCheckInterval;
+const SCAN_MAX_ATTEMPTS = Math.round( config.files.scan.maxWaitTime / SCAN_CHECK_INTERVAL );
+
 function getToken( req ){
 
 	return req.session.ssoToken;
@@ -142,6 +145,59 @@ module.exports = {
 	ping: () => backend.get( '/ping.xml' ),
 	getCounts: ( req ) => backend.get( '/counts', getToken( req ) ),
 
+	documents: {
+		create: ( req, fileName, fileSize ) => backend.post( '/documents', getToken( req ), {
+			original_filename: fileName,
+			size: fileSize
+		} ),
+		delete: ( req, documentId ) => backend.delete( `/documents/${ documentId }`, getToken( req ) ),
+		uploadComplete: ( req, documentId ) => backend.post( `/documents/${ documentId }/upload-callback`, getToken( req ) ),
+		download: ( req, documentId ) => backend.get( `/documents/${ documentId }/download`, getToken( req ) ),
+		getScanStatus: ( req, documentId ) => new Promise( ( resolve, reject ) => {
+
+			const url = `/documents/${ documentId }/upload-callback`;
+			const token = getToken( req );
+			let attempts = 0;
+			const interval = setInterval( async () => {
+
+				attempts++;
+
+				if( attempts > SCAN_MAX_ATTEMPTS ){
+
+					clearInterval( interval );
+					return reject( new Error( 'Virus scan took too long' ) );
+				}
+
+				try {
+
+					const { response, body } = await backend.post( url, token );
+
+					if( response.isSuccess ){
+
+						const { status } = body;
+						const passed = ( status === 'virus_scanned' );
+
+						if( passed || status === 'virus_scanning_failed' ){
+
+							clearInterval( interval );
+							resolve( { status, passed } );
+						}
+
+					} else {
+
+						reject( new Error( 'Not a successful response from the backend, got ' + response.statusCode ) );
+					}
+
+				} catch( e ){
+
+					clearInterval( interval );
+					reject( e );
+				}
+
+			}, SCAN_CHECK_INTERVAL );
+		} )
+	},
+
 	barriers: {
 		getAll: async ( req, filters = {} ) => {
 
@@ -161,7 +217,8 @@ module.exports = {
 		notes: {
 			save: ( req, barrierId, values ) => backend.post( `/barriers/${ barrierId }/interactions`, getToken( req ), {
 				text: values.note,
-				pinned: ( values.pinned === 'true' )
+				pinned: ( values.pinned === 'true' ),
+				documents: ( values.documentId ? [ values.documentId ] : null ),
 			} ),
 			update: ( req, noteId, values ) => backend.put( `/barriers/interactions/${ noteId }`, getToken( req ), {
 				text: values.note

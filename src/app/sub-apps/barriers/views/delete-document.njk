@@ -1,0 +1,25 @@
+{% from 'app-components/search-form.njk' import searchForm %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Barrier - Delete document?{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.barriers.notes.edit( barrier.id, note.id ) },
+		caption: barrier.barrier_title,
+		text: ( 'Are you sure you want to delete ' + document.name + '?' )
+	}) }}
+
+	<div class="restrict-width">
+		<form action="{{ urls.barriers.notes.documents.delete( barrier.id, note.id, document.id ) }}" method="POST">
+			<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+			<input type="submit" class="govuk-button" value="Yes, delete">
+			<a href="{{ urls.barriers.notes.edit( barrier.id, note.id ) }}" class="form-cancel">cancel</a>
+		</form>
+	</div>
+
+{% endblock %}
+

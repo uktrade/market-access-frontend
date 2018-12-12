@@ -6,6 +6,7 @@ const backendUrl = 'https://some.domain.com';
 const GET = 'GET';
 const POST = 'POST';
 const PUT = 'PUT';
+const DELETE = 'DELETE';
 
 describe( 'Backend Request', () => {
 
@@ -424,6 +425,53 @@ describe( 'Backend Request', () => {
 					const responseData = await backend.put( path, token, body );
 
 					checkRequest( PUT, path, { token, body } );
+					checkForMockResponse( responseData );
+				} );
+			} );
+		} );
+	} );
+
+	describe( 'delete', () => {
+		describe( 'With a 200 response', () => {
+			describe( 'Without a token or body', () => {
+				it( 'Should create the correct options', async () => {
+
+					respondWithMocks();
+
+					const path = '/a-test';
+
+					const responseData = await backend.delete( path );
+
+					checkRequest( DELETE, path );
+					checkForMockResponse( responseData );
+				} );
+			} );
+
+			describe( 'With a token but no body', () => {
+				it( 'Should create the correct options', async () => {
+
+					respondWithMocks();
+
+					const path = '/a-test';
+
+					const responseData = await backend.delete( path, token );
+
+					checkRequest( DELETE, path, { token } );
+					checkForMockResponse( responseData );
+				} );
+			} );
+
+			describe( 'With a token and body', () => {
+				it( 'Should create the correct options', async () => {
+
+					respondWithMocks();
+
+					const path = '/a-test';
+					const body = { some: 'body' };
+
+					const responseData = await backend.delete( path, token, body );
+
+					checkRequest( DELETE, path, { token, body } );
 					checkForMockResponse( responseData );
 				} );
 			} );

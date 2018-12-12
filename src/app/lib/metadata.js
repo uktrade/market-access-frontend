@@ -134,6 +134,14 @@ module.exports.fetch = async () => {
 				'true': 'Yes',
 				'false': 'No'
 			};
+			module.exports.documentStatus = {
+				not_virus_scanned: 'Not virus scanned',
+				virus_scanning_scheduled: 'Virus scanning scheduled',
+				virus_scanning_in_progress: 'Virus scanning in progress',
+				virus_scanning_failed: 'Virus scanning failed.',
+				virus_scanned: 'Virus scanned',
+				deletion_pending: 'Deletion pending',
+			};
 
 		} else {
 
@@ -177,4 +185,24 @@ module.exports.barrier = {
 			[ HIBERNATED ]: { name: 'Paused', modifyer: 'hibernated' }
 		}
 	}
+};
+
+module.exports.mimeTypes = {
+	'image/gif': '.gif',
+	'image/png': '.png',
+	'image/webp': '.webp',
+	'image/jpeg': '.jpg',
+	'text/csv': '.csv',
+	'text/plain': '.txt',
+	'application/rtf': '.rtf',
+	'application/pdf': '.pdf',
+	'application/vnd.oasis.opendocument.text': '.odt',
+	'application/msword': '.doc',
+	'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
+	'application/vnd.oasis.opendocument.presentation': '.odp',
+	'application/vnd.ms-powerpoint': '.ppt',
+	'application/vnd.openxmlformats-officedocument.presentationml.presentation': '.pptx',
+	'application/vnd.oasis.opendocument.spreadsheet': '.ods',
+	'application/vnd.ms-excel': '.xls',
+	'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '.xlsx',
 };
