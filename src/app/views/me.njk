@@ -38,7 +38,7 @@
 
 {% block page_content %}
 
-	<h2>About you</h2>
+	<h2>About you{{ ' (Internal)' if user.internal }}</h2>
 
 	<form action="{{ urls.me() }}" method="POST">
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
