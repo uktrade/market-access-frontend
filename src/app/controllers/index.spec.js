@@ -5,9 +5,9 @@ const modulePath = './index';
 let controller;
 let req;
 let res;
+let next;
 let backend;
 let ssoToken;
-let next;
 let dashboardViewModel;
 let urls;
 
@@ -20,7 +20,11 @@ describe( 'Index controller', () => {
 			barriers: {
 				getAll: jasmine.createSpy( 'backend.barriers.getAll' ),
 			},
-			getReports: jasmine.createSpy( 'backend.getReports' )
+			documents: {
+				download: jasmine.createSpy( 'backend.documents.download' ),
+				getScanStatus: jasmine.createSpy( 'backend.documents.getScanStatus' ),
+				delete: jasmine.createSpy( 'backend.documents.delete' ),
+			}
 		};
 		dashboardViewModel = jasmine.createSpy( 'dashboard view model' );
 
@@ -31,12 +35,16 @@ describe( 'Index controller', () => {
 		req = {
 			session: { ssoToken },
 			user: {},
+			params: {},
 			csrfToken: jasmine.createSpy( 'csrfToken' )
 		};
 
 		res = {
 			render: jasmine.createSpy( 'res.render' ),
-			redirect: jasmine.createSpy( 'res.redirect' )
+			redirect: jasmine.createSpy( 'res.redirect' ),
+			status: jasmine.createSpy( 'res.status' ),
+			json: jasmine.createSpy( 'res.json' ),
+			send: jasmine.createSpy( 'res.send' ),
 		};
 
 		next = jasmine.createSpy( 'next' );
@@ -161,6 +169,130 @@ describe( 'Index controller', () => {
 				expect( req.session.user ).not.toBeDefined();
 				expect( res.render ).not.toHaveBeenCalled();
 				expect( res.redirect ).toHaveBeenCalledWith( meResponse );
+			} );
+		} );
+	} );
+
+	describe( 'Documents', () => {
+		describe( 'download', () => {
+
+			const errorMessage = 'Unable to get document download link';
+
+			describe( 'When the backend call throws an error', () => {
+				it( 'Should call next with the error', async () => {
+
+					const err = new Error( 'fail' );
+					backend.documents.download.and.callFake( () => Promise.reject( err ) );
+
+					await controller.documents.download( req, res, next );
+
+					expect( next ).toHaveBeenCalledWith( err );
+				} );
+			} );
+
+			describe( 'When the backend returns a response', () => {
+				describe( 'When it is a success', () => {
+					describe( 'When there is a document_url', () => {
+						it( 'Should redirect to the url', async () => {
+
+							const url = '/a/b/c/';
+
+							backend.documents.download.and.callFake( () => Promise.resolve( {
+								response: { isSuccess: true },
+								body: { document_url: url },
+							} ) );
+
+							await controller.documents.download( req, res, next );
+
+							expect( res.redirect ).toHaveBeenCalledWith( url );
+							expect( next ).not.toHaveBeenCalled();
+						} );
+					} );
+
+					describe( 'When there is NOT a document_url', () => {
+						it( 'Should call next with an error', async () => {
+
+							backend.documents.download.and.callFake( () => Promise.resolve( {
+								response: { isSuccess: true },
+								body: {},
+							} ) );
+
+							await controller.documents.download( req, res, next );
+
+							expect( res.redirect ).not.toHaveBeenCalled();
+							expect( next ).toHaveBeenCalledWith( new Error( errorMessage ));
+						} );
+					} );
+				} );
+
+				describe( 'When it is NOT a success', () => {
+					it( 'Should call next with an error', async () => {
+
+						backend.documents.download.and.callFake( () => Promise.resolve( {
+							response: { isSuccess: false },
+							body: {},
+						} ) );
+
+						await controller.documents.download( req, res, next );
+
+						expect( res.redirect ).not.toHaveBeenCalled();
+						expect( next ).toHaveBeenCalledWith( new Error( errorMessage ));
+					} );
+				} );
+			} );
+		} );
+
+		describe( 'getScanStatus', () => {
+
+			let documentId;
+
+			beforeEach( () => {
+
+				documentId = uuid();
+				req.uuid = documentId;
+			} );
+
+			describe( 'When the service returns a success', () => {
+				it( 'Should return the status', async () => {
+
+					const response = { status: 'virus_scanned', passed: true };
+
+					backend.documents.getScanStatus.and.callFake( () => Promise.resolve( response ) );
+
+					await controller.documents.getScanStatus( req, res );
+
+					expect( backend.documents.getScanStatus ).toHaveBeenCalledWith( req, documentId );
+					expect( res.json ).toHaveBeenCalledWith( response );
+				} );
+			} );
+
+			describe( 'When the service returns an error', () => {
+				it( 'Should return the message', async () => {
+
+					const message = 'foo bar';
+					const err = new Error( message );
+
+					backend.documents.getScanStatus.and.callFake( () => Promise.reject( err ) );
+
+					await controller.documents.getScanStatus( req, res );
+
+					expect( backend.documents.getScanStatus ).toHaveBeenCalledWith( req, documentId );
+					expect( res.status ).toHaveBeenCalledWith( 500 );
+					expect( res.json ).toHaveBeenCalledWith( { message } );
+				} );
+			} );
+		} );
+
+		describe( 'delete', () => {
+			it( 'Should call the backend service', () => {
+
+				const documentId = uuid();
+				req.uuid = documentId;
+
+				controller.documents.delete( req, res );
+
+				expect( backend.documents.delete ).toHaveBeenCalledWith( req, documentId );
+				expect( res.send ).toHaveBeenCalledWith();
 			} );
 		} );
 	} );

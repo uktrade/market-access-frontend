@@ -31,7 +31,8 @@
 				"export_country",
 				"support_type",
 				"contributor_count",
-				"current_status"
+				"current_status",
+				"priority"
 			],
 			"properties": {
 
@@ -60,6 +61,7 @@
 					"enum": [ 1, 2 ]
 				},
 
+				"priority": { "$ref": "$refs/common.json#/priority" },
 				"contributor_count": { "$ref": "$refs/common.json#/small-int" },
 
 				"current_status": {

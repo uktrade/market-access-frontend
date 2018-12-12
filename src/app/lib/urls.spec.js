@@ -38,6 +38,32 @@ describe( 'URLs', () => {
 		} );
 	} );
 
+	describe( 'Documents', () => {
+		describe( 'download', () => {
+			it( 'Should return the correct path', () => {
+
+				const documentId = uuid();
+				expect( urls.documents.download( documentId ) ).toEqual( `/documents/${ documentId }/download/` );
+			} );
+		} );
+
+		describe( 'getScanStatus', () => {
+			it( 'Should return the correct path', () => {
+
+				const documentId = uuid();
+				expect( urls.documents.getScanStatus( documentId ) ).toEqual( `/documents/${ documentId }/status/` );
+			} );
+		} );
+
+		describe( 'delete', () => {
+			it( 'Should return the correct path', () => {
+
+				const documentId = uuid();
+				expect( urls.documents.delete( documentId ) ).toEqual( `/documents/${ documentId }/delete/` );
+			} );
+		} );
+	} );
+
 	describe( 'Barier urls', () => {
 
 		let barrierId;
@@ -82,6 +108,13 @@ describe( 'URLs', () => {
 					expect( urls.barriers.edit.source( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/source/` );
 				} );
 			} );
+
+			describe( 'priority', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.edit.priority( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/priority/` );
+				} );
+			} );
 		} );
 
 		describe( 'Interactions', () => {
@@ -104,6 +137,27 @@ describe( 'URLs', () => {
 
 					const noteId = 23;
 					expect( urls.barriers.notes.edit( barrierId, noteId ) ).toEqual( `/barriers/${ barrierId }/interactions/edit-note/${ noteId }/` );
+				} );
+			} );
+
+			describe( 'note documents', () => {
+				describe( 'add', () => {
+					it( 'Should return the correct path', () => {
+
+						const barrierId = uuid();
+						expect( urls.barriers.notes.documents.add( barrierId ) ).toEqual( `/barriers/${ barrierId }/interactions/documents/add/` );
+					} );
+				} );
+
+				describe( 'delete', () => {
+					it( 'Should return the correct path', () => {
+
+						const barrierId = uuid();
+						const noteId = 234;
+						const documentId = uuid();
+
+						expect( urls.barriers.notes.documents.delete( barrierId, noteId, documentId ) ).toEqual( `/barriers/${ barrierId }/interactions/notes/${ noteId }/documents/${ documentId }/delete/` );
+					} );
 				} );
 			} );
 		} );

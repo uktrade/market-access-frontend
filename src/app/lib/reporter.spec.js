@@ -154,31 +154,66 @@ describe( 'Error reporter', function(){
 		} );
 
 		describe( 'A message', function(){
-			it( 'Should log the error to the logger', function(){
+			describe( 'Without any extra', () => {
+				it( 'Should log the error to the logger', function(){
 
-				const msg = 'Test logger';
-				const level = 'test';
-				const extra = {
-					blah: 'test',
-					foo: 'test'
-				};
+					const msg = 'Test logger';
+					const level = 'test';
 
-				reporter.message( level, msg, extra );
+					reporter.message( level, msg );
 
-				expect( raven.captureMessage ).not.toHaveBeenCalled();
-				expect( logger.warn ).toHaveBeenCalledWith( msg, JSON.stringify( extra ) );
+					expect( raven.captureMessage ).not.toHaveBeenCalled();
+					expect( logger.warn ).toHaveBeenCalledWith( msg );
+					expect( logger.warn.calls.count() ).toEqual( 1 );
+				} );
+			} );
+			describe( 'With extra', () => {
+				it( 'Should log the error to the logger', function(){
+
+					const msg = 'Test logger';
+					const level = 'test';
+					const extra = {
+						blah: 'test',
+						foo: 'test'
+					};
+
+					reporter.message( level, msg, extra );
+
+					expect( raven.captureMessage ).not.toHaveBeenCalled();
+					expect( logger.warn ).toHaveBeenCalledWith( msg );
+					expect( logger.warn ).toHaveBeenCalledWith( JSON.stringify( extra ) );
+					expect( logger.warn.calls.count() ).toEqual( 2 );
+				} );
 			} );
 		} );
 
 		describe( 'captureException', function(){
-			it( 'Should log the error with the logger', function(){
+			describe( 'Without any extra', () => {
+				it( 'Should log the error with the logger', function(){
 
-				const err = new Error( 'Test exception' );
+					const err = new Error( 'Test exception' );
 
-				reporter.captureException( err );
+					reporter.captureException( err );
 
-				expect( logger.error ).toHaveBeenCalledWith( err );
-				expect( raven.captureException ).not.toHaveBeenCalled();
+					expect( raven.captureException ).not.toHaveBeenCalled();
+					expect( logger.error ).toHaveBeenCalledWith( err.stack );
+					expect( logger.error.calls.count() ).toEqual( 1 );
+				} );
+			} );
+
+			describe( 'With extra', () => {
+				it( 'Should log the error with the logger', function(){
+
+					const err = new Error( 'Test exception' );
+					const extra = { response: 'test' };
+
+					reporter.captureException( err, extra );
+
+					expect( raven.captureException ).not.toHaveBeenCalled();
+					expect( logger.error ).toHaveBeenCalledWith( err.stack );
+					expect( logger.error ).toHaveBeenCalledWith( JSON.stringify( extra ) );
+					expect( logger.error.calls.count() ).toEqual( 2 );
+				} );
 			} );
 		} );
 	} );

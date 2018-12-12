@@ -44,6 +44,12 @@ module.exports = {
 	whatIsABarrier: () => '/what-is-a-barrier/',
 	findABarrier: () => '/find-a-barrier/',
 
+	documents: {
+		download: ( documentId ) => `/documents/${ documentId }/download/`,
+		getScanStatus: ( documentId ) => `/documents/${ documentId }/status/`,
+		delete: ( documentId ) => `/documents/${ documentId }/delete/`,
+	},
+
 	barriers: {
 		detail: ( barrierId ) => `/barriers/${ barrierId }/`,
 		edit: {
@@ -51,11 +57,16 @@ module.exports = {
 			product: ( barrierId ) => `/barriers/${ barrierId }/edit/product/`,
 			description: ( barrierId ) => `/barriers/${ barrierId }/edit/description/`,
 			source: ( barrierId ) => `/barriers/${ barrierId }/edit/source/`,
+			priority: ( barrierId ) => `/barriers/${ barrierId }/edit/priority/`,
 		},
 		interactions: ( barrierId ) => `/barriers/${ barrierId }/interactions/`,
 		notes: {
 			add: ( barrierId ) => `/barriers/${ barrierId }/interactions/add-note/`,
 			edit: ( barrierId, noteId ) => `/barriers/${ barrierId }/interactions/edit-note/${ noteId }/`,
+			documents: {
+				add: ( barrierId ) => `/barriers/${ barrierId }/interactions/documents/add/`,
+				delete: ( barrierId, noteId, documentId ) => `/barriers/${ barrierId }/interactions/notes/${ noteId }/documents/${ documentId }/delete/`,
+			},
 		},
 		status: ( barrierId ) => `/barriers/${ barrierId }/status/`,
 		statusResolved: ( barrierId ) => `/barriers/${ barrierId }/status/resolved/`,

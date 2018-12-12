@@ -17,7 +17,8 @@
 		"sectors",
 		"barrier_status",
 		"barrier_type_categories",
-		"barrier_source"
+		"barrier_source",
+		"barrier_priorities"
 	],
 	"properties": {
 
@@ -169,6 +170,15 @@
 				"TRADE": { "$ref": "$refs/common.json#/words" },
 				"GOVT": { "$ref": "$refs/common.json#/words" },
 				"OTHER": { "$ref": "$refs/common.json#/word" }
+			}
+		},
+
+		"barrier_priorities": {
+			"type": "array",
+			"minItems": 4,
+			"maxItems": 4,
+			"items": {
+				"$ref": "$refs/common.json#/priority"
 			}
 		}
 	}

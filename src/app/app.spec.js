@@ -178,6 +178,80 @@ describe( 'App', function(){
 			} );
 		} );
 
+		describe( 'documents', () => {
+			describe( 'download', () => {
+				describe( 'When the response is a success', () => {
+					it( 'Should redirect to the url', ( done ) => {
+
+						const documentId = uuid();
+						const document_url = 'https://www.abc.com';
+
+						intercept.backend()
+							.get( `/documents/${ documentId }/download` )
+							.reply( 200, { document_url } );
+
+						app
+							.get( urls.documents.download( documentId ) )
+							.end( ( err, res ) => {
+
+								if( err ){ done.fail( err ); }
+
+								expect( res.statusCode ).toEqual( 302 );
+								expect( res.headers.location ).toEqual( document_url );
+								done();
+							} );
+					} );
+				} );
+			} );
+
+			describe( 'getScanStatus', () => {
+				describe( 'When the response is a success', () => {
+					it( 'Should return the status', ( done ) => {
+
+						const documentId = uuid();
+						const status = 'virus_scanned';
+
+						intercept.backend()
+							.post( `/documents/${ documentId }/upload-callback` )
+							.reply( 200, { status } );
+
+						app
+							.get( urls.documents.getScanStatus( documentId ) )
+							.end( ( err, res ) => {
+
+								if( err ){ done.fail( err ); }
+
+								expect( res.statusCode ).toEqual( 200 );
+								expect( res.body ).toEqual( { status, passed: true } );
+								done();
+							} );
+					} );
+				} );
+			} );
+
+			describe( 'delete', () => {
+				it( 'Should return success', ( done ) => {
+
+					const documentId = uuid();
+
+					intercept.backend()
+						.delete( `/documents/${ documentId }` )
+						.reply( 200, {} );
+
+					app
+						.post( urls.documents.delete( documentId ) )
+						.end( ( err, res ) => {
+
+							if( err ){ done.fail( err ); }
+
+							expect( res.statusCode ).toEqual( 200 );
+							expect( res.body ).toEqual( {} );
+							done();
+						} );
+				} );
+			} );
+		} );
+
 		describe( 'Barriers', () => {
 
 			let barrierId;
@@ -258,6 +332,15 @@ describe( 'App', function(){
 								.end( checkPage( 'Market Access - Barrier - Edit source', done ) );
 						} );
 					} );
+
+					describe( 'priority', () => {
+						it( 'Should fetch the barrier and render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.edit.priority( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier - Edit priority', done ) );
+						} );
+					} );
 				} );
 
 				describe( 'Barrier interactions', () => {
@@ -268,8 +351,8 @@ describe( 'App', function(){
 							.reply( 200, intercept.stub( '/backend/barriers/interactions' ) );
 
 						intercept.backend()
-							.get( `/barriers/${ barrier.id }/status_history` )
-							.reply( 200, intercept.stub( '/backend/barriers/status_history' ) );
+							.get( `/barriers/${ barrier.id }/history` )
+							.reply( 200, intercept.stub( '/backend/barriers/history' ) );
 
 						app
 							.get( urls.barriers.interactions( barrierId ) )

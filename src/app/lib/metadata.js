@@ -96,11 +96,27 @@ function dedupeBarrierTypes( barrierTypes ){
 	return types;
 }
 
+function sortPriority( { order: orderA }, { order: orderB } ){
+
+	if( orderA === orderB ){ return 0; }
+
+	return ( orderA > orderB ? 1 : -1 );
+}
+
+function barrierPriority( priority ){
+
+	return {
+		...priority,
+		modifyer: priority.code.toLowerCase()
+	};
+}
+
 let countries;
 let sectors;
 let level0Sectors;
 let barrierTypes;
 let uniqueBarrierTypes;
+let barrierPriorities;
 
 module.exports.fetch = async () => {
 
@@ -115,6 +131,7 @@ module.exports.fetch = async () => {
 			level0Sectors = sectors.filter( ( sector ) => sector.level === 0 );
 			barrierTypes = body.barrier_types;
 			uniqueBarrierTypes = dedupeBarrierTypes( barrierTypes );
+			barrierPriorities = body.barrier_priorities.map( barrierPriority ).sort( sortPriority );
 
 			module.exports.statusTypes = body.status_types;
 			module.exports.lossScale = body.loss_range;
@@ -130,9 +147,24 @@ module.exports.fetch = async () => {
 			module.exports.sectors = sectors;
 			module.exports.level0Sectors = level0Sectors;
 			module.exports.barrierSource = body.barrier_source;
+			module.exports.barrierPriorities = barrierPriorities;
+			module.exports.barrierPrioritiesMap = barrierPriorities.reduce( ( map, item ) => {
+
+				map[ item.code ] = item;
+
+				return map;
+			}, {} );
 			module.exports.bool = {
 				'true': 'Yes',
 				'false': 'No'
+			};
+			module.exports.documentStatus = {
+				not_virus_scanned: 'Not virus scanned',
+				virus_scanning_scheduled: 'Virus scanning scheduled',
+				virus_scanning_in_progress: 'Virus scanning in progress',
+				virus_scanning_failed: 'Virus scanning failed.',
+				virus_scanned: 'Virus scanned',
+				deletion_pending: 'Deletion pending',
 			};
 
 		} else {
@@ -160,6 +192,11 @@ module.exports.getBarrierTypeList = () => {
 	return list;
 };
 
+module.exports.getBarrierPrioritiesList = () => barrierPriorities.map( ( { code, name } ) => ({
+	value: code,
+	html: `<span class="priority-marker priority-marker--${ code.toLowerCase() }"></span><strong>${ name }</strong> priority`
+}) );
+
 const OPEN = 2;
 const RESOLVED = 4;
 const HIBERNATED = 5;
@@ -177,4 +214,24 @@ module.exports.barrier = {
 			[ HIBERNATED ]: { name: 'Paused', modifyer: 'hibernated' }
 		}
 	}
+};
+
+module.exports.mimeTypes = {
+	'image/gif': '.gif',
+	'image/png': '.png',
+	'image/webp': '.webp',
+	'image/jpeg': '.jpg',
+	'text/csv': '.csv',
+	'text/plain': '.txt',
+	'application/rtf': '.rtf',
+	'application/pdf': '.pdf',
+	'application/vnd.oasis.opendocument.text': '.odt',
+	'application/msword': '.doc',
+	'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
+	'application/vnd.oasis.opendocument.presentation': '.odp',
+	'application/vnd.ms-powerpoint': '.ppt',
+	'application/vnd.openxmlformats-officedocument.presentationml.presentation': '.pptx',
+	'application/vnd.oasis.opendocument.spreadsheet': '.ods',
+	'application/vnd.ms-excel': '.xls',
+	'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '.xlsx',
 };

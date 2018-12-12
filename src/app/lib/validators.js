@@ -1,3 +1,4 @@
+const config = require( '../config' );
 const metadata = require( './metadata' );
 const uuid = /^[a-zA-Z0-9-]+$/;
 const isNumeric = /^[0-9]+$/;
@@ -19,7 +20,7 @@ module.exports = {
 	isSector: ( value ) => metadata.sectors.some( ( sector ) => sector.id === value ),
 	isOneBoolCheckboxChecked: ( values ) => {
 
-		for( let [ /* key */, value ] of Object.entries( values ) ){
+		for( let value of Object.values( values ) ){
 
 			if( value === 'true' ){
 				return true;
@@ -34,13 +35,10 @@ module.exports = {
 	isDateInPast: ( values ) => ( Date.parse( [ values.year, values.month, values.day ].join( '-' ) ) < Date.now() ),
 	isDateNumeric: ( values ) => {
 
-		let allValues = '';
-
-		for( let [ , value ] of Object.entries( values ) ){
-
-			allValues += value;
-		}
+		const allValues = Object.values( values ).reduce( ( str, value ) => ( str + value ), '' );
 
 		return isNumeric.test( allValues );
-	}
+	},
+	isValidFile: ( file ) => config.files.types.includes( file.type ),
+	isBarrierPriority: ( value ) => metadata.barrierPriorities.some( ( priority ) => priority.code === value ),
 };

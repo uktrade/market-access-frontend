@@ -47,5 +47,54 @@ module.exports = {
 
 			res.render( 'me', { csrfToken: req.csrfToken() } );
 		}
+	},
+
+	documents: {
+		download: async ( req, res, next ) => {
+
+			const documentId = req.params.uuid;
+
+			try {
+
+				const { response, body } = await backend.documents.download( req, documentId );
+
+				if( response.isSuccess && body.document_url ){
+
+					res.redirect( body.document_url );
+
+				} else {
+
+					next( new Error( 'Unable to get document download link' ) );
+				}
+
+			} catch( e ){
+
+				next( e );
+			}
+		},
+
+		getScanStatus: async ( req, res ) => {
+
+			const documentId = req.uuid;
+
+			try {
+
+				res.json( await backend.documents.getScanStatus( req, documentId ) );
+
+			} catch( e ){
+
+				res.status( 500 );
+				res.json( { message: e.message } );
+			}
+		},
+
+		delete: ( req, res ) => {
+
+			const documentId = req.uuid;
+
+			backend.documents.delete( req, documentId );
+
+			res.send();
+		}
 	}
 };

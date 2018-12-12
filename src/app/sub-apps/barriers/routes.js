@@ -1,7 +1,10 @@
 const csurf = require( 'csurf' );
 const controller = require( './controllers' );
 
+const fileUpload = require( './middleware/file-upload' );
 const barrierIdParam = require( './middleware/params/barrier-id' );
+const noteIdParam = require( './middleware/params/note-id' );
+const documentIdParam = require( './middleware/params/document-id' );
 const barrierTypeCategoryParam = require( './middleware/params/barrier-type-category' );
 const companyIdParam = require( './middleware/params/company-id' );
 const uuidParam = require( '../../middleware/params/uuid' );
@@ -13,6 +16,8 @@ module.exports = ( express, app ) => {
 	const parseBody = express.urlencoded( { extended: false } );
 
 	app.param( 'barrierId', barrierIdParam );
+	app.param( 'noteId', noteIdParam );
+	app.param( 'documentId', documentIdParam );
 	app.param( 'uuid', uuidParam );
 	app.param( 'barrierTypeCategory', barrierTypeCategoryParam );
 	app.param( 'companyId', companyIdParam );
@@ -29,12 +34,17 @@ module.exports = ( express, app ) => {
 	app.post( '/:barrierId/edit/description/', controller.edit.description );
 	app.get( '/:barrierId/edit/source/', controller.edit.source );
 	app.post( '/:barrierId/edit/source/', controller.edit.source );
+	app.get( '/:barrierId/edit/priority/', controller.edit.priority );
+	app.post( '/:barrierId/edit/priority/', controller.edit.priority );
 
 	app.get( '/:barrierId/interactions/', controller.interactions.list );
 	app.get( '/:barrierId/interactions/add-note/', controller.interactions.notes.add );
-	app.post( '/:barrierId/interactions/add-note/', controller.interactions.notes.add );
-	app.get( '/:barrierId/interactions/edit-note/:noteId', controller.interactions.notes.edit );
-	app.post( '/:barrierId/interactions/edit-note/:noteId', controller.interactions.notes.edit );
+	app.post( '/:barrierId/interactions/add-note/', fileUpload, controller.interactions.notes.add );
+	app.get( '/:barrierId/interactions/edit-note/:id', controller.interactions.notes.edit );
+	app.post( '/:barrierId/interactions/edit-note/:id', controller.interactions.notes.edit );
+	app.post( '/:uuid/interactions/documents/add/', fileUpload, controller.interactions.notes.documents.add );
+	app.get( '/:barrierId/interactions/notes/:noteId/documents/:documentId/delete/', controller.interactions.notes.documents.deleteConfirmation );
+	app.post( '/:uuid/interactions/notes/:noteId/documents/:documentId/delete/', controller.interactions.notes.documents.delete );
 
 	app.get( '/:barrierId/status/', controller.status.index );
 	app.post( '/:barrierId/status/', controller.status.index );

@@ -20,7 +20,8 @@ describe( 'Backend Service', () => {
 		backend = {
 			get: jasmine.createSpy( 'backend.get' ),
 			post: jasmine.createSpy( 'backend.post' ),
-			put: jasmine.createSpy( 'backend.put' )
+			put: jasmine.createSpy( 'backend.put' ),
+			delete: jasmine.createSpy( 'backend.delete' ),
 		};
 		metadata = {
 			getCountry: jasmine.createSpy( 'metadata.country' )
@@ -28,7 +29,15 @@ describe( 'Backend Service', () => {
 
 		service = proxyquire( modulePath, {
 			'./backend-request': backend,
-			'./metadata': metadata
+			'./metadata': metadata,
+			'../config': {
+				files: {
+					scan: {
+						statusCheckInterval: 10, //make the test run faster
+						maxWaitTime: 2000,
+					}
+				}
+			}
 		} );
 	} );
 
@@ -81,6 +90,74 @@ describe( 'Backend Service', () => {
 			await service.getCounts( req );
 
 			expect( backend.get ).toHaveBeenCalledWith( '/counts', token );
+		} );
+	} );
+
+	describe( 'Documents', () => {
+		describe( 'create', () => {
+			it( 'Should call the correct API', async () => {
+
+				const fileName = 'abc.csv';
+				const size = 1234;
+
+				await service.documents.create( req, fileName, size );
+
+				expect( backend.post ).toHaveBeenCalledWith( '/documents', token, {
+					original_filename: fileName,
+					size
+				} );
+			} );
+		} );
+
+		describe( 'delete', () => {
+			it( 'Should call the correct API', async () => {
+
+				const documentId = uuid();
+
+				await service.documents.delete( req, documentId );
+
+				expect( backend.delete ).toHaveBeenCalledWith( `/documents/${ documentId }`, token );
+			} );
+		} );
+
+		describe( 'uploadComplete', () => {
+			it( 'Should call the correct API', async () => {
+
+				const documentId = uuid();
+
+				await service.documents.uploadComplete( req, documentId );
+
+				expect( backend.post ).toHaveBeenCalledWith( `/documents/${ documentId }/upload-callback`, token );
+			} );
+		} );
+
+		describe( 'download', () => {
+			it( 'Should call the correct API', async () => {
+
+				const documentId = uuid();
+
+				await service.documents.download( req, documentId );
+
+				expect( backend.get ).toHaveBeenCalledWith( `/documents/${ documentId }/download`, token );
+			} );
+		} );
+
+		describe( 'getScanStatus', () => {
+			it( 'Should call the correct API', async () => {
+
+				const documentId = uuid();
+
+				backend.post.and.callFake( () => Promise.resolve( {
+					response: { isSuccess: true },
+					body: { status: 'virus_scanned' },
+				} ) );
+
+				const { status, passed } = await service.documents.getScanStatus( req, documentId );
+
+				expect( backend.post ).toHaveBeenCalledWith( `/documents/${ documentId }/upload-callback`, token );
+				expect( status ).toEqual( 'virus_scanned' );
+				expect( passed ).toEqual( true );
+			} );
 		} );
 	} );
 
@@ -155,30 +232,54 @@ describe( 'Backend Service', () => {
 			} );
 		} );
 
-		describe( 'getStatusHistory', () => {
+		describe( 'getHistory', () => {
 			it( 'Should call the correct path', async () => {
 
-				await service.barriers.getStatusHistory( req, barrierId );
+				await service.barriers.getHistory( req, barrierId );
 
-				expect( backend.get ).toHaveBeenCalledWith( `/barriers/${ barrierId }/status_history`, token );
+				expect( backend.get ).toHaveBeenCalledWith( `/barriers/${ barrierId }/history`, token );
 			} );
 		} );
 
 		describe( 'notes', () => {
 			describe( 'save', () => {
-				it( 'Should POST to the correct path with the correct values', async () => {
+				describe( 'Without a documentId', () => {
+					it( 'Should POST to the correct path with the correct values', async () => {
 
-					const note = 'my test note';
-					const pinned = 'true';
+						const note = 'my test note';
+						const pinned = 'true';
 
-					await service.barriers.notes.save( req, barrierId, {
-						note,
-						pinned
+						await service.barriers.notes.save( req, barrierId, {
+							note,
+							pinned,
+						} );
+
+						expect( backend.post ).toHaveBeenCalledWith( `/barriers/${ barrierId }/interactions`, token, {
+							text: note,
+							pinned: true,
+							documents: null,
+						} );
 					} );
+				} );
 
-					expect( backend.post ).toHaveBeenCalledWith( `/barriers/${ barrierId }/interactions`, token, {
-						text: note,
-						pinned: true
+				describe( 'With a documentId', () => {
+					it( 'Should POST to the correct path with the correct values', async () => {
+
+						const note = 'my test note';
+						const pinned = 'true';
+						const documentId = 'abc-123';
+
+						await service.barriers.notes.save( req, barrierId, {
+							note,
+							pinned,
+							documentId
+						} );
+
+						expect( backend.post ).toHaveBeenCalledWith( `/barriers/${ barrierId }/interactions`, token, {
+							text: note,
+							pinned: true,
+							documents: [ documentId ]
+						} );
 					} );
 				} );
 			} );
@@ -404,6 +505,43 @@ describe( 'Backend Service', () => {
 					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
 						source: source,
 						other_source: null
+					} );
+				} );
+			} );
+		} );
+
+		describe( 'savePriority', () => {
+			describe( 'When priority and other have a value', () => {
+				it( 'Should PUT to the correct path with the correct values', async () => {
+
+					const priority = '1';
+					const priorityDescription = 'my priority description';
+
+					await service.barriers.savePriority( req, barrierId, {
+						priority,
+						priorityDescription,
+					} );
+
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+						priority: priority,
+						priority_summary: priorityDescription
+					} );
+				} );
+			} );
+
+			describe( 'When only priority has a value', () => {
+				it( 'Should PUT to the correct path with the correct values', async () => {
+
+					const priority = '1';
+
+					await service.barriers.savePriority( req, barrierId, {
+						priority,
+						priorityDescription: ''
+					} );
+
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+						priority: priority,
+						priority_summary: null
 					} );
 				} );
 			} );

@@ -23,6 +23,7 @@ describe( 'Edit barrier controller', () => {
 	let backend;
 	let urls;
 
+
 	beforeEach( () => {
 
 		barrierId = uuid();
@@ -32,7 +33,8 @@ describe( 'Edit barrier controller', () => {
 				'1': 'minima aspernatur optio',
 				'2': 'veritatis alias maxime'
 			},
-			getCountryList: () =>  [ 'country one', 'country two' ]
+			getCountryList: () =>  [ 'country one', 'country two' ],
+			getBarrierPrioritiesList: jasmine.createSpy( 'metadata.getBarrierPrioritiesList' ),
 		};
 
 		govukItemsFromObjResponse = { a: 1, b: 2 };
@@ -51,7 +53,8 @@ describe( 'Edit barrier controller', () => {
 
 		validators = {
 			isCountry: jasmine.createSpy( 'validators.isCountry' ),
-			isMetadata: jasmine.createSpy( 'validators.isMetadata' )
+			isMetadata: jasmine.createSpy( 'validators.isMetadata' ),
+			isBarrierPriority: jasmine.createSpy( 'validators.isBarrierPriority' ),
 		};
 
 		backend = {
@@ -60,6 +63,7 @@ describe( 'Edit barrier controller', () => {
 				saveProduct: jasmine.createSpy( 'backend.barriers.saveProduct' ),
 				saveDescription: jasmine.createSpy( 'backend.barriers.saveDescription' ),
 				saveSource: jasmine.createSpy( 'backend.barriers.saveSource' ),
+				savePriority: jasmine.createSpy( 'backend.barriers.savePriority' ),
 			}
 		};
 
@@ -427,6 +431,91 @@ describe( 'Edit barrier controller', () => {
 				processor.process.and.callFake( () => { throw err; } );
 
 				await controller.source( req, res, next );
+
+				expect( next ).toHaveBeenCalledWith( err );
+			} );
+		} );
+	} );
+
+	describe( 'priority', () => {
+
+		const template = 'barriers/views/edit/priority';
+		let barrier;
+		let getBarrierPrioritiesListResponse;
+
+		beforeEach( () => {
+
+			getBarrierPrioritiesListResponse = [ { value: 1, html: 'test' } ];
+			barrier = jasmine.helpers.getFakeData( '/backend/barriers/barrier' );
+			metadata.getBarrierPrioritiesList.and.callFake( () => getBarrierPrioritiesListResponse );
+
+			req.barrier = barrier;
+		} );
+
+		it( 'Should configure the Form correctly', async () => {
+
+			await controller.priority( req, res, next );
+
+			const config = Form.calls.argsFor( 0 )[ 1 ];
+
+			expect( config.priority ).toBeDefined();
+			expect( config.priority.type ).toEqual( RADIO );
+			expect( config.priority.values ).toEqual( [ barrier.priority.code ] );
+			expect( config.priority.items ).toEqual( getBarrierPrioritiesListResponse );
+			expect( config.priority.validators ).toBeDefined();
+			expect( config.priority.validators.length ).toEqual( 1 );
+			expect( config.priority.validators[ 0 ].fn ).toEqual( validators.isBarrierPriority );
+
+			expect( config.priorityDescription ).toBeDefined();
+		} );
+
+		it( 'Should configure the FormProcessor correctly', async () => {
+
+			await controller.priority( req, res );
+
+			const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
+			const templateValues = { abc: '123' };
+			const formValues = { def: 456 };
+			const detailResponse = '/barrier/details';
+
+			expect( config.form ).toEqual( form );
+			expect( typeof config.render ).toEqual( 'function' );
+			expect( typeof config.saveFormData ).toEqual( 'function' );
+			expect( typeof config.saved ).toEqual( 'function' );
+
+			config.render( templateValues );
+
+			expect( res.render ).toHaveBeenCalledWith( template, templateValues );
+
+			config.saveFormData( formValues );
+
+			expect( backend.barriers.savePriority ).toHaveBeenCalledWith( req, barrier.id, formValues );
+
+			urls.barriers.detail.and.callFake( () => detailResponse );
+
+			config.saved();
+
+			expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
+			expect( urls.barriers.detail ).toHaveBeenCalledWith( barrier.id );
+		} );
+
+		describe( 'When the processor does not throw an error', () => {
+			it( 'Should not call next', async () => {
+
+				await controller.priority( req, res, next );
+
+				expect( next ).not.toHaveBeenCalled();
+			} );
+		} );
+
+		describe( 'When the processor throws an errror', () => {
+			it( 'Should call next with the error', async () => {
+
+				const err = new Error( 'a random error' );
+
+				processor.process.and.callFake( () => { throw err; } );
+
+				await controller.priority( req, res, next );
 
 				expect( next ).toHaveBeenCalledWith( err );
 			} );

@@ -104,6 +104,7 @@ describe( 'Barrier detail view model', () => {
 				},
 				summary: inputBarrier.infringement_summary
 			} );
+			expect( outpuBarrier.priority ).toEqual( { ...inputBarrier.priority, modifyer: inputBarrier.priority.code.toLowerCase() } );
 
 			expect( output.sectorsList ).toEqual( barrierSectors.map( ( sector ) => ( { text: sector.name } ) ) );
 			expect( output.companies ).toEqual( inputBarrier.companies );

@@ -15,9 +15,11 @@
 			Barriers in <strong>{{ country.name }}</strong>
 		</h3>
 
+		<div class="overflow-wrapper">
 		<table class="standard-table standard-table--country-barriers">
 			<thead>
 				<tr class="standard-table__heading-row">
+					<th class="standard-table__heading">Priority</th>
 					<th class="standard-table__heading standard-table__heading--active">Date reported</th>
 					<th class="standard-table__heading">Barrier title</th>
 					<th class="standard-table__heading">Sectors affected</th>
@@ -28,6 +30,7 @@
 			<tbody>
 				{%- for barrier in barriers %}
 				<tr class="standard-table__row">
+					<td class="standard-table__cell"><span class="priority-marker priority-marker--{{ barrier.priority.modifyer }}"></span>{{ barrier.priority.name }}</td>
 					<td class="standard-table__cell">{{ barrier.date.reported | dateOnly }}</td>
 					<td class="standard-table__cell">
 						<a class="dashboard-table__barrier-title" href="{{ urls.barriers.detail( barrier.id ) }}">
@@ -42,6 +45,7 @@
 				{%- endfor %}
 			</tbody>
 		</table>
+		</div>
 
 	{%- else -%}
 

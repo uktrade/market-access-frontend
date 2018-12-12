@@ -29,7 +29,7 @@ describe( 'metadata', () => {
 
 					backend.get.and.callFake( () => Promise.resolve( {
 						response: { isSuccess: true },
-						body: fakeData
+						body: getFakeData( '/backend/metadata/' )
 					} ) );
 
 					await metadata.fetch();
@@ -76,17 +76,17 @@ describe( 'metadata', () => {
 
 	describe( 'With fakeData', () => {
 
-		let originalBarrierTypes;
+		let duplicateBarrierTypes;
 
 		beforeEach( async () => {
 
-			originalBarrierTypes = getFakeData( '/backend/metadata/' ).barrier_types;
-
-			fakeData.barrier_types.push( originalBarrierTypes[ 0 ], originalBarrierTypes[ 1 ]);
+			const body = getFakeData( '/backend/metadata/' );
+			body.barrier_types.push( fakeData.barrier_types[ 0 ], fakeData.barrier_types[ 1 ] );
+			duplicateBarrierTypes = body.barrier_types;
 
 			backend.get.and.callFake( () => Promise.resolve( {
 				response: { isSuccess: true },
-				body: fakeData
+				body
 			} ) );
 
 			await metadata.fetch();
@@ -240,7 +240,7 @@ describe( 'metadata', () => {
 			it( 'Should return the list', () => {
 
 				expect( metadata.barrierTypes ).toBeDefined();
-				expect( metadata.barrierTypes ).toEqual( fakeData.barrier_types );
+				expect( metadata.barrierTypes ).toEqual( duplicateBarrierTypes );
 			} );
 		} );
 
@@ -325,7 +325,7 @@ describe( 'metadata', () => {
 		describe( 'getBarrierTypeList', () => {
 			it( 'Should return the list', () => {
 
-				const expected = originalBarrierTypes.map( ( { id, title } ) => ({ value: id, text: title }) );
+				const expected = fakeData.barrier_types.map( ( { id, title } ) => ({ value: id, text: title }) );
 
 				expected.unshift( { value: '', text: 'All barrier types' } );
 
@@ -338,6 +338,54 @@ describe( 'metadata', () => {
 
 				expect( metadata.barrierSource ).toBeDefined();
 				expect( metadata.barrierSource ).toEqual( fakeData.barrier_source );
+			} );
+		} );
+
+		describe( 'barrierPriorities', () => {
+
+			let expectedOrder;
+
+			beforeEach( () => {
+
+				const list = fakeData.barrier_priorities;
+				expectedOrder = [ list[ 2 ], list[ 3 ], list[ 0 ], list[ 1 ] ].map( ( item ) => ({ ...item, modifyer: item.code.toLowerCase() }) );
+			} );
+
+			it( 'Should return the list in the correct order with a modifyer property added', () => {
+
+				expect( metadata.barrierPriorities ).toBeDefined();
+				expect( metadata.barrierPriorities ).toEqual( expectedOrder );
+			} );
+
+			it( 'Should create a map of the priorities', () => {
+
+				expect( metadata.barrierPrioritiesMap ).toEqual( expectedOrder.reduce( ( map, item ) => {
+
+					map[ item.code ] = item;
+
+					return map;
+
+				}, {} ) );
+			} );
+
+			describe( 'getBarrierPrioritiesList', () => {
+				it( 'Should return the list in the correct order', () => {
+
+					expect( metadata.getBarrierPrioritiesList() ).toEqual( expectedOrder.map( ( { code, name } ) => ({
+						value: code,
+						html: `<span class="priority-marker priority-marker--${ code.toLowerCase() }"></span><strong>${ name }</strong> priority`
+					}) ) );
+				} );
+			} );
+		} );
+	} );
+
+	describe( 'static data', () => {
+		describe( 'mimeTypes', () => {
+			it( 'Should create a map of types to extension', () => {
+
+				expect( metadata.mimeTypes ).toBeDefined();
+				expect( metadata.mimeTypes[ 'text/plain' ] ).toEqual( '.txt' );
 			} );
 		} );
 	} );

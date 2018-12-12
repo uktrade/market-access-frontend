@@ -30,3 +30,8 @@ $govuk-fuchsia-10: tint( govuk-colour( 'bright-purple' ), 90 );
 $govuk-white: govuk-colour( 'white' );
 $govuk-blue: govuk-colour( 'blue' );
 $govuk-blue-15: tint( $govuk-blue, 85 );
+
+$priority-high: govuk-colour( 'bright-red' );
+$priority-medium: govuk-colour( 'orange' );
+$priority-low: govuk-colour( 'yellow' );
+$priority-unknown: $govuk-grey-2;

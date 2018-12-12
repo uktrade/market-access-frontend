@@ -5,7 +5,7 @@ const cspValues = [
 	`script-src 'self' 'unsafe-inline' www.google-analytics.com www.googletagmanager.com`,
 	`style-src 'self' 'unsafe-inline'`,
 	`font-src 'self'`,
-	`img-src 'self' www.google-analytics.com`,
+	`img-src 'self' data: www.google-analytics.com`,
 	`form-action 'self'`,
 	`connect-src 'self'`
 

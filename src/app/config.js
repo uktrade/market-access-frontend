@@ -71,6 +71,20 @@ let config = {
 	views: {
 		cache: bool( 'CACHE_VIEWS', true )
 	},
+	files: {
+		maxSize: number( 'FILE_MAX_SIZE', ( 5 * 1024 * 1024 ) ),
+		types: env( 'FILE_TYPES', 'image/jpeg,text/csv' ).split( ',' ),
+		s3: {
+			encryption: {
+				header: env( 'FILE_S3_ENCRYPTION_HEADER', 'x-amz-server-side-encryption' ),
+				value: env( 'FILE_S3_ENCRYPTION_VALUE', 'AES256' ),
+			},
+		},
+		scan: {
+			maxWaitTime: number( 'FILE_SCAN_MAX_WAIT_TIME', 15000 ),
+			statusCheckInterval: number( 'FILE_SCAN_STATUS_CHECK_INTERVAL', 500 ),
+		},
+	},
 	backend: {
 		url: requiredEnv( 'BACKEND_URL' ),
 		hawk: {
