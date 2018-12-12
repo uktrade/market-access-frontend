@@ -17,6 +17,7 @@ describe( 'validators', () => {
 			countries: [ { id: 'abc-123' }, { id: 'def-456' } ],
 			barrierTypes: [ { id: 1 }, { id: 2}, { id: 4 } ],
 			sectors: [ { id: uuid() }, { id: uuid() } ],
+			barrierPriorities: [ { code: 'abc', name: 'test 1' }, { code: 'def', name: 'test 2' } ],
 		};
 
 		validators = proxyquire( modulePath, {
@@ -325,6 +326,22 @@ describe( 'validators', () => {
 
 					expect( validators.isDateNumeric( { year: '2000', month: '10', day: 'abc' } ) ).toEqual( false );
 				} );
+			} );
+		} );
+	} );
+
+	describe( 'isBarrierPriority', () => {
+		describe( 'With a valid priority', () => {
+			it( 'Should return true', () => {
+
+				expect( validators.isBarrierPriority( 'abc' ) ).toEqual( true );
+			} );
+		} );
+
+		describe( 'Without a valid priority', () => {
+			it( 'Should return false', () => {
+
+				expect( validators.isBarrierPriority( 'xyz' ) ).toEqual( false );
 			} );
 		} );
 	} );

@@ -57,38 +57,61 @@ function getNotes( items, editId ){
 	return notes;
 }
 
-function getStatuses( items ){
+function getStatus( item ){
 
-	const statuses = [];
+	return {
+		isStatus: true,
+		date: item.date,
+		event: item.field_info.event,
+		state: {
+			from: getStatusType( item.old_value ),
+			to: getStatusType( item.new_value ),
+			date: item.field_info.status_date,
+			isResolved: ( item.new_value === metadata.barrier.status.types.RESOLVED )
+		},
+		text: item.field_info.status_summary,
+		user: item.user,
+	};
+}
+
+function getPriority( item ){
+
+	const priorityCode = ( item.new_value === 'None' ? 'UNKNOWN' : item.new_value );
+
+	return {
+		isPriority: true,
+		date: item.date,
+		priority: metadata.barrierPrioritiesMap[ priorityCode ],
+		text: item.field_info.priority_summary,
+		user: item.user,
+	};
+}
+
+function getHistory( items ){
+
+	const history = [];
 
 	for( let item of items ){
 
-		statuses.push( {
-			isStatus: true,
-			date: item.date,
-			event: item.event,
-			state: {
-				from: getStatusType( item.old_status ),
-				to: getStatusType( item.new_status ),
-				date: item.status_date,
-				isResolved: ( item.new_status === metadata.barrier.status.types.RESOLVED )
-			},
-			text: item.status_summary,
-			user: item.user,
-		} );
+		switch( item.field ){
+
+			case 'status':
+				history.push( getStatus( item ) );
+			break;
+
+			case 'priority':
+				history.push( getPriority( item ) );
+			break;
+		}
 	}
 
-	return statuses;
+	return history;
 }
 
 module.exports = function ( responses, editId ){
 
 	const notes = getNotes( responses.interactions.results, editId );
-	const statuses = getStatuses( responses.statusHistory.status_history );
+	const history = getHistory( responses.history.history );
 
-	//pinned.sort( sortByDateDescending );
-	//other.sort( sortByDateDescending );
-	//return pinned.concat( other );
-
-	return notes.concat( statuses ).sort( sortByDateDescending );
+	return notes.concat( history ).sort( sortByDateDescending );
 };

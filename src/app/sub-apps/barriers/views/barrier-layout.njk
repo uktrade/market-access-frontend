@@ -17,6 +17,17 @@
 	}
 ] %}
 
+{% block body_script %}
+	<script>
+		if( ma.components.BarrierSummary ){
+			new ma.components.BarrierSummary( {
+				text: 'Update the barrier',
+				linkClass: '.js-barrier-summary-link'
+			} );
+		}
+	</script>
+{% endblock %}
+
 {% block page_content %}
 
 	{{ govukBackLink( { href: urls.index() } ) }}

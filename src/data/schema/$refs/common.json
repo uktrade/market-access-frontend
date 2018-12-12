@@ -110,5 +110,20 @@
 				"pattern": "GOODS|SERVICES"
 			}
 		}
+	},
+
+	"priority-code": {
+		"type": "string",
+		"pattern": "HIGH|MEDIUM|LOW|UNKNOWN"
+	},
+
+	"priority": {
+		"type": "object",
+		"required": [ "code", "name", "order" ],
+		"properties": {
+			"code": { "$ref": "#/priority-code"},
+			"name": { "faker": "lorem.word" },
+			"order": { "enum": [ 0, 1, 2, 3 ] }
+		}
 	}
 }

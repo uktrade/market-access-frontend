@@ -10,6 +10,7 @@
 
 {% if noteForm %}
 	{% block body_script %}
+		{{ super() }}
 		<script>
 			ma.pages.barrier.interactions.addNote( {
 				noteErrorText: '{{ noteErrorText }}'
@@ -198,6 +199,19 @@
 						<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
 					{% endif -%}
 
+				{%- elif item.isPriority -%}
+
+					<h4 class="event-list__item__heading">{{ item.date | dateOnly }}<span class="event-list__item__heading__recede"> at {{ item.date | time }} (GMT)</span></h4>
+
+					<p class="event-list__item__text">
+						<span class="priority-marker priority-marker--{{ item.priority.modifyer }}"></span> Barrier priority set to <strong>{{ item.priority.name }}</strong>{{ ' by ' + item.user.name if item.user.name }}.
+					</p>
+
+					{%- if item.text %}
+						<p class="event-list__item__text">
+							 {{ item.text }}
+						</p>
+						{%- endif %}
 				{%- endif %}
 			</li>
 			{% endfor %}

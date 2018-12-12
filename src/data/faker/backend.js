@@ -12,7 +12,7 @@ const jsonFiles = {
 	'barriers/index': generateSchema( '/backend/barriers/index' ),
 	'barriers/barrier': generateSchema( '/backend/barriers/barrier' ),
 	'barriers/interactions': generateSchema( '/backend/barriers/interactions' ),
-	'barriers/status_history': generateSchema( '/backend/barriers/status-history' ),
+	'barriers/history': generateSchema( '/backend/barriers/history' ),
 };
 
 writeJsonFiles( OUTPUT_PATH, jsonFiles );

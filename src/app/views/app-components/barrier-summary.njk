@@ -6,10 +6,14 @@
 			<a class="barrier-summary__heading__link" href="{{ urls.barriers.edit.headlines( barrier.id ) }}">Edit barrier header</a>
 		</div>
 		<div class="barrier-summary__status">
-			<span class="barrier-status-badge barrier-status-badge--{{ barrier.status.modifyer }}">
+			<span class="barrier-summary__status__badge barrier-status-badge barrier-status-badge--{{ barrier.status.modifyer }}">
 				Status: <strong>{{ barrier.status.name }}</strong>
 			</span>
-			<a class="barrier-summary__status__link" href="{{ urls.barriers.status( barrier.id ) }}">change</a>
+			<span class="barrier-summary__priority">
+				<span class="priority-marker priority-marker--{{ barrier.priority.modifyer }}"></span><strong>{{ barrier.priority.name }}</strong> priority
+			</span>
+			<a class="barrier-summary__status__link js-barrier-summary-link" href="{{ urls.barriers.status( barrier.id ) }}">change status</a>
+			<a class="barrier-summary__status__link js-barrier-summary-link" href="{{ urls.barriers.edit.priority( barrier.id ) }}">change priority</a>
 		</div>
 		<dl class="barrier-summary__info">
 			<div class="barrier-summary__info__group">

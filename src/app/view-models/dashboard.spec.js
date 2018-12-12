@@ -42,13 +42,7 @@ describe( 'Dashboard view model', () => {
 	describe( 'When there are some barriers', () => {
 		it( 'Should transform and sort them', () => {
 
-			const barriers = [
-				{ id: 1, code: 'B-A1C', barrier_title: faker.lorem.words(), problem_status: 1, export_country: 'abc-1', sectors: [ 'a', 'b' ], current_status: { status: 1 }, support_type: 2, contributor_count: 4, reported_on: 'Wed Nov 22 2017 10:45:25 GMT+0000 (GMT)' },
-				{ id: 2, code: 'B-A2C', barrier_title: faker.lorem.words(), problem_status: 2, export_country: 'abc-3', current_status: { status: 4 }, support_type: 1, contributor_count: 0, reported_on: 'Fri Jun 01 2018 01:43:07 GMT+0100 (BST)' },
-				{ id: 3, code: 'B-A3C', barrier_title: faker.lorem.words(), problem_status: 1, export_country: 'def-1', sectors: [ 'c', 'd' ], current_status: { status: 1 }, support_type: 2, contributor_count: 4, reported_on: 'Sat Mar 10 2018 12:51:35 GMT+0000 (GMT)' },
-				{ id: 4, code: 'B-A4C', barrier_title: faker.lorem.words(), problem_status: 2, export_country: 'def-2', current_status: { status: 1 }, support_type: 2, contributor_count: 4, reported_on: 'Wed Nov 22 2017 10:45:25 GMT+0000 (GMT)' }
-			];
-
+			const barriers = jasmine.helpers.getFakeData( '/backend/barriers/index.dashboard' ).results;
 			const output = viewModel( JSON.parse( JSON.stringify( barriers ) ) );
 
 			function checkBarrier( id, index ){
@@ -76,11 +70,15 @@ describe( 'Dashboard view model', () => {
 					sectors: ( barrier.sectors && barrier.sectors.map( () => getSector().name ) || [ 'Unknown' ] ),
 					date: {
 						reported: barrier.reported_on
+					},
+					priority: {
+						...barrier.priority,
+						modifyer: barrier.priority.code.toLowerCase()
 					}
 				} );
 			}
 
-			[ 2, 3, 1, 4 ].forEach( checkBarrier );
+			[ '1ec', '648', '7de', '553' ].forEach( checkBarrier );
 		} );
 	} );
 

@@ -108,6 +108,13 @@ describe( 'URLs', () => {
 					expect( urls.barriers.edit.source( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/source/` );
 				} );
 			} );
+
+			describe( 'priority', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.edit.priority( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/priority/` );
+				} );
+			} );
 		} );
 
 		describe( 'Interactions', () => {

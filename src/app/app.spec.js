@@ -332,6 +332,15 @@ describe( 'App', function(){
 								.end( checkPage( 'Market Access - Barrier - Edit source', done ) );
 						} );
 					} );
+
+					describe( 'priority', () => {
+						it( 'Should fetch the barrier and render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.edit.priority( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier - Edit priority', done ) );
+						} );
+					} );
 				} );
 
 				describe( 'Barrier interactions', () => {
@@ -342,8 +351,8 @@ describe( 'App', function(){
 							.reply( 200, intercept.stub( '/backend/barriers/interactions' ) );
 
 						intercept.backend()
-							.get( `/barriers/${ barrier.id }/status_history` )
-							.reply( 200, intercept.stub( '/backend/barriers/status_history' ) );
+							.get( `/barriers/${ barrier.id }/history` )
+							.reply( 200, intercept.stub( '/backend/barriers/history' ) );
 
 						app
 							.get( urls.barriers.interactions( barrierId ) )

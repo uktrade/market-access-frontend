@@ -264,5 +264,27 @@
       "TRADE": "nam distinctio nihil",
       "GOVT": "voluptatem quia est",
       "OTHER": "qui"
-   }
+	},
+	"barrier_priorities": [
+      {
+         "code": "MEDIUM",
+         "name": "quisquam",
+         "order": 2
+      },
+      {
+         "code": "HIGH",
+         "name": "repellendus",
+         "order": 3
+      },
+      {
+         "code": "UNKNOWN",
+         "name": "repellat",
+         "order": 0
+      },
+      {
+         "code": "LOW",
+         "name": "et",
+         "order": 1
+      }
+   ]
 }

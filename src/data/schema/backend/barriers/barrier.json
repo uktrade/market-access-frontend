@@ -26,7 +26,8 @@
 		"wto_infringement",
 		"fta_infringement",
 		"other_infringement",
-		"infringement_summary"
+		"infringement_summary",
+		"priority"
 	],
 	"properties": {
 
@@ -82,6 +83,7 @@
 		},
 
 		"problem_description": { "$ref": "$refs/common.json#/paragraph" },
+		"priority": { "$ref": "$refs/common.json#/priority" },
 
 		"current_status": {
 			"type": "object",

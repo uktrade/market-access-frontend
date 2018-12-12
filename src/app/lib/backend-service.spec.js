@@ -232,12 +232,12 @@ describe( 'Backend Service', () => {
 			} );
 		} );
 
-		describe( 'getStatusHistory', () => {
+		describe( 'getHistory', () => {
 			it( 'Should call the correct path', async () => {
 
-				await service.barriers.getStatusHistory( req, barrierId );
+				await service.barriers.getHistory( req, barrierId );
 
-				expect( backend.get ).toHaveBeenCalledWith( `/barriers/${ barrierId }/status_history`, token );
+				expect( backend.get ).toHaveBeenCalledWith( `/barriers/${ barrierId }/history`, token );
 			} );
 		} );
 
@@ -505,6 +505,43 @@ describe( 'Backend Service', () => {
 					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
 						source: source,
 						other_source: null
+					} );
+				} );
+			} );
+		} );
+
+		describe( 'savePriority', () => {
+			describe( 'When priority and other have a value', () => {
+				it( 'Should PUT to the correct path with the correct values', async () => {
+
+					const priority = '1';
+					const priorityDescription = 'my priority description';
+
+					await service.barriers.savePriority( req, barrierId, {
+						priority,
+						priorityDescription,
+					} );
+
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+						priority: priority,
+						priority_summary: priorityDescription
+					} );
+				} );
+			} );
+
+			describe( 'When only priority has a value', () => {
+				it( 'Should PUT to the correct path with the correct values', async () => {
+
+					const priority = '1';
+
+					await service.barriers.savePriority( req, barrierId, {
+						priority,
+						priorityDescription: ''
+					} );
+
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+						priority: priority,
+						priority_summary: null
 					} );
 				} );
 			} );
