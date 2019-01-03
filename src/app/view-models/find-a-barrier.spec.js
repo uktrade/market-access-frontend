@@ -42,7 +42,8 @@ describe( 'Find a barrier view model', () => {
 				status,
 				date: {
 					reported: barrier.reported_on,
-					status: barrier.current_status.status_date
+					status: barrier.current_status.status_date,
+					created: barrier.created_on,
 				}
 			});
 		}

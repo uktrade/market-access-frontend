@@ -625,7 +625,7 @@ describe( 'App', function(){
 
 					app
 						.get( urls.reports.index() )
-						.end( checkPage( 'Market Access - Reports', done ) );
+						.end( checkPage( 'Market Access - Unfinished barriers', done ) );
 				} );
 			} );
 
@@ -635,13 +635,13 @@ describe( 'App', function(){
 
 						app
 							.get( urls.reports.new() )
-							.end( checkPage( 'Market Access - Report a barrier', done ) );
+							.end( checkPage( 'Market Access - Add a barrier', done ) );
 					} );
 				} );
 
 				describe( 'Start page', () => {
 
-					const title = 'Market Access - Report - Status of the barrier';
+					const title = 'Market Access - Add - Status of the barrier';
 
 					describe( 'Without a reportId', () => {
 						it( 'Should render the start page', ( done ) => {
@@ -670,7 +670,7 @@ describe( 'App', function(){
 
 				describe( 'Is resolved page', () => {
 
-					const title = 'Market Access - Report - Status of the barrier';
+					const title = 'Market Access - Add - Status of the barrier';
 
 					let agent;
 
@@ -718,7 +718,7 @@ describe( 'App', function(){
 
 				describe( 'Barrier location page', () => {
 
-					const title = 'Market Access - Report - Location of the barrier';
+					const title = 'Market Access - Add - Location of the barrier';
 
 					let agent;
 
@@ -792,7 +792,7 @@ describe( 'App', function(){
 
 							app
 								.get( urls.reports.aboutProblem( reportId ) )
-								.end( checkPage( 'Market Access - Report - About the barrier', done ) );
+								.end( checkPage( 'Market Access - Add - About the barrier', done ) );
 						} );
 					} );
 
@@ -860,7 +860,7 @@ describe( 'App', function(){
 
 							app
 								.get( urls.reports.detail( reportId ) )
-								.end( checkPage( 'Market Access - Report details', done ) );
+								.end( checkPage( 'Market Access - Add - Barrier details', done ) );
 						} );
 					} );
 				} );
