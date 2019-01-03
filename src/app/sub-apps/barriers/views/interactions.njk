@@ -177,11 +177,11 @@
 
 					{%- if item.event === 'REPORT_CREATED' -%}
 
-						Report of barrier started{% if item.user.name %} by <strong>{{ item.user.name }}</strong>{% endif %}
+						Barrier started{% if item.user.name %} by <strong>{{ item.user.name }}</strong>{% endif %}
 
 					{%- elif item.event === 'BARRIER_CREATED' -%}
 
-						Barrier created{% if item.user.name %} by <strong>{{ item.user.name }}</strong>{% endif %}
+						Barrier added to the service{% if item.user.name %} by <strong>{{ item.user.name }}</strong>{% endif %}
 
 					{%- elif item.event === 'BARRIER_STATUS_CHANGE' -%}
 

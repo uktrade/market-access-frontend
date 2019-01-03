@@ -1,7 +1,7 @@
 {% from 'app-components/dashboard-heading.njk' import dashboardHeading %}
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Reports{% endblock %}
+{% block page_title %}{{ super() }} - Unfinished barriers{% endblock %}
 
 {% block page_content %}
 
@@ -12,12 +12,12 @@
 		<table class="standard-table">
 			<thead>
 				<tr class="standard-table__heading-row">
-					<th class="standard-table__heading standard-table__heading--active">Report started</th>
+					<th class="standard-table__heading standard-table__heading--active">Date started</th>
 					<th class="standard-table__heading">Barrier ID</th>
 					<th class="standard-table__heading">Barrier location</th>
 					<th class="standard-table__heading">Resolved?</th>
 					<th class="standard-table__heading">Barrier urgency</th>
-					<th class="standard-table__heading">Report started by</th>
+					<th class="standard-table__heading">Started by</th>
 					<th class="standard-table__heading">Action</th>
 				</tr>
 			</thead>
@@ -53,7 +53,7 @@
 	{%- else -%}
 
 		<p class="no-results-message">
-			There are currently no unfinished market access barrier reports.
+			There are currently no unfinished market access barriers.
 		</p>
 
 	{%- endif %}
