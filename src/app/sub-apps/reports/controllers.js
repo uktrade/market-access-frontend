@@ -419,8 +419,14 @@ module.exports = {
 
 				res.render( 'reports/views/about-problem', templateValues );
 			},
-			saveFormData: ( formValues ) => backend.reports.saveProblem( req, report.id, formValues ),
-			saved: () => res.redirect( urls.reports.detail( report.id ) )
+			saveFormData: ( formValues ) => backend.reports.saveProblemAndSubmit( req, report.id, formValues ),
+			saved: async ( body ) => {
+
+				const barrierId = body.id;
+
+				req.flash( 'barrier-created', barrierId );
+				res.redirect( urls.barriers.detail( barrierId ) );
+			}
 		} );
 
 		try {
@@ -431,30 +437,5 @@ module.exports = {
 
 			next( e );
 		}
-	},
-
-	submit: async ( req, res, next ) => {
-
-		const reportId = req.report.id;
-
-		try {
-
-			const { response } = await	backend.reports.submit( req, reportId );
-
-			if( response.isSuccess ){
-
-				res.redirect( urls.reports.success( reportId ) );
-
-			} else {
-
-				res.redirect( urls.reports.detail( reportId ) );
-			}
-
-		} catch( e ){
-
-			return next( e );
-		}
-	},
-
-	success: ( req, res ) => res.render( 'reports/views/success', { uuid: req.uuid } )
+	}
 };

@@ -36,11 +36,13 @@ describe( 'Barriers controller', () => {
 			},
 			session: {},
 			params: {},
-			query: {}
+			query: {},
+			flash: jasmine.createSpy( 'req.flash' ),
 		};
 
 		res = {
 			render: jasmine.createSpy( 'res.render' ),
+			locals: {},
 		};
 
 		barrierDetailViewModel = jasmine.createSpy( 'barrierDetailViewModel' );
@@ -130,6 +132,26 @@ describe( 'Barriers controller', () => {
 
 					check( true );
 				} );
+			} );
+		} );
+
+		describe( 'With no flash message', () => {
+			it( 'Should not add a toast message to the locals', () => {
+
+				controller.barrier( req, res );
+				expect( res.locals.toast ).not.toBeDefined();
+			} );
+		} );
+
+		describe( 'With a flash message of barrier-created', () => {
+			it( 'Should add a toast message to the locals', () => {
+
+				req.flash.and.callFake( () => [ uuid() ] ) ;
+				controller.barrier( req, res );
+				expect( res.locals.toast ).toEqual( {
+					heading: 'Barrier added to the service',
+					message: 'Continue to add more detail to your barrier'
+				});
 			} );
 		} );
 	} );

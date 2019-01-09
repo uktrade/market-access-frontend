@@ -72,11 +72,13 @@ describe( 'Report controller', () => {
 			params: {},
 			user: {},
 			error: jasmine.createSpy( 'req.error' ),
-			hasErrors: jasmine.createSpy( 'req.hasErrors' )
+			hasErrors: jasmine.createSpy( 'req.hasErrors' ),
+			flash: jasmine.createSpy( 'req.flash' ),
 		};
 		res = {
 			render: jasmine.createSpy( 'res.render' ),
-			redirect: jasmine.createSpy( 'res.redirect' )
+			redirect: jasmine.createSpy( 'res.redirect' ),
+			locals: {},
 		};
 		next = jasmine.createSpy( 'next' );
 		govukItemsFromObj = jasmine.createSpy( 'govukItemsFromObj' ).and.callFake( () => govukItemsFromObjResponse );
@@ -84,7 +86,7 @@ describe( 'Report controller', () => {
 			reports: {
 				save: jasmine.createSpy( 'backend.reports.save' ),
 				update: jasmine.createSpy( 'backend.reports.update' ),
-				saveProblem: jasmine.createSpy( 'backend.reports.saveProblem' ),
+				saveProblemAndSubmit: jasmine.createSpy( 'backend.reports.saveProblemAndSubmit' ),
 				saveImpact: jasmine.createSpy( 'backend.reports.saveImpact' ),
 				saveLegal: jasmine.createSpy( 'backend.reports.saveLegal' ),
 				saveBarrierType: jasmine.createSpy( 'backend.reports.saveBarrierType' ),
@@ -111,7 +113,10 @@ describe( 'Report controller', () => {
 				hasSectors: jasmine.createSpy( 'urls.reports.hasSectors' ),
 				detail: jasmine.createSpy( 'urls.reports.detail' ),
 				success: jasmine.createSpy( 'urls.reports.success' ),
-				addSector: jasmine.createSpy( 'urls.reports.addSector' )
+				addSector: jasmine.createSpy( 'urls.reports.addSector' ),
+			},
+			barriers: {
+				detail: jasmine.createSpy( 'urls.barriers.detail' ),
 			}
 		};
 
@@ -1248,6 +1253,7 @@ describe( 'Report controller', () => {
 		beforeEach( () => {
 
 			report = {
+				id: uuid(),
 				product: 'myProduct',
 				problem_description: 'a description',
 				barrier_title: 'barrier_title',
@@ -1334,6 +1340,8 @@ describe( 'Report controller', () => {
 
 		describe( 'FormProcessor', () => {
 
+			const template = 'reports/views/about-problem';
+
 			let FormProcessor;
 			let processFn;
 			let args;
@@ -1372,9 +1380,6 @@ describe( 'Report controller', () => {
 			} );
 
 			describe( 'render', () => {
-
-				const template = 'reports/views/about-problem';
-
 				describe( 'When the report has sectors_affected', () => {
 					it( 'Should render the template with the correct data', () => {
 
@@ -1407,28 +1412,33 @@ describe( 'Report controller', () => {
 				} );
 			} );
 
-			describe( 'safeFormData', () => {
+			describe( 'saveFormData', () => {
 				it( 'Should call the correct method with the correct data', () => {
 
 					const myFormData = { a: true, b: false };
 
 					args.saveFormData( myFormData );
 
-					expect( backend.reports.saveProblem ).toHaveBeenCalledWith( req, report.id, myFormData );
+					expect( backend.reports.saveProblemAndSubmit ).toHaveBeenCalledWith( req, report.id, myFormData );
 				} );
 			} );
 
 			describe( 'Saved', () => {
-				it( 'Should redirect to the correct URL', () => {
+				it( 'Should redirect to the barrier detail page', async () => {
 
-					const detailResponse = '/a/path/detail';
+					const detailUrlResponse = '/detail-url';
+					const body = { id: 123 };
 
-					urls.reports.detail.and.callFake( () => detailResponse );
+					backend.reports.submit.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+					form.hasErrors = () => false;
+					urls.barriers.detail.and.callFake( () => detailUrlResponse );
 
-					args.saved();
+					await args.saved( body );
 
-					expect( urls.reports.detail ).toHaveBeenCalledWith( report.id  );
-					expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
+					expect( req.flash ).toHaveBeenCalledWith( 'barrier-created', body.id );
+					expect( urls.barriers.detail ).toHaveBeenCalledWith( body.id );
+					expect( res.redirect ).toHaveBeenCalledWith( detailUrlResponse );
+					expect( next ).not.toHaveBeenCalled();
 				} );
 			} );
 
@@ -1455,83 +1465,6 @@ describe( 'Report controller', () => {
 					} );
 				} );
 			} );
-		} );
-	} );
-
-	describe( 'submitReport', () => {
-
-		beforeEach( () => {
-
-			req.report = { id: 1, b: 2 };
-		} );
-
-		describe( 'When the response is a success', () => {
-
-			beforeEach( () => {
-
-				backend.reports.submit.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
-
-				form.hasErrors = () => false;
-			} );
-
-			afterEach( () => {
-
-				expect( next ).not.toHaveBeenCalled();
-				expect( backend.reports.submit ).toHaveBeenCalledWith( req, req.report.id );
-			} );
-
-			it( 'Should render the submitted page', async () => {
-
-				const successUrlResponse = '/a-url';
-
-				urls.reports.success.and.callFake( () => successUrlResponse );
-
-				await controller.submit( req, res, next );
-
-				expect( res.redirect ).toHaveBeenCalledWith( successUrlResponse );
-			} );
-		} );
-
-		describe( 'When the response is not a success', () => {
-			it( 'Should call next with an error', async () => {
-
-				const statusCode = 500;
-				const reportDetailResponse = '/reportDetail';
-				urls.reports.detail.and.callFake( () => reportDetailResponse );
-				form.hasErrors = () => false;
-				backend.reports.submit.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
-
-				await controller.submit( req, res, next );
-
-				expect( urls.reports.detail ).toHaveBeenCalledWith( req.report.id );
-				expect( res.redirect ).toHaveBeenCalledWith( reportDetailResponse );
-			} );
-		} );
-
-		describe( 'When the request fails', () => {
-			it( 'Should call next with the error', async () => {
-
-				const err = new Error( 'my test' );
-				form.hasErrors = () => false;
-				backend.reports.submit.and.callFake( () => Promise.reject( err ) );
-
-				await controller.submit( req, res, next );
-
-				expect( next ).toHaveBeenCalledWith( err );
-			} );
-		} );
-	} );
-
-	describe( 'success', () => {
-		it( 'Should render the success page', () => {
-
-			const id = uuid();
-
-			req.uuid = id;
-
-			controller.success( req, res );
-
-			expect( res.render ).toHaveBeenCalledWith( 'reports/views/success', { uuid: id } );
 		} );
 	} );
 } );
