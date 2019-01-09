@@ -33,7 +33,6 @@ const reportUrl = {
 	removeSector: ( reportId ) => `/reports/${ reportId }/sectors/remove/`,
 	aboutProblem: ( reportId ) => `/reports/${ reportId }/problem/`,
 	submit: ( reportId ) => `/reports/${ reportId }/submit/`,
-	success: ( reportId ) => `/reports/${ reportId }/success/`
 };
 
 module.exports = {
@@ -69,9 +68,6 @@ module.exports = {
 			},
 		},
 		status: ( barrierId ) => `/barriers/${ barrierId }/status/`,
-		statusResolved: ( barrierId ) => `/barriers/${ barrierId }/status/resolved/`,
-		statusHibernated: ( barrierId ) => `/barriers/${ barrierId }/status/hibernated/`,
-		statusOpen: ( barrierId ) => `/barriers/${ barrierId }/status/open/`,
 		type: {
 			category: ( barrierId ) => `/barriers/${ barrierId }/type/`,
 			list: ( barrierId, category ) => `/barriers/${ barrierId }/type/${ category }/`

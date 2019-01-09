@@ -583,34 +583,22 @@ describe( 'App', function(){
 						} );
 					} );
 				} );
+
 			} );
 
 			describe( 'Barrier status', () => {
-				describe( 'Resolved', () => {
-					it( 'Should render the page', ( done ) => {
+				it( 'Should render the page', ( done ) => {
 
-						app
-							.get( urls.barriers.statusResolved( barrierId ) )
-							.end( checkPage( 'Market Access - Barrier resolved', done ) );
-					} );
-				} );
+					const barrier = intercept.stub( '/backend/barriers/barrier' );
+					barrier.current_status.status = 2;
 
-				describe( 'Hibernated', () => {
-					it( 'Should render the page', ( done ) => {
+					intercept.backend()
+						.get( `/barriers/${ barrierId }` )
+						.reply( 200, barrier );
 
-						app
-							.get( urls.barriers.statusHibernated( barrierId ) )
-							.end( checkPage( 'Market Access - Barrier paused', done ) );
-					} );
-				} );
-
-				describe( 'Open', () => {
-					it( 'Should render the page', ( done ) => {
-
-						app
-							.get( urls.barriers.statusOpen( barrierId ) )
-							.end( checkPage( 'Market Access - Barrier open', done ) );
-					} );
+					app
+						.get( urls.barriers.status( barrierId ) )
+						.end( checkPage( 'Market Access - Barrier edit status', done ) );
 				} );
 			} );
 		} );
