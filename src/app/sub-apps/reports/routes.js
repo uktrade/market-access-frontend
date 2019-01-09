@@ -24,7 +24,6 @@ module.exports = ( express, app ) => {
 
 	app.get( '/', headerNav( { isDashboard: true } ), dashboardData, controller.index ),
 	app.get( '/new/', controller.new );
-	app.get( '/:uuid/success/', controller.success );
 
 	app.get( '/:reportId?/start/', controller.start );
 	app.post( '/:reportId?/start/', controller.start );
@@ -48,7 +47,6 @@ module.exports = ( express, app ) => {
 	app.get( '/:reportId/problem/', controller.aboutProblem );
 	app.post( '/:reportId/problem/', controller.aboutProblem );
 
-	app.post( '/:reportId/submit/', controller.submit );
 	// detail must be last route
 	app.get( '/:reportId/', controller.report );
 

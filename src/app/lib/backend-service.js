@@ -139,6 +139,18 @@ function getFilterParams( filters ){
 	return params;
 }
 
+const reports = {
+	saveProblem: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
+		product: getValue( values.item ),
+		problem_description: getValue( values.description ),
+		barrier_title: getValue( values.barrierTitle ),
+		source: getValue( values.barrierSource ),
+		other_source: getValue( values.barrierSourceOther ),
+		status_summary: getValue( values.resolvedDescription )
+	} ),
+	submit: ( req, reportId ) => backend.put( `/reports/${ reportId }/submit`, getToken( req ) ),
+};
+
 module.exports = {
 
 	getUser: ( req ) => backend.get( '/whoami', getToken( req ) ).then( transformUser ),
@@ -266,6 +278,7 @@ module.exports = {
 	},
 
 	reports: {
+		...reports,
 		getAll: ( req ) => backend.get( '/reports', getToken( req ) ).then( transformReportList ),
 		getForCountry: ( req, countryId ) => backend.get( `/reports?export_country=${ countryId }`, getToken( req ) ).then( transformReportList ),
 		get: ( req, reportId ) => backend.get( `/reports/${ reportId }`, getToken( req ) ).then( transformSingleReport ),
@@ -287,14 +300,18 @@ module.exports = {
 		saveSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 			sectors: getValue( values.sectors )
 		} ),
-		saveProblem: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
-			product: getValue( values.item ),
-			problem_description: getValue( values.description ),
-			barrier_title: getValue( values.barrierTitle ),
-			source: getValue( values.barrierSource ),
-			other_source: getValue( values.barrierSourceOther ),
-			status_summary: getValue( values.resolvedDescription )
-		} ),
-		submit: ( req, reportId ) => backend.put( `/reports/${ reportId }/submit`, getToken( req ) )
+		saveProblemAndSubmit: async ( req, reportId, values ) => {
+
+			const { response, body } = await reports.saveProblem( req, reportId, values );
+
+			if( response.isSuccess ){
+
+				return reports.submit( req, reportId );
+
+			} else {
+
+				return Promise.resolve( { response, body } );
+			}
+		},
 	}
 };

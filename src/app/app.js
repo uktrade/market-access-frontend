@@ -3,6 +3,7 @@ const nunjucks = require( 'nunjucks' );
 const path = require( 'path' );
 const morganLogger = require( 'morgan' );
 const compression = require( 'compression' );
+const flash = require( 'connect-flash' );
 
 const routes = require( './routes' );
 const config = require( './config' );
@@ -71,6 +72,7 @@ module.exports = {
 		app.use( sessionStore.create() );
 		if( isDev ){ app.use( ssoBypass ); }
 		app.use( auth );
+		app.use( flash() );
 
 		routes( express, app );
 

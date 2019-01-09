@@ -2,6 +2,7 @@
 {% from 'components/error-summary/macro.njk' import govukErrorSummary %}
 {% from 'app-components/barrier-summary.njk' import barrierSummary %}
 {% from 'app-components/summary-group.njk' import summaryGroup %}
+{% from 'app-components/toast.njk' import toastAlert %}
 
 {% extends 'layout.njk' %}
 
@@ -29,6 +30,10 @@
 {% endblock %}
 
 {% block page_content %}
+
+	{% if toast and toast.heading %}
+	{{ toastAlert( toast ) }}
+	{% endif %}
 
 	{{ govukBackLink( { href: urls.index() } ) }}
 
