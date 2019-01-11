@@ -26,7 +26,7 @@
 				{%- for barrier in barriers %}
 				<tr class="standard-table__row">
 					<td class="standard-table__cell"><span class="priority-marker priority-marker--{{ barrier.priority.modifyer }}"></span>{{ barrier.priority.name }}</td>
-					<td class="standard-table__cell">{{ barrier.date.created | dateOnly }}</td>
+					<td class="standard-table__cell">{{ barrier.date.reported | dateOnly }}</td>
 					<td class="standard-table__cell">
 						<a class="dashboard-table__barrier-title" href="{{ urls.barriers.detail( barrier.id ) }}">
 							{{ barrier.title }}
