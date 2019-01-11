@@ -10,14 +10,17 @@ function update( item ){
 		id,
 		name: metadata.statusTypes[ id ],
 	};
+	item.date = {
+		created: item.created_on
+	};
 
 	return item;
 }
 
 function sortDescending( a, b ){
 
-	const aDate = Date.parse( a.created_on );
-	const bDate = Date.parse( b.created_on );
+	const aDate = Date.parse( a.date.created );
+	const bDate = Date.parse( b.date.created );
 
 	return ( aDate === bDate ? 0 : ( aDate > bDate ? -1 : 1 ) );
 }

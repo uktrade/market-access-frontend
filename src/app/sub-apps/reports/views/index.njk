@@ -25,7 +25,7 @@
 				{% for report in reports %}
 				<tr class="standard-table__row">
 					<td class="standard-table__cell">
-						{{ ( report.created_on | dateWithTime ) or '---' }}
+						{{ ( report.date.created | dateWithTime ) or '---' }}
 					</td>
 					<td class="standard-table__cell">
 						{{ report.code }}
