@@ -19,9 +19,9 @@ Given( 'I\'m on the homepage', async () => {
 	this.driver = driver.getInstance();
 });
 
-Given( 'I\'m on the report a barrier page', async () => {
+Given( 'I\'m on the add a barrier page', async () => {
 
-	this.name = 'report-a-barrier';
+	this.name = 'add-a-barrier';
 
 	await driver.fetch( urls.reports.new() );
 	await driver.takeScreenshot( this.name );
@@ -29,9 +29,9 @@ Given( 'I\'m on the report a barrier page', async () => {
 	this.driver = driver.getInstance();
 });
 
-Given( 'I\'m on the start a report page', async () => {
+Given( 'I\'m on the first step of adding a new barrier', async () => {
 
-	this.name = 'report-a-barrier_start';
+	this.name = 'add-a-barrier_start';
 
 	await driver.fetch( urls.reports.start() );
 	await driver.takeScreenshot( this.name );
@@ -71,7 +71,7 @@ Given( 'I\'m on the find a barrier page', async () => {
 	this.driver = driver.getInstance();
 });
 
-When( 'I navigate to the report a barrier page', async () => {
+When( 'I navigate to the add a barrier page', async () => {
 
 	const button = await driver.byCss( '.dash-button' );
 	await button.click();
@@ -97,7 +97,7 @@ Then( 'the page should not have any accessibility violations', async () => {
 	assert.equal( violations, 0 );
 } );
 
-Then( 'there should be a link to report a barrier', async () => {
+Then( 'there should be a link to add a barrier', async () => {
 
 	const dashButton = await driver.byClass( 'dash-button' );
 	const tag = await dashButton.getTagName();
@@ -129,7 +129,7 @@ Then( 'the footer links should be present', async () => {
 	const info = [
 		[ 'View Data Hub', '/#' ],
 		[ 'Dashboard', '/' ],
-		[ 'Report a barrier', urls.reports.new() ],
+		[ 'Add a barrier', urls.reports.new() ],
 		[ 'Find a barrier', urls.findABarrier() ],
 		[ 'What is a barrier?', urls.whatIsABarrier() ]
 	];

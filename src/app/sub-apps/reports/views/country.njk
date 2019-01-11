@@ -3,13 +3,13 @@
 
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Report - Location of the barrier{% endblock %}
+{% block page_title %}{{ super() }} - Add - Location of the barrier{% endblock %}
 
 {% block page_content %}
 
 	{{ heading({
 		back: { href: urls.reports.isResolved( report.id ) },
-		caption: 'Report a barrier',
+		caption: 'Add a barrier',
 		text: 'Location of the barrier',
 		errors: errors
 	}) }}
