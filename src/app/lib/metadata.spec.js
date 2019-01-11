@@ -191,7 +191,7 @@ describe( 'metadata', () => {
 				expect( metadata.reportTaskList ).toEqual( [
 					{
 						"stage": "1.0",
-						"name": "doloremque qui ipsum",
+						"name": "Add a barrier",
 						"items": [
 							{
 								"stage": "1.1",
