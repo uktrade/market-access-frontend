@@ -419,8 +419,31 @@ module.exports = {
 
 				res.render( 'reports/views/about-problem', templateValues );
 			},
-			saveFormData: ( formValues ) => backend.reports.saveProblem( req, report.id, formValues ),
-			saved: () => res.redirect( urls.reports.detail( report.id ) )
+			saveFormData: ( formValues ) => {
+
+				if( form.isExit ){
+
+					return backend.reports.saveProblem( req, report.id, formValues );
+
+				} else {
+
+					return backend.reports.saveProblemAndSubmit( req, report.id, formValues );
+				}
+			},
+			saved: ( body ) => {
+
+				const barrierId = body.id;
+
+				if( form.isExit ){
+
+					res.redirect( urls.reports.detail( barrierId ) );
+
+				} else {
+
+					req.flash( 'barrier-created', barrierId );
+					res.redirect( urls.barriers.detail( barrierId ) );
+				}
+			}
 		} );
 
 		try {
@@ -443,7 +466,8 @@ module.exports = {
 
 			if( response.isSuccess ){
 
-				res.redirect( urls.reports.success( reportId ) );
+				req.flash( 'barrier-created', reportId );
+				res.redirect( urls.barriers.detail( reportId ) );
 
 			} else {
 
@@ -452,9 +476,7 @@ module.exports = {
 
 		} catch( e ){
 
-			return next( e );
+			next( e );
 		}
 	},
-
-	success: ( req, res ) => res.render( 'reports/views/success', { uuid: req.uuid } )
 };

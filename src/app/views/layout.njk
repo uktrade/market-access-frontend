@@ -135,6 +135,7 @@
 	<script src="/public/js/components/FileUpload.js"></script>
 	<script src="/public/js/components/TextArea.js"></script>
 	<script src="/public/js/components/BarrierSummary.js"></script>
+	<script src="/public/js/components/Toast.js"></script>
 	<script src="/public/js/pages/report/is-resolved.js"></script>
 	<script src="/public/js/pages/report/about-problem.js"></script>
 	<script src="/public/js/pages/barrier/status.js"></script>
@@ -143,13 +144,7 @@
 	<script src="/public/js/pages/find-a-barrier.js"></script>
 	<script src="/public/js/pages/barrier/interactions/add-note.js"></script>
 	<!-- endbuild -->
-	<script>
-		if( ma.components.Header && jessie.queryOne ){
-
-			var header = new ma.components.Header( jessie.queryOne( '.header-wrapper' ) );
-			header.init();
-		}
-	</script>
+	<script>ma.init();</script>
 	{% block body_script %}{% endblock %}
 	{% if not user.internal and analytics.enabled and analytics.id %}
 		<!-- Global site tag (gtag.js) - Google Analytics -->
@@ -158,7 +153,6 @@
 			window.dataLayer = window.dataLayer || [];
 			function gtag(){dataLayer.push(arguments);}
 			gtag('js', new Date());
-
 			gtag('config', '{{ analytics.id }}');
 		</script>
 	{% endif %}

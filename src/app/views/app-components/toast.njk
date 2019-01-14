@@ -1,0 +1,10 @@
+{% from 'app-components/checkmark.njk' import checkmark %}
+{% macro toastAlert( data ) %}
+	<div class="toast">
+		<span class="toast__checkmark">
+			{{ checkmark() }}
+		</span>
+		<h2 role="alert" class="toast__heading">{{ data.heading }}</h2>
+		<p class="toast__message">{{ data.message }}</p>
+	</div>
+{% endmacro %}

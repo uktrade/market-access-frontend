@@ -49,6 +49,7 @@ describe( 'Barrier status controller', () => {
 				saveNote: jasmine.createSpy( 'backend.barriers.saveNote' ),
 				resolve: jasmine.createSpy( 'backend.barriers.resolve' ),
 				hibernate: jasmine.createSpy( 'backend.barriers.hibernate' ),
+				open: jasmine.createSpy( 'backend.barriers.open' ),
 				saveType: jasmine.createSpy( 'backend.barriers.saveType' ),
 				saveSectors: jasmine.createSpy( 'backend.barriers.saveSectors' )
 			}
@@ -120,6 +121,7 @@ describe( 'Barrier status controller', () => {
 		let dayValidator;
 		let monthValidator;
 		let yearValidator;
+		let detailUrl;
 
 		function checkAndGetConfig(){
 			const args = Form.calls.argsFor( 0 );
@@ -189,6 +191,9 @@ describe( 'Barrier status controller', () => {
 				if( name === 'month' ){ return monthValidator; }
 				if( name === 'year' ){ return yearValidator; }
 			} );
+
+			detailUrl = '/barrier-detail/';
+			urls.barriers.detail.and.callFake( () => detailUrl );
 		} );
 
 		describe( 'When the current status is OPEN', () => {
@@ -267,13 +272,10 @@ describe( 'Barrier status controller', () => {
 							describe( 'When the form is saved', () => {
 								it( 'Should redirect', async () => {
 
-									const resolvedlUrl = '/resolved/';
-									urls.barriers.statusResolved.and.callFake( () => resolvedlUrl );
-
 									await controller.index( req, res, next );
 
-									expect( urls.barriers.statusResolved ).toHaveBeenCalledWith( req.barrier.id );
-									expect( res.redirect ).toHaveBeenCalledWith( resolvedlUrl );
+									expect( urls.barriers.detail ).toHaveBeenCalledWith( req.barrier.id );
+									expect( res.redirect ).toHaveBeenCalledWith( detailUrl );
 								} );
 							} );
 						} );
@@ -379,13 +381,10 @@ describe( 'Barrier status controller', () => {
 							describe( 'When the form is saved', () => {
 								it( 'Should redirect', async () => {
 
-									const hibernatelUrl = '/resolved/';
-									urls.barriers.statusHibernated.and.callFake( () => hibernatelUrl );
-
 									await controller.index( req, res, next );
 
-									expect( urls.barriers.statusHibernated ).toHaveBeenCalledWith( req.barrier.id );
-									expect( res.redirect ).toHaveBeenCalledWith( hibernatelUrl );
+									expect( urls.barriers.detail ).toHaveBeenCalledWith( req.barrier.id );
+									expect( res.redirect ).toHaveBeenCalledWith( detailUrl );
 								} );
 							} );
 						} );
@@ -486,6 +485,55 @@ describe( 'Barrier status controller', () => {
 				hasOpenConfig( config );
 				hasHibernateConfig( config );
 			} );
+
+			describe( 'When it is a POST', () => {
+
+				beforeEach( () => {
+
+					req.body = {};
+					form.isPost = true;
+				} );
+
+				afterEach( () => {
+
+					expect( form.validate ).toHaveBeenCalled();
+				} );
+
+				describe( 'When the required values are filled', () => {
+					describe( 'When it is OPEN', () => {
+
+						beforeEach( () => {
+
+							getValuesResponse.status = OPEN;
+						} );
+
+						describe( 'When the response is a success', () => {
+
+							beforeEach( () => {
+
+								backend.barriers.open.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+								form.hasErrors = () => false;
+							} );
+
+							afterEach( () => {
+
+								expect( next ).not.toHaveBeenCalled();
+								expect( backend.barriers.open ).toHaveBeenCalledWith( req, req.barrier.id, getValuesResponse );
+							} );
+
+							describe( 'When the form is saved', () => {
+								it( 'Should redirect', async () => {
+
+									await controller.index( req, res, next );
+
+									expect( urls.barriers.detail ).toHaveBeenCalledWith( req.barrier.id );
+									expect( res.redirect ).toHaveBeenCalledWith( detailUrl );
+								} );
+							} );
+						} );
+					} );
+				} );
+			} );
 		} );
 
 		describe( 'When the current status is HIBERNATE', () => {
@@ -504,39 +552,6 @@ describe( 'Barrier status controller', () => {
 				hasOpenConfig( config );
 				hasResolveConfig( config );
 			} );
-		} );
-	} );
-
-	describe( 'status.resolved', () => {
-		it( 'Should render the success page', () => {
-
-			req.uuid = 'test';
-
-			controller.resolved( req, res );
-
-			expect( res.render ).toHaveBeenCalledWith( 'barriers/views/status/resolved', { barrierId: req.uuid } );
-		} );
-	} );
-
-	describe( 'status.hibernated', () => {
-		it( 'Should render the success page', () => {
-
-			req.uuid = 'test';
-
-			controller.hibernated( req, res );
-
-			expect( res.render ).toHaveBeenCalledWith( 'barriers/views/status/hibernated', { barrierId: req.uuid } );
-		} );
-	} );
-
-	describe( 'status.open', () => {
-		it( 'Should render the success page', () => {
-
-			req.uuid = 'test';
-
-			controller.open( req, res );
-
-			expect( res.render ).toHaveBeenCalledWith( 'barriers/views/status/open', { barrierId: req.uuid } );
 		} );
 	} );
 } );
