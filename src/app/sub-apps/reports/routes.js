@@ -47,6 +47,8 @@ module.exports = ( express, app ) => {
 	app.get( '/:reportId/problem/', controller.aboutProblem );
 	app.post( '/:reportId/problem/', controller.aboutProblem );
 
+	app.post( '/:reportId/submit/', controller.submit );
+
 	// detail must be last route
 	app.get( '/:reportId/', controller.report );
 

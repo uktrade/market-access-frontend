@@ -419,13 +419,30 @@ module.exports = {
 
 				res.render( 'reports/views/about-problem', templateValues );
 			},
-			saveFormData: ( formValues ) => backend.reports.saveProblemAndSubmit( req, report.id, formValues ),
-			saved: async ( body ) => {
+			saveFormData: ( formValues ) => {
+
+				if( form.isExit ){
+
+					return backend.reports.saveProblem( req, report.id, formValues );
+
+				} else {
+
+					return backend.reports.saveProblemAndSubmit( req, report.id, formValues );
+				}
+			},
+			saved: ( body ) => {
 
 				const barrierId = body.id;
 
-				req.flash( 'barrier-created', barrierId );
-				res.redirect( urls.barriers.detail( barrierId ) );
+				if( form.isExit ){
+
+					res.redirect( urls.reports.detail( barrierId ) );
+
+				} else {
+
+					req.flash( 'barrier-created', barrierId );
+					res.redirect( urls.barriers.detail( barrierId ) );
+				}
 			}
 		} );
 
@@ -437,5 +454,29 @@ module.exports = {
 
 			next( e );
 		}
-	}
+	},
+
+	submit: async ( req, res, next ) => {
+
+		const reportId = req.report.id;
+
+		try {
+
+			const { response } = await	backend.reports.submit( req, reportId );
+
+			if( response.isSuccess ){
+
+				req.flash( 'barrier-created', reportId );
+				res.redirect( urls.barriers.detail( reportId ) );
+
+			} else {
+
+				res.redirect( urls.reports.detail( reportId ) );
+			}
+
+		} catch( e ){
+
+			next( e );
+		}
+	},
 };

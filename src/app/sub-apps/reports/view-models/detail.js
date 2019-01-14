@@ -58,7 +58,6 @@ function addReportData( tasks, report ){
 	tasks.next = nextTask;
 }
 
-
 module.exports = ( csrfToken, report ) => {
 
 	//copy tasks before we mutate

@@ -86,6 +86,7 @@ describe( 'Report controller', () => {
 			reports: {
 				save: jasmine.createSpy( 'backend.reports.save' ),
 				update: jasmine.createSpy( 'backend.reports.update' ),
+				saveProblem: jasmine.createSpy( 'backend.reports.saveProblem' ),
 				saveProblemAndSubmit: jasmine.createSpy( 'backend.reports.saveProblemAndSubmit' ),
 				saveImpact: jasmine.createSpy( 'backend.reports.saveImpact' ),
 				saveLegal: jasmine.createSpy( 'backend.reports.saveLegal' ),
@@ -1413,32 +1414,65 @@ describe( 'Report controller', () => {
 			} );
 
 			describe( 'saveFormData', () => {
-				it( 'Should call the correct method with the correct data', () => {
+				describe( 'When it is Save and exit', () => {
+					it( 'Should call the correct method with the correct data', () => {
 
-					const myFormData = { a: true, b: false };
+						const myFormData = { a: true, b: false };
 
-					args.saveFormData( myFormData );
+						form.isExit = true;
 
-					expect( backend.reports.saveProblemAndSubmit ).toHaveBeenCalledWith( req, report.id, myFormData );
+						args.saveFormData( myFormData );
+
+						expect( backend.reports.saveProblem ).toHaveBeenCalledWith( req, report.id, myFormData );
+					} );
+				} );
+
+				describe( 'When it is Save and continue', () => {
+					it( 'Should call the correct method with the correct data', () => {
+
+						const myFormData = { a: true, b: false };
+
+						args.saveFormData( myFormData );
+
+						expect( backend.reports.saveProblemAndSubmit ).toHaveBeenCalledWith( req, report.id, myFormData );
+					} );
 				} );
 			} );
 
 			describe( 'Saved', () => {
-				it( 'Should redirect to the barrier detail page', async () => {
+				describe( 'When it is Save and exit', () => {
+					it( 'Should redirect to the report detail page', () => {
 
-					const detailUrlResponse = '/detail-url';
-					const body = { id: 123 };
+						const detailUrlResponse = '/detail-url';
+						const body = { id: 123 };
 
-					backend.reports.submit.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
-					form.hasErrors = () => false;
-					urls.barriers.detail.and.callFake( () => detailUrlResponse );
+						form.isExit = true;
+						urls.reports.detail.and.callFake( () => detailUrlResponse );
 
-					await args.saved( body );
+						args.saved( body );
 
-					expect( req.flash ).toHaveBeenCalledWith( 'barrier-created', body.id );
-					expect( urls.barriers.detail ).toHaveBeenCalledWith( body.id );
-					expect( res.redirect ).toHaveBeenCalledWith( detailUrlResponse );
-					expect( next ).not.toHaveBeenCalled();
+						expect( urls.reports.detail ).toHaveBeenCalledWith( body.id );
+						expect( res.redirect ).toHaveBeenCalledWith( detailUrlResponse );
+						expect( req.flash ).not.toHaveBeenCalled();
+						expect( next ).not.toHaveBeenCalled();
+					} );
+				} );
+
+				describe( 'When it is Save and continue', () => {
+					it( 'Should redirect to the barrier detail page', () => {
+
+						const detailUrlResponse = '/detail-url';
+						const body = { id: 123 };
+
+						urls.barriers.detail.and.callFake( () => detailUrlResponse );
+
+						args.saved( body );
+
+						expect( req.flash ).toHaveBeenCalledWith( 'barrier-created', body.id );
+						expect( urls.barriers.detail ).toHaveBeenCalledWith( body.id );
+						expect( res.redirect ).toHaveBeenCalledWith( detailUrlResponse );
+						expect( next ).not.toHaveBeenCalled();
+					} );
 				} );
 			} );
 
@@ -1464,6 +1498,73 @@ describe( 'Report controller', () => {
 						expect( next ).toHaveBeenCalledWith( err );
 					} );
 				} );
+			} );
+		} );
+	} );
+
+	describe( 'submitReport', () => {
+
+		beforeEach( () => {
+
+			req.report = { id: 1, b: 2 };
+		} );
+
+		describe( 'When the response is a success', () => {
+
+			beforeEach( () => {
+
+				backend.reports.submit.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+
+				form.hasErrors = () => false;
+			} );
+
+			afterEach( () => {
+
+				expect( next ).not.toHaveBeenCalled();
+				expect( backend.reports.submit ).toHaveBeenCalledWith( req, req.report.id );
+			} );
+
+			it( 'Should render the barrier detail page', async () => {
+
+				const detailUrlResponse = '/a-url';
+
+				urls.barriers.detail.and.callFake( () => detailUrlResponse );
+
+				await controller.submit( req, res, next );
+
+				expect( req.flash ).toHaveBeenCalledWith( 'barrier-created', req.report.id );
+				expect( urls.barriers.detail ).toHaveBeenCalledWith( req.report.id );
+				expect( res.redirect ).toHaveBeenCalledWith( detailUrlResponse );
+			} );
+		} );
+
+		describe( 'When the response is not a success', () => {
+			it( 'Should redirect to the report detail page', async () => {
+
+				const statusCode = 500;
+				const reportDetailResponse = '/reportDetail';
+				urls.reports.detail.and.callFake( () => reportDetailResponse );
+				form.hasErrors = () => false;
+				backend.reports.submit.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
+
+				await controller.submit( req, res, next );
+
+				expect( req.flash ).not.toHaveBeenCalled();
+				expect( urls.reports.detail ).toHaveBeenCalledWith( req.report.id );
+				expect( res.redirect ).toHaveBeenCalledWith( reportDetailResponse );
+			} );
+		} );
+
+		describe( 'When the request fails', () => {
+			it( 'Should call next with the error', async () => {
+
+				const err = new Error( 'my test' );
+				form.hasErrors = () => false;
+				backend.reports.submit.and.callFake( () => Promise.reject( err ) );
+
+				await controller.submit( req, res, next );
+
+				expect( next ).toHaveBeenCalledWith( err );
 			} );
 		} );
 	} );
