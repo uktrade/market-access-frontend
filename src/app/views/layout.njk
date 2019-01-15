@@ -56,12 +56,9 @@
 			</p>
 		</div>
 	</div>
-{% endblock %}
-
-{% block beforeContent %}
 	{{ govukPhaseBanner({
 		attributes: { role: 'complementary' },
-		classes: 'govuk-phase-banner--ma',
+		classes: 'govuk-phase-banner--ma govuk-!-padding-left-3 govuk-!-padding-right-3',
 		tag: {
 			text: "beta",
 			classes: 'govuk-tag--ma'
@@ -71,29 +68,19 @@
 {% endblock %}
 
 {% block content %}
-	{% block page_content %}{% endblock %}
-
-	<div class="footer-bar" role="complementary" aria-labelledby="footer-title">
-		<p class="footer-bar__content">
-			<strong id="footer-title">Is there anything wrong with this page?</strong>
-			Give us <a href="mailto:{{ feedbackEmail }}">feedback on this page</a> to help us improve this service.
-		</p>
-	</div>
+{% block page_content %}{% endblock %}
 {% endblock %}
 
 {% block footer %}
-	{{- govukFooter({
+<div class="footer-bar" role="complementary" aria-labelledby="footer-title">
+	<p class="footer-bar__content">
+		<strong id="footer-title">Is there anything wrong with this page?</strong>
+		Give us <a href="mailto:{{ feedbackEmail }}">feedback on this page</a> to help us improve this service.
+	</p>
+</div>
+{{- govukFooter({
 		classes: 'govuk-footer--ma',
 		'navigation': [
-			{
-				'title': 'Data Hub',
-				'items': [
-					{
-						'href': '#',
-						'text': 'View Data Hub'
-					}
-				]
-			},
 			{
 				'title': 'Market access barriers',
 				'items': [
@@ -114,12 +101,7 @@
 			}
 		]
 	}) }}
-	{#
-	{
-		'href': '#',
-		'text': 'Find a barrier'
-	},
-	#}
+
 {% endblock %}
 
 {% block bodyEnd %}

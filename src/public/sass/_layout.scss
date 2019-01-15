@@ -107,8 +107,6 @@ a {
 }
 
 .govuk-tag--ma {
-	position: relative;
-	top: -2px;
 	padding-top: 4px;
 	padding-bottom: 2px;
 	background-color: $govuk-fuchsia;
@@ -126,7 +124,10 @@ a {
 	font-weight: normal;
 	color: white;
 	text-decoration: none;
-	margin-left: govuk-em( 10, 16 );
+
+	@include mq( $from: tablet ){
+		margin-left: govuk-em( 10, 16 );
+	}
 
 	&:hover {
 		text-decoration: underline;
@@ -169,13 +170,42 @@ a {
 	background-color: $govuk-fuchsia;
 	color: $govuk-white;
 	box-sizing: border-box;
-	padding: govuk-em( 10, 14 ) govuk-em( 10, 14 ) govuk-em( 5, 14 ) govuk-em( 10, 14 );
+	padding: 10px 15px;
 
 	a {
 		color: $govuk-white;
 	}
 }
 
-.govuk-footer--ma {
-	border-top: 8px solid $govuk-fuchsia
+@include mq( $from: tablet ){
+	.govuk-footer--ma {
+		.govuk-width-container {
+			max-width: 100%;
+			margin: 0 30px;
+		}
+		.govuk-footer__section-break {
+			display: none;
+		}
+	}
+}
+
+@include mq( $from: tablet ){
+	.govuk-header--ma {
+		.govuk-width-container {
+			max-width: 100%;
+			margin: 0 15px;
+		}
+		.govuk-header__logo {
+			width: auto;
+			margin-right: 8%;
+		}	
+		.govuk-tag {
+			margin-left: 10px;
+			background-color: #912b88;
+		}		
+	}
+	.header-wrapper__user__content {
+		max-width: 100%;
+		margin: 0 15px;
+	}
 }
