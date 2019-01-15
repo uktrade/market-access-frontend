@@ -127,9 +127,8 @@ Then( 'the footer links should be present', async () => {
 
 	const links = await driver.allByCss( '.govuk-footer__list  a' );
 	const info = [
-		[ 'View Data Hub', '/#' ],
 		[ 'Dashboard', '/' ],
-		[ 'Report a barrier', urls.reports.new() ],
+		[ 'Add a barrier', urls.reports.new() ],
 		[ 'Find a barrier', urls.findABarrier() ],
 		[ 'What is a barrier?', urls.whatIsABarrier() ]
 	];
