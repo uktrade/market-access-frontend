@@ -58,7 +58,7 @@
 	</div>
 	{{ govukPhaseBanner({
 		attributes: { role: 'complementary' },
-		classes: 'govuk-phase-banner--ma',
+		classes: 'govuk-phase-banner--ma govuk-!-padding-left-3 govuk-!-padding-right-3',
 		tag: {
 			text: "beta",
 			classes: 'govuk-tag--ma'
@@ -78,7 +78,11 @@
 		Give us <a href="mailto:{{ feedbackEmail }}">feedback on this page</a> to help us improve this service.
 	</p>
 </div>
+<<<<<<< HEAD
 {{- govukFooterMa({
+=======
+{{- govukFooter({
+>>>>>>> changes to header and footer layout
 		classes: 'govuk-footer--ma',
 		'navigation': [
 			{
