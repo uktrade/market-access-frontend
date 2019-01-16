@@ -125,5 +125,41 @@
 			"name": { "faker": "lorem.word" },
 			"order": { "enum": [ 0, 1, 2, 3 ] }
 		}
+	},
+
+	"progress": {
+		"type": "array",
+		"minItems": 4,
+		"maxItems": 4,
+		"items": {
+			"$ref": "#/progress-item"
+		}
+	},
+
+	"progress-item": {
+		"type": "object",
+		"required": [ "stage_code", "stage_desc", "status_id", "status_desc" ],
+		"properties": {
+
+			"stage_code": {
+				"type": "string",
+				"enum": [ "1.1", "1.2", "1.3", "1.4" ]
+			},
+
+			"stage_desc": {
+				"type": "string",
+				"faker": "lorem.words"
+			},
+
+			"status_id": {
+				"type": "number",
+				"enum": [ 1, 2, 3 ]
+			},
+
+			"status_desc": {
+				"type": "string",
+				"pattern": "COMPLETED|IN PROGRESS"
+			}
+		}
 	}
 }

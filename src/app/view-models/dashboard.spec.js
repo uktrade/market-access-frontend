@@ -69,7 +69,8 @@ describe( 'Dashboard view model', () => {
 					problemStatus: metadata.statusTypes[ barrier.problem_status ],
 					sectors: ( barrier.sectors && barrier.sectors.map( () => getSector().name ) || [ 'Unknown' ] ),
 					date: {
-						reported: barrier.reported_on
+						reported: barrier.reported_on,
+						created: barrier.created_on,
 					},
 					priority: {
 						...barrier.priority,

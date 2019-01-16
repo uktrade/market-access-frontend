@@ -18,7 +18,6 @@ module.exports = {
 		const configItems = {
 			[ RESOLVE ]: {
 				serviceMethod: 'resolve',
-				successPage: 'statusResolved',
 				label: 'Mark as <strong>resolved</strong>',
 				fields: {
 					resolvedDate: {
@@ -56,7 +55,6 @@ module.exports = {
 			},
 			[ HIBERNATE ]: {
 				serviceMethod: 'hibernate',
-				successPage: 'statusHibernated',
 				label: 'Mark as <strong>paused</strong>',
 				fields: {
 					hibernationSummary: {
@@ -68,7 +66,6 @@ module.exports = {
 			},
 			[ OPEN ]: {
 				serviceMethod: 'open',
-				successPage: 'statusOpen',
 				label: 'Mark as <strong>open</strong>',
 				fields: {
 					reopenSummary: {
@@ -132,7 +129,7 @@ module.exports = {
 				configItem = configItems[ formValues.status ];
 				return backend.barriers[ configItem.serviceMethod ]( req, req.barrier.id, formValues );
 			},
-			saved: () => res.redirect( urls.barriers[ configItem.successPage ]( req.barrier.id ) )
+			saved: () => res.redirect( urls.barriers.detail( req.barrier.id ) )
 		} );
 
 		try {
@@ -144,8 +141,4 @@ module.exports = {
 			next( e );
 		}
 	},
-
-	resolved: ( req, res ) => res.render( 'barriers/views/status/resolved', { barrierId: req.uuid } ),
-	hibernated: ( req, res ) => res.render( 'barriers/views/status/hibernated', { barrierId: req.uuid } ),
-	open: ( req, res ) => res.render( 'barriers/views/status/open', { barrierId: req.uuid } ),
 };

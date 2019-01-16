@@ -3,7 +3,7 @@
 	"title": "Detail of a report",
 
 	"type": "object",
-	"required": [ "id", "company_name", "barrier_type" ],
+	"required": [ "id", "company_name", "barrier_type", "progress" ],
 	"properties": {
 
 		"id": {
@@ -29,6 +29,10 @@
 				"id": { "$ref": "$refs/common.json#/small-int" },
 				"title": { "$ref": "$refs/common.json#/words" }
 			}
+		},
+
+		"progress": {
+			"$ref": "$refs/common.json#/progress"
 		}
 	}
 }

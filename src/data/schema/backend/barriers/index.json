@@ -32,7 +32,8 @@
 				"support_type",
 				"contributor_count",
 				"current_status",
-				"priority"
+				"priority",
+				"created_on"
 			],
 			"properties": {
 
@@ -77,7 +78,9 @@
 						"created_on": { "$ref": "$refs/common.json#/past-date" },
 						"created_by": { "$ref": "$refs/common.json#/words" }
 					}
-				}
+				},
+
+				"created_on": { "$ref": "$refs/common.json#/past-date" }
 			}
 		}
 	}

@@ -1,5 +1,5 @@
-$checkmark-circle-size: 75px;
-$checkmark-tick-width: 11px;
+$checkmark-circle-size: 42px;
+$checkmark-tick-width: 7px;
 $checkmark-tick-height: ( $checkmark-tick-width * 0.75 );
 $checkmark-stem-multiplier: 3;
 
@@ -16,7 +16,7 @@ $checkmark-stem-multiplier: 3;
     position: absolute;
     width: $checkmark-circle-size;
     height: $checkmark-circle-size;
-    background-color: rgba( 255, 255, 255, 0.2 );
+    background-color: $govuk-green;
     border-radius: ( $checkmark-circle-size / 2 );
     left: 0;
     top: 0;

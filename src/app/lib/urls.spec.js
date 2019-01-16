@@ -169,27 +169,6 @@ describe( 'URLs', () => {
 			} );
 		} );
 
-		describe( 'statusResolved', () => {
-			it( 'Should return the correct path', () => {
-
-				expect( urls.barriers.statusResolved( barrierId ) ).toEqual( `/barriers/${ barrierId }/status/resolved/` );
-			} );
-		} );
-
-		describe( 'statusHibernated', () => {
-			it( 'Should return the correct path', () => {
-
-				expect( urls.barriers.statusHibernated( barrierId ) ).toEqual( `/barriers/${ barrierId }/status/hibernated/` );
-			} );
-		} );
-
-		describe( 'statusOpen', () => {
-			it( 'Should return the correct path', () => {
-
-				expect( urls.barriers.statusOpen( barrierId ) ).toEqual( `/barriers/${ barrierId }/status/open/` );
-			} );
-		} );
-
 		describe( 'type', () => {
 			describe( 'category', () => {
 				it( 'Should return the correct path', () => {
@@ -379,7 +358,6 @@ describe( 'URLs', () => {
 					[ 'removeSector', 'sectors/remove' ],
 					[ 'aboutProblem', 'problem' ],
 					[ 'submit', 'submit' ],
-					[ 'success', 'success' ]
 				] );
 			} );
 		} );

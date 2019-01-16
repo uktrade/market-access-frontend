@@ -88,6 +88,9 @@ describe( 'Reports view model', () => {
 					problem_status: {
 						id: report.problem_status,
 						name: metadata.statusTypes[ report.problem_status ]
+					},
+					date: {
+						created: report.created_on
 					}
 				};
 			}
