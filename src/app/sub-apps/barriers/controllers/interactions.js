@@ -294,13 +294,6 @@ module.exports = {
 
 						values.documentId = formValues.documentId;
 
-						if( req.session.barrierDocuments ){
-
-							req.session.barrierDocuments = req.session.barrierDocuments.filter( ( { barrierId, documentId } ) => (
-								barrierId === req.barrier.id && documentId === formValues.documentId
-							) );
-						}
-
 					} else if( formValues.document && formValues.document.size > 0 ){
 
 						try {
@@ -322,7 +315,17 @@ module.exports = {
 
 					return backend.barriers.notes.save( req, barrier.id, values );
 				},
-				saved: () => res.redirect( urls.barriers.interactions( barrier.id ) )
+				saved: () => {
+
+					if( req.session.barrierDocuments ){
+
+						req.session.barrierDocuments = req.session.barrierDocuments.filter( ( { barrierId } ) => (
+							barrierId !== barrier.id
+						) );
+					}
+
+					res.redirect( urls.barriers.interactions( barrier.id ) );
+				}
 			} );
 
 			try {
