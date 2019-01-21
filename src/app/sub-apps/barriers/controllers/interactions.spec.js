@@ -315,18 +315,23 @@ describe( 'Barrier interactions controller', () => {
 				} );
 
 				describe( 'With a documentId', () => {
-					it( 'Should configure the saveFormData correctly', async () => {
+
+					let config;
+					let formValues;
+
+					beforeEach( async () => {
 
 						await controller.notes.add( req, res, next );
 
-						const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
-						const formValues = {
+						config = FormProcessor.calls.argsFor( 0 )[ 0 ];
+						formValues = {
 							note: faker.lorem.words(),
 							pinned: true,
 							documentId: uuid(),
 						};
+					} );
 
-						config.saveFormData( formValues );
+					afterEach( () => {
 
 						expect( backend.barriers.notes.save ).toHaveBeenCalledWith( req, req.barrier.id, {
 							note: formValues.note,
@@ -336,22 +341,73 @@ describe( 'Barrier interactions controller', () => {
 
 						expect( next ).not.toHaveBeenCalled();
 					} );
+
+					describe( 'When there are documents in the session', () => {
+						it( 'Should remove the documents for this barrier id', () => {
+
+							const doc1 = { barrierId: uuid(), documentId: uuid() };
+							const doc2 = { barrierId: uuid(), documentId: uuid() };
+
+							req.session.barrierDocuments = [
+								doc1,
+								{ barrierId: barrier.id, documentId: formValues.documentId },
+								doc2,
+							];
+
+							config.saveFormData( formValues );
+							config.saved();
+
+							expect( req.session.barrierDocuments ).toEqual( [
+								doc1, doc2
+							] );
+						} );
+					} );
+
+					describe( 'When there are not any documents in the session', () => {
+						it( 'Should configure the saveFormData correctly', async () => {
+
+							config.saveFormData( formValues );
+						} );
+					} );
 				} );
 
 				describe( 'With a document', () => {
-					describe( 'When uploadDocument and getScanStatus return success', () => {
-						it( 'Should configure the saveFormData correctly', async () => {
 
-							await controller.notes.add( req, res, next );
+					let config;
+					let formValues;
+					let signed_upload_url;
+					let documentId;
 
-							const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
-							const documentId = uuid();
-							const signed_upload_url = 'a/b/c';
-							const formValues = {
-								note: faker.lorem.words(),
-								pinned: true,
-								document: { name: 'a document', size: 12 },
-							};
+					beforeEach( async () => {
+
+						await controller.notes.add( req, res, next );
+
+						config = FormProcessor.calls.argsFor( 0 )[ 0 ];
+						documentId = uuid();
+						signed_upload_url = 'a/b/c';
+						formValues = {
+							note: faker.lorem.words(),
+							pinned: true,
+							document: { name: 'a document', size: 12 },
+						};
+					} );
+
+					describe( 'When uploadDocument rejects', () => {
+						it( 'Should call next with an error', async () => {
+
+							const err = new Error( 'My test' );
+
+							backend.documents.create.and.callFake( () => Promise.reject( err ) );
+
+							await config.saveFormData( formValues );
+
+							expect( next ).toHaveBeenCalledWith( err );
+						} );
+					} );
+
+					describe( 'When uploadDocument returns success', () => {
+
+						beforeEach( () => {
 
 							backend.documents.create.and.callFake( () => Promise.resolve( { response: {
 								isSuccess: true
@@ -367,24 +423,47 @@ describe( 'Barrier interactions controller', () => {
 							backend.documents.uploadComplete.and.callFake( () => Promise.resolve( {
 								response: { isSuccess: true },
 							} ) );
+						} );
 
-							backend.documents.getScanStatus.and.callFake( () => Promise.resolve( {
-								status: 'virus_scanned',
-								passed: true,
-							} ) );
-
-							await config.saveFormData( formValues );
+						afterEach( () => {
 
 							expect( backend.documents.create ).toHaveBeenCalledWith( req, formValues.document.name, formValues.document.size );
 							expect( uploadFile ).toHaveBeenCalledWith( signed_upload_url, formValues.document );
 							expect( backend.documents.uploadComplete ).toHaveBeenCalledWith( req, documentId );
 							expect( backend.documents.getScanStatus ).toHaveBeenCalledWith( req, documentId );
-							expect( backend.barriers.notes.save ).toHaveBeenCalledWith( req, req.barrier.id, {
-								note: formValues.note,
-								pinned: formValues.pinned,
-								documentId
+						} );
+
+						describe( 'When getScanStatus return success', () => {
+							it( 'Should configure the saveFormData correctly', async () => {
+
+								backend.documents.getScanStatus.and.callFake( () => Promise.resolve( {
+									status: 'virus_scanned',
+									passed: true,
+								} ) );
+
+								await config.saveFormData( formValues );
+
+								expect( backend.barriers.notes.save ).toHaveBeenCalledWith( req, req.barrier.id, {
+									note: formValues.note,
+									pinned: formValues.pinned,
+									documentId
+								} );
+								expect( next ).not.toHaveBeenCalled();
 							} );
-							expect( next ).not.toHaveBeenCalled();
+						} );
+
+						describe( 'When getScanStatus returns pass false', () => {
+							it( 'Should throw an error', async () => {
+
+								backend.documents.getScanStatus.and.callFake( () => Promise.resolve( {
+									status: 'virus_scanned',
+									passed: false,
+								} ) );
+
+								await config.saveFormData( formValues );
+
+								expect( next ).toHaveBeenCalledWith( new Error( 'This file may be infected with a virus and will not be accepted.' ) );
+							} );
 						} );
 					} );
 				} );
