@@ -81,7 +81,7 @@ let config = {
 			},
 		},
 		scan: {
-			maxWaitTime: number( 'FILE_SCAN_MAX_WAIT_TIME', 15000 ),
+			maxWaitTime: number( 'FILE_SCAN_MAX_WAIT_TIME', 30000 ),
 			statusCheckInterval: number( 'FILE_SCAN_STATUS_CHECK_INTERVAL', 500 ),
 		},
 	},
