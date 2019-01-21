@@ -84,57 +84,65 @@ function uploadDocument( req, file ) {
 
 	return new Promise( async ( resolve, reject ) => {
 
-		const { response, body } = await backend.documents.create( req, file.name, file.size );
+		try {
 
-		if( response.isSuccess ){
+			const { response, body } = await backend.documents.create( req, file.name, file.size );
 
-			const { id, signed_upload_url } = body;
+			if( response.isSuccess ){
 
-			uploadFile( signed_upload_url, file ).then( async ( { response } ) => {
+				const { id, signed_upload_url } = body;
 
-				if( response.statusCode === 200 ){
+				uploadFile( signed_upload_url, file ).then( async ( { response } ) => {
 
-					const { response } = await backend.documents.uploadComplete( req, id );
+					if( response.statusCode === 200 ){
 
-					if( response.isSuccess ){
+						const { response } = await backend.documents.uploadComplete( req, id );
 
-						resolve( id );
+						if( response.isSuccess ){
+
+							resolve( id );
+
+						} else {
+
+							const err = new Error( 'Unable to complete upload' );
+
+							reject( err );
+							reporter.captureException( err, { response: {
+								statusCode: response.statusCode,
+								documentId: id,
+							} } );
+						}
 
 					} else {
 
-						const err = new Error( 'Unable to complete upload' );
+						const err = new Error( 'Unable to upload document to S3' );
 
 						reject( err );
-						reporter.captureException( err, { response: {
-							statusCode: response.statusCode,
-							documentId: id,
-						} } );
+						reporter.captureException( err, {
+							response: {
+								statusCode: response.statusCode,
+								body: response.body,
+								documentId: id,
+							}
+						} );
 					}
 
-				} else {
+				} ).catch( ( e ) => {
 
-					const err = new Error( 'Unable to upload document to S3' );
+					reject( e );
+					reporter.captureException( e, { documentId: id } );
+				} );
 
-					reject( err );
-					reporter.captureException( err, {
-						response: {
-							statusCode: response.statusCode,
-							body: response.body,
-							documentId: id,
-						}
-					} );
-				}
+			} else {
 
-			} ).catch( ( e ) => {
+				reject( new Error( 'Could not create document' ) );
+			}
 
-				reject( e );
-				reporter.captureException( e, { documentId: id } );
-			} );
+		} catch ( e ){
 
-		} else {
-
-			reject( new Error( 'Could not create document' ) );
+			reject( e );
 		}
+
 	} );
 }
 
@@ -294,13 +302,6 @@ module.exports = {
 
 						values.documentId = formValues.documentId;
 
-						if( req.session.barrierDocuments ){
-
-							req.session.barrierDocuments = req.session.barrierDocuments.filter( ( { barrierId, documentId } ) => (
-								barrierId === req.barrier.id && documentId === formValues.documentId
-							) );
-						}
-
 					} else if( formValues.document && formValues.document.size > 0 ){
 
 						try {
@@ -322,7 +323,17 @@ module.exports = {
 
 					return backend.barriers.notes.save( req, barrier.id, values );
 				},
-				saved: () => res.redirect( urls.barriers.interactions( barrier.id ) )
+				saved: () => {
+
+					if( req.session.barrierDocuments ){
+
+						req.session.barrierDocuments = req.session.barrierDocuments.filter( ( { barrierId } ) => (
+							barrierId !== barrier.id
+						) );
+					}
+
+					res.redirect( urls.barriers.interactions( barrier.id ) );
+				}
 			} );
 
 			try {

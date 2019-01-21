@@ -37,6 +37,13 @@ ma.pages.barrier.interactions.addNote = (function( doc, jessie ){
 
 		var deleteUrl = jessie.getElementData( form, 'xhr-delete' );
 
+		function showError( message ){
+
+			submit.disabled = false;
+			fileUpload.setError( message );
+			fileUpload.showLink();
+		}
+
 		function setDocumentId( id ){
 
 			if( !documentIdInput ){
@@ -66,13 +73,11 @@ ma.pages.barrier.interactions.addNote = (function( doc, jessie ){
 		}
 
 		function transferFailed(){
-			fileUpload.setError( 'Upload of document cancelled, try again.' );
-			fileUpload.showLink();
+			showError( 'Upload of document cancelled, try again.' );
 		}
 
 		function transferCanceled(){
-			fileUpload.setError( 'Upload of document cancelled, try again.' );
-			fileUpload.showLink();
+			showError( 'Upload of document cancelled, try again.' );
 		}
 
 		function checkFileStatus( file, url, documentId ){
@@ -101,19 +106,18 @@ ma.pages.barrier.interactions.addNote = (function( doc, jessie ){
 
 					if( !passed ){
 
-						fileUpload.setError( 'This file may be infected with a virus and will not be accepted.' );
-						fileUpload.showLink();
+						showError( 'This file may be infected with a virus and will not be accepted.' );
 						return;
 					}
 
+					submit.disabled = false;
 					fileUpload.setFile( file );
 					setDocumentId( documentId );
 
 				} else {
 
-					var message = ( data.message || 'A system error has occured, so the file has not been uploaded. Try again.' );
-					fileUpload.setError( message );
-					fileUpload.showLink();
+					var message = ( ( data && data.message ) || 'A system error has occured, so the file has not been uploaded. Try again.' );
+					showError( message );
 				}
 
 			}, false );
@@ -127,8 +131,6 @@ ma.pages.barrier.interactions.addNote = (function( doc, jessie ){
 			var xhr = e.target;
 			var responseCode = xhr.status;
 			var data;
-
-			submit.disabled = false;
 
 			try {
 
@@ -152,15 +154,13 @@ ma.pages.barrier.interactions.addNote = (function( doc, jessie ){
 
 				} else {
 
-					fileUpload.setError( 'There was an issue uploading the document, try again' );
-					fileUpload.showLink();
+					showError( 'There was an issue uploading the document, try again' );
 				}
 
 			} else {
 
 				var message = ( data.message || 'A system error has occured, so the file has not been uploaded. Try again.' );
-				fileUpload.setError( message );
-				fileUpload.showLink();
+				showError( message );
 			}
 		}
 
