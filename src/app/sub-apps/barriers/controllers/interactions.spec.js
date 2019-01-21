@@ -372,25 +372,42 @@ describe( 'Barrier interactions controller', () => {
 				} );
 
 				describe( 'With a document', () => {
+
+					let config;
+					let formValues;
+					let signed_upload_url;
+					let documentId;
+
+					beforeEach( async () => {
+
+						await controller.notes.add( req, res, next );
+
+						config = FormProcessor.calls.argsFor( 0 )[ 0 ];
+						documentId = uuid();
+						signed_upload_url = 'a/b/c';
+						formValues = {
+							note: faker.lorem.words(),
+							pinned: true,
+							document: { name: 'a document', size: 12 },
+						};
+					} );
+
+					describe( 'When uploadDocument rejects', () => {
+						it( 'Should call next with an error', async () => {
+
+							const err = new Error( 'My test' );
+
+							backend.documents.create.and.callFake( () => Promise.reject( err ) );
+
+							await config.saveFormData( formValues );
+
+							expect( next ).toHaveBeenCalledWith( err );
+						} );
+					} );
+
 					describe( 'When uploadDocument returns success', () => {
 
-						let config;
-						let formValues;
-						let signed_upload_url;
-						let documentId;
-
-						beforeEach( async () => {
-
-							await controller.notes.add( req, res, next );
-
-							config = FormProcessor.calls.argsFor( 0 )[ 0 ];
-							documentId = uuid();
-							signed_upload_url = 'a/b/c';
-							formValues = {
-								note: faker.lorem.words(),
-								pinned: true,
-								document: { name: 'a document', size: 12 },
-							};
+						beforeEach( () => {
 
 							backend.documents.create.and.callFake( () => Promise.resolve( { response: {
 								isSuccess: true
