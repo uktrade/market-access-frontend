@@ -49,7 +49,7 @@ module.exports = ( barrier, addCompany = false ) => {
 			type: getBarrierType( barrier.barrier_type ),
 			status,
 			reportedOn: barrier.reported_on,
-			reportedBy: barrier.reported_by.replace("."," ").replace(/\b\w/g, function(l){ return l.toUpperCase(); }),
+			reportedBy: barrier.reported_by,
 			country: metadata.getCountry( barrier.export_country ),
 			sectors,
 			source: {
