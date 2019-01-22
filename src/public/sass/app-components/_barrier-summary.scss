@@ -1,8 +1,6 @@
 .barrier-summary {
-	border-bottom: 2px solid $govuk-grey-2;
-	padding-top: govuk-em( 10, 16 );
-	padding-bottom: govuk-em( 15, 16 );
-	margin-bottom: govuk-em( 45, 16 );
+	padding-top: govuk-em( 30, 16 );
+	padding-bottom: govuk-em( 30, 16 );
 }
 
 .barrier-summary__heading {
@@ -23,6 +21,11 @@
 	}
 }
 
+.barrier-summary__heading__link {
+	display: block;
+	margin-top: 25px;
+}
+
 .barrier-summary__heading__text {
 	@include govuk-font( $size: 27, $weight: bold );
 	margin-top: 0;
@@ -30,10 +33,12 @@
 }
 
 .barrier-summary__status {
-	float: right;
+	@include mq( $from: tablet ){
+		float: right;
+		text-align: right;
+	}
 	box-sizing: border-box;
 	width: govuk-em( 180, 16 );
-	text-align: right;
 }
 
 .barrier-summary__status__badge {

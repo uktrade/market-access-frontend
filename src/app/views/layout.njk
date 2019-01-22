@@ -4,7 +4,7 @@
 
 {% set assetPath = '/govuk-public' %}
 
-{% extends 'template.njk' %}{# extend from govuk-template #}
+{% extends 'marketaccess-template.njk' %}{# extend from govuk-template #}
 
 {% block pageTitle %}{% block page_title %}Market Access{% endblock %}{% endblock %}
 
@@ -65,6 +65,12 @@
 		},
 		html: 'This is a new service – your <a class="govuk-link" href="mailto:' + feedbackEmail +'">feedback</a> will help us to improve it.'
 	}) }}
+{% endblock %}
+
+{% block masthead %}
+	<div class="govuk-masthead">
+		{% block mastheadContent %}{% endblock %}
+	</div>
 {% endblock %}
 
 {% block content %}
