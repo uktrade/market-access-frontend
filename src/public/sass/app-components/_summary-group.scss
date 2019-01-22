@@ -1,5 +1,12 @@
 .summary-group {
-	margin-bottom: govuk-em( 30, 16 );
+	max-width: 100%;
+	@include mq( $from: desktop ){
+		max-width: 400px;
+		margin-right: 30px;
+		display: inline-block;
+	}
+    vertical-align: top;
+    
 }
 
 .summary-group__heading {
@@ -14,14 +21,9 @@
 	@include govuk-font( $size: 19, $weight: bold );
 }
 
-.summary-group__list {
-
-}
-
 .summary-group__list__key {
 	width: 100%;
 	font-weight: bold;
-	background-color: $govuk-grey-4;
 }
 
 .summary-group__list__value {
@@ -35,11 +37,15 @@
 	}
 }
 
-.summary-group__list__key,
 .summary-group__list__value {
-	border-bottom: 1px solid $govuk-grey-2;
-	padding: govuk-em( 10, 16 ) 0;
+	border-bottom: 1px solid $govuk-grey-3;
+	padding-bottom: 15px;
+    margin-bottom: 12px;
 	box-sizing: border-box;
+
+	&:last-of-type {
+		border-bottom: none;
+	}
 }
 
 .summary-group__list__value__heading {
@@ -54,11 +60,11 @@
 	padding: govuk-em( 15, 16 );
 	display: block;
 	box-sizing: border-box;
+	margin-top: 5px;
 }
 
 .summary-group__list__value__edit {
 	display: block;
-	margin-top: govuk-em( 5, 16 );
 }
 
 .summary-group__list__value__list {
@@ -69,23 +75,19 @@
 .summary-group__list__value__list__item {
 	list-style: inside;
 }
+.summary-group__list-item-50 {
+	width: 50%;
+	float: left;
+
+	.summary-group__list__value {
+		border-bottom: 1px solid $govuk-grey-3;
+	}
+}
 
 @include mq( $from: tablet ){
-
 	.summary-group__list {
 		display: flex;
 		flex-wrap: wrap;
 	}
 
-	.summary-group__list__key {
-		width: 35%;
-		padding-right: govuk-em( 30, 16 );
-		padding-left: govuk-em( 10, 16 );
-		background-color: transparent;
-	}
-
-	.summary-group__list__value {
-		width: 65%;
-		//padding-right: govuk-em( 10, 16 );
-	}
 }

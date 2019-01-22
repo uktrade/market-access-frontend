@@ -5,6 +5,9 @@
 		<h{{ headingLevel }} class="summary-group__heading{{ (' summary-group__heading--sub') if params.heading.sub }}">{{ params.heading.text }}</h{{ headingLevel }}>
 		<dl class="summary-group__list">
 			{% for item in params.items %}
+			{% if item.halfWidth %}
+			<div class="summary-group__list-item-50">
+			{% endif %}
 			{% if item.title %}
 			<dt class="summary-group__list__key">{{ item.title }}</dt>
 			<dd class="summary-group__list__value">
@@ -21,6 +24,9 @@
 				<a href="{{ item.add.href }}" class="summary-group__list__value__add">{{ item.add.text }}</a>
 			{% endif %}
 			</dd>
+			{% if item.halfWidth %}
+			</div>
+			{% endif %}
 			{% endif %}
 			{% endfor %}
 		</dl>
