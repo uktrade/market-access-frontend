@@ -50,7 +50,7 @@ function checkCallbackErrors( errorParam, stateParam, codeParam, stateId ){
 
 module.exports = {
 
-	authRedirect: ( req, res ) => {
+	authRedirect: ( req, res, next ) => {
 
 		const stateId = uuid();
 
@@ -69,14 +69,19 @@ module.exports = {
 		req.session.oauthStateId = stateId; // used to check the callback received contains matching state param
 		req.session.save( ( err ) => {
 
-			if( err ){ throw err; }
+			if( err ){
 
-			logger.debug( 'Session saved to redis' );
-			res.redirect( `${ ssoUrls.auth }?${ stringify( urlParams ) }` );
+				next( err );
+
+			} else {
+
+				logger.debug( 'Session saved to redis' );
+				res.redirect( `${ ssoUrls.auth }?${ stringify( urlParams ) }` );
+			}
 		} );
 	},
 
-	callback: ( req, res ) => {
+	callback: ( req, res, next ) => {
 
 		const errorParam = req.query.error;
 		const stateParam = req.query.state;
@@ -94,7 +99,7 @@ module.exports = {
 		if( errMessage ){
 
 			logger.error( errMessage  );
-			throw new Error( errMessage );
+			return next( new Error( errMessage ) );
 		}
 
 		request( {
@@ -115,7 +120,7 @@ module.exports = {
 
 				logger.error( 'Error with SSO token request' );
 				logger.error( err );
-				throw new Error( 'Error with token request' );
+				return next( Error( 'Error with token request' ) );
 			}
 
 			if( data.access_token ){
@@ -125,7 +130,7 @@ module.exports = {
 
 				res.redirect( req.session.returnPath || '/' );
 
-				logger.debug( 'Callback data:' );
+				/* logger.debug( 'Callback data:' );
 
 				try {
 
@@ -134,11 +139,11 @@ module.exports = {
 				} catch( e ){
 
 					logger.debug( e );
-				}
+				} */
 
 			} else {
 
-				throw new Error( 'No access_token from SSO' );
+				next( new Error( 'No access_token from SSO' ) );
 			}
 		} );
 	}
