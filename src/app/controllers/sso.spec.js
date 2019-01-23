@@ -29,6 +29,7 @@ describe( 'SSO controller', () => {
 	let controller;
 	let req;
 	let res;
+	let next;
 	let params;
 	let ssoUri;
 	let ssoConfig;
@@ -54,10 +55,10 @@ describe( 'SSO controller', () => {
 		request = jasmine.createSpy( 'request' );
 
 		req = { session: {} };
-
 		res = {
 			redirect: jasmine.createSpy( 'res.redirect' )
 		};
+		next = jasmine.createSpy( 'next' );
 
 		loginUrl = '/my-login/';
 
@@ -98,13 +99,11 @@ describe( 'SSO controller', () => {
 		} );
 
 		describe( 'Without a mock code', () => {
-
 			describe( 'When the session is saved successfully', () => {
-
 				it( 'Should create a stateId, save it and redirect to SSO', () => {
 
 					createController();
-					controller.authRedirect( req, res );
+					controller.authRedirect( req, res, next );
 
 					expect( req.session.oauthStateId ).toEqual( uuid );
 					expect( req.session.save ).toHaveBeenCalled();
@@ -113,26 +112,21 @@ describe( 'SSO controller', () => {
 			} );
 
 			describe( 'When there is an error saving the session', () => {
-
-				it( 'Should throw the error', () => {
+				it( 'Should call next with the error', () => {
 
 					const testError = new Error( 'test session save error' );
 					req.session.save = jasmine.createSpy( 'session.save' ).and.callFake( ( cb ) => cb( testError ) );
 					createController();
 
-					expect( () => {
-
-						controller.authRedirect( req, res );
-
-					} ).toThrow( testError );
-
+					controller.authRedirect( req, res, next );
+					expect( next ).toHaveBeenCalledWith( testError );
+					expect( res.redirect ).not.toHaveBeenCalled();
 					expect( req.session.oauthStateId ).toEqual( uuid );
 				} );
 			} );
 		} );
 
 		describe( 'With a mock code', () => {
-
 			it( 'Should create a stateId, save it and redirect to SSO with the mock code', () => {
 
 				const code = 'mock-sso-code';
@@ -142,7 +136,7 @@ describe( 'SSO controller', () => {
 
 				createController();
 
-				controller.authRedirect( req, res );
+				controller.authRedirect( req, res, next );
 
 				expect( req.session.oauthStateId ).toEqual( uuid );
 				expect( req.session.save ).toHaveBeenCalled();
@@ -177,7 +171,7 @@ describe( 'SSO controller', () => {
 			it( 'Should call the API with the correct options and a function', () => {
 
 				createController();
-				controller.callback( req, res );
+				controller.callback( req, res, next );
 
 				expect( request.calls.argsFor( 0 )[ 0 ] ).toEqual( {
 					method: 'POST',
@@ -196,7 +190,6 @@ describe( 'SSO controller', () => {
 			} );
 
 			describe( 'With a successful response from the token API', () => {
-
 				describe( 'With an access_token', () => {
 
 					let accessToken;
@@ -208,7 +201,6 @@ describe( 'SSO controller', () => {
 					} );
 
 					describe( 'When a return path is in the session', () => {
-
 						it( 'Should store the token and redirect to the return path', () => {
 
 							const returnPath = '/a/path/';
@@ -216,7 +208,7 @@ describe( 'SSO controller', () => {
 							req.session.returnPath = returnPath;
 
 							createController();
-							controller.callback( req, res );
+							controller.callback( req, res, next );
 
 							expect( req.session.ssoToken ).toEqual( accessToken );
 							expect( req.session.oauthStateId ).not.toBeDefined();
@@ -225,11 +217,10 @@ describe( 'SSO controller', () => {
 					} );
 
 					describe( 'When a return path is NOT in the session', () => {
-
 						it( 'Should store the token and redirect to the root', () => {
 
 							createController();
-							controller.callback( req, res );
+							controller.callback( req, res, next );
 
 							expect( req.session.ssoToken ).toEqual( accessToken );
 							expect( req.session.oauthStateId ).not.toBeDefined();
@@ -239,46 +230,38 @@ describe( 'SSO controller', () => {
 				} );
 
 				describe( 'Without an access_token', () => {
-
-					it( 'Should throw an error', () => {
+					it( 'Should call next with an error', () => {
 
 						request.and.callFake( ( opts, cb ) => cb( null, {}, {} ) );
 
 						createController();
+						controller.callback( req, res, next );
 
-						expect( () => {
-
-							controller.callback( req, res );
-
-						} ).toThrow( new Error( 'No access_token from SSO' ) );
+						expect( next ).toHaveBeenCalledWith( new Error( 'No access_token from SSO' ) );
 					} );
 				} );
 			} );
 
 			describe( 'With an error response from the token API', () => {
-
-				it( 'Should throw an error', () => {
+				it( 'Should call next with an error', () => {
 
 					request.and.callFake( ( opts, cb ) => cb( new Error( 'Test fail response' ) ) );
 
 					createController();
-					expect( () => {
+					controller.callback( req, res, next );
 
-						controller.callback( req, res );
-
-					} ).toThrow( new Error( 'Error with token request' ) );
+					expect( next ).toHaveBeenCalledWith( new Error( 'Error with token request' ) );
 				} );
 			} );
 		} );
 
 		describe( 'Missing state in the session', () => {
-
 			it( 'Should redirect to the login page', () => {
 
 				req.query = {};
 
 				createController();
-				controller.callback( req, res );
+				controller.callback( req, res, next );
 
 				expect( res.redirect ).toHaveBeenCalledWith( loginUrl );
 			} );
@@ -292,8 +275,7 @@ describe( 'SSO controller', () => {
 			} );
 
 			describe( 'With an error param', () => {
-
-				it( 'Should throw an error', () => {
+				it( 'Should call next with an error', () => {
 
 					const errorParam = 'my-error';
 
@@ -304,18 +286,14 @@ describe( 'SSO controller', () => {
 					};
 
 					createController();
+					controller.callback( req, res, next );
 
-					expect( () => {
-
-						controller.callback( req, res );
-
-					} ).toThrow( new Error( `Error with SSO: ${ errorParam }` ) );
-
+					expect( next ).toHaveBeenCalledWith( new Error( `Error with SSO: ${ errorParam }` ) );
+					expect( request ).not.toHaveBeenCalled();
 				} );
 			} );
 
 			describe( 'When the state does not match', () => {
-
 				it( 'Should throw an error', () => {
 
 					const stateParam = 'my-state';
@@ -326,18 +304,14 @@ describe( 'SSO controller', () => {
 					};
 
 					createController();
+					controller.callback( req, res, next );
 
-					expect( () => {
-
-						controller.callback( req, res );
-
-					} ).toThrow( new Error( `StateId mismatch: '${ stateParam }' !== '${ uuid }'` ) );
-
+					expect( next ).toHaveBeenCalledWith( new Error( `StateId mismatch: '${ stateParam }' !== '${ uuid }'` ) );
+					expect( request ).not.toHaveBeenCalled();
 				} );
 			} );
 
 			describe( 'When the code param is too long', () => {
-
 				it( 'Should throw an error', () => {
 
 					const codeParam = '123456789';
@@ -350,18 +324,14 @@ describe( 'SSO controller', () => {
 					ssoConfig.paramLength = 5;
 
 					createController();
+					controller.callback( req, res, next );
 
-					expect( () => {
-
-						controller.callback( req, res );
-
-					} ).toThrow( new Error( `Code param too long: ${ codeParam.length }` ) );
-
+					expect( next ).toHaveBeenCalledWith( new Error( `Code param too long: ${ codeParam.length }` ) );
+					expect( request ).not.toHaveBeenCalled();
 				} );
 			} );
 
 			describe( 'When the code param is not alphanumeric', () => {
-
 				it( 'Should throw an error', () => {
 
 					req.query = {
@@ -370,13 +340,10 @@ describe( 'SSO controller', () => {
 					};
 
 					createController();
+					controller.callback( req, res, next );
 
-					expect( () => {
-
-						controller.callback( req, res );
-
-					} ).toThrow( new Error( 'Invalid code param' ) );
-
+					expect( next ).toHaveBeenCalledWith( new Error( 'Invalid code param' ) );
+					expect( request ).not.toHaveBeenCalled();
 				} );
 			} );
 		} );
