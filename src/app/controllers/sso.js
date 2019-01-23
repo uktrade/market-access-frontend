@@ -98,7 +98,6 @@ module.exports = {
 
 		if( errMessage ){
 
-			logger.error( errMessage  );
 			return next( new Error( errMessage ) );
 		}
 
