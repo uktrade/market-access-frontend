@@ -1,5 +1,4 @@
 const config = require( '../config' );
-const reporter = require( '../lib/reporter' );
 
 module.exports = {
 
@@ -11,10 +10,14 @@ module.exports = {
 
 	catchAll: function( err, req, res, next ){
 
+		/*
+		As this middleware is called after the reporter (raven/sentry) we do not need to report errors
+		If we were to call reporter.captureException here it would result it two errors being reported to Sentry
+		*/
+
 		if( res.headersSent ){
 
 			next( err );
-			reporter.captureException( err );
 
 		} else {
 
@@ -31,7 +34,6 @@ module.exports = {
 
 				res.status( 500 );
 				res.render( 'error/default', { error: err, showErrors: config.showErrors } );
-				reporter.captureException( err );
 			}
 		}
 	}
