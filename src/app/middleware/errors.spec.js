@@ -51,7 +51,7 @@ describe( 'errors middleware', function(){
 
 					expect( res.status ).not.toHaveBeenCalled();
 					expect( res.render ).not.toHaveBeenCalled();
-					expect( reporter.captureException ).toHaveBeenCalledWith( err );
+					expect( reporter.captureException ).not.toHaveBeenCalled();
 					expect( next ).toHaveBeenCalledWith( err );
 				} );
 			} );
@@ -64,7 +64,7 @@ describe( 'errors middleware', function(){
 
 						expect( res.status ).toHaveBeenCalledWith( 500 );
 						expect( res.render ).toHaveBeenCalledWith( 'error/default', { showErrors: config.showErrors, error: err } );
-						expect( reporter.captureException ).toHaveBeenCalledWith( err );
+						expect( reporter.captureException ).not.toHaveBeenCalled();
 						expect( next ).not.toHaveBeenCalled();
 					} );
 				} );
