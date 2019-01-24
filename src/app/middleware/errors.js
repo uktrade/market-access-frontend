@@ -1,5 +1,5 @@
 const config = require( '../config' );
-const logger = require( '../lib/logger' );
+const reporter = require( '../lib/reporter' );
 
 module.exports = {
 
@@ -14,6 +14,7 @@ module.exports = {
 		if( res.headersSent ){
 
 			next( err );
+			reporter.captureException( err );
 
 		} else {
 
@@ -30,9 +31,8 @@ module.exports = {
 
 				res.status( 500 );
 				res.render( 'error/default', { error: err, showErrors: config.showErrors } );
+				reporter.captureException( err );
 			}
 		}
-
-		logger.error( 'Something went wrong: ', err );
 	}
 };
