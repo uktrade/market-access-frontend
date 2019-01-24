@@ -9,7 +9,7 @@ describe( 'errors middleware', function(){
 	let next;
 	let config;
 	let middleware;
-	let logger;
+	let reporter;
 
 	beforeEach( function(){
 
@@ -24,13 +24,13 @@ describe( 'errors middleware', function(){
 		config = {
 			showErrors: false
 		};
-		logger = {
-			error: jasmine.createSpy( 'logger.error' )
+		reporter = {
+			captureException: jasmine.createSpy( 'reporter.captureException' )
 		};
 
 		middleware = proxyquire( modulePath, {
 			'../config': config,
-			'../lib/logger': logger
+			'../lib/reporter': reporter
 		} );
 	} );
 
@@ -51,7 +51,7 @@ describe( 'errors middleware', function(){
 
 					expect( res.status ).not.toHaveBeenCalled();
 					expect( res.render ).not.toHaveBeenCalled();
-					expect( logger.error ).toHaveBeenCalled();
+					expect( reporter.captureException ).toHaveBeenCalledWith( err );
 					expect( next ).toHaveBeenCalledWith( err );
 				} );
 			} );
@@ -64,7 +64,7 @@ describe( 'errors middleware', function(){
 
 						expect( res.status ).toHaveBeenCalledWith( 500 );
 						expect( res.render ).toHaveBeenCalledWith( 'error/default', { showErrors: config.showErrors, error: err } );
-						expect( logger.error ).toHaveBeenCalled();
+						expect( reporter.captureException ).toHaveBeenCalledWith( err );
 						expect( next ).not.toHaveBeenCalled();
 					} );
 				} );
@@ -78,7 +78,7 @@ describe( 'errors middleware', function(){
 						middleware.catchAll( tooManyBytesError, req, res, next );
 
 						expect( res.sendStatus ).toHaveBeenCalledWith( 413 );
-						expect( logger.error ).toHaveBeenCalled();
+						expect( reporter.captureException ).not.toHaveBeenCalled();
 					} );
 				} );
 
@@ -92,7 +92,7 @@ describe( 'errors middleware', function(){
 
 						expect( res.status ).toHaveBeenCalledWith( 400 );
 						expect( res.render ).toHaveBeenCalledWith( 'error/invalid-csrf-token' );
-						expect( logger.error ).toHaveBeenCalled();
+						expect( reporter.captureException ).not.toHaveBeenCalled();
 					} );
 				} );
 			} );
