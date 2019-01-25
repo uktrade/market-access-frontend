@@ -22,7 +22,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 
 /*
 Return URI:
-http://127.0.0.1:1337/?addClass=1&hasClass=1&removeClass=1&toggleClass=1&getDescendantsByClassName=1&getElementData=3&query=1&queryOne=1&setAriaAttribute=1&setElementData=3&attachListener=1&cancelDefault=1&detachListener=1&bind=2&getInputValue=1&toArray=2
+http://jessie.herokuapp.com/builder/?addClass=1&hasClass=1&removeClass=1&toggleClass=1&getDescendantsByClassName=1&getElement=1&getElementData=3&getElementPositionStyles=1&query=1&queryOne=1&setAriaAttribute=1&setElementData=3&attachListener=1&cancelDefault=1&detachListener=1&bind=2&getInputValue=1&toArray=2
 */
 
 var jessie;
@@ -77,6 +77,40 @@ if (canCall && Array.prototype.slice) {
 	} catch(e) {}
 }
 
+
+
+
+/*
+Description:
+Basic rendition which relies on valid markup i.e. forms with unique names and ids
+*/
+
+/*
+See: <a href="https://groups.google.com/forum/#!starred/comp.lang.javascript/fVp-DWAIGnc">Article</a>
+
+That's the most basic rendition: no allowance for screwy markup like this:
+
+<input name="test">
+<input id="test">
+*/
+
+/*
+Degrades:
+IE4, IE3, NN4
+*/
+
+/*
+Author:
+David Mark
+*/
+
+var getElement;
+
+if (isHostMethod(document, 'getElementById')) {
+	getElement = function(id, doc) {
+		return (doc || document).getElementById(id);
+	};
+}
 
 
 
@@ -388,6 +422,100 @@ if(globalDocument && isHostMethod(globalDocument, 'querySelectorAll') && toArray
 
 
 /*
+Description:
+Relies on `jessie.getElement`, `el.style` and `el.offsetLeft`
+*/
+
+// Taken from primer
+
+var getElementPositionStyles;
+
+if(html && getElement && isHostObjectProperty(html, 'style') &&
+	'number' == typeof html.offsetLeft && 'string' == typeof html.style.left ) {
+
+	getElementPositionStyles = (function() {
+		var result,
+			sides = ['left', 'top', 'right', 'bottom'],
+			inlineStyles = {},
+			findPosition;
+
+		findPosition = function(el, sides) {
+			var i,
+				offsetLeft,
+				offsetTop;
+
+			offsetLeft = el.offsetLeft;
+			offsetTop = el.offsetTop;
+			el.style[sides[2]] = 'auto';
+			el.style[sides[3]] = 'auto';
+
+			if (offsetLeft != el.offsetLeft) {
+				result[sides[0]] = null;
+			}
+
+			if (offsetTop != el.offsetTop) {
+				result[sides[1]] = null;
+			}
+
+			offsetLeft = el.offsetLeft;
+			offsetTop = el.offsetTop;
+
+			el.style[sides[0]] = offsetLeft + 'px';
+			el.style[sides[1]] = offsetTop + 'px';
+
+			if (result[sides[0]] !== null && el.offsetLeft != offsetLeft) {
+				if (sides[0] == 'left') {
+					result[sides[0]] = offsetLeft - el.offsetLeft + offsetLeft;
+				}
+				else {
+					result[sides[0]] = el.offsetLeft;
+				}
+			}
+
+			if (result[sides[1]] !== null && el.offsetTop != offsetTop) {
+				if (sides[1] == 'top') {
+					result[sides[1]] = offsetTop - el.offsetTop + offsetTop;
+				}
+				else {
+					result[sides[1]] = el.offsetTop;
+				}
+			}
+
+			for (i = 4; i--;) {
+				el.style[sides[i]] = inlineStyles[sides[i]];
+			}
+		};
+
+		return function(el) {
+			var i,
+				side,
+				otherSide;
+
+			result = {};
+
+			for (i = 2; i--;) {
+				side = sides[i];
+				otherSide = sides[i + 2];
+				result[side] = result[otherSide] = el['offset' + side.charAt(0).toUpperCase() + side.substring(1)];
+			}
+
+			for (i = 4; i--;) {
+				side = sides[i];
+				inlineStyles[side] = el.style[side];
+			}
+
+			findPosition(el, sides);
+			findPosition(el, sides.slice(2).concat(sides.slice(0, 2)));
+
+			return result;
+		};
+
+	}());
+}
+
+
+
+/*
  Description:
  Relies on el.dataset or el.getAttribute for the most support
  */
@@ -475,6 +603,7 @@ jessie.isHostMethod = isHostMethod;
 jessie.isHostObjectProperty = isHostObjectProperty;
 jessie.hasFeatures = hasFeatures;
 jessie.toArray = toArray;
+jessie.getElement = getElement;
 jessie.removeClass = removeClass;
 jessie.hasClass = hasClass;
 jessie.addClass = addClass;
@@ -487,6 +616,7 @@ jessie.setElementData = setElementData;
 jessie.setAriaAttribute = setAriaAttribute;
 jessie.queryOne = queryOne;
 jessie.query = query;
+jessie.getElementPositionStyles = getElementPositionStyles;
 jessie.getElementData = getElementData;
 jessie.getDescendantsByClassName = getDescendantsByClassName;
 jessie.toggleClass = toggleClass;
