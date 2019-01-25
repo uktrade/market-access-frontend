@@ -49,10 +49,6 @@ module.exports = ( express, app ) => {
 	app.get( '/:barrierId/status/', controller.status.index );
 	app.post( '/:barrierId/status/', controller.status.index );
 
-	app.get( '/:uuid/status/resolved/', controller.status.resolved );
-	app.get( '/:uuid/status/hibernated/', controller.status.hibernated );
-	app.get( '/:uuid/status/open/', controller.status.open );
-
 	app.get( '/:barrierId/type/', controller.type.category );
 	app.post( '/:barrierId/type/', controller.type.category );
 

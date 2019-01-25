@@ -95,6 +95,7 @@ aliases:
       AUTHBROKER_CLIENT_SECRET: ghi123
       ALLOWED_ADMIN_IPS: 123.123.123.123
       REDIS_BASE_URL: redis://localhost
+      SLACK_WEBHOOK: ''
     command: ./start-wait-for-db.sh
 
 jobs:

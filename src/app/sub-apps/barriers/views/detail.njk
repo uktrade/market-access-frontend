@@ -6,7 +6,7 @@
 
 {% block barrier_content %}
 
-	{% if barrier.isResolved or barrier.isHibernated %}
+	{%- if barrier.isResolved or barrier.isHibernated -%}
 
 		<div class="barrier-status-details">
 			<span class="barrier-status-details__icon barrier-status-details__icon--{{ barrier.status.modifyer }}">
@@ -29,12 +29,12 @@
 			<p class="barrier-status-details__text">{{ barrier.status.description | escape | nl2br }}</p>
 		</div>
 
-	{% endif %}
+	{% endif -%}
 
-	{% set barrierTypeHtml %}
+	{%- set barrierTypeHtml %}
 		{{ barrier.type.title }}
 		{{ barrier.type.description | safe }}
-	{% endset %}
+	{% endset -%}
 
 	{{ summaryGroup( {
 		heading: {
@@ -96,7 +96,7 @@
 					href: urls.barriers.edit.source( barrier.id )
 				}
 			},{
-				title: 'Initial report made by',
+				title: 'Barrier added by',
 				text: barrier.reportedBy
 			}
 		]

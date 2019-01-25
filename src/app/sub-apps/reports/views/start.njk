@@ -3,12 +3,12 @@
 
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Report - Status of the barrier{% endblock %}
+{% block page_title %}{{ super() }} - Add - Status of the barrier{% endblock %}
 
 {% block page_content %}
 
 	{{ heading({
-		caption: 'Report a barrier',
+		caption: 'Add a barrier',
 		text: 'Status of the barrier',
 		errors: errors
 	}) }}
@@ -21,14 +21,11 @@
 			classes: 'problem-status',
 			fieldset: {
 				legend: {
-					text: 'What is the urgency of the barrier?',
+					text: 'What is the scope of the barrier?',
 					classes: 'govuk-fieldset__legend--s'
 				}
 			},
-			items: status | addToRadio( {
-				'1': { hint: { text: 'for example, goods stuck at the border or documentation issue' } },
-				'2': { hint: { text: 'for example, a change of regulation' } }
-			} ),
+			items: status,
 			errorMessage: errors | errorForName( 'status-1' )
 		}) }}
 

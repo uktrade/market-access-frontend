@@ -47,7 +47,7 @@ describe( 'Form', () => {
 					item1: 'checkbox-value-1',
 					item2: 'checkbox-value-2',
 					groupItem1: 'group-value-1',
-					groupItem2: 'group-value-2'
+					groupItem2: 'group-value-2',
 				};
 
 				fields = {
@@ -158,14 +158,20 @@ describe( 'Form', () => {
 					let requiredMessage;
 					let checkboxRequiredMessage;
 					let groupErrorMessage;
+					let fileErrorMessage;
+					let file;
 
 					beforeEach( () => {
 
 						validators.isDefined.and.callFake( () => false );
+						file = { size: 0, name: 'a-test.txt' };
+
+						req.body.myFile = file;
 
 						requiredMessage = 'a test message';
 						checkboxRequiredMessage = 'Test checkboxes message';
 						groupErrorMessage = 'a group error';
+						fileErrorMessage = 'a file error';
 
 						fields = {
 							myCheckbox: {
@@ -188,6 +194,13 @@ describe( 'Form', () => {
 							},
 							test: {
 								required: requiredMessage
+							},
+							myFile: {
+								type: Form.FILE,
+								validators: [{
+									fn: () => false,
+									message: fileErrorMessage,
+								}]
 							}
 						};
 					} );
@@ -210,6 +223,7 @@ describe( 'Form', () => {
 
 						beforeEach( () => {
 
+							file.size = 100;
 							form = new Form( req, fields );
 
 							form.validate();
@@ -218,7 +232,7 @@ describe( 'Form', () => {
 						it( 'Should return true when hasErrors is called after validation', () => {
 
 							expect( form.hasErrors() ).toEqual( true );
-							expect( form.errors.length ).toEqual( 3 );
+							expect( form.errors.length ).toEqual( 4 );
 							expect( form.errors ).toEqual( [
 								{
 									id: 'my-checkbox-1',
@@ -229,6 +243,9 @@ describe( 'Form', () => {
 								},{
 									id: 'test',
 									message: requiredMessage
+								},{
+									id: 'my-file',
+									message: fileErrorMessage
 								}
 							] );
 							expect( form.getTemplateErrors() ).toEqual( [
@@ -241,6 +258,9 @@ describe( 'Form', () => {
 								},{
 									href: '#test',
 									text: requiredMessage
+								},{
+									href: '#my-file',
+									text: fileErrorMessage
 								}
 							] );
 						} );
@@ -254,7 +274,8 @@ describe( 'Form', () => {
 								errorsResponse = [
 									{ href: '#my-checkbox-1', text: checkboxRequiredMessage },
 									{ href: '#my-group', text: groupErrorMessage },
-									{ href: '#test', text: requiredMessage }
+									{ href: '#test', text: requiredMessage },
+									{ href: '#my-file', text: fileErrorMessage },
 								];
 							} );
 
@@ -265,6 +286,7 @@ describe( 'Form', () => {
 										myGroup: { groupItem1: undefined },
 										myCheckbox: { item1: undefined, item2: undefined },
 										test: undefined,
+										myFile: file,
 										errors: errorsResponse
 									} );
 								} );
@@ -272,11 +294,12 @@ describe( 'Form', () => {
 
 							describe( 'specifiying an errors name', () => {
 								it( 'Should use the name specified', () => {
-									expect( form.getTemplateValues( 'fred') ).toEqual( {
+									expect( form.getTemplateValues( 'fred' ) ).toEqual( {
 										csrfToken,
 										myGroup: { groupItem1: undefined },
 										myCheckbox: { item1: undefined, item2: undefined },
 										test: undefined,
+										myFile: file,
 										fred: errorsResponse
 									} );
 								} );
@@ -287,47 +310,95 @@ describe( 'Form', () => {
 			} );
 
 			describe( 'With conditionals', () => {
+				describe( 'With a single value', () => {
 
-				beforeEach( () => {
+					beforeEach( () => {
 
-					fields = {
-						testName: {},
-						another: {
-							conditional: { name: 'testName', value: 'fred' },
-							required: 'A required message'
-						}
-					};
-				} );
-
-				describe( 'When the conditionals pass', () => {
-					it( 'Should not have any errors', () => {
-
-						req.body = {
-							testName: 'fred',
-							another: 'test value'
+						fields = {
+							testName: {},
+							another: {
+								conditional: { name: 'testName', value: 'fred' },
+								required: 'A required message'
+							}
 						};
+					} );
 
-						form = new Form( req, fields );
+					describe( 'When the conditionals pass', () => {
+						it( 'Should not have any errors', () => {
 
-						form.validate();
+							req.body = {
+								testName: 'fred',
+								another: 'test value'
+							};
 
-						expect( form.hasErrors() ).toEqual( true );
+							form = new Form( req, fields );
+
+							form.validate();
+
+							expect( form.hasErrors() ).toEqual( true );
+						} );
+					} );
+
+					describe( 'When the conditionals fail', () => {
+						it( 'Should not have errors', () => {
+
+							req.body = {
+								testName: '',
+								another: 'test value'
+							};
+
+							form = new Form( req, fields );
+
+							form.validate();
+
+							expect( form.hasErrors() ).toEqual( false );
+						} );
 					} );
 				} );
 
-				describe( 'When the conditionals fail', () => {
-					it( 'Should not have errors', () => {
+				describe( 'With multiple values', () => {
 
-						req.body = {
-							testName: '',
-							another: 'test value'
+					beforeEach( () => {
+
+						fields = {
+							testName: {},
+							another: {
+								conditional: { name: 'testName', values: [ 'bob', 'fred' ] },
+								required: 'A required message'
+							}
 						};
+					} );
 
-						form = new Form( req, fields );
+					describe( 'When the conditionals pass', () => {
+						it( 'Should not have any errors', () => {
 
-						form.validate();
+							req.body = {
+								testName: 'fred',
+								another: 'test value'
+							};
 
-						expect( form.hasErrors() ).toEqual( false );
+							form = new Form( req, fields );
+
+							form.validate();
+
+							expect( form.hasErrors() ).toEqual( true );
+						} );
+					} );
+
+					describe( 'When the conditionals fail', () => {
+						it( 'Should not have errors', () => {
+
+							req.body = {
+								testName: '',
+								another: 'test value'
+							};
+
+							form = new Form( req, fields );
+
+							form.validate();
+
+							expect( form.hasErrors() ).toEqual( false );
+						} );
 					} );
 				} );
 			} );

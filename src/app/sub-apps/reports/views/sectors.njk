@@ -3,13 +3,13 @@
 
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Report - Sectors affected by the barrier{% endblock %}
+{% block page_title %}{{ super() }} - Add - Sectors affected by the barrier{% endblock %}
 
 {% block page_content %}
 
 	{{ heading({
 		back: { href: urls.reports.hasSectors( report.id ) },
-		caption: 'Report a barrier',
+		caption: 'Add a barrier',
 		text: 'Sectors affected by the barrier',
 		errors: errors
 	}) }}

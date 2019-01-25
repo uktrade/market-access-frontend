@@ -37,7 +37,7 @@ function createTaskList( reportStages ){
 
 			tasks[ taskIndex ] = {
 				stage: key,
-				name,
+				name: ( mainStage === '1' ? 'Add a barrier' : name ),
 				items: []
 			};
 

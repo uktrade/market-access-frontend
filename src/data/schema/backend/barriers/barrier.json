@@ -21,6 +21,7 @@
 		"current_status",
 		"reported_on",
 		"reported_by",
+		"created_on",
 		"export_country",
 		"has_legal_infringement",
 		"wto_infringement",
@@ -102,6 +103,7 @@
 			"type": "string",
 			"faker": "name.findName"
 		},
+		"created_on": { "$ref": "$refs/common.json#/past-date" },
 		"export_country": { "$ref": "$refs/common.json#/uuid" },
 
 		"has_legal_infringement": {

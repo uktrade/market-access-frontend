@@ -1,23 +1,23 @@
 Feature: Report a barrier
-	Start to report a new barrier
+	Start to add a new barrier
 
-	Scenario: Navigate to Report a barrier
-		Given I'm on the report a barrier page
-		Then the title should be Market Access - Report a barrier
+	Scenario: Navigate to Add a barrier
+		Given I'm on the add a barrier page
+		Then the title should be Market Access - Add a barrier
 		And the page should not have any accessibility violations
-		And the active heading link should be Report a barrier
-		And the main heading should be Market access barriers Report a barrier
+		And the active heading link should be Add a barrier
+		And the main heading should be Market access barriers Add a barrier
 		And there should be a start banner with a start button
 		And a task list with 4 items
 
 	Scenario: Navigate to start
-		Given I'm on the report a barrier page
+		Given I'm on the add a barrier page
 		When I navigate to the start page
-		Then the title should be Market Access - Report - Status of the barrier
+		Then the title should be Market Access - Add - Status of the barrier
 		And the page should not have any accessibility violations
-		And the main heading should be Report a barrier Status of the barrier
+		And the main heading should be Add a barrier Status of the barrier
 
 	Scenario: Start a report
-		Given I'm on the start a report page
+		Given I'm on the first step of adding a new barrier
 		Then there should 2 radio inputs
 		And there should be a Continue button

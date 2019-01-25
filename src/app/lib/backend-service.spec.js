@@ -861,5 +861,83 @@ describe( 'Backend Service', () => {
 				expect( backend.put ).toHaveBeenCalledWith( `/reports/${ reportId }/submit`, token );
 			} );
 		} );
+
+		describe( 'saveProblemAndSubmit', () => {
+
+			let reportId;
+			let values;
+			let backendValues;
+
+			beforeEach( () => {
+
+				reportId = uuid();
+				values = {
+					item: '1',
+					description: 'b',
+					barrierTitle: 'c',
+					barrierSource: 'd',
+					barrierSourceOther: 'e',
+					resolvedDescription: 'f',
+				};
+
+				backendValues = {
+					product: values.item,
+					problem_description: values.description,
+					barrier_title: values.barrierTitle,
+					source: values.barrierSource,
+					other_source: values.barrierSourceOther,
+					status_summary: values.resolvedDescription
+				};
+			} );
+
+			describe( 'When saveProblem throws an error', () => {
+				it( 'Should return the error', async () => {
+
+					const err = { response: { statusCode: 500 } };
+					backend.put.and.callFake( () => Promise.reject( err ) );
+
+					try {
+
+						await service.reports.saveProblemAndSubmit( req, reportId, {} );
+						expect( false ).toEqual( true );// should not get here
+
+					} catch( e ){
+
+						expect( e ).toEqual( err );
+					}
+				} );
+			} );
+
+			describe( 'When saveProblem returns a 400', () => {
+				it( 'Should return the error', async () => {
+
+					const putResponse = {
+						response: { statusCode: 400 },
+						body: { a: 1, b: 2 }
+					};
+
+					backend.put.and.callFake( () => putResponse );
+
+					const serviceOutput = await service.reports.saveProblemAndSubmit( req, reportId, values );
+
+					expect( backend.put.calls.count() ).toEqual( 1 );
+					expect( backend.put.calls.argsFor( 0 ) ).toEqual( [ `/reports/${ reportId }`, token, backendValues ] );
+					expect( serviceOutput ).toEqual( putResponse );
+				} );
+			} );
+
+			describe( 'When saveProblem returns a 200', () => {
+				it( 'Should call saveProblem and submit', async () => {
+
+					backend.put.and.callFake( () => Promise.resolve({ response: { statusCode: 200, isSuccess: true } }) );
+
+					await service.reports.saveProblemAndSubmit( req, reportId, values );
+
+					expect( backend.put.calls.count() ).toEqual( 2 );
+					expect( backend.put.calls.argsFor( 0 ) ).toEqual( [ `/reports/${ reportId }`, token, backendValues ] );
+					expect( backend.put.calls.argsFor( 1 ) ).toEqual( [ `/reports/${ reportId }/submit`, token ] );
+				} );
+			} );
+		} );
 	} );
 } );

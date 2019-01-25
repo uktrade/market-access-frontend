@@ -1,7 +1,7 @@
 {% from 'app-components/dashboard-heading.njk' import dashboardHeading %}
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Reports in {{ country.name }}{% endblock %}
+{% block page_title %}{{ super() }} - Unfinished barriers in {{ country.name }}{% endblock %}
 
 {% block page_content %}
 
@@ -10,17 +10,17 @@
 	{%- if reports.length -%}
 
 		<h3 class="tab-heading">
-			Unfinished reports in <strong>{{ country.name }}</strong>
+			Unfinished barriers in <strong>{{ country.name }}</strong>
 		</h3>
 
 		<table class="standard-table">
 			<thead>
 				<tr class="standard-table__heading-row">
-					<th class="standard-table__heading standard-table__heading--active">Report started</th>
+					<th class="standard-table__heading standard-table__heading--active">Date started</th>
 					<th class="standard-table__heading">Barrier ID</th>
 					<th class="standard-table__heading">Resolved?</th>
 					<th class="standard-table__heading">Barrier urgency</th>
-					<th class="standard-table__heading">Report started by</th>
+					<th class="standard-table__heading">Started by</th>
 					<th class="standard-table__heading">Action</th>
 				</tr>
 			</thead>
@@ -28,7 +28,7 @@
 				{% for report in reports %}
 				<tr class="standard-table__row">
 					<td class="standard-table__cell">
-						{{ ( report.created_on | dateWithTime ) or '---' }}
+						{{ ( report.date.created | dateWithTime ) or '---' }}
 					</td>
 					<td class="standard-table__cell">
 						{{ report.code }}
@@ -53,7 +53,7 @@
 	{%- else -%}
 
 		<p class="no-results-message">
-			There are currently no unfinished market access barrier reports in <strong>{{ country.name }}</strong>.
+			There are currently no unfinished market access barriers in <strong>{{ country.name }}</strong>.
 		</p>
 
 	{%- endif %}
