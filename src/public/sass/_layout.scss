@@ -198,11 +198,11 @@ a {
 		.govuk-header__logo {
 			width: auto;
 			margin-right: 8%;
-		}	
+		}
 		.govuk-tag {
 			margin-left: 10px;
 			background-color: #912b88;
-		}		
+		}
 	}
 	.header-wrapper__user__content {
 		max-width: 100%;
@@ -211,8 +211,9 @@ a {
 }
 
 .govuk-masthead {
+
 	max-width: 100%;
-    padding: 0 30px;
+   padding: 0 30px;
 	background: $govuk-grey-3;
 	margin-top: -40px;
 	margin-bottom: 40px;
@@ -243,7 +244,7 @@ a {
 
 @include mq( $from: desktop ){
 	.ma-container-full {
-		max-width: 100%; 
+		max-width: 100%;
 		margin: 0 30px;
 	}
 }
