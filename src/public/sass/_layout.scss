@@ -17,6 +17,7 @@ a {
 
 .govuk-phase-banner--ma {
 	margin-bottom: govuk-em( 40, 16 );
+	padding: govuk-em(10, 16) govuk-em(15, 16);
 }
 
 .govuk-header--ma {
@@ -170,7 +171,7 @@ a {
 	background-color: $govuk-fuchsia;
 	color: $govuk-white;
 	box-sizing: border-box;
-	padding: 10px 15px;
+	padding: govuk-em(10, 14) govuk-em(15, 14);
 
 	a {
 		color: $govuk-white;
@@ -184,6 +185,9 @@ a {
 			margin: 0 30px;
 		}
 		.govuk-footer__section-break {
+			display: none;
+		}
+		.govuk-footer__licence-logo, .govuk-footer__licence-description {
 			display: none;
 		}
 	}
