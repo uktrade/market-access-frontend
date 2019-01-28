@@ -52,7 +52,7 @@
 }
 
 .summary-group__list__value__heading {
-	@include govuk-font( $size: 16, $weight: bold );
+	@include govuk-font( $size: 16 );
 	margin: 0;
 }
 

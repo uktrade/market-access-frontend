@@ -26,6 +26,16 @@
 
 
 {% block page_content %}
+
+	{% if toast and toast.heading %}
+		{{ toastAlert( toast ) }}
+	{% endif %}
+	
+	{%- set barrierTypeHtml %}
+		{{ barrier.type.title }}
+		{{ barrier.type.description | safe }}
+	{% endset -%}
+
     {{ summaryGroup( {
 		heading: {
 			level: ( 3 if barrier.isResolved or barrier.isHibernated else 2 ),
