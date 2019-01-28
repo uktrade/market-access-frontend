@@ -29,6 +29,7 @@ describe( 'Interactions view model', () => {
 		return {
 			id: item.id,
 			isNote: true,
+			modifier: 'note',
 			edit,
 			date: item.created_on,
 			text: item.text,
@@ -41,6 +42,7 @@ describe( 'Interactions view model', () => {
 	function createStatus( item, from, to, isResolved ){
 		return {
 			isStatus: true,
+			modifier: 'status',
 			date: item.date,
 			event: item.field_info.event,
 			state: {
@@ -58,6 +60,7 @@ describe( 'Interactions view model', () => {
 
 		return {
 			isPriority: true,
+			modifier: 'priority',
 			date: item.date,
 			priority: metadata.barrierPrioritiesMap[ item.new_value ],
 			text: item.field_info.priority_summary,

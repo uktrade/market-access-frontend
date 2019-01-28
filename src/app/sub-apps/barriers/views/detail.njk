@@ -183,12 +183,11 @@
 	{% else %}
 		<a class="govuk-button button--primary" href="{{ urls.barriers.notes.add( barrier.id ) }}">Add note</a>
 	{% endif %}
-
 	{% if interactions and interactions.length %}
 		<ol class="event-list">
 			{% for item in interactions -%}
 
-			<li class="event-list__item{#{ ' event-list__item--pinned' if item.pinned }#}">
+			<li class="event-list__item event_list__item--{{ item.modifier }}">
 
 				{%- if item.isNote -%}
 
