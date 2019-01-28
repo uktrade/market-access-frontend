@@ -18,6 +18,12 @@
 			} );
 		}
 	</script>
+	{{ super() }}
+	<script>
+		ma.pages.barrier.detail( {
+			noteErrorText: '{{ noteErrorText }}'
+		} );
+	</script>
 {% endblock %}
 
 {% block mastheadContent %}
@@ -171,7 +177,7 @@
 				{% endif %}
 
 				<input type="submit" value="Save note" class="govuk-button js-submit-button">
-				<a class="button-cancel" href="{{ urls.barriers.interactions( barrier.id ) }}">Cancel</a>
+				<a class="button-cancel" href="{{ urls.barriers.detail( barrier.id ) }}">Cancel</a>
 			</form>
 		</div>
 	{% else %}
