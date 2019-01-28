@@ -107,9 +107,6 @@ Form.prototype.addField = function( name, field ){
 Form.prototype.passedConditions = function( name ){
 
 	const field = this.fields[ name ];
-
-	if( !field ){ throw new Error( name + ' field not found' ); }
-
 	const conditional = field.conditional;
 
 	if( conditional ){
@@ -153,9 +150,6 @@ Form.prototype.shouldValidate = function( field, value ){
 Form.prototype.validateField = function( name ){
 
 	const field = this.fields[ name ];
-
-	if( !field ){ throw new Error( name + ' field not found' ); }
-
 	const value = this.values[ name ];
 	let isValid = true;
 
