@@ -1,9 +1,12 @@
 .summary-group {
 	max-width: 100%;
-	@include mq( $from: desktop ){
-		max-width: 400px;
+	@include mq($from: 768px) {
+		max-width:400px;
 		margin-right: 30px;
 		display: inline-block;
+	}
+	@include mq( $from: 1024px ){
+		max-width: 500px;
 	}
     vertical-align: top;
     

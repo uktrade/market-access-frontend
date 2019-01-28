@@ -67,20 +67,20 @@ function getTimelineData( req, barrierId ){
 async function renderInteractions( req, res, next, opts = {} ){
 
 	const addCompany = ( config.addCompany || !!req.query.addCompany );
-		const createdFlash = req.flash( 'barrier-created' );
-		const isNew = createdFlash && createdFlash.length === 1;
+	const createdFlash = req.flash( 'barrier-created' );
+	const isNew = createdFlash && createdFlash.length === 1;
 
-		if( isNew ){
+	if( isNew ){
 
-			res.locals.toast = {
-				heading: 'Barrier added to the service',
-				message: 'Continue to add more detail to your barrier'
-			};
-		}
+		res.locals.toast = {
+			heading: 'Barrier added to the service',
+			message: 'Continue to add more detail to your barrier'
+		};
+	}
 
 	try {
 
-		res.render( 'barriers/views/new-barrier-detail', Object.assign(
+		res.render( 'barriers/views/detail', Object.assign(
 			detailVieWModel( req.barrier, addCompany ),
 			{ interactions: interactionsViewModel( await getTimelineData( req, req.barrier.id ), opts.editId ) },
 			opts.data

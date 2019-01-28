@@ -214,10 +214,13 @@ a {
 }
 
 .barrier-content {
-	width: 100%;
+	max-width: 100%;
 	display: inline-block;
-	@include mq( $from: desktop ){
+	@include mq($from: 768px) {
 		width: calc(100% - 435px);
+	}
+	@include mq( $from: 1024px ){
+		width: calc(100% - 535px);
 	}
 	.section-heading {
 		border-bottom: none;
@@ -226,7 +229,7 @@ a {
 
 @include mq( $from: desktop ){
 	.ma-container-full {
-		max-width: 100%;
+		max-width: 1200px; 
 		margin: 0 30px;
 	}
 }

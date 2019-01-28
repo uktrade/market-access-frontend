@@ -1,48 +1,55 @@
-{% extends './barrier-layout.njk' %}
+{% from 'components/back-link/macro.njk' import govukBackLink %}
+{% from 'components/error-summary/macro.njk' import govukErrorSummary %}
+{% from 'app-components/barrier-summary.njk' import barrierSummary %}
+{% from 'app-components/summary-group.njk' import summaryGroup %}
+{% from "components/textarea/macro.njk" import govukTextarea %}
+{% from "components/file-upload/macro.njk" import govukFileUpload %}
 
-{% set activeBarrierNav = 'headlines' %}
+{% extends 'layout.njk' %}
 
 {% block page_title %}{{ super() }} - Barrier details{% endblock %}
 
-{% block barrier_content %}
+{% block body_script %}
+	<script>
+		if( ma.components.BarrierSummary ){
+			new ma.components.BarrierSummary( {
+				text: 'Update the barrier',
+				linkClass: '.js-barrier-summary-link'
+			} );
+		}
+	</script>
+{% endblock %}
 
-	{%- if barrier.isResolved or barrier.isHibernated -%}
+{% block mastheadContent %}
+    {{ barrierSummary( barrier ) }}
+{% endblock %}
 
-		<div class="barrier-status-details">
-			<span class="barrier-status-details__icon barrier-status-details__icon--{{ barrier.status.modifyer }}">
-				{% if barrier.isResolved %}
 
-					<svg width="26" height="20" viewBox="0 0 26 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-						<path d="M21.6 0L9.6 12L4 6.4L0 10.4L9.6 20L25.6 4L21.6 0Z" fill="#006435">
-					</svg>
-
-				{% else %}
-
-				<svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-					<path d="M10.9573 9.37476C10.9573 8.03905 11.3176 6.78937 11.9416 5.71059C12.0928 5.44964 11.8648 5.12717 11.5725 5.20195C8.20306 6.06723 5.76604 9.25092 6.07886 12.9581C6.37479 16.4566 9.20223 19.3122 12.6983 19.6395C15.1229 19.8667 17.3291 18.9113 18.8184 17.2881C19.0195 17.0686 18.8478 16.7124 18.5506 16.7248C18.4718 16.7284 18.3918 16.7301 18.3118 16.7301C14.2508 16.7301 10.9573 13.4374 10.9573 9.37476ZM25 12.5C25 14.1415 24.6767 15.767 24.0485 17.2835C23.4203 18.8001 22.4996 20.1781 21.3388 21.3388C20.1781 22.4996 18.8001 23.4203 17.2835 24.0485C15.767 24.6767 14.1415 25 12.5 25C10.8585 25 9.23303 24.6767 7.71646 24.0485C6.19989 23.4203 4.8219 22.4996 3.66116 21.3388C2.50043 20.1781 1.57969 18.8001 0.951505 17.2835C0.323321 15.767 -4.75086e-07 14.1415 5.29359e-08 12.5C-4.75086e-07 10.8585 0.323321 9.23303 0.951505 7.71646C1.57969 6.19989 2.50043 4.8219 3.66116 3.66116C4.8219 2.50043 6.19989 1.57969 7.71646 0.951505C9.23303 0.323321 10.8585 -4.99897e-07 12.5 2.81248e-08C14.1415 -4.99897e-07 15.767 0.323321 17.2835 0.951505C18.8001 1.57969 20.1781 2.50043 21.3388 3.66116C22.4996 4.8219 23.4203 6.19989 24.0485 7.71646C24.6767 9.23303 25 10.8585 25 12.5Z" fill="#6F777B">
-				</svg>
-
-				{% endif %}
-			</span>
-			<h2 class="barrier-status-details__heading">Barrier {{ 'resolved' if barrier.isResolved else 'paused' }} <span class="barrier-status-details__heading__caption">in {{ barrier.status.date | dateOnly( day=false ) }}</span></2>
-			<h3 class="barrier-status-details__sub-heading">Summary {{ ' of resolution' if barrier.isResolved }}</h3>
-			<p class="barrier-status-details__text">{{ barrier.status.description | escape | nl2br }}</p>
-		</div>
-
-	{% endif -%}
-
-	{%- set barrierTypeHtml %}
-		{{ barrier.type.title }}
-		{{ barrier.type.description | safe }}
-	{% endset -%}
-
-	{{ summaryGroup( {
+{% block page_content %}
+    {{ summaryGroup( {
 		heading: {
 			level: ( 3 if barrier.isResolved or barrier.isHibernated else 2 ),
 			text: 'Barrier headlines'
 		},
 		items: [
-			{
+            {
+				title: 'Last Modified',
+				html: barrier.modifiedOn | dateOnly | escape | nl2br,
+                halfWidth: true
+			},{
+				title: 'Date added',
+				html: barrier.reportedOn | dateOnly | escape | nl2br,
+                halfWidth: true
+			},{
+				title: 'Summary of the problem',
+				html: barrier.problem.description | escape | nl2br,
+				edit: {
+					href: urls.barriers.edit.description( barrier.id )
+				}
+			},{
+				title: 'Barrier urgency',
+				html: barrier.problem.status | escape | nl2br
+			},{
 				title: 'Company or organisation affected',
 				items: companiesList if companiesList.length,
 				add: {
@@ -78,67 +85,216 @@
 					href: urls.barriers.type.category( barrier.id )
 				}
 			},{
-				title: 'Product or service being exported',
+				title: 'Product or service being exported or invested',
 				text: barrier.product,
 				edit: {
 					href: urls.barriers.edit.product( barrier.id )
 				}
 			},{
-				title: 'Summary of the problem',
-				html: barrier.problem.description | escape | nl2br,
-				edit: {
-					href: urls.barriers.edit.description( barrier.id )
-				}
-			},{
-				title: 'Finding out about the barrier',
+				title: 'Awareness of the problem',
 				html: barrier.source.name + ( ( '<br>' + barrier.source.description ) if barrier.source.description ),
 				edit: {
 					href: urls.barriers.edit.source( barrier.id )
 				}
 			},{
-				title: 'Barrier added by',
-				text: barrier.reportedBy
+				title: 'Initial report made by',
+				text: barrier.reportedBy 
 			}
 		]
 	} ) }}
+    <section class="barrier-content">
+        <h2 class="section-heading">
+		Updates and documents
+        </h2>
+        {% if noteForm %}
+		<div class="interaction-panel">
+			<form action="{{ urls.barriers.notes.add( barrier.id ) }}?_csrf={{ csrfToken }}" method="POST" enctype="multipart/form-data" data-xhr-upload="{{ urls.barriers.notes.documents.add( barrier.id ) }}?_csrf={{ csrfToken }}" data-xhr-delete="{{ urls.documents.delete( ':uuid' ) }}">
 
-	{#%- if barrier.legal.hasInfringements -%}
+				{{ govukTextarea({
+					name: 'note',
+					id: 'note',
+					classes: 'js-note-text',
+					formGroup: {
+						classes: 'js-note-group'
+					},
+					label: {
+						text: 'Add notes on an interaction or event',
+						classes: 'govuk-!-font-weight-bold'
+					},
+					attributes: {
+						autofocus: ''
+					},
+					value: note,
+					errorMessage: errors | errorForName( 'note' )
+				}) }}
 
-		{{ summaryGroup( {
-			heading: {
-				text: 'Legal obligations infringed',
-				sub: true
-			},
-			items: [
-				{
-					title: 'Legal obligations infringed',
-					text: [
-						'WTO' if barrier.legal.infringements.wto,
-						'FTA' if barrier.legal.infringements.fta,
-						'Other' if barrier.legal.infringements.other
-					] | removeEmpty | join( ', ' )
-				},{
-					title: 'Summary of infringements',
-					text: barrier.legal.summary
-				}
-			]
-		} ) }}
+				{#{ govukCheckboxes({
+					name: 'pinned',
+					items: [
+						{
+							value: 'true',
+							text: 'Pin this note to the top of the timeline'
+						}
+					]
+				}) }#}
 
+				{{ govukFileUpload({
+					id: 'document',
+					name: 'document',
+					classes: 'file-upload__input js-file-input',
+					formGroup: {
+						classes: 'file-upload js-form-group' + ( ' file-upload--hide' if documentId )
+					},
+					label: {
+						text: 'Attach a document',
+						classes: 'visually-hidden'
+					},
+					hint: {
+						classes: 'file-upload__size-limit js-max-file-size',
+						html: '(file size limit <strong>' + maxFileSize + '</strong>)'
+					},
+					errorMessage: errors | errorForName( 'document' )
+				}) }}
+
+				{% if documentId %}
+					<input type="hidden" name="documentId" value="{{ documentId }}" class="js-document-id">
+				{% endif %}
+
+				<input type="submit" value="Save note" class="govuk-button js-submit-button">
+				<a class="button-cancel" href="{{ urls.barriers.interactions( barrier.id ) }}">Cancel</a>
+			</form>
+		</div>
 	{% else %}
+		<a class="govuk-button button--primary" href="{{ urls.barriers.notes.add( barrier.id ) }}">Add note</a>
+	{% endif %}
 
-		{{ summaryGroup( {
-			heading: {
-				text: 'Legal obligations infringed',
-				sub: true
-			},
-			items: [
-				{
-					title: 'Legal obligations infringed',
-					text: 'Unknown' if barrier.legal.unknownInfringements else 'None'
-				}
-			]
-		} ) }}
+	{% if interactions and interactions.length %}
+		<ol class="event-list">
+			{% for item in interactions -%}
 
-	{% endif %#}
+			<li class="event-list__item{#{ ' event-list__item--pinned' if item.pinned }#}">
 
+				{%- if item.isNote -%}
+
+					<h4 class="event-list__item__heading">{{ item.date | dateOnly }}<span class="event-list__item__heading__recede"> at {{ item.date | time }} (GMT)</span>
+						{%- if item.user.name -%}
+						<span class="event-list__item__heading__recede"> by </span>{{ item.user.name }}
+						{%- endif -%}
+					</h4>
+
+					{% if item.edit -%}
+
+						<form action="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}" method="POST">
+							<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+							{{ govukTextarea({
+								name: 'note',
+								id: 'note',
+								label: {
+									text: 'Add notes on an interaction or event',
+									classes: 'visually-hidden'
+								},
+								value: item.text,
+								attributes: {
+									autofocus: ''
+								},
+								errorMessage: errors | errorForName( 'note' )
+							}) }}
+
+							{%-for document in item.documents %}
+								<div class="govuk-form-group file-upload">
+									<span class="file-upload__progress"><strong>{{ document.name }}</strong> - {{ document.size }}</span>
+									<a href="{{ urls.barriers.notes.documents.delete( barrier.id, item.id, document.id ) }}" class="file-upload__delete">delete</a>
+								</div>
+							{% endfor %}
+
+							<input type="submit" value="Save note" class="govuk-button">
+							<a href="{{ urls.barriers.interactions( barrier.id ) }}" class="form-cancel">Cancel</a>
+						</form>
+
+					{%- else -%}
+
+						{% if item.hasDocuments -%}
+
+							<div class="event-list__item__document">
+								<ul class="event-list__item__document__list">
+									{% for doc in item.documents -%}
+
+										<li class="event-list__item__document__list__item">
+
+											{%- if doc.canDownload -%}
+
+												<a class="event-list__item__document__list__item__name" href="{{ urls.documents.download( doc.id ) }}">{{ doc.name }}</a> - {{ doc.size }}
+
+											{%- else -%}
+
+												<span class="event-list__item__document__list__item__name">{{ doc.name }}</span>
+												<span class="event-list__item__document__list__item__status">({{ doc.status }})</span>
+
+											{%- endif %}
+										</li>
+
+									{%- endfor %}
+								</ul>
+
+								<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
+								<a href="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}">edit</a>
+							</div>
+
+						{%- else -%}
+
+							<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
+							<a href="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}">edit</a>
+
+						{%- endif %}
+					{%- endif %}
+
+				{%- elif item.isStatus -%}
+
+					<h4 class="event-list__item__heading">{{ item.date | dateOnly }}<span class="event-list__item__heading__recede"> at {{ item.date | time }} (GMT)</span></h4>
+
+					<p class="event-list__item__text">
+
+					{%- if item.event === 'REPORT_CREATED' -%}
+
+						Barrier started{% if item.user.name %} by <strong>{{ item.user.name }}</strong>{% endif %}
+
+					{%- elif item.event === 'BARRIER_CREATED' -%}
+
+						Barrier added to the service{% if item.user.name %} by <strong>{{ item.user.name }}</strong>{% endif %}
+
+					{%- elif item.event === 'BARRIER_STATUS_CHANGE' -%}
+
+						Barrier status changed from <strong>{{ item.state.from }}</strong> to <strong>{{ item.state.to }}</strong>{{ ' by ' + item.user.name if item.user.name }}.
+
+						{%- if item.state.isResolved %}
+
+							 Resolved date set as <strong>{{ item.state.date | dateOnly( day = false ) }}</strong>.
+
+						{%- endif %}
+					{%- endif %}
+					</p>
+
+					{% if item.event === 'BARRIER_STATUS_CHANGE' -%}
+						<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
+					{% endif -%}
+
+				{%- elif item.isPriority -%}
+
+					<h4 class="event-list__item__heading">{{ item.date | dateOnly }}<span class="event-list__item__heading__recede"> at {{ item.date | time }} (GMT)</span></h4>
+
+					<p class="event-list__item__text">
+						<span class="priority-marker priority-marker--{{ item.priority.modifyer }}"></span> Barrier priority set to <strong>{{ item.priority.name }}</strong>{{ ' by ' + item.user.name if item.user.name }}.
+					</p>
+
+					{%- if item.text %}
+						<p class="event-list__item__text">
+							 {{ item.text }}
+						</p>
+						{%- endif %}
+				{%- endif %}
+			</li>
+			{% endfor %}
+		</ol>
+	{% endif %}
+    </section>
 {% endblock %}

@@ -17,7 +17,7 @@ module.exports = {
 			};
 		}
 
-		res.render( 'barriers/views/new-barrier-detail', detailVieWModel( req.barrier, addCompany ) );
+		res.render( 'barriers/views/detail', detailVieWModel( req.barrier, addCompany ) );
 	},
 
 	edit: require( './edit' ),
