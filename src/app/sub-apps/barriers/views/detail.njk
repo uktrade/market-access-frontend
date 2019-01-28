@@ -1,5 +1,3 @@
-{% from 'components/back-link/macro.njk' import govukBackLink %}
-{% from 'components/error-summary/macro.njk' import govukErrorSummary %}
 {% from 'app-components/barrier-summary.njk' import barrierSummary %}
 {% from 'app-components/summary-group.njk' import summaryGroup %}
 {% from "components/textarea/macro.njk" import govukTextarea %}
@@ -223,7 +221,7 @@
 							{% endfor %}
 
 							<input type="submit" value="Save note" class="govuk-button">
-							<a href="{{ urls.barriers.interactions( barrier.id ) }}" class="form-cancel">Cancel</a>
+							<a href="{{ urls.barriers.detail( barrier.id ) }}" class="form-cancel">Cancel</a>
 						</form>
 
 					{%- else -%}
