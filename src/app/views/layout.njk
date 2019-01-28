@@ -1,4 +1,4 @@
-{% from 'components/footer/macro.njk' import govukFooter %}
+{% from 'app-components/govuk-footer-ma.njk' import govukFooterMa %}
 {% from "components/phase-banner/macro.njk" import govukPhaseBanner %}
 {% from 'app-components/govuk-header-ma.njk' import govukHeaderMa %}
 
@@ -56,9 +56,6 @@
 			</p>
 		</div>
 	</div>
-{% endblock %}
-
-{% block beforeContent %}
 	{{ govukPhaseBanner({
 		attributes: { role: 'complementary' },
 		classes: 'govuk-phase-banner--ma',
@@ -71,29 +68,19 @@
 {% endblock %}
 
 {% block content %}
-	{% block page_content %}{% endblock %}
-
-	<div class="footer-bar" role="complementary" aria-labelledby="footer-title">
-		<p class="footer-bar__content">
-			<strong id="footer-title">Is there anything wrong with this page?</strong>
-			Give us <a href="mailto:{{ feedbackEmail }}">feedback on this page</a> to help us improve this service.
-		</p>
-	</div>
+{% block page_content %}{% endblock %}
 {% endblock %}
 
 {% block footer %}
-	{{- govukFooter({
+<div class="footer-bar" role="complementary" aria-labelledby="footer-title">
+	<p class="footer-bar__content">
+		<strong id="footer-title">Is there anything wrong with this page?</strong>
+		Give us <a href="mailto:{{ feedbackEmail }}">feedback on this page</a> to help us improve this service.
+	</p>
+</div>
+{{- govukFooterMa({
 		classes: 'govuk-footer--ma',
 		'navigation': [
-			{
-				'title': 'Data Hub',
-				'items': [
-					{
-						'href': '#',
-						'text': 'View Data Hub'
-					}
-				]
-			},
 			{
 				'title': 'Market access barriers',
 				'items': [
@@ -114,12 +101,7 @@
 			}
 		]
 	}) }}
-	{#
-	{
-		'href': '#',
-		'text': 'Find a barrier'
-	},
-	#}
+
 {% endblock %}
 
 {% block bodyEnd %}
