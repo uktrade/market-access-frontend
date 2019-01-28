@@ -32,6 +32,11 @@
 	margin-bottom: govuk-em( 5, 27 );
 }
 
+.barrier-summary__heading__country {
+	margin: 0;
+	@include govuk-font( $size: 19 );
+}
+
 .barrier-summary__status {
 	width: 100%;
 	@include mq( $from: tablet ){
