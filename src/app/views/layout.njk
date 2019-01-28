@@ -1,4 +1,4 @@
-{% from 'components/footer/macro.njk' import govukFooter %}
+{% from 'app-components/govuk-footer-ma.njk' import govukFooterMa %}
 {% from "components/phase-banner/macro.njk" import govukPhaseBanner %}
 {% from 'app-components/govuk-header-ma.njk' import govukHeaderMa %}
 
@@ -78,7 +78,7 @@
 		Give us <a href="mailto:{{ feedbackEmail }}">feedback on this page</a> to help us improve this service.
 	</p>
 </div>
-{{- govukFooter({
+{{- govukFooterMa({
 		classes: 'govuk-footer--ma',
 		'navigation': [
 			{
