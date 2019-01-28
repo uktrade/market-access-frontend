@@ -7,7 +7,7 @@
 	@include govuk-font( $size: 14);
 	float: left;
 	width: 100%;
-	margin-bottom: govuk-em( 15, 16 );
+	margin-bottom: govuk-em( 15, 14 );
 
 	@include mq( $from: tablet ){
 
@@ -23,7 +23,7 @@
 
 .barrier-summary__heading__link {
 	display: block;
-	margin-top: 25px;
+	margin-top: govuk-em( 25, 27 );
 }
 
 .barrier-summary__heading__text {

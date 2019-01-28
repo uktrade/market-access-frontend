@@ -193,12 +193,11 @@ a {
 }
 
 .govuk-masthead {
-
 	max-width: 100%;
-   padding: 0 30px;
+   	padding: 0 govuk-em( 30, 16 );;
 	background: $govuk-grey-3;
-	margin-top: -40px;
-	margin-bottom: 40px;
+	margin-top: govuk-em( -40, 16 );;
+	margin-bottom: govuk-em( 40, 16 );;
 
 	&:after {
 		content: "";
@@ -230,6 +229,6 @@ a {
 @include mq( $from: desktop ){
 	.ma-container-full {
 		max-width: 1200px; 
-		margin: 0 30px;
+		margin: 0 govuk-em( 30, 16 );;
 	}
 }

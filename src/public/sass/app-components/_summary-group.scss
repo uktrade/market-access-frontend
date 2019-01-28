@@ -2,7 +2,7 @@
 	max-width: 100%;
 	@include mq($from: 768px) {
 		max-width:400px;
-		margin-right: 30px;
+		margin-bottom: govuk-em( 30, 16 );
 		display: inline-block;
 	}
 	@include mq( $from: 1024px ){
@@ -42,8 +42,8 @@
 
 .summary-group__list__value {
 	border-bottom: 1px solid $govuk-grey-3;
-	padding-bottom: 15px;
-    margin-bottom: 12px;
+	padding-bottom: govuk-em( 15, 16 );
+    margin-bottom: govuk-em( 12, 16 );
 	box-sizing: border-box;
 
 	&:last-of-type {
@@ -63,7 +63,7 @@
 	padding: govuk-em( 15, 16 );
 	display: block;
 	box-sizing: border-box;
-	margin-top: 5px;
+	margin-top: govuk-em( 5, 16 );
 }
 
 .summary-group__list__value__edit {

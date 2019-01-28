@@ -140,7 +140,6 @@ describe( 'App', function(){
 					.get( /\/barriers(\?country=[a-z0-9-]+)?$/ )
 					.reply( 200, intercept.stub( '/backend/barriers/' ) );
 
-				console.log("!!!!!!", urls.index());
 				app
 					.get( urls.index() )
 					.end( checkPage( 'Market Access - Homepage', done ) );

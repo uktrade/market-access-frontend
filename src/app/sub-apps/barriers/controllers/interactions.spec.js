@@ -245,7 +245,6 @@ describe( 'Barrier interactions controller', () => {
 			barrier = jasmine.helpers.getFakeData( '/backend/barriers/barrier' );
 
 			req.barrier = barrier;
-			req.query = { addCompany: true};
 		} );
 
 		describe( 'add', () => {
