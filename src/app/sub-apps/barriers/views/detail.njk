@@ -48,11 +48,11 @@
 		items: [
             {
 				title: 'Last Modified',
-				html: barrier.modifiedOn | dateOnly | escape | nl2br,
+				html: barrier.modifiedOn | dateOnly,
                 halfWidth: true
 			},{
 				title: 'Date added',
-				html: barrier.reportedOn | dateOnly | escape | nl2br,
+				html: barrier.reportedOn | dateOnly,
                 halfWidth: true
 			},{
 				title: 'Summary of the problem',
@@ -112,7 +112,7 @@
 				}
 			},{
 				title: 'Initial report made by',
-				text: barrier.reportedBy 
+				text: barrier.addedBy 
 			}
 		]
 	} ) }}

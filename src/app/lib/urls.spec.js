@@ -117,13 +117,6 @@ describe( 'URLs', () => {
 			} );
 		} );
 
-		describe( 'Interactions', () => {
-			it( 'Should return the correct path', () => {
-
-				expect( urls.barriers.interactions( barrierId ) ).toEqual( `/barriers/${ barrierId }/interactions/` );
-			} );
-		} );
-
 		describe( 'Notes', () => {
 			describe( 'Add note', () => {
 				it( 'Should return the correct path', () => {

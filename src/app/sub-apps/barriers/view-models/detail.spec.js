@@ -86,7 +86,7 @@ describe( 'Barrier detail view model', () => {
 				description: inputBarrier.current_status.status_summary
 			} );
 			expect( outpuBarrier.reportedOn ).toEqual( inputBarrier.reported_on );
-			expect( outpuBarrier.reportedBy ).toEqual( inputBarrier.reported_by );
+			expect( outpuBarrier.addedBy ).toEqual( inputBarrier.reported_by );
 			expect( outpuBarrier.country ).toEqual( metadata.getCountry( inputBarrier.export_country ) );
 			expect( outpuBarrier.sectors ).toEqual( barrierSectors );
 			expect( outpuBarrier.source ).toEqual( {
