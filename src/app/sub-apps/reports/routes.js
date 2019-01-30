@@ -37,12 +37,12 @@ module.exports = ( express, app ) => {
 	app.get( '/:reportId/has-sectors/', controller.hasSectors );
 	app.post( '/:reportId/has-sectors/', controller.hasSectors );
 
-	app.get( '/:reportId/sectors/', controller.sectors );
-	app.post( '/:reportId/sectors/', controller.sectors );
+	app.get( '/:reportId/sectors/', controller.sectors.list );
+	app.post( '/:reportId/sectors/', controller.sectors.list );
 
-	app.get( '/:reportId/sectors/add/', controller.addSector );
-	app.post( '/:reportId/sectors/add/', controller.addSector );
-	app.post( '/:reportId/sectors/remove/', controller.removeSector );
+	app.get( '/:reportId/sectors/add/', controller.sectors.add );
+	app.post( '/:reportId/sectors/add/', controller.sectors.add );
+	app.post( '/:reportId/sectors/remove/', controller.sectors.remove );
 
 	app.get( '/:reportId/problem/', controller.aboutProblem );
 	app.post( '/:reportId/problem/', controller.aboutProblem );
