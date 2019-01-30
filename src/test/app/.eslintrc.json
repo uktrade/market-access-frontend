@@ -8,5 +8,8 @@
 		"no-global-assign": 2,
 		"no-shadow-restricted-names": 2,
 		"no-console": 0
+	},
+	"parserOptions": {
+		"ecmaVersion": 9
 	}
 }
