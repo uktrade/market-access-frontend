@@ -50,6 +50,7 @@ module.exports = ( barrier, addCompany = false ) => {
 			status,
 			reportedOn: barrier.reported_on,
 			addedBy: barrier.reported_by,
+			euExitRelated: barrier.eu_exit_related,
 			country: metadata.getCountry( barrier.export_country ),
 			sectors,
 			source: {

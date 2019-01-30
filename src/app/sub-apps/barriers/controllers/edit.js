@@ -186,5 +186,41 @@ module.exports = {
 
 			next( e );
 		}
+	}, 
+	eu_exit_related: async ( req, res, next ) => {
+
+		const barrier = req.barrier;
+		const form = new Form( req, {
+			eu_exit_related: {
+				type: Form.RADIO,
+				values: [ barrier.eu_exit_related ],
+				items: [
+					{
+						value: true,
+						text: "Yes"
+					}, 
+					{
+						value: false,
+						text: "No"
+					}
+				]
+			}
+		} );
+
+		const processor = new FormProcessor( {
+			form,
+			render: ( templateValues ) => res.render( 'barriers/views/edit/eu-exit-related', templateValues ),
+			saveFormData: ( formValues ) => backend.barriers.saveEuExitRelated( req, barrier.id, formValues ),
+			saved: () => res.redirect( urls.barriers.detail( barrier.id ) )
+		} );
+
+		try {
+
+			await processor.process();
+
+		} catch( e ){
+
+			next( e );
+		}
 	},
 };

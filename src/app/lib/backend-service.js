@@ -275,6 +275,9 @@ module.exports = {
 			priority: values.priority,
 			priority_summary: getValue( values.priorityDescription )
 		} ),
+		saveEuExitRelated: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
+			eu_exit_related: values.eu_exit_related,
+		} ),
 	},
 
 	reports: {

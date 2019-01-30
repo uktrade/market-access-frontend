@@ -391,6 +391,11 @@ module.exports = {
 				required: 'Enter a title for this barrier'
 			},
 
+			euExitRelated: {
+				values: [report.is_eu_exit],
+				required: 'Please select whether this barrier is related to the EU Exit or not'
+			},
+			
 			description: {
 				values: [ report.problem_description ],
 				required: 'Enter a brief description for this barrier'

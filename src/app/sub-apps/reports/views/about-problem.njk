@@ -85,6 +85,29 @@
 			value: barrierTitle,
 			errorMessage: errors | errorForName( 'barrier-title' )
 		} ) }}
+		
+		{{ govukRadios( {
+
+			idPrefix: 'is-eu-exit',
+			name: 'isEuExit',
+			classes: 'is-eu-exit',
+			fieldset: {
+				legend: {
+					text: 'Is this issue caused by or related to EU Exit?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			}, items: [
+				{
+					value: true,
+					text: "Yes"
+				}, 
+				{
+					value: false,
+					text: "No"
+				}
+			]
+			} )
+		}}
 
 		{% if isResolved %}
 

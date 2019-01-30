@@ -57,6 +57,7 @@ module.exports = {
 			description: ( barrierId ) => `/barriers/${ barrierId }/edit/description/`,
 			source: ( barrierId ) => `/barriers/${ barrierId }/edit/source/`,
 			priority: ( barrierId ) => `/barriers/${ barrierId }/edit/priority/`,
+			eu_exit_related: (barrierId) => `/barriers/${barrierId}/edit/eu-exit-related/`
 		},
 		notes: {
 			add: ( barrierId ) => `/barriers/${ barrierId }/interactions/add-note/`,

@@ -36,6 +36,8 @@ module.exports = ( express, app ) => {
 	app.post( '/:barrierId/edit/source/', controller.edit.source );
 	app.get( '/:barrierId/edit/priority/', controller.edit.priority );
 	app.post( '/:barrierId/edit/priority/', controller.edit.priority );
+	app.get( '/:barrierId/edit/eu-exit-related/', controller.edit.eu_exit_related );
+	app.post( '/:barrierId/edit/eu-exit-related/', controller.edit.eu_exit_related );
 
 	app.get( '/:barrierId/interactions/add-note/', controller.interactions.notes.add );
 	app.post( '/:barrierId/interactions/add-note/', fileUpload, controller.interactions.notes.add );

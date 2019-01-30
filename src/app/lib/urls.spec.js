@@ -115,6 +115,13 @@ describe( 'URLs', () => {
 					expect( urls.barriers.edit.priority( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/priority/` );
 				} );
 			} );
+
+			describe( 'eu exit related', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.edit.eu_exit_related( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/eu-exit-related/` );
+				} );
+			} );
 		} );
 
 		describe( 'Notes', () => {

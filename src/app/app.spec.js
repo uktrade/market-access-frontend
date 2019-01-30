@@ -834,7 +834,8 @@ describe( 'App', function(){
 
 										agent
 											.post( urls.reports.aboutProblem( reportId ) )
-											.send( `_csrf=${ token }&item=test&barrierSource=COMPANY&barrierTitle=testing&description=abc` )
+											.send( `_csrf=${ token }&item=test&barrierSource=COMPANY&euExitRelated=true&barrierTitle=testing&description=abc` )
+											.redirects(0)
 											.end( ( err, res ) => {
 
 												if( res.statusCode != 302 ){

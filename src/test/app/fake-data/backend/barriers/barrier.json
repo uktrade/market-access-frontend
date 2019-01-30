@@ -52,5 +52,6 @@
       "name": "dolorem",
       "order": 0
 	},
-	"created_on": "Sat Jan 27 2018 03:47:08 GMT+0000 (GMT)"
+   "created_on": "Sat Jan 27 2018 03:47:08 GMT+0000 (GMT)",
+   "eu_exit_related": true
 }

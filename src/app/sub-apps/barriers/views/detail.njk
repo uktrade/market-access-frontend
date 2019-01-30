@@ -62,8 +62,16 @@
 					href: urls.barriers.edit.description( barrier.id )
 				}
 			},{
-				title: 'Barrier urgency',
-				html: barrier.problem.status | escape | nl2br
+				title: 'Barrier scope',
+				html: barrier.problem.status | escape | nl2br,
+				halfWidth: true
+			},{
+				title: 'Related to EU Exit',
+				html: barrier.euExitRelated,
+				halfWidth: true,
+				edit: {
+					href: urls.barriers.edit.eu_exit_related( barrier.id )
+				}
 			},{
 				title: 'Company or organisation affected',
 				items: companiesList if companiesList.length,
