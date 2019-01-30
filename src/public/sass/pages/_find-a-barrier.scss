@@ -114,3 +114,21 @@
 		margin-bottom: 0;
 	}
 }
+
+.govuk-checkboxes__item {
+	background: white;
+}
+
+.govuk-checkboxes__input + .govuk-checkboxes__label::before {
+	top: 6px;
+    left: 6px;
+    width: 28px;
+    height: 28px;
+}
+
+.govuk-checkboxes__input + .govuk-checkboxes__label::after {
+	top: 13px;
+    left: 10px;
+    width: 15px;
+    height: 6px;
+}
