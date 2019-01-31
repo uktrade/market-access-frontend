@@ -115,6 +115,13 @@ describe( 'URLs', () => {
 					expect( urls.barriers.edit.priority( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/priority/` );
 				} );
 			} );
+
+			describe( 'status', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.edit.status( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/status/` );
+				} );
+			} );
 		} );
 
 		describe( 'Notes', () => {

@@ -259,7 +259,6 @@ module.exports = {
 		saveDetails: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
 			barrier_title: values.title,
 			export_country: values.country,
-			problem_status: values.status
 		} ),
 		saveProduct: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
 			product: values.product
@@ -274,6 +273,9 @@ module.exports = {
 		savePriority: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
 			priority: values.priority,
 			priority_summary: getValue( values.priorityDescription )
+		} ),
+		saveStatus: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
+			problem_status: values.status
 		} ),
 	},
 

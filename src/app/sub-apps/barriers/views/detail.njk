@@ -35,7 +35,7 @@
 	{% if toast and toast.heading %}
 		{{ toastAlert( toast ) }}
 	{% endif %}
-	
+
 	{%- set barrierTypeHtml %}
 		{{ barrier.type.title }}
 		{{ barrier.type.description | safe }}
@@ -63,7 +63,10 @@
 				}
 			},{
 				title: 'Barrier scope',
-				html: barrier.problem.status | escape | nl2br
+				html: barrier.problem.status,
+				edit: {
+					href: urls.barriers.edit.status( barrier.id )
+				}
 			},{
 				title: 'Company or organisation affected',
 				items: companiesList if companiesList.length,
@@ -113,7 +116,7 @@
 				}
 			},{
 				title: 'Barrier added by',
-				text: barrier.addedBy 
+				text: barrier.addedBy
 			}
 		]
 	} ) }}

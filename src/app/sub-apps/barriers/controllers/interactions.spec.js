@@ -42,7 +42,9 @@ describe( 'Barrier interactions controller', () => {
 			query: {},
 			flash: jasmine.createSpy( 'req.flash' )
 		};
-		config = {};
+		config = {
+			addCompany: false
+		};
 		res = {
 			render: jasmine.createSpy( 'res.render' ),
 			redirect: jasmine.createSpy( 'res.redirect' ),
@@ -174,26 +176,26 @@ describe( 'Barrier interactions controller', () => {
 
 	describe( 'list', () => {
 		describe( 'Without an error', () => {
-			describe( 'With a success response', () => {				
+			describe( 'With a success response', () => {
 				describe( 'With config.addCompany set to true', () => {
 
 					beforeEach( () => {
-		
+
 						config.addCompany = true;
 					} );
-		
+
 					describe( 'With no query', () => {
 						it( 'Should render the barrier detail page with addCompany true', async () => {
-		
+
 							await check( true );
 						} );
 					} );
-		
+
 					describe( 'With query set to true', () => {
 						it( 'Should render the barrier detail page with addCompany true', async () => {
-		
+
 							req.query.addCompany = true;
-		
+
 							await check( true );
 						} );
 					} );
@@ -201,22 +203,22 @@ describe( 'Barrier interactions controller', () => {
 				describe( 'With config.addCompany set to false', () => {
 
 					beforeEach( () => {
-		
+
 						config.addCompany = false;
 					} );
-		
+
 					describe( 'With no query', () => {
 						it( 'Should render the barrier detail page with addCompany false', async () => {
-		
+
 							await check( false );
 						} );
 					} );
-		
+
 					describe( 'With query set to true', () => {
 						it( 'Should render the barrier detail page with addCompany true', async () => {
-		
+
 							req.query.addCompany = true;
-		
+
 							await check( true );
 						} );
 					} );
@@ -225,15 +227,15 @@ describe( 'Barrier interactions controller', () => {
 
 			describe( 'With no flash message', () => {
 				it( 'Should not add a toast message to the locals', async () => {
-	
+
 					await controller.list( req, res, next );
 					expect( res.locals.toast ).not.toBeDefined();
 				} );
 			} );
-	
+
 			describe( 'With a flash message of barrier-created', () => {
 				it( 'Should add a toast message to the locals', async () => {
-	
+
 					req.flash.and.callFake( () => [ uuid() ] ) ;
 					await controller.list( req, res, next );
 					expect( res.locals.toast ).toEqual( {
