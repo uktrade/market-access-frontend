@@ -427,18 +427,15 @@ describe( 'Backend Service', () => {
 
 				const title = 'my title';
 				const country = uuid();
-				const status = '1';
 
 				await service.barriers.saveDetails( req, barrierId, {
 					title,
 					country,
-					status
 				} );
 
 				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
 					barrier_title: title,
 					export_country: country,
-					problem_status: status
 				} );
 			} );
 		} );
@@ -562,6 +559,20 @@ describe( 'Backend Service', () => {
 			} );
 		});
 
+		describe( 'saveStatus', () => {
+			it( 'Should PUT to the correct path with the correct values', async () => {
+
+				const status = '1';
+
+				await service.barriers.saveStatus( req, barrierId, {
+					status
+				} );
+
+				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+					problem_status: status
+				} );
+			} );
+		} );
 	} );
 
 	describe( 'Reports', () => {

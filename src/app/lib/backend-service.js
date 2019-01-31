@@ -259,7 +259,6 @@ module.exports = {
 		saveDetails: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
 			barrier_title: values.title,
 			export_country: values.country,
-			problem_status: values.status
 		} ),
 		saveProduct: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
 			product: values.product
@@ -277,6 +276,9 @@ module.exports = {
 		} ),
 		saveEuExitRelated: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
 			eu_exit_related: values.eu_exit_related,
+		}),
+		saveStatus: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
+			problem_status: values.status
 		} ),
 	},
 

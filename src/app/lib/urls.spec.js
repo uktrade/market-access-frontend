@@ -120,6 +120,12 @@ describe( 'URLs', () => {
 				it( 'Should return the correct path', () => {
 
 					expect( urls.barriers.edit.eu_exit_related( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/eu-exit-related/` );
+				});
+			});
+			describe( 'status', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.edit.status( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/status/` );
 				} );
 			} );
 		} );

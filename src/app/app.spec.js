@@ -258,7 +258,7 @@ describe( 'App', function(){
 			beforeEach( () => {
 
 				barrierId = uuid();
-				
+
 			} );
 
 			describe( 'When the barrier cannot be found', () => {
@@ -300,7 +300,7 @@ describe( 'App', function(){
 							.get( `/barriers/${ barrier.id }/history` )
 							.reply( 200, intercept.stub( '/backend/barriers/history' ))
 							.persist();
-						
+
 						app
 							.get( urls.barriers.detail( barrierId ) )
 							.end( checkPage( 'Market Access - Barrier details', done ) );
@@ -349,6 +349,15 @@ describe( 'App', function(){
 							app
 								.get( urls.barriers.edit.priority( barrierId ) )
 								.end( checkPage( 'Market Access - Barrier - Edit priority', done ) );
+						} );
+					} );
+
+					describe( 'status', () => {
+						it( 'Should fetch the barrier and render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.edit.status( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier - Edit barrier scope', done ) );
 						} );
 					} );
 				} );
