@@ -1,7 +1,7 @@
 const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
 
-const modulePath = './about-problem';
+const modulePath = './summary';
 
 describe( 'Report controllers', () => {
 
@@ -12,11 +12,7 @@ describe( 'Report controllers', () => {
 	let Form;
 	let form;
 	let urls;
-	let metadata;
-	let validators;
 	let backend;
-	let govukItemsFromObj;
-	let govukItemsFromObjResponse;
 	let getValuesResponse;
 	let getTemplateValuesResponse;
 
@@ -24,7 +20,6 @@ describe( 'Report controllers', () => {
 
 		( { req, res, next } = jasmine.helpers.mocks.middleware() );
 
-		govukItemsFromObjResponse = [ { items: 1 } ];
 		getValuesResponse = { a: 1, b: 2 };
 		getTemplateValuesResponse = { c: 3, d: 4 };
 		form = {
@@ -34,23 +29,10 @@ describe( 'Report controllers', () => {
 			getTemplateValues: jasmine.createSpy( 'form.getTemplateValues' ).and.callFake( () => getTemplateValuesResponse )
 		};
 
-		validators = {
-			isMetadata: jasmine.createSpy( 'validators.isMetaData' ),
-		};
-
-		metadata = {
-			barrierSource: {
-				'A': 'a',
-				'B': 'b'
-			},
-		};
-
 		urls = {
 			reports: {
 				detail: jasmine.createSpy( 'urls.reports.detail' ),
-				sectors: jasmine.createSpy( 'urls.reports.sectors' ),
-				hasSectors: jasmine.createSpy( 'urls.reports.hasSectors' ),
-				summary: jasmine.createSpy( 'urls.reports.summary' ),
+				aboutProblem: jasmine.createSpy( 'urls.reports.aboutProblem' ),
 			},
 			barriers: {
 				detail: jasmine.createSpy( 'urls.barriers.detail' ),
@@ -59,25 +41,21 @@ describe( 'Report controllers', () => {
 
 		backend = {
 			reports: {
-				saveProblem: jasmine.createSpy( 'backend.reports.saveProblem' ),
-				saveProblemAndSubmit: jasmine.createSpy( 'backend.reports.saveProblemAndSubmit' ),
+				saveSummary: jasmine.createSpy( 'backend.reports.saveSummary' ),
+				saveSummaryAndSubmit: jasmine.createSpy( 'backend.reports.saveSummaryAndSubmit' ),
 			}
 		};
 
 		Form = jasmine.createSpy( 'Form' ).and.callFake( () => form );
-		govukItemsFromObj = jasmine.createSpy( 'govukItemsFromObj' ).and.callFake( () => govukItemsFromObjResponse );
 
 		controller = proxyquire( modulePath, {
 			'../../../lib/backend-service': backend,
-			'../../../lib/metadata': metadata,
 			'../../../lib/Form': Form,
 			'../../../lib/urls': urls,
-			'../../../lib/validators': validators,
-			'../../../lib/govuk-items-from-object': govukItemsFromObj
 		} );
 	} );
 
-	describe( 'aboutProblem', () => {
+	describe( 'summary', () => {
 
 		let report;
 
@@ -85,71 +63,65 @@ describe( 'Report controllers', () => {
 
 			report = {
 				id: uuid(),
-				product: 'myProduct',
 				problem_description: 'a description',
-				barrier_title: 'barrier_title',
-				source: 'barrier_awareness',
-				other_source: 'barrier_awareness_other',
-				resolution_summary: 'resolution_summary'
+				resolution_summary: 'resolution_summary',
+				next_steps_summary: 'next_steps_summary',
 			};
 			req.report = report;
 		} );
 
 		describe( 'Form config', () => {
 
-			let barrierSourceResponse;
-
-			function checkForm( args ){
+			function checkForm( args, isResolved ){
 
 				const config = args[ 1 ];
 
 				expect( Form ).toHaveBeenCalled();
 				expect( args[ 0 ] ).toEqual( req );
 
-				expect( config.item ).toBeDefined();
-				expect( config.item.required ).toBeDefined();
-				expect( config.item.values ).toEqual( [ report.product ] );
+				expect( config.description ).toBeDefined();
+				expect( config.description.values ).toEqual( [ report.problem_description ] );
+				expect( config.description.required ).toBeDefined();
 
-				expect( config.barrierTitle ).toBeDefined();
-				expect( config.barrierTitle.values ).toEqual( [ report.barrier_title ] );
-				expect( config.barrierTitle.required ).toBeDefined();
+				if( isResolved ){
 
-				expect( config.barrierSource ).toBeDefined();
-				expect( config.barrierSource.type ).toEqual( Form.RADIO );
-				expect( config.barrierSource.values ).toEqual( [ report.source ] );
-				expect( config.barrierSource.validators[ 0 ].fn ).toEqual( barrierSourceResponse );
-				expect( Array.isArray( config.barrierSource.items ) ).toEqual( true );
+					expect( config.resolvedDescription ).toBeDefined();
+					expect( config.resolvedDescription.values ).toEqual( [ report.status_summary ] );
+					expect( config.resolvedDescription.required ).toBeDefined();
 
-				expect( config.barrierSourceOther ).toBeDefined();
-				expect( config.barrierSourceOther.conditional ).toEqual( { name: 'barrierSource', value: 'OTHER' } );
-				expect( config.barrierSourceOther.values ).toEqual( [ report.other_source ] );
+				} else {
 
-				expect( config.country ).not.toBeDefined();
-				expect( config.description ).not.toBeDefined();
-				expect( config.resolvedDescription ).not.toBeDefined();
+					expect( config.nextSteps ).toBeDefined();
+					expect( config.nextSteps.values ).toEqual( [ report.next_steps_summary ] );
+				}
 			}
 
-			beforeEach( () => {
+			describe( 'When the report is resolved', () => {
+				it( 'Should setup the form correctly', async () => {
 
-				barrierSourceResponse = { barrierSourceResponse: true };
+					req.report.is_resolved = true;
 
-				validators.isMetadata.and.callFake( ( key ) => {
+					await controller( req, res, next );
 
-					if( key === 'barrierSource' ){ return barrierSourceResponse; }
+					checkForm( Form.calls.argsFor( 0 ), true );
 				} );
 			} );
 
-			it( 'Should setup the form correctly', async () => {
+			describe( 'When the report is NOT resolved', () => {
+				it( 'Should setup the form correctly', async () => {
 
-				await controller( req, res, next );
+					req.report.next_steps_summary = 'my next steps';
 
-				checkForm( Form.calls.argsFor( 0 ) );
+					await controller( req, res, next );
+
+					checkForm( Form.calls.argsFor( 0 ) );
+				} );
 			} );
 		} );
 
 		describe( 'FormProcessor', () => {
 
-			const template = 'reports/views/about-problem';
+			const template = 'reports/views/summary';
 
 			let FormProcessor;
 			let processFn;
@@ -163,16 +135,15 @@ describe( 'Report controllers', () => {
 				controller = proxyquire( modulePath, {
 					'../../../lib/backend-service': backend,
 					'../../../lib/urls': urls,
-					'../../../lib/metadata': metadata,
 					'../../../lib/Form': Form,
 					'../../../lib/FormProcessor': FormProcessor,
-					'../../../lib/validators': validators,
-					'../../../lib/govuk-items-from-object': govukItemsFromObj,
 				} );
 
 				FormProcessor.and.callFake( () => ({
 					process: processFn
 				}) );
+
+				req.report.is_resolved = true;
 
 				await controller( req, res, next );
 
@@ -188,35 +159,17 @@ describe( 'Report controllers', () => {
 			} );
 
 			describe( 'render', () => {
-				describe( 'When the report has sectors_affected', () => {
-					it( 'Should render the template with the correct data', () => {
+				it( 'Should render the template with the correct data', () => {
 
-						const myValues = { some: 'data' };
-						const sectorsResponse = 'sectors';
-						const renderValues = Object.assign( {}, myValues, { backHref: sectorsResponse } );
+					const myValues = { some: 'data' };
+					const aboutProblemResponse = 'hasSectors';
+					const renderValues = Object.assign( {}, myValues, { backHref: aboutProblemResponse, isResolved: true } );
 
-						urls.reports.sectors.and.callFake( () => sectorsResponse );
-						report.sectors_affected = true;
+					urls.reports.aboutProblem.and.callFake( () => aboutProblemResponse );
 
-						args.render( myValues );
+					args.render( myValues );
 
-						expect( res.render ).toHaveBeenCalledWith( template, renderValues );
-					} );
-				} );
-
-				describe( 'When the report does not have sectors_affected', () => {
-					it( 'Should render the template with the correct data', () => {
-
-						const myValues = { some: 'data' };
-						const hasSectorsResponse = 'hasSectors';
-						const renderValues = Object.assign( {}, myValues, { backHref: hasSectorsResponse  } );
-
-						urls.reports.hasSectors.and.callFake( () => hasSectorsResponse );
-
-						args.render( myValues );
-
-						expect( res.render ).toHaveBeenCalledWith( template, renderValues );
-					} );
+					expect( res.render ).toHaveBeenCalledWith( template, renderValues );
 				} );
 			} );
 
@@ -230,7 +183,7 @@ describe( 'Report controllers', () => {
 
 						args.saveFormData( myFormData );
 
-						expect( backend.reports.saveProblem ).toHaveBeenCalledWith( req, report.id, myFormData );
+						expect( backend.reports.saveSummary ).toHaveBeenCalledWith( req, report.id, myFormData );
 					} );
 				} );
 
@@ -241,7 +194,7 @@ describe( 'Report controllers', () => {
 
 						args.saveFormData( myFormData );
 
-						expect( backend.reports.saveProblem ).toHaveBeenCalledWith( req, report.id, myFormData );
+						expect( backend.reports.saveSummaryAndSubmit ).toHaveBeenCalledWith( req, report.id, myFormData );
 					} );
 				} );
 			} );
@@ -268,16 +221,16 @@ describe( 'Report controllers', () => {
 				describe( 'When it is Save and continue', () => {
 					it( 'Should redirect to the barrier detail page', () => {
 
-						const summaryUrlResponse = '/detail-url';
+						const detailUrlResponse = '/detail-url';
 						const body = { id: 123 };
 
-						urls.reports.summary.and.callFake( () => summaryUrlResponse );
+						urls.barriers.detail.and.callFake( () => detailUrlResponse );
 
 						args.saved( body );
 
-						expect( req.flash ).not.toHaveBeenCalled();
-						expect( urls.reports.summary ).toHaveBeenCalledWith( body.id );
-						expect( res.redirect ).toHaveBeenCalledWith( summaryUrlResponse );
+						expect( req.flash ).toHaveBeenCalledWith( 'barrier-created', body.id );
+						expect( urls.barriers.detail ).toHaveBeenCalledWith( body.id );
+						expect( res.redirect ).toHaveBeenCalledWith( detailUrlResponse );
 						expect( next ).not.toHaveBeenCalled();
 					} );
 				} );

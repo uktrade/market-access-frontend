@@ -5,6 +5,7 @@ const modulePath = './index';
 describe( 'Report controllers', () => {
 
 	let controller;
+	let controllers;
 	let req;
 	let res;
 	let next;
@@ -49,12 +50,47 @@ describe( 'Report controllers', () => {
 		reportDetailViewModel = jasmine.createSpy( 'reportDetailViewModel' );
 		reportsViewModel = jasmine.createSpy( 'reportsViewModel' );
 
+		const additionalControllers = {
+
+			'./start': 'start',
+			'./is-resolved': 'isResolved',
+			'./country': 'country',
+			'./has-sectors': 'hasSectors',
+			'./sectors': 'sectors',
+			'./about-problem': 'aboutProblem',
+			'./summary': 'summary',
+		};
+
+		controllers = Object.entries( additionalControllers ).reduce( ( obj, [ path, name ] ) => {
+
+			obj[ name ] = { [ name ]: path };
+			return obj;
+
+		}, {} );
+
 		controller = proxyquire( modulePath, {
+
 			'../../../lib/backend-service': backend,
 			'../../../lib/urls': urls,
 			'../../../lib/metadata': metadata,
 			'../view-models/detail': reportDetailViewModel,
 			'../view-models/reports': reportsViewModel,
+
+			...Object.entries( additionalControllers ).reduce( ( obj, [ path, name ] ) => {
+
+				obj[ path ] = controllers[ name ];
+				return obj;
+
+			}, {} )
+		} );
+	} );
+
+	describe( 'Additional controllers', () => {
+		it( 'Should incude the other controllers', () => {
+
+			Object.keys( controllers ).forEach( ( key ) => {
+				expect( controller[ key ] ).toEqual( controllers[ key ] );
+			} );
 		} );
 	} );
 

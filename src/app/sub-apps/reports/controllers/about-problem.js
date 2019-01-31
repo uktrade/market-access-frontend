@@ -9,7 +9,6 @@ const govukItemsFromObj = require( '../../../lib/govuk-items-from-object' );
 module.exports = async ( req, res, next ) => {
 
 	const report = req.report;
-	const isResolved = report.is_resolved;
 	const formConfig = {
 
 		item: {
@@ -39,20 +38,7 @@ module.exports = async ( req, res, next ) => {
 			values: [ report.barrier_title ],
 			required: 'Enter a title for this barrier'
 		},
-
-		description: {
-			values: [ report.problem_description ],
-			required: 'Enter a brief description for this barrier'
-		},
 	};
-
-	if( isResolved ){
-
-		formConfig.resolvedDescription = {
-			values: [ report.status_summary ],
-			required: 'Enter an explanation of how you solved this barrier'
-		};
-	}
 
 	const form = new Form( req, formConfig );
 
@@ -64,21 +50,10 @@ module.exports = async ( req, res, next ) => {
 			const urlMethod = ( hasSectors ? 'sectors' : 'hasSectors' );
 
 			templateValues.backHref =  urls.reports[ urlMethod ]( report.id );
-			templateValues.isResolved = isResolved;
 
 			res.render( 'reports/views/about-problem', templateValues );
 		},
-		saveFormData: ( formValues ) => {
-
-			if( form.isExit ){
-
-				return backend.reports.saveProblem( req, report.id, formValues );
-
-			} else {
-
-				return backend.reports.saveProblemAndSubmit( req, report.id, formValues );
-			}
-		},
+		saveFormData: ( formValues ) => backend.reports.saveProblem( req, report.id, formValues ),
 		saved: ( body ) => {
 
 			const barrierId = body.id;
@@ -89,8 +64,7 @@ module.exports = async ( req, res, next ) => {
 
 			} else {
 
-				req.flash( 'barrier-created', barrierId );
-				res.redirect( urls.barriers.detail( barrierId ) );
+				res.redirect( urls.reports.summary( barrierId ) );
 			}
 		}
 	} );

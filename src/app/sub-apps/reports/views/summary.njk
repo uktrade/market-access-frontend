@@ -1,0 +1,85 @@
+{% from 'components/textarea/macro.njk' import govukTextarea %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Add - Summary of the barrier{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: backHref },
+		caption: 'Add a barrier',
+		text: ( 'Summarise the problem and how it was resolved' if isResolved else 'Summarise the problem and next steps' ),
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.reports.summary( report.id ) }}" method="POST" class="restrict-width">
+
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{% if isResolved %}
+
+			{{ govukTextarea( {
+
+				label: {
+					text: 'Provide a summary of the problem and how you became aware of it',
+					classes: 'govuk-label--s'
+				},
+				id: 'description',
+				name: 'description',
+				value: description,
+				errorMessage: errors | errorForName( 'description' )
+			} ) }}
+
+			{{ govukTextarea( {
+
+				label: {
+					text: 'How did you resolve the problem?',
+					classes: 'govuk-label--s'
+				},
+				id: 'resolved-description',
+				name: 'resolvedDescription',
+				value: resolvedDescription,
+				errorMessage: errors | errorForName( 'resolved-description' )
+			} ) }}
+
+		{% else %}
+
+			{{ govukTextarea( {
+
+				label: {
+					text: 'Provide a summary of the problem',
+					classes: 'govuk-label--s'
+				},
+				id: 'description',
+				name: 'description',
+				value: description,
+				hint: {
+					text: 'Include what you have done so far and who you have discussed the problem with.'
+				},
+				errorMessage: errors | errorForName( 'description' )
+			} ) }}
+
+			{{ govukTextarea( {
+
+				label: {
+					text: 'What are the next steps to resolve this barrier?',
+					classes: 'govuk-label--s'
+				},
+				id: 'next-steps',
+				name: 'nextSteps',
+				value: nextSteps,
+				hint: {
+					text: 'This could be steps determined by yourself or your team. Highlighting that next steps have not been discussed is also useful to note.'
+				},
+				errorMessage: errors | errorForName( 'next-steps' )
+			} ) }}
+
+		{% endif %}
+
+		<input type="submit" class="govuk-button" value="Save and continue">
+		<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>
+
+	</form>
+{% endblock %}

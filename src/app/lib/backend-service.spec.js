@@ -839,26 +839,37 @@ describe( 'Backend Service', () => {
 			describe( 'saveProblem', () => {
 
 				const item = '1';
-				const description = 'b';
 				const barrierTitle = 'c';
 				const barrierSource = 'd';
 				const barrierSourceOther = 'e';
-				const resolvedDescription = 'f';
 
 				checkWithAndWithoutValues( 'saveProblem', {
 					item,
-					description,
 					barrierTitle,
 					barrierSource,
 					barrierSourceOther,
-					resolvedDescription
 				}, {
 					product: item,
-					problem_description: description,
 					barrier_title: barrierTitle,
 					source: barrierSource,
 					other_source: barrierSourceOther,
-					status_summary: resolvedDescription
+				} );
+			} );
+
+			describe( 'saveSummary', () => {
+
+				const description = 'b';
+				const resolvedDescription = 'f';
+				const nextSteps = 'g';
+
+				checkWithAndWithoutValues( 'saveSummary', {
+					description,
+					resolvedDescription,
+					nextSteps
+				}, {
+					problem_description: description,
+					status_summary: resolvedDescription,
+					next_steps_summary: nextSteps,
 				} );
 			} );
 		} );
@@ -874,7 +885,7 @@ describe( 'Backend Service', () => {
 			} );
 		} );
 
-		describe( 'saveProblemAndSubmit', () => {
+		describe( 'saveSummaryAndSubmit', () => {
 
 			let reportId;
 			let values;
@@ -884,25 +895,19 @@ describe( 'Backend Service', () => {
 
 				reportId = uuid();
 				values = {
-					item: '1',
 					description: 'b',
-					barrierTitle: 'c',
-					barrierSource: 'd',
-					barrierSourceOther: 'e',
 					resolvedDescription: 'f',
+					nextSteps: 'g',
 				};
 
 				backendValues = {
-					product: values.item,
 					problem_description: values.description,
-					barrier_title: values.barrierTitle,
-					source: values.barrierSource,
-					other_source: values.barrierSourceOther,
-					status_summary: values.resolvedDescription
+					status_summary: values.resolvedDescription,
+					next_steps_summary: values.nextSteps,
 				};
 			} );
 
-			describe( 'When saveProblem throws an error', () => {
+			describe( 'When saveSummary throws an error', () => {
 				it( 'Should return the error', async () => {
 
 					const err = { response: { statusCode: 500 } };
@@ -910,7 +915,7 @@ describe( 'Backend Service', () => {
 
 					try {
 
-						await service.reports.saveProblemAndSubmit( req, reportId, {} );
+						await service.reports.saveSummaryAndSubmit( req, reportId, {} );
 						expect( false ).toEqual( true );// should not get here
 
 					} catch( e ){
@@ -920,7 +925,7 @@ describe( 'Backend Service', () => {
 				} );
 			} );
 
-			describe( 'When saveProblem returns a 400', () => {
+			describe( 'When saveSummary returns a 400', () => {
 				it( 'Should return the error', async () => {
 
 					const putResponse = {
@@ -930,7 +935,7 @@ describe( 'Backend Service', () => {
 
 					backend.put.and.callFake( () => putResponse );
 
-					const serviceOutput = await service.reports.saveProblemAndSubmit( req, reportId, values );
+					const serviceOutput = await service.reports.saveSummaryAndSubmit( req, reportId, values );
 
 					expect( backend.put.calls.count() ).toEqual( 1 );
 					expect( backend.put.calls.argsFor( 0 ) ).toEqual( [ `/reports/${ reportId }`, token, backendValues ] );
@@ -938,12 +943,12 @@ describe( 'Backend Service', () => {
 				} );
 			} );
 
-			describe( 'When saveProblem returns a 200', () => {
-				it( 'Should call saveProblem and submit', async () => {
+			describe( 'When saveSummary returns a 200', () => {
+				it( 'Should call saveSummary and submit', async () => {
 
 					backend.put.and.callFake( () => Promise.resolve({ response: { statusCode: 200, isSuccess: true } }) );
 
-					await service.reports.saveProblemAndSubmit( req, reportId, values );
+					await service.reports.saveSummaryAndSubmit( req, reportId, values );
 
 					expect( backend.put.calls.count() ).toEqual( 2 );
 					expect( backend.put.calls.argsFor( 0 ) ).toEqual( [ `/reports/${ reportId }`, token, backendValues ] );

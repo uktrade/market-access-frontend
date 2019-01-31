@@ -32,6 +32,7 @@ const reportUrl = {
 	addSector: ( reportId ) => `/reports/${ reportId }/sectors/add/`,
 	removeSector: ( reportId ) => `/reports/${ reportId }/sectors/remove/`,
 	aboutProblem: ( reportId ) => `/reports/${ reportId }/problem/`,
+	summary: ( reportId ) => `/reports/${ reportId }/summary/`,
 	submit: ( reportId ) => `/reports/${ reportId }/submit/`,
 };
 
@@ -101,6 +102,8 @@ module.exports = {
 				return reportUrl.hasSectors( report.id );
 			case '1.4':
 				return reportUrl.aboutProblem( report.id );
+			case '1.5':
+				return reportUrl.summary( report.id );
 			default:
 				return reportUrl.detail( report.id );
 		}
