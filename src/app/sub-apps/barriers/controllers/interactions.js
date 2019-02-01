@@ -66,10 +66,22 @@ function getTimelineData( req, barrierId ){
 
 async function renderInteractions( req, res, next, opts = {} ){
 
+	const addCompany = ( config.addCompany || !!req.query.addCompany );
+	const createdFlash = req.flash( 'barrier-created' );
+	const isNew = createdFlash && createdFlash.length === 1;
+
+	if( isNew ){
+
+		res.locals.toast = {
+			heading: 'Barrier added to the service',
+			message: 'Continue to add more detail to your barrier'
+		};
+	}
+
 	try {
 
-		res.render( 'barriers/views/interactions', Object.assign(
-			detailVieWModel( req.barrier ),
+		res.render( 'barriers/views/detail', Object.assign(
+			detailVieWModel( req.barrier, addCompany ),
 			{ interactions: interactionsViewModel( await getTimelineData( req, req.barrier.id ), opts.editId ) },
 			opts.data
 		) );
@@ -332,7 +344,7 @@ module.exports = {
 						) );
 					}
 
-					res.redirect( urls.barriers.interactions( barrier.id ) );
+					res.redirect( urls.barriers.detail( barrier.id ) );
 				}
 			} );
 
@@ -367,7 +379,7 @@ module.exports = {
 						data: templateValues
 					} ),
 					saveFormData: ( formValues ) => backend.barriers.notes.update( req, noteId, formValues ),
-					saved: () => res.redirect( urls.barriers.interactions( barrier.id ) )
+					saved: () => res.redirect( urls.barriers.detail( barrier.id ) )
 				} );
 
 				try {

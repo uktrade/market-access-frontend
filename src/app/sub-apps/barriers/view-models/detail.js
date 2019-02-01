@@ -49,7 +49,7 @@ module.exports = ( barrier, addCompany = false ) => {
 			type: getBarrierType( barrier.barrier_type ),
 			status,
 			reportedOn: barrier.reported_on,
-			reportedBy: barrier.reported_by,
+			addedBy: barrier.reported_by,
 			country: metadata.getCountry( barrier.export_country ),
 			sectors,
 			source: {
@@ -71,6 +71,7 @@ module.exports = ( barrier, addCompany = false ) => {
 				...barrier.priority,
 				modifyer: barrier.priority.code.toLowerCase()
 			},
+			modifiedOn: barrier.modified_on
 		},
 		sectorsList,
 		companies,

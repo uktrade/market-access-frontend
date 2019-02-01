@@ -38,11 +38,19 @@
 	&:last-of-type:after {
 		border-color: white;
 	}
+
 }
+
+.event_list__item--note {
+	background-color: $govuk-yellow-25;
+	border-color: $govuk-yellow;
+
+}
+
 
 .event-list__item__document {
 
-	background: transparent url( 'data:image/svg+xml;charset=UTF-8,<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="white"/><path d="M72.1429 80.625C72.1429 83.0313 70.15 85 67.7143 85H23.4286C20.9929 85 19 83.0313 19 80.625V28.125C19 25.7187 20.9929 23.75 23.4286 23.75V80.625H72.1429ZM81 32.5V71.875C81 74.2813 79.0071 76.25 76.5714 76.25H32.2857C29.85 76.25 27.8571 74.2813 27.8571 71.875V19.375C27.8571 16.9687 29.85 15 32.2857 15H63.2857C64.4482 15 65.583 15.4649 66.4134 16.2852L79.6991 29.4102C80.5295 30.2032 81 31.3242 81 32.5ZM63.2857 32.5H76.5714L63.2857 19.375V32.5ZM76.5714 34.6875H63.2857C62.0679 34.6875 61.0714 33.7031 61.0714 32.5V19.375H32.2857V71.875H76.5714V34.6875Z" fill="black"/></svg>' ) 0 0 no-repeat;
+	background: transparent url( 'data:image/svg+xml;charset=UTF-8,<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M72.1429 80.625C72.1429 83.0313 70.15 85 67.7143 85H23.4286C20.9929 85 19 83.0313 19 80.625V28.125C19 25.7187 20.9929 23.75 23.4286 23.75V80.625H72.1429ZM81 32.5V71.875C81 74.2813 79.0071 76.25 76.5714 76.25H32.2857C29.85 76.25 27.8571 74.2813 27.8571 71.875V19.375C27.8571 16.9687 29.85 15 32.2857 15H63.2857C64.4482 15 65.583 15.4649 66.4134 16.2852L79.6991 29.4102C80.5295 30.2032 81 31.3242 81 32.5ZM63.2857 32.5H76.5714L63.2857 19.375V32.5ZM76.5714 34.6875H63.2857C62.0679 34.6875 61.0714 33.7031 61.0714 32.5V19.375H32.2857V71.875H76.5714V34.6875Z" fill="black"/></svg>' ) 0 0 no-repeat;
 	padding-left: 45px;
 	background-size: 40px 40px;
 
@@ -68,7 +76,7 @@
 .event-list__item__heading {
 	margin-top: 0;
 	margin-bottom: govuk-em( 15, 16 );
-	color: $govuk-grey-1;
+	color: $govuk-black;
 }
 
 .event-list__item__heading__recede {
@@ -95,10 +103,6 @@
 	display: inline;
 }
 
-.event-list__item__document__list__item__name {
-
-}
-
 .event-list__item__document__list__item__status {
-	color: $govuk-grey-1;
+	color: $govuk-black;
 }

@@ -28,15 +28,6 @@ module.exports = {
 					}
 				]
 			},
-			status: {
-				type: Form.RADIO,
-				values: [ barrier.problem_status ],
-				items: govukItemsFromObj( metadata.statusTypes ),
-				validators: [{
-					fn: validators.isMetadata( 'statusTypes' ),
-					message: 'Select a barrier urgency'
-				}]
-			}
 		} );
 
 		const processor = new FormProcessor( {
@@ -175,6 +166,39 @@ module.exports = {
 			form,
 			render: ( templateValues ) => res.render( 'barriers/views/edit/priority', templateValues ),
 			saveFormData: ( formValues ) => backend.barriers.savePriority( req, barrier.id, formValues ),
+			saved: () => res.redirect( urls.barriers.detail( barrier.id ) )
+		} );
+
+		try {
+
+			await processor.process();
+
+		} catch( e ){
+
+			next( e );
+		}
+	},
+
+	status: async ( req, res, next ) => {
+
+		const barrier = req.barrier;
+
+		const form = new Form( req, {
+			status: {
+				type: Form.RADIO,
+				values: [ barrier.problem_status ],
+				items: govukItemsFromObj( metadata.statusTypes ),
+				validators: [{
+					fn: validators.isMetadata( 'statusTypes' ),
+					message: 'Select a barrier urgency'
+				}]
+			}
+		} );
+
+		const processor = new FormProcessor( {
+			form,
+			render: ( templateValues ) => res.render( 'barriers/views/edit/status', templateValues ),
+			saveFormData: ( formValues ) => backend.barriers.saveStatus( req, barrier.id, formValues ),
 			saved: () => res.redirect( urls.barriers.detail( barrier.id ) )
 		} );
 

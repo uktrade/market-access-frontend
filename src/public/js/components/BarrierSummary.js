@@ -4,7 +4,7 @@ ma.components.BarrierSummary = (function( doc, jessie ){
 	var LIST_CLASS = 'barrier-summary-link-list';
 	var LIST_ITEM_CLASS = 'barrier-summary-link-list__item';
 
-	if( !jessie.hasFeatures( 'query', 'attachListener', 'bind', 'cancelDefault' ) ){ return; }
+	if( !jessie.hasFeatures( 'query', 'attachListener', 'bind', 'cancelDefault', 'getElementPositionStyles' ) ){ return; }
 
 	function BarrierSummary( opts ){
 
@@ -18,10 +18,13 @@ ma.components.BarrierSummary = (function( doc, jessie ){
 
 		this.setupList();
 		this.setupLink();
+		this.setListPosition();
+
+		jessie.attachListener( window, 'resize', jessie.bind( this.setListPosition, this ) );
 	}
 
 	BarrierSummary.prototype.setupList = function(){
-		
+
 		var listItem;
 		var link;
 		var i = 0;
@@ -30,7 +33,8 @@ ma.components.BarrierSummary = (function( doc, jessie ){
 		this.list = doc.createElement( 'ul' );
 		this.list.className = LIST_CLASS;
 		this.list.style.display = 'none';
-		
+		this.list.style.position = 'absolute';
+
 		firstLink.parentNode.insertBefore( this.list, firstLink );
 
 		while( ( link = this.links[ i++ ] ) ){
@@ -41,11 +45,11 @@ ma.components.BarrierSummary = (function( doc, jessie ){
 			this.list.appendChild( listItem );
 		}
 	};
-	
+
 	BarrierSummary.prototype.setupLink = function(){
-		
+
 		var toggle = doc.createElement( 'a' );
-		
+
 		toggle.href = '#';
 		toggle.className = LINK_CLASS;
 		toggle.innerText = this.text;
@@ -55,16 +59,37 @@ ma.components.BarrierSummary = (function( doc, jessie ){
 		this.toggle = toggle;
 	};
 
+	BarrierSummary.prototype.getTogglePosition = function(){
+
+		var currentPosition = this.toggle.style.position;
+		this.toggle.style.position = 'static';
+		var positions = jessie.getElementPositionStyles( this.toggle );
+		this.toggle.style.position = currentPosition;
+
+		return positions;
+	};
+
+	BarrierSummary.prototype.setListPosition = function(){
+
+		var positions = this.getTogglePosition();
+		var offset = this.toggle.offsetHeight;
+
+		this.list.style.top = positions.top + 'px';
+		this.list.style.left = positions.left + 'px';
+		this.list.style.top = ( positions.top + offset ) + 'px';
+	};
+
 	BarrierSummary.prototype.handleClick = function( e ){
 
 		jessie.cancelDefault( e );
-	
+
 		var show = this.list.style.display === 'none';
-		this.list.style.display = ( show ? '' : 'none' );
 
 		if( !show ){
 			this.toggle.blur();
 		}
+
+		this.list.style.display = ( show ? '' : 'none' );
 	};
 
 	return BarrierSummary;

@@ -45,6 +45,7 @@ function getNotes( items, editId ){
 		notes.push( {
 			id: item.id,
 			isNote: true,
+			modifier: 'note',
 			edit: ( item.id == editId ),
 			date: item.created_on,
 			text: item.text,
@@ -61,6 +62,7 @@ function getStatus( item ){
 
 	return {
 		isStatus: true,
+		modifier: 'status',
 		date: item.date,
 		event: item.field_info.event,
 		state: {
@@ -80,6 +82,7 @@ function getPriority( item ){
 
 	return {
 		isPriority: true,
+		modifier: 'priority',
 		date: item.date,
 		priority: metadata.barrierPrioritiesMap[ priorityCode ],
 		text: item.field_info.priority_summary,

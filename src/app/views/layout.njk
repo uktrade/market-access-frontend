@@ -4,7 +4,7 @@
 
 {% set assetPath = '/govuk-public' %}
 
-{% extends 'template.njk' %}{# extend from govuk-template #}
+{% extends 'marketaccess-template.njk' %}{# extend from govuk-template #}
 
 {% block pageTitle %}{% block page_title %}Market Access{% endblock %}{% endblock %}
 
@@ -67,6 +67,12 @@
 	}) }}
 {% endblock %}
 
+{% block masthead %}
+	<div class="govuk-masthead">
+		{% block mastheadContent %}{% endblock %}
+	</div>
+{% endblock %}
+
 {% block content %}
 {% block page_content %}{% endblock %}
 {% endblock %}
@@ -124,7 +130,7 @@
 	<script src="/public/js/pages/barrier/type.js"></script>
 	<script src="/public/js/pages/barrier/edit.js"></script>
 	<script src="/public/js/pages/find-a-barrier.js"></script>
-	<script src="/public/js/pages/barrier/interactions/add-note.js"></script>
+	<script src="/public/js/pages/barrier/detail.js"></script>
 	<!-- endbuild -->
 	<script>ma.init();</script>
 	{% block body_script %}{% endblock %}

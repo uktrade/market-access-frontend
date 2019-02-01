@@ -1,0 +1,16 @@
+{% extends 'template.njk' %}
+
+{% block main %}
+    {% block masthead %}
+        <div class="govuk-masthead">
+            {% block mastheadContent %}{% endblock %}
+        </div>
+    {% endblock %}
+    <div class="govuk-width-container ma-container-full">
+      {% block beforeContent %}{% endblock %}
+      <main class="govuk-main-wrapper {{ mainClasses }}" id="main-content" role="main">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+{% endblock %}
+
