@@ -1,16 +1,25 @@
 {% from 'components/textarea/macro.njk' import govukTextarea %}
+{% from 'components/character-count/macro.njk' import govukCharacterCount %}
 {% from 'app-components/heading.njk' import heading %}
 
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Add - Summary of the barrier{% endblock %}
+{% block page_title %}{{ super() }} - Add - Summarise the problem{% endblock %}
+
+{% block body_script %}
+	<script>
+	if( ma.components.CharacterCount ){
+		new ma.components.CharacterCount( '.govuk-character-count' );
+	}
+	</script>
+{% endblock %}
 
 {% block page_content %}
 
 	{{ heading({
 		back: { href: backHref },
 		caption: 'Add a barrier',
-		text: ( 'Summarise the problem and how it was resolved' if isResolved else 'Summarise the problem and next steps' ),
+		text: ( 'Summarise the problem' ),
 		errors: errors
 	}) }}
 
@@ -18,19 +27,20 @@
 
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
+		{{ govukCharacterCount( {
+
+			label: {
+				text: 'Provide a brief summary of the problem',
+				classes: 'govuk-label--s'
+			},
+			id: 'description',
+			name: 'description',
+			maxlength: summaryLimit,
+			value: description,
+			errorMessage: errors | errorForName( 'description' )
+		} ) }}
+
 		{% if isResolved %}
-
-			{{ govukTextarea( {
-
-				label: {
-					text: 'Provide a summary of the problem and how you became aware of it',
-					classes: 'govuk-label--s'
-				},
-				id: 'description',
-				name: 'description',
-				value: description,
-				errorMessage: errors | errorForName( 'description' )
-			} ) }}
 
 			{{ govukTextarea( {
 
@@ -45,21 +55,6 @@
 			} ) }}
 
 		{% else %}
-
-			{{ govukTextarea( {
-
-				label: {
-					text: 'Provide a summary of the problem',
-					classes: 'govuk-label--s'
-				},
-				id: 'description',
-				name: 'description',
-				value: description,
-				hint: {
-					text: 'Include what you have done so far and who you have discussed the problem with.'
-				},
-				errorMessage: errors | errorForName( 'description' )
-			} ) }}
 
 			{{ govukTextarea( {
 

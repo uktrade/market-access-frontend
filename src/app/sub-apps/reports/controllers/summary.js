@@ -2,6 +2,7 @@ const backend = require( '../../../lib/backend-service' );
 const Form = require( '../../../lib/Form' );
 const FormProcessor = require( '../../../lib/FormProcessor' );
 const urls = require( '../../../lib/urls' );
+const config = require( '../../../config' );
 
 module.exports = async ( req, res, next ) => {
 
@@ -36,6 +37,7 @@ module.exports = async ( req, res, next ) => {
 
 			templateValues.backHref =  urls.reports.aboutProblem( report.id );
 			templateValues.isResolved = isResolved;
+			templateValues.summaryLimit = config.reports.summaryLimit,
 
 			res.render( 'reports/views/summary', templateValues );
 		},

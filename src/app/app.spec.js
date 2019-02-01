@@ -861,7 +861,7 @@ describe( 'App', function(){
 
 									app
 										.get( urls.reports.summary( reportId ) )
-										.end( checkPage( 'Market Access - Add - Summary of the barrier', done ) );
+										.end( checkPage( 'Market Access - Add - Summarise the problem', done ) );
 								} );
 							} );
 

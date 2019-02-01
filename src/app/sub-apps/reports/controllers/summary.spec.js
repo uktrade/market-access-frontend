@@ -12,6 +12,7 @@ describe( 'Report controllers', () => {
 	let Form;
 	let form;
 	let urls;
+	let config;
 	let backend;
 	let getValuesResponse;
 	let getTemplateValuesResponse;
@@ -46,12 +47,19 @@ describe( 'Report controllers', () => {
 			}
 		};
 
+		config = {
+			reports: {
+				summaryLimit: 400,
+			}
+		};
+
 		Form = jasmine.createSpy( 'Form' ).and.callFake( () => form );
 
 		controller = proxyquire( modulePath, {
 			'../../../lib/backend-service': backend,
 			'../../../lib/Form': Form,
 			'../../../lib/urls': urls,
+			'../../../config': config,
 		} );
 	} );
 
@@ -135,6 +143,7 @@ describe( 'Report controllers', () => {
 				controller = proxyquire( modulePath, {
 					'../../../lib/backend-service': backend,
 					'../../../lib/urls': urls,
+					'../../../config': config,
 					'../../../lib/Form': Form,
 					'../../../lib/FormProcessor': FormProcessor,
 				} );
@@ -163,7 +172,13 @@ describe( 'Report controllers', () => {
 
 					const myValues = { some: 'data' };
 					const aboutProblemResponse = 'hasSectors';
-					const renderValues = Object.assign( {}, myValues, { backHref: aboutProblemResponse, isResolved: true } );
+					const renderValues = Object.assign( {},
+						myValues,{
+							backHref: aboutProblemResponse,
+							isResolved: true,
+							summaryLimit: config.reports.summaryLimit,
+						}
+					);
 
 					urls.reports.aboutProblem.and.callFake( () => aboutProblemResponse );
 
