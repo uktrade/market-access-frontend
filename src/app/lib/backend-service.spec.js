@@ -176,7 +176,7 @@ describe( 'Backend Service', () => {
 
 					await service.barriers.getAll( req );
 
-					expect( backend.get ).toHaveBeenCalledWith( '/barriers?ordering=reported_on', token );
+					expect( backend.get ).toHaveBeenCalledWith( '/barriers?ordering=-reported_on', token );
 				} );
 			} );
 
@@ -187,7 +187,7 @@ describe( 'Backend Service', () => {
 
 					await service.barriers.getAll( req, { country } );
 
-					expect( backend.get ).toHaveBeenCalledWith( `/barriers?export_country=${ country }&ordering=reported_on`, token );
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers?export_country=${ country }&ordering=-reported_on`, token );
 				} );
 			} );
 
@@ -198,7 +198,7 @@ describe( 'Backend Service', () => {
 
 					await service.barriers.getAll( req, { sector } );
 
-					expect( backend.get ).toHaveBeenCalledWith( `/barriers?sector=${ sector }&ordering=reported_on`, token );
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers?sector=${ sector }&ordering=-reported_on`, token );
 				} );
 			} );
 
@@ -209,7 +209,7 @@ describe( 'Backend Service', () => {
 
 					await service.barriers.getAll( req, { type } );
 
-					expect( backend.get ).toHaveBeenCalledWith( `/barriers?barrier_type=${ type }&ordering=reported_on`, token );
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers?barrier_type=${ type }&ordering=-reported_on`, token );
 				} );
 			} );
 
@@ -220,7 +220,7 @@ describe( 'Backend Service', () => {
 
 					await service.barriers.getAll( req, { status } );
 
-					expect( backend.get ).toHaveBeenCalledWith( `/barriers?status=${ status }&ordering=reported_on`, token );
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers?status=${ status }&ordering=-reported_on`, token );
 				} );
 			} );
 		} );
@@ -580,7 +580,7 @@ describe( 'Backend Service', () => {
 
 					const { body } = await service.reports.getAll( req );
 
-					expect( backend.get ).toHaveBeenCalledWith( '/reports?ordering=created_on', token );
+					expect( backend.get ).toHaveBeenCalledWith( '/reports?ordering=-created_on', token );
 					expect( body.results[ 0 ].progress.map( ( item ) => item.stage_code ) ).toEqual( [ '1.3', '1.4', '1.4', '1.5', '2.4', '2.5', '3', '3.1' ] );
 				} );
 			} );
@@ -597,7 +597,7 @@ describe( 'Backend Service', () => {
 
 					await service.reports.getAll( req );
 
-					expect( backend.get ).toHaveBeenCalledWith( '/reports?ordering=created_on', token );
+					expect( backend.get ).toHaveBeenCalledWith( '/reports?ordering=-created_on', token );
 				} );
 			} );
 		} );
@@ -605,7 +605,7 @@ describe( 'Backend Service', () => {
 		describe( 'getForCountry', () => {
 
 			const countryId = 'def-789';
-			const countryUrl = `/reports?export_country=${ countryId }&ordering=created_on`;
+			const countryUrl = `/reports?export_country=${ countryId }&ordering=-created_on`;
 
 			describe( 'When the results are an array', () => {
 				it( 'Should call the correct path and sort the progress', async () => {

@@ -214,7 +214,7 @@ module.exports = {
 			const params = getFilterParams( filters );
 			let path = '/barriers';
 
-			params.push( 'ordering=reported_on' );
+			params.push( 'ordering=-reported_on' );
 
 			if( params.length ){
 
@@ -281,8 +281,8 @@ module.exports = {
 
 	reports: {
 		...reports,
-		getAll: ( req ) => backend.get( '/reports?ordering=created_on', getToken( req ) ).then( transformReportList ),
-		getForCountry: ( req, countryId ) => backend.get( `/reports?export_country=${ countryId }&ordering=created_on`, getToken( req ) ).then( transformReportList ),
+		getAll: ( req ) => backend.get( '/reports?ordering=-created_on', getToken( req ) ).then( transformReportList ),
+		getForCountry: ( req, countryId ) => backend.get( `/reports?export_country=${ countryId }&ordering=-created_on`, getToken( req ) ).then( transformReportList ),
 		get: ( req, reportId ) => backend.get( `/reports/${ reportId }`, getToken( req ) ).then( transformSingleReport ),
 		save: ( req, values ) => backend.post( '/reports', getToken( req ), {
 			problem_status: getValue( values.status ),
