@@ -137,7 +137,7 @@ describe( 'App', function(){
 			it( 'Should render the index page', function( done ){
 
 				intercept.backend()
-					.get( /\/barriers(\?country=[a-z0-9-]+)?$/ )
+					.get( /^\/barriers(\?.+)?$/ )
 					.reply( 200, intercept.stub( '/backend/barriers/' ) );
 
 				app
@@ -168,7 +168,7 @@ describe( 'App', function(){
 			it( 'Should render the page', function( done ){
 
 				intercept.backend()
-					.get( `/barriers` )
+					.get( /^\/barriers(\?.+?)?$/ )
 					.reply( 200, intercept.stub( '/backend/barriers/' ) );
 
 				app
@@ -610,7 +610,7 @@ describe( 'App', function(){
 				it( 'Should render a list of reports', ( done ) => {
 
 					intercept.backend()
-					.get( '/reports' )
+					.get( /^\/reports(\?.+)?$/ )
 					.reply( 200, intercept.stub( '/backend/reports/' ) );
 
 					app

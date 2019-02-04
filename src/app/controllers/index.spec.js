@@ -79,7 +79,7 @@ describe( 'Index controller', () => {
 						await controller.index( req, res, next );
 
 						expect( next ).not.toHaveBeenCalled();
-						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { country: country.id } );
+						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { country: country.id, status: '2,5' } );
 						expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, country );
 						expect( res.render ).toHaveBeenCalledWith( 'my-country', dashboardViewModelResponse );
 					} );
@@ -102,7 +102,7 @@ describe( 'Index controller', () => {
 						await controller.index( req, res, next );
 
 						expect( next ).not.toHaveBeenCalled();
-						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, {} );
+						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status: '2,5' } );
 						expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, req.user.country );
 						expect( res.render ).toHaveBeenCalledWith( 'index', dashboardViewModelResponse );
 					} );
@@ -122,7 +122,7 @@ describe( 'Index controller', () => {
 					await controller.index( req, res, next );
 
 					expect( next ).toHaveBeenCalledWith( new Error( `Got ${ barriersResponse.response.statusCode } response from backend` ) );
-					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, {} );
+					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status: '2,5' } );
 					expect( res.render ).not.toHaveBeenCalled();
 				} );
 			} );

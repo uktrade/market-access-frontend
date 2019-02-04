@@ -17,22 +17,12 @@ function update( item ){
 	return item;
 }
 
-function sortDescending( a, b ){
-
-	const aDate = Date.parse( a.date.created );
-	const bDate = Date.parse( b.date.created );
-
-	return ( aDate === bDate ? 0 : ( aDate > bDate ? -1 : 1 ) );
-}
-
 module.exports = ( reports, country ) => {
 
 	if( reports && reports.length ){
 
 		reports = reports.map( update );
 	}
-
-	reports.sort( sortDescending );
 
 	return {	reports, country };
 };

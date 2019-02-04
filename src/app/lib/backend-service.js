@@ -120,6 +120,7 @@ function getFilterParams( filters ){
 		'export_country': 'country',
 		'sector': 'sector',
 		'barrier_type': 'type',
+		'status': 'status'
 		//'start_date': 'date-start',
 		//'end_date': 'date-end',
 	};
@@ -213,6 +214,8 @@ module.exports = {
 			const params = getFilterParams( filters );
 			let path = '/barriers';
 
+			params.push( 'ordering=reported_on' );
+
 			if( params.length ){
 
 				path += '?' + params.join( '&' );
@@ -278,8 +281,8 @@ module.exports = {
 
 	reports: {
 		...reports,
-		getAll: ( req ) => backend.get( '/reports', getToken( req ) ).then( transformReportList ),
-		getForCountry: ( req, countryId ) => backend.get( `/reports?export_country=${ countryId }`, getToken( req ) ).then( transformReportList ),
+		getAll: ( req ) => backend.get( '/reports?ordering=created_on', getToken( req ) ).then( transformReportList ),
+		getForCountry: ( req, countryId ) => backend.get( `/reports?export_country=${ countryId }&ordering=created_on`, getToken( req ) ).then( transformReportList ),
 		get: ( req, reportId ) => backend.get( `/reports/${ reportId }`, getToken( req ) ).then( transformSingleReport ),
 		save: ( req, values ) => backend.post( '/reports', getToken( req ), {
 			problem_status: getValue( values.status ),

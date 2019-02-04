@@ -40,7 +40,7 @@ describe( 'Dashboard view model', () => {
 	} );
 
 	describe( 'When there are some barriers', () => {
-		it( 'Should transform and sort them', () => {
+		it( 'Should transform and not sort them', () => {
 
 			const barriers = jasmine.helpers.getFakeData( '/backend/barriers/index.dashboard' ).results;
 			const output = viewModel( JSON.parse( JSON.stringify( barriers ) ) );
@@ -79,7 +79,7 @@ describe( 'Dashboard view model', () => {
 				} );
 			}
 
-			[ '1ec', '648', '7de', '553' ].forEach( checkBarrier );
+			[ '7de', '1ec', '648', '553' ].forEach( checkBarrier );
 		} );
 	} );
 
