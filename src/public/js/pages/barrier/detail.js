@@ -1,4 +1,4 @@
-ma.pages.barrier.interactions.addNote = (function( doc, jessie ){
+ma.pages.barrier.detail = (function( doc, jessie ){
 
 	return function( opts ){
 

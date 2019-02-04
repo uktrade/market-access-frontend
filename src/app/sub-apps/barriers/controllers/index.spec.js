@@ -1,16 +1,10 @@
 const proxyquire = require( 'proxyquire' );
-const uuid = require( 'uuid/v4' );
 
 const modulePath = './index';
 
 describe( 'Barriers controller', () => {
 
 	let controller;
-	let req;
-	let res;
-	let barrierDetailViewModel;
-	let barrierId;
-	let config;
 
 	let edit;
 	let type;
@@ -21,35 +15,14 @@ describe( 'Barriers controller', () => {
 
 	beforeEach( () => {
 
-		barrierId = uuid();
 		edit = jasmine.createSpy( 'edit' );
 		type = jasmine.createSpy( 'type' );
 		interactions = jasmine.createSpy( 'interactions' );
 		status = jasmine.createSpy( 'status' );
 		sectors = jasmine.createSpy( 'sectors' );
 		companies = jasmine.createSpy( 'companies' );
-		config = {};
-
-		req = {
-			barrier: {
-				id: barrierId
-			},
-			session: {},
-			params: {},
-			query: {},
-			flash: jasmine.createSpy( 'req.flash' ),
-		};
-
-		res = {
-			render: jasmine.createSpy( 'res.render' ),
-			locals: {},
-		};
-
-		barrierDetailViewModel = jasmine.createSpy( 'barrierDetailViewModel' );
 
 		controller = proxyquire( modulePath, {
-			'../../../config': config,
-			'../view-models/detail': barrierDetailViewModel,
 			'./edit': edit,
 			'./type': type,
 			'./interactions': interactions,
@@ -66,93 +39,5 @@ describe( 'Barriers controller', () => {
 		expect( controller.interactions ).toEqual( interactions );
 		expect( controller.status ).toEqual( status );
 		expect( controller.sectors ).toEqual( sectors );
-	} );
-
-	describe( 'Barrier', () => {
-
-		let barierDetailViewModelResponse;
-
-		beforeEach( () => {
-
-			barierDetailViewModelResponse = { a: 1, b: 2 };
-
-			barrierDetailViewModel.and.callFake( () => barierDetailViewModelResponse );
-		} );
-
-		function check( addCompany ){
-
-			controller.barrier( req, res );
-
-			expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier, addCompany );
-			expect( res.render ).toHaveBeenCalledWith( 'barriers/views/detail', barierDetailViewModelResponse );
-		}
-
-		describe( 'With config.addCompany set to true', () => {
-
-			beforeEach( () => {
-
-				config.addCompany = true;
-			} );
-
-			describe( 'With no query', () => {
-				it( 'Should render the barrier detail page with addCompany true', () => {
-
-					check( true );
-				} );
-			} );
-
-			describe( 'With query set to true', () => {
-				it( 'Should render the barrier detail page with addCompany true', () => {
-
-					req.query.addCompany = true;
-
-					check( true );
-				} );
-			} );
-		} );
-
-		describe( 'With config.addCompany set to false', () => {
-
-			beforeEach( () => {
-
-				config.addCompany = false;
-			} );
-
-			describe( 'With no query', () => {
-				it( 'Should render the barrier detail page with addCompany false', () => {
-
-					check( false );
-				} );
-			} );
-
-			describe( 'With query set to true', () => {
-				it( 'Should render the barrier detail page with addCompany true', () => {
-
-					req.query.addCompany = true;
-
-					check( true );
-				} );
-			} );
-		} );
-
-		describe( 'With no flash message', () => {
-			it( 'Should not add a toast message to the locals', () => {
-
-				controller.barrier( req, res );
-				expect( res.locals.toast ).not.toBeDefined();
-			} );
-		} );
-
-		describe( 'With a flash message of barrier-created', () => {
-			it( 'Should add a toast message to the locals', () => {
-
-				req.flash.and.callFake( () => [ uuid() ] ) ;
-				controller.barrier( req, res );
-				expect( res.locals.toast ).toEqual( {
-					heading: 'Barrier added to the service',
-					message: 'Continue to add more detail to your barrier'
-				});
-			} );
-		} );
 	} );
 } );

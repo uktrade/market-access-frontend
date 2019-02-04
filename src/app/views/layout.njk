@@ -1,10 +1,10 @@
-{% from 'components/footer/macro.njk' import govukFooter %}
+{% from 'app-components/govuk-footer-ma.njk' import govukFooterMa %}
 {% from "components/phase-banner/macro.njk" import govukPhaseBanner %}
 {% from 'app-components/govuk-header-ma.njk' import govukHeaderMa %}
 
 {% set assetPath = '/govuk-public' %}
 
-{% extends 'template.njk' %}{# extend from govuk-template #}
+{% extends 'marketaccess-template.njk' %}{# extend from govuk-template #}
 
 {% block pageTitle %}{% block page_title %}Market Access{% endblock %}{% endblock %}
 
@@ -56,9 +56,6 @@
 			</p>
 		</div>
 	</div>
-{% endblock %}
-
-{% block beforeContent %}
 	{{ govukPhaseBanner({
 		attributes: { role: 'complementary' },
 		classes: 'govuk-phase-banner--ma',
@@ -70,30 +67,26 @@
 	}) }}
 {% endblock %}
 
-{% block content %}
-	{% block page_content %}{% endblock %}
-
-	<div class="footer-bar" role="complementary" aria-labelledby="footer-title">
-		<p class="footer-bar__content">
-			<strong id="footer-title">Is there anything wrong with this page?</strong>
-			Give us <a href="mailto:{{ feedbackEmail }}">feedback on this page</a> to help us improve this service.
-		</p>
+{% block masthead %}
+	<div class="govuk-masthead">
+		{% block mastheadContent %}{% endblock %}
 	</div>
 {% endblock %}
 
+{% block content %}
+{% block page_content %}{% endblock %}
+{% endblock %}
+
 {% block footer %}
-	{{- govukFooter({
+<div class="footer-bar" role="complementary" aria-labelledby="footer-title">
+	<p class="footer-bar__content">
+		<strong id="footer-title">Is there anything wrong with this page?</strong>
+		Give us <a href="mailto:{{ feedbackEmail }}">feedback on this page</a> to help us improve this service.
+	</p>
+</div>
+{{- govukFooterMa({
 		classes: 'govuk-footer--ma',
 		'navigation': [
-			{
-				'title': 'Data Hub',
-				'items': [
-					{
-						'href': '#',
-						'text': 'View Data Hub'
-					}
-				]
-			},
 			{
 				'title': 'Market access barriers',
 				'items': [
@@ -114,12 +107,7 @@
 			}
 		]
 	}) }}
-	{#
-	{
-		'href': '#',
-		'text': 'Find a barrier'
-	},
-	#}
+
 {% endblock %}
 
 {% block bodyEnd %}
@@ -142,7 +130,7 @@
 	<script src="/public/js/pages/barrier/type.js"></script>
 	<script src="/public/js/pages/barrier/edit.js"></script>
 	<script src="/public/js/pages/find-a-barrier.js"></script>
-	<script src="/public/js/pages/barrier/interactions/add-note.js"></script>
+	<script src="/public/js/pages/barrier/detail.js"></script>
 	<!-- endbuild -->
 	<script>ma.init();</script>
 	{% block body_script %}{% endblock %}

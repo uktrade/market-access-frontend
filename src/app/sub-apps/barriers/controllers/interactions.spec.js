@@ -14,6 +14,7 @@ describe( 'Barrier interactions controller', () => {
 	let backend;
 	let urls;
 	let csrfToken;
+	let config;
 	let Form;
 	let FormProcessor;
 	let form;
@@ -37,11 +38,17 @@ describe( 'Barrier interactions controller', () => {
 			},
 			csrfToken: () => csrfToken,
 			session: {},
-			params: {}
+			params: {},
+			query: {},
+			flash: jasmine.createSpy( 'req.flash' )
+		};
+		config = {
+			addCompany: false
 		};
 		res = {
 			render: jasmine.createSpy( 'res.render' ),
-			redirect: jasmine.createSpy( 'res.redirect' )
+			redirect: jasmine.createSpy( 'res.redirect' ),
+			locals: {}
 		};
 		next = jasmine.createSpy( 'next' );
 		backend = {
@@ -64,7 +71,6 @@ describe( 'Barrier interactions controller', () => {
 			index: jasmine.createSpy( 'urls.index' ),
 			barriers: {
 				detail: jasmine.createSpy( 'urls.barriers.detail' ),
-				interactions: jasmine.createSpy( 'urls.barriers.interactions' ),
 				statusResolved: jasmine.createSpy( 'urls.barriers.statusResolved' ),
 				statusHibernated: jasmine.createSpy( 'urls.barriers.statusHibernated' ),
 				type: {
@@ -103,6 +109,7 @@ describe( 'Barrier interactions controller', () => {
 		};
 
 		controller = proxyquire( modulePath, {
+			'../../../config': config,
 			'../../../lib/backend-service': backend,
 			'../../../lib/urls': urls,
 			'../../../lib/Form': Form,
@@ -145,29 +152,96 @@ describe( 'Barrier interactions controller', () => {
 		return { barrierDetailViewModelResponse, interactionsViewModelResponse };
 	}
 
+	async function check( addCompany ){
+
+		const { interactionsResponse, historyResponse } = returnSuccessResponses();
+		const { barrierDetailViewModelResponse, interactionsViewModelResponse } = returnViewModels();
+
+		await controller.list( req, res, next );
+
+		expect( next ).not.toHaveBeenCalled();
+		expect( backend.barriers.getInteractions ).toHaveBeenCalledWith( req, barrierId );
+		expect( backend.barriers.getHistory ).toHaveBeenCalledWith( req, barrierId );
+		expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier, addCompany );
+		expect( interactionsViewModel ).toHaveBeenCalledWith( {
+			interactions: interactionsResponse.body,
+			history: historyResponse.body
+		}, undefined );
+
+		expect( res.render ).toHaveBeenCalledWith( 'barriers/views/detail', Object.assign( {},
+			barrierDetailViewModelResponse,
+			{ interactions: interactionsViewModelResponse }
+		) );
+	}
+
 	describe( 'list', () => {
 		describe( 'Without an error', () => {
 			describe( 'With a success response', () => {
-				it( 'Should get the interactions and render the page', async () => {
+				describe( 'With config.addCompany set to true', () => {
 
-					const { interactionsResponse, historyResponse } = returnSuccessResponses();
-					const { barrierDetailViewModelResponse, interactionsViewModelResponse } = returnViewModels();
+					beforeEach( () => {
+
+						config.addCompany = true;
+					} );
+
+					describe( 'With no query', () => {
+						it( 'Should render the barrier detail page with addCompany true', async () => {
+
+							await check( true );
+						} );
+					} );
+
+					describe( 'With query set to true', () => {
+						it( 'Should render the barrier detail page with addCompany true', async () => {
+
+							req.query.addCompany = true;
+
+							await check( true );
+						} );
+					} );
+				} );
+				describe( 'With config.addCompany set to false', () => {
+
+					beforeEach( () => {
+
+						config.addCompany = false;
+					} );
+
+					describe( 'With no query', () => {
+						it( 'Should render the barrier detail page with addCompany false', async () => {
+
+							await check( false );
+						} );
+					} );
+
+					describe( 'With query set to true', () => {
+						it( 'Should render the barrier detail page with addCompany true', async () => {
+
+							req.query.addCompany = true;
+
+							await check( true );
+						} );
+					} );
+				} );
+			} );
+
+			describe( 'With no flash message', () => {
+				it( 'Should not add a toast message to the locals', async () => {
 
 					await controller.list( req, res, next );
+					expect( res.locals.toast ).not.toBeDefined();
+				} );
+			} );
 
-					expect( next ).not.toHaveBeenCalled();
-					expect( backend.barriers.getInteractions ).toHaveBeenCalledWith( req, barrierId );
-					expect( backend.barriers.getHistory ).toHaveBeenCalledWith( req, barrierId );
-					expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier );
-					expect( interactionsViewModel ).toHaveBeenCalledWith( {
-						interactions: interactionsResponse.body,
-						history: historyResponse.body
-					}, undefined );
+			describe( 'With a flash message of barrier-created', () => {
+				it( 'Should add a toast message to the locals', async () => {
 
-					expect( res.render ).toHaveBeenCalledWith( 'barriers/views/interactions', Object.assign( {},
-						barrierDetailViewModelResponse,
-						{ interactions: interactionsViewModelResponse }
-					) );
+					req.flash.and.callFake( () => [ uuid() ] ) ;
+					await controller.list( req, res, next );
+					expect( res.locals.toast ).toEqual( {
+						heading: 'Barrier added to the service',
+						message: 'Continue to add more detail to your barrier'
+					});
 				} );
 			} );
 
@@ -236,7 +310,7 @@ describe( 'Barrier interactions controller', () => {
 
 	describe( 'notes', () => {
 
-		const template = 'barriers/views/interactions';
+		const template = 'barriers/views/detail';
 		let barrier;
 
 		beforeEach( () => {
@@ -275,7 +349,7 @@ describe( 'Barrier interactions controller', () => {
 						const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
 						const templateValues = { abc: '123' };
 						const formValues = { note: 'a note', pinned: false, a: 'test' };
-						const interactionsUrlResponse = '/barrier/interactions';
+						const detailUrlResponse = '/barrier';
 
 						expect( config.form ).toEqual( form );
 						expect( typeof config.render ).toEqual( 'function' );
@@ -291,7 +365,7 @@ describe( 'Barrier interactions controller', () => {
 							templateValues
 						) );
 
-						expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier );
+						expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier, false );
 						expect( interactionsViewModel ).toHaveBeenCalledWith( {
 							interactions: interactionsResponse.body,
 							history: historyResponse.body
@@ -304,12 +378,12 @@ describe( 'Barrier interactions controller', () => {
 							pinned: formValues.pinned,
 						} );
 
-						urls.barriers.interactions.and.callFake( () => interactionsUrlResponse );
+						urls.barriers.detail.and.callFake( () => detailUrlResponse );
 
 						config.saved();
 
-						expect( res.redirect ).toHaveBeenCalledWith( interactionsUrlResponse );
-						expect( urls.barriers.interactions ).toHaveBeenCalledWith( barrier.id );
+						expect( res.redirect ).toHaveBeenCalledWith( detailUrlResponse );
+						expect( urls.barriers.detail ).toHaveBeenCalledWith( barrier.id );
 						expect( next ).not.toHaveBeenCalled();
 					} );
 				} );
@@ -535,28 +609,27 @@ describe( 'Barrier interactions controller', () => {
 
 					const { interactionsResponse, historyResponse } = returnSuccessResponses();
 					const { barrierDetailViewModelResponse, interactionsViewModelResponse } = returnViewModels();
+					req.query.addCompany = true;
 
 					await controller.notes.edit( req, res );
 
 					const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
-					const templateValues = { abc: '123' };
+					const templateValues = { abc: '123', addCompany: true};
 					const formValues = { def: 456 };
-					const interactionsUrlResponse = '/barrier/interactions';
+					const detailUrlResponse = '/barrier/';
 
 					expect( config.form ).toEqual( form );
 					expect( typeof config.render ).toEqual( 'function' );
 					expect( typeof config.saveFormData ).toEqual( 'function' );
 					expect( typeof config.saved ).toEqual( 'function' );
-
 					await config.render( templateValues );
-
 					expect( res.render ).toHaveBeenCalledWith( template, Object.assign( {},
 						barrierDetailViewModelResponse,
 						{ interactions: interactionsViewModelResponse },
 						templateValues
 					) );
 
-					expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier );
+					expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier, req.query.addCompany);
 					expect( interactionsViewModel ).toHaveBeenCalledWith( {
 						interactions: interactionsResponse.body,
 						history: historyResponse.body
@@ -566,12 +639,12 @@ describe( 'Barrier interactions controller', () => {
 
 					expect( backend.barriers.notes.update ).toHaveBeenCalledWith( req, editId, formValues );
 
-					urls.barriers.interactions.and.callFake( () => interactionsUrlResponse );
+					urls.barriers.detail.and.callFake( () => detailUrlResponse );
 
 					config.saved();
 
-					expect( res.redirect ).toHaveBeenCalledWith( interactionsUrlResponse );
-					expect( urls.barriers.interactions ).toHaveBeenCalledWith( barrier.id );
+					expect( res.redirect ).toHaveBeenCalledWith( detailUrlResponse );
+					expect( urls.barriers.detail ).toHaveBeenCalledWith( barrier.id );
 				} );
 
 				describe( 'When the processor does not throw an error', () => {

@@ -3,7 +3,8 @@
 		<div class='barrier-summary__heading'>
 			{{ barrier.code }}
 			<h1 class="barrier-summary__heading__text">{{ barrier.title }}</h1>
-			<a class="barrier-summary__heading__link" href="{{ urls.barriers.edit.headlines( barrier.id ) }}">Edit barrier header</a>
+			<p class="barrier-summary__heading__country"> in {{ barrier.country.name }}</p>
+			<a class="barrier-summary__heading__link" href="{{ urls.barriers.edit.headlines( barrier.id ) }}">Edit title or location</a>
 		</div>
 		<div class="barrier-summary__status">
 			<span class="barrier-summary__status__badge barrier-status-badge barrier-status-badge--{{ barrier.status.modifyer }}">
@@ -15,19 +16,5 @@
 			<a class="barrier-summary__status__link js-barrier-summary-link" href="{{ urls.barriers.status( barrier.id ) }}">change status</a>
 			<a class="barrier-summary__status__link js-barrier-summary-link" href="{{ urls.barriers.edit.priority( barrier.id ) }}">change priority</a>
 		</div>
-		<dl class="barrier-summary__info">
-			<div class="barrier-summary__info__group">
-				<dt class="barrier-summary__info__group__key">Date added</dt>
-				<dd class="barrier-summary__info__group__value">{{ barrier.reportedOn | dateOnly }}</dd>
-			</div>
-			<div class="barrier-summary__info__group">
-				<dt class="barrier-summary__info__group__key">Barrier location</dt>
-				<dd class="barrier-summary__info__group__value">{{ barrier.country.name }}</dd>
-			</div>
-			<div class="barrier-summary__info__group">
-				<dt class="barrier-summary__info__group__key">Barrier scope</dt>
-				<dd class="barrier-summary__info__group__value">{{ barrier.problem.status }}</dd>
-			</div>
-		</dl>
 	</section>
 {% endmacro %}

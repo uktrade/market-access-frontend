@@ -1,0 +1,35 @@
+{% from 'components/radios/macro.njk' import govukRadios %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Barrier - Edit barrier scope{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.barriers.detail( barrier.id ) },
+		caption: barrier.barrier_title,
+		text: 'Edit barrier scope',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.barriers.edit.status( barrier.id ) }}" method="POST" class="restrict-width">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{{ govukRadios({
+
+			name: 'status',
+			fieldset: {
+				legend: {
+					text: 'What is the scope of the barrier?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: status,
+			errorMessage: errors | errorForName( 'status-1' )
+		}) }}
+
+		<input type="submit" value="Save and exit to barrier" class="govuk-button">
+	</form>
+{% endblock %}

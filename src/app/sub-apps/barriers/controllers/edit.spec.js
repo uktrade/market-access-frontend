@@ -1,5 +1,4 @@
 const proxyquire = require( 'proxyquire' );
-const uuid = require( 'uuid/v4' );
 
 const modulePath = './edit';
 const SELECT = 'select-value';
@@ -11,7 +10,7 @@ describe( 'Edit barrier controller', () => {
 	let req;
 	let res;
 	let next;
-	let barrierId;
+	let barrier;
 	let metadata;
 	let validators;
 	let govukItemsFromObj;
@@ -23,10 +22,7 @@ describe( 'Edit barrier controller', () => {
 	let backend;
 	let urls;
 
-
 	beforeEach( () => {
-
-		barrierId = uuid();
 
 		metadata = {
 			statusTypes: {
@@ -64,6 +60,7 @@ describe( 'Edit barrier controller', () => {
 				saveDescription: jasmine.createSpy( 'backend.barriers.saveDescription' ),
 				saveSource: jasmine.createSpy( 'backend.barriers.saveSource' ),
 				savePriority: jasmine.createSpy( 'backend.barriers.savePriority' ),
+				saveStatus: jasmine.createSpy( 'backend.barriers.saveStatus' ),
 			}
 		};
 
@@ -73,10 +70,10 @@ describe( 'Edit barrier controller', () => {
 			}
 		};
 
+		barrier = jasmine.helpers.getFakeData( '/backend/barriers/barrier' );
+
 		req = {
-			barrier: {
-				id: barrierId
-			},
+			barrier,
 			session: {},
 			params: {},
 			query: {}
@@ -102,14 +99,6 @@ describe( 'Edit barrier controller', () => {
 	describe( 'headlines', () => {
 
 		const template = 'barriers/views/edit/headlines';
-		let barrier;
-
-		beforeEach( () => {
-
-			barrier = jasmine.helpers.getFakeData( '/backend/barriers/barrier' );
-
-			req.barrier = barrier;
-		} );
 
 		it( 'Should configure the Form correctly', async () => {
 
@@ -132,14 +121,7 @@ describe( 'Edit barrier controller', () => {
 			expect( config.country.validators.length ).toEqual( 1 );
 			expect( config.country.validators[ 0 ].fn ).toEqual( validators.isCountry );
 
-			expect( config.status ).toBeDefined();
-			expect( config.status.type ).toEqual( RADIO );
-			expect( config.status.values ).toEqual( [ barrier.problem_status ] );
-			expect( config.status.items ).toEqual( govukItemsFromObjResponse );
-			expect( govukItemsFromObj ).toHaveBeenCalledWith( metadata.statusTypes );
-			expect( config.status.validators.length ).toEqual( 1 );
-			expect( config.status.validators[ 0 ].fn ).toEqual( isMetadataResponse );
-			expect( validators.isMetadata ).toHaveBeenCalledWith( 'statusTypes' );
+			expect( config.status ).not.toBeDefined();
 		} );
 
 		it( 'Should configure the FormProcessor correctly', async () => {
@@ -198,14 +180,6 @@ describe( 'Edit barrier controller', () => {
 	describe( 'product', () => {
 
 		const template = 'barriers/views/edit/product';
-		let barrier;
-
-		beforeEach( () => {
-
-			barrier = jasmine.helpers.getFakeData( '/backend/barriers/barrier' );
-
-			req.barrier = barrier;
-		} );
 
 		it( 'Should configure the Form correctly', async () => {
 
@@ -274,14 +248,6 @@ describe( 'Edit barrier controller', () => {
 	describe( 'description', () => {
 
 		const template = 'barriers/views/edit/description';
-		let barrier;
-
-		beforeEach( () => {
-
-			barrier = jasmine.helpers.getFakeData( '/backend/barriers/barrier' );
-
-			req.barrier = barrier;
-		} );
 
 		it( 'Should configure the Form correctly', async () => {
 
@@ -350,14 +316,6 @@ describe( 'Edit barrier controller', () => {
 	describe( 'source', () => {
 
 		const template = 'barriers/views/edit/source';
-		let barrier;
-
-		beforeEach( () => {
-
-			barrier = jasmine.helpers.getFakeData( '/backend/barriers/barrier' );
-
-			req.barrier = barrier;
-		} );
 
 		it( 'Should configure the Form correctly', async () => {
 
@@ -440,16 +398,12 @@ describe( 'Edit barrier controller', () => {
 	describe( 'priority', () => {
 
 		const template = 'barriers/views/edit/priority';
-		let barrier;
 		let getBarrierPrioritiesListResponse;
 
 		beforeEach( () => {
 
 			getBarrierPrioritiesListResponse = [ { value: 1, html: 'test' } ];
-			barrier = jasmine.helpers.getFakeData( '/backend/barriers/barrier' );
 			metadata.getBarrierPrioritiesList.and.callFake( () => getBarrierPrioritiesListResponse );
-
-			req.barrier = barrier;
 		} );
 
 		it( 'Should configure the Form correctly', async () => {
@@ -516,6 +470,83 @@ describe( 'Edit barrier controller', () => {
 				processor.process.and.callFake( () => { throw err; } );
 
 				await controller.priority( req, res, next );
+
+				expect( next ).toHaveBeenCalledWith( err );
+			} );
+		} );
+	} );
+
+	describe( 'status', () => {
+
+		const template = 'barriers/views/edit/status';
+
+		it( 'Should configure the Form correctly', async () => {
+
+			const isMetadataResponse = { ab: '12', cd: '34' };
+
+			validators.isMetadata.and.callFake( () => isMetadataResponse );
+
+			await controller.status( req, res, next );
+
+			const config = Form.calls.argsFor( 0 )[ 1 ];
+
+			expect( config.status ).toBeDefined();
+			expect( config.status.type ).toEqual( RADIO );
+			expect( config.status.values ).toEqual( [ barrier.problem_status ] );
+			expect( config.status.items ).toEqual( govukItemsFromObjResponse );
+			expect( govukItemsFromObj ).toHaveBeenCalledWith( metadata.statusTypes );
+			expect( config.status.validators.length ).toEqual( 1 );
+			expect( config.status.validators[ 0 ].fn ).toEqual( isMetadataResponse );
+			expect( validators.isMetadata ).toHaveBeenCalledWith( 'statusTypes' );
+		} );
+
+		it( 'Should configure the FormProcessor correctly', async () => {
+
+			await controller.status( req, res );
+
+			const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
+			const templateValues = { abc: '123' };
+			const formValues = { def: 456 };
+			const detailResponse = '/barrier/details';
+
+			expect( config.form ).toEqual( form );
+			expect( typeof config.render ).toEqual( 'function' );
+			expect( typeof config.saveFormData ).toEqual( 'function' );
+			expect( typeof config.saved ).toEqual( 'function' );
+
+			config.render( templateValues );
+
+			expect( res.render ).toHaveBeenCalledWith( template, templateValues );
+
+			config.saveFormData( formValues );
+
+			expect( backend.barriers.saveStatus ).toHaveBeenCalledWith( req, barrier.id, formValues );
+
+			urls.barriers.detail.and.callFake( () => detailResponse );
+
+			config.saved();
+
+			expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
+			expect( urls.barriers.detail ).toHaveBeenCalledWith( barrier.id );
+		} );
+
+		describe( 'When the processor does not throw an error', () => {
+			it( 'Should not call next', async () => {
+
+				await controller.status( req, res, next );
+
+				expect( next ).not.toHaveBeenCalled();
+			} );
+		} );
+
+		describe( 'When the processor throws an errror', () => {
+			it( 'Should call next with the error', async () => {
+
+				const err = new Error( 'a random error' );
+
+				processor.process.and.callFake( () => { throw err; } );
+
+				await controller.status( req, res, next );
 
 				expect( next ).toHaveBeenCalledWith( err );
 			} );

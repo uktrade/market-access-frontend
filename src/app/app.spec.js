@@ -61,7 +61,6 @@ function checkResponse( res, statusCode ){
 function checkPage( title, done, responseCode = 200 ){
 
 	return ( err, res ) => {
-
 		if( err ){ return done.fail( err ); }
 
 		checkResponse( res, responseCode );
@@ -77,7 +76,7 @@ function checkNock(){
 	expect( isDone ).toEqual( true );
 
 	if( !isDone ){
-		console.log( nock.pendingMocks() );
+		console.log('PENDING NOCKS!!!!', nock.pendingMocks() );
 	}
 }
 
@@ -98,7 +97,7 @@ describe( 'App', function(){
 		logger.configure({ silent: true });
 
 		oldTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-		jasmine.DEFAULT_TIMEOUT_INTERVAL = 3000;
+		jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000;
 
 		intercept.backend()
 			.persist()
@@ -259,6 +258,7 @@ describe( 'App', function(){
 			beforeEach( () => {
 
 				barrierId = uuid();
+
 			} );
 
 			describe( 'When the barrier cannot be found', () => {
@@ -290,6 +290,16 @@ describe( 'App', function(){
 
 				describe( 'Barrier detail', () => {
 					it( 'Should fetch the barrier and render the page', ( done ) => {
+
+						intercept.backend()
+							.get( `/barriers/${ barrier.id }/interactions` )
+							.reply( 200, intercept.stub( '/backend/barriers/interactions' ) )
+							.persist();
+
+						intercept.backend()
+							.get( `/barriers/${ barrier.id }/history` )
+							.reply( 200, intercept.stub( '/backend/barriers/history' ))
+							.persist();
 
 						app
 							.get( urls.barriers.detail( barrierId ) )
@@ -341,22 +351,14 @@ describe( 'App', function(){
 								.end( checkPage( 'Market Access - Barrier - Edit priority', done ) );
 						} );
 					} );
-				} );
 
-				describe( 'Barrier interactions', () => {
-					it( 'Should fetch the barrier and render the page', ( done ) => {
+					describe( 'status', () => {
+						it( 'Should fetch the barrier and render the page', ( done ) => {
 
-						intercept.backend()
-							.get( `/barriers/${ barrier.id }/interactions` )
-							.reply( 200, intercept.stub( '/backend/barriers/interactions' ) );
-
-						intercept.backend()
-							.get( `/barriers/${ barrier.id }/history` )
-							.reply( 200, intercept.stub( '/backend/barriers/history' ) );
-
-						app
-							.get( urls.barriers.interactions( barrierId ) )
-							.end( checkPage( 'Market Access - Barrier updates', done ) );
+							app
+								.get( urls.barriers.edit.status( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier - Edit barrier scope', done ) );
+						} );
 					} );
 				} );
 
@@ -777,7 +779,6 @@ describe( 'App', function(){
 					describe( 'Incomplete report', () => {
 
 						beforeEach( () => {
-
 							interceptReport( reportId ).persist();
 						} );
 

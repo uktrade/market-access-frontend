@@ -24,7 +24,7 @@ module.exports = ( express, app ) => {
 
 	app.use( parseBody, csrfProtection );
 
-	app.get( '/:barrierId/', controller.barrier );
+	app.get( '/:barrierId/', controller.interactions.list );
 
 	app.get( '/:barrierId/edit/', controller.edit.headlines );
 	app.post( '/:barrierId/edit/', controller.edit.headlines );
@@ -36,8 +36,9 @@ module.exports = ( express, app ) => {
 	app.post( '/:barrierId/edit/source/', controller.edit.source );
 	app.get( '/:barrierId/edit/priority/', controller.edit.priority );
 	app.post( '/:barrierId/edit/priority/', controller.edit.priority );
+	app.get( '/:barrierId/edit/status/', controller.edit.status );
+	app.post( '/:barrierId/edit/status/', controller.edit.status );
 
-	app.get( '/:barrierId/interactions/', controller.interactions.list );
 	app.get( '/:barrierId/interactions/add-note/', controller.interactions.notes.add );
 	app.post( '/:barrierId/interactions/add-note/', fileUpload, controller.interactions.notes.add );
 	app.get( '/:barrierId/interactions/edit-note/:id', controller.interactions.notes.edit );
