@@ -12,6 +12,7 @@ module.exports = {
 	hasSectors: require( './has-sectors' ),
 	sectors: require( './sectors' ),
 	aboutProblem: require( './about-problem' ),
+	summary: require( './summary' ),
 
 	index: async ( req, res, next ) => {
 

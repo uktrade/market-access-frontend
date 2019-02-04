@@ -837,13 +837,86 @@ describe( 'App', function(){
 								describe( 'Save and continue', () => {
 									it( 'Should save the data, submit the form and redirect to the barrier detail', ( done ) => {
 
+										agent
+											.post( urls.reports.aboutProblem( reportId ) )
+											.send( `_csrf=${ token }&item=test&barrierSource=COMPANY&barrierTitle=testing&description=abc` )
+											.end( ( err, res ) => {
+
+												if( res.statusCode != 302 ){
+													console.log( res.text );
+												}
+
+												expect( res.statusCode ).toEqual( 302 );
+												expect( res.headers.location ).toEqual( urls.reports.summary( stubId ) );
+												done();
+											} );
+									} );
+								} );
+							} );
+						} );
+
+						describe( 'Summary of the barrier', () => {
+							describe( 'A GET', () => {
+								it( 'Should fetch the report and render the page', ( done ) => {
+
+									app
+										.get( urls.reports.summary( reportId ) )
+										.end( checkPage( 'Market Access - Add - Summarise the problem', done ) );
+								} );
+							} );
+
+							describe( 'A POST', () => {
+
+								let agent;
+								let token;
+								let stubId;
+
+								beforeEach( ( done ) => {
+
+									const data = intercept.stub( '/backend/reports/report' );
+
+									stubId = data.id;
+
+									intercept.backend()
+										.put( `/reports/${ stubId }` )
+										.reply( 200, data );
+
+									agent = supertest.agent( appInstance );
+
+									agent
+										.get( urls.reports.summary( reportId ) )
+										.end( ( err, res ) => {
+
+											token = getCsrfToken( res, done.fail );
+											done();
+										} );
+								} );
+
+								describe( 'Save and exit', () => {
+									it( 'Should save the data and redirect to the report detail', ( done ) => {
+
+										agent
+											.post( urls.reports.summary( reportId ) )
+											.send( `_csrf=${ token }&action=exit&description=test` )
+											.end( ( err, res ) => {
+
+												expect( res.statusCode ).toEqual( 302 );
+												expect( res.headers.location ).toEqual( urls.reports.detail( stubId ) );
+												done();
+											} );
+									} );
+								} );
+
+								describe( 'Save and continue', () => {
+									it( 'Should save the data, submit the form and redirect to the barrier detail', ( done ) => {
+
 										intercept.backend()
 											.put( `/reports/${ stubId }/submit` )
 											.reply( 200, intercept.stub( '/backend/reports/report' ) );
 
 										agent
-											.post( urls.reports.aboutProblem( reportId ) )
-											.send( `_csrf=${ token }&item=test&barrierSource=COMPANY&barrierTitle=testing&description=abc` )
+											.post( urls.reports.summary( reportId ) )
+											.send( `_csrf=${ token }&description=test1` )
 											.end( ( err, res ) => {
 
 												if( res.statusCode != 302 ){

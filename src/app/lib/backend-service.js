@@ -140,13 +140,10 @@ function getFilterParams( filters ){
 }
 
 const reports = {
-	saveProblem: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
-		product: getValue( values.item ),
+	saveSummary: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 		problem_description: getValue( values.description ),
-		barrier_title: getValue( values.barrierTitle ),
-		source: getValue( values.barrierSource ),
-		other_source: getValue( values.barrierSourceOther ),
-		status_summary: getValue( values.resolvedDescription )
+		status_summary: getValue( values.resolvedDescription ),
+		next_steps_summary: getValue( values.nextSteps ),
 	} ),
 	submit: ( req, reportId ) => backend.put( `/reports/${ reportId }/submit`, getToken( req ) ),
 };
@@ -302,9 +299,15 @@ module.exports = {
 		saveSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 			sectors: getValue( values.sectors )
 		} ),
-		saveProblemAndSubmit: async ( req, reportId, values ) => {
+		saveProblem: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
+			product: getValue( values.item ),
+			barrier_title: getValue( values.barrierTitle ),
+			source: getValue( values.barrierSource ),
+			other_source: getValue( values.barrierSourceOther ),
+		} ),
+		saveSummaryAndSubmit: async ( req, reportId, values ) => {
 
-			const { response, body } = await reports.saveProblem( req, reportId, values );
+			const { response, body } = await reports.saveSummary( req, reportId, values );
 
 			if( response.isSuccess ){
 
