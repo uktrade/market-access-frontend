@@ -57,41 +57,40 @@ module.exports = {
 		}
 	},
 
-	accessibilityCheck: ( reportName ) => {
+	accessibilityCheck: ( reportName ) => new Promise( ( resolve, reject ) => {
 
-		return new Promise( ( resolve, reject ) => {
+		if( !reportName ){
 
-			if( !reportName ){
+			return reject( 'Please specify a report name' );
+		}
 
-				return reject( 'Please specify a report name' );
-			}
+		AxeBuilder( driver )
+			.disableRules( [ 'definition-list', 'dlitem' ] )// disable these rules as <div>s are allowed inside a <dl> but their rules are not updated yet!
+			.analyze( async ( err, results ) => {
 
-			AxeBuilder( driver )
-				.disableRules( [ 'definition-list', 'dlitem' ] )// disable these rules as <div>s are allowed inside a <dl> but their rules are not updated yet!
-				.analyze( async ( results ) => {
+				if( err ){
+					return reject( err );
+				}
 
+				const violations = results.violations;
+				const violationCount = violations.length;
 
-					const violations = results.violations;
-					const violationCount = violations.length;
+				if( violationCount > 0 ){
+					console.log( JSON.stringify( violations, null, 3 ) );
+				}
 
-					if( violationCount > 0 ){
+				try {
 
-						console.log( JSON.stringify( violations, null, 3 ) );
-					}
+					await writeReport( reportName, results );
 
-					try {
+					resolve( {
+						violations: violationCount
+					} );
 
-						await writeReport( reportName, results );
+				} catch( e ){
 
-						resolve( {
-							violations: violationCount
-						} );
-
-					} catch( e ){
-
-						reject( e );
-					}
-				} );
-		} );
-	}
+					reject( e );
+				}
+			} );
+	})
 };
