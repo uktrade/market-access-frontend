@@ -8,7 +8,7 @@ Feature: Report a barrier
 		And the active heading link should be Add a barrier
 		And the main heading should be Market access barriers Add a barrier
 		And there should be a start banner with a start button
-		And a task list with 4 items
+		And a task list with 5 items
 
 	Scenario: Navigate to start
 		Given I'm on the add a barrier page
