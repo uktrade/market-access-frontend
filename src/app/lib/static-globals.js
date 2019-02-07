@@ -12,4 +12,5 @@ module.exports = function( env ){
 	env.addGlobal( 'showErrors', config.isDev );
 	env.addGlobal( 'feedbackEmail', config.feedbackEmail );
 	env.addGlobal( 'maxFileSize', fileSize( config.files.maxSize ) );
+	env.addGlobal( 'env', config.environment );
 };
