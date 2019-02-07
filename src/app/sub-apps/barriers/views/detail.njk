@@ -120,7 +120,8 @@
 			}
 		]
 	} ) }}
-    <section class="barrier-content">
+
+	<section class="barrier-content">
 
 		{%- if barrier.isResolved or barrier.isHibernated -%}
 
@@ -147,10 +148,10 @@
 
 		{% endif -%}
 
-        <h2 class="section-heading">
-		Updates and documents
-        </h2>
-        {% if noteForm %}
+		<h2 class="section-heading">
+			Updates and documents
+		</h2>
+		{% if noteForm %}
 		<div class="interaction-panel">
 			<form action="{{ urls.barriers.notes.add( barrier.id ) }}?_csrf={{ csrfToken }}" method="POST" enctype="multipart/form-data" data-xhr-upload="{{ urls.barriers.notes.documents.add( barrier.id ) }}?_csrf={{ csrfToken }}" data-xhr-delete="{{ urls.documents.delete( ':uuid' ) }}">
 
@@ -208,11 +209,12 @@
 				<a class="button-cancel" href="{{ urls.barriers.detail( barrier.id ) }}">Cancel</a>
 			</form>
 		</div>
-	{% else %}
-		<a class="govuk-button button--primary" href="{{ urls.barriers.notes.add( barrier.id ) }}">Add note</a>
-	{% endif %}
-	{% if interactions and interactions.length %}
+		{% else %}
+			<a class="govuk-button button--primary" href="{{ urls.barriers.notes.add( barrier.id ) }}">Add note</a>
+		{% endif %}
+
 		<ol class="event-list">
+		{%- if interactions and interactions.length %}
 			{% for item in interactions -%}
 
 			<li class="event-list__item event_list__item--{{ item.modifier }}">
@@ -337,7 +339,31 @@
 				{%- endif %}
 			</li>
 			{% endfor %}
+
+		{%- else -%}
+
+			<li class="event-list__item">
+
+				{% if barrier.isResolved -%}
+
+					<h4 class="event-list__item__heading">Attach any useful documents</h4>
+					<p class="event-list__item__text">
+						You can attach any useful documents associated with the resolution of this barrier.
+					</p>
+
+				{%- else -%}
+
+					<h4 class="event-list__item__heading">You have not stated any next steps or progress</h4>
+					<p class="event-list__item__text">
+						A note can be next steps to resolve the barrier or any progress made on the barrier thus far. You can also attach any useful documents associated to the barrier.
+					</p>
+
+				{%- endif -%}
+
+					<a href="{{ urls.barriers.notes.add( barrier.id ) }}">Add your first note</a>
+			</li>
+
+		{%- endif %}
 		</ol>
-	{% endif %}
-    </section>
+	</section>
 {% endblock %}
