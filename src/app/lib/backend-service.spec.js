@@ -172,44 +172,55 @@ describe( 'Backend Service', () => {
 
 		describe( 'getAll', () => {
 			describe( 'With no filters', () => {
-				it( 'Should call the correct path', async () => {
+				it( 'Should call the correct path with default sort order', async () => {
 
 					await service.barriers.getAll( req );
 
-					expect( backend.get ).toHaveBeenCalledWith( '/barriers', token );
+					expect( backend.get ).toHaveBeenCalledWith( '/barriers?ordering=-reported_on', token );
 				} );
 			} );
 
 			describe( 'With a country filter', () => {
-				it( 'Should call the correct path', async () => {
+				it( 'Should call the correct path with default sort order', async () => {
 
 					const country = uuid();
 
 					await service.barriers.getAll( req, { country } );
 
-					expect( backend.get ).toHaveBeenCalledWith( `/barriers?export_country=${ country }`, token );
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers?export_country=${ country }&ordering=-reported_on`, token );
 				} );
 			} );
 
 			describe( 'With a sector filter', () => {
-				it( 'Should call the correct path', async () => {
+				it( 'Should call the correct path with default sort order', async () => {
 
 					const sector = uuid();
 
 					await service.barriers.getAll( req, { sector } );
 
-					expect( backend.get ).toHaveBeenCalledWith( `/barriers?sector=${ sector }`, token );
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers?sector=${ sector }&ordering=-reported_on`, token );
 				} );
 			} );
 
 			describe( 'With a type filter', () => {
-				it( 'Should call the correct path', async () => {
+				it( 'Should call the correct path with default sort order', async () => {
 
 					const type = faker.lorem.word().toUpperCase();
 
 					await service.barriers.getAll( req, { type } );
 
-					expect( backend.get ).toHaveBeenCalledWith( `/barriers?barrier_type=${ type }`, token );
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers?barrier_type=${ type }&ordering=-reported_on`, token );
+				} );
+			} );
+
+			describe( 'With a status filter', () => {
+				it( 'Should call the correct path with default sort order', async () => {
+
+					const status = '2,5';
+
+					await service.barriers.getAll( req, { status } );
+
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers?status=${ status }&ordering=-reported_on`, token );
 				} );
 			} );
 		} );
@@ -569,7 +580,7 @@ describe( 'Backend Service', () => {
 
 					const { body } = await service.reports.getAll( req );
 
-					expect( backend.get ).toHaveBeenCalledWith( '/reports', token );
+					expect( backend.get ).toHaveBeenCalledWith( '/reports?ordering=-created_on', token );
 					expect( body.results[ 0 ].progress.map( ( item ) => item.stage_code ) ).toEqual( [ '1.3', '1.4', '1.4', '1.5', '2.4', '2.5', '3', '3.1' ] );
 				} );
 			} );
@@ -586,7 +597,7 @@ describe( 'Backend Service', () => {
 
 					await service.reports.getAll( req );
 
-					expect( backend.get ).toHaveBeenCalledWith( '/reports', token );
+					expect( backend.get ).toHaveBeenCalledWith( '/reports?ordering=-created_on', token );
 				} );
 			} );
 		} );
@@ -594,7 +605,7 @@ describe( 'Backend Service', () => {
 		describe( 'getForCountry', () => {
 
 			const countryId = 'def-789';
-			const countryUrl = `/reports?export_country=${ countryId }`;
+			const countryUrl = `/reports?export_country=${ countryId }&ordering=-created_on`;
 
 			describe( 'When the results are an array', () => {
 				it( 'Should call the correct path and sort the progress', async () => {
