@@ -28,7 +28,7 @@ module.exports = async ( req, res, next ) => {
 			const user = body.user;
 			const reports = body.reports;
 
-			all = ( barriers && barriers.total );
+			all = ( barriers && ( ( barriers.paused || 0 ) + barriers.open ) );
 			country = ( user && user.country );
 			unfinished = reports;
 
