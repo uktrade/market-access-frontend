@@ -1,7 +1,8 @@
 {
    "barriers": {
       "total": 22,
-      "open": 5,
+		"open": 5,
+		"paused": 10,
       "resolved": 17
    },
    "reports": 15,
