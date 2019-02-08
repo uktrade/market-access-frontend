@@ -57,6 +57,10 @@ let config = {
 	isCi,
 	logLevel,
 	isDebug: ( logLevel === 'debug' ),
+	environment: {
+		banner: bool( "ENV_BANNER", false ),
+		name: env( 'ENV_NAME' ),
+	},
 	showErrors: isDev,
 	addCompany: bool( 'ADD_COMPANY', false ),
 	assignDefaultCountry: bool( 'ASSIGN_DEFAULT_COUNTRY', false ),

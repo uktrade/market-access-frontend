@@ -14,6 +14,7 @@ describe( 'Static globals', function(){
 	let maxFileSize;
 	let fileSize;
 	let fileSizeResponse;
+	let environment;
 
 	beforeEach( function(){
 
@@ -22,8 +23,11 @@ describe( 'Static globals', function(){
 		feedbackEmail = 'test@test.com';
 		maxFileSize = ( 5 * 1024 * 2014 );
 		fileSizeResponse = '123 MB';
-
 		fileSize = jasmine.createSpy( 'fileSize' );
+		environment = {
+			name: 'test',
+			banner: false,
+		};
 
 		staticGlobals = proxyquire( modulePath, {
 			'../config': {
@@ -34,6 +38,7 @@ describe( 'Static globals', function(){
 				files: {
 					maxSize: maxFileSize
 				},
+				environment,
 			},
 			'./urls': urls,
 			'./file-size': fileSize,
@@ -113,5 +118,13 @@ describe( 'Static globals', function(){
 		expect( args[ 1 ] ).toEqual( fileSizeResponse );
 
 		expect( fileSize ).toHaveBeenCalledWith( maxFileSize );
+	} );
+
+	it( 'Should set the environment', () => {
+
+		const args = calls.argsFor( 8 );
+
+		expect( args[ 0 ] ).toEqual( 'env' );
+		expect( args[ 1 ] ).toEqual( environment );
 	} );
 } );

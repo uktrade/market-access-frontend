@@ -145,4 +145,51 @@
 			gtag('config', '{{ analytics.id }}');
 		</script>
 	{% endif %}
+
+	{%- if env.banner and env.name %}
+		<style>
+			.env-banner {
+				position: absolute;
+				top:0;
+				left: 0;
+				width: 100%;
+				padding: 5px 15px;
+				background-color: red;
+				font-size: 24px;
+				text-align: center;
+				opacity: 0.95;
+				color: white;
+				padding-right: 30px;
+				z-index: 999;
+				box-sizing: border-box;
+			}
+
+			@media (min-width: 600px ){
+
+				.env-banner {
+					left: 10%;
+					width: 80%;
+				}
+			}
+
+			@media (min-width: 800px ){
+
+				.env-banner {
+					left: 20%;
+					width: 60%;
+				}
+			}
+
+			.env-banner__dismiss {
+				float: right;
+				color: white !important;
+				text-decoration: none;
+			}
+		</style>
+
+		<div class="env-banner">
+			<strong>{{ env.name | upper }}</strong> environment
+			<a href="#" onclick="this.parentNode.parentNode.removeChild( this.parentNode );event.preventDefault();" class="env-banner__dismiss">X</a>
+		</div>
+	{% endif %}
 {% endblock %}
