@@ -44,11 +44,15 @@ describe( 'Dashboard tabs', () => {
 
 		describe( 'When all counts have a number', () => {
 
+			let fakeData;
+
 			beforeEach( () => {
+
+				fakeData = jasmine.helpers.getFakeData( '/backend/counts/' );
 
 				backend.getCounts.and.callFake( () => Promise.resolve( {
 					response: { isSuccess: true },
-					body: jasmine.helpers.getFakeData( '/backend/counts/' )
+					body: fakeData
 				} ) );
 			} );
 
@@ -72,34 +76,54 @@ describe( 'Dashboard tabs', () => {
 			} );
 
 			describe( 'When the user does NOT have a country', () => {
-				it( 'Should add an all property', async () => {
 
-					await middleware( req, res, next );
+				afterEach( () => {
 
 					expect( res.locals.dashboard.tabs.country.skip ).toEqual( true );
 
 					expect( res.locals.dashboard.tabs.all ).toBeDefined();
 					expect( res.locals.dashboard.tabs.all.skip ).toEqual( false );
-					expect( res.locals.dashboard.tabs.all.count ).toEqual( 22 );
 
 					expect( res.locals.dashboard.tabs.unfinished ).toBeDefined();
 					expect( res.locals.dashboard.tabs.unfinished.skip ).toEqual( false );
 					expect( res.locals.dashboard.tabs.unfinished.count ).toEqual( 15 );
+				} );
+
+				describe( 'When there are no paused numbers (old API)', () => {
+					it( 'Should add an all property with the open number', async () => {
+
+						delete fakeData.barriers.paused;
+
+						await middleware( req, res, next );
+
+						expect( res.locals.dashboard.tabs.all.count ).toEqual( 5 );
+					} );
+				} );
+
+				describe( 'When there are paused numbers', () => {
+					it( 'Should add an all property with the open and paused numbers added together', async () => {
+
+						await middleware( req, res, next );
+
+						expect( res.locals.dashboard.tabs.all.count ).toEqual( 15 );
+					} );
 				} );
 			} );
 		} );
 
 		describe( 'When unfinished has a 0 count', () => {
 
+			let fakeData;
+
 			beforeEach( () => {
 
-				const body = jasmine.helpers.getFakeData( '/backend/counts/' );
+				fakeData = jasmine.helpers.getFakeData( '/backend/counts/' );
 
-				body.reports = 0;
+				fakeData.reports = 0;
 
 				backend.getCounts.and.callFake( () => Promise.resolve( {
 					response: { isSuccess: true },
-					body
+					body: fakeData
 				} ) );
 			} );
 
@@ -123,19 +147,37 @@ describe( 'Dashboard tabs', () => {
 			} );
 
 			describe( 'When the user does NOT have a country', () => {
-				it( 'Should add an all property', async () => {
 
-					await middleware( req, res, next );
+				afterEach( () => {
 
 					expect( res.locals.dashboard.tabs.country.skip ).toEqual( true );
 
 					expect( res.locals.dashboard.tabs.all ).toBeDefined();
 					expect( res.locals.dashboard.tabs.all.skip ).toEqual( false );
-					expect( res.locals.dashboard.tabs.all.count ).toEqual( 22 );
 
 					expect( res.locals.dashboard.tabs.unfinished ).toBeDefined();
 					expect( res.locals.dashboard.tabs.unfinished.skip ).toEqual( true );
 					expect( res.locals.dashboard.tabs.unfinished.count ).toEqual( 0 );
+				} );
+
+				describe( 'When there are no paused numbers (old API)', () => {
+					it( 'Should add an all property with the open number', async () => {
+
+						delete fakeData.barriers.paused;
+
+						await middleware( req, res, next );
+
+						expect( res.locals.dashboard.tabs.all.count ).toEqual( 5 );
+					} );
+				} );
+
+				describe( 'When there are paused numbers', () => {
+					it( 'Should add an all property with the open and paused numbers added together', async () => {
+
+						await middleware( req, res, next );
+
+						expect( res.locals.dashboard.tabs.all.count ).toEqual( 15 );
+					} );
 				} );
 			} );
 		} );
