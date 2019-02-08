@@ -41,21 +41,11 @@ function update( barrier ){
 	};
 }
 
-function sortDescending( a, b ){
-
-	const aDate = Date.parse( a.date.reported );
-	const bDate = Date.parse( b.date.reported );
-
-	return ( aDate === bDate ? 0 : ( aDate > bDate ? -1 : 1 ) );
-}
-
 module.exports = ( barriers, country ) => {
 
 	if( barriers && barriers.length ){
 
 		barriers = barriers.map( update );
-
-		barriers.sort( sortDescending );
 	}
 
 	return {	barriers, country	};

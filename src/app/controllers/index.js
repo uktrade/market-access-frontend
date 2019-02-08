@@ -9,7 +9,9 @@ module.exports = {
 		const country = req.user.country;
 		const countryId = country && req.user.country.id;
 		let template = 'index';
-		const filters = {};
+		const filters = {
+			status: '2,5'
+		};
 
 		if( countryId ){
 

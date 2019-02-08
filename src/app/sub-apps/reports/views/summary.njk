@@ -1,0 +1,80 @@
+{% from 'components/textarea/macro.njk' import govukTextarea %}
+{% from 'components/character-count/macro.njk' import govukCharacterCount %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Add - Summarise the problem{% endblock %}
+
+{% block body_script %}
+	<script>
+	if( ma.components.CharacterCount ){
+		new ma.components.CharacterCount( '.govuk-character-count' );
+	}
+	</script>
+{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: backHref },
+		caption: 'Add a barrier',
+		text: ( 'Summarise the problem' ),
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.reports.summary( report.id ) }}" method="POST" class="restrict-width">
+
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{{ govukCharacterCount( {
+
+			label: {
+				text: 'Provide a brief summary of the problem',
+				classes: 'govuk-label--s'
+			},
+			id: 'description',
+			name: 'description',
+			maxlength: summaryLimit,
+			value: description,
+			errorMessage: errors | errorForName( 'description' )
+		} ) }}
+
+		{% if isResolved %}
+
+			{{ govukTextarea( {
+
+				label: {
+					text: 'How did you resolve the problem?',
+					classes: 'govuk-label--s'
+				},
+				id: 'resolved-description',
+				name: 'resolvedDescription',
+				value: resolvedDescription,
+				errorMessage: errors | errorForName( 'resolved-description' )
+			} ) }}
+
+		{% else %}
+
+			{{ govukTextarea( {
+
+				label: {
+					text: 'What are the next steps to resolve this barrier?',
+					classes: 'govuk-label--s'
+				},
+				id: 'next-steps',
+				name: 'nextSteps',
+				value: nextSteps,
+				hint: {
+					text: 'This could be steps determined by yourself or your team. Highlighting that next steps have not been discussed is also useful to note.'
+				},
+				errorMessage: errors | errorForName( 'next-steps' )
+			} ) }}
+
+		{% endif %}
+
+		<input type="submit" class="govuk-button" value="Save and continue">
+		<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>
+
+	</form>
+{% endblock %}
