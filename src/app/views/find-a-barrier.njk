@@ -1,5 +1,6 @@
-{% from 'app-components/heading.njk' import heading %}
 {% from 'components/select/macro.njk' import govukSelect %}
+{% from 'app-components/heading.njk' import heading %}
+{% from 'app-components/multiselect.njk' import multiselect %}
 
 {% extends 'layout.njk' %}
 
@@ -27,6 +28,9 @@
 					id: 'country',
 					name: 'country',
 					classes: 'govuk-!-width-full js-filter',
+					formGroup: {
+						classes: 'filter-items-group'
+					},
 					label: {
 						text: 'Barrier location',
 						classes: 'filter-items__label'
@@ -38,6 +42,9 @@
 					id: 'sector',
 					name: 'sector',
 					classes: 'govuk-!-width-full js-filter',
+					formGroup: {
+						classes: 'filter-items-group'
+					},
 					label: {
 						text: 'Sector',
 						classes: 'filter-items__label'
@@ -49,12 +56,32 @@
 					id: 'type',
 					name: 'type',
 					classes: 'govuk-!-width-full js-filter',
+					formGroup: {
+						classes: 'filter-items-group'
+					},
 					label: {
 						text: 'Barrier type',
 						classes: 'filter-items__label'
 					},
 					items: filters.type
 				}) }}
+
+				{{ multiselect({
+					id: 'priority',
+					name: 'priority',
+					classes: 'govuk-!-width-full multiselect multiselect--smaller multiselect--light multiselect--filter js-filter',
+					formGroup: {
+						classes: 'filter-group'
+					},
+					fieldset: {
+						classes: 'filter-group__inner',
+						legend: {
+							text: "Barrier priority",
+							classes: "filter-items__label filter-group__label"
+						}
+					},
+					items: filters.priority
+				})	}}
 
 				{% if hasFilters %}
 				<a class="filter-items__clear js-filter-clear" href="{{ urls.findABarrier() }}">Clear filters</a>

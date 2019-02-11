@@ -57,6 +57,7 @@ module.exports = function( params ){
 			country: metadata.getCountryList( 'All locations' ).map( isSelected( filters.country ) ),
 			sector: metadata.getSectorList( 'All sectors' ).map( isSelected( filters.sector ) ),
 			type: metadata.getBarrierTypeList().sort( sortGovukItems.alphabetical ).map( isSelected( filters.type ) ),
+			priority: metadata.getBarrierPrioritiesList(),
 		}
 	};
 };
