@@ -11,7 +11,7 @@ module.exports = {
 		const isDefined = ( type !== 'undefined' );
 		const isString = ( isDefined && type === 'string' );
 
-		if( isString ){ return value.length > 0; }
+		if( isString ){ return value.trim().length > 0; }
 		return isDefined;
 	},
 	isUuid: ( value ) => uuid.test( value ),
