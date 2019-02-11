@@ -49,6 +49,13 @@ describe( 'validators', () => {
 			} );
 		} );
 
+		describe( 'With a string of spaces', () => {
+			it( 'Should return false', () => {
+
+				expect( validators.isDefined( '  ' ) ).toEqual( false );
+			} );
+		} );
+
 		describe( 'With a string', () => {
 			it( 'Shoud return true', () => {
 
