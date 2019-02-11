@@ -10,23 +10,7 @@
 	],
 	"properties": {
 
-		"barriers": {
-			"type": "object",
-			"required": [
-				"total",
-				"open",
-				"paused",
-				"resolved"
-			],
-			"properties": {
-
-				"total": { "$ref": "$refs/common.json#/small-int" },
-				"open": { "$ref": "$refs/common.json#/small-int" },
-				"paused": { "$ref": "$refs/common.json#/small-int" },
-				"resolved": { "$ref": "$refs/common.json#/small-int" }
-			}
-		},
-
+		"barriers": { "$ref": "#/refs/barriers" },
 		"reports": { "$ref": "$refs/common.json#/small-int" },
 
 		"user": {
@@ -49,10 +33,28 @@
 					],
 					"properties": {
 
-						"barriers": { "$ref": "$refs/common.json#/small-int" },
+						"barriers": { "$ref": "#/refs/barriers" },
 						"reports": { "$ref": "$refs/common.json#/small-int" }
 					}
 				}
+			}
+		}
+	},
+	"refs": {
+		"barriers": {
+			"type": "object",
+			"required": [
+				"total",
+				"open",
+				"paused",
+				"resolved"
+			],
+			"properties": {
+
+				"total": { "$ref": "$refs/common.json#/small-int" },
+				"open": { "$ref": "$refs/common.json#/small-int" },
+				"paused": { "$ref": "$refs/common.json#/small-int" },
+				"resolved": { "$ref": "$refs/common.json#/small-int" }
 			}
 		}
 	}

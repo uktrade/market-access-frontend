@@ -42,143 +42,141 @@ describe( 'Dashboard tabs', () => {
 			expect( reporter.captureException ).not.toHaveBeenCalled();
 		} );
 
-		describe( 'When all counts have a number', () => {
+		function checkResults( dataPath, expected ){
 
-			let fakeData;
+			describe( 'When all counts have a number', () => {
 
-			beforeEach( () => {
+				beforeEach( () => {
 
-				fakeData = jasmine.helpers.getFakeData( '/backend/counts/' );
-
-				backend.getCounts.and.callFake( () => Promise.resolve( {
-					response: { isSuccess: true },
-					body: fakeData
-				} ) );
-			} );
-
-			describe( 'When the user has a country', () => {
-				it( 'Should add a country property', async () => {
-
-					req.user = { country: { id: 123 } };
-
-					await middleware( req, res, next );
-
-					expect( res.locals.dashboard.tabs.all.skip ).toEqual( true );
-
-					expect( res.locals.dashboard.tabs.country ).toBeDefined();
-					expect( res.locals.dashboard.tabs.country.skip ).toEqual( false );
-					expect( res.locals.dashboard.tabs.country.count ).toEqual( 9 );
-
-					expect( res.locals.dashboard.tabs.unfinished ).toBeDefined();
-					expect( res.locals.dashboard.tabs.unfinished.skip ).toEqual( false );
-					expect( res.locals.dashboard.tabs.unfinished.count ).toEqual( 5 );
-				} );
-			} );
-
-			describe( 'When the user does NOT have a country', () => {
-
-				afterEach( () => {
-
-					expect( res.locals.dashboard.tabs.country.skip ).toEqual( true );
-
-					expect( res.locals.dashboard.tabs.all ).toBeDefined();
-					expect( res.locals.dashboard.tabs.all.skip ).toEqual( false );
-
-					expect( res.locals.dashboard.tabs.unfinished ).toBeDefined();
-					expect( res.locals.dashboard.tabs.unfinished.skip ).toEqual( false );
-					expect( res.locals.dashboard.tabs.unfinished.count ).toEqual( 15 );
+					backend.getCounts.and.callFake( () => Promise.resolve( {
+						response: { isSuccess: true },
+						body: jasmine.helpers.getFakeData( dataPath )
+					} ) );
 				} );
 
-				describe( 'When there are no paused numbers (old API)', () => {
-					it( 'Should add an all property with the open number', async () => {
+				describe( 'When the user has a country', () => {
+					it( 'Should add a country property', async () => {
 
-						delete fakeData.barriers.paused;
+						req.user = { country: { id: 123 } };
 
 						await middleware( req, res, next );
 
-						expect( res.locals.dashboard.tabs.all.count ).toEqual( 5 );
+						expect( res.locals.dashboard.tabs.all.skip ).toEqual( true );
+
+						expect( res.locals.dashboard.tabs.country ).toBeDefined();
+						expect( res.locals.dashboard.tabs.country.skip ).toEqual( false );
+						expect( res.locals.dashboard.tabs.country.count ).toEqual( expected.country.barriers );
+
+						expect( res.locals.dashboard.tabs.unfinished ).toBeDefined();
+						expect( res.locals.dashboard.tabs.unfinished.skip ).toEqual( false );
+						expect( res.locals.dashboard.tabs.unfinished.count ).toEqual( expected.country.reports );
 					} );
 				} );
 
-				describe( 'When there are paused numbers', () => {
+				describe( 'When the user does NOT have a country', () => {
+					describe( 'When there are paused numbers', () => {
+						it( 'Should add an all property with the open and paused numbers added together', async () => {
+
+							await middleware( req, res, next );
+
+							expect( res.locals.dashboard.tabs.country.skip ).toEqual( true );
+
+							expect( res.locals.dashboard.tabs.all ).toBeDefined();
+							expect( res.locals.dashboard.tabs.all.skip ).toEqual( false );
+							expect( res.locals.dashboard.tabs.all.count ).toEqual( expected.all.barriers );
+
+							expect( res.locals.dashboard.tabs.unfinished ).toBeDefined();
+							expect( res.locals.dashboard.tabs.unfinished.skip ).toEqual( false );
+							expect( res.locals.dashboard.tabs.unfinished.count ).toEqual( expected.all.reports );
+						} );
+					} );
+				} );
+			} );
+
+			describe( 'When unfinished has a 0 count', () => {
+
+				beforeEach( () => {
+
+					const body = jasmine.helpers.getFakeData( dataPath );
+
+					body.reports = 0;
+					body.user.country.reports = 0;
+
+					backend.getCounts.and.callFake( () => Promise.resolve( {
+						response: { isSuccess: true },
+						body
+					} ) );
+				} );
+
+				describe( 'When the user has a country', () => {
+					it( 'Should add a country property', async () => {
+
+						req.user = { country: { id: 123 } };
+
+						await middleware( req, res, next );
+
+						expect( res.locals.dashboard.tabs.all.skip ).toEqual( true );
+
+						expect( res.locals.dashboard.tabs.country ).toBeDefined();
+						expect( res.locals.dashboard.tabs.country.skip ).toEqual( false );
+						expect( res.locals.dashboard.tabs.country.count ).toEqual( expected.country.barriers );
+
+						expect( res.locals.dashboard.tabs.unfinished ).toBeDefined();
+						expect( res.locals.dashboard.tabs.unfinished.skip ).toEqual( true );
+						expect( res.locals.dashboard.tabs.unfinished.count ).toEqual( 0 );
+					} );
+				} );
+
+				describe( 'When the user does NOT have a country', () => {
 					it( 'Should add an all property with the open and paused numbers added together', async () => {
 
 						await middleware( req, res, next );
 
-						expect( res.locals.dashboard.tabs.all.count ).toEqual( 15 );
+						expect( res.locals.dashboard.tabs.country.skip ).toEqual( true );
+
+						expect( res.locals.dashboard.tabs.all ).toBeDefined();
+						expect( res.locals.dashboard.tabs.all.skip ).toEqual( false );
+						expect( res.locals.dashboard.tabs.all.count ).toEqual( expected.all.barriers );
+
+						expect( res.locals.dashboard.tabs.unfinished ).toBeDefined();
+						expect( res.locals.dashboard.tabs.unfinished.skip ).toEqual( true );
+						expect( res.locals.dashboard.tabs.unfinished.count ).toEqual( 0 );
 					} );
 				} );
+			} );
+		}
+
+		describe( 'With the current API response', () => {
+
+			const dataPath = '/backend/counts/';
+			const data = jasmine.helpers.getFakeData( dataPath );
+
+			checkResults( dataPath, {
+				country: {
+					barriers: ( data.user.country.barriers.open + data.user.country.barriers.paused ),
+					reports: data.user.country.reports,
+				},
+				all: {
+					barriers: ( data.barriers.open + data.barriers.paused ),
+					reports: data.reports
+				}
 			} );
 		} );
 
-		describe( 'When unfinished has a 0 count', () => {
+		describe( 'With the old API response', () => {
 
-			let fakeData;
+			const dataPath = '/backend/counts/index.old';
+			const data = jasmine.helpers.getFakeData( dataPath );
 
-			beforeEach( () => {
-
-				fakeData = jasmine.helpers.getFakeData( '/backend/counts/' );
-
-				fakeData.reports = 0;
-
-				backend.getCounts.and.callFake( () => Promise.resolve( {
-					response: { isSuccess: true },
-					body: fakeData
-				} ) );
-			} );
-
-			describe( 'When the user has a country', () => {
-				it( 'Should add a country property', async () => {
-
-					req.user = { country: { id: 123 } };
-
-					await middleware( req, res, next );
-
-					expect( res.locals.dashboard.tabs.all.skip ).toEqual( true );
-
-					expect( res.locals.dashboard.tabs.country ).toBeDefined();
-					expect( res.locals.dashboard.tabs.country.skip ).toEqual( false );
-					expect( res.locals.dashboard.tabs.country.count ).toEqual( 9 );
-
-					expect( res.locals.dashboard.tabs.unfinished ).toBeDefined();
-					expect( res.locals.dashboard.tabs.unfinished.skip ).toEqual( false );
-					expect( res.locals.dashboard.tabs.unfinished.count ).toEqual( 5 );
-				} );
-			} );
-
-			describe( 'When the user does NOT have a country', () => {
-
-				afterEach( () => {
-
-					expect( res.locals.dashboard.tabs.country.skip ).toEqual( true );
-
-					expect( res.locals.dashboard.tabs.all ).toBeDefined();
-					expect( res.locals.dashboard.tabs.all.skip ).toEqual( false );
-
-					expect( res.locals.dashboard.tabs.unfinished ).toBeDefined();
-					expect( res.locals.dashboard.tabs.unfinished.skip ).toEqual( true );
-					expect( res.locals.dashboard.tabs.unfinished.count ).toEqual( 0 );
-				} );
-
-				describe( 'When there are no paused numbers (old API)', () => {
-					it( 'Should add an all property with the open number', async () => {
-
-						delete fakeData.barriers.paused;
-
-						await middleware( req, res, next );
-
-						expect( res.locals.dashboard.tabs.all.count ).toEqual( 5 );
-					} );
-				} );
-
-				describe( 'When there are paused numbers', () => {
-					it( 'Should add an all property with the open and paused numbers added together', async () => {
-
-						await middleware( req, res, next );
-
-						expect( res.locals.dashboard.tabs.all.count ).toEqual( 15 );
-					} );
-				} );
+			checkResults( dataPath, {
+				country: {
+					barriers: data.user.country.barriers,
+					reports: data.user.country.reports,
+				},
+				all: {
+					barriers: data.barriers.open,
+					reports: data.reports
+				}
 			} );
 		} );
 	} );
