@@ -4,20 +4,26 @@ const sortGovukItems = require( '../lib/sort-govuk-items' );
 const { OPEN, RESOLVED, HIBERNATED } = metadata.barrier.status.types;
 const barrierStatusTypeInfo = metadata.barrier.status.typeInfo;
 
-function isSelected( value ){
+function createMatcher( key ){
 
-	return ( item ) => {
+	return function matcher( values = [] ){
 
-		// need to use Abstract Equality Comparison
-		// query params are always strings so ensure they match numbers etc
-		if( item.value == value ){
+		return ( item ) => {
 
-			item.selected = true;
-		}
+			const value = String( item.value ); // query params are always strings so cast value to a string to ensure they match numbers etc
 
-		return item;
+			if( values.includes( value ) ){ // .includes uses Same-value-zero equality matching
+
+				item[ key ] = true;
+			}
+
+			return item;
+		};
 	};
 }
+
+const isSelected = createMatcher( 'selected' );
+const isChecked = createMatcher( 'checked' );
 
 module.exports = function( params ){
 
@@ -57,7 +63,7 @@ module.exports = function( params ){
 			country: metadata.getCountryList( 'All locations' ).map( isSelected( filters.country ) ),
 			sector: metadata.getSectorList( 'All sectors' ).map( isSelected( filters.sector ) ),
 			type: metadata.getBarrierTypeList().sort( sortGovukItems.alphabetical ).map( isSelected( filters.type ) ),
-			priority: metadata.getBarrierPrioritiesList(),
+			priority: metadata.getBarrierPrioritiesList().map( isChecked( filters.priority ) ),
 		}
 	};
 };

@@ -18,6 +18,7 @@ describe( 'Find a barrier view model', () => {
 	let sectorList;
 	let barrierTypeList;
 	let sortGovukItems;
+	let barrierPriorityList;
 
 	function getExpectedBarrierOutput( barriers ){
 
@@ -72,7 +73,8 @@ describe( 'Find a barrier view model', () => {
 			getCountry: jasmine.createSpy( 'metadata.getCountry' ),
 			getCountryList: jasmine.createSpy( 'metadata.getCountryList' ),
 			getSectorList: jasmine.createSpy( 'metadata.getSectorList' ),
-			getBarrierTypeList: jasmine.createSpy( 'jasmine.getBarrierTypeList' ),
+			getBarrierTypeList: jasmine.createSpy( 'metadata.getBarrierTypeList' ),
+			getBarrierPrioritiesList: jasmine.createSpy( 'metadata.getBarrierPrioritiesList' ),
 		};
 
 		mockSector = { id: uuid(), name: faker.lorem.words() };
@@ -97,11 +99,19 @@ describe( 'Find a barrier view model', () => {
 			{ value: 3, text: faker.lorem.words() },
 		];
 
+		barrierPriorityList = [
+			{ value: faker.lorem.word().toUpperCase(), text: faker.lorem.words() },
+			{ value: faker.lorem.word().toUpperCase(), text: faker.lorem.words() },
+			{ value: faker.lorem.word().toUpperCase(), text: faker.lorem.words() },
+			{ value: faker.lorem.word().toUpperCase(), text: faker.lorem.words() },
+		];
+
 		metadata.getCountryList.and.callFake( () => countryList );
 		metadata.getSectorList.and.callFake( () => sectorList );
 		metadata.getSector.and.callFake( () => mockSector );
 		metadata.getCountry.and.callFake( () => mockCountry );
 		metadata.getBarrierTypeList.and.callFake( () => barrierTypeList );
+		metadata.getBarrierPrioritiesList.and.callFake( () => barrierPriorityList );
 
 		sortGovukItems = {
 			alphabetical: jasmine.createSpy( 'sortGovukItems.alphabetical' ).and.callFake( () => 0 ),
@@ -138,7 +148,8 @@ describe( 'Find a barrier view model', () => {
 			expect( output.filters ).toEqual( {
 				country: countryList,
 				sector: sectorList,
-				type: barrierTypeList
+				type: barrierTypeList,
+				priority: barrierPriorityList,
 			} );
 			expect( output.hasFilters ).toEqual( false );
 		} );
@@ -148,9 +159,9 @@ describe( 'Find a barrier view model', () => {
 		it( 'Should return the correct data', () => {
 
 			const count = 10;
-			const filters = { country: uuid() };
+			const filters = { country: [ uuid() ] };
 
-			countryList[ 2 ].value = filters.country;
+			countryList[ 2 ].value = filters.country[ 0 ];
 
 			const output = viewModel( {
 				count,
@@ -164,6 +175,7 @@ describe( 'Find a barrier view model', () => {
 				country: countryList,
 				sector: sectorList,
 				type: barrierTypeList,
+				priority: barrierPriorityList,
 			} );
 			expect( countryList[ 2 ].selected ).toEqual( true );
 			expect( output.hasFilters ).toEqual( true );
@@ -174,9 +186,9 @@ describe( 'Find a barrier view model', () => {
 		it( 'Should return the correct data', () => {
 
 			const count = 5;
-			const filters = { sector: uuid() };
+			const filters = { sector: [ uuid() ] };
 
-			sectorList[ 2 ].value = filters.sector;
+			sectorList[ 2 ].value = filters.sector[ 0 ];
 
 			const output = viewModel( {
 				count,
@@ -190,6 +202,7 @@ describe( 'Find a barrier view model', () => {
 				country: countryList,
 				sector: sectorList,
 				type: barrierTypeList,
+				priority: barrierPriorityList,
 			} );
 			expect( sectorList[ 2 ].selected ).toEqual( true );
 			expect( output.hasFilters ).toEqual( true );
@@ -200,7 +213,7 @@ describe( 'Find a barrier view model', () => {
 		it( 'Should return the correct data', () => {
 
 			const count = 5;
-			const filters = { type: 3 };
+			const filters = { type: [ 3 ] };
 
 			barrierTypeList[ 2 ].value = filters.type;
 
@@ -218,6 +231,40 @@ describe( 'Find a barrier view model', () => {
 				type: barrierTypeList.map( ( item ) => {
 
 					if( item.value == filters.type ){
+						item.selected = true;
+					}
+
+					return item;
+				} ),
+				priority: barrierPriorityList,
+			} );
+			expect( output.hasFilters ).toEqual( true );
+		} );
+	} );
+
+	describe( 'With a barrier priority filter', () => {
+		it( 'Should return the correct data', () => {
+
+			const count = 5;
+			const filters = { priority: [ faker.lorem.word().toUpperCase() ] };
+
+			barrierPriorityList[ 2 ].value = filters.priority[ 0 ];
+
+			const output = viewModel( {
+				count,
+				barriers,
+				filters
+			} );
+
+			expect( output.count ).toEqual( count );
+			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
+			expect( output.filters ).toEqual( {
+				country: countryList,
+				sector: sectorList,
+				type: barrierTypeList,
+				priority: barrierPriorityList.map( ( item ) => {
+
+					if( item.value == filters.priority ){
 						item.selected = true;
 					}
 
