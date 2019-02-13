@@ -60,10 +60,27 @@ module.exports = function( params ){
 		barriers: barrierList,
 		hasFilters: !!Object.keys( filters ).length,
 		filters: {
-			country: metadata.getCountryList( 'All locations' ).map( isSelected( filters.country ) ),
-			sector: metadata.getSectorList( 'All sectors' ).map( isSelected( filters.sector ) ),
-			type: metadata.getBarrierTypeList().sort( sortGovukItems.alphabetical ).map( isSelected( filters.type ) ),
-			priority: metadata.getBarrierPrioritiesList().map( isChecked( filters.priority ) ),
+			country: {
+				items: metadata.getCountryList( 'All locations' ).map( isSelected( filters.country ) ),
+				active: filters.country && filters.country.map( metadata.getCountry ),
+			},
+			sector: {
+				items: metadata.getSectorList( 'All sectors' ).map( isSelected( filters.sector ) ),
+				active: filters.sector && filters.sector.map( metadata.getSector ),
+			},
+			type: {
+				items: metadata.getBarrierTypeList().sort( sortGovukItems.alphabetical ).map( isSelected( filters.type ) ),
+				active: filters.type && filters.type.map( ( id ) => {
+
+					const { title } = metadata.getBarrierType( id );
+
+					return { name: title };
+				} ),
+			},
+			priority: {
+				items: metadata.getBarrierPrioritiesList().map( isChecked( filters.priority ) ),
+				active: filters.priority && filters.priority.map( metadata.getBarrierPriority ),
+			},
 		}
 	};
 };

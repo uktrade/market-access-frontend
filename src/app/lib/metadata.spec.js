@@ -322,6 +322,13 @@ describe( 'metadata', () => {
 			} );
 		} );
 
+		describe( 'getBarrierType', () => {
+			it( 'Should return the list', () => {
+
+				expect( metadata.getBarrierType( fakeData.barrier_types[ 3 ].id ) ).toEqual( fakeData.barrier_types[ 3 ] );
+			} );
+		} );
+
 		describe( 'getBarrierTypeList', () => {
 			it( 'Should return the list', () => {
 
@@ -338,6 +345,19 @@ describe( 'metadata', () => {
 
 				expect( metadata.barrierSource ).toBeDefined();
 				expect( metadata.barrierSource ).toEqual( fakeData.barrier_source );
+			} );
+		} );
+
+		describe( 'getBarrierPriority', () => {
+			it( 'Should return the list', () => {
+
+				const item = fakeData.barrier_priorities[ 2 ];
+				const expected = {
+					...item,
+					modifyer: item.code.toLowerCase()
+				};
+
+				expect( metadata.getBarrierPriority( item.code ) ).toEqual( expected );
 			} );
 		} );
 

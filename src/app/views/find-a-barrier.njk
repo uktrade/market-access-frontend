@@ -35,7 +35,7 @@
 						text: 'Barrier location',
 						classes: 'filter-items__label'
 					},
-					items: filters.country
+					items: filters.country.items
 				}) }}
 
 				{{ govukSelect({
@@ -49,7 +49,7 @@
 						text: 'Sector',
 						classes: 'filter-items__label'
 					},
-					items: filters.sector
+					items: filters.sector.items
 				}) }}
 
 				{{ govukSelect({
@@ -63,7 +63,7 @@
 						text: 'Barrier type',
 						classes: 'filter-items__label'
 					},
-					items: filters.type
+					items: filters.type.items
 				}) }}
 
 				{{ multiselect({
@@ -80,11 +80,11 @@
 							classes: "filter-items__label filter-group__label"
 						}
 					},
-					items: filters.priority
+					items: filters.priority.items
 				})	}}
 
 				{% if hasFilters %}
-				<a class="filter-items__clear js-filter-clear" href="{{ urls.findABarrier() }}">Clear filters</a>
+				<a class="filter-items__clear" href="{{ urls.findABarrier() }}">Remove all filters</a>
 				{% endif %}
 
 				<input type="submit" value="Apply filters" class="govuk-button govuk-button--full-width js-filter-submit">
@@ -92,7 +92,32 @@
 		</div>
 		<div class="govuk-grid-column-three-quarters">
 
-			<h2 class="filter-results-title">{{ count }} <span class="filter-results-title__caption">barrier{{ 's' if count != 1 }}</span></h2>
+			{%- macro activeFilter( name, items ) -%}
+				{% if items.length %}
+				<li class="active-filters__item">
+					<h4 class="active-filter__heading">{{ name }}:</h4>
+					<p class="active-filter__text">
+						{% for item in items %}
+						{{- item.name }}{{ ', ' if not loop.last -}}
+						{% endfor %}
+					</p>
+				</li>
+				{% endif %}
+			{%- endmacro -%}
+
+			<div class="filter-results-header">
+				<h2 class="filter-results-title">{{ count }}<span class="filter-results-title__caption"> barrier{{ 's' if count != 1 }}</span></h2>
+				{% if hasFilters %}
+					<h3 class="visually-hidden">Active filters:</h3>
+					<ul class="active-filters">
+						{{ activeFilter( 'Barrier location', filters.country.active ) }}
+						{{ activeFilter( 'Sector', filters.sector.active ) }}
+						{{ activeFilter( 'Type', filters.type.active ) }}
+						{{ activeFilter( 'Priority', filters.priority.active ) }}
+					</ul>
+					<a class="filter-results-clear-link" href="{{ urls.findABarrier() }}">Remove all filters</a>
+				{% endif %}
+			</div>
 			<ol class="filter-results-list">
 				{% for barrier in barriers %}
 					<li class='filter-results-list__item'>

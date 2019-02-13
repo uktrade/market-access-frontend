@@ -18,14 +18,52 @@
 	margin-bottom: govuk-em( 10, 16 );
 }
 
+.filter-results-header {
+	border-bottom: 5px solid $govuk-black;
+	position: relative;
+}
+
 .filter-results-title {
 	@include govuk-font( 27, $weight: bold );
-	border-bottom: 5px solid $govuk-black;
 	padding: 0 0 govuk-em( 5, 27 ) 0;
+	margin: govuk-em( 10, 27 ) 0 govuk-em( 5, 27 ) 0;
 }
 
 .filter-results-title__caption {
 	@include govuk-font( 19 );
+}
+
+.active-filters {
+	margin: 0;
+	padding: 0;
+	display: inline-block;
+	padding-bottom: govuk-em( 10, 16 );
+}
+
+.active-filters__item {
+	display: inline;
+	background: $govuk-grey-4;
+	margin-right: govuk-em( 5, 16 );
+	padding: govuk-em( 2, 16 ) govuk-em( 5, 16 );
+}
+
+.active-filter__heading {
+	display: inline;
+	font-weight: normal;
+	color: $govuk-grey-1;
+}
+
+.active-filter__text {
+	margin: 0;
+	padding: 0;
+	display: inline;
+	font-weight: bold;
+}
+
+.filter-results-clear-link {
+	position: absolute;
+	top: 0;
+	right: 0;
 }
 
 .filter-results-list {

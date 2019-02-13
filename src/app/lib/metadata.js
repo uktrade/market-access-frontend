@@ -1,5 +1,12 @@
 const backend = require( './backend-request' );
 
+let countries;
+let sectors;
+let level0Sectors;
+let barrierTypes;
+let uniqueBarrierTypes;
+let barrierPriorities;
+
 function notDisabled( item ){
 
 	return  item.disabled_on === null;
@@ -98,8 +105,6 @@ function dedupeBarrierTypes( barrierTypes ){
 
 function sortPriority( { order: orderA }, { order: orderB } ){
 
-	if( orderA === orderB ){ return 0; }
-
 	return ( orderA > orderB ? 1 : -1 );
 }
 
@@ -110,13 +115,6 @@ function barrierPriority( priority ){
 		modifyer: priority.code.toLowerCase()
 	};
 }
-
-let countries;
-let sectors;
-let level0Sectors;
-let barrierTypes;
-let uniqueBarrierTypes;
-let barrierPriorities;
 
 module.exports.fetch = async () => {
 
@@ -182,6 +180,8 @@ module.exports.getCountryList = ( defaultText = 'Choose a country' ) => createCo
 module.exports.getSectorList = ( defaultText = 'Select a sector' ) => createSectorsList( level0Sectors, defaultText );
 module.exports.getSector = ( sectorId ) => sectors.find( ( sector ) => sector.id === sectorId );
 module.exports.getCountry = ( countryId ) => countries.find( ( country ) => country.id === countryId );
+module.exports.getBarrierType = ( typeId ) => uniqueBarrierTypes.find( ( type ) => type.id == typeId );
+module.exports.getBarrierPriority = ( priorityCode ) => barrierPriorities.find( ( priority ) => priority.code == priorityCode );
 
 module.exports.getBarrierTypeList = () => {
 
