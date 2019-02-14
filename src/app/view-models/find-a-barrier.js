@@ -47,6 +47,7 @@ module.exports = function( params ){
 			sectors,
 			sectorsList: sectors.map( ( sector ) => sector.name ),
 			status,
+			priority: barrier.priority,
 			date: {
 				reported: barrier.reported_on,
 				status: barrier.current_status.status_date,

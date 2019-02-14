@@ -124,10 +124,18 @@
 						<div class="filter-results-list__item__main-content">
 							<h3 class='filter-results-list__item__heading'><a href="{{ urls.barriers.detail( barrier.id ) }}">{{ barrier.title }}</a></h3>
 							<dl class="filter-results-list__item__definitions">
+
+								<dt class="filter-results-list__item__definitions__key visually-hidden">ID:</dt>
+								<dd class="filter-results-list__item__definitions__value">{{ barrier.code }}</dd>
+
+								<dt class="filter-results-list__item__definitions__key">Added:</dt>
+								<dd class="filter-results-list__item__definitions__value">{{ barrier.date.reported | dateOnly }}</dd>
+
 								{% if barrier.sectors.length %}
 								<dt class="filter-results-list__item__definitions__key">Sector{{ 's' if barrier.sectorsList.length != 1 }} affected:</dt>
 								<dd class="filter-results-list__item__definitions__value">{{ barrier.sectorsList | join( ', ' ) }}</dd>
 								{% endif %}
+
 								<dt class="filter-results-list__item__definitions__key">Barrier location:</dt>
 								<dd class="filter-results-list__item__definitions__value">{{ barrier.country.name }}</dd>
 							</dl>
@@ -140,10 +148,9 @@
 								</span>
 							</li>
 							<li class="filter-results-list__item__sub-content__item">
-								<span class="visually-hidden">ID: </span>{{ barrier.code }}
-							</li>
-							<li class="filter-results-list__item__sub-content__item">
-								<span class="muted">Added </span>{{ barrier.date.reported | dateOnly }}
+								<span class="priority-marker-wrapper">
+									<span class="priority-marker priority-marker--{{ barrier.priority.code.toLowerCase() }}"></span><strong>{{ barrier.priority.name }}</strong> priority
+								</span>
 							</li>
 						</ul>
 					</li>

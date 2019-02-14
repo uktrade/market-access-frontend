@@ -47,7 +47,8 @@ describe( 'Find a barrier view model', () => {
 					reported: barrier.reported_on,
 					status: barrier.current_status.status_date,
 					created: barrier.created_on,
-				}
+				},
+				priority: barrier.priority
 			});
 		}
 
