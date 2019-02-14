@@ -21,6 +21,8 @@ describe( 'Find a barrier view model', () => {
 	let barrierTypeList;
 	let sortGovukItems;
 	let barrierPriorityList;
+	let urls;
+	let findABarrierResponse;
 
 	function getExpectedBarrierOutput( barriers ){
 
@@ -126,9 +128,16 @@ describe( 'Find a barrier view model', () => {
 			alphabetical: jasmine.createSpy( 'sortGovukItems.alphabetical' ).and.callFake( () => 0 ),
 		};
 
+		findABarrierResponse = '/a/b/c';
+
+		urls = {
+			findABarrier: jasmine.createSpy( 'urls.findABarrier' ).and.callFake( () => findABarrierResponse ),
+		};
+
 		viewModel = proxyquire( modulePath, {
 			'../lib/metadata': metadata,
 			'../lib/sort-govuk-items': sortGovukItems,
+			'../lib/urls': urls,
 		} );
 	} );
 
@@ -139,6 +148,8 @@ describe( 'Find a barrier view model', () => {
 		expect( metadata.getBarrierTypeList ).toHaveBeenCalledWith();
 		expect( metadata.getBarrierPrioritiesList ).toHaveBeenCalledWith( { suffix: false } );
 		expect( sortGovukItems.alphabetical ).toHaveBeenCalled();
+		expect( urls.findABarrier.calls.count() ).toEqual( 4 );
+		expect( urls.findABarrier ).toHaveBeenCalledWith( {} );
 	} );
 
 	describe( 'Without any filters', () => {
@@ -156,10 +167,10 @@ describe( 'Find a barrier view model', () => {
 			expect( output.count ).toEqual( count );
 			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
 			expect( output.filters ).toEqual( {
-				country: { items: countryList, active: undefined },
-				sector: { items: sectorList, active: undefined },
-				type: { items: barrierTypeList, active: undefined },
-				priority: { items: barrierPriorityList, active: undefined },
+				country: { items: countryList, active: undefined, removeUrl: findABarrierResponse },
+				sector: { items: sectorList, active: undefined, removeUrl: findABarrierResponse },
+				type: { items: barrierTypeList, active: undefined, removeUrl: findABarrierResponse },
+				priority: { items: barrierPriorityList, active: undefined, removeUrl: findABarrierResponse },
 			} );
 			expect( output.hasFilters ).toEqual( false );
 		} );
@@ -182,10 +193,10 @@ describe( 'Find a barrier view model', () => {
 			expect( output.count ).toEqual( count );
 			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
 			expect( output.filters ).toEqual( {
-				country: { items: countryList, active: [ mockCountry ] },
-				sector: { items: sectorList, active: undefined },
-				type: { items: barrierTypeList, active: undefined },
-				priority: { items: barrierPriorityList, active: undefined },
+				country: { items: countryList, active: [ mockCountry ], removeUrl: findABarrierResponse },
+				sector: { items: sectorList, active: undefined, removeUrl: findABarrierResponse },
+				type: { items: barrierTypeList, active: undefined, removeUrl: findABarrierResponse },
+				priority: { items: barrierPriorityList, active: undefined, removeUrl: findABarrierResponse },
 			} );
 			expect( countryList[ 2 ].selected ).toEqual( true );
 			expect( output.hasFilters ).toEqual( true );
@@ -209,10 +220,10 @@ describe( 'Find a barrier view model', () => {
 			expect( output.count ).toEqual( count );
 			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
 			expect( output.filters ).toEqual( {
-				country: { items: countryList, active: undefined },
-				sector: { items: sectorList, active: [ mockSector ] },
-				type: { items: barrierTypeList, active: undefined },
-				priority: { items: barrierPriorityList, active: undefined },
+				country: { items: countryList, active: undefined, removeUrl: findABarrierResponse },
+				sector: { items: sectorList, active: [ mockSector ], removeUrl: findABarrierResponse },
+				type: { items: barrierTypeList, active: undefined, removeUrl: findABarrierResponse },
+				priority: { items: barrierPriorityList, active: undefined, removeUrl: findABarrierResponse },
 			} );
 			expect( sectorList[ 2 ].selected ).toEqual( true );
 			expect( output.hasFilters ).toEqual( true );
@@ -236,8 +247,8 @@ describe( 'Find a barrier view model', () => {
 			expect( output.count ).toEqual( count );
 			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
 			expect( output.filters ).toEqual( {
-				country: { items: countryList, active: undefined },
-				sector: { items: sectorList, active: undefined },
+				country: { items: countryList, active: undefined, removeUrl: findABarrierResponse },
+				sector: { items: sectorList, active: undefined, removeUrl: findABarrierResponse },
 				type: {
 					items: barrierTypeList.map( ( item ) => {
 
@@ -247,9 +258,10 @@ describe( 'Find a barrier view model', () => {
 
 						return item;
 					} ),
-					active: [ { name: mockType.title } ]
+					active: [ { name: mockType.title } ],
+					removeUrl: findABarrierResponse
 				},
-				priority: { items: barrierPriorityList, active: undefined },
+				priority: { items: barrierPriorityList, active: undefined, removeUrl: findABarrierResponse },
 			} );
 			expect( output.hasFilters ).toEqual( true );
 		} );
@@ -272,9 +284,9 @@ describe( 'Find a barrier view model', () => {
 			expect( output.count ).toEqual( count );
 			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
 			expect( output.filters ).toEqual( {
-				country: { items: countryList, active: undefined },
-				sector: { items: sectorList, active: undefined },
-				type: { items: barrierTypeList, active: undefined },
+				country: { items: countryList, active: undefined, removeUrl: findABarrierResponse },
+				sector: { items: sectorList, active: undefined, removeUrl: findABarrierResponse },
+				type: { items: barrierTypeList, active: undefined, removeUrl: findABarrierResponse },
 				priority: {
 					items: barrierPriorityList.map( ( item ) => {
 
@@ -284,7 +296,8 @@ describe( 'Find a barrier view model', () => {
 
 						return item;
 					} ),
-					active: [ mockPriority ]
+					active: [ mockPriority ],
+					removeUrl: findABarrierResponse,
 				},
 			} );
 			expect( output.hasFilters ).toEqual( true );

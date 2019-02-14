@@ -82,6 +82,20 @@
 	}
 }
 
+.active-filters__item__link {
+
+	text-decoration: none;
+
+	&:after {
+		content: "\D7";
+		font-weight: bold;
+	}
+
+	&:visited {
+		color: $govuk-blue;
+	}
+}
+
 .filter-results-list__item__main-content {
 
 	@include mq( $from: 550px ){

@@ -36,13 +36,25 @@ const reportUrl = {
 	submit: ( reportId ) => `/reports/${ reportId }/submit/`,
 };
 
+function getParams( map ){
+
+	const params = [];
+
+	for( let [ key, value ] of Object.entries( map ) ){
+
+		params.push( key + '=' + value );
+	}
+
+	return ( params.length ? '?' + params.join( '&' ) : '' );
+}
+
 module.exports = {
 
 	index: () => '/',
 	login: () => '/login/',
 	me: () => '/me',
 	whatIsABarrier: () => '/what-is-a-barrier/',
-	findABarrier: () => '/find-a-barrier/',
+	findABarrier: ( params ) => '/find-a-barrier/' + ( params ? getParams( params ) : '' ),
 
 	documents: {
 		download: ( documentId ) => `/documents/${ documentId }/download/`,

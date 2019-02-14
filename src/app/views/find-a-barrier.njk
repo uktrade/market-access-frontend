@@ -92,15 +92,17 @@
 		</div>
 		<div class="govuk-grid-column-three-quarters">
 
-			{%- macro activeFilter( name, items ) -%}
-				{% if items.length %}
+			{%- macro activeFilter( name, filter ) -%}
+				{% if filter.active.length %}
 				<li class="active-filters__item">
-					<h4 class="active-filter__heading">{{ name }}:</h4>
-					<p class="active-filter__text">
-						{% for item in items %}
-						{{- item.name }}{{ ', ' if not loop.last -}}
-						{% endfor %}
-					</p>
+					<a href="{{ filter.removeUrl }}" class="active-filters__item__link" title="Remove {{ name }} filter">
+						<h4 class="active-filter__heading">{{ name }}:</h4>
+						<p class="active-filter__text">
+							{% for item in filter.active %}
+							{{- item.name }}{{ ', ' if not loop.last -}}
+							{% endfor %}
+						</p>
+					</a>
 				</li>
 				{% endif %}
 			{%- endmacro -%}
@@ -110,10 +112,10 @@
 				{% if hasFilters %}
 					<h3 class="visually-hidden">Active filters:</h3>
 					<ul class="active-filters">
-						{{ activeFilter( 'Barrier location', filters.country.active ) }}
-						{{ activeFilter( 'Sector', filters.sector.active ) }}
-						{{ activeFilter( 'Type', filters.type.active ) }}
-						{{ activeFilter( 'Priority', filters.priority.active ) }}
+						{{ activeFilter( 'Barrier location', filters.country ) }}
+						{{ activeFilter( 'Sector', filters.sector ) }}
+						{{ activeFilter( 'Type', filters.type ) }}
+						{{ activeFilter( 'Priority', filters.priority ) }}
 					</ul>
 					<a class="filter-results-clear-link" href="{{ urls.findABarrier() }}">Remove all filters</a>
 				{% endif %}

@@ -32,9 +32,20 @@ describe( 'URLs', () => {
 	} );
 
 	describe( 'Find a barrier', () => {
-		it( 'Should return the login path', () => {
+		describe( 'Without any filters', () => {
+			it( 'Should return the login path', () => {
 
-			expect( urls.findABarrier() ).toEqual( '/find-a-barrier/' );
+				expect( urls.findABarrier() ).toEqual( '/find-a-barrier/' );
+			} );
+		} );
+
+		describe( 'With filters', () => {
+			it( 'Should return the login path', () => {
+
+				expect( urls.findABarrier( {} ) ).toEqual( '/find-a-barrier/' );
+				expect( urls.findABarrier( { country: '1' } ) ).toEqual( '/find-a-barrier/?country=1' );
+				expect( urls.findABarrier( { country: '1', sector: '2' } ) ).toEqual( '/find-a-barrier/?country=1&sector=2' );
+			} );
 		} );
 	} );
 

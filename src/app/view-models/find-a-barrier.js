@@ -1,5 +1,6 @@
 const metadata = require( '../lib/metadata' );
 const sortGovukItems = require( '../lib/sort-govuk-items' );
+const urls = require( '../lib/urls' );
 
 const { OPEN, RESOLVED, HIBERNATED } = metadata.barrier.status.types;
 const barrierStatusTypeInfo = metadata.barrier.status.typeInfo;
@@ -20,6 +21,15 @@ function createMatcher( key ){
 			return item;
 		};
 	};
+}
+
+function getRemoveUrl( filters, key ){
+
+	const clone = { ...filters };
+
+	delete clone[ key ];
+
+	return urls.findABarrier( clone );
 }
 
 const isSelected = createMatcher( 'selected' );
@@ -64,10 +74,12 @@ module.exports = function( params ){
 			country: {
 				items: metadata.getCountryList( 'All locations' ).map( isSelected( filters.country ) ),
 				active: filters.country && filters.country.map( metadata.getCountry ),
+				removeUrl: getRemoveUrl( filters, 'country' ),
 			},
 			sector: {
 				items: metadata.getSectorList( 'All sectors' ).map( isSelected( filters.sector ) ),
 				active: filters.sector && filters.sector.map( metadata.getSector ),
+				removeUrl: getRemoveUrl( filters, 'sector' ),
 			},
 			type: {
 				items: metadata.getBarrierTypeList().sort( sortGovukItems.alphabetical ).map( isSelected( filters.type ) ),
@@ -77,10 +89,12 @@ module.exports = function( params ){
 
 					return { name: title };
 				} ),
+				removeUrl: getRemoveUrl( filters, 'type' ),
 			},
 			priority: {
 				items: metadata.getBarrierPrioritiesList( { suffix: false } ).map( isChecked( filters.priority ) ),
 				active: filters.priority && filters.priority.map( metadata.getBarrierPriority ),
+				removeUrl: getRemoveUrl( filters, 'priority' ),
 			},
 		}
 	};
