@@ -79,7 +79,7 @@ module.exports = function( params ){
 				} ),
 			},
 			priority: {
-				items: metadata.getBarrierPrioritiesList().map( isChecked( filters.priority ) ),
+				items: metadata.getBarrierPrioritiesList( { suffix: false } ).map( isChecked( filters.priority ) ),
 				active: filters.priority && filters.priority.map( metadata.getBarrierPriority ),
 			},
 		}

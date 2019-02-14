@@ -192,9 +192,9 @@ module.exports.getBarrierTypeList = () => {
 	return list;
 };
 
-module.exports.getBarrierPrioritiesList = () => barrierPriorities.map( ( { code, name } ) => ({
+module.exports.getBarrierPrioritiesList = ( opts = {} ) => barrierPriorities.map( ( { code, name } ) => ({
 	value: code,
-	html: `<span class="priority-marker priority-marker--${ code.toLowerCase() }"></span><strong>${ name }</strong> priority`
+	html: `<span class="priority-marker priority-marker--${ code.toLowerCase() }"></span>` + ( opts.suffix === false ? name : `<strong>${ name }</strong> priority` )
 }) );
 
 const OPEN = 2;

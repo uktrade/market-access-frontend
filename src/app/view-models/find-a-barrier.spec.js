@@ -137,7 +137,7 @@ describe( 'Find a barrier view model', () => {
 		expect( metadata.getCountryList ).toHaveBeenCalledWith( 'All locations' );
 		expect( metadata.getSectorList ).toHaveBeenCalledWith( 'All sectors' );
 		expect( metadata.getBarrierTypeList ).toHaveBeenCalledWith();
-		expect( metadata.getBarrierPrioritiesList ).toHaveBeenCalledWith();
+		expect( metadata.getBarrierPrioritiesList ).toHaveBeenCalledWith( { suffix: false } );
 		expect( sortGovukItems.alphabetical ).toHaveBeenCalled();
 	} );
 

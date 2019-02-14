@@ -389,12 +389,24 @@ describe( 'metadata', () => {
 			} );
 
 			describe( 'getBarrierPrioritiesList', () => {
-				it( 'Should return the list in the correct order', () => {
+				describe( 'Without any params', () => {
+					it( 'Should return the list in the correct order', () => {
 
-					expect( metadata.getBarrierPrioritiesList() ).toEqual( expectedOrder.map( ( { code, name } ) => ({
-						value: code,
-						html: `<span class="priority-marker priority-marker--${ code.toLowerCase() }"></span><strong>${ name }</strong> priority`
-					}) ) );
+						expect( metadata.getBarrierPrioritiesList() ).toEqual( expectedOrder.map( ( { code, name } ) => ({
+							value: code,
+							html: `<span class="priority-marker priority-marker--${ code.toLowerCase() }"></span><strong>${ name }</strong> priority`
+						}) ) );
+					} );
+				} );
+
+				describe( 'With suffix: false', () => {
+					it( 'Should return the list in the correct order without a suffix', () => {
+
+						expect( metadata.getBarrierPrioritiesList( { suffix: false } ) ).toEqual( expectedOrder.map( ( { code, name } ) => ({
+							value: code,
+							html: `<span class="priority-marker priority-marker--${ code.toLowerCase() }"></span>${ name }`
+						}) ) );
+					} );
 				} );
 			} );
 		} );
