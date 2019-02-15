@@ -34,6 +34,7 @@ describe( 'Find a barrier controller', () => {
 			isCountry: jasmine.createSpy( 'validators.isCountry' ),
 			isSector: jasmine.createSpy( 'validators.isSector' ),
 			isBarrierType: jasmine.createSpy( 'validators.isBarrierType' ),
+			isBarrierPriority: jasmine.createSpy( 'validators.isBarrierPriority' ),
 		};
 
 		controller = proxyquire( modulePath, {
@@ -97,7 +98,7 @@ describe( 'Find a barrier controller', () => {
 
 					await controller( req, res, next );
 
-					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { country } );
+					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { country: [ country ] } );
 				} );
 			} );
 
@@ -145,7 +146,7 @@ describe( 'Find a barrier controller', () => {
 
 					await controller( req, res, next );
 
-					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { sector } );
+					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { sector: [ sector ] } );
 				} );
 			} );
 
@@ -193,7 +194,7 @@ describe( 'Find a barrier controller', () => {
 
 					await controller( req, res, next );
 
-					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { type } );
+					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { type: [ type ] } );
 				} );
 			} );
 
@@ -205,6 +206,112 @@ describe( 'Find a barrier controller', () => {
 					await controller( req, res, next );
 
 					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, {} );
+				} );
+			} );
+		} );
+
+		describe( 'With a priority filter', () => {
+
+			let priority;
+			let viewModelResponse;
+
+			beforeEach( () => {
+
+				viewModelResponse = { a: 1, b: 2 };
+
+				viewModel.and.callFake( () => viewModelResponse );
+
+				backend.barriers.getAll.and.callFake( () => ({
+					response: { isSuccess: true },
+					body: jasmine.helpers.getFakeData( '/backend/barriers/' )
+				}) );
+			} );
+
+			afterEach( () => {
+
+				expect( res.render ).toHaveBeenCalledWith( template, viewModelResponse );
+				expect( next ).not.toHaveBeenCalled();
+			} );
+
+			describe( 'A single value', () => {
+
+				beforeEach( () => {
+
+					priority = faker.lorem.word().toUpperCase();
+					req.query.priority = priority;
+				} );
+
+				describe( 'When the priority is valid', () => {
+					it( 'Should render the template with a filter', async () => {
+
+						validators.isBarrierPriority.and.callFake( () => true );
+
+						await controller( req, res, next );
+
+						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { priority: [ priority ] } );
+					} );
+				} );
+
+				describe( 'When the priority is NOT valid', () => {
+					it( 'Should render the template without filters', async () => {
+
+						validators.isBarrierPriority.and.callFake( () => false );
+
+						await controller( req, res, next );
+
+						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, {} );
+					} );
+				} );
+			} );
+
+			describe( 'Multiple values', () => {
+
+				beforeEach( () => {
+					priority = [ faker.lorem.word().toUpperCase(), faker.lorem.word().toUpperCase() ];
+					req.query.priority = priority;
+				} );
+
+				describe( 'When all priorities are valid', () => {
+					it( 'Should render the template with a filter', async () => {
+
+						validators.isBarrierPriority.and.callFake( () => true );
+
+						await controller( req, res, next );
+
+						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { priority } );
+					} );
+				} );
+
+				describe( 'When all priorities are NOT valid', () => {
+					it( 'Should render the template without filters', async () => {
+
+						validators.isBarrierPriority.and.callFake( () => false );
+
+						await controller( req, res, next );
+
+						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, {} );
+					} );
+				} );
+
+				describe( 'When one priority is valid and one is not', () => {
+					it( 'Should render the template with a filter', async () => {
+
+						const validPriorities = priority;
+						const invalidPriority = faker.lorem.word().toUpperCase();
+
+						req.query.priority = validPriorities.concat( [ invalidPriority ] );
+
+						validators.isBarrierPriority.and.callFake( ( value ) => {
+
+							if( validPriorities.includes( value ) ){ return true; }
+
+							return false;
+						} );
+
+						await controller( req, res, next );
+
+						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { priority: validPriorities } );
+					} );
 				} );
 			} );
 		} );

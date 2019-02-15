@@ -1,5 +1,6 @@
-{% from 'app-components/heading.njk' import heading %}
 {% from 'components/select/macro.njk' import govukSelect %}
+{% from 'app-components/heading.njk' import heading %}
+{% from 'app-components/multiselect.njk' import multiselect %}
 
 {% extends 'layout.njk' %}
 
@@ -27,37 +28,63 @@
 					id: 'country',
 					name: 'country',
 					classes: 'govuk-!-width-full js-filter',
+					formGroup: {
+						classes: 'filter-items-group'
+					},
 					label: {
 						text: 'Barrier location',
 						classes: 'filter-items__label'
 					},
-					items: filters.country
+					items: filters.country.items
 				}) }}
 
 				{{ govukSelect({
 					id: 'sector',
 					name: 'sector',
 					classes: 'govuk-!-width-full js-filter',
+					formGroup: {
+						classes: 'filter-items-group'
+					},
 					label: {
 						text: 'Sector',
 						classes: 'filter-items__label'
 					},
-					items: filters.sector
+					items: filters.sector.items
 				}) }}
 
 				{{ govukSelect({
 					id: 'type',
 					name: 'type',
 					classes: 'govuk-!-width-full js-filter',
+					formGroup: {
+						classes: 'filter-items-group'
+					},
 					label: {
 						text: 'Barrier type',
 						classes: 'filter-items__label'
 					},
-					items: filters.type
+					items: filters.type.items
 				}) }}
 
+				{{ multiselect({
+					id: 'priority',
+					name: 'priority',
+					classes: 'govuk-!-width-full js-filter-group',
+					formGroup: {
+						classes: 'filter-group'
+					},
+					fieldset: {
+						classes: 'filter-group__inner',
+						legend: {
+							text: "Barrier priority",
+							classes: "filter-items__label filter-group__label"
+						}
+					},
+					items: filters.priority.items
+				})	}}
+
 				{% if hasFilters %}
-				<a class="filter-items__clear js-filter-clear" href="{{ urls.findABarrier() }}">Clear filters</a>
+				<a class="filter-items__clear" href="{{ urls.findABarrier() }}">Remove all filters</a>
 				{% endif %}
 
 				<input type="submit" value="Apply filters" class="govuk-button govuk-button--full-width js-filter-submit">
@@ -65,17 +92,52 @@
 		</div>
 		<div class="govuk-grid-column-three-quarters">
 
-			<h2 class="filter-results-title">{{ count }} <span class="filter-results-title__caption">barrier{{ 's' if count != 1 }}</span></h2>
+			{%- macro activeFilter( name, filter ) -%}
+				{% if filter.active.length %}
+				<li class="active-filters__item">
+					<a href="{{ filter.removeUrl }}" class="active-filters__item__link" title="Remove {{ name }} filter">
+						<h4 class="active-filter__heading">{{ name }}:</h4>
+						<p class="active-filter__text">
+							{% for item in filter.active %}
+							{{- item.name }}{{ ', ' if not loop.last -}}
+							{% endfor %}
+						</p>
+					</a>
+				</li>
+				{% endif %}
+			{%- endmacro -%}
+
+			<div class="filter-results-header">
+				<h2 class="filter-results-title">{{ count }}<span class="filter-results-title__caption"> barrier{{ 's' if count != 1 }}</span></h2>
+				{% if hasFilters %}
+					<h3 class="visually-hidden">Active filters:</h3>
+					<ul class="active-filters">
+						{{ activeFilter( 'Barrier location', filters.country ) }}
+						{{ activeFilter( 'Sector', filters.sector ) }}
+						{{ activeFilter( 'Type', filters.type ) }}
+						{{ activeFilter( 'Priority', filters.priority ) }}
+					</ul>
+					<a class="filter-results-clear-link" href="{{ urls.findABarrier() }}">Remove all filters</a>
+				{% endif %}
+			</div>
 			<ol class="filter-results-list">
 				{% for barrier in barriers %}
 					<li class='filter-results-list__item'>
 						<div class="filter-results-list__item__main-content">
 							<h3 class='filter-results-list__item__heading'><a href="{{ urls.barriers.detail( barrier.id ) }}">{{ barrier.title }}</a></h3>
 							<dl class="filter-results-list__item__definitions">
+
+								<dt class="filter-results-list__item__definitions__key visually-hidden">ID:</dt>
+								<dd class="filter-results-list__item__definitions__value">{{ barrier.code }}</dd>
+
+								<dt class="filter-results-list__item__definitions__key">Added:</dt>
+								<dd class="filter-results-list__item__definitions__value">{{ barrier.date.reported | dateOnly }}</dd>
+
 								{% if barrier.sectors.length %}
 								<dt class="filter-results-list__item__definitions__key">Sector{{ 's' if barrier.sectorsList.length != 1 }} affected:</dt>
 								<dd class="filter-results-list__item__definitions__value">{{ barrier.sectorsList | join( ', ' ) }}</dd>
 								{% endif %}
+
 								<dt class="filter-results-list__item__definitions__key">Barrier location:</dt>
 								<dd class="filter-results-list__item__definitions__value">{{ barrier.country.name }}</dd>
 							</dl>
@@ -88,10 +150,9 @@
 								</span>
 							</li>
 							<li class="filter-results-list__item__sub-content__item">
-								<span class="visually-hidden">ID: </span>{{ barrier.code }}
-							</li>
-							<li class="filter-results-list__item__sub-content__item">
-								<span class="muted">Added </span>{{ barrier.date.reported | dateOnly }}
+								<span class="priority-marker-wrapper">
+									<span class="priority-marker priority-marker--{{ barrier.priority.code.toLowerCase() }}"></span><strong>{{ barrier.priority.name }}</strong> priority
+								</span>
 							</li>
 						</ul>
 					</li>

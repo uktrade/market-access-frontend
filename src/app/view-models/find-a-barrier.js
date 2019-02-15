@@ -1,23 +1,39 @@
 const metadata = require( '../lib/metadata' );
 const sortGovukItems = require( '../lib/sort-govuk-items' );
+const urls = require( '../lib/urls' );
 
 const { OPEN, RESOLVED, HIBERNATED } = metadata.barrier.status.types;
 const barrierStatusTypeInfo = metadata.barrier.status.typeInfo;
 
-function isSelected( value ){
+function createMatcher( key ){
 
-	return ( item ) => {
+	return function matcher( values = [] ){
 
-		// need to use Abstract Equality Comparison
-		// query params are always strings so ensure they match numbers etc
-		if( item.value == value ){
+		return ( item ) => {
 
-			item.selected = true;
-		}
+			const value = String( item.value ); // query params are always strings so cast value to a string to ensure they match numbers etc
 
-		return item;
+			if( values.includes( value ) ){ // .includes uses Same-value-zero equality matching
+
+				item[ key ] = true;
+			}
+
+			return item;
+		};
 	};
 }
+
+function getRemoveUrl( filters, key ){
+
+	const clone = { ...filters };
+
+	delete clone[ key ];
+
+	return urls.findABarrier( clone );
+}
+
+const isSelected = createMatcher( 'selected' );
+const isChecked = createMatcher( 'checked' );
 
 module.exports = function( params ){
 
@@ -41,6 +57,7 @@ module.exports = function( params ){
 			sectors,
 			sectorsList: sectors.map( ( sector ) => sector.name ),
 			status,
+			priority: barrier.priority,
 			date: {
 				reported: barrier.reported_on,
 				status: barrier.current_status.status_date,
@@ -54,9 +71,31 @@ module.exports = function( params ){
 		barriers: barrierList,
 		hasFilters: !!Object.keys( filters ).length,
 		filters: {
-			country: metadata.getCountryList( 'All locations' ).map( isSelected( filters.country ) ),
-			sector: metadata.getSectorList( 'All sectors' ).map( isSelected( filters.sector ) ),
-			type: metadata.getBarrierTypeList().sort( sortGovukItems.alphabetical ).map( isSelected( filters.type ) ),
+			country: {
+				items: metadata.getCountryList( 'All locations' ).map( isSelected( filters.country ) ),
+				active: filters.country && filters.country.map( metadata.getCountry ),
+				removeUrl: getRemoveUrl( filters, 'country' ),
+			},
+			sector: {
+				items: metadata.getSectorList( 'All sectors' ).map( isSelected( filters.sector ) ),
+				active: filters.sector && filters.sector.map( metadata.getSector ),
+				removeUrl: getRemoveUrl( filters, 'sector' ),
+			},
+			type: {
+				items: metadata.getBarrierTypeList().sort( sortGovukItems.alphabetical ).map( isSelected( filters.type ) ),
+				active: filters.type && filters.type.map( ( id ) => {
+
+					const { title } = metadata.getBarrierType( id );
+
+					return { name: title };
+				} ),
+				removeUrl: getRemoveUrl( filters, 'type' ),
+			},
+			priority: {
+				items: metadata.getBarrierPrioritiesList( { suffix: false } ).map( isChecked( filters.priority ) ),
+				active: filters.priority && filters.priority.map( metadata.getBarrierPriority ),
+				removeUrl: getRemoveUrl( filters, 'priority' ),
+			},
 		}
 	};
 };
