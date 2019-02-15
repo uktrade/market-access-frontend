@@ -1,6 +1,5 @@
 {% from 'app-components/heading.njk' import heading %}
 {% from 'components/select/macro.njk' import govukSelect %}
-{% from "components/checkboxes/macro.njk" import govukCheckboxes %}
 
 {% extends 'layout.njk' %}
 
@@ -55,28 +54,7 @@
 						classes: 'filter-items__label'
 					},
 					items: filters.type
-				}) }}
-
-				{{ govukCheckboxes({
-					idPrefix: "waste",
-					name: "euExitRelated",
-					fieldset: {
-						legend: {
-						text: "Related to EU exit",
-						classes: "filter-items__label"
-						}
-					},
-					items: [
-						{
-						value: true,
-						text: "Yes"
-						},
-						{
-						value: false,
-						text: "No"
-						}
-					]
-				}) }}
+				}) }
 
 				{% if hasFilters %}
 				<a class="filter-items__clear js-filter-clear" href="{{ urls.findABarrier() }}">Clear filters</a>

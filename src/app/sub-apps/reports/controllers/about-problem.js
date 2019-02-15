@@ -39,8 +39,8 @@ module.exports = async ( req, res, next ) => {
 			required: 'Enter a title for this barrier'
 		},
 
-		isEuExit: {
-			values: [report.is_eu_exit],
+		euExitRelated: {
+			values: [report.eu_exit_related],
 			required: 'Select whether this is EU exit related or not'
 		},
 	};
