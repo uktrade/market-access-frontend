@@ -1,6 +1,7 @@
 ma.pages.findABarrier = (function( doc, jessie ){
 
 	var filterClass = 'js-filter';
+	var filterGroupClass = 'js-filter-group';
 	var submitClass = 'js-filter-submit';
 
 	function hasSelectChanged( select ){
@@ -24,6 +25,11 @@ ma.pages.findABarrier = (function( doc, jessie ){
 		return changed;
 	}
 
+	function hasCheckboxChanged( input ){
+
+		return input.checked !== input.defaultChecked;
+	}
+
 	function filtersHaveChanged( filters ){
 
 		var i = 0;
@@ -37,6 +43,10 @@ ma.pages.findABarrier = (function( doc, jessie ){
 				case 'select-one':
 					changed = hasSelectChanged( filter );
 				break;
+
+				case 'checkbox':
+					changed = hasCheckboxChanged( filter );
+				break;
 			}
 
 			if( changed ){ break; }
@@ -49,20 +59,28 @@ ma.pages.findABarrier = (function( doc, jessie ){
 
 		if( !( jessie.query && jessie.queryOne && jessie.attachListener ) ){ return; }
 
-		var filters = jessie.query( '.' + filterClass );
+		var singleFilters = jessie.query( '.' + filterClass );
+		var groupFilterContainer = jessie.query( '.' + filterGroupClass );
+		var groupFilters = jessie.query( '.' + filterGroupClass + ' input' );
 		var submit = jessie.queryOne( '.' + submitClass );
 
 		var i = 0;
 		var filter;
+		var filters = singleFilters.concat( groupFilters );
 
 		function handleChange(){
 
-			if( filtersHaveChanged( filters ) ){
-				submit.disabled = false;
-			}
+			submit.disabled = !filtersHaveChanged( filters );
 		}
 
-		while( ( filter = filters[ i++ ] ) ){
+		while( ( filter = singleFilters[ i++ ] ) ){
+
+			jessie.attachListener( filter, 'change', handleChange );
+		}
+
+		i = 0;
+
+		while( ( filter = groupFilterContainer[ i++ ] ) ){
 
 			jessie.attachListener( filter, 'change', handleChange );
 		}
@@ -70,5 +88,9 @@ ma.pages.findABarrier = (function( doc, jessie ){
 		if( !filtersHaveChanged( filters ) ){
 			submit.disabled = true;
 		}
+
+		singleFilters = null;
+		groupFilterContainer = null;
+		groupFilters = null;
 	};
 }( document, jessie ));

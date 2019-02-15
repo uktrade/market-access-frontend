@@ -6,6 +6,7 @@ describe( 'validators', () => {
 
 	let validators;
 	let metadata;
+	let config;
 
 	beforeEach( () => {
 
@@ -20,8 +21,15 @@ describe( 'validators', () => {
 			barrierPriorities: [ { code: 'abc', name: 'test 1' }, { code: 'def', name: 'test 2' } ],
 		};
 
+		config = {
+			files: {
+				types: [ 'text/plain' ]
+			}
+		};
+
 		validators = proxyquire( modulePath, {
-			'./metadata': metadata
+			'./metadata': metadata,
+			'../config': config
 		} );
 	} );
 
@@ -333,6 +341,22 @@ describe( 'validators', () => {
 
 					expect( validators.isDateNumeric( { year: '2000', month: '10', day: 'abc' } ) ).toEqual( false );
 				} );
+			} );
+		} );
+	} );
+
+	describe( 'isValidFile', () => {
+		describe( 'With a valid priority', () => {
+			it( 'Should return true', () => {
+
+				expect( validators.isValidFile( { type: 'text/plain' } ) ).toEqual( true );
+			} );
+		} );
+
+		describe( 'Without a valid priority', () => {
+			it( 'Should return false', () => {
+
+				expect( validators.isValidFile( { type: 'xyz' } ) ).toEqual( false );
 			} );
 		} );
 	} );

@@ -322,6 +322,13 @@ describe( 'metadata', () => {
 			} );
 		} );
 
+		describe( 'getBarrierType', () => {
+			it( 'Should return the list', () => {
+
+				expect( metadata.getBarrierType( fakeData.barrier_types[ 3 ].id ) ).toEqual( fakeData.barrier_types[ 3 ] );
+			} );
+		} );
+
 		describe( 'getBarrierTypeList', () => {
 			it( 'Should return the list', () => {
 
@@ -338,6 +345,19 @@ describe( 'metadata', () => {
 
 				expect( metadata.barrierSource ).toBeDefined();
 				expect( metadata.barrierSource ).toEqual( fakeData.barrier_source );
+			} );
+		} );
+
+		describe( 'getBarrierPriority', () => {
+			it( 'Should return the list', () => {
+
+				const item = fakeData.barrier_priorities[ 2 ];
+				const expected = {
+					...item,
+					modifyer: item.code.toLowerCase()
+				};
+
+				expect( metadata.getBarrierPriority( item.code ) ).toEqual( expected );
 			} );
 		} );
 
@@ -369,12 +389,24 @@ describe( 'metadata', () => {
 			} );
 
 			describe( 'getBarrierPrioritiesList', () => {
-				it( 'Should return the list in the correct order', () => {
+				describe( 'Without any params', () => {
+					it( 'Should return the list in the correct order', () => {
 
-					expect( metadata.getBarrierPrioritiesList() ).toEqual( expectedOrder.map( ( { code, name } ) => ({
-						value: code,
-						html: `<span class="priority-marker priority-marker--${ code.toLowerCase() }"></span><strong>${ name }</strong> priority`
-					}) ) );
+						expect( metadata.getBarrierPrioritiesList() ).toEqual( expectedOrder.map( ( { code, name } ) => ({
+							value: code,
+							html: `<span class="priority-marker priority-marker--${ code.toLowerCase() }"></span><strong>${ name }</strong> priority`
+						}) ) );
+					} );
+				} );
+
+				describe( 'With suffix: false', () => {
+					it( 'Should return the list in the correct order without a suffix', () => {
+
+						expect( metadata.getBarrierPrioritiesList( { suffix: false } ) ).toEqual( expectedOrder.map( ( { code, name } ) => ({
+							value: code,
+							html: `<span class="priority-marker priority-marker--${ code.toLowerCase() }"></span>${ name }`
+						}) ) );
+					} );
 				} );
 			} );
 		} );

@@ -120,7 +120,8 @@ function getFilterParams( filters ){
 		'export_country': 'country',
 		'sector': 'sector',
 		'barrier_type': 'type',
-		'status': 'status'
+		'status': 'status',
+		'priority': 'priority',
 		//'start_date': 'date-start',
 		//'end_date': 'date-end',
 	};
