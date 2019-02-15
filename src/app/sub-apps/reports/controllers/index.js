@@ -57,7 +57,6 @@ module.exports = {
 	submit: async ( req, res, next ) => {
 
 		const reportId = req.report.id;
-
 		try {
 
 			const { response } = await	backend.reports.submit( req, reportId );

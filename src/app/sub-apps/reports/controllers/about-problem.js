@@ -38,6 +38,11 @@ module.exports = async ( req, res, next ) => {
 			values: [ report.barrier_title ],
 			required: 'Enter a title for this barrier'
 		},
+
+		isEuExit: {
+			values: [report.is_eu_exit],
+			required: 'Select whether this is EU exit related or not'
+		},
 	};
 
 	const form = new Form( req, formConfig );
