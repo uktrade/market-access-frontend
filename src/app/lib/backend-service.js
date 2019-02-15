@@ -275,7 +275,7 @@ module.exports = {
 			priority_summary: getValue( values.priorityDescription )
 		} ),
 		saveEuExitRelated: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
-			eu_exit_related: values.eu_exit_related,
+			is_eu_exit: values.isEuExit,
 		}),
 		saveStatus: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
 			problem_status: values.status
@@ -309,6 +309,7 @@ module.exports = {
 			product: getValue( values.item ),
 			barrier_title: getValue( values.barrierTitle ),
 			source: getValue( values.barrierSource ),
+			is_eu_exit: getValue( values.isEuExit),
 			other_source: getValue( values.barrierSourceOther ),
 		} ),
 		saveSummaryAndSubmit: async ( req, reportId, values ) => {
