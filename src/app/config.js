@@ -57,6 +57,10 @@ let config = {
 	isCi,
 	logLevel,
 	isDebug: ( logLevel === 'debug' ),
+	environment: {
+		banner: bool( "ENV_BANNER", false ),
+		name: env( 'ENV_NAME' ),
+	},
 	showErrors: isDev,
 	addCompany: bool( 'ADD_COMPANY', false ),
 	assignDefaultCountry: bool( 'ASSIGN_DEFAULT_COUNTRY', false ),
@@ -70,6 +74,9 @@ let config = {
 	datahubDomain: env( 'DATA_HUB_DOMAIN', 'https://www.datahub.trade.gov.uk' ),
 	views: {
 		cache: bool( 'CACHE_VIEWS', true )
+	},
+	reports: {
+		summaryLimit: number( 'REPORT_SUMMARY_LIMIT', 300 ),
 	},
 	files: {
 		maxSize: number( 'FILE_MAX_SIZE', ( 5 * 1024 * 1024 ) ),

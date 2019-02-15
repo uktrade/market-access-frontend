@@ -101,7 +101,7 @@ describe( 'Reports view model', () => {
 			}
 		} );
 
-		it( 'Should sort them', () => {
+		it( 'Should not sort them', () => {
 
 			reports[ 3 ].created_on = 'Thur, 30 Aug 2018 08:19:05 GMT';
 			reports[ 0 ].created_on = 'Tue, 28 Aug 2018 08:19:05 GMT';
@@ -110,10 +110,10 @@ describe( 'Reports view model', () => {
 
 			const output = viewModel( getReports() );
 
-			expect( output.reports[ 0 ].id ).toEqual( 4 );
-			expect( output.reports[ 1 ].id ).toEqual( 1 );
+			expect( output.reports[ 0 ].id ).toEqual( 1 );
+			expect( output.reports[ 1 ].id ).toEqual( 2 );
 			expect( output.reports[ 2 ].id ).toEqual( 3 );
-			expect( output.reports[ 3 ].id ).toEqual( 2 );
+			expect( output.reports[ 3 ].id ).toEqual( 4 );
 		} );
 	} );
 

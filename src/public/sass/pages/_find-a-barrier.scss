@@ -112,6 +112,7 @@
 
 	@include mq( $from: tablet ){
 		margin-bottom: 0;
+		width: 65%;
 	}
 }
 

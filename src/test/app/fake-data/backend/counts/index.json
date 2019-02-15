@@ -1,16 +1,22 @@
 {
    "barriers": {
-      "total": 22,
+      "total": 2,
       "open": 5,
-      "resolved": 17
+      "paused": 1,
+      "resolved": 14
    },
-   "reports": 15,
+   "reports": 9,
    "user": {
-      "barriers": 1,
+      "barriers": 10,
       "reports": 4,
       "country": {
-         "barriers": 9,
-         "reports": 5
+         "barriers": {
+            "total": 8,
+            "open": 6,
+            "paused": 10,
+            "resolved": 18
+         },
+         "reports": 13
       }
    }
 }

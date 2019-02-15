@@ -109,51 +109,6 @@
 			} )
 		}}
 
-		{% if isResolved %}
-
-			{{ govukTextarea( {
-
-				label: {
-					text: 'Provide a summary of the problem and how you became aware of it',
-					classes: 'govuk-label--s'
-				},
-				id: 'description',
-				name: 'description',
-				value: description,
-				errorMessage: errors | errorForName( 'description' )
-			} ) }}
-
-			{{ govukTextarea( {
-
-			label: {
-				text: 'How did you resolve the problem?',
-				classes: 'govuk-label--s'
-			},
-			id: 'resolved-description',
-			name: 'resolvedDescription',
-			value: resolvedDescription,
-			errorMessage: errors | errorForName( 'resolved-description' )
-		} ) }}
-
-		{% else %}
-
-			{{ govukTextarea( {
-
-				label: {
-					text: 'Provide a summary of the problem',
-					classes: 'govuk-label--s'
-				},
-				id: 'description',
-				name: 'description',
-				value: description,
-				hint: {
-					text: 'Include what you have done so far and who you have discussed the problem with.'
-				},
-				errorMessage: errors | errorForName( 'description' )
-			} ) }}
-
-		{% endif %}
-
 		<input type="submit" class="govuk-button" value="Save and continue">
 		<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>
 

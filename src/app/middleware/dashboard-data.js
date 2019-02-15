@@ -1,6 +1,13 @@
 const backend = require( '../lib/backend-service' );
 const reporter = require( '../lib/reporter' );
 
+function getBarrierCount( barriers ){
+
+	const isNumber = ( typeof barriers === 'number' );
+
+	return isNumber ? barriers : ( barriers && ( ( barriers.paused || 0 ) + barriers.open ) );
+}
+
 module.exports = async ( req, res, next ) => {
 
 	const hasCountry = req.user && req.user.country && req.user.country.id;
@@ -28,7 +35,7 @@ module.exports = async ( req, res, next ) => {
 			const user = body.user;
 			const reports = body.reports;
 
-			all = ( barriers && barriers.total );
+			all = getBarrierCount( barriers );
 			country = ( user && user.country );
 			unfinished = reports;
 
@@ -48,7 +55,7 @@ module.exports = async ( req, res, next ) => {
 
 		tabs.country = {
 			skip: false,
-			count: ( country && country.barriers )
+			count: getBarrierCount( country && country.barriers )
 		};
 
 		unfinished = ( country && country.reports );
