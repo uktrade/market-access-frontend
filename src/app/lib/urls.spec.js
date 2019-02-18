@@ -130,7 +130,7 @@ describe( 'URLs', () => {
 			describe( 'eu exit related', () => {
 				it( 'Should return the correct path', () => {
 
-					expect( urls.barriers.edit.eu_exit_related( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/eu-exit-related/` );
+					expect( urls.barriers.edit.euExitRelated( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/eu-exit-related/` );
 				});
 			});
 			describe( 'status', () => {

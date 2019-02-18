@@ -14,7 +14,7 @@
 		errors: errors
 	}) }}
 
-	<form action="{{ urls.barriers.edit.eu_exit_related( barrier.id ) }}" method="POST" class="restrict-width">
+	<form action="{{ urls.barriers.edit.euExitRelated( barrier.id ) }}" method="POST" class="restrict-width">
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
 		{{ govukRadios({

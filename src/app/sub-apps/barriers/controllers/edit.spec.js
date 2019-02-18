@@ -494,7 +494,7 @@ describe( 'Edit barrier controller', () => {
 
 		it( 'Should configure the Form correctly', async () => {
 
-			await controller.eu_exit_related( req, res, next );
+			await controller.euExitRelated( req, res, next );
 
 			const config = Form.calls.argsFor( 0 )[ 1 ];
 
@@ -506,7 +506,7 @@ describe( 'Edit barrier controller', () => {
 
 		it( 'Should configure the FormProcessor correctly', async () => {
 
-			await controller.eu_exit_related( req, res );
+			await controller.euExitRelated( req, res );
 
 			const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
 			const templateValues = { abc: '123' };
@@ -537,7 +537,7 @@ describe( 'Edit barrier controller', () => {
 		describe( 'When the processor does not throw an error', () => {
 			it( 'Should not call next', async () => {
 
-				await controller.eu_exit_related( req, res, next );
+				await controller.euExitRelated( req, res, next );
 
 				expect( next ).not.toHaveBeenCalled();
 			} );
@@ -550,7 +550,7 @@ describe( 'Edit barrier controller', () => {
 
 				processor.process.and.callFake( () => { throw err; } );
 
-				await controller.eu_exit_related( req, res, next );
+				await controller.euExitRelated( req, res, next );
 
 				expect( next ).toHaveBeenCalledWith( err );
 			} );

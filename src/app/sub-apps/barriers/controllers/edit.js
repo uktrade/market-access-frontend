@@ -178,7 +178,7 @@ module.exports = {
 			next( e );
 		}
 	}, 
-	eu_exit_related: async ( req, res, next ) => {
+	euExitRelated: async ( req, res, next ) => {
 
 		const barrier = req.barrier;
 		const form = new Form( req, {
