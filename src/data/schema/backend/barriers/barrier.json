@@ -83,6 +83,8 @@
 			"faker": "lorem.words"
 		},
 
+		"eu_exit_related": { "$ref": "$refs/common.json#/boolean" },
+
 		"problem_description": { "$ref": "$refs/common.json#/paragraph" },
 		"priority": { "$ref": "$refs/common.json#/priority" },
 
