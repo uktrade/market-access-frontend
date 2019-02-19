@@ -28,6 +28,16 @@ module.exports = ( barrier, addCompany = false ) => {
 	const sectorsList = sectors.map( ( sector ) => ( sector && { text: sector.name } || { text: 'Unknown' } ) );
 	const companies = barrier.companies || [];
 	const companiesList = companies.map( ( company ) => ( { text: company.name } ) );
+	const euExitRelated = (item) => {
+		switch (item) {
+			case false:
+				return "No";
+			case true:
+				return "Yes";
+			default:
+				return "Unknown";
+		}
+	};
 
 	status.description = barrier.current_status.status_summary;
 	status.date = barrier.current_status.status_date;
@@ -50,7 +60,7 @@ module.exports = ( barrier, addCompany = false ) => {
 			status,
 			reportedOn: barrier.reported_on,
 			addedBy: barrier.reported_by,
-			euExitRelated: barrier.eu_exit_related ? "Yes" : "No",
+			euExitRelated: euExitRelated(barrier.eu_exit_related),
 			country: metadata.getCountry( barrier.export_country ),
 			sectors,
 			source: {

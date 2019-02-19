@@ -192,6 +192,18 @@ describe( 'Barrier detail view model', () => {
 		} );
 	} );
 
+	describe( 'A barrier with no eu exit relation', () => {
+		it( 'Should have the correct properties', () => {
+
+			inputBarrier.eu_exit_related = null;
+
+			const output = viewModel( inputBarrier );
+			const outputBarrier = output.barrier;
+
+			expect( outputBarrier.euExitRelated ).toEqual( "Unknown" );
+		} );
+	} );
+
 	describe( 'A hibernated barrier', () => {
 		it( 'Should have the correct properties', () => {
 
