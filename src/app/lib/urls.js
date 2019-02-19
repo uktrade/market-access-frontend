@@ -70,6 +70,7 @@ module.exports = {
 			description: ( barrierId ) => `/barriers/${ barrierId }/edit/description/`,
 			source: ( barrierId ) => `/barriers/${ barrierId }/edit/source/`,
 			priority: ( barrierId ) => `/barriers/${ barrierId }/edit/priority/`,
+			euExitRelated: (barrierId) => `/barriers/${barrierId}/edit/eu-exit-related/`,
 			status: ( barrierId ) => `/barriers/${ barrierId }/edit/status/`,
 		},
 		notes: {

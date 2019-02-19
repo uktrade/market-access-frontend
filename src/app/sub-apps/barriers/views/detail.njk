@@ -66,6 +66,14 @@
 				html: barrier.problem.status,
 				edit: {
 					href: urls.barriers.edit.status( barrier.id )
+				},
+				halfWidth: true
+			},{
+				title: 'Related to EU Exit',
+				html: barrier.euExitRelated,
+				halfWidth: true,
+				edit: {
+					href: urls.barriers.edit.euExitRelated( barrier.id )
 				}
 			},{
 				title: 'Company or organisation affected',

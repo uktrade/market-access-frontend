@@ -60,6 +60,7 @@ describe( 'Edit barrier controller', () => {
 				saveDescription: jasmine.createSpy( 'backend.barriers.saveDescription' ),
 				saveSource: jasmine.createSpy( 'backend.barriers.saveSource' ),
 				savePriority: jasmine.createSpy( 'backend.barriers.savePriority' ),
+				saveEuExitRelated: jasmine.createSpy( 'backend.barriers.saveEuExitRelated' ),
 				saveStatus: jasmine.createSpy( 'backend.barriers.saveStatus' ),
 			}
 		};
@@ -476,6 +477,86 @@ describe( 'Edit barrier controller', () => {
 		} );
 	} );
 
+	describe( 'EU exit related', () => {
+
+		const template = 'barriers/views/edit/eu-exit-related';
+		let barrier;
+		let getBarrierEuExitRelatedResponse;
+
+		beforeEach( () => {
+
+			getBarrierEuExitRelatedResponse = [ { value: true, text: 'Yes' }, { value: false, text: 'No' } ];
+			barrier = jasmine.helpers.getFakeData( '/backend/barriers/barrier' );
+			metadata.getBarrierPrioritiesList.and.callFake( () => getBarrierEuExitRelatedResponse );
+
+			req.barrier = barrier;
+		} );
+
+		it( 'Should configure the Form correctly', async () => {
+
+			await controller.euExitRelated( req, res, next );
+
+			const config = Form.calls.argsFor( 0 )[ 1 ];
+
+			expect( config.eu_exit_related ).toBeDefined();
+			expect( config.eu_exit_related.type ).toEqual( RADIO );
+			expect( config.eu_exit_related.values ).toEqual( [ barrier.eu_exit_related ] );
+			expect( config.eu_exit_related.items ).toEqual( getBarrierEuExitRelatedResponse );
+		});
+
+		it( 'Should configure the FormProcessor correctly', async () => {
+
+			await controller.euExitRelated( req, res );
+
+			const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
+			const templateValues = { abc: '123' };
+			const formValues = { def: 456 };
+			const detailResponse = '/barrier/details';
+
+			expect( config.form ).toEqual( form );
+			expect( typeof config.render ).toEqual( 'function' );
+			expect( typeof config.saveFormData ).toEqual( 'function' );
+			expect( typeof config.saved ).toEqual( 'function' );
+
+			config.render( templateValues );
+
+			expect( res.render ).toHaveBeenCalledWith( template, templateValues );
+
+			config.saveFormData( formValues );
+
+			expect( backend.barriers.saveEuExitRelated ).toHaveBeenCalledWith( req, barrier.id, formValues );
+
+			urls.barriers.detail.and.callFake( () => detailResponse );
+
+			config.saved();
+
+			expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
+			expect( urls.barriers.detail ).toHaveBeenCalledWith( barrier.id );
+		} );
+
+		describe( 'When the processor does not throw an error', () => {
+			it( 'Should not call next', async () => {
+
+				await controller.euExitRelated( req, res, next );
+
+				expect( next ).not.toHaveBeenCalled();
+			} );
+		} );
+
+		describe( 'When the processor throws an errror', () => {
+			it( 'Should call next with the error', async () => {
+
+				const err = new Error( 'a random error' );
+
+				processor.process.and.callFake( () => { throw err; } );
+
+				await controller.euExitRelated( req, res, next );
+
+				expect( next ).toHaveBeenCalledWith( err );
+			} );
+		} );
+	});
+	
 	describe( 'status', () => {
 
 		const template = 'barriers/views/edit/status';

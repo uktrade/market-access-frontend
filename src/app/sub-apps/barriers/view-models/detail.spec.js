@@ -61,16 +61,16 @@ describe( 'Barrier detail view model', () => {
 			inputBarrier.problem_status = '2';
 
 			const output = viewModel( inputBarrier );
-			const outpuBarrier = output.barrier;
+			const outputBarrier = output.barrier;
 			const barrierSectors = inputBarrier.sectors.map( metadata.getSector );
 
-			expect( outpuBarrier.id ).toEqual( inputBarrier.id );
-			expect( outpuBarrier.code ).toEqual( inputBarrier.code );
-			expect( outpuBarrier.title ).toEqual( inputBarrier.barrier_title );
-			expect( outpuBarrier.product ).toEqual( inputBarrier.product );
-			expect( outpuBarrier.problem.status ).toEqual( metadata.statusTypes[ inputBarrier.problem_status ] );
-			expect( outpuBarrier.problem.description ).toEqual( inputBarrier.problem_description );
-			expect( outpuBarrier.type ).toEqual( {
+			expect( outputBarrier.id ).toEqual( inputBarrier.id );
+			expect( outputBarrier.code ).toEqual( inputBarrier.code );
+			expect( outputBarrier.title ).toEqual( inputBarrier.barrier_title );
+			expect( outputBarrier.product ).toEqual( inputBarrier.product );
+			expect( outputBarrier.problem.status ).toEqual( metadata.statusTypes[ inputBarrier.problem_status ] );
+			expect( outputBarrier.problem.description ).toEqual( inputBarrier.problem_description );
+			expect( outputBarrier.type ).toEqual( {
 				id: inputBarrier.barrier_type.id,
 				title: inputBarrier.barrier_type.title,
 				description: inputBarrier.barrier_type.description,
@@ -79,22 +79,22 @@ describe( 'Barrier detail view model', () => {
 					name: metadata.barrierTypeCategories[ inputBarrier.barrier_type.category ]
 				}
 			} );
-			expect( outpuBarrier.status ).toEqual( {
+			expect( outputBarrier.status ).toEqual( {
 				name: 'Open',
 				modifyer: 'assessment',
 				date: inputBarrier.current_status.status_date,
 				description: inputBarrier.current_status.status_summary
 			} );
-			expect( outpuBarrier.reportedOn ).toEqual( inputBarrier.reported_on );
-			expect( outpuBarrier.addedBy ).toEqual( inputBarrier.reported_by );
-			expect( outpuBarrier.country ).toEqual( metadata.getCountry( inputBarrier.export_country ) );
-			expect( outpuBarrier.sectors ).toEqual( barrierSectors );
-			expect( outpuBarrier.source ).toEqual( {
+			expect( outputBarrier.reportedOn ).toEqual( inputBarrier.reported_on );
+			expect( outputBarrier.addedBy ).toEqual( inputBarrier.reported_by );
+			expect( outputBarrier.country ).toEqual( metadata.getCountry( inputBarrier.export_country ) );
+			expect( outputBarrier.sectors ).toEqual( barrierSectors );
+			expect( outputBarrier.source ).toEqual( {
 				id: inputBarrier.source,
 				name: metadata.barrierSource[ inputBarrier.source ],
 				description: inputBarrier.other_source
 			} );
-			expect( outpuBarrier.legal ).toEqual( {
+			expect( outputBarrier.legal ).toEqual( {
 				hasInfringements: ( inputBarrier.has_legal_infringement == '1' ),
 				unknownInfringements: ( inputBarrier.has_legal_infringement == '3' ),
 				infringements: {
@@ -104,7 +104,8 @@ describe( 'Barrier detail view model', () => {
 				},
 				summary: inputBarrier.infringement_summary
 			} );
-			expect( outpuBarrier.priority ).toEqual( { ...inputBarrier.priority, modifyer: inputBarrier.priority.code.toLowerCase() } );
+			expect( outputBarrier.priority ).toEqual( { ...inputBarrier.priority, modifyer: inputBarrier.priority.code.toLowerCase() } );
+			expect( outputBarrier.euExitRelated).toEqual('Yes');
 
 			expect( output.sectorsList ).toEqual( barrierSectors.map( ( sector ) => ( { text: sector.name } ) ) );
 			expect( output.companies ).toEqual( inputBarrier.companies );
@@ -119,14 +120,14 @@ describe( 'Barrier detail view model', () => {
 			inputBarrier.sectors = null;
 
 			const output = viewModel( inputBarrier );
-			const outpuBarrier = output.barrier;
+			const outputBarrier = output.barrier;
 
-			expect( outpuBarrier.sectors ).toEqual( [] );
+			expect( outputBarrier.sectors ).toEqual( [] );
 			expect( output.sectorsList ).toEqual( [] );
 
-			expect( outpuBarrier.isOpen ).toEqual( true );
-			expect( outpuBarrier.isResolved ).toEqual( false );
-			expect( outpuBarrier.isHibernated ).toEqual( false );
+			expect( outputBarrier.isOpen ).toEqual( true );
+			expect( outputBarrier.isResolved ).toEqual( false );
+			expect( outputBarrier.isHibernated ).toEqual( false );
 		} );
 	} );
 
@@ -139,9 +140,9 @@ describe( 'Barrier detail view model', () => {
 			inputBarrier.sectors = [ null ];
 
 			const output = viewModel( inputBarrier );
-			const outpuBarrier = output.barrier;
+			const outputBarrier = output.barrier;
 
-			expect( outpuBarrier.sectors ).toEqual( [ null ] );
+			expect( outputBarrier.sectors ).toEqual( [ null ] );
 			expect( output.sectorsList ).toEqual( [ { text: 'Unknown' } ] );
 		} );
 	} );
@@ -152,9 +153,9 @@ describe( 'Barrier detail view model', () => {
 			inputBarrier.barrier_type = null;
 
 			const output = viewModel( inputBarrier );
-			const outpuBarrier = output.barrier;
+			const outputBarrier = output.barrier;
 
-			expect( outpuBarrier.type ).toEqual( null );
+			expect( outputBarrier.type ).toEqual( null );
 		} );
 	} );
 
@@ -164,9 +165,9 @@ describe( 'Barrier detail view model', () => {
 			delete inputBarrier.companies;
 
 			const output = viewModel( inputBarrier );
-			const outpuBarrier = output.barrier;
+			const outputBarrier = output.barrier;
 
-			expect( outpuBarrier.companies ).toEqual();
+			expect( outputBarrier.companies ).toEqual();
 		} );
 	} );
 
@@ -176,18 +177,30 @@ describe( 'Barrier detail view model', () => {
 			inputBarrier.current_status.status = 4;
 
 			const output = viewModel( inputBarrier );
-			const outpuBarrier = output.barrier;
+			const outputBarrier = output.barrier;
 
-			expect( outpuBarrier.status ).toEqual( {
+			expect( outputBarrier.status ).toEqual( {
 				name: 'Resolved',
 				modifyer: 'resolved',
 				date: inputBarrier.current_status.status_date,
 				description: inputBarrier.current_status.status_summary
 			} );
 
-			expect( outpuBarrier.isOpen ).toEqual( false );
-			expect( outpuBarrier.isResolved ).toEqual( true );
-			expect( outpuBarrier.isHibernated ).toEqual( false );
+			expect( outputBarrier.isOpen ).toEqual( false );
+			expect( outputBarrier.isResolved ).toEqual( true );
+			expect( outputBarrier.isHibernated ).toEqual( false );
+		} );
+	} );
+
+	describe( 'A barrier with no eu exit relation', () => {
+		it( 'Should have the correct properties', () => {
+
+			inputBarrier.eu_exit_related = null;
+
+			const output = viewModel( inputBarrier );
+			const outputBarrier = output.barrier;
+
+			expect( outputBarrier.euExitRelated ).toEqual( "Unknown" );
 		} );
 	} );
 
@@ -197,18 +210,18 @@ describe( 'Barrier detail view model', () => {
 			inputBarrier.current_status.status = 5;
 
 			const output = viewModel( inputBarrier );
-			const outpuBarrier = output.barrier;
+			const outputBarrier = output.barrier;
 
-			expect( outpuBarrier.status ).toEqual( {
+			expect( outputBarrier.status ).toEqual( {
 				name: 'Paused',
 				modifyer: 'hibernated',
 				date: inputBarrier.current_status.status_date,
 				description: inputBarrier.current_status.status_summary
 			} );
 
-			expect( outpuBarrier.isOpen ).toEqual( false );
-			expect( outpuBarrier.isResolved ).toEqual( false );
-			expect( outpuBarrier.isHibernated ).toEqual( true );
+			expect( outputBarrier.isOpen ).toEqual( false );
+			expect( outputBarrier.isResolved ).toEqual( false );
+			expect( outputBarrier.isHibernated ).toEqual( true );
 		} );
 	} );
 

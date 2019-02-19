@@ -88,6 +88,7 @@ describe( 'Report controllers', () => {
 				product: 'myProduct',
 				problem_description: 'a description',
 				barrier_title: 'barrier_title',
+				eu_exit_related: true,
 				source: 'barrier_awareness',
 				other_source: 'barrier_awareness_other',
 				resolution_summary: 'resolution_summary'

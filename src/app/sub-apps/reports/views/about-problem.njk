@@ -85,6 +85,29 @@
 			value: barrierTitle,
 			errorMessage: errors | errorForName( 'barrier-title' )
 		} ) }}
+		
+		{{ govukRadios( {
+
+			idPrefix: 'eu-exit-related',
+			name: 'euExitRelated',
+			classes: 'eu-exit-related',
+			fieldset: {
+				legend: {
+					text: 'Is this issue caused by or related to EU Exit?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			}, items: [
+				{
+					value: true,
+					text: "Yes"
+				}, 
+				{
+					value: false,
+					text: "No"
+				}
+			]
+			} )
+		}}
 
 		<input type="submit" class="govuk-button" value="Save and continue">
 		<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>

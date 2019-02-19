@@ -1,0 +1,34 @@
+{% from 'components/radios/macro.njk' import govukRadios %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Barrier - Edit EU exit related{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.barriers.detail( barrier.id ) },
+		caption: barrier.barrier_title,
+		text: 'Related to the EU Exit',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.barriers.edit.euExitRelated( barrier.id ) }}" method="POST" class="restrict-width">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{{ govukRadios({
+			name: 'eu_exit_related',
+			fieldset: {
+				legend: {
+					text: 'Is this issue caused by or related to EU Exit?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: eu_exit_related
+		}) }}
+
+		<input type="submit" value="Save and exit to barrier" class="govuk-button">
+		<a href="{{ urls.barriers.detail( barrier.id ) }}" class="govuk-button button--secondary">Cancel</a>
+	</form>
+{% endblock %}

@@ -127,6 +127,12 @@ describe( 'URLs', () => {
 				} );
 			} );
 
+			describe( 'eu exit related', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.edit.euExitRelated( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/eu-exit-related/` );
+				});
+			});
 			describe( 'status', () => {
 				it( 'Should return the correct path', () => {
 
