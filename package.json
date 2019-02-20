@@ -2,6 +2,7 @@
   "name": "market-access-frontend",
   "version": "5.12.1",
   "description": "A front end for Market Access",
+  "private": true,
   "main": "server.js",
   "engines": {
     "node": "10.15.1",
@@ -18,12 +19,12 @@
     "test:setup": "cd src/test/ci/; ./setup.sh;",
     "test:features": "npm run test:setup; export TEST_BROWSER=chrome; npm run test:health && cucumber-js src/test/ci/features --format json:src/test/ci/output/test-reports/cucumber/results.cucumber",
     "test:features:local": "npm run test:setup; export TEST_HOST=10.200.10.1; export TEST_BROWSER=chrome; cucumber-js src/test/ci/features --format progress-bar --format json:src/test/ci/output/test-reports/cucumber/results.cucumber",
-    "watch": "run-p watch:*",
+    "watch": "npm run pack:dev && run-p watch:*",
     "watch-stub": "export DATAHUB_STUB=true; npm run watch",
     "watch:node": "export LOG_LEVEL=${LOG_LEVEL:-debug}; nodemon src/app/cluster.js --ignore 'src/public/**/*' --ignore 'src/test/**/*' --ignore 'src/app/**/*.spec.js' --ignore 'src/data/**/*'",
     "debug": "export LOG_LEVEL=debug; export SERVER_WORKERS=1; node --inspect src/app/cluster.js",
     "grunt": "grunt dist",
-    "build:dist": "npm run govuk-assets && npm run sass:prod && grunt dist && npm run dist-install",
+    "build:dist": "npm run govuk-assets && npm run sass:prod && npm run pack:prod && grunt dist && npm run dist-install",
     "dist-install": "cd dist && npm install --production",
     "dist": "npm run build:dist && npm run start",
     "heroku-postbuild": "npm run build:dist",
@@ -39,7 +40,9 @@
     "govuk-assets": "mkdir -p src/public/govuk/images; cp node_modules/govuk-frontend/assets/images/* src/public/govuk/images/",
     "backstop:reference": "backstop reference --config=src/test/backstop/backstop.js",
     "backstop:test": "backstop test --config=src/test/backstop/backstop.js",
-    "backstop:approve": "backstop approve --config=src/test/backstop/backstop.js"
+    "backstop:approve": "backstop approve --config=src/test/backstop/backstop.js",
+    "pack:dev": "webpack",
+    "pack:prod": "webpack --env.production"
   },
   "repository": {
     "type": "git",
@@ -71,7 +74,10 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.3.3",
+    "@babel/preset-env": "^7.3.1",
     "axe-webdriverjs": "^2.1.0",
+    "babel-loader": "^8.0.5",
     "backstopjs": "^3.8.8",
     "cucumber": "^4.2.1",
     "eslint": "^5.13.0",
@@ -96,6 +102,12 @@
     "nyc": "^13.2.0",
     "proxyquire": "^2.1.0",
     "selenium-webdriver": "^4.0.0-alpha.1",
-    "supertest": "^3.4.2"
+    "supertest": "^3.4.2",
+    "vue": "^2.6.6",
+    "vue-loader": "^15.6.2",
+    "vue-multiselect": "^2.1.3",
+    "vue-template-compiler": "^2.6.6",
+    "webpack": "^4.29.3",
+    "webpack-cli": "^3.2.3"
   }
 }

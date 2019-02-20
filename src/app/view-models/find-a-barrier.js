@@ -72,7 +72,7 @@ module.exports = function( params ){
 		hasFilters: !!Object.keys( filters ).length,
 		filters: {
 			country: {
-				items: metadata.getCountryList( 'All locations' ).map( isSelected( filters.country ) ),
+				items: metadata.getCountryList( 'All locations' ).map( isChecked( filters.country ) ),
 				active: filters.country && filters.country.map( metadata.getCountry ),
 				removeUrl: getRemoveUrl( filters, 'country' ),
 			},

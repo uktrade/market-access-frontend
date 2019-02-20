@@ -1,0 +1,17 @@
+{% from 'components/select/macro.njk' import govukSelect %}
+{% from 'app-components/checkbox-filter.njk' import checkboxFilter %}
+
+{% macro typeahead( params ) %}
+	<div class="js-vue-typeahead">
+		{{ checkboxFilter( params ) }}
+		<typeahead
+			entity="{{ params.entity }}"
+			selected-value="{{ params.value }}"
+			name="{{ params.name }}"
+			label="{{ params.label.text }}"
+			placeholder="Search locations"
+			classes="typeahead filter-items-group"
+		>
+		</typeahead>
+	</div>
+{% endmacro %}

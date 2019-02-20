@@ -1,9 +1,11 @@
 $default-spacing-unit: 5px;
 
-.multiselect {
+.checkbox-filter {
 
 	transform: translateZ(0); // Enforcing GPU acceleration fixes overflow cropping caused by CSS columns
 	border-bottom: 1px solid $govuk-grey-2;
+	max-height: govuk-em( 200, 16 );
+	overflow: scroll;
 
 	&:last-child {
 		border-bottom: 0;
@@ -14,7 +16,7 @@ $default-spacing-unit: 5px;
 	}
 }
 
-.multiselect__item {
+.checkbox-filter__item {
 
 	position: relative;
 	background-color: white;
@@ -35,7 +37,7 @@ $default-spacing-unit: 5px;
 	width: $input-size;
 	height: $input-size;
 
-	&[type="checkbox"] + .multiselect__label::after {
+	&[type="checkbox"] + .checkbox-filter__label::after {
 
 		@if round($font-size) < 10 {
 			border-width: 0 0 2px 2px;
@@ -47,7 +49,7 @@ $default-spacing-unit: 5px;
 		height: round($input-size / 3);
 	}
 
-	& + .multiselect__label {
+	& + .checkbox-filter__label {
 
 		&::before {
 			height: $input-size;
@@ -62,7 +64,7 @@ $default-spacing-unit: 5px;
 	}
 }
 
-.multiselect__input {
+.checkbox-filter__input {
 
 	@include _scale-input(8px);
 	@include govuk-font( 16 );
@@ -72,18 +74,18 @@ $default-spacing-unit: 5px;
 	margin: auto;
 	opacity: 0;
 
-	+ .multiselect__label {
+	+ .checkbox-filter__label {
 		@include govuk-font( 16, $line-height: 1.25 );
 		padding-top: 8px;
 		padding-bottom: 8px;
 	}
 
-	&[type="checkbox"] + .multiselect__label::after {
+	&[type="checkbox"] + .checkbox-filter__label::after {
 		transform: rotate(-45deg);
 		-ms-transform: rotate(-45deg);
 	}
 
-	& + .multiselect__label {
+	& + .checkbox-filter__label {
 
 		&::before,
 		&::after {
@@ -105,16 +107,16 @@ $default-spacing-unit: 5px;
 		}
 	}
 
-	&:checked + .multiselect__label::after {
+	&:checked + .checkbox-filter__label::after {
 		visibility: visible;
 	}
 
-	&:focus + .multiselect__label::before {
+	&:focus + .checkbox-filter__label::before {
 		box-shadow: 0 0 0 3px $govuk-focus-colour;
 	}
 }
 
-.multiselect__label {
+.checkbox-filter__label {
 	cursor: pointer;
 	display: block;
 	padding: ($default-spacing-unit / 2) ($default-spacing-unit / 2) $default-spacing-unit round($default-spacing-unit * 6.5);
@@ -122,7 +124,7 @@ $default-spacing-unit: 5px;
 	margin-bottom: 0;
 }
 
-.multiselect__hint {
+.checkbox-filter__hint {
 
 	@include govuk-font(16);
 	display: block;

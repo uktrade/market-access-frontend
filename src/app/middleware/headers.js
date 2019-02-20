@@ -1,8 +1,9 @@
+const { isDev } = require( '../config' );
 const cspValues = [
 
 	`default-src 'none'`,
 	`base-uri 'self'`,
-	`script-src 'self' 'unsafe-inline' www.google-analytics.com www.googletagmanager.com`,
+	`script-src 'self' 'unsafe-inline' ${ isDev ? `'unsafe-eval' ` : '' }www.google-analytics.com www.googletagmanager.com`,
 	`style-src 'self' 'unsafe-inline'`,
 	`font-src 'self'`,
 	`img-src 'self' data: www.google-analytics.com`,

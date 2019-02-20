@@ -198,7 +198,7 @@ describe( 'Find a barrier view model', () => {
 				type: { items: barrierTypeList, active: undefined, removeUrl: findABarrierResponse },
 				priority: { items: barrierPriorityList, active: undefined, removeUrl: findABarrierResponse },
 			} );
-			expect( countryList[ 2 ].selected ).toEqual( true );
+			expect( countryList[ 2 ].checked ).toEqual( true );
 			expect( output.hasFilters ).toEqual( true );
 		} );
 	} );
