@@ -29,7 +29,7 @@ module.exports = ( env = {} ) => ({
 	},
 	resolve: {
 		alias: {
-			'vue$': ( env.production ? 'vue/dist/vue.runtime.esm.js' : 'vue/dist/vue.esm.js' ),
+			'vue$': 'vue/dist/vue.esm.js',
 		},
 	}
 });
