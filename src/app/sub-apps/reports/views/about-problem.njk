@@ -85,7 +85,7 @@
 			value: barrierTitle,
 			errorMessage: errors | errorForName( 'barrier-title' )
 		} ) }}
-		
+
 		{{ govukRadios( {
 
 			idPrefix: 'eu-exit-related',
@@ -96,16 +96,9 @@
 					text: 'Is this issue caused by or related to EU Exit?',
 					classes: 'govuk-fieldset__legend--s'
 				}
-			}, items: [
-				{
-					value: true,
-					text: "Yes"
-				}, 
-				{
-					value: false,
-					text: "No"
-				}
-			]
+			},
+			items: euExitRelated,
+			errorMessage: errors | errorForName( 'eu-exit-related-1' )
 			} )
 		}}
 

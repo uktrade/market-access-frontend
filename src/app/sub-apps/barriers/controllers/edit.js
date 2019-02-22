@@ -177,24 +177,20 @@ module.exports = {
 
 			next( e );
 		}
-	}, 
+	},
+
 	euExitRelated: async ( req, res, next ) => {
 
 		const barrier = req.barrier;
 		const form = new Form( req, {
-			eu_exit_related: {
+			euExitRelated: {
 				type: Form.RADIO,
 				values: [ barrier.eu_exit_related ],
-				items: [
-					{
-						value: true,
-						text: "Yes"
-					}, 
-					{
-						value: false,
-						text: "No"
-					}
-				]
+				validators: [ {
+					fn: validators.isMetadata( 'bool' ),
+					message: 'Select whether this is EU exit related or not'
+				} ],
+				items: govukItemsFromObj( metadata.bool )
 			}
 		} );
 
