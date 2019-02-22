@@ -557,15 +557,15 @@ describe( 'Backend Service', () => {
 
 		describe( 'saveEuExitRelated', () => {
 			it( 'Should PUT to the correct path with the correct values', async () => {
-	
-				const eu_exit_related = true;
-	
+
+				const euExitRelated = true;
+
 				await service.barriers.saveEuExitRelated( req, barrierId, {
-					eu_exit_related,
+					euExitRelated,
 				} );
-	
+
 				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
-					eu_exit_related: eu_exit_related,
+					eu_exit_related: euExitRelated,
 				} );
 			} );
 		});

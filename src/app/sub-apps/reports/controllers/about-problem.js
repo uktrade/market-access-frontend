@@ -40,8 +40,13 @@ module.exports = async ( req, res, next ) => {
 		},
 
 		euExitRelated: {
-			values: [report.eu_exit_related],
-			required: 'Select whether this is EU exit related or not'
+			type: Form.RADIO,
+			values: [ report.eu_exit_related ],
+			validators: [ {
+				fn: validators.isMetadata( 'bool' ),
+				message: 'Select whether this is EU exit related or not'
+			} ],
+			items: govukItemsFromObj( metadata.bool )
 		},
 	};
 

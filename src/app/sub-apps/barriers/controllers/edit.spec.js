@@ -31,6 +31,7 @@ describe( 'Edit barrier controller', () => {
 			},
 			getCountryList: () =>  [ 'country one', 'country two' ],
 			getBarrierPrioritiesList: jasmine.createSpy( 'metadata.getBarrierPrioritiesList' ),
+			bool: { a: 1, b: 2 },
 		};
 
 		govukItemsFromObjResponse = { a: 1, b: 2 };
@@ -477,17 +478,26 @@ describe( 'Edit barrier controller', () => {
 		} );
 	} );
 
-	describe( 'EU exit related', () => {
+	describe( 'euExitRelated', () => {
 
 		const template = 'barriers/views/edit/eu-exit-related';
 		let barrier;
-		let getBarrierEuExitRelatedResponse;
+		let boolResponse;
 
 		beforeEach( () => {
 
-			getBarrierEuExitRelatedResponse = [ { value: true, text: 'Yes' }, { value: false, text: 'No' } ];
+			boolResponse = { 'boolResponse': 'yes' };
+			validators.isMetadata.and.callFake( () => boolResponse );
 			barrier = jasmine.helpers.getFakeData( '/backend/barriers/barrier' );
-			metadata.getBarrierPrioritiesList.and.callFake( () => getBarrierEuExitRelatedResponse );
+			govukItemsFromObjResponse = [
+				{
+					value: 'true',
+					text: 'yes'
+				},{
+					value: 'false',
+					text: 'No'
+				}
+			];
 
 			req.barrier = barrier;
 		} );
@@ -498,10 +508,12 @@ describe( 'Edit barrier controller', () => {
 
 			const config = Form.calls.argsFor( 0 )[ 1 ];
 
-			expect( config.eu_exit_related ).toBeDefined();
-			expect( config.eu_exit_related.type ).toEqual( RADIO );
-			expect( config.eu_exit_related.values ).toEqual( [ barrier.eu_exit_related ] );
-			expect( config.eu_exit_related.items ).toEqual( getBarrierEuExitRelatedResponse );
+			expect( config.euExitRelated ).toBeDefined();
+			expect( config.euExitRelated.type ).toEqual( RADIO );
+			expect( config.euExitRelated.values ).toEqual( [ barrier.eu_exit_related ] );
+			expect( config.euExitRelated.items ).toEqual( govukItemsFromObjResponse );
+			expect( config.euExitRelated.validators[ 0 ].fn ).toEqual( boolResponse );
+			expect( govukItemsFromObj ).toHaveBeenCalledWith( metadata.bool );
 		});
 
 		it( 'Should configure the FormProcessor correctly', async () => {
@@ -556,7 +568,7 @@ describe( 'Edit barrier controller', () => {
 			} );
 		} );
 	});
-	
+
 	describe( 'status', () => {
 
 		const template = 'barriers/views/edit/status';
