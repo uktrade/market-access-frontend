@@ -555,6 +555,21 @@ describe( 'Backend Service', () => {
 			} );
 		} );
 
+		describe( 'saveEuExitRelated', () => {
+			it( 'Should PUT to the correct path with the correct values', async () => {
+
+				const euExitRelated = true;
+
+				await service.barriers.saveEuExitRelated( req, barrierId, {
+					euExitRelated,
+				} );
+
+				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+					eu_exit_related: euExitRelated,
+				} );
+			} );
+		});
+
 		describe( 'saveStatus', () => {
 			it( 'Should PUT to the correct path with the correct values', async () => {
 
@@ -852,17 +867,20 @@ describe( 'Backend Service', () => {
 				const item = '1';
 				const barrierTitle = 'c';
 				const barrierSource = 'd';
+				const euExitRelated = true;
 				const barrierSourceOther = 'e';
 
 				checkWithAndWithoutValues( 'saveProblem', {
 					item,
 					barrierTitle,
 					barrierSource,
+					euExitRelated,
 					barrierSourceOther,
 				}, {
 					product: item,
 					barrier_title: barrierTitle,
 					source: barrierSource,
+					eu_exit_related: euExitRelated,
 					other_source: barrierSourceOther,
 				} );
 			} );

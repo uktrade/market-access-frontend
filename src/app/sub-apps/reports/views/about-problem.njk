@@ -86,6 +86,22 @@
 			errorMessage: errors | errorForName( 'barrier-title' )
 		} ) }}
 
+		{{ govukRadios( {
+
+			idPrefix: 'eu-exit-related',
+			name: 'euExitRelated',
+			classes: 'eu-exit-related',
+			fieldset: {
+				legend: {
+					text: 'Is this issue caused by or related to EU Exit?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: euExitRelated,
+			errorMessage: errors | errorForName( 'eu-exit-related-1' )
+			} )
+		}}
+
 		<input type="submit" class="govuk-button" value="Save and continue">
 		<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>
 

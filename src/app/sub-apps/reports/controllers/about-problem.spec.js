@@ -88,6 +88,7 @@ describe( 'Report controllers', () => {
 				product: 'myProduct',
 				problem_description: 'a description',
 				barrier_title: 'barrier_title',
+				eu_exit_related: true,
 				source: 'barrier_awareness',
 				other_source: 'barrier_awareness_other',
 				resolution_summary: 'resolution_summary'
@@ -98,6 +99,7 @@ describe( 'Report controllers', () => {
 		describe( 'Form config', () => {
 
 			let barrierSourceResponse;
+			let boolResponse;
 
 			function checkForm( args ){
 
@@ -118,11 +120,18 @@ describe( 'Report controllers', () => {
 				expect( config.barrierSource.type ).toEqual( Form.RADIO );
 				expect( config.barrierSource.values ).toEqual( [ report.source ] );
 				expect( config.barrierSource.validators[ 0 ].fn ).toEqual( barrierSourceResponse );
-				expect( Array.isArray( config.barrierSource.items ) ).toEqual( true );
+				expect( config.barrierSource.items ).toEqual( govukItemsFromObjResponse );
 
 				expect( config.barrierSourceOther ).toBeDefined();
 				expect( config.barrierSourceOther.conditional ).toEqual( { name: 'barrierSource', value: 'OTHER' } );
 				expect( config.barrierSourceOther.values ).toEqual( [ report.other_source ] );
+
+
+				expect( config.euExitRelated ).toBeDefined();
+				expect( config.euExitRelated.type ).toEqual( Form.RADIO );
+				expect( config.euExitRelated.values ).toEqual( [ report.eu_exit_related ] );
+				expect( config.euExitRelated.validators[ 0 ].fn ).toEqual( boolResponse );
+				expect( config.euExitRelated.items ).toEqual( govukItemsFromObjResponse );
 
 				expect( config.country ).not.toBeDefined();
 				expect( config.description ).not.toBeDefined();
@@ -136,6 +145,7 @@ describe( 'Report controllers', () => {
 				validators.isMetadata.and.callFake( ( key ) => {
 
 					if( key === 'barrierSource' ){ return barrierSourceResponse; }
+					if( key === 'bool' ){ return boolResponse; }
 				} );
 			} );
 

@@ -38,6 +38,16 @@ module.exports = async ( req, res, next ) => {
 			values: [ report.barrier_title ],
 			required: 'Enter a title for this barrier'
 		},
+
+		euExitRelated: {
+			type: Form.RADIO,
+			values: [ report.eu_exit_related ],
+			validators: [ {
+				fn: validators.isMetadata( 'bool' ),
+				message: 'Select whether this is EU exit related or not'
+			} ],
+			items: govukItemsFromObj( metadata.bool )
+		},
 	};
 
 	const form = new Form( req, formConfig );

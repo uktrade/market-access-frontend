@@ -5,7 +5,8 @@ const viewModel = require( '../view-models/find-a-barrier' );
 const FILTERS = {
 	country: validators.isCountry,
 	sector: validators.isSector,
-	type: validators.isBarrierType
+	type: validators.isBarrierType,
+	priority: validators.isBarrierPriority,
 };
 
 function getFilters( query ){
@@ -15,10 +16,21 @@ function getFilters( query ){
 	for( let [ name, validator ] of Object.entries( FILTERS ) ){
 
 		const value = query[ name ];
+		const isArray = Array.isArray( value );
+		let validValues = [];
 
-		if( value && validator( value ) ){
+		if( isArray ){
 
-			filters[ name ] = value;
+			validValues = value.filter( validator );
+
+		} else if( validator( value ) ){
+
+			validValues.push( value );
+		}
+
+		if( validValues.length ){
+
+			filters[ name ] = validValues;
 		}
 	}
 

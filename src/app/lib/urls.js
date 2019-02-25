@@ -36,13 +36,25 @@ const reportUrl = {
 	submit: ( reportId ) => `/reports/${ reportId }/submit/`,
 };
 
+function getParams( map ){
+
+	const params = [];
+
+	for( let [ key, value ] of Object.entries( map ) ){
+
+		params.push( key + '=' + value );
+	}
+
+	return ( params.length ? '?' + params.join( '&' ) : '' );
+}
+
 module.exports = {
 
 	index: () => '/',
 	login: () => '/login/',
 	me: () => '/me',
 	whatIsABarrier: () => '/what-is-a-barrier/',
-	findABarrier: () => '/find-a-barrier/',
+	findABarrier: ( params ) => '/find-a-barrier/' + ( params ? getParams( params ) : '' ),
 
 	documents: {
 		download: ( documentId ) => `/documents/${ documentId }/download/`,
@@ -58,6 +70,7 @@ module.exports = {
 			description: ( barrierId ) => `/barriers/${ barrierId }/edit/description/`,
 			source: ( barrierId ) => `/barriers/${ barrierId }/edit/source/`,
 			priority: ( barrierId ) => `/barriers/${ barrierId }/edit/priority/`,
+			euExitRelated: (barrierId) => `/barriers/${barrierId}/edit/eu-exit-related/`,
 			status: ( barrierId ) => `/barriers/${ barrierId }/edit/status/`,
 		},
 		notes: {
