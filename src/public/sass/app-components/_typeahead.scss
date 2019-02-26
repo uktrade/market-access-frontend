@@ -27,15 +27,15 @@ $highlight-colour: $govuk-grey-4;;
 	margin-bottom: 0;
 	padding: 0;
 	min-height: auto;
-	line-height: 2;
 }
 
 .multiselect__tags {
-	border: 1px solid #000;
+	border: 2px solid #000;
 	border-radius: 0;
 	font-size: 1em;
-	padding: 0 8px;
+	padding: 2px 8px;
 	min-height: auto;
+	overflow: hidden;
 }
 
 .multiselect__tag {
@@ -43,8 +43,8 @@ $highlight-colour: $govuk-grey-4;;
 	background: $highlight-colour;
 	border-radius: 0;
 	color: $govuk-black;
-	margin: 0 8px 0 0;
-	overflow: initial;
+	margin: 0 6px 0 0;
+	padding-left: 8px;
 }
 
 .multiselect__input:focus,
@@ -97,15 +97,12 @@ $highlight-colour: $govuk-grey-4;;
 	margin-bottom: 4px;
 }
 
-.multiselect__tags {
-	border-width: 2px;
-}
-
 .multiselect__placeholder,
 .multiselect__single,
 .multiselect__input {
 
 	font-size: 16px;
+	line-height: 1.8;
 
 	&:focus {
 		font-size: 16px;
