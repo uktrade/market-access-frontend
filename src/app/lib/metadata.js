@@ -156,6 +156,11 @@ module.exports.fetch = async () => {
 				'true': 'Yes',
 				'false': 'No'
 			};
+			module.exports.optionalBool = {
+				'true': 'Yes',
+				'false': 'No',
+				Null:  'Don’t know'
+			};
 			module.exports.documentStatus = {
 				not_virus_scanned: 'Not virus scanned',
 				virus_scanning_scheduled: 'Virus scanning scheduled',
