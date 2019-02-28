@@ -187,10 +187,10 @@ module.exports = {
 				type: Form.RADIO,
 				values: [ barrier.eu_exit_related ],
 				validators: [ {
-					fn: validators.isMetadata( 'optionalBool' ),
+					fn: validators.isMetadata( 'bool' ),
 					message: 'Select whether this is EU exit related or not'
 				} ],
-				items: govukItemsFromObj( metadata.optionalBool )
+				items: govukItemsFromObj( metadata.bool )
 			}
 		} );
 
