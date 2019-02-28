@@ -265,52 +265,105 @@ describe( 'Find a barrier controller', () => {
 			} );
 
 			describe( 'Multiple values', () => {
+				describe( 'As an array', () => {
 
-				beforeEach( () => {
-					priority = [ faker.lorem.word().toUpperCase(), faker.lorem.word().toUpperCase() ];
-					req.query.priority = priority;
-				} );
-
-				describe( 'When all priorities are valid', () => {
-					it( 'Should render the template with a filter', async () => {
-
-						validators.isBarrierPriority.and.callFake( () => true );
-
-						await controller( req, res, next );
-
-						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { priority } );
+					beforeEach( () => {
+						priority = [ faker.lorem.word().toUpperCase(), faker.lorem.word().toUpperCase() ];
+						req.query.priority = priority;
 					} );
-				} );
 
-				describe( 'When all priorities are NOT valid', () => {
-					it( 'Should render the template without filters', async () => {
+					describe( 'When all priorities are valid', () => {
+						it( 'Should render the template with a filter', async () => {
 
-						validators.isBarrierPriority.and.callFake( () => false );
+							validators.isBarrierPriority.and.callFake( () => true );
 
-						await controller( req, res, next );
+							await controller( req, res, next );
 
-						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, {} );
-					} );
-				} );
-
-				describe( 'When one priority is valid and one is not', () => {
-					it( 'Should render the template with a filter', async () => {
-
-						const validPriorities = priority;
-						const invalidPriority = faker.lorem.word().toUpperCase();
-
-						req.query.priority = validPriorities.concat( [ invalidPriority ] );
-
-						validators.isBarrierPriority.and.callFake( ( value ) => {
-
-							if( validPriorities.includes( value ) ){ return true; }
-
-							return false;
+							expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { priority } );
 						} );
+					} );
 
-						await controller( req, res, next );
+					describe( 'When all priorities are NOT valid', () => {
+						it( 'Should render the template without filters', async () => {
 
-						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { priority: validPriorities } );
+							validators.isBarrierPriority.and.callFake( () => false );
+
+							await controller( req, res, next );
+
+							expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, {} );
+						} );
+					} );
+
+					describe( 'When one priority is valid and one is not', () => {
+						it( 'Should render the template with a filter', async () => {
+
+							const validPriorities = priority;
+							const invalidPriority = faker.lorem.word().toUpperCase();
+
+							req.query.priority = validPriorities.concat( [ invalidPriority ] );
+
+							validators.isBarrierPriority.and.callFake( ( value ) => {
+
+								if( validPriorities.includes( value ) ){ return true; }
+
+								return false;
+							} );
+
+							await controller( req, res, next );
+
+							expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { priority: validPriorities } );
+						} );
+					} );
+				} );
+
+				describe( 'As a csv', () => {
+
+					beforeEach( () => {
+						priority = [ faker.lorem.word().toUpperCase(), faker.lorem.word().toUpperCase() ];
+						req.query.priority = priority.join( ',' );
+					} );
+
+					describe( 'When all priorities are valid', () => {
+						it( 'Should render the template with a filter', async () => {
+
+							validators.isBarrierPriority.and.callFake( () => true );
+
+							await controller( req, res, next );
+
+							expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { priority } );
+						} );
+					} );
+
+					describe( 'When all priorities are NOT valid', () => {
+						it( 'Should render the template without filters', async () => {
+
+							validators.isBarrierPriority.and.callFake( () => false );
+
+							await controller( req, res, next );
+
+							expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, {} );
+						} );
+					} );
+
+					describe( 'When one priority is valid and one is not', () => {
+						it( 'Should render the template with a filter', async () => {
+
+							const validPriorities = priority;
+							const invalidPriority = faker.lorem.word().toUpperCase();
+
+							req.query.priority = validPriorities.concat( [ invalidPriority ] ).join( ',' );
+
+							validators.isBarrierPriority.and.callFake( ( value ) => {
+
+								if( validPriorities.includes( value ) ){ return true; }
+
+								return false;
+							} );
+
+							await controller( req, res, next );
+
+							expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { priority: validPriorities } );
+						} );
 					} );
 				} );
 			} );

@@ -10,7 +10,6 @@ describe( 'Typeahead', () => {
 
 		defaultProps = {
 			name: 'adviser',
-			entity: 'adviser',
 			label: 'Adviser',
 			placeholder: 'Search adviser',
 			classes: 'typeahead-element'

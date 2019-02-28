@@ -115,6 +115,10 @@ describe( 'Find a barrier view model', () => {
 			{ value: faker.lorem.word().toUpperCase(), text: faker.lorem.words() },
 		];
 
+		sortGovukItems = {
+			alphabetical: jasmine.createSpy( 'sortGovukItems.alphabetical' ).and.callFake( ( a, b ) => a.text > b.text ),
+		};
+
 		metadata.getCountryList.and.callFake( () => countryList );
 		metadata.getSectorList.and.callFake( () => sectorList );
 		metadata.getSector.and.callFake( () => mockSector );
@@ -123,10 +127,6 @@ describe( 'Find a barrier view model', () => {
 		metadata.getBarrierTypeList.and.callFake( () => barrierTypeList );
 		metadata.getBarrierPriority.and.callFake( () => mockPriority );
 		metadata.getBarrierPrioritiesList.and.callFake( () => barrierPriorityList );
-
-		sortGovukItems = {
-			alphabetical: jasmine.createSpy( 'sortGovukItems.alphabetical' ).and.callFake( () => 0 ),
-		};
 
 		findABarrierResponse = '/a/b/c';
 
@@ -225,7 +225,7 @@ describe( 'Find a barrier view model', () => {
 				type: { items: barrierTypeList, active: undefined, removeUrl: findABarrierResponse },
 				priority: { items: barrierPriorityList, active: undefined, removeUrl: findABarrierResponse },
 			} );
-			expect( sectorList[ 2 ].selected ).toEqual( true );
+			expect( sectorList[ 2 ].checked ).toEqual( true );
 			expect( output.hasFilters ).toEqual( true );
 		} );
 	} );
@@ -234,9 +234,10 @@ describe( 'Find a barrier view model', () => {
 		it( 'Should return the correct data', () => {
 
 			const count = 5;
-			const filters = { type: [ 3 ] };
+			const selectedType = 999;
+			const filters = { type: [ String( selectedType ) ] };
 
-			barrierTypeList[ 2 ].value = filters.type;
+			barrierTypeList[ 1 ].value = selectedType;
 
 			const output = viewModel( {
 				count,
@@ -250,14 +251,17 @@ describe( 'Find a barrier view model', () => {
 				country: { items: countryList, active: undefined, removeUrl: findABarrierResponse },
 				sector: { items: sectorList, active: undefined, removeUrl: findABarrierResponse },
 				type: {
-					items: barrierTypeList.map( ( item ) => {
+					items: barrierTypeList.map( ( { text, value } ) => {
 
-						if( item.value == filters.type ){
-							item.selected = true;
+						const item = { text, value };
+
+						if( value == selectedType ){
+							item.checked = true;
 						}
 
 						return item;
-					} ),
+
+					} ).sort( ( a, b ) => a.text.localeCompare( b.text ) ),
 					active: [ { name: mockType.title } ],
 					removeUrl: findABarrierResponse
 				},
@@ -288,10 +292,12 @@ describe( 'Find a barrier view model', () => {
 				sector: { items: sectorList, active: undefined, removeUrl: findABarrierResponse },
 				type: { items: barrierTypeList, active: undefined, removeUrl: findABarrierResponse },
 				priority: {
-					items: barrierPriorityList.map( ( item ) => {
+					items: barrierPriorityList.map( ( { text, value } ) => {
 
-						if( item.value == filters.priority ){
-							item.selected = true;
+						const item = { text, value };
+
+						if( value == filters.priority ){
+							item.checked = true;
 						}
 
 						return item;

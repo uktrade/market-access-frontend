@@ -11,7 +11,6 @@
 			open-direction="bottom"
 			v-model="selectedOptions"
 			:placeholder="placeholder"
-			:model="model"
 			:clear-on-select="true"
 			:close-on-select="false"
 			:hide-selected="true"
@@ -101,43 +100,10 @@
 				type: String,
 				required: true,
 			},
-			entity: {
-				type: String,
-				required: false,
-			},
-			selectedValue: {
-				type: String,
-				required: false,
-			},
-			model: {
-				type: String,
-				required: false,
-			},
 			value: {
 				type: String,
 				required: false,
 				default: ''
-			},
-			formSelector: {
-				type: String,
-				required: false,
-			},
-			autoSubmit: {
-				type: Boolean,
-				default: true,
-			},
-			multiple: {
-				type: Boolean,
-				default: false,
-			},
-			multipleSelect: {
-				type: Boolean,
-				required: false,
-				default: true,
-			},
-			closeOnSelect: {
-				type: Boolean,
-				default: false,
 			},
 			classes: {
 				type: String,

@@ -5,11 +5,9 @@
 	<div class="js-vue-typeahead">
 		{{ checkboxFilter( params ) }}
 		<typeahead
-			entity="{{ params.entity }}"
-			selected-value="{{ params.value }}"
 			name="{{ params.name }}"
 			label="{{ params.label.text }}"
-			placeholder="Search locations"
+			placeholder="{{ params.placeholder }}"
 			classes="typeahead filter-items-group"
 		>
 		</typeahead>

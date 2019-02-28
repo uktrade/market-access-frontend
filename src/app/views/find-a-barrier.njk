@@ -50,10 +50,11 @@
 						text: 'Barrier location',
 						classes: 'filter-items__label'
 					},
+					placeholder: 'Search locations',
 					items: filters.country.items
 				}) }}
 
-				{{ govukSelect({
+				{{ typeahead({
 					id: 'sector',
 					name: 'sector',
 					classes: 'govuk-!-width-full js-filter',
@@ -64,10 +65,11 @@
 						text: 'Sector',
 						classes: 'filter-items__label'
 					},
+					placeholder: 'Search sector',
 					items: filters.sector.items
 				}) }}
 
-				{{ govukSelect({
+				{{ typeahead({
 					id: 'type',
 					name: 'type',
 					classes: 'govuk-!-width-full js-filter',
@@ -78,6 +80,7 @@
 						text: 'Barrier type',
 						classes: 'filter-items__label'
 					},
+					placeholder: 'Search type',
 					items: filters.type.items
 				}) }}
 
