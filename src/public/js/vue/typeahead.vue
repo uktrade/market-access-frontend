@@ -33,7 +33,6 @@
 				<div class="multiselect__option-label" v-html="$options.filters.highlight(props.option.text, props.search)">
 					{{ props.option.text }}
 				</div>
-				<div class="multiselect__option-sublabel">{{ props.option.subLabel }}</div>
 			</template>
 
 			<template slot="caret" slot-scope="methods">
@@ -52,6 +51,7 @@
 <script>
 
 	const Multiselect = require( 'vue-multiselect' ).default;
+	const { highlight } = require( './filters' );
 	const uuid = require( 'uuid' );
 
 	/**
@@ -147,18 +147,26 @@
 
 		data () {
 
-			const model = this.$parent.$data.defaultOptions;
-			const selectedOptions = model.filter( ( item ) => item.selected );
-
 			return {
-				selectedOptions,
-				options: model || [],
-				optionsData: model,
 				id: uuid(),
+				options: [],
+				optionsData: [],
+				selectedOptions: [],
 			};
 		},
 
+		filters: {
+			highlight
+		},
+
 		methods: {
+
+			setOptions: function( options ){
+
+				this.options = options;
+				this.optionsData = options;
+				this.selectedOptions = options.filter( ( item ) => item.selected );
+			},
 
 			search: function( query ){
 				//filter options when typing

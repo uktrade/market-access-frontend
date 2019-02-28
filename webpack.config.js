@@ -1,35 +1,11 @@
 const path = require( 'path' );
-const VueLoaderPlugin = require( 'vue-loader/lib/plugin' );
+const commonConfig = require( './webpack.common.js' );
 
 module.exports = ( env = {} ) => ({
-	mode: ( env.production ? 'production' : 'development' ),
+	...commonConfig( env ),
 	entry: './src/public/js/vue/app-vue.js',
 	output: {
-		path: path.resolve(__dirname, 'src/public/js/vue'),
+		path: path.resolve( __dirname, 'src/public/js/vue' ),
 		filename: 'vue-bundle.js'
 	},
-	plugins: [
-		new VueLoaderPlugin(),
-	],
-	module: {
-		rules: [
-			{
-				test: /\.js$/,
-				exclude: /node_modules/,
-				loader: 'babel-loader',
-				options: {
-					cacheDirectory: './.tmp/babel_cache',
-				},
-			},
-			{
-				test: /\.vue$/,
-				loader: 'vue-loader',
-			},
-		],
-	},
-	resolve: {
-		alias: {
-			'vue$': 'vue/dist/vue.esm.js',
-		},
-	}
 });

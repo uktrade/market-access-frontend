@@ -14,7 +14,9 @@
     "start": "NODE_ENV=production node --use-strict dist/server.js",
     "tag-master": "git tag v${npm_package_version}-master && git push --tags",
     "coverage": "NODE_ENV=development; LOG_LEVEL=error; SSO_BYPASS=true; ASSIGN_DEFAULT_COUNTRY=false; JASMINE_CONFIG_PATH=src/test/app/jasmine.json nyc jasmine",
-    "test": "NODE_ENV=development; LOG_LEVEL=error; SSO_BYPASS=true; ASSIGN_DEFAULT_COUNTRY=false; JASMINE_CONFIG_PATH=src/test/app/jasmine.json jasmine",
+	 "test": "npm run test:unit && npm run test:vue",
+	 "test:unit": "NODE_ENV=development; LOG_LEVEL=error; SSO_BYPASS=true; ASSIGN_DEFAULT_COUNTRY=false; JASMINE_CONFIG_PATH=src/test/app/jasmine.json jasmine",
+    "test:vue": "npm run pack:tests; NODE_ENV=development; JASMINE_CONFIG_PATH=src/test/vue/jasmine.json jasmine",
     "test:health": "node src/test/ci/test-health.js",
     "test:setup": "cd src/test/ci/; ./setup.sh;",
     "test:features": "npm run test:setup; export TEST_BROWSER=chrome; npm run test:health && cucumber-js src/test/ci/features --format json:src/test/ci/output/test-reports/cucumber/results.cucumber",
@@ -42,6 +44,7 @@
     "backstop:test": "backstop test --config=src/test/backstop/backstop.js",
     "backstop:approve": "backstop approve --config=src/test/backstop/backstop.js",
     "pack:dev": "webpack",
+    "pack:tests": "if [ -d .tmp/webpack-tests ]; then rm -rf .tmp/webpack-tests; fi; webpack --config webpack.test.js",
     "pack:prod": "webpack --env.production"
   },
   "repository": {
@@ -76,6 +79,7 @@
   "devDependencies": {
     "@babel/core": "^7.3.3",
     "@babel/preset-env": "^7.3.1",
+    "@vue/test-utils": "^1.0.0-beta.29",
     "axe-webdriverjs": "^2.1.0",
     "babel-loader": "^8.0.5",
     "backstopjs": "^3.8.8",
@@ -93,6 +97,8 @@
     "grunt-usemin": "^3.1.1",
     "jasmine": "^3.3.1",
     "jasmine-core": "^3.3.0",
+    "jsdom": "^13.2.0",
+    "jsdom-global": "^3.0.2",
     "json-schema-faker": "^0.5.0-rc9",
     "load-grunt-tasks": "^4.0.0",
     "nock": "^10.0.6",

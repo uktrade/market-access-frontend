@@ -1,12 +1,9 @@
 const Vue = require( 'vue' ).default;
 const Typeahead = require( './typeahead.vue' ).default;
-const { highlight } = require( './filters' );
-
-Vue.filter( 'highlight', highlight );
 
 const vueWrappers = Array.from( document.querySelectorAll( '.js-vue-typeahead' ) );
 
-function getOptions( parent ){
+function getOptionsAndRemoveList( parent ){
 
 	const formGroup = parent.querySelector( '.govuk-form-group' );
 	const inputs = formGroup.querySelectorAll( 'input' );
@@ -26,13 +23,13 @@ function getOptions( parent ){
 
 vueWrappers.forEach( ( wrapper ) => {
 
-	new Vue({
+	const options = getOptionsAndRemoveList( wrapper ); //call this first as it removes the current list from the DOM
+	const vm = new Vue({
 		el: wrapper,
 		components: {
 			'typeahead': Typeahead,
 		},
-		data: {
-			defaultOptions: getOptions( wrapper ),
-		},
 	});
+
+	vm.$children[ 0 ].setOptions( options );
 });
