@@ -306,18 +306,13 @@ module.exports = {
 		saveSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 			sectors: getValue( values.sectors )
 		} ),
-		saveProblem: ( req, reportId, values ) => {
-			let problemDetails = {
-				product: getValue( values.item ),
-				barrier_title: getValue( values.barrierTitle ),
-				source: getValue( values.barrierSource ),
-				other_source: getValue( values.barrierSourceOther )
-			};
-			if (getValue(values.euExitRelated)) {
-				problemDetails.eu_exit_related = getValue(values.euExitRelated);
-			}
-			return updateReport( getToken( req ), reportId, problemDetails);
-		},
+		saveProblem: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
+			product: getValue( values.item ),
+			barrier_title: getValue( values.barrierTitle ),
+			source: getValue( values.barrierSource ),
+			other_source: getValue( values.barrierSourceOther ),
+			eu_exit_related: getValue( values.euExitRelated ),
+		} ),
 		saveSummaryAndSubmit: async ( req, reportId, values ) => {
 
 			const { response, body } = await reports.saveSummary( req, reportId, values );

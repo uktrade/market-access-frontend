@@ -766,7 +766,7 @@ describe( 'Backend Service', () => {
 				path = `/reports/${ reportId }`;
 			} );
 
-			function checkWithAndWithoutValues( methodName, serviceData, backendData, dataNotSent = [] ){
+			function checkWithAndWithoutValues( methodName, serviceData, backendData ){
 
 				describe( 'With empty values', () => {
 					it( 'Should use null for the values', () => {
@@ -779,9 +779,7 @@ describe( 'Backend Service', () => {
 						}
 
 						for( let key of Object.keys( backendData ) ){
-							if (!dataNotSent.includes(key)) {
-								nullBackendData[ key ] = null;
-							}
+							nullBackendData[ key ] = null;
 						}
 
 						service.reports[ methodName ]( req, reportId, emptyServiceData );
@@ -883,9 +881,7 @@ describe( 'Backend Service', () => {
 					source: barrierSource,
 					eu_exit_related: euExitRelated,
 					other_source: barrierSourceOther,
-				}, [
-					'eu_exit_related'
-				] );
+				} );
 			} );
 
 			describe( 'saveSummary', () => {
