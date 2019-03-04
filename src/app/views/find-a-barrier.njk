@@ -42,13 +42,15 @@
 				{{ typeahead({
 					id: 'country',
 					name: 'country',
-					classes: 'govuk-!-width-full js-filter',
+					classes: 'govuk-!-width-full',
 					formGroup: {
 						classes: 'filter-items-group'
 					},
-					label: {
-						text: 'Barrier location',
-						classes: 'filter-items__label'
+					fieldset: {
+						legend: {
+							text: 'Barrier location',
+							classes: 'filter-items__label'
+						}
 					},
 					placeholder: 'Search locations',
 					items: filters.country.items
@@ -57,13 +59,15 @@
 				{{ typeahead({
 					id: 'sector',
 					name: 'sector',
-					classes: 'govuk-!-width-full js-filter',
+					classes: 'govuk-!-width-full',
 					formGroup: {
 						classes: 'filter-items-group'
 					},
-					label: {
-						text: 'Sector',
-						classes: 'filter-items__label'
+					fieldset: {
+						legend: {
+							text: 'Sector',
+							classes: 'filter-items__label'
+						}
 					},
 					placeholder: 'Search sector',
 					items: filters.sector.items
@@ -72,13 +76,15 @@
 				{{ typeahead({
 					id: 'type',
 					name: 'type',
-					classes: 'govuk-!-width-full js-filter',
+					classes: 'govuk-!-width-full ',
 					formGroup: {
 						classes: 'filter-items-group'
 					},
-					label: {
-						text: 'Barrier type',
-						classes: 'filter-items__label'
+					fieldset: {
+						legend: {
+							text: 'Barrier type',
+							classes: 'filter-items__label'
+						}
 					},
 					placeholder: 'Search type',
 					items: filters.type.items
@@ -87,7 +93,7 @@
 				{{ checkboxFilter({
 					id: 'priority',
 					name: 'priority',
-					classes: 'govuk-!-width-full js-filter-group',
+					classes: 'govuk-!-width-full',
 					formGroup: {
 						classes: 'filter-group'
 					},
