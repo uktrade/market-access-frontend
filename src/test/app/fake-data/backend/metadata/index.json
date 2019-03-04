@@ -135,7 +135,11 @@
       {
          "id": "9a662aa0-99ba-4f3b-835a-859fe210e9c2",
          "name": "Senegal",
-         "disabled_on": null
+			"disabled_on": null,
+			"overseas_region": {
+            "name": "quis porro blanditiis",
+            "id": "d9fdeed8-247e-4f54-8fd2-e86077e9faf3"
+         }
       },
       {
          "id": "3febacf2-cfdc-4d31-8794-41e69cf509ef",

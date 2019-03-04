@@ -164,6 +164,49 @@ describe( 'metadata', () => {
 			} );
 		} );
 
+		describe( 'overseasRegions', () => {
+			it( 'Should return the data', () => {
+
+				expect( metadata.overseasRegions ).toEqual( [{
+					'id': 'd9fdeed8-247e-4f54-8fd2-e86077e9faf3',
+					'name': 'quis porro blanditiis'
+				}] );
+			} );
+		} );
+
+		describe( 'getOverseasRegionList', () => {
+			describe( 'Without specifying the default text', () => {
+				it( 'Should create a region list for use with a select - with a default choose option', () => {
+
+					const regions = metadata.getOverseasRegionList();
+
+					expect( regions.length ).toEqual( metadata.overseasRegions.length + 1 );
+					expect( regions[ 0 ] ).toEqual( { value: '', text: 'Choose overseas region' } );
+
+					regions.forEach( ( region ) => {
+						expect( region.value ).toBeDefined();
+						expect( region.text ).toBeDefined();
+					});
+				} );
+			} );
+
+			describe( 'Specifying the default text', () => {
+				it( 'Should create a region list for use with a select - with the specified choose option', () => {
+
+					const text = 'Select an option';
+					const regions = metadata.getOverseasRegionList( text );
+
+					expect( regions.length ).toEqual( metadata.overseasRegions.length + 1 );
+					expect( regions[ 0 ] ).toEqual( { value: '', text } );
+
+					regions.forEach( ( region ) => {
+						expect( region.value ).toBeDefined();
+						expect( region.text ).toBeDefined();
+					});
+				} );
+			} );
+		} );
+
 		describe( 'govResponse', () => {
 			it( 'Should return the data', () => {
 
