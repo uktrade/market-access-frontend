@@ -1,6 +1,7 @@
 const backend = require( './backend-request' );
 
 let countries;
+let adminAreas;
 let sectors;
 let level0Sectors;
 let barrierTypes;
@@ -18,6 +19,29 @@ function cleanCountry( item ){
 		id: item.id,
 		name: item.name
 	};
+}
+
+// Groups the admin areas into seperate areas of objects relating to country
+function alterAdminAreasData( countryAdminAreas ) {
+
+	// Define UUIDs so we have reference to country and id
+	let unitedStatesUUID = '81756b9a-5d95-e211-a939-e4115bead28a';
+	let canadaUUID = '5daf72a6-5d95-e211-a939-e4115bead28a';
+
+	let adminAreaList = {
+		[unitedStatesUUID]: [],
+		[canadaUUID]: [],
+	};
+
+	// Loop through each admin area and push it to the corresponding 
+	// array based on country ID 
+	countryAdminAreas.forEach( ( countryAdminArea ) => {
+		adminAreaList[countryAdminArea.country.id].push(countryAdminArea);
+	} );
+
+	console.log('ADMIN AREA LIST', adminAreaList);
+
+	return adminAreaList;
 }
 
 function addNumber( tasks ){
@@ -125,6 +149,7 @@ module.exports.fetch = async () => {
 		if( response.isSuccess ){
 
 			countries = body.countries.filter( notDisabled ).map( cleanCountry );
+			adminAreas = alterAdminAreasData(body.country_admin_areas);
 			sectors = body.sectors.filter( notDisabled );
 			level0Sectors = sectors.filter( ( sector ) => sector.level === 0 );
 			barrierTypes = body.barrier_types;
@@ -135,6 +160,7 @@ module.exports.fetch = async () => {
 			module.exports.lossScale = body.loss_range;
 			module.exports.boolScale = body.adv_boolean;
 			module.exports.countries = countries;
+			module.exports.adminAreas = adminAreas;
 			module.exports.govResponse = body.govt_response;
 			module.exports.publishResponse = body.publish_response;
 			module.exports.reportStages = body.report_stages;
@@ -177,6 +203,7 @@ module.exports.fetch = async () => {
 };
 
 module.exports.getCountryList = ( defaultText = 'Choose a country' ) => createCountryList( countries, defaultText );
+module.exports.getCountryAdminAreas = ( countryID, defaultText = 'Choose an admin area') => createAdminAreaList(countryID, defaultText);
 module.exports.getSectorList = ( defaultText = 'Select a sector' ) => createSectorsList( level0Sectors, defaultText );
 module.exports.getSector = ( sectorId ) => sectors.find( ( sector ) => sector.id === sectorId );
 module.exports.getCountry = ( countryId ) => countries.find( ( country ) => country.id === countryId );
