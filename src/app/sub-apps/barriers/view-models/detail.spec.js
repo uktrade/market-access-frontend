@@ -40,6 +40,11 @@ describe( 'Barrier detail view model', () => {
 			barrierTypeCategories: {
 				GOODS: 'some goods',
 				SERVICES: 'some services'
+			},
+			optionalBool: {
+				1: 'A',
+				2: 'B',
+				3: 'C'
 			}
 		};
 
@@ -105,7 +110,7 @@ describe( 'Barrier detail view model', () => {
 				summary: inputBarrier.infringement_summary
 			} );
 			expect( outputBarrier.priority ).toEqual( { ...inputBarrier.priority, modifyer: inputBarrier.priority.code.toLowerCase() } );
-			expect( outputBarrier.euExitRelated).toEqual('Yes');
+			expect( outputBarrier.euExitRelated ).toEqual( 'A' );
 
 			expect( output.sectorsList ).toEqual( barrierSectors.map( ( sector ) => ( { text: sector.name } ) ) );
 			expect( output.companies ).toEqual( inputBarrier.companies );
@@ -200,7 +205,7 @@ describe( 'Barrier detail view model', () => {
 			const output = viewModel( inputBarrier );
 			const outputBarrier = output.barrier;
 
-			expect( outputBarrier.euExitRelated ).toEqual( "Unknown" );
+			expect( outputBarrier.euExitRelated ).toEqual( 'Unknown' );
 		} );
 	} );
 

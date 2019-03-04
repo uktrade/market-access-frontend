@@ -100,6 +100,7 @@ describe( 'Report controllers', () => {
 
 			let barrierSourceResponse;
 			let boolResponse;
+			let optionalBoolResponse;
 
 			function checkForm( args ){
 
@@ -126,11 +127,11 @@ describe( 'Report controllers', () => {
 				expect( config.barrierSourceOther.conditional ).toEqual( { name: 'barrierSource', value: 'OTHER' } );
 				expect( config.barrierSourceOther.values ).toEqual( [ report.other_source ] );
 
-
 				expect( config.euExitRelated ).toBeDefined();
 				expect( config.euExitRelated.type ).toEqual( Form.RADIO );
 				expect( config.euExitRelated.values ).toEqual( [ report.eu_exit_related ] );
-				expect( config.euExitRelated.validators[ 0 ].fn ).toEqual( boolResponse );
+				expect( config.euExitRelated.validators.length ).toEqual( 1 );
+				expect( config.euExitRelated.validators[ 0 ].fn ).toEqual( optionalBoolResponse );
 				expect( config.euExitRelated.items ).toEqual( govukItemsFromObjResponse );
 
 				expect( config.country ).not.toBeDefined();
@@ -141,11 +142,14 @@ describe( 'Report controllers', () => {
 			beforeEach( () => {
 
 				barrierSourceResponse = { barrierSourceResponse: true };
+				boolResponse = { boolResponse: 1 };
+				optionalBoolResponse = { optionalBoolResponse: 2 };
 
 				validators.isMetadata.and.callFake( ( key ) => {
 
 					if( key === 'barrierSource' ){ return barrierSourceResponse; }
 					if( key === 'bool' ){ return boolResponse; }
+					if( key === 'optionalBool' ){ return optionalBoolResponse; }
 				} );
 			} );
 

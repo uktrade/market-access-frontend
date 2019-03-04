@@ -133,7 +133,7 @@ module.exports.fetch = async () => {
 
 			module.exports.statusTypes = body.status_types;
 			module.exports.lossScale = body.loss_range;
-			module.exports.boolScale = body.adv_boolean;
+			module.exports.optionalBool = body.adv_boolean;
 			module.exports.countries = countries;
 			module.exports.govResponse = body.govt_response;
 			module.exports.publishResponse = body.publish_response;

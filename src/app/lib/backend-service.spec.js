@@ -779,7 +779,6 @@ describe( 'Backend Service', () => {
 						}
 
 						for( let key of Object.keys( backendData ) ){
-
 							nullBackendData[ key ] = null;
 						}
 
