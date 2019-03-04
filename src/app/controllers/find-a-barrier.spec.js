@@ -32,6 +32,7 @@ describe( 'Find a barrier controller', () => {
 		viewModel = jasmine.createSpy( 'view-model' );
 		validators = {
 			isCountry: jasmine.createSpy( 'validators.isCountry' ),
+			isOverseasRegion: jasmine.createSpy( 'validators.isOverseasRegion' ),
 			isSector: jasmine.createSpy( 'validators.isSector' ),
 			isBarrierType: jasmine.createSpy( 'validators.isBarrierType' ),
 			isBarrierPriority: jasmine.createSpy( 'validators.isBarrierPriority' ),
@@ -106,6 +107,54 @@ describe( 'Find a barrier controller', () => {
 				it( 'Should render the template without filters', async () => {
 
 					validators.isCountry.and.callFake( () => false );
+
+					await controller( req, res, next );
+
+					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, {} );
+				} );
+			} );
+		} );
+
+		describe( 'With an overseas region filter', () => {
+
+			let region;
+			let viewModelResponse;
+
+			beforeEach( () => {
+
+				region = uuid();
+				req.query.region = region;
+				viewModelResponse = { a: 1, b: 2 };
+
+				viewModel.and.callFake( () => viewModelResponse );
+
+				backend.barriers.getAll.and.callFake( () => ({
+					response: { isSuccess: true },
+					body: jasmine.helpers.getFakeData( '/backend/barriers/' )
+				}) );
+			} );
+
+			afterEach( () => {
+
+				expect( res.render ).toHaveBeenCalledWith( template, viewModelResponse );
+				expect( next ).not.toHaveBeenCalled();
+			} );
+
+			describe( 'When the region is valid', () => {
+				it( 'Should render the template with a filter', async () => {
+
+					validators.isOverseasRegion.and.callFake( () => true );
+
+					await controller( req, res, next );
+
+					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { region: [ region ] } );
+				} );
+			} );
+
+			describe( 'When the region is NOT valid', () => {
+				it( 'Should render the template without filters', async () => {
+
+					validators.isOverseasRegion.and.callFake( () => false );
 
 					await controller( req, res, next );
 

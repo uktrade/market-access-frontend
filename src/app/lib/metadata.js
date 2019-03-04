@@ -186,11 +186,12 @@ module.exports.fetch = async () => {
 	}
 };
 
-module.exports.getCountryList = ( defaultText = 'Choose a country' ) => createList( countries, defaultText );
-module.exports.getOverseasRegionList = ( defaultText = 'Choose overseas region' ) => createList( overseasRegions, defaultText );
-module.exports.getSectorList = ( defaultText = 'Select a sector' ) => createList( level0Sectors, defaultText );
-module.exports.getSector = ( sectorId ) => sectors.find( ( sector ) => sector.id === sectorId );
 module.exports.getCountry = ( countryId ) => countries.find( ( country ) => country.id === countryId );
+module.exports.getCountryList = ( defaultText = 'Choose a country' ) => createList( countries, defaultText );
+module.exports.getOverseasRegion = ( id ) => overseasRegions.find( ( region ) => region.id === id );
+module.exports.getOverseasRegionList = ( defaultText = 'Choose overseas region' ) => createList( overseasRegions, defaultText );
+module.exports.getSector = ( sectorId ) => sectors.find( ( sector ) => sector.id === sectorId );
+module.exports.getSectorList = ( defaultText = 'Select a sector' ) => createList( level0Sectors, defaultText );
 module.exports.getBarrierType = ( typeId ) => uniqueBarrierTypes.find( ( type ) => type.id == typeId );
 module.exports.getBarrierPriority = ( priorityCode ) => barrierPriorities.find( ( priority ) => priority.code == priorityCode );
 

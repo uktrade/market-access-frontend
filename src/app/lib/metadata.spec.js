@@ -131,6 +131,18 @@ describe( 'metadata', () => {
 			} );
 		} );
 
+		describe( 'getCountry', () => {
+			it( 'Should get the country', () => {
+
+				const country = {
+					id: fakeData.countries[ 1 ].id,
+					name: fakeData.countries[ 1 ].name
+				};
+
+				expect( metadata.getCountry( '9a662aa0-99ba-4f3b-835a-859fe210e9c2' ) ).toEqual( country );
+			} );
+		} );
+
 		describe( 'getCountryList', () => {
 			describe( 'Without specifying the default text', () => {
 				it( 'Should create a country list for use with a select - with a default choose option', () => {
@@ -171,6 +183,18 @@ describe( 'metadata', () => {
 					'id': 'd9fdeed8-247e-4f54-8fd2-e86077e9faf3',
 					'name': 'quis porro blanditiis'
 				}] );
+			} );
+		} );
+
+		describe( 'getOverseasRegion', () => {
+			it( 'Should get the region', () => {
+
+				const region = {
+					id: fakeData.countries[ 1 ].overseas_region.id,
+					name: fakeData.countries[ 1 ].overseas_region.name
+				};
+
+				expect( metadata.getOverseasRegion( 'd9fdeed8-247e-4f54-8fd2-e86077e9faf3' ) ).toEqual( region );
 			} );
 		} );
 
@@ -365,6 +389,13 @@ describe( 'metadata', () => {
 						expect( metadata.getSectorList( text ) ).toEqual( affectedSectorsList );
 					} );
 				} );
+			} );
+		} );
+
+		describe( 'getSector', () => {
+			it( 'Should get the country', () => {
+
+				expect( metadata.getSector( 'ecb89515-9df1-4432-b191-d4b41ad2eb39' ) ).toEqual( fakeData.sectors[ 1 ] );
 			} );
 		} );
 
