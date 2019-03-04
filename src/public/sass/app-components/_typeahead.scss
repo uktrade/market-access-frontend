@@ -38,13 +38,19 @@ $highlight-colour: $govuk-grey-4;;
 	overflow: hidden;
 }
 
+.multiselect__tags-wrap {
+	display: inline-block;
+	width: 90%;
+	padding-top: 5px;
+}
+
 .multiselect__tag {
 	font-size: 14px;
 	background: $highlight-colour;
 	border-radius: 0;
 	color: $govuk-black;
-	margin: 0 6px 0 0;
-	padding-left: 8px;
+	margin: 0 5px 0 0;
+	padding-left: 4px;
 }
 
 .multiselect__input:focus,
