@@ -191,6 +191,17 @@ describe( 'Backend Service', () => {
 				} );
 			} );
 
+			describe( 'With an overseas region filter', () => {
+				it( 'Should call the correct path with default sort order', async () => {
+
+					const region = uuid();
+
+					await service.barriers.getAll( req, { region } );
+
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers?overseas_region=${ region }&ordering=-reported_on`, token );
+				} );
+			} );
+
 			describe( 'With a sector filter', () => {
 				it( 'Should call the correct path with default sort order', async () => {
 

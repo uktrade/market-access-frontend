@@ -122,6 +122,7 @@ function getFilterParams( filters ){
 		'barrier_type': 'type',
 		'status': 'status',
 		'priority': 'priority',
+		'overseas_region': 'region',
 		//'start_date': 'date-start',
 		//'end_date': 'date-end',
 	};
