@@ -262,15 +262,73 @@ describe( 'Report controllers', () => {
 				} );
 
 				describe( 'When the formProcessor throws an error', () => {
-					it( 'Should call next with the error', async () => {
+					describe( 'When the error has a code of UNHANDLED_400', () => {
 
-						const err = new Error( 'Some random error' );
+						let err;
 
-						processFn.and.callFake( () => Promise.reject( err ) );
+						beforeEach( () => {
 
-						await controller( req, res, next );
+							err = new Error( '400' );
+							err.code = 'UNHANDLED_400';
+						} );
 
-						expect( next ).toHaveBeenCalledWith( err );
+						describe( 'When there is a responseBody', () => {
+							describe( 'When there is the correct property in the body', () => {
+								it( 'Should render the custom error page', async () => {
+
+									err.responseBody = {
+										eu_exit_related: [ 'This field is required.' ]
+									};
+
+									processFn.and.callFake( () => Promise.reject( err ) );
+
+									await controller( req, res, next );
+
+									expect( next ).not.toHaveBeenCalled();
+									expect( res.render ).toHaveBeenCalledWith( 'reports/views/error/eu-exit-required' );
+								} );
+							} );
+
+							describe( 'When there is not a property in the response body', () => {
+								it( 'Should call next with the err', async () => {
+
+									err.responseBody = {
+										random: [ 'a' ]
+									};
+
+									processFn.and.callFake( () => Promise.reject( err ) );
+
+									await controller( req, res, next );
+
+									expect( next ).toHaveBeenCalledWith( err );
+									expect( res.render ).not.toHaveBeenCalled();
+								} );
+							} );
+						} );
+
+						describe( 'When there is not a responseBody', () => {
+							it( 'Should call next', async () => {
+
+								processFn.and.callFake( () => Promise.reject( err ) );
+
+								await controller( req, res, next );
+
+								expect( next ).toHaveBeenCalledWith( err );
+							} );
+						} );
+					} );
+
+					describe( 'When there is no code for the error', () => {
+						it( 'Should call next with the error', async () => {
+
+							const err = new Error( 'Some random error' );
+
+							processFn.and.callFake( () => Promise.reject( err ) );
+
+							await controller( req, res, next );
+
+							expect( next ).toHaveBeenCalledWith( err );
+						} );
 					} );
 				} );
 			} );
