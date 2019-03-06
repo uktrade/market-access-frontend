@@ -123,11 +123,11 @@ describe( 'FormProcessor', () => {
 						response = { isSuccess: false, statusCode: 400 };
 					} );
 
-					async function runProcessor(){
+					async function runProcessor( checkResponseErrors = true ){
 
 						try {
 
-							await processor.process( { checkResponseErrors: true } );
+							await processor.process( { checkResponseErrors } );
 
 						} catch( e ){
 
@@ -148,6 +148,7 @@ describe( 'FormProcessor', () => {
 
 								expect( render ).not.toHaveBeenCalled();
 								expect( err ).toEqual( new Error( 'Unable to save form - got 400 from backend' ) );
+								expect( err.code ).toEqual( 'UNHANDLED_400' );
 							} );
 						} );
 
@@ -163,6 +164,7 @@ describe( 'FormProcessor', () => {
 
 								expect( render ).not.toHaveBeenCalled();
 								expect( err ).toEqual( new Error( 'Unable to save form - got 400 from backend' ) );
+								expect( err.code ).toEqual( 'UNHANDLED_400' );
 							} );
 						} );
 
@@ -197,8 +199,25 @@ describe( 'FormProcessor', () => {
 
 									expect( render ).not.toHaveBeenCalled();
 									expect( err ).toEqual( new Error( 'No errors in response body, form not saved - got 400 from backend' ) );
+									expect( err.code ).not.toBeDefined();
 								} );
 							} );
+						} );
+					} );
+
+					describe( 'When checkResponseErrors is false', () => {
+						it( 'Should throw an error', async () => {
+
+							saveFormData.and.callFake( () => ({
+								response,
+								body: { fields: { a: 1, b: 2 } }
+							}) );
+
+							await runProcessor( false );
+
+							expect( render ).not.toHaveBeenCalled();
+							expect( err ).toEqual( new Error( 'Unable to save form - got 400 from backend' ) );
+							expect( err.code ).toEqual( 'UNHANDLED_400' );
 						} );
 					} );
 				} );
