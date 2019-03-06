@@ -1,15 +1,16 @@
 {% from 'components/select/macro.njk' import govukSelect %}
 {% from 'app-components/heading.njk' import heading %}
-{% from 'app-components/multiselect.njk' import multiselect %}
+{% from 'app-components/checkbox-filter.njk' import checkboxFilter %}
+{% from 'app-components/typeahead.njk' import typeahead %}
 
 {% extends 'layout.njk' %}
 
 {% block page_title %}{{ super() }} - Find a barrier{% endblock %}
 
 {% block body_script %}
-	<script>
-		ma.pages.findABarrier();
-	</script>
+	<!-- build:js(src) /public/js/vue.min.js -->
+	<script src="/public/js/vue/vue-bundle.js"></script>
+	<!-- endbuild -->
 {% endblock %}
 
 {% block page_content %}
@@ -24,7 +25,7 @@
 			<h2 class="filter-list-title">Filter barriers by:</h2>
 			<form action="{{ urls.findABarrier() }}" method="GET" class="filter-items">
 
-				{{ govukSelect({
+				{# govukSelect({
 					id: 'country',
 					name: 'country',
 					classes: 'govuk-!-width-full js-filter',
@@ -36,40 +37,63 @@
 						classes: 'filter-items__label'
 					},
 					items: filters.country.items
-				}) }}
+				}) #}
 
-				{{ govukSelect({
-					id: 'sector',
-					name: 'sector',
-					classes: 'govuk-!-width-full js-filter',
+				{{ typeahead({
+					id: 'country',
+					name: 'country',
+					classes: 'govuk-!-width-full',
 					formGroup: {
 						classes: 'filter-items-group'
 					},
-					label: {
-						text: 'Sector',
-						classes: 'filter-items__label'
+					fieldset: {
+						legend: {
+							text: 'Barrier location',
+							classes: 'filter-items__label'
+						}
 					},
+					placeholder: 'Search locations',
+					items: filters.country.items
+				}) }}
+
+				{{ typeahead({
+					id: 'sector',
+					name: 'sector',
+					classes: 'govuk-!-width-full',
+					formGroup: {
+						classes: 'filter-items-group'
+					},
+					fieldset: {
+						legend: {
+							text: 'Sector',
+							classes: 'filter-items__label'
+						}
+					},
+					placeholder: 'Search sector',
 					items: filters.sector.items
 				}) }}
 
-				{{ govukSelect({
+				{{ typeahead({
 					id: 'type',
 					name: 'type',
-					classes: 'govuk-!-width-full js-filter',
+					classes: 'govuk-!-width-full ',
 					formGroup: {
 						classes: 'filter-items-group'
 					},
-					label: {
-						text: 'Barrier type',
-						classes: 'filter-items__label'
+					fieldset: {
+						legend: {
+							text: 'Barrier type',
+							classes: 'filter-items__label'
+						}
 					},
+					placeholder: 'Search type',
 					items: filters.type.items
 				}) }}
 
-				{{ multiselect({
+				{{ checkboxFilter({
 					id: 'priority',
 					name: 'priority',
-					classes: 'govuk-!-width-full js-filter-group',
+					classes: 'govuk-!-width-full',
 					formGroup: {
 						classes: 'filter-group'
 					},

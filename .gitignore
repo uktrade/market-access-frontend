@@ -50,6 +50,7 @@ src/test/ci/output
 *.map
 src/public/css/main.css
 src/public/govuk
+src/public/js/vue/vue-bundle.js
 src/data/stubs
 src/data/faker/output
 src/test/backstop/data
