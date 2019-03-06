@@ -4,6 +4,14 @@ const FormProcessor = require( '../../../lib/FormProcessor' );
 const urls = require( '../../../lib/urls' );
 const config = require( '../../../config' );
 
+function isEuExitRequired( body ){
+
+	const messages = body && body.eu_exit_related;
+	const message = messages && messages[ 0 ];
+
+	return message && message.includes( 'required' );
+}
+
 module.exports = async ( req, res, next ) => {
 
 	const report = req.report;
@@ -74,6 +82,14 @@ module.exports = async ( req, res, next ) => {
 
 	} catch( e ){
 
-		next( e );
+		if( e.code === 'UNHANDLED_400' && isEuExitRequired( e.responseBody ) ){
+
+			res.render( 'reports/views/error/eu-exit-required' );
+
+		} else {
+
+			next( e );
+		}
+
 	}
 };

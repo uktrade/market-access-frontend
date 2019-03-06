@@ -38,6 +38,10 @@ FormPocessor.prototype.doSave = async function( checkResponseErrors = false ){
 		const err = new Error( `Unable to save form - got ${ response.statusCode } from backend` );
 		err.responseBody = body;
 
+		if( response.statusCode === 400 ){
+			err.code = 'UNHANDLED_400';
+		}
+
 		throw err;
 	}
 };
