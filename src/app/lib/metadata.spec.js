@@ -96,7 +96,10 @@ describe( 'metadata', () => {
 			it( 'Should return the data', () => {
 
 				expect( metadata.statusTypes ).toBeDefined();
-				expect( metadata.statusTypes ).toEqual( fakeData.status_types );
+				expect( metadata.statusTypes ).toEqual( {
+					'1': 'A procedural/short-term barrier',
+					'2': 'A long term strategic barrier'
+				} );
 			} );
 		} );
 
