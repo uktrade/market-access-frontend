@@ -59,8 +59,9 @@ describe( 'Barrier type controller', () => {
 
 		metadata = {
 			barrierTypes: [
-				{ id: 1, title: 'barrier 1', category: 'GOODS', description: 'some text' },
-				{ id: 2, title: 'barrier 2', category: 'SERVICES', description: 'a bit more text' }
+				{ id: 1, title: 'barrier 1', category: 'GOODS', description: 'some text 1' },
+				{ id: 2, title: 'barrier 2', category: 'GOODS', description: 'some text 2' },
+				{ id: 3, title: 'barrier 3', category: 'SERVICES', description: 'a bit more text' }
 			],
 			barrierTypeCategories: {
 				'GOODS': 'title 1',
@@ -158,7 +159,6 @@ describe( 'Barrier type controller', () => {
 
 					const config = Form.calls.argsFor( 0 )[ 1 ];
 					expect( config.category.values ).toEqual( [ barrier.barrier_type.category ] );
-
 				} );
 			} );
 		} );
@@ -243,8 +243,9 @@ describe( 'Barrier type controller', () => {
 
 			getTemplateValuesResponse = {
 				barrierType: [
-					{ value: 1, text: 'barrier 1', category: 'GOODS', description: 'some text' },
-					{ value: 2, text: 'barrier 2', category: 'SERVICES', description: 'a bit more text' }
+					{ value: 1, text: 'barrier 2', category: 'GOODS', description: 'some text 2' },
+					{ value: 2, text: 'barrier 1', category: 'GOODS', description: 'some text 1' },
+					{ value: 3, text: 'barrier 3', category: 'SERVICES', description: 'a bit more text' }
 				]
 			};
 
@@ -262,17 +263,23 @@ describe( 'Barrier type controller', () => {
 
 			const args = Form.calls.argsFor( 0 );
 			const config = args[ 1 ];
-			const goodsBarrierType = metadata.barrierTypes[ 0 ];
+			const goodsBarrierType1 = metadata.barrierTypes[ 0 ];
+			const goodsBarrierType2 = metadata.barrierTypes[ 1 ];
 
 			expect( args[ 0 ] ).toEqual( req );
 
 			expect( config.barrierType ).toBeDefined();
 			expect( config.barrierType.type ).toEqual( Form.RADIO );
 			expect( config.barrierType.items ).toEqual( [{
-				value: goodsBarrierType.id,
-				text: goodsBarrierType.title,
-				category: goodsBarrierType.category,
-				conditional: { html: `<div class="conditional-barrier-type-content">${ goodsBarrierType.description }</div>` }
+				value: goodsBarrierType1.id,
+				text: goodsBarrierType1.title,
+				category: goodsBarrierType1.category,
+				conditional: { html: `<div class="conditional-barrier-type-content">${ goodsBarrierType1.description }</div>` }
+			},{
+				value: goodsBarrierType2.id,
+				text: goodsBarrierType2.title,
+				category: goodsBarrierType2.category,
+				conditional: { html: `<div class="conditional-barrier-type-content">${ goodsBarrierType2.description }</div>` }
 			}] );
 			expect( config.barrierType.values ).toEqual( [ barrier.barrier_type.id ] );
 			expect( config.barrierType.validators[ 0 ].fn ).toEqual( validators.isBarrierType );
