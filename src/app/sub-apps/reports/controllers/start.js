@@ -16,7 +16,7 @@ module.exports = ( req, res ) => {
 			items: govukItemsFromObj( metadata.statusTypes ),
 			validators: [{
 				fn: validators.isMetadata( 'statusTypes' ),
-				message: 'Select a barrier urgency'
+				message: 'Select a barrier scope'
 			}]
 		}
 	} );
