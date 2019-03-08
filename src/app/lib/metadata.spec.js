@@ -96,7 +96,10 @@ describe( 'metadata', () => {
 			it( 'Should return the data', () => {
 
 				expect( metadata.statusTypes ).toBeDefined();
-				expect( metadata.statusTypes ).toEqual( fakeData.status_types );
+				expect( metadata.statusTypes ).toEqual( {
+					'1': 'A procedural/short-term barrier',
+					'2': 'A long term strategic barrier'
+				} );
 			} );
 		} );
 
@@ -108,11 +111,11 @@ describe( 'metadata', () => {
 			} );
 		} );
 
-		describe( 'boolScale', () => {
+		describe( 'optionalBool', () => {
 			it( 'Should return the data', () => {
 
-				expect( metadata.boolScale ).toBeDefined();
-				expect( metadata.boolScale ).toEqual( fakeData.adv_boolean );
+				expect( metadata.optionalBool ).toBeDefined();
+				expect( metadata.optionalBool ).toEqual( fakeData.adv_boolean );
 			} );
 		} );
 

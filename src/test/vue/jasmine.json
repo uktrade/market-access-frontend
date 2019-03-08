@@ -1,0 +1,10 @@
+{
+	"spec_dir": ".tmp/webpack-tests",
+	"spec_files": [
+	  "**/*.spec.js"
+	],
+	"helpers": [
+		"../../src/test/vue/helpers/*.js"
+	],
+	"random": false
+ }

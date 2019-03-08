@@ -168,9 +168,13 @@ module.exports.fetch = async () => {
 			uniqueBarrierTypes = dedupeBarrierTypes( barrierTypes );
 			barrierPriorities = body.barrier_priorities.map( barrierPriority ).sort( sortPriority );
 
-			module.exports.statusTypes = body.status_types;
+			module.exports.statusTypes = {
+				...body.status_types,
+				'1': 'A procedural/short-term barrier',
+				'2': 'A long term strategic barrier'
+			};
 			module.exports.lossScale = body.loss_range;
-			module.exports.boolScale = body.adv_boolean;
+			module.exports.optionalBool = body.adv_boolean;
 			module.exports.countries = countries;
 			module.exports.adminAreas = adminAreas;
 			module.exports.govResponse = body.govt_response;

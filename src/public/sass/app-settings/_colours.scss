@@ -35,5 +35,6 @@ $govuk-blue-15: tint( $govuk-blue, 85 );
 $priority-high: govuk-colour( 'bright-red' );
 $priority-medium: govuk-colour( 'orange' );
 $priority-low: govuk-colour( 'yellow' );
-
 $priority-unknown: $govuk-grey-2;
+
+$focus-colour: $govuk-yellow;

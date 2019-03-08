@@ -1,0 +1,15 @@
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Add - Error submitting barrier{% endblock %}
+
+{% block page_content %}
+
+	<h1>Unable to submit barrier</h1>
+
+	<p class="restrict-width">
+		Since you started adding this barrier we have added a new question. <a href="{{ urls.reports.aboutProblem( report.id ) }}#eu-exit-related-1">Go to about the barrier</a> and answer if this barrier is EU exit related.
+	</p>
+
+{% endblock %}

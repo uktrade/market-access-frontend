@@ -310,8 +310,8 @@ module.exports = {
 			product: getValue( values.item ),
 			barrier_title: getValue( values.barrierTitle ),
 			source: getValue( values.barrierSource ),
-			eu_exit_related: getValue( values.euExitRelated),
 			other_source: getValue( values.barrierSourceOther ),
+			eu_exit_related: getValue( values.euExitRelated ),
 		} ),
 		saveSummaryAndSubmit: async ( req, reportId, values ) => {
 

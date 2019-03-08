@@ -32,6 +32,7 @@ describe( 'Edit barrier controller', () => {
 			getCountryList: () =>  [ 'country one', 'country two' ],
 			getBarrierPrioritiesList: jasmine.createSpy( 'metadata.getBarrierPrioritiesList' ),
 			bool: { a: 1, b: 2 },
+			optionalBool: { c: 3, d: 4 },
 		};
 
 		govukItemsFromObjResponse = { a: 1, b: 2 };
@@ -482,12 +483,12 @@ describe( 'Edit barrier controller', () => {
 
 		const template = 'barriers/views/edit/eu-exit-related';
 		let barrier;
-		let boolResponse;
+		let optionalBoolResponse;
 
 		beforeEach( () => {
 
-			boolResponse = { 'boolResponse': 'yes' };
-			validators.isMetadata.and.callFake( () => boolResponse );
+			optionalBoolResponse = { 'optionalBoolResponse': 'yes' };
+			validators.isMetadata.and.callFake( () => optionalBoolResponse );
 			barrier = jasmine.helpers.getFakeData( '/backend/barriers/barrier' );
 			govukItemsFromObjResponse = [
 				{
@@ -512,8 +513,9 @@ describe( 'Edit barrier controller', () => {
 			expect( config.euExitRelated.type ).toEqual( RADIO );
 			expect( config.euExitRelated.values ).toEqual( [ barrier.eu_exit_related ] );
 			expect( config.euExitRelated.items ).toEqual( govukItemsFromObjResponse );
-			expect( config.euExitRelated.validators[ 0 ].fn ).toEqual( boolResponse );
-			expect( govukItemsFromObj ).toHaveBeenCalledWith( metadata.bool );
+			expect( config.euExitRelated.validators[ 0 ].fn ).toEqual( optionalBoolResponse );
+			expect( govukItemsFromObj ).toHaveBeenCalledWith( metadata.optionalBool );
+			expect( validators.isMetadata ).toHaveBeenCalledWith( 'optionalBool' );
 		});
 
 		it( 'Should configure the FormProcessor correctly', async () => {

@@ -2,31 +2,22 @@ const backend = require( '../lib/backend-service' );
 const validators = require( '../lib/validators' );
 const viewModel = require( '../view-models/find-a-barrier' );
 
-const FILTERS = {
+const FILTERS = Object.entries( {
 	country: validators.isCountry,
 	sector: validators.isSector,
 	type: validators.isBarrierType,
 	priority: validators.isBarrierPriority,
-};
+} );
 
 function getFilters( query ){
 
 	const filters = {};
 
-	for( let [ name, validator ] of Object.entries( FILTERS ) ){
+	for( let [ name, validator ] of FILTERS ){
 
-		const value = query[ name ];
-		const isArray = Array.isArray( value );
-		let validValues = [];
-
-		if( isArray ){
-
-			validValues = value.filter( validator );
-
-		} else if( validator( value ) ){
-
-			validValues.push( value );
-		}
+		const queryValue = ( query[ name ] || '' );
+		const values = ( Array.isArray( queryValue ) ? queryValue : queryValue.split( ',' ) );
+		const validValues = values.filter( validator );
 
 		if( validValues.length ){
 
