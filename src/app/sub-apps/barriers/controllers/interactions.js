@@ -2,12 +2,12 @@ const config = require( '../../../config' );
 const metadata = require( '../../../lib/metadata' );
 const reporter = require( '../../../lib/reporter' );
 const backend = require( '../../../lib/backend-service' );
-const uploadFile = require( '../../../lib/upload-file' );
 const Form = require( '../../../lib/Form' );
 const FormProcessor = require( '../../../lib/FormProcessor' );
 const urls = require( '../../../lib/urls' );
 const validators = require( '../../../lib/validators' );
 const fileSize = require( '../../../lib/file-size' );
+const uploadDocument = require( '../../../lib/upload-document' );
 const detailVieWModel = require( '../view-models/detail' );
 const interactionsViewModel = require( '../view-models/interactions' );
 
@@ -90,72 +90,6 @@ async function renderInteractions( req, res, next, opts = {} ){
 
 		next( e );
 	}
-}
-
-function uploadDocument( req, file ) {
-
-	return new Promise( async ( resolve, reject ) => {
-
-		try {
-
-			const { response, body } = await backend.documents.create( req, file.name, file.size );
-
-			if( response.isSuccess ){
-
-				const { id, signed_upload_url } = body;
-
-				uploadFile( signed_upload_url, file ).then( async ( { response } ) => {
-
-					if( response.statusCode === 200 ){
-
-						const { response } = await backend.documents.uploadComplete( req, id );
-
-						if( response.isSuccess ){
-
-							resolve( id );
-
-						} else {
-
-							const err = new Error( 'Unable to complete upload' );
-
-							reject( err );
-							reporter.captureException( err, { response: {
-								statusCode: response.statusCode,
-								documentId: id,
-							} } );
-						}
-
-					} else {
-
-						const err = new Error( 'Unable to upload document to S3' );
-
-						reject( err );
-						reporter.captureException( err, {
-							response: {
-								statusCode: response.statusCode,
-								body: response.body,
-								documentId: id,
-							}
-						} );
-					}
-
-				} ).catch( ( e ) => {
-
-					reject( e );
-					reporter.captureException( e, { documentId: id } );
-				} );
-
-			} else {
-
-				reject( new Error( 'Could not create document' ) );
-			}
-
-		} catch ( e ){
-
-			reject( e );
-		}
-
-	} );
 }
 
 function getUploadedDocuments( sessionDocuments, id ){

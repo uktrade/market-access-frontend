@@ -43,5 +43,10 @@ if( typeof jasmine !== 'undefined' ){
 				csrfToken,
 			};
 		},
+
+		reporter: () => ({
+			message: jasmine.createSpy( 'reporter.message' ),
+			captureException: jasmine.createSpy( 'reporter.captureException' ),
+		})
 	};
 }

@@ -25,7 +25,7 @@ describe( 'Barrier interactions controller', () => {
 	let barrierDetailViewModel;
 	let interactionsViewModel;
 	let barrierId;
-	let uploadFile;
+	let uploadDocument;
 
 	beforeEach( () => {
 
@@ -53,8 +53,6 @@ describe( 'Barrier interactions controller', () => {
 		next = jasmine.createSpy( 'next' );
 		backend = {
 			documents: {
-				create: jasmine.createSpy( 'backend.documents.create' ),
-				uploadComplete: jasmine.createSpy( 'backend.documents.uploadComplete' ),
 				getScanStatus: jasmine.createSpy( 'backend.documents.getScanStatus' ),
 			},
 			barriers: {
@@ -96,7 +94,7 @@ describe( 'Barrier interactions controller', () => {
 		FormProcessor = jasmine.createSpy( 'FormProcessor' ).and.callFake( () => processor );
 		barrierDetailViewModel = jasmine.createSpy( 'barrierDetailViewModel' );
 		interactionsViewModel = jasmine.createSpy( 'interactionsViewModel' );
-		uploadFile = jasmine.createSpy( 'uploadFile' );
+		uploadDocument = jasmine.createSpy( 'uploadDocument' );
 
 		validators = {
 			isNumeric: jasmine.createSpy( 'validators.isNumeric' ),
@@ -117,7 +115,7 @@ describe( 'Barrier interactions controller', () => {
 			'../../../lib/validators': validators,
 			'../view-models/detail': barrierDetailViewModel,
 			'../view-models/interactions': interactionsViewModel,
-			'../../../lib/upload-file': uploadFile,
+			'../../../lib/upload-document': uploadDocument,
 		} );
 	} );
 
@@ -449,7 +447,6 @@ describe( 'Barrier interactions controller', () => {
 
 					let config;
 					let formValues;
-					let signed_upload_url;
 					let documentId;
 
 					beforeEach( async () => {
@@ -458,7 +455,6 @@ describe( 'Barrier interactions controller', () => {
 
 						config = FormProcessor.calls.argsFor( 0 )[ 0 ];
 						documentId = uuid();
-						signed_upload_url = 'a/b/c';
 						formValues = {
 							note: faker.lorem.words(),
 							pinned: true,
@@ -471,7 +467,7 @@ describe( 'Barrier interactions controller', () => {
 
 							const err = new Error( 'My test' );
 
-							backend.documents.create.and.callFake( () => Promise.reject( err ) );
+							uploadDocument.and.callFake( () => Promise.reject( err ) );
 
 							await config.saveFormData( formValues );
 
@@ -479,31 +475,16 @@ describe( 'Barrier interactions controller', () => {
 						} );
 					} );
 
-					describe( 'When uploadDocument returns success', () => {
+					describe( 'When uploadDocument resolves', () => {
 
 						beforeEach( () => {
 
-							backend.documents.create.and.callFake( () => Promise.resolve( { response: {
-								isSuccess: true
-							}, body: {
-								id: documentId,
-								signed_upload_url,
-							} }));
-
-							uploadFile.and.callFake( () => Promise.resolve( {
-								response: { statusCode: 200 },
-							} ) );
-
-							backend.documents.uploadComplete.and.callFake( () => Promise.resolve( {
-								response: { isSuccess: true },
-							} ) );
+							uploadDocument.and.callFake( () => Promise.resolve( documentId ) );
 						} );
 
 						afterEach( () => {
 
-							expect( backend.documents.create ).toHaveBeenCalledWith( req, formValues.document.name, formValues.document.size );
-							expect( uploadFile ).toHaveBeenCalledWith( signed_upload_url, formValues.document );
-							expect( backend.documents.uploadComplete ).toHaveBeenCalledWith( req, documentId );
+							expect( uploadDocument ).toHaveBeenCalledWith( req, formValues.document );
 							expect( backend.documents.getScanStatus ).toHaveBeenCalledWith( req, documentId );
 						} );
 
