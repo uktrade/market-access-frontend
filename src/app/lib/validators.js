@@ -17,6 +17,10 @@ module.exports = {
 	isUuid: ( value ) => uuid.test( value ),
 	isMetadata: ( key ) => ( value ) => Object.keys( metadata[ key ] ).includes( value ),
 	isCountry: ( value ) => metadata.countries.some( ( country ) => country.id === value ),
+	isCountryAdminArea: (value) => metadata.adminAreas.some( (adminArea) => {
+		console.log(`admin area ${adminArea.id}, value ${value}`);
+		adminArea.id === value;
+	}),
 	isSector: ( value ) => metadata.sectors.some( ( sector ) => sector.id === value ),
 	isOneBoolCheckboxChecked: ( values ) => {
 

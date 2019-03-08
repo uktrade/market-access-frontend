@@ -1,6 +1,7 @@
 const backend = require( './backend-request' );
 
 let countries;
+let adminAreasByCountry;
 let adminAreas;
 let sectors;
 let level0Sectors;
@@ -22,26 +23,23 @@ function cleanCountry( item ){
 }
 
 // Groups the admin areas into seperate areas of objects relating to country
-function alterAdminAreasData( countryAdminAreas ) {
+function alterAdminAreasData( adminAreas ) {
 
-	// Define UUIDs so we have reference to country and id
-	let unitedStatesUUID = '81756b9a-5d95-e211-a939-e4115bead28a';
-	let canadaUUID = '5daf72a6-5d95-e211-a939-e4115bead28a';
-
-	let adminAreaList = {
-		[unitedStatesUUID]: [],
-		[canadaUUID]: [],
-	};
+	let alteredAdminAreas = {};
 
 	// Loop through each admin area and push it to the corresponding 
 	// array based on country ID 
-	countryAdminAreas.forEach( ( countryAdminArea ) => {
-		adminAreaList[countryAdminArea.country.id].push(countryAdminArea);
+	adminAreas.forEach( ( countryAdminArea ) => {
+		// Key already exists for country
+		if (countryAdminArea.country.id in alteredAdminAreas) {
+			alteredAdminAreas[countryAdminArea.country.id].push(countryAdminArea);
+		// Key does not exist for country
+		} else {
+			alteredAdminAreas[countryAdminArea.country.id] = [];
+			alteredAdminAreas[countryAdminArea.country.id].push(countryAdminArea);
+		}
 	} );
-
-	console.log('ADMIN AREA LIST', adminAreaList);
-
-	return adminAreaList;
+	return alteredAdminAreas;
 }
 
 function addNumber( tasks ){
@@ -98,6 +96,19 @@ function createCountryList( countries, text ){
 	return countryList;
 }
 
+function createAdminAreaList (country, adminAreas, text) {
+	// console.log('country', country);
+	// console.log('adminareas', adminAreas);
+	const adminAreaList = adminAreas[country].map( ( adminArea ) => ( {
+		value: adminArea.id,
+		text: adminArea.name
+	} ) );
+
+	adminAreaList.unshift( { value: '', text } );
+
+	return adminAreaList;
+}
+
 function createSectorsList( sectors, text ){
 
 	const sectorList = sectors.map( ( sector ) => ( {
@@ -149,7 +160,8 @@ module.exports.fetch = async () => {
 		if( response.isSuccess ){
 
 			countries = body.countries.filter( notDisabled ).map( cleanCountry );
-			adminAreas = alterAdminAreasData(body.country_admin_areas);
+			adminAreas = body.country_admin_areas;
+			adminAreasByCountry = alterAdminAreasData(body.country_admin_areas);
 			sectors = body.sectors.filter( notDisabled );
 			level0Sectors = sectors.filter( ( sector ) => sector.level === 0 );
 			barrierTypes = body.barrier_types;
@@ -203,7 +215,6 @@ module.exports.fetch = async () => {
 };
 
 module.exports.getCountryList = ( defaultText = 'Choose a country' ) => createCountryList( countries, defaultText );
-module.exports.getCountryAdminAreas = ( countryID, defaultText = 'Choose an admin area') => createAdminAreaList(countryID, defaultText);
 module.exports.getSectorList = ( defaultText = 'Select a sector' ) => createSectorsList( level0Sectors, defaultText );
 module.exports.getSector = ( sectorId ) => sectors.find( ( sector ) => sector.id === sectorId );
 module.exports.getCountry = ( countryId ) => countries.find( ( country ) => country.id === countryId );
@@ -227,6 +238,10 @@ module.exports.getBarrierPrioritiesList = ( opts = {} ) => barrierPriorities.map
 const OPEN = 2;
 const RESOLVED = 4;
 const HIBERNATED = 5;
+
+module.exports.getCountryAdminAreasList = ( countryID, defaultText = 'Applies to all [states/provinces]') => createAdminAreaList(countryID, adminAreasByCountry, defaultText);
+module.exports.isCountryWithAdminArea = ( countryID ) => countryID in adminAreasByCountry;
+
 
 module.exports.barrier = {
 	status: {

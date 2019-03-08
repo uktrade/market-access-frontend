@@ -1,0 +1,62 @@
+{% from 'components/select/macro.njk' import govukSelect %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Add - Location of the barrier{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.reports.country( report.id ) },
+		caption: 'Add a barrier',
+		text: 'Location of the barrier',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.reports.hasState( report.id ) }}" method="POST" class="restrict-width">
+
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{{ govukSelect( {
+
+			label: {
+				text: "Exports to which country are affected by this issue?",
+				classes: 'govuk-label--s'
+			},
+			id: 'country-disabled',
+			name: 'country-disabled',
+			classes: 'govuk-!-width-full',
+			items: country,
+            attributes: {
+                disabled: true
+            },
+			errorMessage: errors | errorForName( 'country' )
+		} ) }}
+
+        {{ govukSelect( {
+			id: 'country',
+			name: 'country',
+			classes: 'govuk-!-width-full visually-hidden',
+			items: country,
+			errorMessage: errors | errorForName( 'country-admin-area' )
+		} ) }}
+
+        {{ govukSelect( {
+
+			label: {
+				text: "Select a [state/province] (optional)",
+				classes: 'govuk-label--s'
+			},
+			id: 'admin-area',
+			name: 'adminArea',
+			classes: 'govuk-!-width-full',
+			items: countryAdminArea,
+			errorMessage: errors | errorForName( 'adminArea' )
+		} ) }}
+        
+
+		<input type="submit" class="govuk-button" value="Continue">
+
+	</form>
+{% endblock %}

@@ -10,6 +10,7 @@ const reportId = require( './middleware/params/report-id' );
 
 const hasStartFormValues = require( './middleware/has-start-form-values' );
 const hasResolvedFormValues = require( './middleware/has-resolved-form-values' );
+const hasCountryFormValues = require('././middleware/has-country-form-values');
 
 const csrfProtection = csurf();
 
@@ -33,6 +34,9 @@ module.exports = ( express, app ) => {
 
 	app.get( '/:reportId?/country/', hasStartFormValues, hasResolvedFormValues, controller.country );
 	app.post( '/:reportId?/country/', hasStartFormValues, hasResolvedFormValues, controller.country );
+
+	app.get( '/:reportId?/has-state/', hasStartFormValues, hasResolvedFormValues, hasCountryFormValues, controller.hasState );
+	app.post( '/:reportId?/has-state/', hasStartFormValues, hasResolvedFormValues, hasCountryFormValues, controller.hasState );
 
 	app.get( '/:reportId/has-sectors/', controller.hasSectors );
 	app.post( '/:reportId/has-sectors/', controller.hasSectors );

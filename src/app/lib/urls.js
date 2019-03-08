@@ -27,6 +27,7 @@ const reportUrl = {
 	start: ( reportId ) => `/reports/${ getReportPath( reportId ) }/start/`,
 	isResolved: ( reportId ) => `/reports/${ getReportPath( reportId ) }/is-resolved/`,
 	country: ( reportId ) => `/reports/${ getReportPath( reportId ) }/country/`,
+	hasState: ( reportId ) => `/reports/${ getReportPath( reportId ) }/has-state/`,
 	hasSectors: ( reportId ) => `/reports/${ reportId }/has-sectors/`,
 	sectors: ( reportId ) => `/reports/${ reportId }/sectors/`,
 	addSector: ( reportId ) => `/reports/${ reportId }/sectors/add/`,

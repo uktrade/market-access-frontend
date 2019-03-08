@@ -55,6 +55,7 @@ describe( 'Report controllers', () => {
 			'./start': 'start',
 			'./is-resolved': 'isResolved',
 			'./country': 'country',
+			'./has-state': 'hasState',
 			'./has-sectors': 'hasSectors',
 			'./sectors': 'sectors',
 			'./about-problem': 'aboutProblem',

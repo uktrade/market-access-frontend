@@ -9,6 +9,7 @@ module.exports = {
 	start: require( './start' ),
 	isResolved: require( './is-resolved' ),
 	country: require( './country' ),
+	hasState: require('./has-state'),
 	hasSectors: require( './has-sectors' ),
 	sectors: require( './sectors' ),
 	aboutProblem: require( './about-problem' ),
