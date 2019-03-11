@@ -118,6 +118,10 @@ function barrierPriority( priority ){
 	};
 }
 
+function sortOverseasRegions( a, b ){
+	return a.name.localeCompare( b.name );
+}
+
 module.exports.fetch = async () => {
 
 	try {
@@ -128,7 +132,7 @@ module.exports.fetch = async () => {
 
 			const availableCountries = body.countries.filter( notDisabled );
 
-			overseasRegions = getOverseasRegions( availableCountries );
+			overseasRegions = getOverseasRegions( availableCountries ).sort( sortOverseasRegions );
 			countries = availableCountries.map( cleanCountry );
 			sectors = body.sectors.filter( notDisabled );
 			level0Sectors = sectors.filter( ( sector ) => sector.level === 0 );

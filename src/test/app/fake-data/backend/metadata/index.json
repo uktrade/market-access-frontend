@@ -145,6 +145,15 @@
          "id": "3febacf2-cfdc-4d31-8794-41e69cf509ef",
          "name": "Mali",
          "disabled_on": "Fri Dec 08 2017 23:40:33 GMT+0000 (GMT)"
+		},
+		{
+         "id": "a37cc3be-c719-4530-b99a-b07429a141cc",
+         "name": "Dominican Republic",
+         "disabled_on": null,
+         "overseas_region": {
+            "id": "1e1cb902-f4c5-4126-8968-7488506eef22",
+            "name": "et vero tempora"
+         }
       }
    ],
    "sectors": [

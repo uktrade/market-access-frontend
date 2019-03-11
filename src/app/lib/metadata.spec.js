@@ -124,7 +124,8 @@ describe( 'metadata', () => {
 
 				const output = [
 					fakeData.countries[ 0 ],
-					fakeData.countries[ 1 ]
+					fakeData.countries[ 1 ],
+					fakeData.countries[ 3 ]
 				].map( ( { id, name } ) => ({ id, name }) );
 
 				expect( metadata.countries ).toEqual( output );
@@ -179,10 +180,10 @@ describe( 'metadata', () => {
 		describe( 'overseasRegions', () => {
 			it( 'Should return the data', () => {
 
-				expect( metadata.overseasRegions ).toEqual( [{
-					'id': 'd9fdeed8-247e-4f54-8fd2-e86077e9faf3',
-					'name': 'quis porro blanditiis'
-				}] );
+				expect( metadata.overseasRegions ).toEqual( [
+					fakeData.countries[ 3 ].overseas_region,
+					fakeData.countries[ 1 ].overseas_region,
+				] );
 			} );
 		} );
 
