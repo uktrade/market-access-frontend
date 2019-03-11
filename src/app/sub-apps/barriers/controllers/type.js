@@ -5,6 +5,7 @@ const urls = require( '../../../lib/urls' );
 const validators = require( '../../../lib/validators' );
 const metadata = require( '../../../lib/metadata' );
 const govukItemsFromObj = require( '../../../lib/govuk-items-from-object' );
+const sortGovukItems = require( '../../../lib/sort-govuk-items' );
 
 function barrierTypeToRadio( item ){
 
@@ -30,7 +31,7 @@ module.exports = {
 		const category = req.category;
 		const barrier = req.barrier;
 		const typeId = ( barrier.barrier_type && barrier.barrier_type.id );
-		const items = metadata.barrierTypes.filter( isBarrierTypeCategory( category ) ).map( barrierTypeToRadio );
+		const items = metadata.barrierTypes.filter( isBarrierTypeCategory( category ) ).map( barrierTypeToRadio ).sort( sortGovukItems.alphabetical );
 		const form = new Form( req, {
 			barrierType: {
 				type: Form.RADIO,

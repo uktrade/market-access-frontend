@@ -25,7 +25,10 @@
 					classes: 'govuk-fieldset__legend--s'
 				}
 			},
-			items: status,
+			items: status | addToRadio( {
+				'1': { hint: { text: 'for example, goods stuck at the border or documentation issue' } },
+				'2': { hint: { text: 'for example, a change of regulation' } }
+			} ),
 			errorMessage: errors | errorForName( 'status-1' )
 		}) }}
 
