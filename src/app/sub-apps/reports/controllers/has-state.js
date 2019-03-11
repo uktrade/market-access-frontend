@@ -10,7 +10,46 @@ module.exports = async ( req, res, next ) => {
     const report  = ( req.report || {} );
     
     if (!metadata.isCountryWithAdminArea(countryFormValue.country)){
-        await saveData(req, report, next, false);
+        try {
+            const reportId = report.id;
+            const sessionStartForm = ( req.session.startFormValues || req.report && { status: req.report.problem_status } );
+            const sessionResolvedForm = ( req.session.isResolvedFormValues || req.report && { isResolved: req.report.is_resolved, resolvedDate: req.report.resolved_date } );
+            const isUpdate = !!reportId;
+    
+            let response;
+            let body;
+            let values = Object.assign( {}, sessionStartForm, sessionResolvedForm, countryFormValue );
+    
+            if( isUpdate ){
+                ({ response, body } = await backend.reports.update( req, reportId, values ));
+            } else {
+                ({ response, body } = await backend.reports.save( req, values ));
+            }
+    
+            if( response.isSuccess ){
+    
+                delete req.session.startFormValues;
+                delete req.session.isResolvedFormValues;
+                delete req.session.countryFormValues;
+    
+                if( !isUpdate && !body.id ){
+    
+                    return next( new Error( 'No id created for report' ) );
+    
+                } else {
+    
+                    return res.redirect( urls.reports.hasSectors( body.id ) );
+                }
+    
+            } else {
+    
+                return next( new Error( `Unable to ${ isUpdate ? 'update' : 'save' } report, got ${ response.statusCode } response code` ) );
+            }
+    
+        } catch( e ){
+    
+            return next( e );
+        }
     }
 
 	const form = new Form( req, {
@@ -27,9 +66,9 @@ module.exports = async ( req, res, next ) => {
 			]
 		},
 
-		countryAdminArea: {
+		countryAdminAreas: {
 			type: Form.SELECT,
-			values: [ report.country_admin_area ],
+			values: [ report.country_admin_areas ],
 			items: metadata.getCountryAdminAreasList(countryFormValue.country),
 			validators: [
 				{
@@ -45,58 +84,47 @@ module.exports = async ( req, res, next ) => {
         form.validate();
         
 		if( !form.hasErrors() ){
-            await saveData(req, report, next, true);
-		}
-    }
-    
-    async function saveData(req, report, next, withState){
-        try {
-            const reportId = report.id;
-            const sessionStartForm = ( req.session.startFormValues || req.report && { status: req.report.problem_status } );
-            const sessionResolvedForm = ( req.session.isResolvedFormValues || req.report && { isResolved: req.report.is_resolved, resolvedDate: req.report.resolved_date } );
-            const isUpdate = !!reportId;
+            try {
+                const reportId = report.id;
+                const sessionStartForm = ( req.session.startFormValues || req.report && { status: req.report.problem_status } );
+                const sessionResolvedForm = ( req.session.isResolvedFormValues || req.report && { isResolved: req.report.is_resolved, resolvedDate: req.report.resolved_date } );
+                const isUpdate = !!reportId;
+        
+                let response;
+                let body;
+                let values = Object.assign( {}, sessionStartForm, sessionResolvedForm, countryFormValue, form.getValues() );
 
-            let response;
-            let body;
-            let values = Object.assign( {}, sessionStartForm, sessionResolvedForm, countryFormValue );
-            
-            if (withState) {
-                values = Object.assign(values, form.getValues());
-            }
-
-            if( isUpdate ){
-                ({ response, body } = await backend.reports.update( req, reportId, values ));
-            } else {
-                console.log("trying to save");
-                ({ response, body } = await backend.reports.save( req, values ));
-            }
-
-            if( response.isSuccess ){
-
-                delete req.session.startFormValues;
-                delete req.session.isResolvedFormValues;
-                delete req.session.countryFormValues;
-
-                if( !isUpdate && !body.id ){
-
-                    return next( new Error( 'No id created for report' ) );
-
+                if( isUpdate ){
+                    ({ response, body } = await backend.reports.update( req, reportId, values ));
                 } else {
-                    console.log('trying to redirect');
-                    // TODO: Can this be cached again?
-                    //req.session.report = body;
-                    return res.redirect( urls.reports.hasSectors( body.id ) );
+                    ({ response, body } = await backend.reports.save( req, values ));
                 }
-
-            } else {
-
-                return next( new Error( `Unable to ${ isUpdate ? 'update' : 'save' } report, got ${ response.statusCode } response code` ) );
+        
+                if( response.isSuccess ){
+        
+                    delete req.session.startFormValues;
+                    delete req.session.isResolvedFormValues;
+                    delete req.session.countryFormValues;
+        
+                    if( !isUpdate && !body.id ){
+        
+                        return next( new Error( 'No id created for report' ) );
+        
+                    } else {
+        
+                        return res.redirect( urls.reports.hasSectors( body.id ) );
+                    }
+        
+                } else {
+        
+                    return next( new Error( `Unable to ${ isUpdate ? 'update' : 'save' } report, got ${ response.statusCode } response code` ) );
+                }
+        
+            } catch( e ){
+        
+                return next( e );
             }
-
-        } catch( e ){
-
-            return next( e );
-        }
+		}
     }
 
 	res.render( 'reports/views/has-state', form.getTemplateValues() );
