@@ -42,10 +42,10 @@ module.exports = async ( req, res, next ) => {
 
     if( form.isPost ){
 
-		form.validate();
-
+        form.validate();
+        
 		if( !form.hasErrors() ){
-            saveData(req, report, next, true);
+            await saveData(req, report, next, true);
 		}
     }
     
@@ -61,11 +61,13 @@ module.exports = async ( req, res, next ) => {
             let values = Object.assign( {}, sessionStartForm, sessionResolvedForm, countryFormValue );
             
             if (withState) {
-                values.assign(form.getValues());
+                values = Object.assign(values, form.getValues());
             }
+
             if( isUpdate ){
                 ({ response, body } = await backend.reports.update( req, reportId, values ));
             } else {
+                console.log("trying to save");
                 ({ response, body } = await backend.reports.save( req, values ));
             }
 
@@ -80,6 +82,7 @@ module.exports = async ( req, res, next ) => {
                     return next( new Error( 'No id created for report' ) );
 
                 } else {
+                    console.log('trying to redirect');
                     // TODO: Can this be cached again?
                     //req.session.report = body;
                     return res.redirect( urls.reports.hasSectors( body.id ) );

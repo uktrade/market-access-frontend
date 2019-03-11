@@ -31,7 +31,7 @@
             attributes: {
                 disabled: true
             },
-			errorMessage: errors | errorForName( 'country' )
+			errorMessage: errors | errorForName( 'country-disabled-1' )
 		} ) }}
 
         {{ govukSelect( {
@@ -39,7 +39,7 @@
 			name: 'country',
 			classes: 'govuk-!-width-full visually-hidden',
 			items: country,
-			errorMessage: errors | errorForName( 'country-admin-area' )
+			errorMessage: errors | errorForName( 'country' )
 		} ) }}
 
         {{ govukSelect( {
@@ -48,11 +48,11 @@
 				text: "Select a [state/province] (optional)",
 				classes: 'govuk-label--s'
 			},
-			id: 'admin-area',
-			name: 'adminArea',
+			id: 'country-admin-area',
+			name: 'countryAdminArea',
 			classes: 'govuk-!-width-full',
 			items: countryAdminArea,
-			errorMessage: errors | errorForName( 'adminArea' )
+			errorMessage: errors | errorForName( 'country-admin-area' )
 		} ) }}
         
 

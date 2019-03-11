@@ -222,6 +222,7 @@ module.exports.getCountryList = ( defaultText = 'Choose a country' ) => createCo
 module.exports.getSectorList = ( defaultText = 'Select a sector' ) => createSectorsList( level0Sectors, defaultText );
 module.exports.getSector = ( sectorId ) => sectors.find( ( sector ) => sector.id === sectorId );
 module.exports.getCountry = ( countryId ) => countries.find( ( country ) => country.id === countryId );
+
 module.exports.getBarrierType = ( typeId ) => uniqueBarrierTypes.find( ( type ) => type.id == typeId );
 module.exports.getBarrierPriority = ( priorityCode ) => barrierPriorities.find( ( priority ) => priority.code == priorityCode );
 
@@ -245,7 +246,7 @@ const HIBERNATED = 5;
 
 module.exports.getCountryAdminAreasList = ( countryID, defaultText = 'Applies to all [states/provinces]') => createAdminAreaList(countryID, adminAreasByCountry, defaultText);
 module.exports.isCountryWithAdminArea = ( countryID ) => countryID in adminAreasByCountry;
-
+module.exports.getAdminArea = (adminAreaId) => adminAreas.find( ( AdminArea ) => AdminArea.id === adminAreaId );
 
 module.exports.barrier = {
 	status: {
