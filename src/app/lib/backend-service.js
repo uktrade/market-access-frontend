@@ -288,33 +288,20 @@ module.exports = {
 		getAll: ( req ) => backend.get( '/reports?ordering=-created_on', getToken( req ) ).then( transformReportList ),
 		getForCountry: ( req, countryId ) => backend.get( `/reports?export_country=${ countryId }&ordering=-created_on`, getToken( req ) ).then( transformReportList ),
 		get: ( req, reportId ) => backend.get( `/reports/${ reportId }`, getToken( req ) ).then( transformSingleReport ),
-		save: ( req, values ) => {
-			let formValues = {
-				problem_status: getValue( values.status ),
-				is_resolved: getValue( values.isResolved ),
-				resolved_date: getValue( getDefaultedDate( values.resolvedDate ) ),
-				export_country: getValue( values.country )
-			};
-			if ('adminAreas' in values) {
-				formValues.country_admin_areas = getValue( values.adminAreas );
-			}
-			console.log('formValues', formValues);
-			return backend.post( '/reports', getToken( req ), formValues);
-		},
-		update: ( req, reportId, values ) => {
-			let formValues = {
-				problem_status: getValue( values.status ),
-				is_resolved: getValue( values.isResolved ),
-				resolved_date: getValue( getDefaultedDate( values.resolvedDate ) ),
-				export_country: getValue( values.country )
-			};
-			if ('adminAreas' in values) {
-				formValues.country_admin_areas = getValue( values.adminAreas );
-			}
-			console.log('formValues', formValues);
-			return updateReport( getToken( req ), reportId, formValues);
-			
-		},
+		save: ( req, values ) => backend.post( '/reports', getToken( req ), {
+			problem_status: getValue( values.status ),
+			is_resolved: getValue( values.isResolved ),
+			resolved_date: getValue( getDefaultedDate( values.resolvedDate ) ),
+			export_country: getValue( values.country ),
+			country_admin_areas: getValue(values.adminArea)
+		} ),
+		update: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
+			problem_status: getValue( values.status ),
+			is_resolved: getValue( values.isResolved ),
+			resolved_date: getValue( getDefaultedDate( values.resolvedDate ) ),
+			export_country: getValue( values.country ),
+			country_admin_areas: getValue(values.adminArea)
+		} ),
 		saveHasSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 			sectors_affected: getValue( values.hasSectors )
 		} ),
