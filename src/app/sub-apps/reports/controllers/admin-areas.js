@@ -9,12 +9,12 @@ module.exports = {
 
 		const report = req.report;
 		const isPost = req.method === 'POST';
-
+		
 		if( !req.session.adminAreas ){
-			req.session.adminAreas = ( report.adminAreas || [] );
+			req.session.adminAreas = ( report.country_admin_areas || [] );
 		}
 
-        const adminAreas = req.session.adminAreas;
+		const adminAreas = req.session.adminAreas;
 
 		if( isPost ){
             console.log("trying to post");
@@ -30,8 +30,8 @@ module.exports = {
                     let response;
                     let body;
                     let values = Object.assign( {}, sessionStartForm, sessionResolvedForm, sessionCountryForm, {adminAreas});
-    
-                    if( isUpdate ){
+
+					if( isUpdate ){
                         ({ response, body } = await backend.reports.update( req, reportId, values ));
                     } else {
                         ({ response, body } = await backend.reports.save( req, values ));

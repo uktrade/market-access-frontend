@@ -295,9 +295,10 @@ module.exports = {
 				resolved_date: getValue( getDefaultedDate( values.resolvedDate ) ),
 				export_country: getValue( values.country )
 			};
-			if ('countryAdminAreas' in values) {
-				formValues.country_admin_areas = [getValue( values.countryAdminAreas )];
+			if ('adminAreas' in values) {
+				formValues.country_admin_areas = getValue( values.adminAreas );
 			}
+			console.log('formValues', formValues);
 			return backend.post( '/reports', getToken( req ), formValues);
 		},
 		update: ( req, reportId, values ) => {
@@ -307,9 +308,10 @@ module.exports = {
 				resolved_date: getValue( getDefaultedDate( values.resolvedDate ) ),
 				export_country: getValue( values.country )
 			};
-			if ('countryAdminAreas' in values) {
-				formValues.country_admin_areas = [getValue( values.countryAdminAreas )];
+			if ('adminAreas' in values) {
+				formValues.country_admin_areas = getValue( values.adminAreas );
 			}
+			console.log('formValues', formValues);
 			return updateReport( getToken( req ), reportId, formValues);
 			
 		},
