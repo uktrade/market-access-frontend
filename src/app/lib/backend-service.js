@@ -296,7 +296,7 @@ module.exports = {
 				export_country: getValue( values.country )
 			};
 			if ('countryAdminAreas' in values) {
-				formValues.country_admin_areas = getValue( values.countryAdminAreas );
+				formValues.country_admin_areas = [getValue( values.countryAdminAreas )];
 			}
 			return backend.post( '/reports', getToken( req ), formValues);
 		},
@@ -308,7 +308,7 @@ module.exports = {
 				export_country: getValue( values.country )
 			};
 			if ('countryAdminAreas' in values) {
-				formValues.country_admin_areas = getValue( values.countryAdminAreas );
+				formValues.country_admin_areas = [getValue( values.countryAdminAreas )];
 			}
 			return updateReport( getToken( req ), reportId, formValues);
 			

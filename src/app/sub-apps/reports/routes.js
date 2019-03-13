@@ -35,8 +35,15 @@ module.exports = ( express, app ) => {
 	app.get( '/:reportId?/country/', hasStartFormValues, hasResolvedFormValues, controller.country );
 	app.post( '/:reportId?/country/', hasStartFormValues, hasResolvedFormValues, controller.country );
 
-	app.get( '/:reportId?/has-state/', hasStartFormValues, hasResolvedFormValues, hasCountryFormValues, controller.hasState );
-	app.post( '/:reportId?/has-state/', hasStartFormValues, hasResolvedFormValues, hasCountryFormValues, controller.hasState );
+	app.get( '/:reportId?/has-admin-areas/', hasStartFormValues, hasResolvedFormValues, hasCountryFormValues, controller.hasAdminAreas );
+	app.post( '/:reportId?/has-admin-areas/', hasStartFormValues, hasResolvedFormValues, hasCountryFormValues, controller.hasAdminAreas );
+
+	app.get( '/:reportId?/admin-areas/', hasStartFormValues, hasResolvedFormValues, hasCountryFormValues, controller.adminAreas.list );
+	app.post( '/:reportId?/admin-areas/', hasStartFormValues, hasResolvedFormValues, hasCountryFormValues, controller.adminAreas.list );
+
+	app.get( '/:reportId/admin-areas/add/', controller.adminAreas.add );
+	app.post( '/:reportId/admin-areas/add/', controller.adminAreas.add );
+	app.post( '/:reportId/admin-areas/remove/', controller.adminAreas.remove );
 
 	app.get( '/:reportId/has-sectors/', controller.hasSectors );
 	app.post( '/:reportId/has-sectors/', controller.hasSectors );
