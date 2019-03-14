@@ -19,6 +19,7 @@ module.exports = ( express, app ) => {
 	app.param( 'noteId', noteIdParam );
 	app.param( 'documentId', documentIdParam );
 	app.param( 'uuid', uuidParam );
+	app.param( 'documentUuid', uuidParam );
 	app.param( 'barrierTypeCategory', barrierTypeCategoryParam );
 	app.param( 'companyId', companyIdParam );
 
@@ -41,11 +42,13 @@ module.exports = ( express, app ) => {
 	app.get( '/:barrierId/edit/status/', controller.edit.status );
 	app.post( '/:barrierId/edit/status/', controller.edit.status );
 
+	app.post( '/:uuid/interactions/documents/add/', fileUpload, controller.interactions.documents.add );
+	app.post( '/:uuid/interactions/documents/:id/delete/', controller.interactions.documents.delete );
+
 	app.get( '/:barrierId/interactions/add-note/', controller.interactions.notes.add );
 	app.post( '/:barrierId/interactions/add-note/', fileUpload, controller.interactions.notes.add );
 	app.get( '/:barrierId/interactions/edit-note/:id', controller.interactions.notes.edit );
-	app.post( '/:barrierId/interactions/edit-note/:id', controller.interactions.notes.edit );
-	app.post( '/:uuid/interactions/documents/add/', fileUpload, controller.interactions.notes.documents.add );
+	app.post( '/:barrierId/interactions/edit-note/:id', fileUpload, controller.interactions.notes.edit );
 	app.get( '/:barrierId/interactions/notes/:noteId/documents/:documentId/delete/', controller.interactions.notes.documents.deleteConfirmation );
 	app.post( '/:uuid/interactions/notes/:noteId/documents/:documentId/delete/', controller.interactions.notes.documents.delete );
 

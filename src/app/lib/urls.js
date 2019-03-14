@@ -73,11 +73,14 @@ module.exports = {
 			euExitRelated: (barrierId) => `/barriers/${barrierId}/edit/eu-exit-related/`,
 			status: ( barrierId ) => `/barriers/${ barrierId }/edit/status/`,
 		},
+		documents: {
+			add: ( barrierId ) => `/barriers/${ barrierId }/interactions/documents/add/`,
+			delete: ( barrierId, documentId ) => `/barriers/${ barrierId }/interactions/documents/${ documentId }/delete/`,
+		},
 		notes: {
 			add: ( barrierId ) => `/barriers/${ barrierId }/interactions/add-note/`,
 			edit: ( barrierId, noteId ) => `/barriers/${ barrierId }/interactions/edit-note/${ noteId }/`,
 			documents: {
-				add: ( barrierId ) => `/barriers/${ barrierId }/interactions/documents/add/`,
 				delete: ( barrierId, noteId, documentId ) => `/barriers/${ barrierId }/interactions/notes/${ noteId }/documents/${ documentId }/delete/`,
 			},
 		},

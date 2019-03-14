@@ -2,11 +2,12 @@ ma.pages.barrier.detail = (function( doc, jessie ){
 
 	return function( opts ){
 
-		if( !( ma.components.FileUpload && ma.components.TextArea && ma.xhr2 && ( typeof FormData !== 'undefined' ) && jessie.hasFeatures(
+		if( !( ma.components.FileUpload && ma.components.DocumentList && ma.components.TextArea && ma.xhr2 && ( typeof FormData !== 'undefined' ) && jessie.hasFeatures(
 			'queryOne', 'cancelDefault', 'getElementData'
 		) ) ){ return; }
 
 		var fileUpload;
+		var documentList;
 		var note;
 
 		try {
@@ -28,7 +29,6 @@ ma.pages.barrier.detail = (function( doc, jessie ){
 
 		} catch( e ){ return; }
 
-		var documentIdInput;// = jessie.queryOne( '.js-document-id' );
 		var submit = jessie.queryOne( '.js-submit-button' );
 		var form = fileUpload.form;
 
@@ -37,24 +37,17 @@ ma.pages.barrier.detail = (function( doc, jessie ){
 
 		var deleteUrl = jessie.getElementData( form, 'xhr-delete' );
 
+		try {
+
+			documentList = new ma.components.DocumentList( fileUpload, deleteUrl );
+
+		} catch( e ){ return; }
+
 		function showError( message ){
 
 			submit.disabled = false;
 			fileUpload.setError( message );
 			fileUpload.showLink();
-		}
-
-		function setDocumentId( id ){
-
-			if( !documentIdInput ){
-
-				documentIdInput = doc.createElement( 'input' );
-				documentIdInput.type = 'hidden';
-				documentIdInput.name = 'documentId';
-				fileUpload.form.append( documentIdInput );
-			}
-
-			documentIdInput.value = id;
 		}
 
 		function updateProgress( e ){
@@ -111,8 +104,12 @@ ma.pages.barrier.detail = (function( doc, jessie ){
 					}
 
 					submit.disabled = false;
-					fileUpload.setFile( file );
-					setDocumentId( documentId );
+					fileUpload.showLink();
+					documentList.addItem( {
+						id: documentId,
+						name: file.name,
+						size: file.size
+					} );
 
 				} else {
 
@@ -206,19 +203,12 @@ ma.pages.barrier.detail = (function( doc, jessie ){
 
 			xhr.open( 'POST', url, true );
 			xhr.send();
+
+			documentList.removeItem( documentId );
 		}
 
 		fileUpload.events.file.subscribe( newFile );
-		fileUpload.events.delete.subscribe( function(){
-
-			if( documentIdInput ){
-
-				var documentId = documentIdInput.value;
-
-				documentIdInput.value = '';
-				deleteDocument( documentId );
-			}
-		} );
+		documentList.events.delete.subscribe( deleteDocument );
 
 		jessie.attachListener( form, 'submit', handleFormSubmit );
 	};
