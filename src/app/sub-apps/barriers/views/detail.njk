@@ -48,7 +48,7 @@
 			},
 			value: params.note.text,
 			errorMessage: errors | errorForName( 'note' )
-		}) }}
+		}) -}}
 
 		{#% if params.isEdit and params.note.hasDocuments -%#}
 		{% if params.documents.length %}
@@ -60,19 +60,19 @@
 
 					{%- set deleteUrl %}
 						{% if params.note %}
-							{{ urls.barriers.notes.documents.delete( barrier.id, params.note.id, document.id ) }}
+							{{- urls.barriers.notes.documents.delete( barrier.id, params.note.id, document.id ) -}}
 						{% else %}
-							{{ urls.documents.delete( document.id ) }}
+							{{- urls.barriers.documents.delete( barrier.id, document.id ) -}}
 						{% endif %}
-					{% endset -%}
+					{% endset %}
 
 						<li class="document__list__item">
 							<span class="document__list__item__file"><strong>{{ document.name }}</strong> - {{ document.size }}</span>
-							<a href="{{ deleteUrl }}" class="document__list__item__delete" data-document-id="{{ document.id }}">delete</a>
+							<a href="{{ deleteUrl }}" class="document__list__item__delete" data-is-edit="{{ params.isEdit }}" data-document-id="{{ document.id }}">delete</a>
 							<input type="hidden" name="documentIds" value="{{ document.id }}">
 						</li>
 
-					{%- endif %}
+					{% endif %}
 				{% endfor %}
 				</ul>
 			</div>
@@ -244,12 +244,12 @@
 		{% endif %}
 
 		<ol class="event-list">
-		{%- if interactions and interactions.length %}
-			{% for item in interactions -%}
+		{% if interactions and interactions.length %}
+			{%- for item in interactions %}
 
 			<li class="event-list__item event_list__item--{{ item.modifier }}">
 
-				{%- if item.isNote -%}
+				{% if item.isNote -%}
 
 					<h4 class="event-list__item__heading">{{ item.date | dateOnly }}<span class="event-list__item__heading__recede"> at {{ item.date | time }} (GMT)</span>
 						{%- if item.user.name -%}
@@ -257,7 +257,7 @@
 						{%- endif -%}
 					</h4>
 
-					{% if item.edit -%}
+					{% if item.edit %}
 
 						{{ noteForm( {
 							isEdit: true,
@@ -272,7 +272,7 @@
 
 							<div class="event-list__item__document">
 								<ul class="event-list__item__document__list">
-									{% for doc in item.documents -%}
+									{% for doc in item.documents %}
 
 										<li class="event-list__item__document__list__item">
 
@@ -285,22 +285,22 @@
 												<span class="event-list__item__document__list__item__name">{{ doc.name }}</span>
 												<span class="event-list__item__document__list__item__status">({{ doc.status }})</span>
 
-											{%- endif %}
+											{% endif -%}
 										</li>
 
-									{%- endfor %}
+									{% endfor %}
 								</ul>
 
 								<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
 								<a href="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}">edit</a>
 							</div>
 
-						{%- else -%}
+						{%- else %}
 
 							<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
 							<a href="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}">edit</a>
 
-						{%- endif %}
+						{% endif %}
 					{%- endif %}
 
 				{%- elif item.isStatus -%}
@@ -350,7 +350,7 @@
 			</li>
 			{% endfor %}
 
-		{%- else -%}
+		{% else %}
 
 			<li class="event-list__item">
 
@@ -373,7 +373,7 @@
 					<a href="{{ urls.barriers.notes.add( barrier.id ) }}">Add your first note</a>
 			</li>
 
-		{%- endif %}
+		{% endif %}
 		</ol>
 	</section>
 {% endblock %}

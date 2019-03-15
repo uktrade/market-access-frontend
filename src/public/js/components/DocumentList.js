@@ -2,6 +2,7 @@ ma.components.DocumentList = (function( doc ){
 
 	var LIST_CLASS = 'js-documents-list';
 	var DATA_KEY = 'document-id';
+	var IS_EDIT_KEY = 'is-edit';
 
 	if( !( jessie.hasFeatures(
 		'queryOne',
@@ -30,13 +31,11 @@ ma.components.DocumentList = (function( doc ){
 
 	DocumentList.prototype.handleClick = function( e ){
 
-		jessie.cancelDefault( e );
-		console.log( e );
-
 		var target = jessie.getEventTarget( e );
 		var documentId = jessie.getElementData( target, DATA_KEY );
+		var isEdit = jessie.getElementData( target, IS_EDIT_KEY );
 
-		if( documentId ){
+		if( !isEdit && documentId ){
 
 			jessie.cancelDefault( e );
 			this.events.delete.publish( documentId );
@@ -44,8 +43,6 @@ ma.components.DocumentList = (function( doc ){
 	};
 
 	DocumentList.prototype.createList = function(){
-
-		console.log( 'DocumentList -> createList' );
 
 		var documents = doc.createElement( 'div' );
 		var heading = doc.createElement( 'h3' );
@@ -96,12 +93,8 @@ ma.components.DocumentList = (function( doc ){
 
 	DocumentList.prototype.removeItem = function( uuid ){
 
-		console.log( uuid );
-
 		var input = jessie.queryOne( 'input[value="' + uuid + '"]', this.list );
 		var item = input && input.parentNode;
-
-		console.log( input );
 
 		if( item ){
 
