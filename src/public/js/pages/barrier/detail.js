@@ -2,12 +2,12 @@ ma.pages.barrier.detail = (function( doc, jessie ){
 
 	return function( opts ){
 
-		if( !( ma.components.FileUpload && ma.components.DocumentList && ma.components.TextArea && ma.xhr2 && ( typeof FormData !== 'undefined' ) && jessie.hasFeatures(
+		if( !( ma.components.FileUpload && ma.components.Attachments && ma.components.TextArea && ma.xhr2 && ( typeof FormData !== 'undefined' ) && jessie.hasFeatures(
 			'queryOne', 'cancelDefault', 'getElementData'
 		) ) ){ return; }
 
 		var fileUpload;
-		var documentList;
+		var attachments;
 		var note;
 
 		try {
@@ -39,7 +39,7 @@ ma.pages.barrier.detail = (function( doc, jessie ){
 
 		try {
 
-			documentList = new ma.components.DocumentList( fileUpload, deleteUrl );
+			attachments = new ma.components.Attachments( fileUpload );
 
 		} catch( e ){ return; }
 
@@ -73,56 +73,6 @@ ma.pages.barrier.detail = (function( doc, jessie ){
 			showError( 'Upload of document cancelled, try again.' );
 		}
 
-		function checkFileStatus( file, url, documentId ){
-
-			var xhr = ma.xhr2();
-
-			xhr.addEventListener( 'error', transferFailed, false );
-			xhr.addEventListener( 'abort', transferCanceled, false );
-			xhr.addEventListener( 'load', function(){
-
-				var responseCode = xhr.status;
-				var data;
-
-				try {
-
-					data = JSON.parse( xhr.response );
-
-				} catch( e ){
-
-					//console.log( e );
-				}
-
-				if( responseCode === 200 && data ){
-
-					var passed = data.passed;
-
-					if( !passed ){
-
-						showError( 'This file may be infected with a virus and will not be accepted.' );
-						return;
-					}
-
-					submit.disabled = false;
-					fileUpload.showLink();
-					documentList.addItem( {
-						id: documentId,
-						name: file.name,
-						size: file.size
-					} );
-
-				} else {
-
-					var message = ( ( data && data.message ) || 'A system error has occured, so the file has not been uploaded. Try again.' );
-					showError( message );
-				}
-
-			}, false );
-
-			xhr.open( 'GET', url, true );
-			xhr.send();
-		}
-
 		function loaded( e ){
 
 			var xhr = e.target;
@@ -146,8 +96,13 @@ ma.pages.barrier.detail = (function( doc, jessie ){
 
 				if( documentId && file && checkUrl ){
 
-					fileUpload.setProgress( 'scanning for viruses...' );
-					checkFileStatus( file, checkUrl, documentId );
+					submit.disabled = false;
+					fileUpload.showLink();
+					attachments.addItem( {
+						id: documentId,
+						name: file.name,
+						size: file.size
+					} );
 
 				} else {
 
@@ -204,11 +159,11 @@ ma.pages.barrier.detail = (function( doc, jessie ){
 			xhr.open( 'POST', url, true );
 			xhr.send();
 
-			documentList.removeItem( documentId );
+			attachments.removeItem( documentId );
 		}
 
 		fileUpload.events.file.subscribe( newFile );
-		documentList.events.delete.subscribe( deleteDocument );
+		attachments.events.delete.subscribe( deleteDocument );
 
 		jessie.attachListener( form, 'submit', handleFormSubmit );
 	};

@@ -52,9 +52,9 @@
 
 		{#% if params.isEdit and params.note.hasDocuments -%#}
 		{% if params.documents.length %}
-			<div class="documents">
-				<h3 class="documents__heading">Attached documents</h3>
-				<ul class="documents__list js-documents-list">
+			<div class="attachments">
+				<h3 class="attachments__heading">Attached documents</h3>
+				<ul class="attachments__list js-documents-list">
 				{%-for document in params.documents %}
 					{% if document %}{# ignore existing uploads in session which won't have a document - can be removed in next release #}
 
@@ -66,9 +66,9 @@
 						{% endif %}
 					{% endset %}
 
-						<li class="document__list__item">
-							<span class="document__list__item__file"><strong>{{ document.name }}</strong> - {{ document.size }}</span>
-							<a href="{{ deleteUrl }}" class="document__list__item__delete" data-is-edit="{{ params.isEdit }}" data-document-id="{{ document.id }}">delete</a>
+						<li class="attachments__list__item">
+							<span class="attachments__list__item__file-name">{{ document.name }} - {{ document.size }}</span>
+							<a href="{{ deleteUrl }}" class="attachments__list__item__delete" data-is-edit="{{ params.isEdit }}" data-document-id="{{ document.id }}">delete</a>
 							<input type="hidden" name="documentIds" value="{{ document.id }}">
 						</li>
 
