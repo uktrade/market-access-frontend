@@ -82,7 +82,7 @@ ma.components.Attachments = (function( doc ){
 
 		deleteLink.className = DELETE_CLASS;
 		deleteLink.href = '#';
-		deleteLink.innerText = 'delete';
+		deleteLink.innerText = 'Delete';
 		jessie.setElementData( deleteLink, DATA_KEY, document.id );
 
 		input.type = 'hidden';

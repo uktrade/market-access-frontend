@@ -68,7 +68,7 @@
 
 						<li class="attachments__list__item">
 							<span class="attachments__list__item__file-name">{{ document.name }} - {{ document.size }}</span>
-							<a href="{{ deleteUrl }}" class="attachments__list__item__delete" data-is-edit="{{ params.isEdit }}" data-document-id="{{ document.id }}">delete</a>
+							<a href="{{ deleteUrl }}" class="attachments__list__item__delete" data-is-edit="{{ params.isEdit }}" data-document-id="{{ document.id }}">Delete</a>
 							<input type="hidden" name="documentIds" value="{{ document.id }}">
 						</li>
 
@@ -257,6 +257,7 @@
 						{%- endif -%}
 					</h4>
 
+
 					{% if item.edit %}
 
 						{{ noteForm( {
@@ -267,6 +268,9 @@
 						} ) }}
 
 					{%- else -%}
+
+						<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
+						<a class="event-list__item__edit-link" href="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}">Edit</a>
 
 						{% if item.hasDocuments -%}
 
@@ -290,15 +294,7 @@
 
 									{% endfor %}
 								</ul>
-
-								<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
-								<a href="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}">edit</a>
 							</div>
-
-						{%- else %}
-
-							<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
-							<a href="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}">edit</a>
 
 						{% endif %}
 					{%- endif %}
