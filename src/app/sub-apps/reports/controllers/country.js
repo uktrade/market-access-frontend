@@ -6,13 +6,13 @@ const backend = require( '../../../lib/backend-service' );
 
 module.exports = async ( req, res, next ) => {
 
-	const countryFormValue = ( req.session.countryFormValues || req.report && { country: req.report.country } );
+	const sessionValues = ( req.session.isResolvedFormValues || {} );
 	const report  = ( req.report || {} );
 	const form = new Form( req, {
 
 		country: {
 			type: Form.SELECT,
-			values: [ report.export_country, countryFormValue.country ],
+			values: [ report.export_country, sessionValues.country ],
 			items: metadata.getCountryList(),
 			validators: [
 				{
@@ -38,7 +38,7 @@ module.exports = async ( req, res, next ) => {
 			
 					let response;
 					let body;
-					let values = Object.assign( {}, sessionStartForm, sessionResolvedForm, countryFormValue, {country_admin_area: []} );
+					let values = Object.assign( {}, sessionStartForm, sessionResolvedForm, form.getValues(), {country_admin_areas: []} );
 			
 					if( isUpdate ){
 						({ response, body } = await backend.reports.update( req, reportId, values ));

@@ -351,6 +351,70 @@ describe( 'URLs', () => {
 			} );
 		} );
 
+		describe( 'hasAdminAreas', () => {
+			describe( 'With a reportId', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.reports.hasAdminAreas( reportId ) ).toEqual( `/reports/${ reportId }/has-admin-areas/` );
+				} );
+			} );
+			describe( 'Without a reportId', () => {
+
+				it( 'Should return the correct path', () => {
+
+					expect( urls.reports.hasAdminAreas() ).toEqual( '/reports/new/has-admin-areas/' );
+				} );
+			} );
+		} );
+
+		describe( 'adminAreas', () => {
+			describe( 'With a reportId', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.reports.adminAreas( reportId ) ).toEqual( `/reports/${ reportId }/admin-areas/` );
+				} );
+			} );
+			describe( 'Without a reportId', () => {
+
+				it( 'Should return the correct path', () => {
+
+					expect( urls.reports.adminAreas() ).toEqual( '/reports/new/admin-areas/' );
+				} );
+			} );
+		} );
+		
+		describe( 'addAdminArea', () => {
+			describe( 'With a reportId', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.reports.addAdminArea( reportId ) ).toEqual( `/reports/${ reportId }/admin-areas/add` );
+				} );
+			} );
+			describe( 'Without a reportId', () => {
+
+				it( 'Should return the correct path', () => {
+
+					expect( urls.reports.addAdminArea() ).toEqual( '/reports/new/admin-areas/add' );
+				} );
+			} );
+		} );
+
+		describe( 'removeAdminArea', () => {
+			describe( 'With a reportId', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.reports.removeAdminArea( reportId ) ).toEqual( `/reports/${ reportId }/admin-areas/remove` );
+				} );
+			} );
+			describe( 'Without a reportId', () => {
+
+				it( 'Should return the correct path', () => {
+
+					expect( urls.reports.removeAdminArea() ).toEqual( '/reports/new/admin-areas/remove' );
+				} );
+			} );
+		} );
+
 		describe( 'When the reportId is required', () => {
 
 			function checkUrls( urlsInfo ){

@@ -60,6 +60,7 @@ module.exports = ( req, res ) => {
 		delete req.session.isResolvedFormValues;
 
 		if( !form.hasErrors() ){
+			
 			req.session.isResolvedFormValues = form.getValues();
 			return res.redirect( urls.reports.country( report.id ) );
 		}

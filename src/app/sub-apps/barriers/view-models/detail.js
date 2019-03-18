@@ -57,7 +57,6 @@ module.exports = ( barrier, addCompany = false ) => {
 			addedBy: barrier.reported_by,
 			euExitRelated: getEuExitRelatedText( barrier.eu_exit_related ),
 			country: metadata.getCountry( barrier.export_country ),
-			adminArea: metadata.getAdminArea( barrier.country_admin_areas ),
 			sectors,
 			source: {
 				id: barrier.source,

@@ -46,7 +46,7 @@ module.exports = async ( req, res, next ) => {
             
                     let response;
                     let body;
-                    let values = Object.assign( {}, sessionStartForm, sessionResolvedForm, countryFormValue, {country_admin_area: []}  );
+                    let values = Object.assign( {}, sessionStartForm, sessionResolvedForm, countryFormValue, {country_admin_areas: []}  );
     
                     if( isUpdate ){
                         ({ response, body } = await backend.reports.update( req, reportId, values ));

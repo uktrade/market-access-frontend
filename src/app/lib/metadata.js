@@ -160,7 +160,7 @@ module.exports.fetch = async () => {
 		if( response.isSuccess ){
 
 			countries = body.countries.filter( notDisabled ).map( cleanCountry );
-			adminAreas = body.country_admin_areas;
+			adminAreas = body.country_admin_areas.filter( notDisabled );
 			adminAreasByCountry = alterAdminAreasData(body.country_admin_areas);
 			sectors = body.sectors.filter( notDisabled );
 			level0Sectors = sectors.filter( ( sector ) => sector.level === 0 );
