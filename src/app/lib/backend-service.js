@@ -247,7 +247,7 @@ module.exports = {
 			} ),
 			update: ( req, noteId, values ) => backend.put( `/barriers/interactions/${ noteId }`, getToken( req ), {
 				text: values.note,
-				documents: ( values.documentIds ? values.documentIds : [] ),
+				documents: values.documentIds
 			} ),
 		},
 		resolve: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/resolve`, getToken( req ), {

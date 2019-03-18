@@ -56,7 +56,7 @@ ma.pages.barrier.detail = (function( doc, jessie ){
 
 				if( e.loaded === e.total ){
 
-					fileUpload.setProgress( 'processing file...' );
+					fileUpload.setProgress( 'scanning file for viruses...' );
 
 				} else {
 
@@ -92,9 +92,8 @@ ma.pages.barrier.detail = (function( doc, jessie ){
 
 				var documentId = data.documentId;
 				var file = data.file;
-				var checkUrl = data.checkUrl;
 
-				if( documentId && file && checkUrl ){
+				if( documentId && file ){
 
 					submit.disabled = false;
 					fileUpload.showLink();
@@ -108,6 +107,10 @@ ma.pages.barrier.detail = (function( doc, jessie ){
 
 					showError( 'There was an issue uploading the document, try again' );
 				}
+
+			} else if( responseCode === 401 ){
+
+				showError( data.message );
 
 			} else {
 

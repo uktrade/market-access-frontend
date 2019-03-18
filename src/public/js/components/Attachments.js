@@ -12,7 +12,6 @@ ma.components.Attachments = (function( doc ){
 
 	var JS_LIST_CLASS = 'js-documents-list';
 	var DATA_KEY = 'document-id';
-	var IS_EDIT_KEY = 'is-edit';
 
 	var WRAPPER_CLASS = 'attachments';
 	var HEADNG_CLASS = 'attachments__heading';
@@ -40,9 +39,8 @@ ma.components.Attachments = (function( doc ){
 
 		var target = jessie.getEventTarget( e );
 		var documentId = jessie.getElementData( target, DATA_KEY );
-		var isEdit = jessie.getElementData( target, IS_EDIT_KEY );
 
-		if( !isEdit && documentId ){
+		if( documentId ){
 
 			jessie.cancelDefault( e );
 			this.events.delete.publish( documentId );

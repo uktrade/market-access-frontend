@@ -141,6 +141,26 @@ describe( 'URLs', () => {
 			} );
 		} );
 
+		describe( 'Documents', () => {
+			describe( 'add', () => {
+				it( 'Should return the correct path', () => {
+
+					const barrierId = uuid();
+					expect( urls.barriers.documents.add( barrierId ) ).toEqual( `/barriers/${ barrierId }/interactions/documents/add/` );
+				} );
+			} );
+
+			describe( 'delete', () => {
+				it( 'Should return the correct path', () => {
+
+					const barrierId = uuid();
+					const documentId = uuid();
+
+					expect( urls.barriers.documents.delete( barrierId, documentId ) ).toEqual( `/barriers/${ barrierId }/interactions/documents/${ documentId }/delete/` );
+				} );
+			} );
+		} );
+
 		describe( 'Notes', () => {
 			describe( 'Add note', () => {
 				it( 'Should return the correct path', () => {
@@ -162,7 +182,8 @@ describe( 'URLs', () => {
 					it( 'Should return the correct path', () => {
 
 						const barrierId = uuid();
-						expect( urls.barriers.notes.documents.add( barrierId ) ).toEqual( `/barriers/${ barrierId }/interactions/documents/add/` );
+						const noteId = 233;
+						expect( urls.barriers.notes.documents.add( barrierId, noteId ) ).toEqual( `/barriers/${ barrierId }/interactions/notes/${ noteId }/documents/add/` );
 					} );
 				} );
 

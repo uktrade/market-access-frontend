@@ -30,7 +30,7 @@
 {% endblock %}
 
 {% macro noteForm( params ) %}
-	<form action="{{ params.action }}?_csrf={{ csrfToken }}" method="POST" enctype="multipart/form-data" data-xhr-upload="{{ urls.barriers.documents.add( barrier.id ) }}?_csrf={{ csrfToken }}" data-xhr-delete="{{ urls.barriers.documents.delete( barrier.id, ':uuid' ) }}?_csrf={{ csrfToken }}">
+	<form action="{{ params.action }}?_csrf={{ csrfToken }}" method="POST" enctype="multipart/form-data" data-xhr-upload="{{ params.xhr.upload }}?_csrf={{ csrfToken }}" data-xhr-delete="{{ params.xhr.delete }}?_csrf={{ csrfToken }}">
 
 		{{ govukTextarea({
 			name: 'note',
@@ -68,7 +68,7 @@
 
 						<li class="attachments__list__item">
 							<span class="attachments__list__item__file-name">{{ document.name }} - {{ document.size }}</span>
-							<a href="{{ deleteUrl }}" class="attachments__list__item__delete" data-is-edit="{{ params.isEdit }}" data-document-id="{{ document.id }}">Delete</a>
+							<a href="{{ deleteUrl }}" class="attachments__list__item__delete" data-document-id="{{ document.id }}">Delete</a>
 							<input type="hidden" name="documentIds" value="{{ document.id }}">
 						</li>
 
@@ -236,6 +236,10 @@
 			<div class="interaction-panel">
 				{{ noteForm( {
 					action: urls.barriers.notes.add( barrier.id ),
+					xhr: {
+						upload: urls.barriers.documents.add( barrier.id ),
+						delete: urls.barriers.documents.delete( barrier.id, ':uuid' )
+					},
 					documents: documents
 				} )}}
 			</div>
@@ -263,8 +267,12 @@
 						{{ noteForm( {
 							isEdit: true,
 							action: urls.barriers.notes.edit( barrier.id, item.id ),
+							xhr: {
+								upload: urls.barriers.notes.documents.add( barrier.id, item.id ),
+								delete: urls.barriers.notes.documents.delete( barrier.id, item.id, ':uuid' )
+							},
 							note: item,
-							documents: item.documents
+							documents: documents
 						} ) }}
 
 					{%- else -%}
