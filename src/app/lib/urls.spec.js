@@ -150,6 +150,14 @@ describe( 'URLs', () => {
 				} );
 			} );
 
+			describe( 'cancel', () => {
+				it( 'Should return the correct path', () => {
+
+					const barrierId = uuid();
+					expect( urls.barriers.documents.cancel( barrierId ) ).toEqual( `/barriers/${ barrierId }/interactions/documents/cancel/` );
+				} );
+			} );
+
 			describe( 'delete', () => {
 				it( 'Should return the correct path', () => {
 
@@ -184,6 +192,15 @@ describe( 'URLs', () => {
 						const barrierId = uuid();
 						const noteId = 233;
 						expect( urls.barriers.notes.documents.add( barrierId, noteId ) ).toEqual( `/barriers/${ barrierId }/interactions/notes/${ noteId }/documents/add/` );
+					} );
+				} );
+
+				describe( 'cancel', () => {
+					it( 'Should return the correct path', () => {
+
+						const barrierId = uuid();
+						const noteId = 233;
+						expect( urls.barriers.notes.documents.cancel( barrierId, noteId ) ).toEqual( `/barriers/${ barrierId }/interactions/notes/${ noteId }/documents/cancel/` );
 					} );
 				} );
 

@@ -75,6 +75,7 @@ module.exports = {
 		},
 		documents: {
 			add: ( barrierId ) => `/barriers/${ barrierId }/interactions/documents/add/`,
+			cancel: ( barrierId ) => `/barriers/${ barrierId }/interactions/documents/cancel/`,
 			delete: ( barrierId, documentId ) => `/barriers/${ barrierId }/interactions/documents/${ documentId }/delete/`,
 		},
 		notes: {
@@ -82,6 +83,7 @@ module.exports = {
 			edit: ( barrierId, noteId ) => `/barriers/${ barrierId }/interactions/edit-note/${ noteId }/`,
 			documents: {
 				add: ( barrierId, noteId ) => `/barriers/${ barrierId }/interactions/notes/${ noteId }/documents/add/`,
+				cancel: ( barrierId, noteId ) => `/barriers/${ barrierId }/interactions/notes/${ noteId }/documents/cancel/`,
 				delete: ( barrierId, noteId, documentId ) => `/barriers/${ barrierId }/interactions/notes/${ noteId }/documents/${ documentId }/delete/`,
 			},
 		},

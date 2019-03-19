@@ -218,6 +218,16 @@ function removeBarrierDocumentInSession( { session }, barrierIdToMatch, document
 	}
 }
 
+function removeAllBarrierDocumentsInSession( { session }, barrierIdToMatch ){
+
+	if( session.barrierDocuments ){
+
+		session.barrierDocuments = session.barrierDocuments.filter( ( { barrierId } ) => !(
+			barrierId === barrierIdToMatch
+		) );
+	}
+}
+
 function getNoteDocumentsFromSession( req ){
 
 	const sessionDocuments = ( req.session.noteDocuments || [] );
@@ -231,6 +241,16 @@ function removeNoteDocumentInSession( { session }, noteIdToMatch, documentIdToMa
 
 		session.noteDocuments = session.noteDocuments.filter( ( { noteId, document } ) => !(
 			noteId === noteIdToMatch && document.id === documentIdToMatch
+		) );
+	}
+}
+
+function removeAllNoteDocumentsInSession( { session }, noteIdToMatch ){
+
+	if( session.noteDocuments ){
+
+		session.noteDocuments = session.noteDocuments.filter( ( { noteId } ) => !(
+			noteId === noteIdToMatch
 		) );
 	}
 }
@@ -328,6 +348,14 @@ module.exports = {
 				res.json( {} );
 				reporter.captureException( e );
 			}
+		},
+
+		cancel: ( req, res ) => {
+
+			const barrierId = req.uuid;
+
+			removeAllBarrierDocumentsInSession( req, barrierId );
+			res.redirect( urls.barriers.detail( barrierId ) );
 		}
 	},
 
@@ -341,7 +369,7 @@ module.exports = {
 			delete: async ( req, res, next ) => {
 
 				const { uuid: barrierId, note } = req;
-				const documentId = req.document.id;
+				const documentId = req.params.id;
 				const isJson = req.method === 'POST';
 
 				try {
@@ -380,6 +408,11 @@ module.exports = {
 					}
 				}
 			},
+			cancel: ( req, res ) => {
+
+				removeAllNoteDocumentsInSession( req, req.note.id );
+				res.redirect( urls.barriers.detail( req.uuid ) );
+			}
 		},
 
 		add: async ( req, res, next ) => {

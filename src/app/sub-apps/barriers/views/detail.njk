@@ -98,7 +98,7 @@
 		}) }}
 
 		<input type="submit" value="Save note" class="govuk-button js-submit-button">
-		<a class="button-cancel" href="{{ urls.barriers.detail( barrier.id ) }}">Cancel</a>
+		<a class="button-cancel" href="{{ params.cancel }}">Cancel</a>
 	</form>
 {% endmacro %}
 
@@ -236,6 +236,7 @@
 			<div class="interaction-panel">
 				{{ noteForm( {
 					action: urls.barriers.notes.add( barrier.id ),
+					cancel: urls.barriers.documents.cancel( barrier.id ),
 					xhr: {
 						upload: urls.barriers.documents.add( barrier.id ),
 						delete: urls.barriers.documents.delete( barrier.id, ':uuid' )
@@ -267,6 +268,7 @@
 						{{ noteForm( {
 							isEdit: true,
 							action: urls.barriers.notes.edit( barrier.id, item.id ),
+							cancel: urls.barriers.notes.documents.cancel( barrier.id, item.id ),
 							xhr: {
 								upload: urls.barriers.notes.documents.add( barrier.id, item.id ),
 								delete: urls.barriers.notes.documents.delete( barrier.id, item.id, ':uuid' )
