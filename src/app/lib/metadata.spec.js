@@ -303,7 +303,7 @@ describe( 'metadata', () => {
 
 						const affectedAdminAreasList = adminAreasByCountry[countryId].map( ( adminArea ) => ({ value: adminArea.id, text: adminArea.name } ) );
 
-						affectedAdminAreasList.unshift( { value: '', text: 'Applies to all [states/provinces]' } );
+						affectedAdminAreasList.unshift( { value: '', text: 'Select an admin area' } );
 
 						expect( metadata.getCountryAdminAreasList(countryId) ).toEqual( affectedAdminAreasList );
 					} );

@@ -248,7 +248,7 @@ const OPEN = 2;
 const RESOLVED = 4;
 const HIBERNATED = 5;
 
-module.exports.getCountryAdminAreasList = ( countryID, defaultText = 'Applies to all [states/provinces]') => createAdminAreaList(countryID, adminAreasByCountry, defaultText);
+module.exports.getCountryAdminAreasList = ( countryID, defaultText = 'Select an admin area') => createAdminAreaList(countryID, adminAreasByCountry, defaultText);
 module.exports.isCountryWithAdminArea = ( countryID ) => countryID in adminAreasByCountry;
 module.exports.getAdminArea = (adminAreaId) => adminAreas.find( ( AdminArea ) => AdminArea.id === adminAreaId );
 

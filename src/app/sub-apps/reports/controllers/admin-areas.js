@@ -21,18 +21,18 @@ module.exports = {
 			if( adminAreas && adminAreas.length ){
 
                 try {
-                    const reportId = report.id;
+                    const report  = ( req.report || {} );
                     const sessionStartForm = ( req.session.startFormValues || req.report && { status: req.report.problem_status } );
                     const sessionResolvedForm = ( req.session.isResolvedFormValues || req.report && { isResolved: req.report.is_resolved, resolvedDate: req.report.resolved_date } );
                     const sessionCountryForm = ( req.session.countryFormValues || req.report && { country: req.report.country});
-                    const isUpdate = !!reportId;
+                    const isUpdate = !!report.id;
             
                     let response;
                     let body;
                     let values = Object.assign( {}, sessionStartForm, sessionResolvedForm, sessionCountryForm, {adminAreas});
 
 					if( isUpdate ){
-                        ({ response, body } = await backend.reports.update( req, reportId, values ));
+                        ({ response, body } = await backend.reports.update( req, report.id, values ));
                     } else {
                         ({ response, body } = await backend.reports.save( req, values ));
                     }
@@ -77,12 +77,14 @@ module.exports = {
     },
     add: ( req, res ) => {
 
-        const report = req.report;
+        const report  = ( req.report || {} );
         const sessionCountryForm = ( req.session.countryFormValues || req.report && { country: req.report.country});
 
         if( !req.session.adminAreas ){
-
-			req.session.adminAreas = ( report.adminAreas || [] );
+			if(report){
+				req.session.adminAreas = report.country_admin_areas
+			}
+			req.session.adminAreas = [];
 		}
 
 		const adminAreas = req.session.adminAreas;

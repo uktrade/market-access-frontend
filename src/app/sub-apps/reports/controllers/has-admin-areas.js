@@ -7,21 +7,9 @@ const govukItemsFromObj = require( '../../../lib/govuk-items-from-object' );
 
 module.exports = async ( req, res, next ) => {
 
-    const countryFormValue = ( req.session.countryFormValues || req.report && { country: req.report.country } );
     const report  = ( req.report || {} );
 
 	const form = new Form( req, {
-        country: {
-			type: Form.SELECT,
-			values: [ countryFormValue.country ],
-			items: metadata.getCountryList(),
-			validators: [
-				{
-					fn: validators.isCountry,
-					message: 'Select a location for this barrier'
-				}
-			]
-		},
         hasAdminAreas: {
 			type: Form.RADIO,
 			items: govukItemsFromObj( metadata.adminAreaOptions ),
@@ -35,18 +23,20 @@ module.exports = async ( req, res, next ) => {
     if( form.isPost ){
 
         form.validate();
-        
+        console.log(form.errors);
 		if( !form.hasErrors() ){
             if (form.getValues().hasAdminAreas == '1') {
                 try {
                     const reportId = report.id;
                     const sessionStartForm = ( req.session.startFormValues || req.report && { status: req.report.problem_status } );
                     const sessionResolvedForm = ( req.session.isResolvedFormValues || req.report && { isResolved: req.report.is_resolved, resolvedDate: req.report.resolved_date } );
+                    const sessionCountryForm = ( req.session.countryFormValues || req.report && { country: req.report.export_country } );
+                    
                     const isUpdate = !!reportId;
             
                     let response;
                     let body;
-                    let values = Object.assign( {}, sessionStartForm, sessionResolvedForm, countryFormValue, {country_admin_areas: []}  );
+                    let values = Object.assign( {}, sessionStartForm, sessionResolvedForm, sessionCountryForm, {country_admin_areas: []}  );
     
                     if( isUpdate ){
                         ({ response, body } = await backend.reports.update( req, reportId, values ));
@@ -59,6 +49,7 @@ module.exports = async ( req, res, next ) => {
                         delete req.session.startFormValues;
                         delete req.session.isResolvedFormValues;
                         delete req.session.countryFormValues;
+                        delete req.session.adminAreas;
             
                         if( !isUpdate && !body.id ){
             

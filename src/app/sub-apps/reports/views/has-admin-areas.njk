@@ -19,30 +19,6 @@
 
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
-		{{ govukSelect( {
-
-			label: {
-				text: "Exports to which country are affected by this issue?",
-				classes: 'govuk-label--s'
-			},
-			id: 'country-disabled',
-			name: 'country-disabled',
-			classes: 'govuk-!-width-full',
-			items: country,
-            attributes: {
-                disabled: true
-            },
-			errorMessage: errors | errorForName( 'country-disabled-1' )
-		} ) }}
-
-        {{ govukSelect( {
-			id: 'country',
-			name: 'country',
-			classes: 'govuk-!-width-full visually-hidden',
-			items: country,
-			errorMessage: errors | errorForName( 'country' )
-		} ) }}
-
         {{ govukRadios( {
 
 			idPrefix: 'has-admin-areas',

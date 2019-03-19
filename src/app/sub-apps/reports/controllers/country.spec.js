@@ -132,88 +132,152 @@ describe( 'Report controllers', () => {
 			} );
 
 			describe( 'When the form does not have errors', () => {
-				describe( 'When there is a report and no session data', () => {
+				describe ( 'When the chosen country does not have admin areas', () => {
+					describe( 'When there is a report and no session data', () => {
 
-					let report;
-					let saveValues;
+						let report;
+						let saveValues;
 
-					beforeEach( () => {
+						beforeEach( () => {
 
-						report = {
-							id: 1,
-							problem_status: { a: 1 },
-							is_resolved: false,
-							resolved_date: { c: 3 }
-						};
+							report = {
+								id: 1,
+								problem_status: { a: 1 },
+								is_resolved: false,
+								resolved_date: { c: 3 }
+							};
 
-						saveValues = Object.assign( {}, {
-							status: report.problem_status,
-							isResolved: false,
-							resolvedDate: report.resolved_date
-						}, getValuesResponse );
+							saveValues = Object.assign( {}, {
+								status: report.problem_status,
+								isResolved: false,
+								resolvedDate: report.resolved_date
+							}, getValuesResponse );
 
-						req.report = report;
-					} );
+							req.report = report;
+						} );
 
-					it( 'Should update the report with the report data', async () => {
-
-						await controller( req, res, next );
-
-						const args = backend.reports.update.calls.argsFor( 0 );
-
-						expect( args[ 0 ] ).toEqual( req );
-						expect( args[ 1 ] ).toEqual( report.id );
-						expect( args[ 2 ] ).toEqual( saveValues );
-					} );
-
-					describe( 'When the update throws an error', () => {
-						it( 'Should call next with the error', async () => {
-
-							const err = new Error( 'an update error' );
-
-							backend.reports.update.and.callFake( () => Promise.reject( err ) );
+						it( 'Should update the report with the report data', async () => {
 
 							await controller( req, res, next );
 
-							expect( next ).toHaveBeenCalledWith( err );
-							expect( res.redirect ).not.toHaveBeenCalled();
+							const args = backend.reports.update.calls.argsFor( 0 );
+
+							expect( args[ 0 ] ).toEqual( req );
+							expect( args[ 1 ] ).toEqual( report.id );
+							expect( args[ 2 ] ).toEqual( saveValues );
 						} );
-					} );
 
-					describe( 'When the update does not throw an error', () => {
-						describe( 'When the response is a success', () => {
-							it( 'Should redirect to the correct url', async () => {
+						describe( 'When the update throws an error', () => {
+							it( 'Should call next with the error', async () => {
 
-								const hasSectorsResponse = '/a/sector/url';
-								const body = { id: 2 };
+								const err = new Error( 'an update error' );
 
-								backend.reports.update.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body } ) );
-								urls.reports.hasSectors.and.callFake( () => hasSectorsResponse );
+								backend.reports.update.and.callFake( () => Promise.reject( err ) );
 
 								await controller( req, res, next );
 
-								expect( res.redirect ).toHaveBeenCalledWith( hasSectorsResponse );
-								expect( urls.reports.hasSectors ).toHaveBeenCalledWith( body.id );
-								expect( next ).not.toHaveBeenCalled();
-							} );
-						} );
-
-						describe( 'When the response is NOT a success', () => {
-							it( 'Should redirect to the correct url', async () => {
-
-								backend.reports.update.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode: 404 } } ) );
-
-								await controller( req, res, next );
-
+								expect( next ).toHaveBeenCalledWith( err );
 								expect( res.redirect ).not.toHaveBeenCalled();
-								expect( next ).toHaveBeenCalledWith( new Error( 'Unable to update report, got 404 response code' ) );
+							} );
+						} );
+
+						describe( 'When the update does not throw an error', () => {
+							describe( 'When the response is a success', () => {
+								it( 'Should redirect to the correct url', async () => {
+
+									const hasSectorsResponse = '/a/sector/url';
+									const body = { id: 2 };
+
+									backend.reports.update.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body } ) );
+									urls.reports.hasSectors.and.callFake( () => hasSectorsResponse );
+
+									await controller( req, res, next );
+
+									expect( res.redirect ).toHaveBeenCalledWith( hasSectorsResponse );
+									expect( urls.reports.hasSectors ).toHaveBeenCalledWith( body.id );
+									expect( next ).not.toHaveBeenCalled();
+								} );
+							} );
+
+							describe( 'When the response is NOT a success', () => {
+								it( 'Should redirect to the correct url', async () => {
+
+									backend.reports.update.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode: 404 } } ) );
+
+									await controller( req, res, next );
+
+									expect( res.redirect ).not.toHaveBeenCalled();
+									expect( next ).toHaveBeenCalledWith( new Error( 'Unable to update report, got 404 response code' ) );
+								} );
 							} );
 						} );
 					} );
+
+					describe( 'When there is only session data', () => {
+
+						beforeEach( () => {
+
+							sessionValues = {
+								startFormValues: { x: 1 },
+								isResolvedFormValues: { y: 2 }
+							};
+
+							req.session = sessionValues;
+						} );
+
+						describe( 'When the response is a success', () => {
+
+							const response = { isSuccess: true };
+
+							it( 'Should delete the session data', async () => {
+
+								backend.reports.save.and.callFake( () => Promise.resolve( { response } ) );
+
+								await controller( req, res, next );
+
+								expect( req.session ).toEqual( {} );
+							} );
+
+							describe( 'When there is not a body with an id', () => {
+								it( 'Should call next with an error', async () => {
+
+									backend.reports.save.and.callFake( () => Promise.resolve( { response, body: {} } ) );
+
+									await controller( req, res, next );
+
+									expect( next ).toHaveBeenCalledWith( new Error( 'No id created for report' ) );
+								} );
+							} );
+
+							describe( 'When there is a body with id', () => {
+								it( 'Should redirect to the correct url', async () => {
+
+									const hasSectorsResponse = '/a/b/c';
+
+									urls.reports.hasSectors.and.callFake( () => hasSectorsResponse );
+									backend.reports.save.and.callFake( () => Promise.resolve( { response, body: { id: 10 } } ) );
+
+									await controller( req, res, next );
+
+									expect( res.redirect ).toHaveBeenCalledWith( hasSectorsResponse  );
+									expect( urls.reports.hasSectors ).toHaveBeenCalledWith( 10 );
+								} );
+							} );
+						} );
+
+						describe( 'When the response is not a success', () => {
+							it( 'Should call next with an error', async () => {
+
+								backend.reports.save.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode: 123 } } ) );
+
+								await controller( req, res, next );
+
+								expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save report, got 123 response code' ) );
+							} );
+						} );
+					});
 				} );
-
-				describe( 'When there is only session data', () => {
-
+				describe( 'When the chosen country does have admin areas', () => {
 					beforeEach( () => {
 
 						sessionValues = {
@@ -222,59 +286,27 @@ describe( 'Report controllers', () => {
 						};
 
 						req.session = sessionValues;
+
 					} );
 
-					describe( 'When the response is a success', () => {
-
-						const response = { isSuccess: true };
-
-						it( 'Should delete the session data', async () => {
-
-							backend.reports.save.and.callFake( () => Promise.resolve( { response } ) );
-
-							await controller( req, res, next );
-
-							expect( req.session ).toEqual( {} );
-						} );
-
-						describe( 'When there is not a body with an id', () => {
-							it( 'Should call next with an error', async () => {
-
-								backend.reports.save.and.callFake( () => Promise.resolve( { response, body: {} } ) );
-
-								await controller( req, res, next );
-
-								expect( next ).toHaveBeenCalledWith( new Error( 'No id created for report' ) );
-							} );
-						} );
-
-						describe( 'When there is a body with id', () => {
-							it( 'Should redirect to the correct url', async () => {
-
-								const hasSectorsResponse = '/a/b/c';
-
-								urls.reports.hasSectors.and.callFake( () => hasSectorsResponse );
-								backend.reports.save.and.callFake( () => Promise.resolve( { response, body: { id: 10 } } ) );
-
-								await controller( req, res, next );
-
-								expect( res.redirect ).toHaveBeenCalledWith( hasSectorsResponse  );
-								expect( urls.reports.hasSectors ).toHaveBeenCalledWith( 10 );
-							} );
+					describe( 'When the form is valid', () => {
+						it( 'Should save the values to the session and redirect to the correct url', () => {
+		
+							const hasStateUrlResponse = '/a/country/url';
+		
+							urls.reports.hasState.and.callFake( () => hasStateUrlResponse );
+							metadata.isCountryWithAdminArea.and.callFake( () => true );
+		
+							controller( req, res, next );
+		
+							expect( form.validate ).toHaveBeenCalledWith();
+							expect( form.hasErrors ).toHaveBeenCalledWith();
+							expect( req.session.countryFormValues ).toEqual( getValuesResponse );
+							expect( res.redirect ).toHaveBeenCalledWith( hasStateUrlResponse );
+							expect( res.render ).not.toHaveBeenCalled();
 						} );
 					} );
-
-					describe( 'When the response is not a success', () => {
-						it( 'Should call next with an error', async () => {
-
-							backend.reports.save.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode: 123 } } ) );
-
-							await controller( req, res, next );
-
-							expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save report, got 123 response code' ) );
-						} );
-					} );
-				} );
+				});	
 			} );
 		} );
 	} );
