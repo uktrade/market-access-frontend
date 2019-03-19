@@ -3,7 +3,7 @@
 		<div class='barrier-summary__heading'>
 			{{ barrier.code }}
 			<h1 class="barrier-summary__heading__text">{{ barrier.title }}</h1>
-			<p class="barrier-summary__heading__country"> in {{ barrier.country.name }}</p>
+			<p class="barrier-summary__heading__country"> in {{ barrier.location }}</p>
 			<a class="barrier-summary__heading__link" href="{{ urls.barriers.edit.headlines( barrier.id ) }}">Edit title or location</a>
 		</div>
 		<div class="barrier-summary__status">

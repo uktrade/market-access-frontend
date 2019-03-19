@@ -3,6 +3,7 @@ const faker = require( 'faker' );
 const modulePath = './detail';
 
 describe( 'Barrier detail view model', () => {
+	// Add in the admin areas 
 
 	let viewModel;
 	let metadata;
@@ -31,6 +32,7 @@ describe( 'Barrier detail view model', () => {
 				'2': 'Problem status two'
 			},
 			getCountry: jasmine.createSpy( 'metadata.getCountry' ),
+			getAdminArea: jasmine.createSpy('meta.getAdminArea'),
 			getSector: jasmine.createSpy( 'metadata.getSector' ),
 			barrierSource: {
 				'COMPANY': 'company',
@@ -118,6 +120,10 @@ describe( 'Barrier detail view model', () => {
 		} );
 	} );
 
+	describe( 'With no admin areas on an open barrier', () => {
+
+	})
+	
 	describe( 'With sectors missing on an open barrier', () => {
 		it( 'Should create all the correct properties', () => {
 
