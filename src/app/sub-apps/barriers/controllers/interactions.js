@@ -348,7 +348,7 @@ module.exports = {
 
 					const { response } = await backend.documents.delete( req, documentId );
 
-					if( response.isSuccess ){
+					if( response.isSuccess || response.statusCode === 400 ){
 
 						removeNoteDocumentInSession( req, note.id, documentId );
 
