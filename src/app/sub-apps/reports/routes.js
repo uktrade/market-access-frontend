@@ -7,6 +7,7 @@ const controller = require( './controllers' );
 const uuidParam = require( '../../middleware/params/uuid' );
 const dashboardData = require( '../../middleware/dashboard-data' );
 const reportId = require( './middleware/params/report-id' );
+const countryId = require( './middleware/params/country-id' );
 
 const hasStartFormValues = require( './middleware/has-start-form-values' );
 const hasResolvedFormValues = require( './middleware/has-resolved-form-values' );
@@ -20,6 +21,7 @@ module.exports = ( express, app ) => {
 
 	app.param( 'uuid', uuidParam );
 	app.param( 'reportId', reportId );
+	app.param( 'countryId', countryId);
 
 	app.use( parseBody, csrfProtection );
 
@@ -35,15 +37,15 @@ module.exports = ( express, app ) => {
 	app.get( '/:reportId?/country/', hasStartFormValues, hasResolvedFormValues, controller.country );
 	app.post( '/:reportId?/country/', hasStartFormValues, hasResolvedFormValues, controller.country );
 
-	app.get( '/:reportId?/has-admin-areas/', hasStartFormValues, hasResolvedFormValues, hasCountryFormValues, controller.hasAdminAreas );
-	app.post( '/:reportId?/has-admin-areas/', hasStartFormValues, hasResolvedFormValues, hasCountryFormValues, controller.hasAdminAreas );
+	app.get( '/:reportId?/country/:countryId/has-admin-areas/', hasStartFormValues, hasResolvedFormValues, hasCountryFormValues, controller.hasAdminAreas );
+	app.post( '/:reportId?/country/:countryId/has-admin-areas/', hasStartFormValues, hasResolvedFormValues, hasCountryFormValues, controller.hasAdminAreas );
 
-	app.get( '/:reportId?/admin-areas/', hasStartFormValues, hasResolvedFormValues, hasCountryFormValues, controller.adminAreas.list );
-	app.post( '/:reportId?/admin-areas/', hasStartFormValues, hasResolvedFormValues, hasCountryFormValues, controller.adminAreas.list );
+	app.get( '/:reportId?/country/:countryId/admin-areas/', hasStartFormValues, hasResolvedFormValues, hasCountryFormValues, controller.adminAreas.list );
+	app.post( '/:reportId?/country/:countryId/admin-areas/', hasStartFormValues, hasResolvedFormValues, hasCountryFormValues, controller.adminAreas.list );
 
-	app.get( '/:reportId/admin-areas/add/', controller.adminAreas.add );
-	app.post( '/:reportId/admin-areas/add/', controller.adminAreas.add );
-	app.post( '/:reportId/admin-areas/remove/', controller.adminAreas.remove );
+	app.get( '/:reportId/country/:countryId/admin-areas/add/', controller.adminAreas.add );
+	app.post( '/:reportId/country/:countryId/admin-areas/add/', controller.adminAreas.add );
+	app.post( '/:reportId/country/:countryId/admin-areas/remove/', controller.adminAreas.remove );
 
 	app.get( '/:reportId/has-sectors/', controller.hasSectors );
 	app.post( '/:reportId/has-sectors/', controller.hasSectors );

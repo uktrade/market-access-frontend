@@ -8,7 +8,7 @@
 {% block page_content %}
 
 	{{ heading({
-		back: { href: urls.reports.hasAdminAreas( report.id ) },
+		back: { href: urls.reports.hasAdminAreas( report.id, countryId ) },
 		caption: 'Add a barrier',
 		text: 'Location of the barrier',
 		errors: errors
@@ -16,13 +16,13 @@
 
 	{{ adminAreasList( adminAreas, {
 			csrfToken: csrfToken,
-			add: urls.reports.addAdminArea( report.id ),
+			add: urls.reports.addAdminArea( report.id, countryId ),
 			inputName: 'adminArea',
-			remove: urls.reports.removeAdminArea( report.id )
+			remove: urls.reports.removeAdminArea( report.id, countryId )
 		}
 	) }}
 
-	<form action="{{ urls.reports.adminAreas( report.id ) }}" method="POST">
+	<form action="{{ urls.reports.adminAreas( report.id, countryId ) }}" method="POST">
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 		<input type="submit" value="Save and continue" class="govuk-button">
 		<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>

@@ -71,9 +71,10 @@ module.exports = async ( req, res, next ) => {
 					return next( e );
 				}
 			} else {
-				delete req.session.countryFormValues;
-				req.session.countryFormValues = form.getValues();
-				return res.redirect( urls.reports.hasAdminAreas( report.id ) );
+				if (form.getValues().country !== report.export_country) {
+					delete req.session.adminAreas;
+				}
+				return res.redirect( urls.reports.hasAdminAreas( report.id, form.getValues().country ) );
 			}
 		}
 	}

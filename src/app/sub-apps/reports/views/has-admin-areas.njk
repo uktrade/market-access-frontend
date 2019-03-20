@@ -15,7 +15,7 @@
 		errors: errors
 	}) }}
 
-	<form action="{{ urls.reports.hasAdminAreas( report.id ) }}" method="POST" class="restrict-width">
+	<form action="{{ urls.reports.hasAdminAreas( report.id, countryId ) }}" method="POST" class="restrict-width">
 
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 

@@ -9,13 +9,13 @@
 {% block page_content %}
 
 	{{ heading({
-		back: { href: urls.reports.hasAdminAreas( report.id ) },
+		back: { href: urls.reports.hasAdminAreas( report.id, countryId ) },
 		caption: 'Add a barrier',
 		text: 'Location of the barrier',
 		errors: errors
 	}) }}
 
-	<form action="{{ urls.reports.addAdminArea( report.id ) }}" method="POST" class="restrict-width">
+	<form action="{{ urls.reports.addAdminArea( report.id, countryId ) }}" method="POST" class="restrict-width">
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
 		{{ govukSelect( {
@@ -36,6 +36,6 @@
 		{% endif %}
 
 		<input type="submit" value="Add admin area" class="govuk-button">
-		<a class="form-cancel" href="{{ urls.reports.adminAreas( report.id ) }}">cancel</a>
+		<a class="form-cancel" href="{{ urls.reports.adminAreas( report.id, countryId ) }}">cancel</a>
 	</form>
 {% endblock %}

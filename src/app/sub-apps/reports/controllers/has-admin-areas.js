@@ -8,16 +8,18 @@ const govukItemsFromObj = require( '../../../lib/govuk-items-from-object' );
 module.exports = async ( req, res, next ) => {
 
     const report  = ( req.report || {} );
-    const sessionValues = ( req.session.adminAreasFormValues || {} );
+    const countryId = req.params.countryId;
+    const isSameCountry = report.export_country == countryId;
+    const hasAdminAreasInReport = report.country_admin_areas && report.country_admin_areas.length > 0;
+    const alreadyContainsStates = isSameCountry && hasAdminAreasInReport ? "false": null
 
     const boolItems = govukItemsFromObj( metadata.bool );
 	const items = boolItems.map( ( item ) => item.value === 'false' ? { value: item.value, text: 'No - just part of the country' } : item );
-
 	const form = new Form( req, {
         hasAdminAreas: {
 			type: Form.RADIO,
             items,
-            values: [ report.country_admin_areas, sessionValues.adminAreas ],
+            values: [ alreadyContainsStates ],
 			validators: [ {
 				fn: validators.isMetadata( 'bool' ),
 				message: 'Does it affect the entire country?'
@@ -30,19 +32,17 @@ module.exports = async ( req, res, next ) => {
         form.validate();
         console.log(form.errors);
 		if( !form.hasErrors() ){
-            console.log("Thing", typeof(form.getValues().hasAdminAreas));
-            if (form.getValues().hasAdminAreas) {
+            if (form.getValues().hasAdminAreas === "true") {
                 try {
                     const reportId = report.id;
                     const sessionStartForm = ( req.session.startFormValues || req.report && { status: req.report.problem_status } );
                     const sessionResolvedForm = ( req.session.isResolvedFormValues || req.report && { isResolved: req.report.is_resolved, resolvedDate: req.report.resolved_date } );
-                    const sessionCountryForm = ( req.session.countryFormValues || req.report && { country: req.report.export_country } );
                     
                     const isUpdate = !!reportId;
             
                     let response;
                     let body;
-                    let values = Object.assign( {}, sessionStartForm, sessionResolvedForm, sessionCountryForm, {country_admin_areas: []}  );
+                    let values = Object.assign( {}, sessionStartForm, sessionResolvedForm, {country: countryId}, {country_admin_areas: []}  );
     
                     if( isUpdate ){
                         ({ response, body } = await backend.reports.update( req, reportId, values ));
@@ -54,7 +54,6 @@ module.exports = async ( req, res, next ) => {
             
                         delete req.session.startFormValues;
                         delete req.session.isResolvedFormValues;
-                        delete req.session.countryFormValues;
                         delete req.session.adminAreas;
             
                         if( !isUpdate && !body.id ){
@@ -76,15 +75,20 @@ module.exports = async ( req, res, next ) => {
                     return next( e );
                 }
             } else {
-
-                const adminAreasList = ( report.country_admin_areas || req.session.adminAreas );
+                delete req.session.adminAreas;
+                
+                if (isSameCountry && hasAdminAreasInReport ) {
+                    req.session.adminAreas = report.country_admin_areas;
+                }
+                
+                const adminAreasList = req.session.adminAreas;
                 const hasListOfAdminAreas = ( Array.isArray( adminAreasList ) && adminAreasList.length > 0 );
                 const urlMethod = hasListOfAdminAreas ? 'adminAreas' : 'addAdminArea';
                         
-                return res.redirect( urls.reports[ urlMethod ]( report.id ));
+                return res.redirect( urls.reports[ urlMethod ]( report.id, countryId ));
             }
 		}
     }
 
-	res.render( 'reports/views/has-admin-areas', form.getTemplateValues() );
+	res.render( 'reports/views/has-admin-areas', {countryId, ...form.getTemplateValues()} );
 };
