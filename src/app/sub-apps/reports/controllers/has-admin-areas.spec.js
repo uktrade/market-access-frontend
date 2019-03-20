@@ -102,11 +102,11 @@ describe( 'Report controllers', () => {
 
 				govukItemsFromObjResponse = [
 					{
-						value: 'true',
-						text: 'yes'
+						value: '1',
+						text: 'Affects entire country'
 					},{
-						value: 'false',
-						text: 'No'
+						value: '2',
+						text: 'Affects individual states'
 					}
 				];
 
@@ -118,17 +118,17 @@ describe( 'Report controllers', () => {
 				expect( Form ).toHaveBeenCalled();
 				expect( args[ 0 ] ).toEqual( req );
 
-				expect( config.hasSectors ).toBeDefined();
-				expect( config.hasSectors.type ).toEqual( Form.RADIO );
-				expect( config.hasSectors.values ).toEqual( [ report.sectors_affected ] );
-				expect( config.hasSectors.validators[ 0 ].fn ).toEqual( boolResponse );
-				expect( config.hasSectors.items ).toEqual( [
+				expect( config.hasAdminAreas ).toBeDefined();
+				expect( config.hasAdminAreas.type ).toEqual( Form.RADIO );
+				expect( config.hasAdminAreas.values ).toEqual( [ report.has_admin_areas ] );
+				expect( config.hasAdminAreas.validators[ 0 ].fn ).toEqual( boolResponse );
+				expect( config.hasAdminAreas.items ).toEqual( [
 					{
-						value: 'true',
-						text: 'yes'
+						value: '1',
+						text: 'Affects entire country'
 					},{
-						value: 'false',
-						text: 'No, I don\'t know at the moment'
+						value: '2',
+						text: 'Affects individual states'
 					}
 				] );
 			} );

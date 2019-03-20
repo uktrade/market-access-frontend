@@ -17,7 +17,6 @@ module.exports = {
 		const adminAreas = req.session.adminAreas;
 
 		if( isPost ){
-            console.log("trying to post");
 			if( adminAreas && adminAreas.length ){
 
                 try {

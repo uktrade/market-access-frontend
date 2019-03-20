@@ -8,14 +8,19 @@ const govukItemsFromObj = require( '../../../lib/govuk-items-from-object' );
 module.exports = async ( req, res, next ) => {
 
     const report  = ( req.report || {} );
+    const sessionValues = ( req.session.adminAreasFormValues || {} );
+
+    const boolItems = govukItemsFromObj( metadata.bool );
+	const items = boolItems.map( ( item ) => item.value === 'false' ? { value: item.value, text: 'No - just part of the country' } : item );
 
 	const form = new Form( req, {
         hasAdminAreas: {
 			type: Form.RADIO,
-			items: govukItemsFromObj( metadata.adminAreaOptions ),
+            items,
+            values: [ report.country_admin_areas, sessionValues.adminAreas ],
 			validators: [ {
-				fn: validators.isMetadata( 'adminAreaOptions' ),
-				message: 'Does it affect the entire location or individual states/regions?'
+				fn: validators.isMetadata( 'bool' ),
+				message: 'Does it affect the entire country?'
 			} ]
 		}
     } );
@@ -25,7 +30,8 @@ module.exports = async ( req, res, next ) => {
         form.validate();
         console.log(form.errors);
 		if( !form.hasErrors() ){
-            if (form.getValues().hasAdminAreas == '1') {
+            console.log("Thing", typeof(form.getValues().hasAdminAreas));
+            if (form.getValues().hasAdminAreas) {
                 try {
                     const reportId = report.id;
                     const sessionStartForm = ( req.session.startFormValues || req.report && { status: req.report.problem_status } );

@@ -198,10 +198,6 @@ module.exports.fetch = async () => {
 				'true': 'Yes',
 				'false': 'No'
 			};
-			module.exports.adminAreaOptions = {
-				'1': 'Affects entire country',
-				'2': 'Affects individual states'
-			};
 			module.exports.documentStatus = {
 				not_virus_scanned: 'Not virus scanned',
 				virus_scanning_scheduled: 'Virus scanning scheduled',
