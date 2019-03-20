@@ -57,22 +57,6 @@ describe( 'URLs', () => {
 				expect( urls.documents.download( documentId ) ).toEqual( `/documents/${ documentId }/download/` );
 			} );
 		} );
-
-		describe( 'getScanStatus', () => {
-			it( 'Should return the correct path', () => {
-
-				const documentId = uuid();
-				expect( urls.documents.getScanStatus( documentId ) ).toEqual( `/documents/${ documentId }/status/` );
-			} );
-		} );
-
-		describe( 'delete', () => {
-			it( 'Should return the correct path', () => {
-
-				const documentId = uuid();
-				expect( urls.documents.delete( documentId ) ).toEqual( `/documents/${ documentId }/delete/` );
-			} );
-		} );
 	} );
 
 	describe( 'Barier urls', () => {

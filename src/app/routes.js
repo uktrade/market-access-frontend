@@ -31,8 +31,6 @@ module.exports = function( express, app ){
 	app.post( '/me', parseBody, csrfProtection, indexController.me );
 
 	app.get( '/documents/:uuid/download/', indexController.documents.download ),
-	app.get( '/documents/:uuid/status/', indexController.documents.getScanStatus ),
-	app.post( '/documents/:uuid/delete/', indexController.documents.delete ),
 
 	app.get( '/', headerNav( { isDashboard: true } ), dashboardData, indexController.index );
 	app.use( '/reports/', headerNav( { isReport: true } ), reportRoutes( express, express.Router() ) );

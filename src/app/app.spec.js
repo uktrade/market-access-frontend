@@ -202,53 +202,6 @@ describe( 'App', function(){
 					} );
 				} );
 			} );
-
-			describe( 'getScanStatus', () => {
-				describe( 'When the response is a success', () => {
-					it( 'Should return the status', ( done ) => {
-
-						const documentId = uuid();
-						const status = 'virus_scanned';
-
-						intercept.backend()
-							.post( `/documents/${ documentId }/upload-callback` )
-							.reply( 200, { status } );
-
-						app
-							.get( urls.documents.getScanStatus( documentId ) )
-							.end( ( err, res ) => {
-
-								if( err ){ done.fail( err ); }
-
-								expect( res.statusCode ).toEqual( 200 );
-								expect( res.body ).toEqual( { status, passed: true } );
-								done();
-							} );
-					} );
-				} );
-			} );
-
-			describe( 'delete', () => {
-				it( 'Should return success', ( done ) => {
-
-					const documentId = uuid();
-
-					intercept.backend()
-						.delete( `/documents/${ documentId }` )
-						.reply( 200, {} );
-
-					app
-						.post( urls.documents.delete( documentId ) )
-						.end( ( err, res ) => {
-
-							if( err ){ done.fail( err ); }
-
-							expect( res.statusCode ).toEqual( 200 );
-							expect( res.body ).toEqual( {} );
-							done();
-						} );
-				} );
-			} );
 		} );
 
 		describe( 'Barriers', () => {

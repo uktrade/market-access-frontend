@@ -58,8 +58,6 @@ module.exports = {
 
 	documents: {
 		download: ( documentId ) => `/documents/${ documentId }/download/`,
-		getScanStatus: ( documentId ) => `/documents/${ documentId }/status/`,
-		delete: ( documentId ) => `/documents/${ documentId }/delete/`,
 	},
 
 	barriers: {
