@@ -8,8 +8,7 @@ const urls = require( './lib/urls' );
 const logger = require( './lib/logger' );
 const modulePath = './app';
 
-const intercept = jasmine.helpers.intercept;
-const getCsrfToken = jasmine.helpers.getCsrfToken;
+const { intercept, getCsrfToken, getCsrfTokenFromQueryParam } = jasmine.helpers;
 
 function getTitle( res ){
 
@@ -227,7 +226,7 @@ describe( 'App', function(){
 				} );
 			} );
 
-			describe( 'With a barrier', () => {
+			describe( 'With a barrierId param', () => {
 
 				let barrier;
 
@@ -246,13 +245,11 @@ describe( 'App', function(){
 
 						intercept.backend()
 							.get( `/barriers/${ barrier.id }/interactions` )
-							.reply( 200, intercept.stub( '/backend/barriers/interactions' ) )
-							.persist();
+							.reply( 200, intercept.stub( '/backend/barriers/interactions' ) );
 
 						intercept.backend()
 							.get( `/barriers/${ barrier.id }/history` )
-							.reply( 200, intercept.stub( '/backend/barriers/history' ))
-							.persist();
+							.reply( 200, intercept.stub( '/backend/barriers/history' ));
 
 						app
 							.get( urls.barriers.detail( barrierId ) )
@@ -302,6 +299,15 @@ describe( 'App', function(){
 							app
 								.get( urls.barriers.edit.priority( barrierId ) )
 								.end( checkPage( 'Market Access - Barrier - Edit priority', done ) );
+						} );
+					} );
+
+					describe( 'euExitRelated', () => {
+						it( 'Should fetch the barrier and render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.edit.euExitRelated( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier - Edit EU exit related', done ) );
 						} );
 					} );
 
@@ -539,6 +545,97 @@ describe( 'App', function(){
 					} );
 				} );
 
+				describe( 'Barrier Documents', () => {
+
+					let documentId;
+
+					beforeEach( () => {
+
+						documentId = uuid();
+					} );
+
+					describe( 'Delete', () => {
+
+						let token;
+						let agent;
+						let url;
+
+						beforeEach( ( done ) => {
+
+							intercept.backend()
+								.get( `/barriers/${ barrier.id }/interactions` )
+								.reply( 200, intercept.stub( '/backend/barriers/interactions' ) );
+
+							intercept.backend()
+								.get( `/barriers/${ barrier.id }/history` )
+								.reply( 200, intercept.stub( '/backend/barriers/history' ) );
+
+							agent = supertest.agent( appInstance );
+
+							agent
+								.get( urls.barriers.notes.add( barrierId ) )
+								.end( ( err, res ) => {
+
+									token = getCsrfTokenFromQueryParam( res, done.fail );
+									url = urls.barriers.documents.delete( barrierId, documentId ) + `?_csrf=${ token }`;
+									done();
+								} );
+						} );
+
+						describe( 'When the API returns a 200', () => {
+							it( 'Should return a 200', ( done ) => {
+
+								intercept.backend()
+									.delete( `/documents/${ documentId }` )
+									.reply( 200, '{}' );
+
+								agent.post( url )
+									.send( '' )
+									.end( ( err, res ) => {
+
+										expect( res.statusCode ).toEqual( 200 );
+										expect( res.text ).toEqual( '{}' );
+										done();
+									} );
+							} );
+						} );
+
+						describe( 'When the API returns a 404', () => {
+							it( 'Should return a 200', ( done ) => {
+
+								intercept.backend()
+									.delete( `/documents/${ documentId }` )
+									.reply( 404, '{}' );
+
+								agent.post( url )
+									.send( '' )
+									.end( ( err, res ) => {
+
+										expect( res.statusCode ).toEqual( 200 );
+										expect( res.text ).toEqual( '{}' );
+										done();
+									} );
+							} );
+						} );
+					} );
+				} );
+			} );
+
+			describe( 'With a uuid param', () => {
+				describe( 'Barrier Documents', () => {
+					describe( 'Cancel', () => {
+						it( 'Should redirect to the barrier detail page', ( done ) => {
+
+							app.get( urls.barriers.documents.cancel( barrierId, uuid() ) )
+								.end( ( err, res ) => {
+
+									expect( res.statusCode ).toEqual( 302 );
+									expect( res.headers.location ).toEqual( urls.barriers.detail( barrierId ) );
+									done();
+								} );
+						} );
+					} );
+				} );
 			} );
 
 			describe( 'Barrier status', () => {
