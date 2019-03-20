@@ -13,10 +13,12 @@ describe( 'Find a barrier view model', () => {
 	let viewModel;
 	let mockSector;
 	let mockCountry;
+	let mockRegion;
 	let mockType;
 	let mockPriority;
 	let barriers;
 	let countryList;
+	let overseasRegionList;
 	let sectorList;
 	let barrierTypeList;
 	let sortGovukItems;
@@ -75,9 +77,11 @@ describe( 'Find a barrier view model', () => {
 				}
 			},
 			getSector: jasmine.createSpy( 'metadata.getSector' ),
+			getSectorList: jasmine.createSpy( 'metadata.getSectorList' ),
 			getCountry: jasmine.createSpy( 'metadata.getCountry' ),
 			getCountryList: jasmine.createSpy( 'metadata.getCountryList' ),
-			getSectorList: jasmine.createSpy( 'metadata.getSectorList' ),
+			getOverseasRegion: jasmine.createSpy( 'metadata.getOverseasRegion' ),
+			getOverseasRegionList: jasmine.createSpy( 'metadata.getOverseasRegionList' ),
 			getBarrierType: jasmine.createSpy( 'metadata.getBarrierType' ),
 			getBarrierTypeList: jasmine.createSpy( 'metadata.getBarrierTypeList' ),
 			getBarrierPriority: jasmine.createSpy( 'metadata.getBarrierPriority' ),
@@ -86,6 +90,7 @@ describe( 'Find a barrier view model', () => {
 
 		mockSector = { id: uuid(), name: faker.lorem.words() };
 		mockCountry = { id: uuid(), name: faker.address.country() };
+		mockRegion = { id: uuid(), name: faker.lorem.words() };
 		mockType = { id: uuid(), title: faker.lorem.words() };
 		mockPriority = { code: faker.lorem.word().toUpperCase(), name: faker.lorem.words() };
 		barriers = jasmine.helpers.getFakeData( '/backend/barriers/find-a-barrier' );
@@ -94,6 +99,12 @@ describe( 'Find a barrier view model', () => {
 			{ value: uuid(), text: faker.address.country() },
 			{ value: uuid(), text: faker.address.country() },
 			{ value: uuid(), text: faker.address.country() },
+		];
+
+		overseasRegionList = [
+			{ value: uuid(), text: faker.lorem.words() },
+			{ value: uuid(), text: faker.lorem.words() },
+			{ value: uuid(), text: faker.lorem.words() },
 		];
 
 		sectorList = [
@@ -120,9 +131,11 @@ describe( 'Find a barrier view model', () => {
 		};
 
 		metadata.getCountryList.and.callFake( () => countryList );
+		metadata.getOverseasRegionList.and.callFake( () => overseasRegionList );
 		metadata.getSectorList.and.callFake( () => sectorList );
 		metadata.getSector.and.callFake( () => mockSector );
 		metadata.getCountry.and.callFake( () => mockCountry );
+		metadata.getOverseasRegion.and.callFake( () => mockRegion );
 		metadata.getBarrierType.and.callFake( () => mockType );
 		metadata.getBarrierTypeList.and.callFake( () => barrierTypeList );
 		metadata.getBarrierPriority.and.callFake( () => mockPriority );
@@ -144,13 +157,25 @@ describe( 'Find a barrier view model', () => {
 	afterEach( () => {
 
 		expect( metadata.getCountryList ).toHaveBeenCalledWith( 'All locations' );
+		expect( metadata.getOverseasRegionList ).toHaveBeenCalledWith( 'All regions' );
 		expect( metadata.getSectorList ).toHaveBeenCalledWith( 'All sectors' );
 		expect( metadata.getBarrierTypeList ).toHaveBeenCalledWith();
 		expect( metadata.getBarrierPrioritiesList ).toHaveBeenCalledWith( { suffix: false } );
 		expect( sortGovukItems.alphabetical ).toHaveBeenCalled();
-		expect( urls.findABarrier.calls.count() ).toEqual( 4 );
+		expect( urls.findABarrier.calls.count() ).toEqual( 5 );
 		expect( urls.findABarrier ).toHaveBeenCalledWith( {} );
 	} );
+
+	function getFilters( overrides = {} ){
+
+		return {
+			country: overrides.country || { items: countryList, active: undefined, removeUrl: findABarrierResponse },
+			region: overrides.region || { items: overseasRegionList, active: undefined, removeUrl: findABarrierResponse },
+			sector: overrides.sector || { items: sectorList, active: undefined, removeUrl: findABarrierResponse },
+			type: overrides.type || { items: barrierTypeList, active: undefined, removeUrl: findABarrierResponse },
+			priority: overrides.priority || { items: barrierPriorityList, active: undefined, removeUrl: findABarrierResponse },
+		};
+	}
 
 	describe( 'Without any filters', () => {
 		it( 'Should return the correct data', () => {
@@ -166,12 +191,7 @@ describe( 'Find a barrier view model', () => {
 
 			expect( output.count ).toEqual( count );
 			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
-			expect( output.filters ).toEqual( {
-				country: { items: countryList, active: undefined, removeUrl: findABarrierResponse },
-				sector: { items: sectorList, active: undefined, removeUrl: findABarrierResponse },
-				type: { items: barrierTypeList, active: undefined, removeUrl: findABarrierResponse },
-				priority: { items: barrierPriorityList, active: undefined, removeUrl: findABarrierResponse },
-			} );
+			expect( output.filters ).toEqual( getFilters() );
 			expect( output.hasFilters ).toEqual( false );
 		} );
 	} );
@@ -192,13 +212,34 @@ describe( 'Find a barrier view model', () => {
 
 			expect( output.count ).toEqual( count );
 			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
-			expect( output.filters ).toEqual( {
+			expect( output.filters ).toEqual( getFilters( {
 				country: { items: countryList, active: [ mockCountry ], removeUrl: findABarrierResponse },
-				sector: { items: sectorList, active: undefined, removeUrl: findABarrierResponse },
-				type: { items: barrierTypeList, active: undefined, removeUrl: findABarrierResponse },
-				priority: { items: barrierPriorityList, active: undefined, removeUrl: findABarrierResponse },
-			} );
+			} ) );
 			expect( countryList[ 2 ].checked ).toEqual( true );
+			expect( output.hasFilters ).toEqual( true );
+		} );
+	} );
+
+	describe( 'With a overseas region filter', () => {
+		it( 'Should return the correct data', () => {
+
+			const count = 10;
+			const filters = { region: [ uuid() ] };
+
+			overseasRegionList[ 2 ].value = filters.region[ 0 ];
+
+			const output = viewModel( {
+				count,
+				barriers,
+				filters
+			} );
+
+			expect( output.count ).toEqual( count );
+			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
+			expect( output.filters ).toEqual( getFilters({
+				region: { items: overseasRegionList, active: [ mockRegion ], removeUrl: findABarrierResponse },
+			}) );
+			expect( overseasRegionList[ 2 ].checked ).toEqual( true );
 			expect( output.hasFilters ).toEqual( true );
 		} );
 	} );
@@ -219,12 +260,9 @@ describe( 'Find a barrier view model', () => {
 
 			expect( output.count ).toEqual( count );
 			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
-			expect( output.filters ).toEqual( {
-				country: { items: countryList, active: undefined, removeUrl: findABarrierResponse },
+			expect( output.filters ).toEqual( getFilters({
 				sector: { items: sectorList, active: [ mockSector ], removeUrl: findABarrierResponse },
-				type: { items: barrierTypeList, active: undefined, removeUrl: findABarrierResponse },
-				priority: { items: barrierPriorityList, active: undefined, removeUrl: findABarrierResponse },
-			} );
+			}) );
 			expect( sectorList[ 2 ].checked ).toEqual( true );
 			expect( output.hasFilters ).toEqual( true );
 		} );
@@ -247,9 +285,7 @@ describe( 'Find a barrier view model', () => {
 
 			expect( output.count ).toEqual( count );
 			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
-			expect( output.filters ).toEqual( {
-				country: { items: countryList, active: undefined, removeUrl: findABarrierResponse },
-				sector: { items: sectorList, active: undefined, removeUrl: findABarrierResponse },
+			expect( output.filters ).toEqual( getFilters({
 				type: {
 					items: barrierTypeList.map( ( { text, value } ) => {
 
@@ -265,8 +301,7 @@ describe( 'Find a barrier view model', () => {
 					active: [ { name: mockType.title } ],
 					removeUrl: findABarrierResponse
 				},
-				priority: { items: barrierPriorityList, active: undefined, removeUrl: findABarrierResponse },
-			} );
+			}) );
 			expect( output.hasFilters ).toEqual( true );
 		} );
 	} );
@@ -287,10 +322,7 @@ describe( 'Find a barrier view model', () => {
 
 			expect( output.count ).toEqual( count );
 			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
-			expect( output.filters ).toEqual( {
-				country: { items: countryList, active: undefined, removeUrl: findABarrierResponse },
-				sector: { items: sectorList, active: undefined, removeUrl: findABarrierResponse },
-				type: { items: barrierTypeList, active: undefined, removeUrl: findABarrierResponse },
+			expect( output.filters ).toEqual( getFilters({
 				priority: {
 					items: barrierPriorityList.map( ( { text, value } ) => {
 
@@ -305,7 +337,7 @@ describe( 'Find a barrier view model', () => {
 					active: [ mockPriority ],
 					removeUrl: findABarrierResponse,
 				},
-			} );
+			}) );
 			expect( output.hasFilters ).toEqual( true );
 		} );
 	} );
