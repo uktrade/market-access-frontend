@@ -19,7 +19,6 @@ module.exports = ( express, app ) => {
 	app.param( 'noteId', noteIdParam );
 	app.param( 'documentId', documentIdParam );
 	app.param( 'uuid', uuidParam );
-	app.param( 'documentUuid', uuidParam );
 	app.param( 'barrierTypeCategory', barrierTypeCategoryParam );
 	app.param( 'companyId', companyIdParam );
 
