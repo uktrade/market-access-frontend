@@ -435,6 +435,7 @@ module.exports = {
 
 					data: {
 						showNoteForm: true,
+						pageTitleSuffix: ' - Add a note'
 					},
 
 					saveFormData: async ( values ) => backend.barriers.notes.save( req, req.barrier.id, values ),
@@ -479,6 +480,9 @@ module.exports = {
 				await handleNoteForm( req, res, next, {
 
 					editId: note.id,
+					data: {
+						pageTitleSuffix: ' - Edit a note'
+					},
 					getDocuments: () => getNoteDocumentsFromSession( req ).map( ({ document }) => document ),
 					getDocumentIds,
 					clearSessionDocuments: () => {

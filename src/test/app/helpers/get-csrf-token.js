@@ -21,8 +21,12 @@ if( typeof jasmine !== 'undefined' ){
 
 	jasmine.helpers.getCsrfTokenFromQueryParam = ( res, fail ) => {
 
-		const token = getToken( /".+?\?.*?_csrf=([a-zA-Z0-9-]+)[&"]/, res );
+		const token = getToken( /".+?\?.*?_csrf=(.+?)[&"]/, res );
 
-		return token || fail( '"Count not find CSRF token from query string' );
+		if( !token ){
+			console.log( res.text );
+		}
+
+		return token || fail( '"Could not find CSRF token from query string' );
 	};
 }

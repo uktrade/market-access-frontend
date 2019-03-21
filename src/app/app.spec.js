@@ -68,6 +68,23 @@ function checkPage( title, done, responseCode = 200 ){
 	};
 }
 
+function checkRedirect( location, done, responseCode = 302 ){
+
+	return ( err, res ) => {
+
+		if( err ){ return done.fail( err ); }
+
+		expect( res.statusCode ).toEqual( responseCode );
+		expect( res.headers.location ).toEqual( location );
+
+		if( res.statusCode !== responseCode ){
+			console.log( res.text );
+		}
+
+		done();
+	};
+}
+
 function checkNock(){
 
 	const isDone = nock.isDone();
@@ -75,7 +92,7 @@ function checkNock(){
 	expect( isDone ).toEqual( true );
 
 	if( !isDone ){
-		console.log('PENDING NOCKS!!!!', nock.pendingMocks() );
+		console.log( 'PENDING NOCKS!!!!', nock.pendingMocks() );
 	}
 }
 
@@ -98,10 +115,19 @@ describe( 'App', function(){
 		oldTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
 		jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000;
 
+	} );
+
+	beforeEach( () => {
+
 		intercept.backend()
 			.persist()
 			.get( '/whoami' )
 			.reply( 200, {} );
+	} );
+
+	afterEach( () => {
+
+		nock.cleanAll();
 	} );
 
 	afterAll( function(){
@@ -115,17 +141,17 @@ describe( 'App', function(){
 
 		beforeAll( async () => {
 
-			intercept.backend()
-				.persist()
-				.get( '/metadata' )
-				.reply( 200, intercept.stub( '/backend/metadata/' ) );
-
 			const appModule =  proxyquire( modulePath, {
 				'morgan': () => ( req, res, next ) => next(),
 				'./config': {
 					isDev: true
 				}
 			} );
+
+			intercept.backend()
+				.persist()
+				.get( '/metadata' )
+				.reply( 200, intercept.stub( '/backend/metadata/' ) );
 
 			appInstance = await appModule.create();
 
@@ -190,14 +216,7 @@ describe( 'App', function(){
 
 						app
 							.get( urls.documents.download( documentId ) )
-							.end( ( err, res ) => {
-
-								if( err ){ done.fail( err ); }
-
-								expect( res.statusCode ).toEqual( 302 );
-								expect( res.headers.location ).toEqual( document_url );
-								done();
-							} );
+							.end( checkRedirect( document_url, done ) );
 					} );
 				} );
 			} );
@@ -210,7 +229,6 @@ describe( 'App', function(){
 			beforeEach( () => {
 
 				barrierId = uuid();
-
 			} );
 
 			describe( 'When the barrier cannot be found', () => {
@@ -233,7 +251,6 @@ describe( 'App', function(){
 				beforeEach( () => {
 
 					barrier = intercept.stub( '/backend/barriers/barrier' );
-
 					intercept.backend()
 						.get( `/barriers/${ barrierId }` )
 						.reply( 200, barrier )
@@ -241,19 +258,79 @@ describe( 'App', function(){
 				} );
 
 				describe( 'Barrier detail', () => {
-					it( 'Should fetch the barrier and render the page', ( done ) => {
+
+					beforeEach( () => {
+
+						intercept.backend()
+							.get( `/barriers/${ barrierId }/interactions` )
+							.reply( 200, intercept.stub( '/backend/barriers/interactions' ) );
 
 						intercept.backend()
 							.get( `/barriers/${ barrier.id }/interactions` )
-							.reply( 200, intercept.stub( '/backend/barriers/interactions' ) );
+							.reply( 200, intercept.stub( '/backend/barriers/interactions' ) )
+							.persist();
 
 						intercept.backend()
 							.get( `/barriers/${ barrier.id }/history` )
 							.reply( 200, intercept.stub( '/backend/barriers/history' ));
+					} );
 
-						app
-							.get( urls.barriers.detail( barrierId ) )
-							.end( checkPage( 'Market Access - Barrier details', done ) );
+					describe( 'The default page', () => {
+						it( 'Should fetch the barrier and render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.detail( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier details', done ) );
+						} );
+					} );
+
+					describe( 'With notes', () => {
+						describe( 'Adding', () => {
+							describe( 'A GET', () => {
+								it( 'Should render the page', ( done ) => {
+
+									app.get( urls.barriers.notes.add( barrierId ) )
+										.end( checkPage( 'Market Access - Barrier details - Add a note', done ) );
+								} );
+							} );
+						} );
+
+						describe( 'Editing', () => {
+							describe( 'A GET', () => {
+								it( 'Should render the page', ( done ) => {
+
+									app.get( urls.barriers.notes.edit( barrierId, 7 ) )
+										.end( checkPage( 'Market Access - Barrier details - Edit a note', done ) );
+								} );
+							} );
+						} );
+
+						describe( 'Documents', () => {
+							describe( 'Cancel', () => {
+								it( 'It should redirect to the barrier detail', ( done ) => {
+
+									app.get( urls.barriers.notes.documents.cancel( barrierId, 7 ) )
+										.end( checkRedirect( urls.barriers.detail( barrierId ), done ) );
+								} );
+							} );
+
+							describe( 'Delete', () => {
+								describe( 'When the backend returns a 200', () => {
+									it( 'It should return 200', ( done ) => {
+
+										const documentId = uuid();
+										const noteId = 7;
+
+										intercept.backend()
+											.delete( `/documents/${ documentId }` )
+											.reply( 200, '' );
+
+										app.get( urls.barriers.notes.documents.delete( barrierId, noteId, documentId ) )
+											.end( checkRedirect( urls.barriers.notes.edit( barrierId, noteId ), done ) );
+									} );
+								} );
+							} );
+						} );
 					} );
 				} );
 
@@ -545,7 +622,7 @@ describe( 'App', function(){
 					} );
 				} );
 
-				describe( 'Barrier Documents', () => {
+				describe( 'Barrier Documents (AJAX)', () => {
 
 					let documentId;
 
@@ -627,12 +704,7 @@ describe( 'App', function(){
 						it( 'Should redirect to the barrier detail page', ( done ) => {
 
 							app.get( urls.barriers.documents.cancel( barrierId, uuid() ) )
-								.end( ( err, res ) => {
-
-									expect( res.statusCode ).toEqual( 302 );
-									expect( res.headers.location ).toEqual( urls.barriers.detail( barrierId ) );
-									done();
-								} );
+								.end( checkRedirect( urls.barriers.detail( barrierId ), done ) );
 						} );
 					} );
 				} );
@@ -875,12 +947,7 @@ describe( 'App', function(){
 										agent
 											.post( urls.reports.aboutProblem( reportId ) )
 											.send( `_csrf=${ token }&action=exit&item=test` )
-											.end( ( err, res ) => {
-
-												expect( res.statusCode ).toEqual( 302 );
-												expect( res.headers.location ).toEqual( urls.reports.detail( stubId ) );
-												done();
-											} );
+											.end( checkRedirect( urls.reports.detail( stubId ), done ) );
 									} );
 								} );
 
@@ -890,16 +957,7 @@ describe( 'App', function(){
 										agent
 											.post( urls.reports.aboutProblem( reportId ) )
 											.send( `_csrf=${ token }&item=test&barrierSource=COMPANY&euExitRelated=2&barrierTitle=testing&description=abc` )
-											.end( ( err, res ) => {
-
-												if( res.statusCode != 302 ){
-													console.log( res.text );
-												}
-
-												expect( res.statusCode ).toEqual( 302 );
-												expect( res.headers.location ).toEqual( urls.reports.summary( stubId ) );
-												done();
-											} );
+											.end( checkRedirect( urls.reports.summary( stubId ), done ) );
 									} );
 								} );
 							} );
@@ -948,12 +1006,7 @@ describe( 'App', function(){
 										agent
 											.post( urls.reports.summary( reportId ) )
 											.send( `_csrf=${ token }&action=exit&description=test` )
-											.end( ( err, res ) => {
-
-												expect( res.statusCode ).toEqual( 302 );
-												expect( res.headers.location ).toEqual( urls.reports.detail( stubId ) );
-												done();
-											} );
+											.end( checkRedirect( urls.reports.detail( stubId ), done ) );
 									} );
 								} );
 
@@ -967,16 +1020,7 @@ describe( 'App', function(){
 										agent
 											.post( urls.reports.summary( reportId ) )
 											.send( `_csrf=${ token }&description=test1` )
-											.end( ( err, res ) => {
-
-												if( res.statusCode != 302 ){
-													console.log( res.text );
-												}
-
-												expect( res.statusCode ).toEqual( 302 );
-												expect( res.headers.location ).toEqual( urls.barriers.detail( stubId ) );
-												done();
-											} );
+											.end( checkRedirect( urls.barriers.detail( stubId ), done ) );
 									} );
 								} );
 							} );
@@ -1092,16 +1136,7 @@ describe( 'App', function(){
 								agent
 									.post( urls.reports.submit( reportId ) )
 									.send( `_csrf=${ token }` )
-									.end( ( err, res ) => {
-
-										if( res.statusCode !== 302 ){
-											console.log( res.text );
-										}
-
-										expect( res.statusCode ).toEqual( 302 );
-										expect( res.headers.location ).toEqual( urls.barriers.detail( data.id ) );
-										done();
-									} );
+									.end( checkRedirect( urls.barriers.detail( data.id ), done ) );
 							} );
 						} );
 					} );
