@@ -124,10 +124,23 @@ describe( 'metadata', () => {
 
 				const output = [
 					fakeData.countries[ 0 ],
-					fakeData.countries[ 1 ]
+					fakeData.countries[ 1 ],
+					fakeData.countries[ 3 ]
 				].map( ( { id, name } ) => ({ id, name }) );
 
 				expect( metadata.countries ).toEqual( output );
+			} );
+		} );
+
+		describe( 'getCountry', () => {
+			it( 'Should get the country', () => {
+
+				const country = {
+					id: fakeData.countries[ 1 ].id,
+					name: fakeData.countries[ 1 ].name
+				};
+
+				expect( metadata.getCountry( '9a662aa0-99ba-4f3b-835a-859fe210e9c2' ) ).toEqual( country );
 			} );
 		} );
 
@@ -159,6 +172,61 @@ describe( 'metadata', () => {
 					countries.forEach( ( country ) => {
 						expect( country.value ).toBeDefined();
 						expect( country.text ).toBeDefined();
+					});
+				} );
+			} );
+		} );
+
+		describe( 'overseasRegions', () => {
+			it( 'Should return the data', () => {
+
+				expect( metadata.overseasRegions ).toEqual( [
+					fakeData.countries[ 3 ].overseas_region,
+					fakeData.countries[ 1 ].overseas_region,
+				] );
+			} );
+		} );
+
+		describe( 'getOverseasRegion', () => {
+			it( 'Should get the region', () => {
+
+				const region = {
+					id: fakeData.countries[ 1 ].overseas_region.id,
+					name: fakeData.countries[ 1 ].overseas_region.name
+				};
+
+				expect( metadata.getOverseasRegion( 'd9fdeed8-247e-4f54-8fd2-e86077e9faf3' ) ).toEqual( region );
+			} );
+		} );
+
+		describe( 'getOverseasRegionList', () => {
+			describe( 'Without specifying the default text', () => {
+				it( 'Should create a region list for use with a select - with a default choose option', () => {
+
+					const regions = metadata.getOverseasRegionList();
+
+					expect( regions.length ).toEqual( metadata.overseasRegions.length + 1 );
+					expect( regions[ 0 ] ).toEqual( { value: '', text: 'Choose overseas region' } );
+
+					regions.forEach( ( region ) => {
+						expect( region.value ).toBeDefined();
+						expect( region.text ).toBeDefined();
+					});
+				} );
+			} );
+
+			describe( 'Specifying the default text', () => {
+				it( 'Should create a region list for use with a select - with the specified choose option', () => {
+
+					const text = 'Select an option';
+					const regions = metadata.getOverseasRegionList( text );
+
+					expect( regions.length ).toEqual( metadata.overseasRegions.length + 1 );
+					expect( regions[ 0 ] ).toEqual( { value: '', text } );
+
+					regions.forEach( ( region ) => {
+						expect( region.value ).toBeDefined();
+						expect( region.text ).toBeDefined();
 					});
 				} );
 			} );
@@ -322,6 +390,13 @@ describe( 'metadata', () => {
 						expect( metadata.getSectorList( text ) ).toEqual( affectedSectorsList );
 					} );
 				} );
+			} );
+		} );
+
+		describe( 'getSector', () => {
+			it( 'Should get the country', () => {
+
+				expect( metadata.getSector( 'ecb89515-9df1-4432-b191-d4b41ad2eb39' ) ).toEqual( fakeData.sectors[ 1 ] );
 			} );
 		} );
 

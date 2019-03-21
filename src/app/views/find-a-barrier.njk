@@ -90,6 +90,23 @@
 					items: filters.type.items
 				}) }}
 
+				{{ typeahead({
+					id: 'region',
+					name: 'region',
+					classes: 'govuk-!-width-full js-filter',
+					formGroup: {
+						classes: 'filter-items-group'
+					},
+					fieldset: {
+						legend: {
+							text: 'Overseas region',
+							classes: 'filter-items__label'
+						}
+					},
+					placeholder: 'Search regions',
+					items: filters.region.items
+				}) }}
+
 				{{ checkboxFilter({
 					id: 'priority',
 					name: 'priority',
@@ -140,6 +157,7 @@
 						{{ activeFilter( 'Sector', filters.sector ) }}
 						{{ activeFilter( 'Type', filters.type ) }}
 						{{ activeFilter( 'Priority', filters.priority ) }}
+						{{ activeFilter( 'Overseas region', filters.region ) }}
 					</ul>
 					<a class="filter-results-clear-link" href="{{ urls.findABarrier() }}">Remove all filters</a>
 				{% endif %}
