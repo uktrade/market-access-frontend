@@ -306,125 +306,135 @@ describe( 'Barrier interactions controller', () => {
 			req.barrier = barrier;
 		} );
 
+		function checkFormConfig(){
+
+			let args;
+			let config;
+
+			beforeEach( () => {
+
+				args = Form.calls.argsFor( 0 );
+				config = args[ 1 ];
+			} );
+
+			it( 'Should have the correct config', async () => {
+
+				expect( Form ).toHaveBeenCalled();
+				expect( args[ 0 ] ).toEqual( req );
+
+				expect( config.note ).toBeDefined();
+				expect( config.note.required ).toBeDefined();
+
+				expect( config.pinned ).not.toBeDefined();
+
+				expect( config.document ).toBeDefined();
+				expect( config.document.type ).toEqual( Form.FILE );
+				expect( config.document.validators.length ).toEqual( 1 );
+			} );
+
+			describe( 'document validator', () => {
+
+				let validator;
+				let file;
+
+				beforeEach( () => {
+
+					validator = config.document.validators[ 0 ].fn;
+					file = { name: 'test.txt', size: 10, type: 'text/plain' };
+				} );
+
+				describe( 'When the file is valid', () => {
+					it( 'Should return true', () => {
+
+						validators.isValidFile.and.callFake( () => true );
+
+						expect( validator( file ) ).toEqual( true );
+						expect( validators.isValidFile ).toHaveBeenCalledWith( file );
+						expect( reporter.message ).not.toHaveBeenCalled();
+					} );
+				} );
+
+				describe( 'When the file is invalid', () => {
+					it( 'Should return false and report the file', () => {
+
+						validators.isValidFile.and.callFake( () => false );
+
+						expect( validator( file ) ).toEqual( false );
+						expect( validators.isValidFile ).toHaveBeenCalledWith( file );
+						expect( reporter.message ).toHaveBeenCalledWith( 'info', 'Invalid document type: ' + file.type, { size: file.size, name: file.name } );
+					} );
+				} );
+			} );
+		}
+
 		describe( 'add', () => {
 			describe( 'Configuring the Form', () => {
-
-				let args;
-				let config;
 
 				beforeEach( async () => {
 
 					await controller.notes.add( req, res, next );
-
-					args = Form.calls.argsFor( 0 );
-					config = args[ 1 ];
 				} );
 
-				it( 'Should have the correct config', async () => {
-
-					expect( Form ).toHaveBeenCalled();
-					expect( args[ 0 ] ).toEqual( req );
-
-					expect( config.note ).toBeDefined();
-					expect( config.note.required ).toBeDefined();
-
-					expect( config.pinned ).not.toBeDefined();
-
-					expect( config.document ).toBeDefined();
-					expect( config.document.type ).toEqual( Form.FILE );
-					expect( config.document.validators.length ).toEqual( 1 );
-				} );
-
-				describe( 'document validator', () => {
-
-					let validator;
-					let file;
-
-					beforeEach( () => {
-
-						validator = config.document.validators[ 0 ].fn;
-						file = { name: 'test.txt', size: 10, type: 'text/plain' };
-					} );
-
-					describe( 'When the file is valid', () => {
-						it( 'Should return true', () => {
-
-							validators.isValidFile.and.callFake( () => true );
-
-							expect( validator( file ) ).toEqual( true );
-							expect( validators.isValidFile ).toHaveBeenCalledWith( file );
-							expect( reporter.message ).not.toHaveBeenCalled();
-						} );
-					} );
-
-					describe( 'When the file is invalid', () => {
-						it( 'Should return false and report the file', () => {
-
-							validators.isValidFile.and.callFake( () => false );
-
-							expect( validator( file ) ).toEqual( false );
-							expect( validators.isValidFile ).toHaveBeenCalledWith( file );
-							expect( reporter.message ).toHaveBeenCalledWith( 'info', 'Invalid document type: ' + file.type, { size: file.size, name: file.name } );
-						} );
-					} );
-				} );
+				checkFormConfig();
 			} );
 
 			describe( 'configuring the FormProcessor', () => {
 				describe( 'With no document POSTed', () => {
 
 					async function checkProcessor( { renderDocs, saveDocs, sessionDocs } ){
+
 						const { interactionsResponse, historyResponse } = returnSuccessResponses();
-							const { barrierDetailViewModelResponse, interactionsViewModelResponse } = returnViewModels();
+						const { barrierDetailViewModelResponse, interactionsViewModelResponse } = returnViewModels();
 
-							await controller.notes.add( req, res, next );
+						await controller.notes.add( req, res, next );
 
-							const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
-							const templateValues = { abc: '123' };
-							const formValues = { note: 'a note', a: 'test' };
-							const detailUrlResponse = '/barrier';
+						const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
+						const templateValues = { abc: '123' };
+						const formValues = { note: 'a note', a: 'test' };
+						const detailUrlResponse = '/barrier';
 
-							expect( config.form ).toEqual( form );
-							expect( typeof config.render ).toEqual( 'function' );
-							expect( typeof config.saveFormData ).toEqual( 'function' );
-							expect( typeof config.saved ).toEqual( 'function' );
+						expect( config.form ).toEqual( form );
+						expect( typeof config.render ).toEqual( 'function' );
+						expect( typeof config.saveFormData ).toEqual( 'function' );
+						expect( typeof config.saved ).toEqual( 'function' );
 
-							await config.render( templateValues );
+						await config.render( templateValues );
 
-							expect( res.render ).toHaveBeenCalledWith( template, Object.assign( {},
-								barrierDetailViewModelResponse,
-								templateValues,
-								{
-									interactions: interactionsViewModelResponse,
-									showNoteForm: true,
-									noteErrorText: 'Add text for the note.',
-									pageTitleSuffix: ' - Add a note',
-									documents: renderDocs,
-								},
-							) );
+						expect( res.render ).toHaveBeenCalledWith( template, Object.assign( {},
+							barrierDetailViewModelResponse,
+							templateValues,
+							{
+								interactions: interactionsViewModelResponse,
+								showNoteForm: true,
+								noteErrorText: 'Add text for the note.',
+								pageTitleSuffix: ' - Add a note',
+								documents: renderDocs,
+							},
+						) );
 
-							expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier, false );
-							expect( interactionsViewModel ).toHaveBeenCalledWith( {
-								interactions: interactionsResponse.body,
-								history: historyResponse.body
-							}, undefined );
+						expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier, false );
+						expect( interactionsViewModel ).toHaveBeenCalledWith( {
+							interactions: interactionsResponse.body,
+							history: historyResponse.body
+						}, undefined );
 
-							config.saveFormData( formValues );
+						config.saveFormData( formValues );
 
-							expect( backend.barriers.notes.save ).toHaveBeenCalledWith( req, req.barrier.id, {
-								note: formValues.note,
-								documentIds: saveDocs
-							} );
+						expect( backend.barriers.notes.save ).toHaveBeenCalledWith( req, req.barrier.id, {
+							note: formValues.note,
+							documentIds: saveDocs
+						} );
 
-							urls.barriers.detail.and.callFake( () => detailUrlResponse );
+						urls.barriers.detail.and.callFake( () => detailUrlResponse );
 
-							config.saved();
+						config.saved();
 
-							expect( res.redirect ).toHaveBeenCalledWith( detailUrlResponse );
-							expect( urls.barriers.detail ).toHaveBeenCalledWith( barrier.id );
-							expect( next ).not.toHaveBeenCalled();
-							expect( req.session.barrierDocuments ).toEqual( sessionDocs );
+						expect( res.redirect ).toHaveBeenCalledWith( detailUrlResponse );
+						expect( urls.barriers.detail ).toHaveBeenCalledWith( barrier.id );
+						expect( next ).not.toHaveBeenCalled();
+						expect( req.session.barrierDocuments ).toEqual( sessionDocs );
 					}
+
 					describe( 'With no documents in the session', () => {
 						it( 'Should configure the FormProcessor correctly', async () => {
 
@@ -578,45 +588,29 @@ describe( 'Barrier interactions controller', () => {
 		} );
 
 		describe( 'edit', () => {
-			describe( 'When the noteId is invalid', () => {
-				it( 'Should call next with an error', async () => {
 
-					req.params.noteId = 'abc';
-					validators.isNumeric.and.callFake( () => false );
+			let editId;
 
-					await controller.notes.edit( req, res, next );
+			beforeEach( () => {
 
-					expect( next ).toHaveBeenCalledWith( new Error( 'Invalid noteId' ) );
-					expect( res.render ).not.toHaveBeenCalled();
-				} );
+				editId = 6;
+				req.params.id = editId;
+				req.note = getFakeData( '/backend/barriers/interactions' ).results[ 0 ];
 			} );
 
-			describe( 'when the noteId is valid', () => {
+			describe( 'Configuring the Form', () => {
 
-				let editId;
-
-				beforeEach( () => {
-
-					editId = 34;
-					req.params.id = editId;
-					validators.isNumeric.and.callFake( () => true );
-				} );
-
-				it( 'Should configure the Form correctly', async () => {
+				beforeEach( async () => {
 
 					await controller.notes.edit( req, res, next );
-
-					const args = Form.calls.argsFor( 0 );
-					const config = args[ 1 ];
-
-					expect( Form ).toHaveBeenCalled();
-					expect( args[ 0 ] ).toEqual( req );
-
-					expect( config.note ).toBeDefined();
-					expect( config.note.required ).toBeDefined();
 				} );
 
-				it( 'Should configure the FormProcessor correctly', async () => {
+				checkFormConfig();
+			} );
+
+			describe( 'configuring the FormProcessor', () => {
+
+				async function checkProcessor( { renderDocs, saveDocs, sessionDocs } ){
 
 					const { interactionsResponse, historyResponse } = returnSuccessResponses();
 					const { barrierDetailViewModelResponse, interactionsViewModelResponse } = returnViewModels();
@@ -633,11 +627,18 @@ describe( 'Barrier interactions controller', () => {
 					expect( typeof config.render ).toEqual( 'function' );
 					expect( typeof config.saveFormData ).toEqual( 'function' );
 					expect( typeof config.saved ).toEqual( 'function' );
+
 					await config.render( templateValues );
+
 					expect( res.render ).toHaveBeenCalledWith( template, Object.assign( {},
 						barrierDetailViewModelResponse,
-						{ interactions: interactionsViewModelResponse },
-						templateValues
+						templateValues,
+						{
+							interactions: interactionsViewModelResponse,
+							noteErrorText: 'Add text for the note.',
+							pageTitleSuffix: ' - Edit a note',
+							documents: renderDocs,
+						},
 					) );
 
 					expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier, req.query.addCompany);
@@ -648,7 +649,10 @@ describe( 'Barrier interactions controller', () => {
 
 					config.saveFormData( formValues );
 
-					expect( backend.barriers.notes.update ).toHaveBeenCalledWith( req, editId, formValues );
+					expect( backend.barriers.notes.update ).toHaveBeenCalledWith( req, editId, {
+						note: formValues.note,
+						documentIds: saveDocs,
+					} );
 
 					urls.barriers.detail.and.callFake( () => detailUrlResponse );
 
@@ -656,28 +660,67 @@ describe( 'Barrier interactions controller', () => {
 
 					expect( res.redirect ).toHaveBeenCalledWith( detailUrlResponse );
 					expect( urls.barriers.detail ).toHaveBeenCalledWith( barrier.id );
-				} );
+					expect( req.session.noteDocuments ).toEqual( sessionDocs );
+				}
 
-				describe( 'When the processor does not throw an error', () => {
-					it( 'Should not call next', async () => {
+				describe( 'With no documents in the session', () => {
+					it( 'Should configure it correctly', async () => {
 
-						await controller.notes.edit( req, res, next );
-
-						expect( next ).not.toHaveBeenCalled();
+						await checkProcessor( {
+							renderDocs: [],
+							saveDocs: [],
+							sessionDocs: []
+						} );
 					} );
 				} );
 
-				describe( 'When the processor throws an errror', () => {
-					it( 'Should call next with the error', async () => {
+				describe( 'With documents in the session', () => {
 
-						const err = new Error( 'a random error' );
+					let matchingDoc;
+					let nonMatchingDoc1;
 
-						processor.process.and.callFake( () => { throw err; } );
+					beforeEach( () => {
 
-						await controller.notes.edit( req, res, next );
+						matchingDoc = { noteId: editId, document: { id: uuid(), name: 'test1.jpg' } };
+						nonMatchingDoc1 = { noteId: 1234, document: { id: uuid(), name: 'test3.txt' } };
 
-						expect( next ).toHaveBeenCalledWith( err );
+						req.session.noteDocuments = [ matchingDoc, nonMatchingDoc1 ];
 					} );
+
+					describe( 'When the note has documents that are not in the session', () => {
+						it( 'Should add the documents to the session', async () => {
+
+							req.note.documents = [ { id: uuid(), name: 'test2.txt', size: 100 } ];
+
+							await checkProcessor( {
+								renderDocs: [ matchingDoc.document, { ...req.note.documents[ 0 ], size: '100 Bytes', } ],
+								saveDocs: [ matchingDoc.document.id, req.note.documents[ 0 ].id ],
+								sessionDocs: [ nonMatchingDoc1 ],
+							} );
+						} );
+					} );
+				} );
+			} );
+
+			describe( 'When the processor does not throw an error', () => {
+				it( 'Should not call next', async () => {
+
+					await controller.notes.edit( req, res, next );
+
+					expect( next ).not.toHaveBeenCalled();
+				} );
+			} );
+
+			describe( 'When the processor throws an errror', () => {
+				it( 'Should call next with the error', async () => {
+
+					const err = new Error( 'a random error' );
+
+					processor.process.and.callFake( () => { throw err; } );
+
+					await controller.notes.edit( req, res, next );
+
+					expect( next ).toHaveBeenCalledWith( err );
 				} );
 			} );
 		} );

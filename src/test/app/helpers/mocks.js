@@ -13,6 +13,7 @@ if( typeof jasmine !== 'undefined' ){
 		}),
 
 		req: () => ({
+			method: 'GET',
 			query: {},
 			session: {},
 			params: {},

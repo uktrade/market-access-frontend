@@ -414,37 +414,30 @@ module.exports = {
 			}
 		},
 
-		add: async ( req, res, next ) => {
+		add: ( req, res, next ) => {
 
-			try {
+			handleNoteForm( req, res, next, {
 
-				await handleNoteForm( req, res, next, {
+				data: {
+					showNoteForm: true,
+					pageTitleSuffix: ' - Add a note'
+				},
+				getDocuments: () => getBarrierDocumentsFromSession( req ).map( ({ document }) => document ),
+				getDocumentIds: () => getBarrierDocumentsFromSession( req ).map( ({ document }) => document.id ),
+				clearSessionDocuments: () => {
 
-					data: {
-						showNoteForm: true,
-						pageTitleSuffix: ' - Add a note'
-					},
-					getDocuments: () => getBarrierDocumentsFromSession( req ).map( ({ document }) => document ),
-					getDocumentIds: () => getBarrierDocumentsFromSession( req ).map( ({ document }) => document.id ),
-					clearSessionDocuments: () => {
+					if( req.session.barrierDocuments ){
 
-						if( req.session.barrierDocuments ){
-
-							req.session.barrierDocuments = req.session.barrierDocuments.filter( ({ barrierId }) => (
-								barrierId !== req.barrier.id
-							) );
-						}
-					},
-					saveFormData: async ( values ) => backend.barriers.notes.save( req, req.barrier.id, values ),
-				} );
-
-			} catch( e ){
-
-				next( e );
-			}
+						req.session.barrierDocuments = req.session.barrierDocuments.filter( ({ barrierId }) => (
+							barrierId !== req.barrier.id
+						) );
+					}
+				},
+				saveFormData: async ( values ) => backend.barriers.notes.save( req, req.barrier.id, values ),
+			} );
 		},
 
-		edit: async ( req, res, next ) => {
+		edit: ( req, res, next ) => {
 
 			const note = req.note;
 			const getDocumentIds = () => getNoteDocumentsFromSession( req ).map( ({ document }) => document.id );
@@ -472,30 +465,23 @@ module.exports = {
 				}
 			}
 
-			try {
+			handleNoteForm( req, res, next, {
 
-				await handleNoteForm( req, res, next, {
+				editId: note.id,
+				data: {
+					pageTitleSuffix: ' - Edit a note'
+				},
+				getDocuments: () => getNoteDocumentsFromSession( req ).map( ({ document }) => document ),
+				getDocumentIds,
+				clearSessionDocuments: () => {
 
-					editId: note.id,
-					data: {
-						pageTitleSuffix: ' - Edit a note'
-					},
-					getDocuments: () => getNoteDocumentsFromSession( req ).map( ({ document }) => document ),
-					getDocumentIds,
-					clearSessionDocuments: () => {
+					if( req.session.noteDocuments ){
 
-						if( req.session.noteDocuments ){
-
-							req.session.noteDocuments = req.session.noteDocuments.filter( ( { noteId } ) => noteId !== note.id );
-						}
-					},
-					saveFormData: ( values ) => backend.barriers.notes.update( req, note.id, values ),
-				} );
-
-			} catch( e ){
-
-				next( e );
-			}
+						req.session.noteDocuments = req.session.noteDocuments.filter( ( { noteId } ) => noteId !== note.id );
+					}
+				},
+				saveFormData: ( values ) => backend.barriers.notes.update( req, note.id, values ),
+			} );
 		}
 	},
 };
