@@ -10,6 +10,8 @@ if( typeof jasmine !== 'undefined' ){
 			redirect: jasmine.createSpy( 'res.redirect' ),
 			render: jasmine.createSpy( 'res.render' ),
 			locals: {},
+			status: jasmine.createSpy( 'res.status' ),
+			json: jasmine.createSpy( 'res.json' ),
 		}),
 
 		req: () => ({

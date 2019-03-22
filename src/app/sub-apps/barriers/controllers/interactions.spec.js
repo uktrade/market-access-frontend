@@ -37,6 +37,7 @@ describe( 'Barrier interactions controller', () => {
 		backend = {
 			documents: {
 				getScanStatus: jasmine.createSpy( 'backend.documents.getScanStatus' ),
+				delete: jasmine.createSpy( 'backend.documents.delete' ),
 			},
 			barriers: {
 				getInteractions: jasmine.createSpy( 'backend.barriers.getInteractions' ),
@@ -59,6 +60,9 @@ describe( 'Barrier interactions controller', () => {
 				},
 				sectors: {
 					list: jasmine.createSpy( 'urls.barriers.sectors.list' )
+				},
+				notes: {
+					edit: jasmine.createSpy( 'urls.barriers.notes.edit' ),
 				}
 			}
 		};
@@ -721,6 +725,99 @@ describe( 'Barrier interactions controller', () => {
 					await controller.notes.edit( req, res, next );
 
 					expect( next ).toHaveBeenCalledWith( err );
+				} );
+			} );
+		} );
+
+		describe( 'documents', () => {
+
+			let barrierId;
+			let noteId;
+			let documentId;
+
+			beforeEach( () => {
+
+				barrierId = uuid();
+				documentId = uuid();
+
+				req.uuid = barrierId;
+				req.note = { id: noteId };
+				req.params.id = documentId;
+			} );
+
+			afterEach( () => {
+
+				expect( backend.documents.delete ).toHaveBeenCalledWith( req, documentId );
+			} );
+
+			describe( 'delete', () => {
+				describe( 'When the backend returns an error', () => {
+
+					let err;
+
+					beforeEach( () => {
+
+						err = new Error( 'A backend error' );
+						backend.documents.delete.and.callFake( () => Promise.reject( err ) );
+					} );
+
+					describe( 'When it is a POST', () => {
+						it( 'Should return a JSON error with status 500', async () => {
+
+							req.method = 'POST';
+
+							await controller.notes.documents.delete( req, res, next );
+
+							expect( res.status ).toHaveBeenCalledWith( 500 );
+							expect( res.json ).toHaveBeenCalledWith( { message: 'Error deleting file' } );
+							expect( reporter.captureException ).toHaveBeenCalledWith( err );
+						} );
+					} );
+
+					describe( 'When it is a GET', () => {
+						it( 'Should call next with the error', async () => {
+
+							await controller.notes.documents.delete( req, res, next );
+
+							expect( next ).toHaveBeenCalledWith( err );
+							expect( reporter.captureException ).not.toHaveBeenCalled();
+						} );
+					} );
+				} );
+
+				describe( 'When the backend returns a 200', () => {
+
+					beforeEach( () => {
+
+						backend.documents.delete.and.callFake( () => Promise.resolve( {
+							response: { isSuccess: true }
+						} ) );
+					} );
+
+					describe( 'When it is a POST', () => {
+						it( 'Should return the response in JSON', async () => {
+
+							req.method = 'POST';
+
+							await controller.notes.documents.delete( req, res, next );
+
+							expect( res.json ).toHaveBeenCalledWith( {} );
+						} );
+					} );
+
+					describe( 'When it is a GET', () => {
+						it( 'Should retun a 302 to the edit note page', async () => {
+
+							const editResponse = '/edit-a-note';
+
+							urls.barriers.notes.edit.and.callFake( () => editResponse );
+
+							await controller.notes.documents.delete( req, res, next );
+
+							expect( res.redirect ).toHaveBeenCalledWith( editResponse );
+							expect( urls.barriers.notes.edit ).toHaveBeenCalledWith( barrierId, noteId );
+						} );
+					} );
 				} );
 			} );
 		} );

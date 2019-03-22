@@ -398,7 +398,7 @@ module.exports = {
 					if( isJson ){
 
 						res.status( 500 );
-						res.json( { message: 'Error deleteing file' } );
+						res.json( { message: 'Error deleting file' } );
 						reporter.captureException( e );
 
 					} else {
