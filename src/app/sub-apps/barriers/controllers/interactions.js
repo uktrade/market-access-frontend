@@ -115,7 +115,6 @@ async function handleNoteForm( req, res, next, opts ){
 		note: {
 			required: NOTE_ERROR
 		},
-		documentIds: {},
 		document: {
 			type: Form.FILE,
 			validators: [
@@ -421,6 +420,10 @@ module.exports = {
 
 				await handleNoteForm( req, res, next, {
 
+					data: {
+						showNoteForm: true,
+						pageTitleSuffix: ' - Add a note'
+					},
 					getDocuments: () => getBarrierDocumentsFromSession( req ).map( ({ document }) => document ),
 					getDocumentIds: () => getBarrierDocumentsFromSession( req ).map( ({ document }) => document.id ),
 					clearSessionDocuments: () => {
@@ -432,12 +435,6 @@ module.exports = {
 							) );
 						}
 					},
-
-					data: {
-						showNoteForm: true,
-						pageTitleSuffix: ' - Add a note'
-					},
-
 					saveFormData: async ( values ) => backend.barriers.notes.save( req, req.barrier.id, values ),
 				} );
 

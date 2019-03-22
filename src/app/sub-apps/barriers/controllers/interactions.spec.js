@@ -3,7 +3,7 @@ const uuid = require( 'uuid/v4' );
 const faker = require( 'faker' );
 
 const modulePath = './interactions';
-const getFakeData = jasmine.helpers.getFakeData;
+const { getFakeData, mocks } = jasmine.helpers;
 
 describe( 'Barrier interactions controller', () => {
 
@@ -13,7 +13,6 @@ describe( 'Barrier interactions controller', () => {
 	let next;
 	let backend;
 	let urls;
-	let csrfToken;
 	let config;
 	let Form;
 	let FormProcessor;
@@ -26,31 +25,15 @@ describe( 'Barrier interactions controller', () => {
 	let interactionsViewModel;
 	let barrierId;
 	let uploadDocument;
+	let reporter;
 
 	beforeEach( () => {
 
-		csrfToken = uuid();
+		( { req, res, next } = mocks.middleware() );
 		barrierId = uuid();
+		config = { addCompany: false };
+		req.barrier = { id: barrierId };
 
-		req = {
-			barrier: {
-				id: barrierId
-			},
-			csrfToken: () => csrfToken,
-			session: {},
-			params: {},
-			query: {},
-			flash: jasmine.createSpy( 'req.flash' )
-		};
-		config = {
-			addCompany: false
-		};
-		res = {
-			render: jasmine.createSpy( 'res.render' ),
-			redirect: jasmine.createSpy( 'res.redirect' ),
-			locals: {}
-		};
-		next = jasmine.createSpy( 'next' );
 		backend = {
 			documents: {
 				getScanStatus: jasmine.createSpy( 'backend.documents.getScanStatus' ),
@@ -91,6 +74,7 @@ describe( 'Barrier interactions controller', () => {
 			process: jasmine.createSpy( 'FormProcessor.process' )
 		};
 		Form = jasmine.createSpy( 'Form' ).and.callFake( () => form );
+		Form.FILE = 'file-type';
 		FormProcessor = jasmine.createSpy( 'FormProcessor' ).and.callFake( () => processor );
 		barrierDetailViewModel = jasmine.createSpy( 'barrierDetailViewModel' );
 		interactionsViewModel = jasmine.createSpy( 'interactionsViewModel' );
@@ -103,8 +87,11 @@ describe( 'Barrier interactions controller', () => {
 			isDateInPast: jasmine.createSpy( 'validators.isDateInPast' ),
 			isMetadata: jasmine.createSpy( 'validators.isMetadata' ),
 			isSector: jasmine.createSpy( 'validators.isSector' ),
-			isDateNumeric: jasmine.createSpy( 'validators.isDateNumeric' )
+			isDateNumeric: jasmine.createSpy( 'validators.isDateNumeric' ),
+			isValidFile: jasmine.createSpy( 'validators.isValidFile' ),
 		};
+
+		reporter = mocks.reporter();
 
 		controller = proxyquire( modulePath, {
 			'../../../config': config,
@@ -116,6 +103,7 @@ describe( 'Barrier interactions controller', () => {
 			'../view-models/detail': barrierDetailViewModel,
 			'../view-models/interactions': interactionsViewModel,
 			'../../../lib/upload-document': uploadDocument,
+			'../../../lib/reporter': reporter,
 		} );
 	} );
 
@@ -313,132 +301,176 @@ describe( 'Barrier interactions controller', () => {
 
 		beforeEach( () => {
 
-			barrier = jasmine.helpers.getFakeData( '/backend/barriers/barrier' );
+			barrier = getFakeData( '/backend/barriers/barrier' );
 
 			req.barrier = barrier;
 		} );
 
 		describe( 'add', () => {
-			it( 'Should configure the Form correctly', async () => {
+			describe( 'Configuring the Form', () => {
 
-				await controller.notes.add( req, res, next );
+				let args;
+				let config;
 
-				const args = Form.calls.argsFor( 0 );
-				const config = args[ 1 ];
+				beforeEach( async () => {
 
-				expect( Form ).toHaveBeenCalled();
-				expect( args[ 0 ] ).toEqual( req );
+					await controller.notes.add( req, res, next );
 
-				expect( config.note ).toBeDefined();
-				expect( config.note.required ).toBeDefined();
+					args = Form.calls.argsFor( 0 );
+					config = args[ 1 ];
+				} );
 
-				expect( config.pinned ).toBeDefined();
+				it( 'Should have the correct config', async () => {
+
+					expect( Form ).toHaveBeenCalled();
+					expect( args[ 0 ] ).toEqual( req );
+
+					expect( config.note ).toBeDefined();
+					expect( config.note.required ).toBeDefined();
+
+					expect( config.pinned ).not.toBeDefined();
+
+					expect( config.document ).toBeDefined();
+					expect( config.document.type ).toEqual( Form.FILE );
+					expect( config.document.validators.length ).toEqual( 1 );
+				} );
+
+				describe( 'document validator', () => {
+
+					let validator;
+					let file;
+
+					beforeEach( () => {
+
+						validator = config.document.validators[ 0 ].fn;
+						file = { name: 'test.txt', size: 10, type: 'text/plain' };
+					} );
+
+					describe( 'When the file is valid', () => {
+						it( 'Should return true', () => {
+
+							validators.isValidFile.and.callFake( () => true );
+
+							expect( validator( file ) ).toEqual( true );
+							expect( validators.isValidFile ).toHaveBeenCalledWith( file );
+							expect( reporter.message ).not.toHaveBeenCalled();
+						} );
+					} );
+
+					describe( 'When the file is invalid', () => {
+						it( 'Should return false and report the file', () => {
+
+							validators.isValidFile.and.callFake( () => false );
+
+							expect( validator( file ) ).toEqual( false );
+							expect( validators.isValidFile ).toHaveBeenCalledWith( file );
+							expect( reporter.message ).toHaveBeenCalledWith( 'info', 'Invalid document type: ' + file.type, { size: file.size, name: file.name } );
+						} );
+					} );
+				} );
 			} );
 
 			describe( 'configuring the FormProcessor', () => {
-				describe( 'With no document', () => {
-					it( 'Should configure the FormProcessor correctly', async () => {
+				describe( 'With no document POSTed', () => {
 
+					async function checkProcessor( { renderDocs, saveDocs, sessionDocs } ){
 						const { interactionsResponse, historyResponse } = returnSuccessResponses();
-						const { barrierDetailViewModelResponse, interactionsViewModelResponse } = returnViewModels();
+							const { barrierDetailViewModelResponse, interactionsViewModelResponse } = returnViewModels();
 
-						await controller.notes.add( req, res, next );
+							await controller.notes.add( req, res, next );
 
-						const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
-						const templateValues = { abc: '123' };
-						const formValues = { note: 'a note', pinned: false, a: 'test' };
-						const detailUrlResponse = '/barrier';
+							const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
+							const templateValues = { abc: '123' };
+							const formValues = { note: 'a note', a: 'test' };
+							const detailUrlResponse = '/barrier';
 
-						expect( config.form ).toEqual( form );
-						expect( typeof config.render ).toEqual( 'function' );
-						expect( typeof config.saveFormData ).toEqual( 'function' );
-						expect( typeof config.saved ).toEqual( 'function' );
+							expect( config.form ).toEqual( form );
+							expect( typeof config.render ).toEqual( 'function' );
+							expect( typeof config.saveFormData ).toEqual( 'function' );
+							expect( typeof config.saved ).toEqual( 'function' );
 
-						await config.render( templateValues );
+							await config.render( templateValues );
 
-						expect( res.render ).toHaveBeenCalledWith( template, Object.assign( {},
-							barrierDetailViewModelResponse,
-							{ interactions: interactionsViewModelResponse },
-							{ noteForm: true, noteErrorText: 'Add text for the note.' },
-							templateValues
-						) );
+							expect( res.render ).toHaveBeenCalledWith( template, Object.assign( {},
+								barrierDetailViewModelResponse,
+								templateValues,
+								{
+									interactions: interactionsViewModelResponse,
+									showNoteForm: true,
+									noteErrorText: 'Add text for the note.',
+									pageTitleSuffix: ' - Add a note',
+									documents: renderDocs,
+								},
+							) );
 
-						expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier, false );
-						expect( interactionsViewModel ).toHaveBeenCalledWith( {
-							interactions: interactionsResponse.body,
-							history: historyResponse.body
-						}, undefined );
-
-						config.saveFormData( formValues );
-
-						expect( backend.barriers.notes.save ).toHaveBeenCalledWith( req, req.barrier.id, {
-							note: formValues.note,
-							pinned: formValues.pinned,
-						} );
-
-						urls.barriers.detail.and.callFake( () => detailUrlResponse );
-
-						config.saved();
-
-						expect( res.redirect ).toHaveBeenCalledWith( detailUrlResponse );
-						expect( urls.barriers.detail ).toHaveBeenCalledWith( barrier.id );
-						expect( next ).not.toHaveBeenCalled();
-					} );
-				} );
-
-				describe( 'With a documentId', () => {
-
-					let config;
-					let formValues;
-
-					beforeEach( async () => {
-
-						await controller.notes.add( req, res, next );
-
-						config = FormProcessor.calls.argsFor( 0 )[ 0 ];
-						formValues = {
-							note: faker.lorem.words(),
-							pinned: true,
-							documentId: uuid(),
-						};
-					} );
-
-					afterEach( () => {
-
-						expect( backend.barriers.notes.save ).toHaveBeenCalledWith( req, req.barrier.id, {
-							note: formValues.note,
-							pinned: formValues.pinned,
-							documentId: formValues.documentId
-						} );
-
-						expect( next ).not.toHaveBeenCalled();
-					} );
-
-					describe( 'When there are documents in the session', () => {
-						it( 'Should remove the documents for this barrier id', () => {
-
-							const doc1 = { barrierId: uuid(), documentId: uuid() };
-							const doc2 = { barrierId: uuid(), documentId: uuid() };
-
-							req.session.barrierDocuments = [
-								doc1,
-								{ barrierId: barrier.id, documentId: formValues.documentId },
-								doc2,
-							];
+							expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier, false );
+							expect( interactionsViewModel ).toHaveBeenCalledWith( {
+								interactions: interactionsResponse.body,
+								history: historyResponse.body
+							}, undefined );
 
 							config.saveFormData( formValues );
+
+							expect( backend.barriers.notes.save ).toHaveBeenCalledWith( req, req.barrier.id, {
+								note: formValues.note,
+								documentIds: saveDocs
+							} );
+
+							urls.barriers.detail.and.callFake( () => detailUrlResponse );
+
 							config.saved();
 
-							expect( req.session.barrierDocuments ).toEqual( [
-								doc1, doc2
-							] );
+							expect( res.redirect ).toHaveBeenCalledWith( detailUrlResponse );
+							expect( urls.barriers.detail ).toHaveBeenCalledWith( barrier.id );
+							expect( next ).not.toHaveBeenCalled();
+							expect( req.session.barrierDocuments ).toEqual( sessionDocs );
+					}
+					describe( 'With no documents in the session', () => {
+						it( 'Should configure the FormProcessor correctly', async () => {
+
+							await checkProcessor({
+								renderDocs: [],
+								saveDocs: [],
+							});
 						} );
 					} );
 
-					describe( 'When there are not any documents in the session', () => {
-						it( 'Should configure the saveFormData correctly', async () => {
+					describe( 'With documents in the session', () => {
 
-							config.saveFormData( formValues );
+						let nonMatchingDoc1;
+						let nonMatchingDoc2;
+
+						beforeEach( () => {
+
+							nonMatchingDoc1 = { barrierId: uuid(), document: { name: '1.jpg', size: 10 } };
+							nonMatchingDoc2 = { barrierId: uuid(), document: { name: '2.jpg', size: 20 } };
+						} );
+
+						describe( 'With a matching doc', () => {
+							it( 'Should configure the FormProcessor correctly', async () => {
+
+								const matchingDoc = { barrierId: barrier.id, document: { name: 'match.jpg', size: 30 } };
+								req.session.barrierDocuments = [ nonMatchingDoc1, nonMatchingDoc2, matchingDoc ];
+
+								await checkProcessor({
+									renderDocs: [ matchingDoc.document ],
+									saveDocs: [ matchingDoc.document.id ],
+									sessionDocs: [ nonMatchingDoc1, nonMatchingDoc2 ],
+								});
+							} );
+						} );
+
+						describe( 'Without a matching doc', () => {
+							it( 'Should configure the FormProcessor correctly', async () => {
+
+								req.session.barrierDocuments = [ nonMatchingDoc1, nonMatchingDoc2 ];
+
+								await checkProcessor({
+									renderDocs: [],
+									saveDocs: [],
+									sessionDocs: [ nonMatchingDoc1, nonMatchingDoc2 ],
+								});
+							} );
 						} );
 					} );
 				} );
@@ -457,7 +489,6 @@ describe( 'Barrier interactions controller', () => {
 						documentId = uuid();
 						formValues = {
 							note: faker.lorem.words(),
-							pinned: true,
 							document: { name: 'a document', size: 12 },
 						};
 					} );
@@ -489,7 +520,7 @@ describe( 'Barrier interactions controller', () => {
 						} );
 
 						describe( 'When getScanStatus return success', () => {
-							it( 'Should configure the saveFormData correctly', async () => {
+							it( 'Should configure saveFormData correctly', async () => {
 
 								backend.documents.getScanStatus.and.callFake( () => Promise.resolve( {
 									status: 'virus_scanned',
@@ -500,8 +531,7 @@ describe( 'Barrier interactions controller', () => {
 
 								expect( backend.barriers.notes.save ).toHaveBeenCalledWith( req, req.barrier.id, {
 									note: formValues.note,
-									pinned: formValues.pinned,
-									documentId
+									documentIds: [ documentId ]
 								} );
 								expect( next ).not.toHaveBeenCalled();
 							} );
