@@ -104,7 +104,7 @@ function isFileOverSize( err ){
 	return isOverSize;
 }
 
-function reportInvalidFile( file ){
+function reportInvalidFile( file = {} ){
 	reporter.message( 'info', 'Invalid document type: ' + file.type, { size: file.size, name: file.name } );
 }
 

@@ -20,6 +20,7 @@ if( typeof jasmine !== 'undefined' ){
 			session: {},
 			params: {},
 			user: {},
+			body: {},
 			error: jasmine.createSpy( 'req.error' ),
 			hasErrors: jasmine.createSpy( 'req.hasErrors' ),
 			flash: jasmine.createSpy( 'req.flash' ),

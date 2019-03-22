@@ -31,7 +31,13 @@ describe( 'Barrier interactions controller', () => {
 
 		( { req, res, next } = mocks.middleware() );
 		barrierId = uuid();
-		config = { addCompany: false };
+		config = {
+			addCompany: false,
+			files: {
+				maxSize: ( 5 * 1024 * 1024 ),
+				types: [ 'image/jpeg', 'text/csv' ]
+			}
+		};
 		req.barrier = { id: barrierId };
 
 		backend = {
@@ -739,18 +745,20 @@ describe( 'Barrier interactions controller', () => {
 
 				barrierId = uuid();
 				documentId = uuid();
+				noteId = 123;
 
 				req.uuid = barrierId;
 				req.note = { id: noteId };
 				req.params.id = documentId;
 			} );
 
-			afterEach( () => {
-
-				expect( backend.documents.delete ).toHaveBeenCalledWith( req, documentId );
-			} );
-
 			describe( 'delete', () => {
+
+				afterEach( () => {
+
+					expect( backend.documents.delete ).toHaveBeenCalledWith( req, documentId );
+				} );
+
 				describe( 'When the backend returns an error', () => {
 
 					let err;
@@ -816,6 +824,129 @@ describe( 'Barrier interactions controller', () => {
 
 							expect( res.redirect ).toHaveBeenCalledWith( editResponse );
 							expect( urls.barriers.notes.edit ).toHaveBeenCalledWith( barrierId, noteId );
+						} );
+					} );
+				} );
+			} );
+
+			describe( 'add', () => {
+				describe( 'When there is a formError on the req', () => {
+					describe( 'When the error is about file size', () => {
+						it( 'Should return a 400 with a message', async () => {
+
+							req.formError = new Error( 'The error is maxFileSize exceeded' );
+
+							await controller.notes.documents.add( req, res );
+
+							expect( res.status ).toHaveBeenCalledWith( 400 );
+							expect( res.json ).toHaveBeenCalledWith( { message: 'File size exceeds the 5 MB limit. Reduce file size and upload the document again.' } );
+							expect( reporter.message ).toHaveBeenCalledWith( 'info', req.formError.message );
+						} );
+					} );
+				} );
+
+				describe( 'When there is not a formError', () => {
+					describe( 'When there is not a document', () => {
+						it( 'Should return a 400 with an error message', async () => {
+
+							await controller.notes.documents.add( req, res );
+
+							expect( res.status ).toHaveBeenCalledWith( 400 );
+							expect( res.json ).toHaveBeenCalledWith( { message: 'Unsupported file format. The following file formats are accepted .jpg, .csv' } );
+							expect( reporter.message ).toHaveBeenCalledWith( 'info', 'Invalid document type: undefined', { size: undefined, name: undefined } );
+						} );
+					} );
+
+					describe( 'When there is a document', () => {
+
+						let doc;
+
+						beforeEach( () => {
+
+							doc = { type: 'text/plain', size: 10, name: 'test-1.txt' };
+							req.body.document = doc;
+						} );
+
+						describe( 'When the document is invalid', () => {
+							it( 'Should return 400 with an error message', async () => {
+
+								validators.isValidFile.and.callFake( () => false );
+
+								await controller.notes.documents.add( req, res );
+
+								expect( res.status ).toHaveBeenCalledWith( 400 );
+								expect( res.json ).toHaveBeenCalledWith( { message: 'Unsupported file format. The following file formats are accepted .jpg, .csv' } );
+								expect( reporter.message ).toHaveBeenCalledWith( 'info', `Invalid document type: ${ doc.type }`, { size: doc.size, name: doc.name } );
+							} );
+						} );
+
+						describe( 'When the document is valid', () => {
+
+							beforeEach( () => {
+
+								validators.isValidFile.and.callFake( () => true );
+							} );
+
+							describe( 'When uploadDocument returns an error', () => {
+								it( 'Should return a 500', async () => {
+
+									const err = new Error( 'uploadDocument error' );
+
+									uploadDocument.and.callFake( () => Promise.reject( err ) );
+
+									await controller.notes.documents.add( req, res );
+
+									expect( res.status ).toHaveBeenCalledWith( 500 );
+									expect( res.json ).toHaveBeenCalledWith( { message: 'A system error has occured, so the file has not been uploaded. Try again.' } );
+									expect( reporter.captureException ).toHaveBeenCalledWith( err );
+								} );
+							} );
+
+							describe( 'When uploadDocument returns a documentId', () => {
+
+								let documentId;
+
+								beforeEach( () => {
+
+									documentId = uuid();
+									uploadDocument.and.callFake( () => documentId );
+								} );
+
+								describe( 'When the document does not pass virus scanning', () => {
+									it( 'Should return a 401', async () => {
+
+										backend.documents.getScanStatus.and.callFake( () => Promise.resolve( { passed: false } ) );
+
+										await controller.notes.documents.add( req, res );
+
+										expect( res.status ).toHaveBeenCalledWith( 401 );
+										expect( res.json ).toHaveBeenCalledWith( { message: 'This file may be infected with a virus and will not be accepted.' } );
+									} );
+								} );
+
+								describe( 'When the document passes virus scanning', () => {
+									it( 'Should return the document details and add the document to the session', async () => {
+
+										backend.documents.getScanStatus.and.callFake( () => Promise.resolve( { passed: true } ) );
+
+										await controller.notes.documents.add( req, res );
+
+										expect( res.json ).toHaveBeenCalledWith( {
+											documentId,
+											file: { name: doc.name, size: '10 Bytes' }
+										} );
+
+										expect( req.session.noteDocuments ).toEqual( [{
+											noteId,
+											document: {
+												id: documentId,
+												size: '10 Bytes',
+												name: doc.name,
+											}
+										}] );
+									} );
+								} );
+							} );
 						} );
 					} );
 				} );
