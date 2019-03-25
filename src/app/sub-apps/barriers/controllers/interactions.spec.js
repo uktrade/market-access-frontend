@@ -989,6 +989,44 @@ describe( 'Barrier interactions controller', () => {
 					}] );
 				} );
 			} );
+
+			describe( 'cancel', () => {
+
+				let detailResponse;
+
+				beforeEach( () => {
+
+					detailResponse = '/barrier/detail';
+					urls.barriers.detail.and.callFake( () => detailResponse );
+				} );
+
+				afterEach( () => {
+
+					expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
+					expect( urls.barriers.detail ).toHaveBeenCalledWith( barrierId );
+				} );
+
+				describe( 'When there are documents in the session', () => {
+					it( 'Should remove the documents and redirect', () => {
+
+						req.session.noteDocuments = [
+							{ noteId, document: { id: uuid() } } ,
+							{ noteId, document: { id: uuid() } }
+						];
+
+						controller.notes.documents.cancel( req, res );
+
+						expect( req.session.noteDocuments ).toEqual( [] );
+					} );
+				} );
+
+				describe( 'When there are no documents in the session', () => {
+					it( 'Should redirect to the detail page', () => {
+
+						controller.notes.documents.cancel( req, res );
+					} );
+				} );
+			} );
 		} );
 	} );
 
@@ -1124,6 +1162,49 @@ describe( 'Barrier interactions controller', () => {
 
 						checkSuccess();
 					} );
+				} );
+			} );
+		} );
+
+		describe( 'cancel', () => {
+
+			let detailResponse;
+
+			beforeEach( () => {
+
+				req.uuid = barrierId;
+				urls.barriers.detail.and.callFake( () => detailResponse );
+			} );
+
+			afterEach( () => {
+
+				expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
+				expect( urls.barriers.detail ).toHaveBeenCalledWith( barrierId );
+			} );
+
+			describe( 'When there are documents in the session', () => {
+				it( 'Should remove ones matched to the current barrier and redirect to the barrier detail', () => {
+
+					const nonMatchingDoc = { barrierId: uuid(), document: { id: uuid() } };
+					const matchingDoc1 = { barrierId, document: { id: uuid() } };
+					const matchingDoc2 = { barrierId, document: { id: uuid() } };
+
+					req.session.barrierDocuments = [
+						nonMatchingDoc,
+						matchingDoc1,
+						matchingDoc2,
+					];
+
+					controller.documents.cancel( req, res );
+
+					expect( req.session.barrierDocuments ).toEqual( [ nonMatchingDoc ] );
+				} );
+			} );
+
+			describe( 'When there are no documents in the session', () => {
+				it( 'Should redirect to the barrier detail', () => {
+
+					controller.documents.cancel( req, res );
 				} );
 			} );
 		} );
