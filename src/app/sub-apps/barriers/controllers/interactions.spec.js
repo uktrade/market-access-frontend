@@ -99,6 +99,7 @@ describe( 'Barrier interactions controller', () => {
 			isSector: jasmine.createSpy( 'validators.isSector' ),
 			isDateNumeric: jasmine.createSpy( 'validators.isDateNumeric' ),
 			isValidFile: jasmine.createSpy( 'validators.isValidFile' ),
+			isUuid: jasmine.createSpy( 'validators.isUuid' ),
 		};
 
 		reporter = mocks.reporter();
@@ -983,6 +984,126 @@ describe( 'Barrier interactions controller', () => {
 						name: doc.name,
 					}
 				}] );
+			} );
+		} );
+
+		describe( 'delete', () => {
+
+			let barrierId;
+			let documentId;
+
+			beforeEach( () => {
+
+				barrierId = uuid();
+				documentId = uuid();
+
+				req.uuid = barrierId;
+				req.params.id = documentId;
+			} );
+
+			describe( 'When the document id is invalid', () => {
+				it( 'Should return a 500 and report the error', async () => {
+
+					validators.isUuid.and.callFake( () => false );
+
+					await controller.documents.delete( req, res );
+
+					expect( res.status ).toHaveBeenCalledWith( 500 );
+					expect( res.json ).toHaveBeenCalledWith( {} );
+					expect( reporter.captureException ).toHaveBeenCalledWith( new Error( 'Invalid documentId' ) );
+				} );
+			} );
+
+			describe( 'When the document id is valid', () => {
+
+				beforeEach( () => {
+					validators.isUuid.and.callFake( () => true );
+				} );
+
+				describe( 'When the backend delete rejects', () => {
+					it( 'Should return a 500 with the correct message', async () => {
+
+						const err = new Error( 'A backend fail' );
+
+						backend.documents.delete.and.callFake( () => Promise.reject( err ) );
+
+						await controller.documents.delete( req, res );
+
+						expect( res.status ).toHaveBeenCalledWith( 500 );
+						expect( res.json ).toHaveBeenCalledWith( {} );
+						expect( reporter.captureException ).toHaveBeenCalledWith( err );
+					} );
+				} );
+
+				describe( 'When the backend resolves', () => {
+					describe( 'When it is a 500', () => {
+						it( 'Should report the error', async() => {
+
+							backend.documents.delete.and.callFake( () => Promise.resolve( { response: { statusCode: 500 } } ) );
+
+							await controller.documents.delete( req, res );
+
+							expect( res.status ).toHaveBeenCalledWith( 500 );
+							expect( res.json ).toHaveBeenCalledWith( { message: 'A system error has occured, so the file has not been deleted. Try again.' } );
+							expect( reporter.captureException ).toHaveBeenCalledWith( new Error( `Unable to delete document ${ documentId }, got 500 from backend` ) );
+						} );
+					} );
+
+					function checkSuccess(){
+
+						afterEach( () => {
+
+							expect( res.status ).toHaveBeenCalledWith( 200 );
+							expect( res.json ).toHaveBeenCalledWith( {} );
+						} );
+
+						describe( 'When there are barrier documents in the session', () => {
+							it( 'Should remove the document from the session and return a 200', async() => {
+
+								const nonMatchingDoc1 = { id: uuid(), name: 'test1.jpg' };
+								const matchingDoc = { id: documentId, name: 'match.txt' };
+
+								req.session.barrierDocuments = [
+									{ barrierId, document: nonMatchingDoc1 },
+									{ barrierId, document: matchingDoc }
+								];
+
+								await controller.documents.delete( req, res );
+
+								expect( req.session.barrierDocuments ).toEqual( [ { barrierId, document: nonMatchingDoc1 } ] );
+							} );
+						} );
+
+						describe( 'When there are not documents in the session', () => {
+							it( 'Should not error and have no documents in the session', async () => {
+
+								await controller.documents.delete( req, res );
+
+								expect( req.session.barrierDocuments ).not.toBeDefined();
+							} );
+						} );
+					}
+
+					describe( 'When it is a 200', () => {
+
+						beforeEach( () => {
+
+							backend.documents.delete.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+						} );
+
+						checkSuccess();
+					} );
+
+					describe( 'When it is a 404', () => {
+
+						beforeEach( () => {
+
+							backend.documents.delete.and.callFake( () => Promise.resolve( { response: { statusCode: 404 } } ) );
+						} );
+
+						checkSuccess();
+					} );
+				} );
 			} );
 		} );
 	} );
