@@ -5,6 +5,7 @@ const logger = require( './logger' );
 
 const SCAN_CHECK_INTERVAL = config.files.scan.statusCheckInterval;
 const SCAN_MAX_ATTEMPTS = Math.round( config.files.scan.maxWaitTime / SCAN_CHECK_INTERVAL );
+const LOCATION = 'location';
 
 function getToken( req ){
 
@@ -117,25 +118,37 @@ function transformUser( { response, body } ){
 function getFilterParams( filters ){
 
 	const filterMap = {
-		'export_country': 'country',
+		'country': LOCATION,
 		'sector': 'sector',
-		'barrier_type': 'type',
+		'type': 'barrier_type',
 		'status': 'status',
 		'priority': 'priority',
-		//'start_date': 'date-start',
-		//'end_date': 'date-end',
+		'region': LOCATION,
 	};
 
 	const params = [];
+	const locations = [];
 
-	for( let [ paramKey, filterKey ] of Object.entries( filterMap ) ){
+	for( let [ filterKey, paramKey ] of Object.entries( filterMap ) ){
 
 		const value = filters[ filterKey ];
 
 		if( value ){
 
-			params.push( `${ paramKey }=${ value }` );
+			if( paramKey === LOCATION ){
+
+				locations.push( value );
+
+			} else {
+
+				params.push( `${ paramKey }=${ value }` );
+			}
 		}
+	}
+
+	if( locations.length ){
+
+		params.push( `${ LOCATION }=${ locations }` );
 	}
 
 	return params;

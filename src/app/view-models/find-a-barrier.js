@@ -35,9 +35,8 @@ function getRemoveUrl( filters, key ){
 //const isSelected = createMatcher( 'selected' );
 const isChecked = createMatcher( 'checked' );
 
-module.exports = function( params ){
+module.exports = function( { count, barriers, filters } ){
 
-	const { count, barriers, filters } = params;
 	const barrierList = [];
 
 	for( let barrier of barriers ){
@@ -75,6 +74,11 @@ module.exports = function( params ){
 				items: metadata.getCountryList( 'All locations' ).map( isChecked( filters.country ) ),
 				active: filters.country && filters.country.map( metadata.getCountry ),
 				removeUrl: getRemoveUrl( filters, 'country' ),
+			},
+			region: {
+				items: metadata.getOverseasRegionList( 'All regions' ).map( isChecked( filters.region ) ),
+				active: filters.region && filters.region.map( metadata.getOverseasRegion ),
+				removeUrl: getRemoveUrl( filters, 'region' ),
 			},
 			sector: {
 				items: metadata.getSectorList( 'All sectors' ).map( isChecked( filters.sector ) ),

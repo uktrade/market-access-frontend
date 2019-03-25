@@ -71,6 +71,15 @@
 						"faker": "date.past"
 					}
 				]
+			},
+
+			"overseas_region": {
+				"type": "object",
+				"reqired": [ "id", "name" ],
+				"properties": {
+					"id": { "$ref": "#/uuid" },
+					"name": { "$ref": "#/words" }
+				}
 			}
 		}
 	},

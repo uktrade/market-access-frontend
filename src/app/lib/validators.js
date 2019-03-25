@@ -14,11 +14,12 @@ module.exports = {
 		if( isString ){ return value.trim().length > 0; }
 		return isDefined;
 	},
-	isUuid: ( value ) => uuid.test( value ),
+	isUuid: ( id ) => uuid.test( id ),
 	isMetadata: ( key ) => ( value ) => Object.keys( metadata[ key ] ).includes( value ),
-	isCountry: ( value ) => metadata.countries.some( ( country ) => country.id === value ),
-	isCountryAdminArea: (value) => metadata.adminAreas.some( (adminArea) => adminArea.id === value),
-	isSector: ( value ) => metadata.sectors.some( ( sector ) => sector.id === value ),
+	isCountry: ( id ) => metadata.countries.some( ( country ) => country.id === id ),
+	isOverseasRegion: ( id ) => metadata.overseasRegions.some( ( region ) => region.id === id ),
+	isCountryAdminArea: (id) => metadata.adminAreas.some( (adminArea) => adminArea.id === id),
+	isSector: ( id ) => metadata.sectors.some( ( sector ) => sector.id === id ),
 	isOneBoolCheckboxChecked: ( values ) => {
 
 		for( let value of Object.values( values ) ){
@@ -30,7 +31,7 @@ module.exports = {
 
 		return false;
 	},
-	isBarrierType: ( value ) => metadata.barrierTypes.some( ( barrier ) => barrier.id == value ),
+	isBarrierType: ( id ) => metadata.barrierTypes.some( ( barrier ) => barrier.id == id ),
 	isDateValue: ( key ) => ( values ) => !!values[ key ],
 	isDateValid: ( values ) => !!Date.parse( [ values.year, values.month, values.day ].join( '-' ) ),
 	isDateInPast: ( values ) => ( Date.parse( [ values.year, values.month, values.day ].join( '-' ) ) < Date.now() ),

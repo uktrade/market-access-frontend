@@ -3,6 +3,7 @@ const backend = require( './backend-request' );
 let countries;
 let adminAreasByCountry;
 let adminAreas;
+let overseasRegions;
 let sectors;
 let level0Sectors;
 let barrierTypes;
@@ -40,6 +41,19 @@ function alterAdminAreasData( adminAreas ) {
 		}
 	} );
 	return alteredAdminAreas;
+
+}
+function getOverseasRegions( countries ){
+
+	const regions = {};
+
+	for( let country of countries ){
+		if( country.overseas_region ){
+			regions[ country.overseas_region.id ] = country.overseas_region.name;
+		}
+	}
+
+	return Object.entries( regions ).map( ( [ id, name ] ) => ({ id, name }) );
 }
 
 function addNumber( tasks ){
@@ -84,21 +98,15 @@ function createTaskList( reportStages ){
 	return tasks;
 }
 
-function createCountryList( countries, text ){
+function createList( items, text ){
 
-	const countryList = countries.map( ( country ) => ( {
-		value: country.id,
-		text: country.name
+	const list = items.map( ( item ) => ( {
+		value: item.id,
+		text: item.name
 	} ) );
-
-	countryList.unshift( { value: '', text } );
-
-	return countryList;
 }
 
 function createAdminAreaList (country, adminAreas, text) {
-	// console.log('country', country);
-	// console.log('adminareas', adminAreas);
 	const adminAreaList = adminAreas[country].map( ( adminArea ) => ( {
 		value: adminArea.id,
 		text: adminArea.name
@@ -107,18 +115,6 @@ function createAdminAreaList (country, adminAreas, text) {
 	adminAreaList.unshift( { value: '', text } );
 
 	return adminAreaList;
-}
-
-function createSectorsList( sectors, text ){
-
-	const sectorList = sectors.map( ( sector ) => ( {
-		value: sector.id,
-		text: sector.name
-	} ) );
-
-	sectorList.unshift( { value: '', text } );
-
-	return sectorList;
 }
 
 function dedupeBarrierTypes( barrierTypes ){
@@ -151,6 +147,10 @@ function barrierPriority( priority ){
 	};
 }
 
+function sortOverseasRegions( a, b ){
+	return a.name.localeCompare( b.name );
+}
+
 module.exports.fetch = async () => {
 
 	try {
@@ -159,9 +159,12 @@ module.exports.fetch = async () => {
 
 		if( response.isSuccess ){
 
-			countries = body.countries.filter( notDisabled ).map( cleanCountry );
+			const availableCountries = body.countries.filter( notDisabled );
+
+			overseasRegions = getOverseasRegions( availableCountries ).sort( sortOverseasRegions );
 			adminAreas = body.country_admin_areas.filter( notDisabled );
 			adminAreasByCountry = alterAdminAreasData(body.country_admin_areas);
+			countries = availableCountries.map( cleanCountry );
 			sectors = body.sectors.filter( notDisabled );
 			level0Sectors = sectors.filter( ( sector ) => sector.level === 0 );
 			barrierTypes = body.barrier_types;
@@ -177,6 +180,7 @@ module.exports.fetch = async () => {
 			module.exports.optionalBool = body.adv_boolean;
 			module.exports.countries = countries;
 			module.exports.adminAreas = adminAreas;
+			module.exports.overseasRegions = overseasRegions;
 			module.exports.govResponse = body.govt_response;
 			module.exports.publishResponse = body.publish_response;
 			module.exports.reportStages = body.report_stages;
@@ -218,11 +222,12 @@ module.exports.fetch = async () => {
 	}
 };
 
-module.exports.getCountryList = ( defaultText = 'Choose a country' ) => createCountryList( countries, defaultText );
-module.exports.getSectorList = ( defaultText = 'Select a sector' ) => createSectorsList( level0Sectors, defaultText );
-module.exports.getSector = ( sectorId ) => sectors.find( ( sector ) => sector.id === sectorId );
 module.exports.getCountry = ( countryId ) => countries.find( ( country ) => country.id === countryId );
-
+module.exports.getCountryList = ( defaultText = 'Choose a country' ) => createList( countries, defaultText );
+module.exports.getOverseasRegion = ( id ) => overseasRegions.find( ( region ) => region.id === id );
+module.exports.getOverseasRegionList = ( defaultText = 'Choose overseas region' ) => createList( overseasRegions, defaultText );
+module.exports.getSector = ( sectorId ) => sectors.find( ( sector ) => sector.id === sectorId );
+module.exports.getSectorList = ( defaultText = 'Select a sector' ) => createList( level0Sectors, defaultText );
 module.exports.getBarrierType = ( typeId ) => uniqueBarrierTypes.find( ( type ) => type.id == typeId );
 module.exports.getBarrierPriority = ( priorityCode ) => barrierPriorities.find( ( priority ) => priority.code == priorityCode );
 

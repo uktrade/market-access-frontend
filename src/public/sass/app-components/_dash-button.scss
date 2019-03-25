@@ -22,6 +22,7 @@ $desktop-width: mq-get-breakpoint-width(desktop, $mq-breakpoints);
 	padding: govuk-em( 15, 24 ) govuk-em( 13, 24 );
 	box-sizing: border-box;
 	width: 100%;
+	min-height: govuk-em( ( 100 - 30 ), 16 );
 
 	@include mq( $from: $dash-button-from-tablet-width ){
 		width: $dash-button-width;

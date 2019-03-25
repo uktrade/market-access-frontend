@@ -187,7 +187,30 @@ describe( 'Backend Service', () => {
 
 					await service.barriers.getAll( req, { country } );
 
-					expect( backend.get ).toHaveBeenCalledWith( `/barriers?export_country=${ country }&ordering=-reported_on`, token );
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers?location=${ country }&ordering=-reported_on`, token );
+				} );
+			} );
+
+			describe( 'With an overseas region filter', () => {
+				it( 'Should call the correct path with default sort order', async () => {
+
+					const region = uuid();
+
+					await service.barriers.getAll( req, { region } );
+
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers?location=${ region }&ordering=-reported_on`, token );
+				} );
+			} );
+
+			describe( 'With a country and an overseas region filter', () => {
+				it( 'Should call the correct path with default sort order', async () => {
+
+					const country = uuid();
+					const region = uuid();
+
+					await service.barriers.getAll( req, { region, country } );
+
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers?location=${ country },${ region }&ordering=-reported_on`, token );
 				} );
 			} );
 

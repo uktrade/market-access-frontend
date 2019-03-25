@@ -16,6 +16,7 @@ describe( 'validators', () => {
 				'test-value-2': 'another value'
 			},
 			countries: [ { id: 'abc-123' }, { id: 'def-456' } ],
+			overseasRegions: [ { id: 'ghi-123' }, { id: 'jkl-456' } ],
 			barrierTypes: [ { id: 1 }, { id: 2}, { id: 4 } ],
 			sectors: [ { id: uuid() }, { id: uuid() } ],
 			barrierPriorities: [ { code: 'abc', name: 'test 1' }, { code: 'def', name: 'test 2' } ],
@@ -119,8 +120,8 @@ describe( 'validators', () => {
 			} );
 		} );
 
-		describe( 'With a valid country', () => {
-			it( 'Should return true', () => {
+		describe( 'With an invalid country', () => {
+			it( 'Should return false', () => {
 
 				expect( validators.isCountry( 'xyz-123' ) ).toEqual( false );
 			} );
@@ -139,20 +140,35 @@ describe( 'validators', () => {
 			it( 'Should return false', () => {
 
 				expect( validators.isCountryAdminArea( '1234' ) ).toEqual( false );
+			});
+		});
+	});
+	describe( 'isOverseasRegion', () => {
+		describe( 'With a valid overseas region', () => {
+			it( 'Should return true', () => {
+
+				expect( validators.isOverseasRegion( 'ghi-123' ) ).toEqual( true );
+			} );
+		} );
+
+		describe( 'With an invalid overseas region', () => {
+			it( 'Should return true', () => {
+
+				expect( validators.isOverseasRegion( 'xyz-123' ) ).toEqual( false );
 			} );
 		} );
 	} );
 
 	describe( 'isSector', () => {
-		describe( 'With a valid country', () => {
+		describe( 'With a valid sector', () => {
 			it( 'Should return true', () => {
 
 				expect( validators.isSector( metadata.sectors[ 0 ].id ) ).toEqual( true );
 			} );
 		} );
 
-		describe( 'With a valid country', () => {
-			it( 'Should return true', () => {
+		describe( 'With an invalid sector', () => {
+			it( 'Should return false', () => {
 
 				expect( validators.isSector( 'xyz-123' ) ).toEqual( false );
 			} );
