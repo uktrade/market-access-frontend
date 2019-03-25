@@ -21,7 +21,7 @@ describe( 'Report controllers', () => {
 
 		( { req, res, next } = jasmine.helpers.mocks.middleware() );
 
-		getValuesResponse = { a: 1, b: 2 };
+		getValuesResponse = { country: '1234' };
 		getTemplateValuesResponse = { c: 3, d: 4 };
 		form = {
 			hasErrors: jasmine.createSpy( 'form.hasErrors' ),
@@ -40,11 +40,13 @@ describe( 'Report controllers', () => {
 				{ id: 1, name: 'country 1' },
 				{ id: 2, name: 'country 2' }
 			],
+			isCountryWithAdminArea: jasmine.createSpy( 'metadata.isCountryWithAdminArea' ),
 		};
 
 		urls = {
 			reports: {
 				hasSectors: jasmine.createSpy( 'urls.reports.hasSectors' ),
+				hasAdminAreas: jasmine.createSpy( 'urls.reports.hasAdminAreas' )
 			},
 		};
 
@@ -133,6 +135,11 @@ describe( 'Report controllers', () => {
 
 			describe( 'When the form does not have errors', () => {
 				describe ( 'When the chosen country does not have admin areas', () => {
+
+					beforeEach( () => {
+						metadata.isCountryWithAdminArea.and.callFake( () => false );
+					} );
+
 					describe( 'When there is a report and no session data', () => {
 
 						let report;
@@ -150,7 +157,8 @@ describe( 'Report controllers', () => {
 							saveValues = Object.assign( {}, {
 								status: report.problem_status,
 								isResolved: false,
-								resolvedDate: report.resolved_date
+								resolvedDate: report.resolved_date,
+								adminAreas: []
 							}, getValuesResponse );
 
 							req.report = report;
@@ -285,24 +293,41 @@ describe( 'Report controllers', () => {
 							isResolvedFormValues: { y: 2 }
 						};
 
+						metadata.isCountryWithAdminArea.and.callFake( () => true );
+
 						req.session = sessionValues;
 
 					} );
 
+					describe( 'When there is a report with a country that is different to the chosen', () => {
+						it( 'Should delete the admin areas session', () => {
+							req.report = {
+								id: 1,
+								problem_status: { a: 1 },
+								is_resolved: false,
+								resolved_date: { c: 3 },
+								export_country: '1234',
+								country_admin_areas: ['3456']
+							};
+
+							controller( req, res, next );
+
+							expect( req.session.adminAreas ).toBeUndefined();
+						});
+					});
+
 					describe( 'When the form is valid', () => {
 						it( 'Should save the values to the session and redirect to the correct url', () => {
 		
-							const hasStateUrlResponse = '/a/country/url';
+							const hasAdminAreaUrlResponse = '/a/country/url';
 		
-							urls.reports.hasState.and.callFake( () => hasStateUrlResponse );
-							metadata.isCountryWithAdminArea.and.callFake( () => true );
+							urls.reports.hasAdminAreas.and.callFake( () => hasAdminAreaUrlResponse );
 		
 							controller( req, res, next );
 		
 							expect( form.validate ).toHaveBeenCalledWith();
 							expect( form.hasErrors ).toHaveBeenCalledWith();
-							expect( req.session.countryFormValues ).toEqual( getValuesResponse );
-							expect( res.redirect ).toHaveBeenCalledWith( hasStateUrlResponse );
+							expect( res.redirect ).toHaveBeenCalledWith( hasAdminAreaUrlResponse );
 							expect( res.render ).not.toHaveBeenCalled();
 						} );
 					} );

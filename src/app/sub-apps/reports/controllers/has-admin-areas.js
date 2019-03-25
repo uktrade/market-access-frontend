@@ -9,6 +9,7 @@ module.exports = async ( req, res, next ) => {
 
     const report  = ( req.report || {} );
     const countryId = req.params.countryId;
+
     const isSameCountry = report.export_country == countryId;
     const hasAdminAreasInReport = report.country_admin_areas && report.country_admin_areas.length > 0;
     const alreadyContainsStates = isSameCountry && hasAdminAreasInReport ? "false": null
@@ -28,21 +29,20 @@ module.exports = async ( req, res, next ) => {
     } );
 
     if( form.isPost ){
-
         form.validate();
-        console.log(form.errors);
-		if( !form.hasErrors() ){
+
+        if( !form.hasErrors() ){
             if (form.getValues().hasAdminAreas === "true") {
                 try {
                     const reportId = report.id;
                     const sessionStartForm = ( req.session.startFormValues || req.report && { status: req.report.problem_status } );
                     const sessionResolvedForm = ( req.session.isResolvedFormValues || req.report && { isResolved: req.report.is_resolved, resolvedDate: req.report.resolved_date } );
-                    
+
                     const isUpdate = !!reportId;
             
                     let response;
                     let body;
-                    let values = Object.assign( {}, sessionStartForm, sessionResolvedForm, {country: countryId}, {country_admin_areas: []}  );
+                    let values = Object.assign( {}, sessionStartForm, sessionResolvedForm, {country: countryId}, {adminAreas: []}  );
     
                     if( isUpdate ){
                         ({ response, body } = await backend.reports.update( req, reportId, values ));
@@ -76,7 +76,7 @@ module.exports = async ( req, res, next ) => {
                 }
             } else {
                 delete req.session.adminAreas;
-                
+
                 if (isSameCountry && hasAdminAreasInReport ) {
                     req.session.adminAreas = report.country_admin_areas;
                 }

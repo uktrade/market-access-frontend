@@ -826,7 +826,7 @@ describe( 'Backend Service', () => {
 						is_resolved: isResolved,
 						resolved_date: '2018-02-01',
 						export_country: country,
-						country_admin_areas: adminArea
+						country_admin_areas: adminAreas
 					} );
 				} );
 

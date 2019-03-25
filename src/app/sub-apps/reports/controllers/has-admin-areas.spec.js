@@ -25,8 +25,8 @@ describe( 'Report controllers', () => {
 		( { req, res, next } = jasmine.helpers.mocks.middleware() );
 
 		govukItemsFromObjResponse = [ { items: 1 } ];
-		getValuesResponse = { a: 1, b: 2 };
-		getTemplateValuesResponse = { c: 3, d: 4 };
+		getValuesResponse = { hasAdminAreas: 'true'};
+		getTemplateValuesResponse = { countryId: uuid(), c: 3, d: 4 };
 		form = {
 			hasErrors: jasmine.createSpy( 'form.hasErrors' ),
 			validate: jasmine.createSpy( 'form.validate' ),
@@ -69,237 +69,295 @@ describe( 'Report controllers', () => {
 			'../../../lib/validators': validators,
 			'../../../lib/govuk-items-from-object': govukItemsFromObj
 		} );
+		req.params.countryId = '1234';
 	} );
 
 	describe( 'hasAdminAreas', () => {
 
-		let report;
+		const template = 'reports/views/has-admin-areas';
 
-		beforeEach( () => {
+		it( 'Should setup the form correctly', async () => {
 
-			report = {
-				id: uuid(),
-				admin_areas: null,
-			};
-			req.report = report;
+			let boolResponse = { 'boolResponse': 'yes' };
+
+			validators.isMetadata.and.callFake( ( key ) => {
+
+				if( key === 'bool' ){ return boolResponse; }
+			} );
+
+			govukItemsFromObjResponse = [
+				{
+					value: 'true',
+					text: 'yes'
+				},{
+					value: 'false',
+					text: 'No - just part of the country'
+				}
+			];
+
+			await controller( req, res, next );
+
+			const args = Form.calls.argsFor( 0 );
+			const config = args[ 1 ];
+
+			expect( Form ).toHaveBeenCalled();
+			expect( args[ 0 ] ).toEqual( req );
+
+			expect( config.hasAdminAreas ).toBeDefined();
+			expect( config.hasAdminAreas.type ).toEqual( Form.RADIO );
+			expect( config.hasAdminAreas.values ).toEqual( [null] );
+			expect( config.hasAdminAreas.validators[ 0 ].fn ).toEqual( boolResponse );
+			expect( config.hasAdminAreas.items ).toEqual( [
+				{
+					value: 'true',
+					text: 'yes'
+				},{
+					value: 'false',
+					text: 'No - just part of the country'
+				}
+			] );
 		} );
 
-		describe( 'Form config', () => {
+		describe( 'When it is a GET', () => {
+			it( 'Should render the correct template', async () => {
 
-			let boolResponse;
+				await controller( req, res, next );
+
+				expect( res.render ).toHaveBeenCalledWith( template, getTemplateValuesResponse );
+			} );
+		} );
+
+		describe( 'When it is a POST', () => {
+
+			let sessionValues;
 
 			beforeEach( () => {
-
-				boolResponse = { 'boolResponse': 'yes' };
-
-				validators.isMetadata.and.callFake( ( key ) => {
-
-					if( key === 'bool' ){ return boolResponse; }
-				} );
+				form.isPost = true;
 			} );
 
-			it( 'Should setup the form correctly', async () => {
+			describe( 'When the form has errors', () => {
+				it( 'Should render the template', async () => {
 
-				govukItemsFromObjResponse = [
-					{
-						value: '1',
-						text: 'Affects entire country'
-					},{
-						value: '2',
-						text: 'Affects individual states'
-					}
-				];
+					sessionValues = {
+						startFormValues: { a: 1 },
+						isResolvedFormValues: { b: 2 }
+					};
 
-				await controller( req, res, next );
+					req.session = sessionValues;
 
-				const args = Form.calls.argsFor( 0 );
-				const config = args[ 1 ];
+					form.hasErrors.and.callFake( () => true );
 
-				expect( Form ).toHaveBeenCalled();
-				expect( args[ 0 ] ).toEqual( req );
-
-				expect( config.hasAdminAreas ).toBeDefined();
-				expect( config.hasAdminAreas.type ).toEqual( Form.RADIO );
-				expect( config.hasAdminAreas.values ).toEqual( [ report.has_admin_areas ] );
-				expect( config.hasAdminAreas.validators[ 0 ].fn ).toEqual( boolResponse );
-				expect( config.hasAdminAreas.items ).toEqual( [
-					{
-						value: '1',
-						text: 'Affects entire country'
-					},{
-						value: '2',
-						text: 'Affects individual states'
-					}
-				] );
-			} );
-		} );
-
-		describe( 'FormProcessor', () => {
-
-			let FormProcessor;
-			let processFn;
-			let args;
-
-			beforeEach( async () => {
-
-				FormProcessor = jasmine.createSpy( 'FormProcessor' );
-				processFn = jasmine.createSpy( 'FormProcessor.process' );
-
-				controller = proxyquire( modulePath, {
-					'../../../lib/backend-service': backend,
-					'../../../lib/urls': urls,
-					'../../../lib/metadata': metadata,
-					'../../../lib/Form': Form,
-					'../../../lib/FormProcessor': FormProcessor,
-					'../../../lib/validators': validators,
-					'../../../lib/govuk-items-from-object': govukItemsFromObj,
-				} );
-
-				FormProcessor.and.callFake( () => ({
-					process: processFn
-				}) );
-
-				await controller( req, res, next );
-
-				args = FormProcessor.calls.argsFor( 0 )[ 0 ];
-			} );
-
-			it( 'Should setup the FormProcessor correctly', () => {
-
-				expect( args.form ).toEqual( form );
-				expect( typeof args.render ).toEqual( 'function' );
-				expect( typeof args.saveFormData ).toEqual( 'function' );
-				expect( typeof args.saved ).toEqual( 'function' );
-			} );
-
-			describe( 'render', () => {
-				it( 'Should render the template with the correct data', () => {
-
-					const template = 'reports/views/has-sectors';
-
-					args.render( getTemplateValuesResponse );
+					await controller( req, res, next );
 
 					expect( res.render ).toHaveBeenCalledWith( template, getTemplateValuesResponse );
+					expect( req.session ).toEqual( sessionValues );
 				} );
 			} );
 
-			describe( 'safeFormData', () => {
-				it( 'Should call the correct method with the correct data', () => {
+			describe( 'When the form does not have errors', () => {
 
-					const myFormData = { a: true, b: false };
+				beforeEach( () => {
+					form.hasErrors.and.callFake( () => false );
+				})
 
-					args.saveFormData( myFormData );
+				describe( 'When selecting the entire country', () => {
 
-					expect( backend.reports.saveHasSectors ).toHaveBeenCalledWith( req, report.id, myFormData );
-				} );
-			} );
-
-			describe( 'Saved', () => {
-				describe( 'When form.isExit is true', () => {
-					it( 'Should redirect to the correct URL', () => {
-
-						const detailResponse = '/a/path/detail';
-
-						urls.reports.detail.and.callFake( () => detailResponse );
-						form.isExit = true;
-
-						args.saved();
-
-						expect( urls.reports.detail ).toHaveBeenCalledWith( report.id  );
-						expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
-					} );
-				} );
-
-				describe( 'When hasSectors is true', () => {
+					let saveValues;
 
 					beforeEach( () => {
-
-						getValuesResponse = { hasSectors: 'true' };
+						form.isPost = true;
 					} );
 
-					describe( 'When there are sectors', () => {
+					describe(' When updating a report', () => {
 
-						afterEach( () => {
+						let report;
 
+						beforeEach( () => {
+							report = {
+								id: 1,
+								problem_status: { a: 1 },
+								is_resolved: false,
+								resolved_date: { c: 3 },
+								export_country: 'country',
+								country_admin_areas: []
+							};
 
-							const sectorsResponse = '/sectors';
+							saveValues = Object.assign( {}, {
+								status: report.problem_status,
+								isResolved: false,
+								resolvedDate: report.resolved_date,
+								country: '1234',
+								adminAreas: []
+							} );
 
-							urls.reports.sectors.and.callFake( () => sectorsResponse );
-
-							args.saved();
-
-							expect( urls.reports.sectors ).toHaveBeenCalledWith( report.id );
-							expect( res.redirect ).toHaveBeenCalledWith( sectorsResponse );
+							req.report = report;
 						} );
 
-						describe( 'When the sectors are in the report', () => {
-							it( 'Should call the correct url', () => {
+						it( 'Should update the report with the report data', async () => {
+							
+							await controller( req, res, next );
+							
+							const args = backend.reports.update.calls.argsFor( 0 );
 
-								report.sectors = [ uuid(), uuid() ];
+							expect( args[ 0 ] ).toEqual( req );
+							expect( args[ 1 ] ).toEqual( report.id );
+							expect( args[ 2 ] ).toEqual( saveValues );
+							
+						} );
+
+						describe( 'When the update throws an error', () => {
+							it( 'Should call next with the error', async () => {
+								const err = new Error( 'an update error' );
+
+								backend.reports.update.and.callFake( () => Promise.reject( err ) );
+
+								await controller( req, res, next );
+
+								expect( next ).toHaveBeenCalledWith( err );
+								expect( res.redirect ).not.toHaveBeenCalled();
 							} );
 						} );
 
-						describe( 'When the sectors are in the session', () => {
-							it( 'Should call the correct url', () => {
+						describe( 'When the update does not throw an error', () => {
+							describe( 'When the response is a success', () => {
+								it( 'Should redirect to the correct url', async () => {
+									const hasSectorsResponse = '/a/sector/url';
+									const body = { id: 2 };
 
-								req.session.sectors = [ uuid(), uuid() ];
+									backend.reports.update.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body } ) );
+									urls.reports.hasSectors.and.callFake( () => hasSectorsResponse );
+
+									await controller( req, res, next );
+
+									expect( res.redirect ).toHaveBeenCalledWith( hasSectorsResponse );
+									expect( urls.reports.hasSectors ).toHaveBeenCalledWith( body.id );
+									expect( next ).not.toHaveBeenCalled();
+								} );
+							} );
+
+							describe( 'When the response is NOT a success', () => {
+								it( 'Should redirect to the correct url', async () => {
+									backend.reports.update.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode: 404 } } ) );
+
+									await controller( req, res, next );
+
+									expect( res.redirect ).not.toHaveBeenCalled();
+									expect( next ).toHaveBeenCalledWith( new Error( 'Unable to update report, got 404 response code' ) );
+								} );
 							} );
 						} );
-					} );
+					});
+					describe(' When creating a new report', () => {
 
-					describe( 'When there are NOT any sectors', () => {
-						it( 'Should redirect to the correct URL', () => {
+						beforeEach( () => {
 
-							const addSectorResponse = '/add/sector';
+							sessionValues = {
+								startFormValues: {status: 1 },
+								isResolvedFormValues: { isReolved: false, resolvedDate: { c: 3 }  }
+							};
 
-							urls.reports.addSector.and.callFake( () => addSectorResponse );
+							saveValues = Object.assign( {}, {
+								status: sessionValues.startFormValues,
+								isResolved: false,
+								resolvedDate: sessionValues.isResolvedFormValues,
+								country: '1234',
+								adminAreas: []
+							} );
 
-							args.saved();
-
-							expect( urls.reports.addSector ).toHaveBeenCalledWith( report.id );
-							expect( res.redirect ).toHaveBeenCalledWith( addSectorResponse );
+							req.session = sessionValues;
 						} );
-					} );
-				} );
 
-				describe( 'When hasSectors is false', () => {
-					it( 'Should redirect to the correct URL', () => {
+						describe( 'When the response is a success', () => {
 
-						const aboutProblemResponse = '/about/sector';
+							const response = { isSuccess: true };
 
-						urls.reports.aboutProblem.and.callFake( () => aboutProblemResponse );
-						getValuesResponse = { hasSectors: 'false' };
+							it( 'Should save the report and delete the session data', async () => {
+								backend.reports.save.and.callFake( () => Promise.resolve( { response } ) );
 
-						args.saved();
+								await controller( req, res, next );
 
-						expect( urls.reports.aboutProblem ).toHaveBeenCalledWith( report.id );
-						expect( res.redirect ).toHaveBeenCalledWith( aboutProblemResponse );
-					} );
-				} );
-			} );
+								expect( req.session ).toEqual( {} );
+							} );
 
-			describe( 'Calling formProcessor.process', () => {
-				describe( 'When there are no errors', () => {
-					it( 'Should not call next', async () => {
+							describe( 'When there is not a body with an id', () => {
+								it( 'Should call next with an error', async () => {
 
-						await controller( req, res, next );
+									backend.reports.save.and.callFake( () => Promise.resolve( { response, body: {} } ) );
 
-						expect( next ).not.toHaveBeenCalledWith();
-					} );
-				} );
+									await controller( req, res, next );
 
-				describe( 'When the formProcessor throws an error', () => {
-					it( 'Should call next with the error', async () => {
+									expect( next ).toHaveBeenCalledWith( new Error( 'No id created for report' ) );
+								} );
+							} );
 
-						const err = new Error( 'Some random error' );
+							describe( 'When there is a body with id', () => {
+								it( 'Should redirect to the correct url', async () => {
 
-						processFn.and.callFake( () => Promise.reject( err ) );
+									const hasSectorsResponse = '/a/b/c';
 
-						await controller( req, res, next );
+									urls.reports.hasSectors.and.callFake( () => hasSectorsResponse );
+									backend.reports.save.and.callFake( () => Promise.resolve( { response, body: { id: 10 } } ) );
 
-						expect( next ).toHaveBeenCalledWith( err );
-					} );
-				} );
+									await controller( req, res, next );
+
+									expect( res.redirect ).toHaveBeenCalledWith( hasSectorsResponse  );
+									expect( urls.reports.hasSectors ).toHaveBeenCalledWith( 10 );
+								} );
+							} );
+						} );
+
+						describe( 'When the response is not a success', () => {
+							it( 'Should call next with an error', async () => {
+								backend.reports.save.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode: 123 } } ) );
+
+								await controller( req, res, next );
+
+								expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save report, got 123 response code' ) );
+							} );
+						} );
+					});
+				});
+				describe( 'When selecting only parts of the country', () => {
+
+					beforeEach( () => {
+						getValuesResponse = { hasAdminAreas: 'false'};
+					} ); 
+
+					describe( 'When there is no report or the selected country is different', () => {
+						it( 'Should delete the admin areas session and redirect to add an admin area', () => {
+							const addAdminAreaResponse = 'add/admin/area';
+
+							urls.reports.addAdminArea.and.callFake( () => addAdminAreaResponse );
+
+							controller( req, res, next );
+
+							expect( req.session.adminAreas ).toBeUndefined();
+							expect( res.redirect ).toHaveBeenCalledWith( addAdminAreaResponse  );
+						});
+					});
+					describe( 'When there is a report with admin areas and the same country', () => {
+						it( 'Should populate the admin areas session and redirect straight to the list ', () => {
+
+							req.report = {
+								id: 1,
+								problem_status: { a: 1 },
+								is_resolved: false,
+								resolved_date: { c: 3 },
+								export_country: '1234',
+								country_admin_areas: ['3456']
+							};
+
+							const adminAreasResponse = 'admin/area';
+
+							urls.reports.adminAreas.and.callFake( () => adminAreasResponse );
+
+							controller( req, res, next );
+
+							expect( req.session.adminAreas ).toEqual(['3456']);
+							expect( res.redirect ).toHaveBeenCalledWith( adminAreasResponse  );
+						});
+					});
+				});
 			} );
 		} );
 	} );

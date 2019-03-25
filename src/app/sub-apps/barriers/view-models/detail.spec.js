@@ -22,6 +22,12 @@ describe( 'Barrier detail view model', () => {
 				{ id: faker.random.uuid(), name: faker.address.country() },
 				{ id: faker.random.uuid(), name: faker.address.country() }
 			],
+			adminAreas: [
+				{ id: faker.random.uuid(), name: faker.address.country() },
+				{ id: faker.random.uuid(), name: faker.address.country() },
+				{ id: faker.random.uuid(), name: faker.address.country() },
+
+			],
 			sectors: [
 				{ id: faker.random.uuid(), name: faker.lorem.words() },
 				{ id: faker.random.uuid(), name: faker.lorem.words() },
@@ -119,10 +125,6 @@ describe( 'Barrier detail view model', () => {
 			expect( output.companiesList ).toEqual( inputBarrier.companies.map( ( company ) => ( { text: company.name } ) ) );
 		} );
 	} );
-
-	describe( 'With no admin areas on an open barrier', () => {
-
-	})
 	
 	describe( 'With sectors missing on an open barrier', () => {
 		it( 'Should create all the correct properties', () => {
