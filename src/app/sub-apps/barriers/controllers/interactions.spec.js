@@ -928,13 +928,34 @@ describe( 'Barrier interactions controller', () => {
 					} );
 
 					describe( 'When it is a POST', () => {
-						it( 'Should return the response in JSON', async () => {
+
+						beforeEach( () => {
 
 							req.method = 'POST';
+						} );
 
-							await controller.notes.documents.delete( req, res, next );
+						describe( 'When there are not any documents in the session', () => {
+							it( 'Should return the response in JSON', async () => {
 
-							expect( res.json ).toHaveBeenCalledWith( {} );
+								await controller.notes.documents.delete( req, res, next );
+
+								expect( res.json ).toHaveBeenCalledWith( {} );
+							} );
+						} );
+
+						describe( 'When there are documents in the session', () => {
+							it( 'Should remove the matching document and return a 200', async () => {
+
+								const nonMatchingDoc1 = { noteId, document: { id: uuid(), name: 'test1.txt'} };
+								const matchingDoc = { noteId, document: { id: documentId, name: 'match1.txt' } };
+
+								req.session.noteDocuments = [ nonMatchingDoc1, matchingDoc ];
+
+								await controller.notes.documents.delete( req, res, next );
+
+								expect( res.json ).toHaveBeenCalledWith( {} );
+								expect( req.session.noteDocuments ).toEqual( [ nonMatchingDoc1 ] );
+							} );
 						} );
 					} );
 
