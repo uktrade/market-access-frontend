@@ -11,7 +11,6 @@ const countryId = require( './middleware/params/country-id' );
 
 const hasStartFormValues = require( './middleware/has-start-form-values' );
 const hasResolvedFormValues = require( './middleware/has-resolved-form-values' );
-const hasCountryFormValues = require('././middleware/has-country-form-values');
 
 const csrfProtection = csurf();
 
@@ -37,11 +36,11 @@ module.exports = ( express, app ) => {
 	app.get( '/:reportId?/country/', hasStartFormValues, hasResolvedFormValues, controller.country );
 	app.post( '/:reportId?/country/', hasStartFormValues, hasResolvedFormValues, controller.country );
 
-	app.get( '/:reportId?/country/:countryId/has-admin-areas/', hasStartFormValues, hasResolvedFormValues, hasCountryFormValues, controller.hasAdminAreas );
-	app.post( '/:reportId?/country/:countryId/has-admin-areas/', hasStartFormValues, hasResolvedFormValues, hasCountryFormValues, controller.hasAdminAreas );
+	app.get( '/:reportId?/country/:countryId/has-admin-areas/', hasStartFormValues, hasResolvedFormValues, controller.hasAdminAreas );
+	app.post( '/:reportId?/country/:countryId/has-admin-areas/', hasStartFormValues, hasResolvedFormValues, controller.hasAdminAreas );
 
-	app.get( '/:reportId?/country/:countryId/admin-areas/', hasStartFormValues, hasResolvedFormValues, hasCountryFormValues, controller.adminAreas.list );
-	app.post( '/:reportId?/country/:countryId/admin-areas/', hasStartFormValues, hasResolvedFormValues, hasCountryFormValues, controller.adminAreas.list );
+	app.get( '/:reportId?/country/:countryId/admin-areas/', hasStartFormValues, hasResolvedFormValues, controller.adminAreas.list );
+	app.post( '/:reportId?/country/:countryId/admin-areas/', hasStartFormValues, hasResolvedFormValues, controller.adminAreas.list );
 
 	app.get( '/:reportId/country/:countryId/admin-areas/add/', controller.adminAreas.add );
 	app.post( '/:reportId/country/:countryId/admin-areas/add/', controller.adminAreas.add );

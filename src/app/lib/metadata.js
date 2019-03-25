@@ -40,6 +40,7 @@ function alterAdminAreasData( adminAreas ) {
 			alteredAdminAreas[countryAdminArea.country.id].push(countryAdminArea);
 		}
 	} );
+
 	return alteredAdminAreas;
 
 }
@@ -104,6 +105,10 @@ function createList( items, text ){
 		value: item.id,
 		text: item.name
 	} ) );
+
+	list.unshift( { value: '', text } );
+
+	return list;
 }
 
 function createAdminAreaList (country, adminAreas, text) {
@@ -163,7 +168,7 @@ module.exports.fetch = async () => {
 
 			overseasRegions = getOverseasRegions( availableCountries ).sort( sortOverseasRegions );
 			adminAreas = body.country_admin_areas.filter( notDisabled );
-			adminAreasByCountry = alterAdminAreasData(body.country_admin_areas);
+			adminAreasByCountry = alterAdminAreasData(adminAreas);
 			countries = availableCountries.map( cleanCountry );
 			sectors = body.sectors.filter( notDisabled );
 			level0Sectors = sectors.filter( ( sector ) => sector.level === 0 );
@@ -180,6 +185,7 @@ module.exports.fetch = async () => {
 			module.exports.optionalBool = body.adv_boolean;
 			module.exports.countries = countries;
 			module.exports.adminAreas = adminAreas;
+			module.exports.adminAreasByCountry = adminAreasByCountry;
 			module.exports.overseasRegions = overseasRegions;
 			module.exports.govResponse = body.govt_response;
 			module.exports.publishResponse = body.publish_response;
@@ -251,7 +257,9 @@ const HIBERNATED = 5;
 
 module.exports.getCountryAdminAreasList = ( countryID, defaultText = 'Select an admin area') => createAdminAreaList(countryID, adminAreasByCountry, defaultText);
 module.exports.isCountryWithAdminArea = ( countryID ) => countryID in adminAreasByCountry;
-module.exports.getAdminArea = (adminAreaId) => adminAreas.find( ( AdminArea ) => AdminArea.id === adminAreaId );
+module.exports.getAdminArea = (adminAreaId) => {
+	return adminAreas.find( ( AdminArea ) => AdminArea.id === adminAreaId );
+} 
 
 module.exports.barrier = {
 	status: {

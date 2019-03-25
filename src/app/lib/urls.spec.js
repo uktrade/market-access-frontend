@@ -283,6 +283,7 @@ describe( 'URLs', () => {
 	describe( 'Report urls', () => {
 
 		let reportId;
+		let countryId;
 
 		beforeEach( () => {
 
@@ -352,65 +353,85 @@ describe( 'URLs', () => {
 		} );
 
 		describe( 'hasAdminAreas', () => {
+
+			beforeEach( () => {
+				countryId = uuid();
+			} );
+			
 			describe( 'With a reportId', () => {
 				it( 'Should return the correct path', () => {
 
-					expect( urls.reports.hasAdminAreas( reportId ) ).toEqual( `/reports/${ reportId }/has-admin-areas/` );
+					expect( urls.reports.hasAdminAreas( reportId, countryId ) ).toEqual( `/reports/${ reportId }/country/${ countryId }/has-admin-areas/` );
 				} );
 			} );
 			describe( 'Without a reportId', () => {
 
 				it( 'Should return the correct path', () => {
 
-					expect( urls.reports.hasAdminAreas() ).toEqual( '/reports/new/has-admin-areas/' );
+					expect( urls.reports.hasAdminAreas(undefined, countryId) ).toEqual( `/reports/new/country/${ countryId }/has-admin-areas/` );
 				} );
 			} );
 		} );
 
 		describe( 'adminAreas', () => {
+
+			beforeEach( () => {
+				countryId = uuid();
+			} );
+
 			describe( 'With a reportId', () => {
 				it( 'Should return the correct path', () => {
 
-					expect( urls.reports.adminAreas( reportId ) ).toEqual( `/reports/${ reportId }/admin-areas/` );
+					expect( urls.reports.adminAreas( reportId, countryId ) ).toEqual( `/reports/${ reportId }/country/${ countryId }/admin-areas/` );
 				} );
 			} );
 			describe( 'Without a reportId', () => {
 
 				it( 'Should return the correct path', () => {
 
-					expect( urls.reports.adminAreas() ).toEqual( '/reports/new/admin-areas/' );
+					expect( urls.reports.adminAreas( undefined, countryId) ).toEqual( `/reports/new/country/${ countryId }/admin-areas/` );
 				} );
 			} );
 		} );
 		
 		describe( 'addAdminArea', () => {
+
+			beforeEach( () => {
+				countryId = uuid();
+			} );
+
 			describe( 'With a reportId', () => {
 				it( 'Should return the correct path', () => {
 
-					expect( urls.reports.addAdminArea( reportId ) ).toEqual( `/reports/${ reportId }/admin-areas/add` );
+					expect( urls.reports.addAdminArea( reportId, countryId ) ).toEqual( `/reports/${ reportId }/country/${ countryId }/admin-areas/add/` );
 				} );
 			} );
 			describe( 'Without a reportId', () => {
 
 				it( 'Should return the correct path', () => {
 
-					expect( urls.reports.addAdminArea() ).toEqual( '/reports/new/admin-areas/add' );
+					expect( urls.reports.addAdminArea( undefined, countryId) ).toEqual( `/reports/new/country/${ countryId }/admin-areas/add/` );
 				} );
 			} );
 		} );
 
 		describe( 'removeAdminArea', () => {
+
+			beforeEach( () => {
+				countryId = uuid();
+			} );
+
 			describe( 'With a reportId', () => {
 				it( 'Should return the correct path', () => {
 
-					expect( urls.reports.removeAdminArea( reportId ) ).toEqual( `/reports/${ reportId }/admin-areas/remove` );
+					expect( urls.reports.removeAdminArea( reportId, countryId ) ).toEqual( `/reports/${ reportId }/country/${ countryId }/admin-areas/remove/` );
 				} );
 			} );
 			describe( 'Without a reportId', () => {
 
 				it( 'Should return the correct path', () => {
 
-					expect( urls.reports.removeAdminArea() ).toEqual( '/reports/new/admin-areas/remove' );
+					expect( urls.reports.removeAdminArea(undefined, countryId) ).toEqual( `/reports/new/country/${ countryId }/admin-areas/remove/` );
 				} );
 			} );
 		} );

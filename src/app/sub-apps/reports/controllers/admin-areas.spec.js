@@ -3,7 +3,7 @@ const uuid = require( 'uuid/v4' );
 
 const modulePath = './admin-areas';
 
-fdescribe( 'Report controllers', () => {
+describe( 'Report controllers', () => {
 
 	let controller;
 	let req;

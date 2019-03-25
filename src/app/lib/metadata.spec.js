@@ -344,9 +344,11 @@ describe( 'metadata', () => {
 
 		describe( 'adminAreas', () => {
 
+			let nonDisabledAdminAreas;
+			let adminAreasByCountry;
+
 			beforeEach( () => {
-				nonDisabledAdminAreas = fakeData.adminAreas.filter( ( adminArea ) => adminArea.disabled_on === null );
-				adminAreasByCountry = fakeData.adminAreasByCountry;
+				nonDisabledAdminAreas = fakeData.country_admin_areas.filter( ( adminArea ) => adminArea.disabled_on === null );
 			});
 
 			describe( 'adminAreas', () => {
@@ -357,13 +359,19 @@ describe( 'metadata', () => {
 
 			describe( 'adminAreasByCountry', () => {
 				it('Should return an object containing all countries with their corresponding admin areas', () => {
-					expect( metadata.adminAreasByCountry).toEqual(adminAreasByCountry);
+					adminAreasByCountry = metadata.adminAreasByCountry;
+
+					expect(Object.keys(adminAreasByCountry).length).toEqual(2);
+					expect(Object.keys(adminAreasByCountry)).toEqual(
+						[ '81756b9a-5d95-e211-a939-e4115bead28a', '5daf72a6-5d95-e211-a939-e4115bead28a' ]
+					);
 				});
 			});
 
 			describe( 'getCountryAdminAreasList', () => {
 				beforeEach( () => {
-					countryId = '81756b9a-5d95-e211-a939-e4115bead28';
+					countryId = '81756b9a-5d95-e211-a939-e4115bead28a';
+					adminAreasByCountry = metadata.adminAreasByCountry;
 				});
 
 				describe( 'Without specifying the default text', () => {
