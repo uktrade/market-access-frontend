@@ -456,20 +456,17 @@ describe( 'Backend Service', () => {
 			} );
 		} );
 
-		describe( 'saveDetails', () => {
+		describe( 'saveTitle', () => {
 			it( 'Should PUT to the correct path with the correct values', async () => {
 
 				const title = 'my title';
-				const country = uuid();
 
-				await service.barriers.saveDetails( req, barrierId, {
+				await service.barriers.saveTitle( req, barrierId, {
 					title,
-					country,
 				} );
 
 				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
 					barrier_title: title,
-					export_country: country,
 				} );
 			} );
 		} );

@@ -106,6 +106,13 @@ describe( 'URLs', () => {
 				} );
 			} );
 
+			describe( 'title', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.edit.title( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/title/` );
+				} );
+			} );
+
 			describe( 'description', () => {
 				it( 'Should return the correct path', () => {
 

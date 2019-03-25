@@ -270,13 +270,13 @@ module.exports = {
 		saveCompanies: ( req, barrierId, companies ) => updateBarrier( getToken( req ), barrierId, {
 			companies: ( companies && companies.length ? companies : null )
 		} ),
-		saveDetails: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
+		saveTitle: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
 			barrier_title: values.title,
-			export_country: values.country,
 		} ),
 		saveProduct: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
 			product: values.product
 		} ),
+
 		saveDescription: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
 			problem_description: values.description
 		} ),

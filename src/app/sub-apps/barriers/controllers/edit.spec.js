@@ -57,7 +57,7 @@ describe( 'Edit barrier controller', () => {
 
 		backend = {
 			barriers: {
-				saveDetails: jasmine.createSpy( 'backend.barriers.saveDetails' ),
+				saveTitle: jasmine.createSpy( 'backend.barriers.saveTitle' ),
 				saveProduct: jasmine.createSpy( 'backend.barriers.saveProduct' ),
 				saveDescription: jasmine.createSpy( 'backend.barriers.saveDescription' ),
 				saveSource: jasmine.createSpy( 'backend.barriers.saveSource' ),
@@ -99,17 +99,13 @@ describe( 'Edit barrier controller', () => {
 		} );
 	} );
 
-	describe( 'headlines', () => {
+	fdescribe( 'title', () => {
 
-		const template = 'barriers/views/edit/headlines';
+		const template = 'barriers/views/edit/title';
 
 		it( 'Should configure the Form correctly', async () => {
 
-			const isMetadataResponse = { ab: '12', cd: '34' };
-
-			validators.isMetadata.and.callFake( () => isMetadataResponse );
-
-			await controller.headlines( req, res, next );
+			await controller.title( req, res, next );
 
 			const config = Form.calls.argsFor( 0 )[ 1 ];
 
@@ -117,19 +113,12 @@ describe( 'Edit barrier controller', () => {
 			expect( config.title.values ).toEqual( [ barrier.barrier_title ] );
 			expect( config.title.required ).toBeDefined();
 
-			expect( config.country ).toBeDefined();
-			expect( config.country.type ).toEqual( SELECT );
-			expect( config.country.values ).toEqual( [ barrier.export_country ] );
-			expect( config.country.items ).toEqual( metadata.getCountryList() );
-			expect( config.country.validators.length ).toEqual( 1 );
-			expect( config.country.validators[ 0 ].fn ).toEqual( validators.isCountry );
-
 			expect( config.status ).not.toBeDefined();
 		} );
 
 		it( 'Should configure the FormProcessor correctly', async () => {
 
-			await controller.headlines( req, res );
+			await controller.title( req, res );
 
 			const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
 			const templateValues = { abc: '123' };
@@ -147,7 +136,7 @@ describe( 'Edit barrier controller', () => {
 
 			config.saveFormData( formValues );
 
-			expect( backend.barriers.saveDetails ).toHaveBeenCalledWith( req, barrier.id, formValues );
+			expect( backend.barriers.saveTitle ).toHaveBeenCalledWith( req, barrier.id, formValues );
 
 			urls.barriers.detail.and.callFake( () => detailResponse );
 
@@ -160,7 +149,7 @@ describe( 'Edit barrier controller', () => {
 		describe( 'When the processor does not throw an error', () => {
 			it( 'Should not call next', async () => {
 
-				await controller.headlines( req, res, next );
+				await controller.title( req, res, next );
 
 				expect( next ).not.toHaveBeenCalled();
 			} );
@@ -173,7 +162,7 @@ describe( 'Edit barrier controller', () => {
 
 				processor.process.and.callFake( () => { throw err; } );
 
-				await controller.headlines( req, res, next );
+				await controller.title( req, res, next );
 
 				expect( next ).toHaveBeenCalledWith( err );
 			} );
