@@ -15,6 +15,9 @@ const MAX_FILE_SIZE = fileSize( config.files.maxSize );
 const OVERSIZE_FILE_MESSAGE = `File size exceeds the ${ MAX_FILE_SIZE } limit. Reduce file size and upload the document again.`;
 const NOTE_ERROR = 'Add text for the note.';
 const INVALID_FILE_TYPE_MESSAGE = `Unsupported file format. The following file formats are accepted ${ getValidTypes() }`;
+const UPLOAD_ERROR_MESSAGE = 'A system error has occured, so the file has not been uploaded. Try again.';
+const DELETE_ERROR_MESSAGE = 'A system error has occured, so the file has not been deleted. Try again.';
+const FILE_INFECTED_MESSAGE = 'This file may be infected with a virus and will not be accepted.';
 
 function getValidTypes(){
 
@@ -97,10 +100,6 @@ function isFileOverSize( err ){
 	const message = err.message;
 	const isOverSize = ( message.indexOf( 'maxFileSize exceeded' ) >= 0 );
 
-	if( isOverSize ){
-		reporter.message( 'info', err.message );
-	}
-
 	return isOverSize;
 }
 
@@ -172,7 +171,7 @@ async function handleNoteForm( req, res, next, opts ){
 
 					} else {
 
-						throw new Error( 'This file may be infected with a virus and will not be accepted.' );
+						throw new Error( FILE_INFECTED_MESSAGE );
 					}
 
 				} catch ( e ){
@@ -262,7 +261,7 @@ function createUploadHandler( passedCb ){
 		if( req.formError ){
 
 			res.status( 400 );
-			res.json( { message: ( isFileOverSize( req.formError ) ? OVERSIZE_FILE_MESSAGE : '' ) } );
+			res.json( { message: ( isFileOverSize( req.formError ) ? OVERSIZE_FILE_MESSAGE : UPLOAD_ERROR_MESSAGE ) } );
 
 		} else if( document && validators.isValidFile( document ) ){
 
@@ -287,13 +286,13 @@ function createUploadHandler( passedCb ){
 				} else {
 
 					res.status( 401 );
-					res.json( { message: 'This file may be infected with a virus and will not be accepted.' } );
+					res.json( { message: FILE_INFECTED_MESSAGE } );
 				}
 
 			} catch( e ){
 
 				res.status( 500 );
-				res.json( { message: 'A system error has occured, so the file has not been uploaded. Try again.' } );
+				res.json( { message: UPLOAD_ERROR_MESSAGE } );
 				reporter.captureException( e );
 			}
 
@@ -337,7 +336,7 @@ module.exports = {
 				} else {
 
 					res.status( 500 );
-					res.json( { message: 'A system error has occured, so the file has not been deleted. Try again.' } );
+					res.json( { message: DELETE_ERROR_MESSAGE } );
 					reporter.captureException( new Error( `Unable to delete document ${ documentId }, got ${ response.statusCode } from backend` ) );
 				}
 

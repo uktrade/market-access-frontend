@@ -78,7 +78,8 @@ describe( 'Barrier interactions controller', () => {
 		form = {
 			validate: jasmine.createSpy( 'form.validate' ),
 			getValues: jasmine.createSpy( 'form.getValues' ).and.callFake( () => getValuesResponse ),
-			getTemplateValues: jasmine.createSpy( 'form.getTemplateValues' ).and.callFake( () => getTemplateValuesResponse )
+			getTemplateValues: jasmine.createSpy( 'form.getTemplateValues' ).and.callFake( () => getTemplateValuesResponse ),
+			addErrors: jasmine.createSpy( 'form.addErrros' ),
 		};
 		processor = {
 			process: jasmine.createSpy( 'FormProcessor.process' )
@@ -190,7 +191,20 @@ describe( 'Barrier interactions controller', () => {
 
 					expect( res.status ).toHaveBeenCalledWith( 400 );
 					expect( res.json ).toHaveBeenCalledWith( { message: 'File size exceeds the 5 MB limit. Reduce file size and upload the document again.' } );
-					expect( reporter.message ).toHaveBeenCalledWith( 'info', req.formError.message );
+					expect( reporter.message ).not.toHaveBeenCalled();
+				} );
+			} );
+
+			describe( 'When the error is about file size', () => {
+				it( 'Should return a 400 with a message', async () => {
+
+					req.formError = new Error( 'The error is something else' );
+
+					await method( req, res );
+
+					expect( res.status ).toHaveBeenCalledWith( 400 );
+					expect( res.json ).toHaveBeenCalledWith( { message: 'A system error has occured, so the file has not been uploaded. Try again.' } );
+					expect( reporter.message ).not.toHaveBeenCalled();
 				} );
 			} );
 		} );
@@ -294,6 +308,28 @@ describe( 'Barrier interactions controller', () => {
 			} );
 		} );
 	}
+
+	describe( 'With an missing mime type map', () => {
+		it( 'Should report the error', () => {
+
+			config.files.types.push( 'fake/mime' );
+
+			controller = proxyquire( modulePath, {
+				'../../../config': config,
+				'../../../lib/backend-service': backend,
+				'../../../lib/urls': urls,
+				'../../../lib/Form': Form,
+				'../../../lib/FormProcessor': FormProcessor,
+				'../../../lib/validators': validators,
+				'../view-models/detail': barrierDetailViewModel,
+				'../view-models/interactions': interactionsViewModel,
+				'../../../lib/upload-document': uploadDocument,
+				'../../../lib/reporter': reporter,
+			} );
+
+			expect( reporter.message ).toHaveBeenCalledWith( 'info', 'No file extension mapping found for valid type: fake/mime'  );
+		} );
+	} );
 
 	describe( 'list', () => {
 		describe( 'Without an error', () => {
@@ -511,6 +547,21 @@ describe( 'Barrier interactions controller', () => {
 				} );
 
 				checkFormConfig();
+			} );
+
+			describe( 'When there is a formError', () => {
+				it( 'Should add the error to the form', async () => {
+
+					req.formError = new Error( 'Something about maxFileSize exceeded' );
+
+					await controller.notes.add( req, res, next );
+
+					expect( form.addErrors ).toHaveBeenCalled();
+
+					const args = form.addErrors.calls.argsFor( 0 );
+
+					expect( args[ 0 ].document ).toBeDefined();
+				} );
 			} );
 
 			describe( 'configuring the FormProcessor', () => {
@@ -834,6 +885,19 @@ describe( 'Barrier interactions controller', () => {
 							} );
 						} );
 					} );
+
+					describe( 'When the note has documents that are alredy in the session', () => {
+						it( 'Should not add them again', async () => {
+
+							req.note.documents = [ matchingDoc.document ];
+
+							await checkProcessor( {
+								renderDocs: [ matchingDoc.document ],
+								saveDocs: [ matchingDoc.document.id ],
+								sessionDocs: [ nonMatchingDoc1 ]
+							} );
+						} );
+					} );
 				} );
 			} );
 
@@ -970,6 +1034,61 @@ describe( 'Barrier interactions controller', () => {
 
 							expect( res.redirect ).toHaveBeenCalledWith( editResponse );
 							expect( urls.barriers.notes.edit ).toHaveBeenCalledWith( barrierId, noteId );
+						} );
+					} );
+				} );
+
+				describe( 'When the backend returns a 500', () => {
+
+					beforeEach( () => {
+
+						backend.documents.delete.and.callFake( () => Promise.resolve( {
+							response: { isSuccess: false, statusCode: 500 }
+						} ) );
+					} );
+
+					describe( 'When it is a POST', () => {
+
+						beforeEach( () => {
+
+							req.method = 'POST';
+						} );
+
+						afterEach( () => {
+
+							expect( res.status ).toHaveBeenCalledWith( 500 );
+							expect( res.json ).toHaveBeenCalledWith( { message: 'Error deleting file' } );
+							expect( reporter.captureException ).toHaveBeenCalledWith( new Error( `Unable to delete document ${ documentId }, got 500 from backend` ) );
+						} );
+
+						describe( 'When there are not any documents in the session', () => {
+							it( 'Should return a 500 and report the error in JSON', async () => {
+
+								await controller.notes.documents.delete( req, res, next );
+							} );
+						} );
+
+						describe( 'When there are documents in the session', () => {
+							it( 'Should leave the matching document and return a 500', async () => {
+
+								const nonMatchingDoc1 = { noteId, document: { id: uuid(), name: 'test1.txt'} };
+								const matchingDoc = { noteId, document: { id: documentId, name: 'match1.txt' } };
+
+								req.session.noteDocuments = [ nonMatchingDoc1, matchingDoc ];
+
+								await controller.notes.documents.delete( req, res, next );
+
+								expect( req.session.noteDocuments ).toEqual( [ nonMatchingDoc1, matchingDoc ] );
+							} );
+						} );
+					} );
+
+					describe( 'When it is a GET', () => {
+						it( 'Should call next with the error', async () => {
+
+							await controller.notes.documents.delete( req, res, next );
+
+							expect( next ).toHaveBeenCalledWith( new Error( `Unable to delete document ${ documentId }, got 500 from backend` ) );
 						} );
 					} );
 				} );
