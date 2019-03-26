@@ -41,26 +41,17 @@
 }
 
 .event_list__item--note {
-	background-color: $govuk-yellow-25;
-	border-color: $govuk-yellow;
+	background-color: $govuk-yellow-10;
+	border-color: $govuk-yellow-10;
 }
 
 .event-list__item__document {
-
-	background: transparent url( 'data:image/svg+xml;charset=UTF-8,<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M72.1429 80.625C72.1429 83.0313 70.15 85 67.7143 85H23.4286C20.9929 85 19 83.0313 19 80.625V28.125C19 25.7187 20.9929 23.75 23.4286 23.75V80.625H72.1429ZM81 32.5V71.875C81 74.2813 79.0071 76.25 76.5714 76.25H32.2857C29.85 76.25 27.8571 74.2813 27.8571 71.875V19.375C27.8571 16.9687 29.85 15 32.2857 15H63.2857C64.4482 15 65.583 15.4649 66.4134 16.2852L79.6991 29.4102C80.5295 30.2032 81 31.3242 81 32.5ZM63.2857 32.5H76.5714L63.2857 19.375V32.5ZM76.5714 34.6875H63.2857C62.0679 34.6875 61.0714 33.7031 61.0714 32.5V19.375H32.2857V71.875H76.5714V34.6875Z" fill="black"/></svg>' ) 0 0 no-repeat;
-	padding-left: 45px;
-	background-size: 40px 40px;
-
-	@include mq( $from: tablet ){
-		padding-left: 60px;
-		background-size: 50px 50px;
-	}
 }
 
 .event-list__item__heading {
 	margin-top: 0;
 	margin-bottom: govuk-em( 15, 16 );
-	color: $govuk-black;
+	color: $secondary-text-colour;
 }
 
 .event-list__item__heading__recede {
@@ -82,10 +73,17 @@
 	list-style: none;
 	padding: 0;
 	margin: 0;
+	@include govuk-font( 19 );
 }
 
 .event-list__item__document__list__item {
-	display: inline;
+	background: transparent url( 'data:image/svg+xml;charset=UTF-8,<svg width="15" height="20" viewBox="0 0 15 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.0475 4.11718L10.4475 0.367184C10.2225 0.132809 9.915 0 9.6 0H1.2C0.54 0 0 0.5625 0 1.25V18.75C0 19.4375 0.54 20 1.2 20H13.2C13.86 20 14.4 19.4375 14.4 18.75V5C14.4 4.67188 14.2725 4.35156 14.0475 4.11718ZM9.6 1.2578L13.2 5.0078H9.6V1.2578ZM13.2 18.7578H1.2V1.2578H9V5.0078C9 5.35155 9.27 5.6328 9.6 5.6328H13.2V18.7578Z" fill="black"/></svg>' ) 0 0 no-repeat;
+	padding-left: 25px;
+}
+
+.event-list__item__edit-link {
+	display: inline-block;
+	margin-bottom: govuk-em( 30, 19 );
 }
 
 .event-list__item__document__list__item__status {

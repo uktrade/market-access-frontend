@@ -317,7 +317,7 @@ describe( 'Find a barrier controller', () => {
 				describe( 'As an array', () => {
 
 					beforeEach( () => {
-						priority = [ faker.lorem.word().toUpperCase(), faker.lorem.word().toUpperCase() ];
+						priority = [ 'ABC', 'DEF' ];
 						req.query.priority = priority;
 					} );
 
@@ -347,7 +347,7 @@ describe( 'Find a barrier controller', () => {
 						it( 'Should render the template with a filter', async () => {
 
 							const validPriorities = priority;
-							const invalidPriority = faker.lorem.word().toUpperCase();
+							const invalidPriority = 'GHI';
 
 							req.query.priority = validPriorities.concat( [ invalidPriority ] );
 

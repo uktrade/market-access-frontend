@@ -74,29 +74,5 @@ module.exports = {
 				next( e );
 			}
 		},
-
-		getScanStatus: async ( req, res ) => {
-
-			const documentId = req.uuid;
-
-			try {
-
-				res.json( await backend.documents.getScanStatus( req, documentId ) );
-
-			} catch( e ){
-
-				res.status( 500 );
-				res.json( { message: e.message } );
-			}
-		},
-
-		delete: ( req, res ) => {
-
-			const documentId = req.uuid;
-
-			backend.documents.delete( req, documentId );
-
-			res.send();
-		}
 	}
 };

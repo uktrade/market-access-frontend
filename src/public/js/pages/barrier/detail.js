@@ -2,11 +2,12 @@ ma.pages.barrier.detail = (function( doc, jessie ){
 
 	return function( opts ){
 
-		if( !( ma.components.FileUpload && ma.components.TextArea && ma.xhr2 && ( typeof FormData !== 'undefined' ) && jessie.hasFeatures(
+		if( !( ma.components.FileUpload && ma.components.Attachments && ma.components.TextArea && ma.xhr2 && ( typeof FormData !== 'undefined' ) && jessie.hasFeatures(
 			'queryOne', 'cancelDefault', 'getElementData'
 		) ) ){ return; }
 
 		var fileUpload;
+		var attachments;
 		var note;
 
 		try {
@@ -28,7 +29,6 @@ ma.pages.barrier.detail = (function( doc, jessie ){
 
 		} catch( e ){ return; }
 
-		var documentIdInput;// = jessie.queryOne( '.js-document-id' );
 		var submit = jessie.queryOne( '.js-submit-button' );
 		var form = fileUpload.form;
 
@@ -37,24 +37,17 @@ ma.pages.barrier.detail = (function( doc, jessie ){
 
 		var deleteUrl = jessie.getElementData( form, 'xhr-delete' );
 
+		try {
+
+			attachments = new ma.components.Attachments( fileUpload );
+
+		} catch( e ){ return; }
+
 		function showError( message ){
 
 			submit.disabled = false;
 			fileUpload.setError( message );
 			fileUpload.showLink();
-		}
-
-		function setDocumentId( id ){
-
-			if( !documentIdInput ){
-
-				documentIdInput = doc.createElement( 'input' );
-				documentIdInput.type = 'hidden';
-				documentIdInput.name = 'documentId';
-				fileUpload.form.append( documentIdInput );
-			}
-
-			documentIdInput.value = id;
 		}
 
 		function updateProgress( e ){
@@ -63,7 +56,7 @@ ma.pages.barrier.detail = (function( doc, jessie ){
 
 				if( e.loaded === e.total ){
 
-					fileUpload.setProgress( 'processing file...' );
+					fileUpload.setProgress( 'scanning file for viruses...' );
 
 				} else {
 
@@ -78,52 +71,6 @@ ma.pages.barrier.detail = (function( doc, jessie ){
 
 		function transferCanceled(){
 			showError( 'Upload of document cancelled, try again.' );
-		}
-
-		function checkFileStatus( file, url, documentId ){
-
-			var xhr = ma.xhr2();
-
-			xhr.addEventListener( 'error', transferFailed, false );
-			xhr.addEventListener( 'abort', transferCanceled, false );
-			xhr.addEventListener( 'load', function(){
-
-				var responseCode = xhr.status;
-				var data;
-
-				try {
-
-					data = JSON.parse( xhr.response );
-
-				} catch( e ){
-
-					//console.log( e );
-				}
-
-				if( responseCode === 200 && data ){
-
-					var passed = data.passed;
-
-					if( !passed ){
-
-						showError( 'This file may be infected with a virus and will not be accepted.' );
-						return;
-					}
-
-					submit.disabled = false;
-					fileUpload.setFile( file );
-					setDocumentId( documentId );
-
-				} else {
-
-					var message = ( ( data && data.message ) || 'A system error has occured, so the file has not been uploaded. Try again.' );
-					showError( message );
-				}
-
-			}, false );
-
-			xhr.open( 'GET', url, true );
-			xhr.send();
 		}
 
 		function loaded( e ){
@@ -145,17 +92,25 @@ ma.pages.barrier.detail = (function( doc, jessie ){
 
 				var documentId = data.documentId;
 				var file = data.file;
-				var checkUrl = data.checkUrl;
 
-				if( documentId && file && checkUrl ){
+				if( documentId && file ){
 
-					fileUpload.setProgress( 'scanning for viruses...' );
-					checkFileStatus( file, checkUrl, documentId );
+					submit.disabled = false;
+					fileUpload.showLink();
+					attachments.addItem( {
+						id: documentId,
+						name: file.name,
+						size: file.size
+					} );
 
 				} else {
 
 					showError( 'There was an issue uploading the document, try again' );
 				}
+
+			} else if( responseCode === 401 ){
+
+				showError( data.message );
 
 			} else {
 
@@ -206,19 +161,12 @@ ma.pages.barrier.detail = (function( doc, jessie ){
 
 			xhr.open( 'POST', url, true );
 			xhr.send();
+
+			attachments.removeItem( documentId );
 		}
 
 		fileUpload.events.file.subscribe( newFile );
-		fileUpload.events.delete.subscribe( function(){
-
-			if( documentIdInput ){
-
-				var documentId = documentIdInput.value;
-
-				documentIdInput.value = '';
-				deleteDocument( documentId );
-			}
-		} );
+		attachments.events.delete.subscribe( deleteDocument );
 
 		jessie.attachListener( form, 'submit', handleFormSubmit );
 	};
