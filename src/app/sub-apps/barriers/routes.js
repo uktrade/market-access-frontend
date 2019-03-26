@@ -49,6 +49,16 @@ module.exports = ( express, app ) => {
 	app.get( '/:barrierId/interactions/notes/:noteId/documents/:documentId/delete/', controller.interactions.notes.documents.deleteConfirmation );
 	app.post( '/:uuid/interactions/notes/:noteId/documents/:documentId/delete/', controller.interactions.notes.documents.delete );
 
+	app.get( '/:barrierId/location/', controller.location.list );
+	app.post( '/:barrierId/location/', controller.location.list );
+	app.get( '/:barrierId/location/country', controller.location.country );
+	app.post( '/:barrierId/location/country', controller.location.country );
+	app.get( '/:barrierId/location/admin-areas/add', controller.location.add_admin_area );
+	app.post( '/:barrierId/location/admin-areas/add', controller.location.add_admin_area );
+	app.get( '/:barrierId/location/admin-areas/remove', controller.location.remove_admin_area );
+	app.post( '/:barrierId/location/admin-areas/remove', controller.location.remove_admin_area );
+	
+
 	app.get( '/:barrierId/status/', controller.status.index );
 	app.post( '/:barrierId/status/', controller.status.index );
 

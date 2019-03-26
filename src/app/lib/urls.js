@@ -98,6 +98,12 @@ module.exports = {
 			remove: ( barrierId ) => `/barriers/${ barrierId }/sectors/remove/`,
 			new: ( barrierId ) => `/barriers/${ barrierId }/sectors/new/`,
 		},
+		location: {
+			list: ( barrierId ) => `/barriers/${ barrierId }/location/`,
+			country: ( barrierId ) => `/barriers/${ barrierId }/location/country`,
+			add_admin_area: ( barrierId ) => `/barriers/${ barrierId }/location/admin-areas/add`,
+			remove_admin_area: ( barrierId ) => `/barriers/${ barrierId }/location/admin-areas/remove`,
+		},
 		companies: {
 			edit: ( barrierId ) => `/barriers/${ barrierId }/companies/edit/`,
 			list: ( barrierId ) => `/barriers/${ barrierId }/companies/`,

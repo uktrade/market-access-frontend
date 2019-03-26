@@ -267,6 +267,10 @@ module.exports = {
 		saveSectors: ( req, barrierId, sectors ) => updateBarrier( getToken( req ), barrierId, {
 			sectors: ( sectors && sectors.length ? sectors : null )
 		} ),
+		saveLocation: (req, barrierId, location) => updateBarrier( getToken( req ), barrierId, {
+			export_country: location.country,
+			country_admin_areas: ( location.adminAreas && location.adminAreas.length ? location.adminAreas : [] )
+		} ),
 		saveCompanies: ( req, barrierId, companies ) => updateBarrier( getToken( req ), barrierId, {
 			companies: ( companies && companies.length ? companies : null )
 		} ),
@@ -276,7 +280,6 @@ module.exports = {
 		saveProduct: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
 			product: values.product
 		} ),
-
 		saveDescription: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
 			problem_description: values.description
 		} ),

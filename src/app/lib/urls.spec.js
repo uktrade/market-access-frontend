@@ -210,6 +210,17 @@ describe( 'URLs', () => {
 			} );
 		} );
 
+		describe( 'location', () => {
+			describe( 'list', () => {
+
+			});
+			describe( 'country', () => {
+				it( 'Should return the correct path', () => {
+					expect( urls.barriers.location.country( barrierId ) ).toEqual( `/barriers/${ barrierId }/location/country` );
+				} );
+			});
+		});
+
 		describe( 'sectors', () => {
 			describe( 'edit', () => {
 				it( 'Should return the correct path', () => {

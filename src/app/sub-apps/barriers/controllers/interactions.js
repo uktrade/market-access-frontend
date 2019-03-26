@@ -34,6 +34,10 @@ function getValidTypes(){
 	return types.join( ', ' );
 }
 
+function deleteSession(req){
+	delete req.session.location
+}
+
 function getTimelineData( req, barrierId ){
 
 	return new Promise( async ( resolve, reject ) => {
@@ -69,6 +73,8 @@ async function renderInteractions( req, res, next, opts = {} ){
 	const addCompany = ( config.addCompany || !!req.query.addCompany );
 	const createdFlash = req.flash( 'barrier-created' );
 	const isNew = createdFlash && createdFlash.length === 1;
+
+	deleteSession(req);
 
 	if( isNew ){
 
