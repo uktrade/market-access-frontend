@@ -243,11 +243,11 @@ module.exports = {
 		notes: {
 			save: ( req, barrierId, values ) => backend.post( `/barriers/${ barrierId }/interactions`, getToken( req ), {
 				text: values.note,
-				pinned: ( values.pinned === 'true' ),
-				documents: ( values.documentId ? [ values.documentId ] : null ),
+				documents: ( values.documentIds ? values.documentIds : null ),
 			} ),
 			update: ( req, noteId, values ) => backend.put( `/barriers/interactions/${ noteId }`, getToken( req ), {
-				text: values.note
+				text: values.note,
+				documents: values.documentIds
 			} ),
 		},
 		resolve: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/resolve`, getToken( req ), {

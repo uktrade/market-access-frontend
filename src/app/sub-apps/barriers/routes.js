@@ -41,13 +41,19 @@ module.exports = ( express, app ) => {
 	app.get( '/:barrierId/edit/status/', controller.edit.status );
 	app.post( '/:barrierId/edit/status/', controller.edit.status );
 
+	app.post( '/:uuid/interactions/documents/add/', fileUpload, controller.interactions.documents.add );
+	app.get( '/:uuid/interactions/documents/cancel/', controller.interactions.documents.cancel );
+	app.post( '/:uuid/interactions/documents/:id/delete/', controller.interactions.documents.delete );
+
 	app.get( '/:barrierId/interactions/add-note/', controller.interactions.notes.add );
 	app.post( '/:barrierId/interactions/add-note/', fileUpload, controller.interactions.notes.add );
-	app.get( '/:barrierId/interactions/edit-note/:id', controller.interactions.notes.edit );
-	app.post( '/:barrierId/interactions/edit-note/:id', controller.interactions.notes.edit );
-	app.post( '/:uuid/interactions/documents/add/', fileUpload, controller.interactions.notes.documents.add );
-	app.get( '/:barrierId/interactions/notes/:noteId/documents/:documentId/delete/', controller.interactions.notes.documents.deleteConfirmation );
-	app.post( '/:uuid/interactions/notes/:noteId/documents/:documentId/delete/', controller.interactions.notes.documents.delete );
+	app.get( '/:barrierId/interactions/edit-note/:noteId', controller.interactions.notes.edit );
+	app.post( '/:barrierId/interactions/edit-note/:noteId', fileUpload, controller.interactions.notes.edit );
+
+	app.post( '/:uuid/interactions/notes/:noteId/documents/add/', fileUpload, controller.interactions.notes.documents.add );
+	app.get( '/:uuid/interactions/notes/:noteId/documents/cancel/', controller.interactions.notes.documents.cancel );
+	app.get( '/:uuid/interactions/notes/:noteId/documents/:id/delete/', controller.interactions.notes.documents.delete );
+	app.post( '/:uuid/interactions/notes/:noteId/documents/:id/delete/', controller.interactions.notes.documents.delete );
 
 	app.get( '/:barrierId/status/', controller.status.index );
 	app.post( '/:barrierId/status/', controller.status.index );

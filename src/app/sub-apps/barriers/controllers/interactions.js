@@ -2,12 +2,12 @@ const config = require( '../../../config' );
 const metadata = require( '../../../lib/metadata' );
 const reporter = require( '../../../lib/reporter' );
 const backend = require( '../../../lib/backend-service' );
-const uploadFile = require( '../../../lib/upload-file' );
 const Form = require( '../../../lib/Form' );
 const FormProcessor = require( '../../../lib/FormProcessor' );
 const urls = require( '../../../lib/urls' );
 const validators = require( '../../../lib/validators' );
 const fileSize = require( '../../../lib/file-size' );
+const uploadDocument = require( '../../../lib/upload-document' );
 const detailVieWModel = require( '../view-models/detail' );
 const interactionsViewModel = require( '../view-models/interactions' );
 
@@ -15,6 +15,9 @@ const MAX_FILE_SIZE = fileSize( config.files.maxSize );
 const OVERSIZE_FILE_MESSAGE = `File size exceeds the ${ MAX_FILE_SIZE } limit. Reduce file size and upload the document again.`;
 const NOTE_ERROR = 'Add text for the note.';
 const INVALID_FILE_TYPE_MESSAGE = `Unsupported file format. The following file formats are accepted ${ getValidTypes() }`;
+const UPLOAD_ERROR_MESSAGE = 'A system error has occured, so the file has not been uploaded. Try again.';
+const DELETE_ERROR_MESSAGE = 'A system error has occured, so the file has not been deleted. Try again.';
+const FILE_INFECTED_MESSAGE = 'This file may be infected with a virus and will not be accepted.';
 
 function getValidTypes(){
 
@@ -92,309 +95,392 @@ async function renderInteractions( req, res, next, opts = {} ){
 	}
 }
 
-function uploadDocument( req, file ) {
-
-	return new Promise( async ( resolve, reject ) => {
-
-		try {
-
-			const { response, body } = await backend.documents.create( req, file.name, file.size );
-
-			if( response.isSuccess ){
-
-				const { id, signed_upload_url } = body;
-
-				uploadFile( signed_upload_url, file ).then( async ( { response } ) => {
-
-					if( response.statusCode === 200 ){
-
-						const { response } = await backend.documents.uploadComplete( req, id );
-
-						if( response.isSuccess ){
-
-							resolve( id );
-
-						} else {
-
-							const err = new Error( 'Unable to complete upload' );
-
-							reject( err );
-							reporter.captureException( err, { response: {
-								statusCode: response.statusCode,
-								documentId: id,
-							} } );
-						}
-
-					} else {
-
-						const err = new Error( 'Unable to upload document to S3' );
-
-						reject( err );
-						reporter.captureException( err, {
-							response: {
-								statusCode: response.statusCode,
-								body: response.body,
-								documentId: id,
-							}
-						} );
-					}
-
-				} ).catch( ( e ) => {
-
-					reject( e );
-					reporter.captureException( e, { documentId: id } );
-				} );
-
-			} else {
-
-				reject( new Error( 'Could not create document' ) );
-			}
-
-		} catch ( e ){
-
-			reject( e );
-		}
-
-	} );
-}
-
-function getUploadedDocuments( sessionDocuments, id ){
-
-	const uploadedDocuments = ( sessionDocuments || [] );
-
-	return uploadedDocuments.filter( ( { barrierId } ) => barrierId === id ).map( ( { documentId } ) => documentId );
-}
-
 function isFileOverSize( err ){
 
 	const message = err.message;
 	const isOverSize = ( message.indexOf( 'maxFileSize exceeded' ) >= 0 );
 
-	if( isOverSize ){
-		reporter.message( 'info', err.message );
-	}
-
 	return isOverSize;
 }
 
-function reportInvalidFile( file ){
+function reportInvalidFile( file = {} ){
 	reporter.message( 'info', 'Invalid document type: ' + file.type, { size: file.size, name: file.name } );
+}
+
+async function handleNoteForm( req, res, next, opts ){
+
+	const barrier = req.barrier;
+	const form = new Form( req, {
+		note: {
+			required: NOTE_ERROR
+		},
+		document: {
+			type: Form.FILE,
+			validators: [
+				{
+					fn: ( file ) => {
+
+						const isValid = validators.isValidFile( file );
+
+						if( !isValid ){
+
+							reportInvalidFile( file );
+						}
+
+						return isValid;
+					},
+					message: INVALID_FILE_TYPE_MESSAGE
+				}
+			]
+		}
+	} );
+
+	if( req.formError && isFileOverSize( req.formError ) ){
+
+		form.addErrors( { document: OVERSIZE_FILE_MESSAGE } );
+	}
+
+	const processor = new FormProcessor( {
+		form,
+		render: async ( templateValues ) => await renderInteractions( req, res, next, {
+			editId: opts.editId,
+			data: {
+				...templateValues,
+				...opts.data,
+				documents: opts.getDocuments(),
+				noteErrorText: NOTE_ERROR
+			},
+		} ),
+		saveFormData: async ( formValues ) => {
+
+			const values = {
+				note: formValues.note,
+				documentIds: ( opts.getDocumentIds() || [] ),
+			};
+
+			if( formValues.document && formValues.document.size > 0 ){
+
+				try {
+
+					const id = await uploadDocument( req, formValues.document );
+					const { passed } = await backend.documents.getScanStatus( req, id );
+
+					if( passed ){
+
+						values.documentIds.push( id );
+
+					} else {
+
+						throw new Error( FILE_INFECTED_MESSAGE );
+					}
+
+				} catch ( e ){
+
+					return next( e );
+				}
+			}
+
+			return opts.saveFormData( values );
+		},
+		saved: () => {
+
+			opts.clearSessionDocuments();
+			res.redirect( urls.barriers.detail( barrier.id ) );
+		}
+	} );
+
+	try {
+
+		await processor.process();
+
+	} catch( e ){
+
+		next( e );
+	}
+}
+
+function getBarrierDocumentsFromSession( req ){
+
+	const sessionDocuments = ( req.session.barrierDocuments || [] );
+
+	return sessionDocuments.filter( ( { barrierId } ) => barrierId === req.barrier.id );
+}
+
+function removeBarrierDocumentInSession( { session }, barrierIdToMatch, documentIdToMatch ){
+
+	if( session.barrierDocuments ){
+
+		session.barrierDocuments = session.barrierDocuments.filter( ( { barrierId, document } ) => !(
+			barrierId === barrierIdToMatch && document.id === documentIdToMatch
+		) );
+	}
+}
+
+function removeAllBarrierDocumentsInSession( { session }, barrierIdToMatch ){
+
+	if( session.barrierDocuments ){
+
+		session.barrierDocuments = session.barrierDocuments.filter( ( { barrierId } ) => !(
+			barrierId === barrierIdToMatch
+		) );
+	}
+}
+
+function getNoteDocumentsFromSession( req ){
+
+	const sessionDocuments = ( req.session.noteDocuments || [] );
+
+	return sessionDocuments.filter( ({ noteId }) => noteId === req.note.id );
+}
+
+function removeNoteDocumentInSession( { session }, noteIdToMatch, documentIdToMatch ){
+
+	if( session.noteDocuments ){
+
+		session.noteDocuments = session.noteDocuments.filter( ( { noteId, document } ) => !(
+			noteId === noteIdToMatch && document.id === documentIdToMatch
+		) );
+	}
+}
+
+function removeAllNoteDocumentsInSession( { session }, noteIdToMatch ){
+
+	if( session.noteDocuments ){
+
+		session.noteDocuments = session.noteDocuments.filter( ( { noteId } ) => !(
+			noteId === noteIdToMatch
+		) );
+	}
+}
+
+function createUploadHandler( passedCb ){
+	return async ( req, res ) => {
+
+		const document = req.body.document;
+
+		if( req.formError ){
+
+			res.status( 400 );
+			res.json( { message: ( isFileOverSize( req.formError ) ? OVERSIZE_FILE_MESSAGE : UPLOAD_ERROR_MESSAGE ) } );
+
+		} else if( document && validators.isValidFile( document ) ){
+
+			try {
+
+				const documentId = await uploadDocument( req, document );
+				const { passed } = await backend.documents.getScanStatus( req, documentId );
+
+				if( passed ){
+
+					passedCb( req, {
+						id: documentId,
+						size: fileSize( document.size ),
+						name: document.name,
+					} );
+
+					res.json( {
+						documentId,
+						file: { name: document.name, size: fileSize( document.size ) },
+					} );
+
+				} else {
+
+					res.status( 401 );
+					res.json( { message: FILE_INFECTED_MESSAGE } );
+				}
+
+			} catch( e ){
+
+				res.status( 500 );
+				res.json( { message: UPLOAD_ERROR_MESSAGE } );
+				reporter.captureException( e );
+			}
+
+		} else {
+
+			res.status( 400 );
+			res.json( { message: INVALID_FILE_TYPE_MESSAGE } );
+			reportInvalidFile( document );
+		}
+	};
 }
 
 module.exports = {
 
 	list: async ( req, res, next ) => await renderInteractions( req, res, next ),
 
-	notes: {
-		documents: {
-			add: async ( req, res ) => {
+	documents: {
+		add: createUploadHandler( ( req, document ) => {
 
-				const barrierId = req.uuid;
-				const document = req.body.document;
+			req.session.barrierDocuments = req.session.barrierDocuments || [];
+			req.session.barrierDocuments.push( { barrierId: req.uuid, document } );
+		} ),
 
-				function sendJson( data ){
+		delete: async ( req, res ) => {
 
-					res.json( data );
-				}
+			const { uuid: barrierId } = req;
+			const { id: documentId } = req.params;
 
-				if( req.formError ){
+			try {
 
-					res.status( 400 );
-					sendJson( { message: ( isFileOverSize( req.formError ) ? OVERSIZE_FILE_MESSAGE : '' ) } );
+				if( !validators.isUuid( documentId ) ){ throw new Error( 'Invalid documentId' ); }
 
-				} else if( document && validators.isValidFile( document ) ){
+				const { response } = await backend.documents.delete( req, documentId );
 
-					try {
+				if( response.isSuccess || response.statusCode === 404 ){
 
-						const documentId = await uploadDocument( req, document );
-
-						req.session.barrierDocuments = req.session.barrierDocuments || [];
-						req.session.barrierDocuments.push( { barrierId, documentId } );
-
-						sendJson( {
-							documentId,
-							file: { name: document.name, size: fileSize( document.size ) },
-							checkUrl: urls.documents.getScanStatus( documentId ),
-						} );
-
-					} catch( e ){
-
-						res.status( 500 );
-						sendJson( { message: 'A system error has occured, so the file has not been uploaded. Try again.' } );
-					}
+					removeBarrierDocumentInSession( req, barrierId, documentId );
+					res.status( 200 );
+					res.json( {} );
 
 				} else {
 
-					res.status( 400 );
-					sendJson( { message: INVALID_FILE_TYPE_MESSAGE } );
-					reportInvalidFile( document );
+					res.status( 500 );
+					res.json( { message: DELETE_ERROR_MESSAGE } );
+					reporter.captureException( new Error( `Unable to delete document ${ documentId }, got ${ response.statusCode } from backend` ) );
 				}
-			},
 
-			deleteConfirmation: ( req, res ) => {
+			} catch ( e ){
 
-				const note = req.note;
-				const document = req.document;
+				res.status( 500 );
+				res.json( {} );
+				reporter.captureException( e );
+			}
+		},
 
-				res.render( 'barriers/views/delete-document', { note, document, csrfToken: req.csrfToken() } );
-			},
+		cancel: ( req, res ) => {
 
+			const barrierId = req.uuid;
+
+			removeAllBarrierDocumentsInSession( req, barrierId );
+			res.redirect( urls.barriers.detail( barrierId ) );
+		}
+	},
+
+	notes: {
+		documents: {
+			add: createUploadHandler( ( req, document ) => {
+
+				req.session.noteDocuments = req.session.noteDocuments || [];
+				req.session.noteDocuments.push( { noteId: req.note.id, document } );
+			} ),
 			delete: async ( req, res, next ) => {
 
 				const { uuid: barrierId, note } = req;
-				const documentId = req.document.id;
+				const documentId = req.params.id;
+				const isJson = req.method === 'POST';
 
 				try {
 
 					const { response } = await backend.documents.delete( req, documentId );
 
-					if( response.isSuccess ){
+					if( response.isSuccess || response.statusCode === 400 ){
 
-						res.redirect( urls.barriers.notes.edit( barrierId, note.id ) );
+						removeNoteDocumentInSession( req, note.id, documentId );
+
+						if( isJson ){
+
+							res.json( {} );
+
+						} else {
+
+							res.redirect( urls.barriers.notes.edit( barrierId, note.id ) );
+						}
 
 					} else {
 
 						throw new Error( `Unable to delete document ${ documentId }, got ${ response.statusCode } from backend` );
 					}
 
-				} catch ( e ){ next( e ); }
+				} catch ( e ){
+
+					if( isJson ){
+
+						res.status( 500 );
+						res.json( { message: 'Error deleting file' } );
+						reporter.captureException( e );
+
+					} else {
+
+						next( e );
+					}
+				}
 			},
+			cancel: ( req, res ) => {
+
+				removeAllNoteDocumentsInSession( req, req.note.id );
+				res.redirect( urls.barriers.detail( req.uuid ) );
+			}
 		},
 
-		add: async ( req, res, next ) => {
+		add: ( req, res, next ) => {
 
-			const barrier = req.barrier;
-			const form = new Form( req, {
-				note: {
-					required: NOTE_ERROR
+			handleNoteForm( req, res, next, {
+
+				data: {
+					showNoteForm: true,
+					pageTitleSuffix: ' - Add a note'
 				},
-				pinned: {},
-				documentId: {
-					values: getUploadedDocuments( req.session.barrierDocuments, req.barrier.id )
-				},
-				document: {
-					type: Form.FILE,
-					validators: [
-						{
-							fn: ( file ) => {
-
-								const isValid = validators.isValidFile( file );
-
-								if( !isValid ){
-
-									reportInvalidFile( file );
-								}
-
-								return isValid;
-							},
-							message: INVALID_FILE_TYPE_MESSAGE
-						}
-					]
-				}
-			} );
-
-			if( req.formError && isFileOverSize( req.formError ) ){
-
-				form.addErrors( { document: OVERSIZE_FILE_MESSAGE } );
-			}
-
-			const processor = new FormProcessor( {
-				form,
-				render: async ( templateValues ) => await renderInteractions( req, res, next, {
-					data: Object.assign(	{ noteForm: true, noteErrorText: NOTE_ERROR }, templateValues )
-				} ),
-				saveFormData: async ( formValues ) => {
-
-					const values = {
-						note: formValues.note,
-						pinned: formValues.pinned,
-					};
-
-					if( formValues.documentId ){
-
-						values.documentId = formValues.documentId;
-
-					} else if( formValues.document && formValues.document.size > 0 ){
-
-						try {
-
-							const id = await uploadDocument( req, formValues.document );
-							values.documentId = id;
-							const { passed } = await backend.documents.getScanStatus( req, id );
-
-							if( !passed ){
-
-								throw new Error( 'This file may be infected with a virus and will not be accepted.' );
-							}
-
-						} catch ( e ){
-
-							return next( e );
-						}
-					}
-
-					return backend.barriers.notes.save( req, barrier.id, values );
-				},
-				saved: () => {
+				getDocuments: () => getBarrierDocumentsFromSession( req ).map( ({ document }) => document ),
+				getDocumentIds: () => getBarrierDocumentsFromSession( req ).map( ({ document }) => document.id ),
+				clearSessionDocuments: () => {
 
 					if( req.session.barrierDocuments ){
 
-						req.session.barrierDocuments = req.session.barrierDocuments.filter( ( { barrierId } ) => (
-							barrierId !== barrier.id
+						req.session.barrierDocuments = req.session.barrierDocuments.filter( ({ barrierId }) => (
+							barrierId !== req.barrier.id
 						) );
 					}
-
-					res.redirect( urls.barriers.detail( barrier.id ) );
-				}
+				},
+				saveFormData: async ( values ) => backend.barriers.notes.save( req, req.barrier.id, values ),
 			} );
-
-			try {
-
-				await processor.process();
-
-			} catch( e ){
-
-				next( e );
-			}
 		},
 
-		edit: async ( req, res, next ) => {
+		edit: ( req, res, next ) => {
 
-			const barrier = req.barrier;
-			const noteId = req.params.id;
-			const noteIdIsNumeric = ( !!noteId && validators.isNumeric( noteId ) );
+			const note = req.note;
+			const getDocumentIds = () => getNoteDocumentsFromSession( req ).map( ({ document }) => document.id );
 
-			if( noteIdIsNumeric ){
+			if( req.method === 'GET' ){
 
-				const form = new Form( req, {
-					note: {
-						required: 'Add text for the note.'
+				req.session.noteDocuments = ( req.session.noteDocuments || [] );
+
+				if( note.documents ){
+
+					const docIdsInSession = getDocumentIds();
+					const notAlreadyInSession = note.documents.filter( ( document ) => !docIdsInSession.includes( document.id ) );
+
+					if( notAlreadyInSession.length ){
+
+						req.session.noteDocuments = req.session.noteDocuments.concat( note.documents.map( ( document ) => ({
+							noteId: note.id,
+							document: {
+								id: document.id,
+								name: document.name,
+								size: fileSize( document.size ),
+							}
+						}) ) );
 					}
-				} );
-
-				const processor = new FormProcessor( {
-					form,
-					render: async ( templateValues ) => await renderInteractions( req, res, next, {
-						editId: noteId,
-						data: templateValues
-					} ),
-					saveFormData: ( formValues ) => backend.barriers.notes.update( req, noteId, formValues ),
-					saved: () => res.redirect( urls.barriers.detail( barrier.id ) )
-				} );
-
-				try {
-
-					await processor.process();
-
-				} catch( e ){
-
-					next( e );
 				}
-
-			} else {
-
-				next( new Error( 'Invalid noteId' ) );
 			}
+
+			handleNoteForm( req, res, next, {
+
+				editId: note.id,
+				data: {
+					pageTitleSuffix: ' - Edit a note'
+				},
+				getDocuments: () => getNoteDocumentsFromSession( req ).map( ({ document }) => document ),
+				getDocumentIds,
+				clearSessionDocuments: () => {
+
+					if( req.session.noteDocuments ){
+
+						req.session.noteDocuments = req.session.noteDocuments.filter( ( { noteId } ) => noteId !== note.id );
+					}
+				},
+				saveFormData: ( values ) => backend.barriers.notes.update( req, note.id, values ),
+			} );
 		}
 	},
 };

@@ -33,11 +33,9 @@ ma.components.FileUpload = (function( doc, jessie ){
 
 		this.createLink();
 		this.createProgress();
-		this.createDelete();
 
 		this.linkVisible = false;
 		this.progressVisible = false;
-		this.deleteVisible = false;
 		this.inErrorState = false;
 
 		//this.input.style.display = 'none';
@@ -47,11 +45,9 @@ ma.components.FileUpload = (function( doc, jessie ){
 
 		attachListener( this.link, 'click', bind( this.selectDocument, this ) );
 		attachListener( this.input, 'change', bind( this.fileChange, this ) );
-		attachListener( this.del, 'click', bind( this.deleteDocument, this ) );
 
 		this.events = {
-			file: new ma.CustomEvent(),
-			delete: new ma.CustomEvent()
+			file: new ma.CustomEvent()
 		};
 
 		this.showLink();
@@ -79,7 +75,6 @@ ma.components.FileUpload = (function( doc, jessie ){
 			this.linkVisible = true;
 
 			this.hideProgress();
-			this.hideDelete();
 		}
 	};
 
@@ -111,7 +106,6 @@ ma.components.FileUpload = (function( doc, jessie ){
 			this.progressVisible = true;
 
 			this.hideLink();
-			this.hideDelete();
 			this.removeError();
 		}
 	};
@@ -125,55 +119,10 @@ ma.components.FileUpload = (function( doc, jessie ){
 		}
 	};
 
-	FileUpload.prototype.createDelete = function(){
-
-		var del = doc.createElement( 'a' );
-
-		del.innerText = 'delete';
-		del.className = 'file-upload__delete';
-		del.style.display = 'none';
-		del.href = '#';
-
-		this.progress.parentNode.appendChild( del );
-		this.del = del;
-	};
-
-	FileUpload.prototype.showDelete = function(){
-
-		if( !this.deleteVisible ){
-
-			this.del.style.display = '';
-			this.deleteVisible = true;
-		}
-	};
-
-	FileUpload.prototype.hideDelete = function(){
-
-		if( this.deleteVisible ){
-
-			this.del.style.display = 'none';
-			this.deleteVisible = false;
-		}
-	};
-
 	FileUpload.prototype.selectDocument = function( e ){
 
 		cancelDefault( e );
 		this.input.click();
-	};
-
-	FileUpload.prototype.deleteDocument = function( e ){
-
-		cancelDefault( e );
-
-		this.showLink();
-		this.removeError();
-		this.input.value = '';
-
-		//this.form.appendChild( this.input );
-		this.form.focus();
-
-		this.events.delete.publish();
 	};
 
 	FileUpload.prototype.fileChange = function(){
@@ -181,6 +130,7 @@ ma.components.FileUpload = (function( doc, jessie ){
 		var file = this.input.files[ 0 ];
 
 		if( file ){
+
 			this.events.file.publish( file );
 		}
 	};
@@ -217,12 +167,6 @@ ma.components.FileUpload = (function( doc, jessie ){
 		this.progress.innerHTML = html;
 		this.showProgress();
 		this.progress.focus();
-	};
-
-	FileUpload.prototype.setFile = function( file ){
-
-		this.setProgress( ( '<strong>' + file.name + '</strong> - ' + file.size ) );
-		this.showDelete();
 	};
 
 	return FileUpload;

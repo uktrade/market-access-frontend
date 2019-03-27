@@ -22,7 +22,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 
 /*
 Return URI:
-http://jessie.herokuapp.com/builder/?addClass=1&hasClass=1&removeClass=1&toggleClass=1&getDescendantsByClassName=1&getElement=1&getElementData=3&getElementPositionStyles=1&query=1&queryOne=1&setAriaAttribute=1&setElementData=3&attachListener=1&cancelDefault=1&detachListener=1&bind=2&getInputValue=1&toArray=2
+http://127.0.0.1:1337/?addClass=1&hasClass=1&removeClass=1&toggleClass=1&getDescendantsByClassName=1&getElement=1&getElementData=3&getElementPositionStyles=1&query=1&queryOne=1&setAriaAttribute=1&setElementData=3&attachListener=1&cancelDefault=1&detachListener=1&getEventTarget=1&bind=2&getInputValue=1&toArray=2
 */
 
 var jessie;
@@ -249,6 +249,32 @@ Cutting edge (W3 compliant)
 
 /*
 Degrades:
+IE8, IE7, IE6, IE5.5, IE5, IE4, IE3, Opera 7.6
+*/
+
+var getEventTarget;
+
+if(html && isHostMethod(html, 'addEventListener')) {
+	getEventTarget = function(e) {
+		var target = e.target;
+		// Check if not an element (e.g. a text node)
+		if (1 != target.nodeType) {
+			// Set reference to parent node (which must be an element)
+			target = target.parentNode;
+		}
+		return target;
+	};
+}
+
+
+
+/*
+Description:
+Cutting edge (W3 compliant)
+*/
+
+/*
+Degrades:
 IE8, IE7, IE6, IE5.5, IE5, IE4, IE3, NN4, Opera 7.6
 */
 
@@ -432,23 +458,23 @@ var getElementPositionStyles;
 
 if(html && getElement && isHostObjectProperty(html, 'style') &&
 	'number' == typeof html.offsetLeft && 'string' == typeof html.style.left ) {
-
+	
 	getElementPositionStyles = (function() {
 		var result,
 			sides = ['left', 'top', 'right', 'bottom'],
 			inlineStyles = {},
 			findPosition;
-
+			
 		findPosition = function(el, sides) {
 			var i,
 				offsetLeft,
 				offsetTop;
-
+				
 			offsetLeft = el.offsetLeft;
 			offsetTop = el.offsetTop;
 			el.style[sides[2]] = 'auto';
 			el.style[sides[3]] = 'auto';
-
+			
 			if (offsetLeft != el.offsetLeft) {
 				result[sides[0]] = null;
 			}
@@ -480,7 +506,7 @@ if(html && getElement && isHostObjectProperty(html, 'style') &&
 					result[sides[1]] = el.offsetTop;
 				}
 			}
-
+			
 			for (i = 4; i--;) {
 				el.style[sides[i]] = inlineStyles[sides[i]];
 			}
@@ -509,7 +535,7 @@ if(html && getElement && isHostObjectProperty(html, 'style') &&
 
 			return result;
 		};
-
+		
 	}());
 }
 
@@ -609,6 +635,7 @@ jessie.hasClass = hasClass;
 jessie.addClass = addClass;
 jessie.getInputValue = getInputValue;
 jessie.bind = bind;
+jessie.getEventTarget = getEventTarget;
 jessie.detachListener = detachListener;
 jessie.cancelDefault = cancelDefault;
 jessie.attachListener = attachListener;

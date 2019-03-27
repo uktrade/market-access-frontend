@@ -241,59 +241,5 @@ describe( 'Index controller', () => {
 				} );
 			} );
 		} );
-
-		describe( 'getScanStatus', () => {
-
-			let documentId;
-
-			beforeEach( () => {
-
-				documentId = uuid();
-				req.uuid = documentId;
-			} );
-
-			describe( 'When the service returns a success', () => {
-				it( 'Should return the status', async () => {
-
-					const response = { status: 'virus_scanned', passed: true };
-
-					backend.documents.getScanStatus.and.callFake( () => Promise.resolve( response ) );
-
-					await controller.documents.getScanStatus( req, res );
-
-					expect( backend.documents.getScanStatus ).toHaveBeenCalledWith( req, documentId );
-					expect( res.json ).toHaveBeenCalledWith( response );
-				} );
-			} );
-
-			describe( 'When the service returns an error', () => {
-				it( 'Should return the message', async () => {
-
-					const message = 'foo bar';
-					const err = new Error( message );
-
-					backend.documents.getScanStatus.and.callFake( () => Promise.reject( err ) );
-
-					await controller.documents.getScanStatus( req, res );
-
-					expect( backend.documents.getScanStatus ).toHaveBeenCalledWith( req, documentId );
-					expect( res.status ).toHaveBeenCalledWith( 500 );
-					expect( res.json ).toHaveBeenCalledWith( { message } );
-				} );
-			} );
-		} );
-
-		describe( 'delete', () => {
-			it( 'Should call the backend service', () => {
-
-				const documentId = uuid();
-				req.uuid = documentId;
-
-				controller.documents.delete( req, res );
-
-				expect( backend.documents.delete ).toHaveBeenCalledWith( req, documentId );
-				expect( res.send ).toHaveBeenCalledWith();
-			} );
-		} );
 	} );
 } );
