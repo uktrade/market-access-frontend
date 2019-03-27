@@ -62,8 +62,6 @@ module.exports = {
 
 	documents: {
 		download: ( documentId ) => `/documents/${ documentId }/download/`,
-		getScanStatus: ( documentId ) => `/documents/${ documentId }/status/`,
-		delete: ( documentId ) => `/documents/${ documentId }/delete/`,
 	},
 
 	barriers: {
@@ -78,11 +76,17 @@ module.exports = {
 			euExitRelated: (barrierId) => `/barriers/${barrierId}/edit/eu-exit-related/`,
 			status: ( barrierId ) => `/barriers/${ barrierId }/edit/status/`,
 		},
+		documents: {
+			add: ( barrierId ) => `/barriers/${ barrierId }/interactions/documents/add/`,
+			cancel: ( barrierId ) => `/barriers/${ barrierId }/interactions/documents/cancel/`,
+			delete: ( barrierId, documentId ) => `/barriers/${ barrierId }/interactions/documents/${ documentId }/delete/`,
+		},
 		notes: {
 			add: ( barrierId ) => `/barriers/${ barrierId }/interactions/add-note/`,
 			edit: ( barrierId, noteId ) => `/barriers/${ barrierId }/interactions/edit-note/${ noteId }/`,
 			documents: {
-				add: ( barrierId ) => `/barriers/${ barrierId }/interactions/documents/add/`,
+				add: ( barrierId, noteId ) => `/barriers/${ barrierId }/interactions/notes/${ noteId }/documents/add/`,
+				cancel: ( barrierId, noteId ) => `/barriers/${ barrierId }/interactions/notes/${ noteId }/documents/cancel/`,
 				delete: ( barrierId, noteId, documentId ) => `/barriers/${ barrierId }/interactions/notes/${ noteId }/documents/${ documentId }/delete/`,
 			},
 		},

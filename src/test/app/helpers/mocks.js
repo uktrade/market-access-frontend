@@ -10,13 +10,17 @@ if( typeof jasmine !== 'undefined' ){
 			redirect: jasmine.createSpy( 'res.redirect' ),
 			render: jasmine.createSpy( 'res.render' ),
 			locals: {},
+			status: jasmine.createSpy( 'res.status' ),
+			json: jasmine.createSpy( 'res.json' ),
 		}),
 
 		req: () => ({
+			method: 'GET',
 			query: {},
 			session: {},
 			params: {},
 			user: {},
+			body: {},
 			error: jasmine.createSpy( 'req.error' ),
 			hasErrors: jasmine.createSpy( 'req.hasErrors' ),
 			flash: jasmine.createSpy( 'req.flash' ),
@@ -43,5 +47,10 @@ if( typeof jasmine !== 'undefined' ){
 				csrfToken,
 			};
 		},
+
+		reporter: () => ({
+			message: jasmine.createSpy( 'reporter.message' ),
+			captureException: jasmine.createSpy( 'reporter.captureException' ),
+		})
 	};
 }

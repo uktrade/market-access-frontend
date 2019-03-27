@@ -57,22 +57,6 @@ describe( 'URLs', () => {
 				expect( urls.documents.download( documentId ) ).toEqual( `/documents/${ documentId }/download/` );
 			} );
 		} );
-
-		describe( 'getScanStatus', () => {
-			it( 'Should return the correct path', () => {
-
-				const documentId = uuid();
-				expect( urls.documents.getScanStatus( documentId ) ).toEqual( `/documents/${ documentId }/status/` );
-			} );
-		} );
-
-		describe( 'delete', () => {
-			it( 'Should return the correct path', () => {
-
-				const documentId = uuid();
-				expect( urls.documents.delete( documentId ) ).toEqual( `/documents/${ documentId }/delete/` );
-			} );
-		} );
 	} );
 
 	describe( 'Barier urls', () => {
@@ -148,6 +132,34 @@ describe( 'URLs', () => {
 			} );
 		} );
 
+		describe( 'Documents', () => {
+			describe( 'add', () => {
+				it( 'Should return the correct path', () => {
+
+					const barrierId = uuid();
+					expect( urls.barriers.documents.add( barrierId ) ).toEqual( `/barriers/${ barrierId }/interactions/documents/add/` );
+				} );
+			} );
+
+			describe( 'cancel', () => {
+				it( 'Should return the correct path', () => {
+
+					const barrierId = uuid();
+					expect( urls.barriers.documents.cancel( barrierId ) ).toEqual( `/barriers/${ barrierId }/interactions/documents/cancel/` );
+				} );
+			} );
+
+			describe( 'delete', () => {
+				it( 'Should return the correct path', () => {
+
+					const barrierId = uuid();
+					const documentId = uuid();
+
+					expect( urls.barriers.documents.delete( barrierId, documentId ) ).toEqual( `/barriers/${ barrierId }/interactions/documents/${ documentId }/delete/` );
+				} );
+			} );
+		} );
+
 		describe( 'Notes', () => {
 			describe( 'Add note', () => {
 				it( 'Should return the correct path', () => {
@@ -169,7 +181,17 @@ describe( 'URLs', () => {
 					it( 'Should return the correct path', () => {
 
 						const barrierId = uuid();
-						expect( urls.barriers.notes.documents.add( barrierId ) ).toEqual( `/barriers/${ barrierId }/interactions/documents/add/` );
+						const noteId = 233;
+						expect( urls.barriers.notes.documents.add( barrierId, noteId ) ).toEqual( `/barriers/${ barrierId }/interactions/notes/${ noteId }/documents/add/` );
+					} );
+				} );
+
+				describe( 'cancel', () => {
+					it( 'Should return the correct path', () => {
+
+						const barrierId = uuid();
+						const noteId = 233;
+						expect( urls.barriers.notes.documents.cancel( barrierId, noteId ) ).toEqual( `/barriers/${ barrierId }/interactions/notes/${ noteId }/documents/cancel/` );
 					} );
 				} );
 
