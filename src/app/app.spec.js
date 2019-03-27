@@ -737,7 +737,7 @@ describe( 'App', function(){
 
 					app
 						.get( urls.reports.index() )
-						.end( checkPage( 'Market Access - Unfinished barriers', done ) );
+						.end( checkPage( 'Market Access - Draft barriers', done ) );
 				} );
 			} );
 
