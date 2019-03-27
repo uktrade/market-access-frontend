@@ -800,6 +800,7 @@ describe( 'Barrier interactions controller', () => {
 
 					const { interactionsResponse, historyResponse } = returnSuccessResponses();
 					const { barrierDetailViewModelResponse, interactionsViewModelResponse } = returnViewModels();
+
 					req.query.addCompany = true;
 
 					await controller.notes.edit( req, res );
@@ -808,6 +809,8 @@ describe( 'Barrier interactions controller', () => {
 					const templateValues = { abc: '123', addCompany: true};
 					const formValues = { def: 456 };
 					const detailUrlResponse = '/barrier/';
+
+					expect( req.session.noteDocuments[ editId ] ).toEqual( sessionDocs );
 
 					expect( config.form ).toEqual( form );
 					expect( typeof config.render ).toEqual( 'function' );
@@ -846,16 +849,33 @@ describe( 'Barrier interactions controller', () => {
 
 					expect( res.redirect ).toHaveBeenCalledWith( detailUrlResponse );
 					expect( urls.barriers.detail ).toHaveBeenCalledWith( barrier.id );
-					expect( req.session.noteDocuments ).toEqual( sessionDocs );
 				}
 
 				describe( 'With no documents in the session', () => {
-					it( 'Should configure it correctly', async () => {
+					describe( 'When the note does not have any documents', () => {
+						it( 'Should configure it correctly', async () => {
 
-						await checkProcessor( {
-							renderDocs: [],
-							saveDocs: [],
-							sessionDocs: []
+							await checkProcessor( {
+								renderDocs: [],
+								saveDocs: [],
+								sessionDocs: []
+							} );
+						} );
+					} );
+
+					describe( 'When the note has documents', () => {
+						it( 'Should add the documents to the session', async () => {
+
+							const doc1 = { id: uuid(), name: 'test-1.txt', size: 100 };
+							const doc2 = { id: uuid(), name: 'test-2.txt', size: 200 };
+
+							req.note.documents = [ doc1, doc2 ];
+
+							await checkProcessor( {
+								renderDocs: [ { ...doc1, size: '100 Bytes' }, { ...doc2, size: '200 Bytes' } ],
+								saveDocs: [ doc1.id, doc2.id ],
+								sessionDocs: [ { document: { ...doc1, size: '100 Bytes' } }, { document: { ...doc2, size: '200 Bytes' } } ],
+							} );
 						} );
 					} );
 				} );
@@ -867,21 +887,24 @@ describe( 'Barrier interactions controller', () => {
 
 					beforeEach( () => {
 
-						matchingDoc = { noteId: editId, document: { id: uuid(), name: 'test1.jpg' } };
-						nonMatchingDoc1 = { noteId: 1234, document: { id: uuid(), name: 'test3.txt' } };
+						matchingDoc = { document: { id: uuid(), name: 'test1.jpg' } };
+						nonMatchingDoc1 = { document: { id: uuid(), name: 'test3.txt' } };
 
-						req.session.noteDocuments = [ matchingDoc, nonMatchingDoc1 ];
+						req.session.noteDocuments = {
+							[ editId ]: [ matchingDoc ],
+							123: [ nonMatchingDoc1 ]
+						};
 					} );
 
-					describe( 'When the note has documents that are not in the session', () => {
-						it( 'Should add the documents to the session', async () => {
+					describe( 'When the note has documents', () => {
+						it( 'Should not add the documents to the session', async () => {
 
 							req.note.documents = [ { id: uuid(), name: 'test2.txt', size: 100 } ];
 
 							await checkProcessor( {
-								renderDocs: [ matchingDoc.document, { ...req.note.documents[ 0 ], size: '100 Bytes', } ],
-								saveDocs: [ matchingDoc.document.id, req.note.documents[ 0 ].id ],
-								sessionDocs: [ nonMatchingDoc1 ],
+								renderDocs: [ matchingDoc.document ],
+								saveDocs: [ matchingDoc.document.id ],
+								sessionDocs: [ matchingDoc ],
 							} );
 						} );
 					} );
@@ -894,7 +917,7 @@ describe( 'Barrier interactions controller', () => {
 							await checkProcessor( {
 								renderDocs: [ matchingDoc.document ],
 								saveDocs: [ matchingDoc.document.id ],
-								sessionDocs: [ nonMatchingDoc1 ]
+								sessionDocs: [ matchingDoc ],
 							} );
 						} );
 					} );
@@ -1010,15 +1033,15 @@ describe( 'Barrier interactions controller', () => {
 						describe( 'When there are documents in the session', () => {
 							it( 'Should remove the matching document and return a 200', async () => {
 
-								const nonMatchingDoc1 = { noteId, document: { id: uuid(), name: 'test1.txt'} };
-								const matchingDoc = { noteId, document: { id: documentId, name: 'match1.txt' } };
+								const nonMatchingDoc1 = { document: { id: uuid(), name: 'test1.txt'} };
+								const matchingDoc = { document: { id: documentId, name: 'match1.txt' } };
 
-								req.session.noteDocuments = [ nonMatchingDoc1, matchingDoc ];
+								req.session.noteDocuments = { [noteId]: [ nonMatchingDoc1, matchingDoc ] };
 
 								await controller.notes.documents.delete( req, res, next );
 
 								expect( res.json ).toHaveBeenCalledWith( {} );
-								expect( req.session.noteDocuments ).toEqual( [ nonMatchingDoc1 ] );
+								expect( req.session.noteDocuments[ noteId ] ).toEqual( [ nonMatchingDoc1 ] );
 							} );
 						} );
 					} );
@@ -1098,8 +1121,7 @@ describe( 'Barrier interactions controller', () => {
 
 				checkAddDocument( () => controller.notes.documents.add, ( documentId, doc ) => {
 
-					expect( req.session.noteDocuments ).toEqual( [{
-						noteId,
+					expect( req.session.noteDocuments[ noteId ] ).toEqual( [{
 						document: {
 							id: documentId,
 							size: '10 Bytes',
@@ -1135,7 +1157,7 @@ describe( 'Barrier interactions controller', () => {
 
 						controller.notes.documents.cancel( req, res );
 
-						expect( req.session.noteDocuments ).toEqual( [] );
+						expect( req.session.noteDocuments[ noteId ] ).not.toBeDefined();
 					} );
 				} );
 
