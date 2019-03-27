@@ -3,7 +3,7 @@ const proxyquire = require( 'proxyquire' );
 const modulePath = './location';
 const SELECT = 'select-value';
 
-describe( 'Edit barrier controller', () => {
+describe( 'Edit barrier location controller', () => {
 
 	let controller;
 	let req;
@@ -49,7 +49,10 @@ describe( 'Edit barrier controller', () => {
 
 		urls = {
 			barriers: {
-				detail: jasmine.createSpy( 'urls.barriers.detail' )
+				detail: jasmine.createSpy( 'urls.barriers.detail' ),
+				location: {
+					list: jasmine.createSpy( 'urls.barriers.location.list' )
+				}
 			}
 		};
 
@@ -61,11 +64,21 @@ describe( 'Edit barrier controller', () => {
 			params: {},
 			query: {}
 		};
+		
 
 		res = {
 			render: jasmine.createSpy( 'res.render' ),
 			redirect: jasmine.createSpy( 'res.redirect' )
 		};
+
+		getValuesResponse = { country: 'country 2' };
+		getTemplateValuesResponse = { country: 'country 1' };
+		form = {
+			validate: jasmine.createSpy( 'form.validate' ),
+			getValues: jasmine.createSpy( 'form.getValues' ).and.callFake( () => getValuesResponse ),
+			getTemplateValues: jasmine.createSpy( 'form.getTemplateValues' ).and.callFake( () => Object.assign( {}, getTemplateValuesResponse ) )
+		};
+
 		next = jasmine.createSpy( 'next' );
 
 		controller = proxyquire( modulePath, {
@@ -78,9 +91,13 @@ describe( 'Edit barrier controller', () => {
 		} );
 	} );
 
-	describe( 'country', () => {
+	fdescribe( 'country', () => {
 
-		const template = 'barriers/views/edit/headlines';
+		beforeEach( () => {
+			req.session = {
+				location: { country: 'country 1' }
+			}
+		});
 
 		it( 'Should configure the Form correctly', async () => {
 
@@ -94,7 +111,7 @@ describe( 'Edit barrier controller', () => {
 
 			expect( config.country ).toBeDefined();
 			expect( config.country.type ).toEqual( SELECT );
-			expect( config.country.values ).toEqual( [ barrier.export_country ] );
+			expect( config.country.values ).toEqual( [ 'country 1' ] );
 			expect( config.country.items ).toEqual( metadata.getCountryList() );
 			expect( config.country.validators.length ).toEqual( 1 );
 			expect( config.country.validators[ 0 ].fn ).toEqual( validators.isCountry );
@@ -102,56 +119,49 @@ describe( 'Edit barrier controller', () => {
 			expect( config.status ).not.toBeDefined();
 		} );
 
-		it( 'Should configure the FormProcessor correctly', async () => {
+		describe('When it is a GET', () => {
+			it( 'Should render the template', () => {
+				controller.country( req, res );
 
-			await controller.country( req, res );
-
-			const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
-			const templateValues = { abc: '123' };
-			const formValues = { def: 456 };
-			const detailResponse = '/barrier/location';
-
-			expect( config.form ).toEqual( form );
-			expect( typeof config.render ).toEqual( 'function' );
-			expect( typeof config.saveFormData ).toEqual( 'function' );
-			expect( typeof config.saved ).toEqual( 'function' );
-
-			config.render( templateValues );
-
-			expect( res.render ).toHaveBeenCalledWith( template, templateValues );
-
-			config.saveFormData( formValues );
-
-			expect( backend.barriers.saveCountry ).toHaveBeenCalledWith( req, barrier.id, formValues );
-
-			urls.barriers.detail.and.callFake( () => detailResponse );
-
-			config.saved();
-
-			expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
-			expect( urls.barriers.location.list ).toHaveBeenCalledWith( barrier.id );
-		} );
-
-		describe( 'When the processor does not throw an error', () => {
-			it( 'Should not call next', async () => {
-
-				await controller.country( req, res, next );
-
-				expect( next ).not.toHaveBeenCalled();
+				expect( res.render ).toHaveBeenCalledWith( 'barriers/views/location/country', Object.assign( {},
+					getTemplateValuesResponse,
+				) );
 			} );
-		} );
+		});
 
-		describe( 'When the processor throws an errror', () => {
-			it( 'Should call next with the error', async () => {
+		describe('When it is a POST', () => {
 
-				const err = new Error( 'a random error' );
+			beforeEach( () => {
+				form.isPost = true;
+			});
 
-				processor.process.and.callFake( () => { throw err; } );
+			describe('When the form has errors', () => {
+				it( 'Should render the template', () => {
 
-				await controller.country( req, res, next );
+					form.hasErrors = () => true;
 
-				expect( next ).toHaveBeenCalledWith( err );
-			} );
-		} );
+					controller.country( req, res );
+
+					expect( res.render ).toHaveBeenCalledWith( 'barriers/views/location/country', Object.assign( {},
+						getTemplateValuesResponse,
+					) );
+				} );
+			})
+
+			describe('When the form does not have errors', () => {
+				it('Should add the country to the session', () => {
+				
+					form.hasErrors = () => false;
+
+					const listResponse = '/list/location';
+					urls.barriers.location.list.and.callFake( () => listResponse );
+
+					controller.country( req, res );
+
+					expect(req.session.location.country).toEqual('country 2');
+					expect( res.redirect).toHaveBeenCalledWith(listResponse);
+				})
+			})
+		});
 	} );
 } );

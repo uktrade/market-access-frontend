@@ -74,7 +74,7 @@ module.exports = {
 			if( !form.hasErrors() ){
 	
 				req.session.location.country = form.getValues().country;
-	
+
 				return res.redirect( urls.barriers.location.list( barrier.id ) );
 			}
 		}

@@ -99,7 +99,7 @@ describe( 'Edit barrier controller', () => {
 		} );
 	} );
 
-	fdescribe( 'title', () => {
+	describe( 'title', () => {
 
 		const template = 'barriers/views/edit/title';
 
