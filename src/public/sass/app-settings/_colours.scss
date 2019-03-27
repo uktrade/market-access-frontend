@@ -25,6 +25,7 @@ $govuk-green-15: tint( $govuk-green, 85 );
 
 $govuk-yellow: (govuk-colour( 'yellow' ));
 $govuk-yellow-25: tint( govuk-colour( 'yellow' ), 75 );
+$govuk-yellow-10: tint( govuk-colour( 'yellow' ), 90 );
 $govuk-fuchsia: govuk-colour( 'bright-purple' );
 $govuk-fuchsia-50: tint( govuk-colour( 'bright-purple' ), 50 );
 $govuk-fuchsia-10: tint( govuk-colour( 'bright-purple' ), 90 );
@@ -38,3 +39,4 @@ $priority-low: govuk-colour( 'yellow' );
 $priority-unknown: $govuk-grey-2;
 
 $focus-colour: $govuk-yellow;
+$secondary-text-colour: tint( $govuk-black, 25 );

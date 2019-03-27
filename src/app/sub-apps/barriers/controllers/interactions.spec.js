@@ -3,7 +3,7 @@ const uuid = require( 'uuid/v4' );
 const faker = require( 'faker' );
 
 const modulePath = './interactions';
-const getFakeData = jasmine.helpers.getFakeData;
+const { getFakeData, mocks } = jasmine.helpers;
 
 describe( 'Barrier interactions controller', () => {
 
@@ -13,7 +13,6 @@ describe( 'Barrier interactions controller', () => {
 	let next;
 	let backend;
 	let urls;
-	let csrfToken;
 	let config;
 	let Form;
 	let FormProcessor;
@@ -25,37 +24,26 @@ describe( 'Barrier interactions controller', () => {
 	let barrierDetailViewModel;
 	let interactionsViewModel;
 	let barrierId;
-	let uploadFile;
+	let uploadDocument;
+	let reporter;
 
 	beforeEach( () => {
 
-		csrfToken = uuid();
+		( { req, res, next } = mocks.middleware() );
 		barrierId = uuid();
-
-		req = {
-			barrier: {
-				id: barrierId
-			},
-			csrfToken: () => csrfToken,
-			session: {},
-			params: {},
-			query: {},
-			flash: jasmine.createSpy( 'req.flash' )
-		};
 		config = {
-			addCompany: false
+			addCompany: false,
+			files: {
+				maxSize: ( 5 * 1024 * 1024 ),
+				types: [ 'image/jpeg', 'text/csv' ]
+			}
 		};
-		res = {
-			render: jasmine.createSpy( 'res.render' ),
-			redirect: jasmine.createSpy( 'res.redirect' ),
-			locals: {}
-		};
-		next = jasmine.createSpy( 'next' );
+		req.barrier = { id: barrierId };
+
 		backend = {
 			documents: {
-				create: jasmine.createSpy( 'backend.documents.create' ),
-				uploadComplete: jasmine.createSpy( 'backend.documents.uploadComplete' ),
 				getScanStatus: jasmine.createSpy( 'backend.documents.getScanStatus' ),
+				delete: jasmine.createSpy( 'backend.documents.delete' ),
 			},
 			barriers: {
 				getInteractions: jasmine.createSpy( 'backend.barriers.getInteractions' ),
@@ -78,6 +66,9 @@ describe( 'Barrier interactions controller', () => {
 				},
 				sectors: {
 					list: jasmine.createSpy( 'urls.barriers.sectors.list' )
+				},
+				notes: {
+					edit: jasmine.createSpy( 'urls.barriers.notes.edit' ),
 				}
 			}
 		};
@@ -87,16 +78,18 @@ describe( 'Barrier interactions controller', () => {
 		form = {
 			validate: jasmine.createSpy( 'form.validate' ),
 			getValues: jasmine.createSpy( 'form.getValues' ).and.callFake( () => getValuesResponse ),
-			getTemplateValues: jasmine.createSpy( 'form.getTemplateValues' ).and.callFake( () => getTemplateValuesResponse )
+			getTemplateValues: jasmine.createSpy( 'form.getTemplateValues' ).and.callFake( () => getTemplateValuesResponse ),
+			addErrors: jasmine.createSpy( 'form.addErrros' ),
 		};
 		processor = {
 			process: jasmine.createSpy( 'FormProcessor.process' )
 		};
 		Form = jasmine.createSpy( 'Form' ).and.callFake( () => form );
+		Form.FILE = 'file-type';
 		FormProcessor = jasmine.createSpy( 'FormProcessor' ).and.callFake( () => processor );
 		barrierDetailViewModel = jasmine.createSpy( 'barrierDetailViewModel' );
 		interactionsViewModel = jasmine.createSpy( 'interactionsViewModel' );
-		uploadFile = jasmine.createSpy( 'uploadFile' );
+		uploadDocument = jasmine.createSpy( 'uploadDocument' );
 
 		validators = {
 			isNumeric: jasmine.createSpy( 'validators.isNumeric' ),
@@ -105,8 +98,12 @@ describe( 'Barrier interactions controller', () => {
 			isDateInPast: jasmine.createSpy( 'validators.isDateInPast' ),
 			isMetadata: jasmine.createSpy( 'validators.isMetadata' ),
 			isSector: jasmine.createSpy( 'validators.isSector' ),
-			isDateNumeric: jasmine.createSpy( 'validators.isDateNumeric' )
+			isDateNumeric: jasmine.createSpy( 'validators.isDateNumeric' ),
+			isValidFile: jasmine.createSpy( 'validators.isValidFile' ),
+			isUuid: jasmine.createSpy( 'validators.isUuid' ),
 		};
+
+		reporter = mocks.reporter();
 
 		controller = proxyquire( modulePath, {
 			'../../../config': config,
@@ -117,7 +114,8 @@ describe( 'Barrier interactions controller', () => {
 			'../../../lib/validators': validators,
 			'../view-models/detail': barrierDetailViewModel,
 			'../view-models/interactions': interactionsViewModel,
-			'../../../lib/upload-file': uploadFile,
+			'../../../lib/upload-document': uploadDocument,
+			'../../../lib/reporter': reporter,
 		} );
 	} );
 
@@ -173,6 +171,165 @@ describe( 'Barrier interactions controller', () => {
 			{ interactions: interactionsViewModelResponse }
 		) );
 	}
+
+	function checkAddDocument( getMethod, passedCb ){
+
+		let method;
+
+		beforeEach( () => {
+
+			method = getMethod();
+		} );
+
+		describe( 'When there is a formError on the req', () => {
+			describe( 'When the error is about file size', () => {
+				it( 'Should return a 400 with a message', async () => {
+
+					req.formError = new Error( 'The error is maxFileSize exceeded' );
+
+					await method( req, res );
+
+					expect( res.status ).toHaveBeenCalledWith( 400 );
+					expect( res.json ).toHaveBeenCalledWith( { message: 'File size exceeds the 5 MB limit. Reduce file size and upload the document again.' } );
+					expect( reporter.message ).not.toHaveBeenCalled();
+				} );
+			} );
+
+			describe( 'When the error is about file size', () => {
+				it( 'Should return a 400 with a message', async () => {
+
+					req.formError = new Error( 'The error is something else' );
+
+					await method( req, res );
+
+					expect( res.status ).toHaveBeenCalledWith( 400 );
+					expect( res.json ).toHaveBeenCalledWith( { message: 'A system error has occured, so the file has not been uploaded. Try again.' } );
+					expect( reporter.message ).not.toHaveBeenCalled();
+				} );
+			} );
+		} );
+
+		describe( 'When there is not a formError', () => {
+			describe( 'When there is not a document', () => {
+				it( 'Should return a 400 with an error message', async () => {
+
+					await method( req, res );
+
+					expect( res.status ).toHaveBeenCalledWith( 400 );
+					expect( res.json ).toHaveBeenCalledWith( { message: 'Unsupported file format. The following file formats are accepted .jpg, .csv' } );
+					expect( reporter.message ).toHaveBeenCalledWith( 'info', 'Invalid document type: undefined', { size: undefined, name: undefined } );
+				} );
+			} );
+
+			describe( 'When there is a document', () => {
+
+				let doc;
+
+				beforeEach( () => {
+
+					doc = { type: 'text/plain', size: 10, name: 'test-1.txt' };
+					req.body.document = doc;
+				} );
+
+				describe( 'When the document is invalid', () => {
+					it( 'Should return 400 with an error message', async () => {
+
+						validators.isValidFile.and.callFake( () => false );
+
+						await method( req, res );
+
+						expect( res.status ).toHaveBeenCalledWith( 400 );
+						expect( res.json ).toHaveBeenCalledWith( { message: 'Unsupported file format. The following file formats are accepted .jpg, .csv' } );
+						expect( reporter.message ).toHaveBeenCalledWith( 'info', `Invalid document type: ${ doc.type }`, { size: doc.size, name: doc.name } );
+					} );
+				} );
+
+				describe( 'When the document is valid', () => {
+
+					beforeEach( () => {
+
+						validators.isValidFile.and.callFake( () => true );
+					} );
+
+					describe( 'When uploadDocument returns an error', () => {
+						it( 'Should return a 500', async () => {
+
+							const err = new Error( 'uploadDocument error' );
+
+							uploadDocument.and.callFake( () => Promise.reject( err ) );
+
+							await method( req, res );
+
+							expect( res.status ).toHaveBeenCalledWith( 500 );
+							expect( res.json ).toHaveBeenCalledWith( { message: 'A system error has occured, so the file has not been uploaded. Try again.' } );
+							expect( reporter.captureException ).toHaveBeenCalledWith( err );
+						} );
+					} );
+
+					describe( 'When uploadDocument returns a documentId', () => {
+
+						let documentId;
+
+						beforeEach( () => {
+
+							documentId = uuid();
+							uploadDocument.and.callFake( () => documentId );
+						} );
+
+						describe( 'When the document does not pass virus scanning', () => {
+							it( 'Should return a 401', async () => {
+
+								backend.documents.getScanStatus.and.callFake( () => Promise.resolve( { passed: false } ) );
+
+								await method( req, res );
+
+								expect( res.status ).toHaveBeenCalledWith( 401 );
+								expect( res.json ).toHaveBeenCalledWith( { message: 'This file may be infected with a virus and will not be accepted.' } );
+							} );
+						} );
+
+						describe( 'When the document passes virus scanning', () => {
+							it( 'Should return the document details and add the document to the session', async () => {
+
+								backend.documents.getScanStatus.and.callFake( () => Promise.resolve( { passed: true } ) );
+
+								await method( req, res );
+
+								expect( res.json ).toHaveBeenCalledWith( {
+									documentId,
+									file: { name: doc.name, size: '10 Bytes' }
+								} );
+
+								passedCb( documentId, doc );
+							} );
+						} );
+					} );
+				} );
+			} );
+		} );
+	}
+
+	describe( 'With an missing mime type map', () => {
+		it( 'Should report the error', () => {
+
+			config.files.types.push( 'fake/mime' );
+
+			controller = proxyquire( modulePath, {
+				'../../../config': config,
+				'../../../lib/backend-service': backend,
+				'../../../lib/urls': urls,
+				'../../../lib/Form': Form,
+				'../../../lib/FormProcessor': FormProcessor,
+				'../../../lib/validators': validators,
+				'../view-models/detail': barrierDetailViewModel,
+				'../view-models/interactions': interactionsViewModel,
+				'../../../lib/upload-document': uploadDocument,
+				'../../../lib/reporter': reporter,
+			} );
+
+			expect( reporter.message ).toHaveBeenCalledWith( 'info', 'No file extension mapping found for valid type: fake/mime'  );
+		} );
+	} );
 
 	describe( 'list', () => {
 		describe( 'Without an error', () => {
@@ -315,18 +472,23 @@ describe( 'Barrier interactions controller', () => {
 
 		beforeEach( () => {
 
-			barrier = jasmine.helpers.getFakeData( '/backend/barriers/barrier' );
+			barrier = getFakeData( '/backend/barriers/barrier' );
 
 			req.barrier = barrier;
 		} );
 
-		describe( 'add', () => {
-			it( 'Should configure the Form correctly', async () => {
+		function checkFormConfig(){
 
-				await controller.notes.add( req, res, next );
+			let args;
+			let config;
 
-				const args = Form.calls.argsFor( 0 );
-				const config = args[ 1 ];
+			beforeEach( () => {
+
+				args = Form.calls.argsFor( 0 );
+				config = args[ 1 ];
+			} );
+
+			it( 'Should have the correct config', async () => {
 
 				expect( Form ).toHaveBeenCalled();
 				expect( args[ 0 ] ).toEqual( req );
@@ -334,12 +496,78 @@ describe( 'Barrier interactions controller', () => {
 				expect( config.note ).toBeDefined();
 				expect( config.note.required ).toBeDefined();
 
-				expect( config.pinned ).toBeDefined();
+				expect( config.pinned ).not.toBeDefined();
+
+				expect( config.document ).toBeDefined();
+				expect( config.document.type ).toEqual( Form.FILE );
+				expect( config.document.validators.length ).toEqual( 1 );
+			} );
+
+			describe( 'document validator', () => {
+
+				let validator;
+				let file;
+
+				beforeEach( () => {
+
+					validator = config.document.validators[ 0 ].fn;
+					file = { name: 'test.txt', size: 10, type: 'text/plain' };
+				} );
+
+				describe( 'When the file is valid', () => {
+					it( 'Should return true', () => {
+
+						validators.isValidFile.and.callFake( () => true );
+
+						expect( validator( file ) ).toEqual( true );
+						expect( validators.isValidFile ).toHaveBeenCalledWith( file );
+						expect( reporter.message ).not.toHaveBeenCalled();
+					} );
+				} );
+
+				describe( 'When the file is invalid', () => {
+					it( 'Should return false and report the file', () => {
+
+						validators.isValidFile.and.callFake( () => false );
+
+						expect( validator( file ) ).toEqual( false );
+						expect( validators.isValidFile ).toHaveBeenCalledWith( file );
+						expect( reporter.message ).toHaveBeenCalledWith( 'info', 'Invalid document type: ' + file.type, { size: file.size, name: file.name } );
+					} );
+				} );
+			} );
+		}
+
+		describe( 'add', () => {
+			describe( 'Configuring the Form', () => {
+
+				beforeEach( async () => {
+
+					await controller.notes.add( req, res, next );
+				} );
+
+				checkFormConfig();
+			} );
+
+			describe( 'When there is a formError', () => {
+				it( 'Should add the error to the form', async () => {
+
+					req.formError = new Error( 'Something about maxFileSize exceeded' );
+
+					await controller.notes.add( req, res, next );
+
+					expect( form.addErrors ).toHaveBeenCalled();
+
+					const args = form.addErrors.calls.argsFor( 0 );
+
+					expect( args[ 0 ].document ).toBeDefined();
+				} );
 			} );
 
 			describe( 'configuring the FormProcessor', () => {
-				describe( 'With no document', () => {
-					it( 'Should configure the FormProcessor correctly', async () => {
+				describe( 'With no document POSTed', () => {
+
+					async function checkProcessor( { renderDocs, saveDocs, sessionDocs } ){
 
 						const { interactionsResponse, historyResponse } = returnSuccessResponses();
 						const { barrierDetailViewModelResponse, interactionsViewModelResponse } = returnViewModels();
@@ -348,7 +576,7 @@ describe( 'Barrier interactions controller', () => {
 
 						const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
 						const templateValues = { abc: '123' };
-						const formValues = { note: 'a note', pinned: false, a: 'test' };
+						const formValues = { note: 'a note', a: 'test' };
 						const detailUrlResponse = '/barrier';
 
 						expect( config.form ).toEqual( form );
@@ -360,9 +588,14 @@ describe( 'Barrier interactions controller', () => {
 
 						expect( res.render ).toHaveBeenCalledWith( template, Object.assign( {},
 							barrierDetailViewModelResponse,
-							{ interactions: interactionsViewModelResponse },
-							{ noteForm: true, noteErrorText: 'Add text for the note.' },
-							templateValues
+							templateValues,
+							{
+								interactions: interactionsViewModelResponse,
+								showNoteForm: true,
+								noteErrorText: 'Add text for the note.',
+								pageTitleSuffix: ' - Add a note',
+								documents: renderDocs,
+							},
 						) );
 
 						expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier, false );
@@ -375,7 +608,7 @@ describe( 'Barrier interactions controller', () => {
 
 						expect( backend.barriers.notes.save ).toHaveBeenCalledWith( req, req.barrier.id, {
 							note: formValues.note,
-							pinned: formValues.pinned,
+							documentIds: saveDocs
 						} );
 
 						urls.barriers.detail.and.callFake( () => detailUrlResponse );
@@ -385,62 +618,55 @@ describe( 'Barrier interactions controller', () => {
 						expect( res.redirect ).toHaveBeenCalledWith( detailUrlResponse );
 						expect( urls.barriers.detail ).toHaveBeenCalledWith( barrier.id );
 						expect( next ).not.toHaveBeenCalled();
-					} );
-				} );
+						expect( req.session.barrierDocuments ).toEqual( sessionDocs );
+					}
 
-				describe( 'With a documentId', () => {
+					describe( 'With no documents in the session', () => {
+						it( 'Should configure the FormProcessor correctly', async () => {
 
-					let config;
-					let formValues;
-
-					beforeEach( async () => {
-
-						await controller.notes.add( req, res, next );
-
-						config = FormProcessor.calls.argsFor( 0 )[ 0 ];
-						formValues = {
-							note: faker.lorem.words(),
-							pinned: true,
-							documentId: uuid(),
-						};
-					} );
-
-					afterEach( () => {
-
-						expect( backend.barriers.notes.save ).toHaveBeenCalledWith( req, req.barrier.id, {
-							note: formValues.note,
-							pinned: formValues.pinned,
-							documentId: formValues.documentId
-						} );
-
-						expect( next ).not.toHaveBeenCalled();
-					} );
-
-					describe( 'When there are documents in the session', () => {
-						it( 'Should remove the documents for this barrier id', () => {
-
-							const doc1 = { barrierId: uuid(), documentId: uuid() };
-							const doc2 = { barrierId: uuid(), documentId: uuid() };
-
-							req.session.barrierDocuments = [
-								doc1,
-								{ barrierId: barrier.id, documentId: formValues.documentId },
-								doc2,
-							];
-
-							config.saveFormData( formValues );
-							config.saved();
-
-							expect( req.session.barrierDocuments ).toEqual( [
-								doc1, doc2
-							] );
+							await checkProcessor({
+								renderDocs: [],
+								saveDocs: [],
+							});
 						} );
 					} );
 
-					describe( 'When there are not any documents in the session', () => {
-						it( 'Should configure the saveFormData correctly', async () => {
+					describe( 'With documents in the session', () => {
 
-							config.saveFormData( formValues );
+						let nonMatchingDoc1;
+						let nonMatchingDoc2;
+
+						beforeEach( () => {
+
+							nonMatchingDoc1 = { barrierId: uuid(), document: { name: '1.jpg', size: 10 } };
+							nonMatchingDoc2 = { barrierId: uuid(), document: { name: '2.jpg', size: 20 } };
+						} );
+
+						describe( 'With a matching doc', () => {
+							it( 'Should configure the FormProcessor correctly', async () => {
+
+								const matchingDoc = { barrierId: barrier.id, document: { name: 'match.jpg', size: 30 } };
+								req.session.barrierDocuments = [ nonMatchingDoc1, nonMatchingDoc2, matchingDoc ];
+
+								await checkProcessor({
+									renderDocs: [ matchingDoc.document ],
+									saveDocs: [ matchingDoc.document.id ],
+									sessionDocs: [ nonMatchingDoc1, nonMatchingDoc2 ],
+								});
+							} );
+						} );
+
+						describe( 'Without a matching doc', () => {
+							it( 'Should configure the FormProcessor correctly', async () => {
+
+								req.session.barrierDocuments = [ nonMatchingDoc1, nonMatchingDoc2 ];
+
+								await checkProcessor({
+									renderDocs: [],
+									saveDocs: [],
+									sessionDocs: [ nonMatchingDoc1, nonMatchingDoc2 ],
+								});
+							} );
 						} );
 					} );
 				} );
@@ -449,7 +675,6 @@ describe( 'Barrier interactions controller', () => {
 
 					let config;
 					let formValues;
-					let signed_upload_url;
 					let documentId;
 
 					beforeEach( async () => {
@@ -458,10 +683,8 @@ describe( 'Barrier interactions controller', () => {
 
 						config = FormProcessor.calls.argsFor( 0 )[ 0 ];
 						documentId = uuid();
-						signed_upload_url = 'a/b/c';
 						formValues = {
 							note: faker.lorem.words(),
-							pinned: true,
 							document: { name: 'a document', size: 12 },
 						};
 					} );
@@ -471,7 +694,7 @@ describe( 'Barrier interactions controller', () => {
 
 							const err = new Error( 'My test' );
 
-							backend.documents.create.and.callFake( () => Promise.reject( err ) );
+							uploadDocument.and.callFake( () => Promise.reject( err ) );
 
 							await config.saveFormData( formValues );
 
@@ -479,36 +702,21 @@ describe( 'Barrier interactions controller', () => {
 						} );
 					} );
 
-					describe( 'When uploadDocument returns success', () => {
+					describe( 'When uploadDocument resolves', () => {
 
 						beforeEach( () => {
 
-							backend.documents.create.and.callFake( () => Promise.resolve( { response: {
-								isSuccess: true
-							}, body: {
-								id: documentId,
-								signed_upload_url,
-							} }));
-
-							uploadFile.and.callFake( () => Promise.resolve( {
-								response: { statusCode: 200 },
-							} ) );
-
-							backend.documents.uploadComplete.and.callFake( () => Promise.resolve( {
-								response: { isSuccess: true },
-							} ) );
+							uploadDocument.and.callFake( () => Promise.resolve( documentId ) );
 						} );
 
 						afterEach( () => {
 
-							expect( backend.documents.create ).toHaveBeenCalledWith( req, formValues.document.name, formValues.document.size );
-							expect( uploadFile ).toHaveBeenCalledWith( signed_upload_url, formValues.document );
-							expect( backend.documents.uploadComplete ).toHaveBeenCalledWith( req, documentId );
+							expect( uploadDocument ).toHaveBeenCalledWith( req, formValues.document );
 							expect( backend.documents.getScanStatus ).toHaveBeenCalledWith( req, documentId );
 						} );
 
 						describe( 'When getScanStatus return success', () => {
-							it( 'Should configure the saveFormData correctly', async () => {
+							it( 'Should configure saveFormData correctly', async () => {
 
 								backend.documents.getScanStatus.and.callFake( () => Promise.resolve( {
 									status: 'virus_scanned',
@@ -519,8 +727,7 @@ describe( 'Barrier interactions controller', () => {
 
 								expect( backend.barriers.notes.save ).toHaveBeenCalledWith( req, req.barrier.id, {
 									note: formValues.note,
-									pinned: formValues.pinned,
-									documentId
+									documentIds: [ documentId ]
 								} );
 								expect( next ).not.toHaveBeenCalled();
 							} );
@@ -567,48 +774,33 @@ describe( 'Barrier interactions controller', () => {
 		} );
 
 		describe( 'edit', () => {
-			describe( 'When the noteId is invalid', () => {
-				it( 'Should call next with an error', async () => {
 
-					req.params.noteId = 'abc';
-					validators.isNumeric.and.callFake( () => false );
+			let editId;
 
-					await controller.notes.edit( req, res, next );
+			beforeEach( () => {
 
-					expect( next ).toHaveBeenCalledWith( new Error( 'Invalid noteId' ) );
-					expect( res.render ).not.toHaveBeenCalled();
-				} );
+				editId = 6;
+				req.params.id = editId;
+				req.note = getFakeData( '/backend/barriers/interactions' ).results[ 0 ];
 			} );
 
-			describe( 'when the noteId is valid', () => {
+			describe( 'Configuring the Form', () => {
 
-				let editId;
-
-				beforeEach( () => {
-
-					editId = 34;
-					req.params.id = editId;
-					validators.isNumeric.and.callFake( () => true );
-				} );
-
-				it( 'Should configure the Form correctly', async () => {
+				beforeEach( async () => {
 
 					await controller.notes.edit( req, res, next );
-
-					const args = Form.calls.argsFor( 0 );
-					const config = args[ 1 ];
-
-					expect( Form ).toHaveBeenCalled();
-					expect( args[ 0 ] ).toEqual( req );
-
-					expect( config.note ).toBeDefined();
-					expect( config.note.required ).toBeDefined();
 				} );
 
-				it( 'Should configure the FormProcessor correctly', async () => {
+				checkFormConfig();
+			} );
+
+			describe( 'configuring the FormProcessor', () => {
+
+				async function checkProcessor( { renderDocs, saveDocs, sessionDocs } ){
 
 					const { interactionsResponse, historyResponse } = returnSuccessResponses();
 					const { barrierDetailViewModelResponse, interactionsViewModelResponse } = returnViewModels();
+
 					req.query.addCompany = true;
 
 					await controller.notes.edit( req, res );
@@ -618,15 +810,24 @@ describe( 'Barrier interactions controller', () => {
 					const formValues = { def: 456 };
 					const detailUrlResponse = '/barrier/';
 
+					expect( req.session.noteDocuments[ editId ] ).toEqual( sessionDocs );
+
 					expect( config.form ).toEqual( form );
 					expect( typeof config.render ).toEqual( 'function' );
 					expect( typeof config.saveFormData ).toEqual( 'function' );
 					expect( typeof config.saved ).toEqual( 'function' );
+
 					await config.render( templateValues );
+
 					expect( res.render ).toHaveBeenCalledWith( template, Object.assign( {},
 						barrierDetailViewModelResponse,
-						{ interactions: interactionsViewModelResponse },
-						templateValues
+						templateValues,
+						{
+							interactions: interactionsViewModelResponse,
+							noteErrorText: 'Add text for the note.',
+							pageTitleSuffix: ' - Edit a note',
+							documents: renderDocs,
+						},
 					) );
 
 					expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier, req.query.addCompany);
@@ -637,7 +838,10 @@ describe( 'Barrier interactions controller', () => {
 
 					config.saveFormData( formValues );
 
-					expect( backend.barriers.notes.update ).toHaveBeenCalledWith( req, editId, formValues );
+					expect( backend.barriers.notes.update ).toHaveBeenCalledWith( req, editId, {
+						note: formValues.note,
+						documentIds: saveDocs,
+					} );
 
 					urls.barriers.detail.and.callFake( () => detailUrlResponse );
 
@@ -645,28 +849,503 @@ describe( 'Barrier interactions controller', () => {
 
 					expect( res.redirect ).toHaveBeenCalledWith( detailUrlResponse );
 					expect( urls.barriers.detail ).toHaveBeenCalledWith( barrier.id );
-				} );
+				}
 
-				describe( 'When the processor does not throw an error', () => {
-					it( 'Should not call next', async () => {
+				describe( 'With no documents in the session', () => {
+					describe( 'When the note does not have any documents', () => {
+						it( 'Should configure it correctly', async () => {
 
-						await controller.notes.edit( req, res, next );
+							await checkProcessor( {
+								renderDocs: [],
+								saveDocs: [],
+								sessionDocs: []
+							} );
+						} );
+					} );
 
-						expect( next ).not.toHaveBeenCalled();
+					describe( 'When the note has documents', () => {
+						it( 'Should add the documents to the session', async () => {
+
+							const doc1 = { id: uuid(), name: 'test-1.txt', size: 100 };
+							const doc2 = { id: uuid(), name: 'test-2.txt', size: 200 };
+
+							req.note.documents = [ doc1, doc2 ];
+
+							await checkProcessor( {
+								renderDocs: [ { ...doc1, size: '100 Bytes' }, { ...doc2, size: '200 Bytes' } ],
+								saveDocs: [ doc1.id, doc2.id ],
+								sessionDocs: [ { document: { ...doc1, size: '100 Bytes' } }, { document: { ...doc2, size: '200 Bytes' } } ],
+							} );
+						} );
 					} );
 				} );
 
-				describe( 'When the processor throws an errror', () => {
-					it( 'Should call next with the error', async () => {
+				describe( 'With documents in the session', () => {
 
-						const err = new Error( 'a random error' );
+					let matchingDoc;
+					let nonMatchingDoc1;
 
-						processor.process.and.callFake( () => { throw err; } );
+					beforeEach( () => {
 
-						await controller.notes.edit( req, res, next );
+						matchingDoc = { document: { id: uuid(), name: 'test1.jpg' } };
+						nonMatchingDoc1 = { document: { id: uuid(), name: 'test3.txt' } };
 
-						expect( next ).toHaveBeenCalledWith( err );
+						req.session.noteDocuments = {
+							[ editId ]: [ matchingDoc ],
+							123: [ nonMatchingDoc1 ]
+						};
 					} );
+
+					describe( 'When the note has documents', () => {
+						it( 'Should not add the documents to the session', async () => {
+
+							req.note.documents = [ { id: uuid(), name: 'test2.txt', size: 100 } ];
+
+							await checkProcessor( {
+								renderDocs: [ matchingDoc.document ],
+								saveDocs: [ matchingDoc.document.id ],
+								sessionDocs: [ matchingDoc ],
+							} );
+						} );
+					} );
+
+					describe( 'When the note has documents that are alredy in the session', () => {
+						it( 'Should not add them again', async () => {
+
+							req.note.documents = [ matchingDoc.document ];
+
+							await checkProcessor( {
+								renderDocs: [ matchingDoc.document ],
+								saveDocs: [ matchingDoc.document.id ],
+								sessionDocs: [ matchingDoc ],
+							} );
+						} );
+					} );
+				} );
+			} );
+
+			describe( 'When the processor does not throw an error', () => {
+				it( 'Should not call next', async () => {
+
+					await controller.notes.edit( req, res, next );
+
+					expect( next ).not.toHaveBeenCalled();
+				} );
+			} );
+
+			describe( 'When the processor throws an errror', () => {
+				it( 'Should call next with the error', async () => {
+
+					const err = new Error( 'a random error' );
+
+					processor.process.and.callFake( () => { throw err; } );
+
+					await controller.notes.edit( req, res, next );
+
+					expect( next ).toHaveBeenCalledWith( err );
+				} );
+			} );
+		} );
+
+		describe( 'documents', () => {
+
+			let barrierId;
+			let noteId;
+			let documentId;
+
+			beforeEach( () => {
+
+				barrierId = uuid();
+				documentId = uuid();
+				noteId = 123;
+
+				req.uuid = barrierId;
+				req.note = { id: noteId };
+				req.params.id = documentId;
+			} );
+
+			describe( 'delete', () => {
+
+				afterEach( () => {
+
+					expect( backend.documents.delete ).toHaveBeenCalledWith( req, documentId );
+				} );
+
+				describe( 'When the backend returns an error', () => {
+
+					let err;
+
+					beforeEach( () => {
+
+						err = new Error( 'A backend error' );
+						backend.documents.delete.and.callFake( () => Promise.reject( err ) );
+					} );
+
+					describe( 'When it is a POST', () => {
+						it( 'Should return a JSON error with status 500', async () => {
+
+							req.method = 'POST';
+
+							await controller.notes.documents.delete( req, res, next );
+
+							expect( res.status ).toHaveBeenCalledWith( 500 );
+							expect( res.json ).toHaveBeenCalledWith( { message: 'Error deleting file' } );
+							expect( reporter.captureException ).toHaveBeenCalledWith( err );
+						} );
+					} );
+
+					describe( 'When it is a GET', () => {
+						it( 'Should call next with the error', async () => {
+
+							await controller.notes.documents.delete( req, res, next );
+
+							expect( next ).toHaveBeenCalledWith( err );
+							expect( reporter.captureException ).not.toHaveBeenCalled();
+						} );
+					} );
+				} );
+
+				describe( 'When the backend returns a 200', () => {
+
+					beforeEach( () => {
+
+						backend.documents.delete.and.callFake( () => Promise.resolve( {
+							response: { isSuccess: true }
+						} ) );
+					} );
+
+					describe( 'When it is a POST', () => {
+
+						beforeEach( () => {
+
+							req.method = 'POST';
+						} );
+
+						describe( 'When there are not any documents in the session', () => {
+							it( 'Should return the response in JSON', async () => {
+
+								await controller.notes.documents.delete( req, res, next );
+
+								expect( res.json ).toHaveBeenCalledWith( {} );
+							} );
+						} );
+
+						describe( 'When there are documents in the session', () => {
+							it( 'Should remove the matching document and return a 200', async () => {
+
+								const nonMatchingDoc1 = { document: { id: uuid(), name: 'test1.txt'} };
+								const matchingDoc = { document: { id: documentId, name: 'match1.txt' } };
+
+								req.session.noteDocuments = { [noteId]: [ nonMatchingDoc1, matchingDoc ] };
+
+								await controller.notes.documents.delete( req, res, next );
+
+								expect( res.json ).toHaveBeenCalledWith( {} );
+								expect( req.session.noteDocuments[ noteId ] ).toEqual( [ nonMatchingDoc1 ] );
+							} );
+						} );
+					} );
+
+					describe( 'When it is a GET', () => {
+						it( 'Should retun a 302 to the edit note page', async () => {
+
+							const editResponse = '/edit-a-note';
+
+							urls.barriers.notes.edit.and.callFake( () => editResponse );
+
+							await controller.notes.documents.delete( req, res, next );
+
+							expect( res.redirect ).toHaveBeenCalledWith( editResponse );
+							expect( urls.barriers.notes.edit ).toHaveBeenCalledWith( barrierId, noteId );
+						} );
+					} );
+				} );
+
+				describe( 'When the backend returns a 500', () => {
+
+					beforeEach( () => {
+
+						backend.documents.delete.and.callFake( () => Promise.resolve( {
+							response: { isSuccess: false, statusCode: 500 }
+						} ) );
+					} );
+
+					describe( 'When it is a POST', () => {
+
+						beforeEach( () => {
+
+							req.method = 'POST';
+						} );
+
+						afterEach( () => {
+
+							expect( res.status ).toHaveBeenCalledWith( 500 );
+							expect( res.json ).toHaveBeenCalledWith( { message: 'Error deleting file' } );
+							expect( reporter.captureException ).toHaveBeenCalledWith( new Error( `Unable to delete document ${ documentId }, got 500 from backend` ) );
+						} );
+
+						describe( 'When there are not any documents in the session', () => {
+							it( 'Should return a 500 and report the error in JSON', async () => {
+
+								await controller.notes.documents.delete( req, res, next );
+							} );
+						} );
+
+						describe( 'When there are documents in the session', () => {
+							it( 'Should leave the matching document and return a 500', async () => {
+
+								const nonMatchingDoc1 = { noteId, document: { id: uuid(), name: 'test1.txt'} };
+								const matchingDoc = { noteId, document: { id: documentId, name: 'match1.txt' } };
+
+								req.session.noteDocuments = [ nonMatchingDoc1, matchingDoc ];
+
+								await controller.notes.documents.delete( req, res, next );
+
+								expect( req.session.noteDocuments ).toEqual( [ nonMatchingDoc1, matchingDoc ] );
+							} );
+						} );
+					} );
+
+					describe( 'When it is a GET', () => {
+						it( 'Should call next with the error', async () => {
+
+							await controller.notes.documents.delete( req, res, next );
+
+							expect( next ).toHaveBeenCalledWith( new Error( `Unable to delete document ${ documentId }, got 500 from backend` ) );
+						} );
+					} );
+				} );
+			} );
+
+			describe( 'add', () => {
+
+				checkAddDocument( () => controller.notes.documents.add, ( documentId, doc ) => {
+
+					expect( req.session.noteDocuments[ noteId ] ).toEqual( [{
+						document: {
+							id: documentId,
+							size: '10 Bytes',
+							name: doc.name,
+						}
+					}] );
+				} );
+			} );
+
+			describe( 'cancel', () => {
+
+				let detailResponse;
+
+				beforeEach( () => {
+
+					detailResponse = '/barrier/detail';
+					urls.barriers.detail.and.callFake( () => detailResponse );
+				} );
+
+				afterEach( () => {
+
+					expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
+					expect( urls.barriers.detail ).toHaveBeenCalledWith( barrierId );
+				} );
+
+				describe( 'When there are documents in the session', () => {
+					it( 'Should remove the documents and redirect', () => {
+
+						req.session.noteDocuments = [
+							{ noteId, document: { id: uuid() } } ,
+							{ noteId, document: { id: uuid() } }
+						];
+
+						controller.notes.documents.cancel( req, res );
+
+						expect( req.session.noteDocuments[ noteId ] ).not.toBeDefined();
+					} );
+				} );
+
+				describe( 'When there are no documents in the session', () => {
+					it( 'Should redirect to the detail page', () => {
+
+						controller.notes.documents.cancel( req, res );
+					} );
+				} );
+			} );
+		} );
+	} );
+
+	describe( 'documents (AJAX)', () => {
+		describe( 'add', () => {
+
+			checkAddDocument( () => controller.documents.add, ( documentId, doc ) => {
+
+				expect( req.session.barrierDocuments ).toEqual( [{
+					barrierId: req.uuid,
+					document: {
+						id: documentId,
+						size: '10 Bytes',
+						name: doc.name,
+					}
+				}] );
+			} );
+		} );
+
+		describe( 'delete', () => {
+
+			let barrierId;
+			let documentId;
+
+			beforeEach( () => {
+
+				barrierId = uuid();
+				documentId = uuid();
+
+				req.uuid = barrierId;
+				req.params.id = documentId;
+			} );
+
+			describe( 'When the document id is invalid', () => {
+				it( 'Should return a 500 and report the error', async () => {
+
+					validators.isUuid.and.callFake( () => false );
+
+					await controller.documents.delete( req, res );
+
+					expect( res.status ).toHaveBeenCalledWith( 500 );
+					expect( res.json ).toHaveBeenCalledWith( {} );
+					expect( reporter.captureException ).toHaveBeenCalledWith( new Error( 'Invalid documentId' ) );
+				} );
+			} );
+
+			describe( 'When the document id is valid', () => {
+
+				beforeEach( () => {
+					validators.isUuid.and.callFake( () => true );
+				} );
+
+				describe( 'When the backend delete rejects', () => {
+					it( 'Should return a 500 with the correct message', async () => {
+
+						const err = new Error( 'A backend fail' );
+
+						backend.documents.delete.and.callFake( () => Promise.reject( err ) );
+
+						await controller.documents.delete( req, res );
+
+						expect( res.status ).toHaveBeenCalledWith( 500 );
+						expect( res.json ).toHaveBeenCalledWith( {} );
+						expect( reporter.captureException ).toHaveBeenCalledWith( err );
+					} );
+				} );
+
+				describe( 'When the backend resolves', () => {
+					describe( 'When it is a 500', () => {
+						it( 'Should report the error', async() => {
+
+							backend.documents.delete.and.callFake( () => Promise.resolve( { response: { statusCode: 500 } } ) );
+
+							await controller.documents.delete( req, res );
+
+							expect( res.status ).toHaveBeenCalledWith( 500 );
+							expect( res.json ).toHaveBeenCalledWith( { message: 'A system error has occured, so the file has not been deleted. Try again.' } );
+							expect( reporter.captureException ).toHaveBeenCalledWith( new Error( `Unable to delete document ${ documentId }, got 500 from backend` ) );
+						} );
+					} );
+
+					function checkSuccess(){
+
+						afterEach( () => {
+
+							expect( res.status ).toHaveBeenCalledWith( 200 );
+							expect( res.json ).toHaveBeenCalledWith( {} );
+						} );
+
+						describe( 'When there are barrier documents in the session', () => {
+							it( 'Should remove the document from the session and return a 200', async() => {
+
+								const nonMatchingDoc1 = { id: uuid(), name: 'test1.jpg' };
+								const matchingDoc = { id: documentId, name: 'match.txt' };
+
+								req.session.barrierDocuments = [
+									{ barrierId, document: nonMatchingDoc1 },
+									{ barrierId, document: matchingDoc }
+								];
+
+								await controller.documents.delete( req, res );
+
+								expect( req.session.barrierDocuments ).toEqual( [ { barrierId, document: nonMatchingDoc1 } ] );
+							} );
+						} );
+
+						describe( 'When there are not documents in the session', () => {
+							it( 'Should not error and have no documents in the session', async () => {
+
+								await controller.documents.delete( req, res );
+
+								expect( req.session.barrierDocuments ).not.toBeDefined();
+							} );
+						} );
+					}
+
+					describe( 'When it is a 200', () => {
+
+						beforeEach( () => {
+
+							backend.documents.delete.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+						} );
+
+						checkSuccess();
+					} );
+
+					describe( 'When it is a 404', () => {
+
+						beforeEach( () => {
+
+							backend.documents.delete.and.callFake( () => Promise.resolve( { response: { statusCode: 404 } } ) );
+						} );
+
+						checkSuccess();
+					} );
+				} );
+			} );
+		} );
+
+		describe( 'cancel', () => {
+
+			let detailResponse;
+
+			beforeEach( () => {
+
+				req.uuid = barrierId;
+				urls.barriers.detail.and.callFake( () => detailResponse );
+			} );
+
+			afterEach( () => {
+
+				expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
+				expect( urls.barriers.detail ).toHaveBeenCalledWith( barrierId );
+			} );
+
+			describe( 'When there are documents in the session', () => {
+				it( 'Should remove ones matched to the current barrier and redirect to the barrier detail', () => {
+
+					const nonMatchingDoc = { barrierId: uuid(), document: { id: uuid() } };
+					const matchingDoc1 = { barrierId, document: { id: uuid() } };
+					const matchingDoc2 = { barrierId, document: { id: uuid() } };
+
+					req.session.barrierDocuments = [
+						nonMatchingDoc,
+						matchingDoc1,
+						matchingDoc2,
+					];
+
+					controller.documents.cancel( req, res );
+
+					expect( req.session.barrierDocuments ).toEqual( [ nonMatchingDoc ] );
+				} );
+			} );
+
+			describe( 'When there are no documents in the session', () => {
+				it( 'Should redirect to the barrier detail', () => {
+
+					controller.documents.cancel( req, res );
 				} );
 			} );
 		} );

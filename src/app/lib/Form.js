@@ -1,12 +1,10 @@
-const validators = require( './validators' );
+const { isDefined } = require( './validators' );
 
 const RADIO = 'radio';
 const SELECT = 'select';
 const CHECKBOXES = 'checkbox';
 const GROUP = 'group';
 const FILE = 'file';
-
-const isDefined = validators.isDefined;
 
 function camelCaseToDash( str ) {
 	return str.replace( /([a-z])([A-Z])/g, '$1-$2' ).toLowerCase();

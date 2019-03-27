@@ -23,13 +23,11 @@ function sortByDateDescending( a, b ){
 
 function getDocument( doc ){
 
-	const canDownload = doc.status === 'virus_scanned';
-
 	return {
 		id: doc.id,
 		name: doc.name,
 		size: fileSize( doc.size ),
-		canDownload,
+		canDownload: ( doc.status === 'virus_scanned' ),
 		status: metadata.documentStatus[ doc.status ]
 	};
 }
