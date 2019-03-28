@@ -33,4 +33,13 @@
 
 	padding: govuk-em( 10, 16 );
 	border-bottom: 1px solid $govuk-grey-2;
+	
+	.table__link {
+		&:visited {
+			color: $govuk-blue;
+		}
+		&:not(:first-child) {
+			margin-left: govuk-em( 15, 16 );
+		}
+	}
 }

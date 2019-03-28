@@ -369,6 +369,7 @@ describe( 'URLs', () => {
 					[ 'aboutProblem', 'problem' ],
 					[ 'summary', 'summary' ],
 					[ 'submit', 'submit' ],
+					['delete', 'delete']
 				] );
 			} );
 		} );

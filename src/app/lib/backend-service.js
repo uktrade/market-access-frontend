@@ -310,6 +310,7 @@ module.exports = {
 		getAll: ( req ) => backend.get( '/reports?ordering=-created_on', getToken( req ) ).then( transformReportList ),
 		getForCountry: ( req, countryId ) => backend.get( `/reports?export_country=${ countryId }&ordering=-created_on`, getToken( req ) ).then( transformReportList ),
 		get: ( req, reportId ) => backend.get( `/reports/${ reportId }`, getToken( req ) ).then( transformSingleReport ),
+		delete: ( req, reportId ) => backend.delete( `/reports/${ reportId }`, getToken( req ) ),
 		save: ( req, values ) => backend.post( '/reports', getToken( req ), {
 			problem_status: getValue( values.status ),
 			is_resolved: getValue( values.isResolved ),

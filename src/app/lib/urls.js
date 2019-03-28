@@ -40,6 +40,7 @@ const reportUrl = {
 	aboutProblem: ( reportId ) => `/reports/${ reportId }/problem/`,
 	summary: ( reportId ) => `/reports/${ reportId }/summary/`,
 	submit: ( reportId ) => `/reports/${ reportId }/submit/`,
+	delete: ( reportId ) => `/reports/${ reportId }/delete/`,
 };
 
 function getParams( map ){

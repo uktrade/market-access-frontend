@@ -1075,6 +1075,17 @@ describe( 'Backend Service', () => {
 			} );
 		} );
 
+		fdescribe( 'delete', () => {
+			it( 'Should call the correct path', () => {
+
+				const reportId = 200;
+
+				service.reports.delete( req, reportId );
+
+				expect( backend.delete ).toHaveBeenCalledWith( `/reports/${ reportId }`, token );
+			} );
+		} );
+
 		describe( 'saveSummaryAndSubmit', () => {
 
 			let reportId;

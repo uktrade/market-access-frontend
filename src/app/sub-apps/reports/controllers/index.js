@@ -52,6 +52,74 @@ module.exports = {
 		}
 	},
 
+	delete: async (req, res, next) => {
+		const country = req.user.country;
+		const countryId = country && req.user.country.id;
+		const currentReportId = req.params.reportId;
+		const isPost = req.method === 'POST';
+
+		let template = 'reports/views/delete';
+		let promise;
+
+		if(isPost){
+			try {
+
+				const { response } = await	backend.reports.delete( req, currentReportId );
+
+				if( response.isSuccess ){
+
+					res.redirect(urls.reports.index());
+	
+				} else {
+	
+					throw new Error( `Got ${ response.statusCode } response from backend` );
+				}
+			} catch( e ){
+				
+				next( e );
+
+			}
+		}
+
+		if( countryId ){
+
+			template = 'reports/views/my-country';
+			promise = backend.reports.getForCountry( req, countryId );
+
+		} else {
+
+			promise = backend.reports.getAll( req );
+		}
+
+		try {
+
+			const { response, body } = await promise;
+			let currentReport = {}
+
+			body.results.some((report) => {
+				if (report.id === currentReportId) {
+					currentReport = report;
+					return
+				}
+			});
+
+			console.log(currentReport)
+			
+			if( response.isSuccess ){
+
+				res.render( template, Object.assign({},{ currentReport, csrfToken: req.csrfToken() }, reportsViewModel( body.results, country )) );
+
+			} else {
+
+				throw new Error( `Got ${ response.statusCode } response from backend` );
+			}
+
+		} catch( e ){
+
+			next( e );
+		}
+	},
+
 	new: ( req, res ) => res.render( 'reports/views/new', { tasks: metadata.reportTaskList } ),
 
 	report: ( req, res ) => res.render( 'reports/views/detail', reportDetailViewModel( req.csrfToken(), req.report ) ),
