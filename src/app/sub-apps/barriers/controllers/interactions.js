@@ -234,28 +234,24 @@ function removeAllBarrierDocumentsInSession( { session }, barrierIdToMatch ){
 
 function getNoteDocumentsFromSession( req ){
 
-	const sessionDocuments = ( req.session.noteDocuments || [] );
+	const sessionDocuments = ( req.session.noteDocuments || {} );
 
-	return sessionDocuments.filter( ({ noteId }) => noteId === req.note.id );
+	return sessionDocuments[ req.note.id ] || [];
 }
 
 function removeNoteDocumentInSession( { session }, noteIdToMatch, documentIdToMatch ){
 
-	if( session.noteDocuments ){
+	if( session.noteDocuments && session.noteDocuments[ noteIdToMatch ] ){
 
-		session.noteDocuments = session.noteDocuments.filter( ( { noteId, document } ) => !(
-			noteId === noteIdToMatch && document.id === documentIdToMatch
-		) );
+		session.noteDocuments[ noteIdToMatch ] = session.noteDocuments[ noteIdToMatch ].filter( ( { document } ) => document.id !== documentIdToMatch );
 	}
 }
 
 function removeAllNoteDocumentsInSession( { session }, noteIdToMatch ){
 
-	if( session.noteDocuments ){
+	if( session.noteDocuments && session.noteDocuments[ noteIdToMatch ] ){
 
-		session.noteDocuments = session.noteDocuments.filter( ( { noteId } ) => !(
-			noteId === noteIdToMatch
-		) );
+		delete session.noteDocuments[ noteIdToMatch ];
 	}
 }
 
@@ -367,8 +363,11 @@ module.exports = {
 		documents: {
 			add: createUploadHandler( ( req, document ) => {
 
-				req.session.noteDocuments = req.session.noteDocuments || [];
-				req.session.noteDocuments.push( { noteId: req.note.id, document } );
+				const noteId = req.note.id;
+
+				req.session.noteDocuments = req.session.noteDocuments || {};
+				req.session.noteDocuments[ noteId ] = req.session.noteDocuments[ noteId ] || [];
+				req.session.noteDocuments[ noteId ].push( { document } );
 			} ),
 			delete: async ( req, res, next ) => {
 
@@ -431,12 +430,7 @@ module.exports = {
 				getDocumentIds: () => getBarrierDocumentsFromSession( req ).map( ({ document }) => document.id ),
 				clearSessionDocuments: () => {
 
-					if( req.session.barrierDocuments ){
-
-						req.session.barrierDocuments = req.session.barrierDocuments.filter( ({ barrierId }) => (
-							barrierId !== req.barrier.id
-						) );
-					}
+					removeAllBarrierDocumentsInSession( req, req.barrier.id );
 				},
 				saveFormData: async ( values ) => backend.barriers.notes.save( req, req.barrier.id, values ),
 			} );
@@ -445,28 +439,22 @@ module.exports = {
 		edit: ( req, res, next ) => {
 
 			const note = req.note;
-			const getDocumentIds = () => getNoteDocumentsFromSession( req ).map( ({ document }) => document.id );
 
-			if( req.method === 'GET' ){
+			req.session.noteDocuments = ( req.session.noteDocuments || {} );
 
-				req.session.noteDocuments = ( req.session.noteDocuments || [] );
+			if( req.method === 'GET' && !req.session.noteDocuments[ note.id ] ){
+
+				req.session.noteDocuments[ note.id ] = [];
 
 				if( note.documents ){
 
-					const docIdsInSession = getDocumentIds();
-					const notAlreadyInSession = note.documents.filter( ( document ) => !docIdsInSession.includes( document.id ) );
-
-					if( notAlreadyInSession.length ){
-
-						req.session.noteDocuments = req.session.noteDocuments.concat( note.documents.map( ( document ) => ({
-							noteId: note.id,
-							document: {
-								id: document.id,
-								name: document.name,
-								size: fileSize( document.size ),
-							}
-						}) ) );
-					}
+					req.session.noteDocuments[ note.id ] = req.session.noteDocuments[ note.id ].concat( note.documents.map( ( document ) => ({
+						document: {
+							id: document.id,
+							name: document.name,
+							size: fileSize( document.size ),
+						}
+					}) ) );
 				}
 			}
 
@@ -477,13 +465,10 @@ module.exports = {
 					pageTitleSuffix: ' - Edit a note'
 				},
 				getDocuments: () => getNoteDocumentsFromSession( req ).map( ({ document }) => document ),
-				getDocumentIds,
+				getDocumentIds: () => getNoteDocumentsFromSession( req ).map( ({ document }) => document.id ),
 				clearSessionDocuments: () => {
 
-					if( req.session.noteDocuments ){
-
-						req.session.noteDocuments = req.session.noteDocuments.filter( ( { noteId } ) => noteId !== note.id );
-					}
+					removeAllNoteDocumentsInSession( req, note.id );
 				},
 				saveFormData: ( values ) => backend.barriers.notes.update( req, note.id, values ),
 			} );
