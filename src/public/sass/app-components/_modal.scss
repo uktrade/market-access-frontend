@@ -14,7 +14,7 @@
         position: relative;
         margin: 0 auto;
         width: 60%;
-        top: 10%;
+        top: 15%;
         background: white;
         font-size: govuk-em( 19, 16 );
     }
@@ -30,7 +30,8 @@
             margin-bottom: govuk-em( 10, 16 );
         }
         dt { 
-            clear:both
+            clear:both;
+            width: govuk-em( 80, 16 );
         }
         dd {
             font-weight: bold;

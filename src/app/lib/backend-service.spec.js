@@ -1075,7 +1075,7 @@ describe( 'Backend Service', () => {
 			} );
 		} );
 
-		fdescribe( 'delete', () => {
+		describe( 'delete', () => {
 			it( 'Should call the correct path', () => {
 
 				const reportId = 200;

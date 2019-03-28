@@ -47,7 +47,6 @@ module.exports = {
 			}
 
 		} catch( e ){
-
 			next( e );
 		}
 	},
@@ -63,9 +62,7 @@ module.exports = {
 
 		if(isPost){
 			try {
-
-				const { response } = await	backend.reports.delete( req, currentReportId );
-
+				const { response } = await backend.reports.delete( req, currentReportId );
 				if( response.isSuccess ){
 
 					res.redirect(urls.reports.index());
@@ -94,9 +91,11 @@ module.exports = {
 		try {
 
 			const { response, body } = await promise;
+			const { reports } = reportsViewModel( body.results, country );
+			
 			let currentReport = {}
 
-			body.results.some((report) => {
+			reports.some((report) => {
 				if (report.id === currentReportId) {
 					currentReport = report;
 					return
@@ -105,7 +104,7 @@ module.exports = {
 			
 			if( response.isSuccess ){
 
-				res.render( template, Object.assign({},{ currentReport, csrfToken: req.csrfToken(), isDelete: true }, reportsViewModel( body.results, country )) );
+				res.render( template, Object.assign({},{ currentReport, reports, csrfToken: req.csrfToken(), isDelete: true }) );
 
 			} else {
 
@@ -113,7 +112,6 @@ module.exports = {
 			}
 
 		} catch( e ){
-
 			next( e );
 		}
 	},
