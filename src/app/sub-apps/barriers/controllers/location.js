@@ -5,7 +5,8 @@ const validators = require( '../../../lib/validators' );
 const backend = require( '../../../lib/backend-service' );
 
 module.exports = {
-    list: async (req, res, next) => {
+
+  list: async (req, res, next) => {
 		const barrier = req.barrier;
 		const isPost = req.method === 'POST';
 
@@ -16,7 +17,7 @@ module.exports = {
 			};
 		}
 
-		const {country, adminAreas} = req.session.location;
+		const { country, adminAreas } = req.session.location;
 		const isCountryWithAdminAreas = metadata.isCountryWithAdminArea(country);
 
 		if( isPost ){
@@ -48,7 +49,8 @@ module.exports = {
 			adminAreas: adminAreas.map( metadata.getAdminArea),
 			csrfToken: req.csrfToken()
 		});
-    },
+	},
+	
 	country: ( req, res ) => {
 
 		const barrier = req.barrier;
@@ -81,11 +83,12 @@ module.exports = {
 	
 		res.render( 'barriers/views/location/country', form.getTemplateValues() )
 	},
+
 	add_admin_area: ( req, res ) => {
 		const barrier = req.barrier;
 		const adminAreas = req.session.location.adminAreas;
 		const country =  req.session.location.country
-		console.log('Stuff', metadata.getCountryAdminAreasList(country))
+
 		const form = new Form( req, {
 
 			adminAreas: {
@@ -119,6 +122,7 @@ module.exports = {
 			{ currentAdminAreas: adminAreas.map( metadata.getAdminArea ) },
 		) );
 	},
+
 	remove_admin_area: ( req, res ) => {
 		const adminAreaToRemove = req.body.adminArea;
 
