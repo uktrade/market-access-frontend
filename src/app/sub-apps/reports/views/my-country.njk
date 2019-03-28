@@ -1,7 +1,7 @@
 {% from 'app-components/dashboard-heading.njk' import dashboardHeading %}
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Unfinished barriers in {{ country.name }}{% endblock %}
+{% block page_title %}{{ super() }} - Draft barriers in {{ country.name }}{% endblock %}
 
 {% block page_content %}
 
@@ -10,7 +10,7 @@
 	{%- if reports.length -%}
 
 		<h3 class="tab-heading">
-			Unfinished barriers in <strong>{{ country.name }}</strong>
+			Draft barriers in <strong>{{ country.name }}</strong>
 		</h3>
 
 		<table class="standard-table">
@@ -53,7 +53,7 @@
 	{%- else -%}
 
 		<p class="no-results-message">
-			There are currently no unfinished market access barriers in <strong>{{ country.name }}</strong>.
+			There are currently no draft market access barriers in <strong>{{ country.name }}</strong>.
 		</p>
 
 	{%- endif %}
