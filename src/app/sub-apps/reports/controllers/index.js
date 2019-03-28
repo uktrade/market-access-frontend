@@ -58,7 +58,7 @@ module.exports = {
 		const currentReportId = req.params.reportId;
 		const isPost = req.method === 'POST';
 
-		let template = 'reports/views/delete';
+		let template = 'reports/views/index';
 		let promise;
 
 		if(isPost){
@@ -102,12 +102,10 @@ module.exports = {
 					return
 				}
 			});
-
-			console.log(currentReport)
 			
 			if( response.isSuccess ){
 
-				res.render( template, Object.assign({},{ currentReport, csrfToken: req.csrfToken() }, reportsViewModel( body.results, country )) );
+				res.render( template, Object.assign({},{ currentReport, csrfToken: req.csrfToken(), isDelete: true }, reportsViewModel( body.results, country )) );
 
 			} else {
 
