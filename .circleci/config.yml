@@ -52,6 +52,8 @@ aliases:
       SSO_BYPASS: true
       SSO_MOCK_CODE: abc-def-ghi
       DATAHUB_URL: 'http://localhost.datahub'
+      DATAHUB_HAWK_ID: abc
+      DATAHUB_HAWK_KEY: def
       FEEDBACK_EMAIL: 'test@test'
       REDIS_USE_TLS: false
       CI: true
