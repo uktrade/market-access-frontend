@@ -332,7 +332,7 @@ describe( 'Barrier companies controller', () => {
 				} );
 
 				describe( 'When the service throws an error', () => {
-					it( 'Should call next with an erro', async () => {
+					it( 'Should call next with an error', async () => {
 
 						const err = new Error( 'a service error' );
 
@@ -345,7 +345,7 @@ describe( 'Barrier companies controller', () => {
 					} );
 				} );
 
-				describe( 'When the service retuns a success', () => {
+				describe( 'When the service returns a success', () => {
 					it( 'Should render the template with the results', async () => {
 
 						results = [ { id: 1, name: 'one' } ];
@@ -384,13 +384,6 @@ describe( 'Barrier companies controller', () => {
 						it( 'Should render the template with an error', async () => {
 
 							await check( 404, 'No company found' );
-						} );
-					} );
-
-					describe( 'When it retuns a 403', () => {
-						it( 'Should render the template with an error', async () => {
-
-							await check( 403, 'You do not have permission to search for a company, please contact Data Hub support.' );
 						} );
 					} );
 

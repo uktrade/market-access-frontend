@@ -97,12 +97,15 @@ let config = {
 		hawk: {
 			enabled: bool( 'BACKEND_HAWK_ENABLED', true ),
 			id: requiredEnv( 'BACKEND_HAWK_ID' ),
-			key: requiredEnv( 'BACKEND_HAWK_KEY' )
+			key: requiredEnv( 'BACKEND_HAWK_KEY' ),
 		}
 	},
 	datahub: {
 		url: requiredEnv( 'DATAHUB_URL' ),
-		token: env( 'DATAHUB_DEV_TOKEN' ),
+		hawk: {
+			id: requiredEnv( 'DATAHUB_HAWK_ID' ),
+			key: requiredEnv( 'DATAHUB_HAWK_KEY' ),
+		},
 		stub: bool( 'DATAHUB_STUB' )
 	},
 	server: {

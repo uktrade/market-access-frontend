@@ -282,6 +282,13 @@ describe( 'URLs', () => {
 		} );
 
 		describe( 'companies', () => {
+			describe( 'new', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.companies.new( barrierId ) ).toEqual( `/barriers/${ barrierId }/companies/new/` );
+				} );
+			} );
+
 			describe( 'edit', () => {
 				it( 'Should return the correct path', () => {
 

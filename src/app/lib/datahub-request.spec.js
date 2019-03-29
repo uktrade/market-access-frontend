@@ -1,197 +1,83 @@
 const proxyquire = require( 'proxyquire' );
-const uuid = require( 'uuid/v4' );
 const modulePath = './datahub-request';
 
-const datahubUrl = 'http://some.domain.com';
 const GET = 'GET';
 const POST = 'POST';
 
-describe( 'datahub Request', () => {
+describe( 'Data Hub Request', () => {
 
-	let request;
-	let token;
-	let datahub;
-	let mockResponse;
-	let mockBody;
-	let reporter;
-
-	function checkRequest( path, method, body ){
-
-		const uri = ( datahubUrl + path );
-
-		const requestOptions = {
-			uri,
-			method,
-			json: true,
-			headers: {
-				Authorization: `Bearer ${ token }`
-			}
-		};
-
-		if( body ){
-
-			requestOptions.body = body;
-		}
-
-		expect( request.calls.argsFor( 0 )[ 0 ] ).toEqual( requestOptions );
-	}
+	let backend;
+	let makeRequest;
+	let config;
 
 	beforeEach( () => {
 
-		request = jasmine.createSpy( 'request' );
-		token = uuid();
-		mockResponse = {
-			statusCode: 200
-		};
-		mockBody = 'a body';
-		reporter = {
-			message: jasmine.createSpy( 'reporter.message' )
-		};
-
-		datahub = proxyquire( modulePath, {
-			request,
-			'./reporter': reporter,
-			'../config': {
-				datahub: { url: datahubUrl }
+		config = {
+			datahub: {
+				url: 'https://some.domain.com',
+				hawk: {
+					id: 'a hawk id',
+					key: 'a hawk key'
+				}
 			}
-		} );
+		};
+
+		makeRequest = jasmine.createSpy( 'makeRequest' );
 	} );
 
-	describe( 'Missing parameters', () => {
-		describe( 'Without a path', () => {
-			it( 'Should throw an error', () => {
+	describe( 'Calling makeRequest', () => {
+		describe( 'When config.isDev is false', () => {
 
-				expect( () => {
+			let sendRequest;
+			let path;
+			let body;
 
-					datahub.get();
+			beforeEach( () => {
 
-				} ).toThrow( new Error( 'Path is required' ) );
-			} );
-		} );
+				sendRequest = jasmine.createSpy( 'sendRequest' );
+				path = '/a-path';
+				body = 'some body content';
 
-		describe( 'Without a token', () => {
-			it( 'Should throw an error', () => {
+				makeRequest.and.callFake( () => sendRequest );
 
-				expect( () => {
+				config.datahub.hawk.enabled = false;
 
-					datahub.get( '/' );
-
-				} ).toThrow( new Error( 'Token is required' ) );
-			} );
-		} );
-	} );
-
-	describe( 'Without an error', () => {
-		describe( 'get', () => {
-			describe( 'With a 200 statusCode', () => {
-				it( 'Should resolve', ( done ) => {
-
-					const path = '/whoami/';
-
-					datahub.get( path, token ).then( ( { response, body } ) => {
-
-						expect( response ).toEqual( mockResponse );
-						expect( body ).toEqual( mockBody );
-						done();
-					});
-
-					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
-					checkRequest( path, GET );
+				backend = proxyquire( modulePath, {
+					'../config': config,
+					'./make-request': makeRequest,
 				} );
 			} );
 
-			describe( 'With a 404 statusCode', () => {
-				it( 'Should resolve', ( done ) => {
+			it( 'Should set defaultContentType to and empty string', () => {
 
-					const path = '/whoami/';
-
-					mockResponse.statusCode = 404;
-
-					datahub.get( path, token ).then( ( { response, body } ) => {
-
-						expect( response ).toEqual( mockResponse );
-						expect( body ).toEqual( mockBody );
-						done();
-					});
-
-					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
-					checkRequest( path, GET );
+				expect( makeRequest ).toHaveBeenCalledWith( config.datahub.url, {
+					credentials: {
+						id: config.datahub.hawk.id,
+						key: config.datahub.hawk.key,
+						algorithm: 'sha256',
+					},
+					defaultContentType: ''
 				} );
 			} );
 
-			describe( 'With a 403 statusCode', () => {
-				it( 'Should resolve', ( done ) => {
+			describe( 'methods', () => {
+				describe( 'get', () => {
+					it( 'Should call sendRequest with the correct params', () => {
 
-					const path = '/whoami/';
+						backend.get( path );
 
-					mockResponse.statusCode = 403;
-
-					datahub.get( path, token ).then( ( { response, body } ) => {
-
-						expect( response ).toEqual( mockResponse );
-						expect( body ).toEqual( mockBody );
-						done();
-					});
-
-					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
-					checkRequest( path, GET );
-					expect( reporter.message ).toHaveBeenCalledWith( 'info', 'Data Hub API returned 403 for user' );
-				} );
-			} );
-
-			describe( 'With a 400 statusCode', () => {
-				it( 'Should reject', ( done ) => {
-
-					const path = '/whoami/';
-
-					mockResponse.statusCode = 400;
-
-					datahub.get( path, token ).then( done.fail ).catch( ( err ) => {
-
-						expect( err ).toEqual( new Error( `Got at ${ mockResponse.statusCode } response code from datahub` ) );
-						done();
-					});
-
-					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
-					checkRequest( path, GET );
-				} );
-			} );
-		} );
-
-		describe( 'post', () => {
-			describe( 'With a body', () => {
-				it( 'Should make a POST request with a body', ( done ) => {
-
-					const path = '/test/';
-					const requestBody = { test: 'my-body' };
-
-					datahub.post( path, token, requestBody ).then( ( { response, body } ) => {
-
-						expect( response ).toEqual( mockResponse );
-						expect( body ).toEqual( mockBody );
-						done();
+						expect( sendRequest ).toHaveBeenCalledWith( GET, path );
 					} );
-
-					request.calls.argsFor( 0 )[ 1 ]( null, mockResponse, mockBody );
-					checkRequest( path, POST, requestBody );
-				} );
-			} );
-		} );
-	} );
-
-	describe( 'With an error', () => {
-		describe( 'get', () => {
-			it( 'Should reject with the error', ( done ) => {
-
-				const mockError = new Error( 'Broken' );
-
-				datahub.get( '/test/', token ).then( done.fail ).catch( ( err ) => {
-
-					expect( err ).toEqual( mockError );
-					done();
 				} );
 
-				request.calls.argsFor( 0 )[ 1 ]( mockError, { statusCode: 400 } );
+				describe( 'post', () => {
+					it( 'Should call sendRequest with the correct params', () => {
+
+						backend.post( path, body );
+
+						expect( sendRequest ).toHaveBeenCalledWith( POST, path, { body } );
+					} );
+				} );
 			} );
 		} );
 	} );

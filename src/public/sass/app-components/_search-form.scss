@@ -1,26 +1,13 @@
-$search-button-width: 50px;
-
 .search-form__input-group {
 	position: relative;
 }
 
 .search-form__input {
-	padding-right: $search-button-width + 5px;
+	width: 85%;
+	display: inline-block;
 }
 
 .search-form__button {
-
-	position: absolute;
-	top: 0;
-	right: 0;
-	border: 0;
-	padding: 0;
-	background: $govuk-blue url( "/public/img/search-button.png" ) no-repeat 8px 50%; // TODO convert to SVG
-	border-radius: 0;
-	width: $search-button-width;
-	height: 100%;
-
-	&:focus {
-		outline: 3px solid $govuk-focus-colour;
-	}
+	display: inline-block;
+	min-width: 14%;
 }

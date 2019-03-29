@@ -17,7 +17,7 @@
 
 	<div class="restrict-width">
 
-		{% if companies %}
+		{% if companies.length %}
 			{{ companiesList( companies ) }}
 		{% endif %}
 
@@ -88,11 +88,16 @@
 			{% endfor %}
 			</ul>
 
-		{% else %}
-
-			<a href="{{ urls.barriers.detail( barrier.id ) }}" class="govuk-button button--secondary">Exit to barrier</a>
-
 		{% endif %}
+
+		<a href="{{ urls.barriers.detail( barrier.id ) }}" class="govuk-button button--secondary">Cancel</a>
+
+		<div class="info-panel">
+			<h4 class="info-panel__heading">Can't find the company?</h4>
+			<p class="info-panel__text">
+				If you can’t find the company or organisation you’re looking for, try a different search query, check the company’s website or any email correspondence that contains company registration details.
+			</p>
+		</div>
 	</div>
 
 {% endblock %}
