@@ -18,6 +18,7 @@ module.exports = {
 	isMetadata: ( key ) => ( value ) => Object.keys( metadata[ key ] ).includes( value ),
 	isCountry: ( id ) => metadata.countries.some( ( country ) => country.id === id ),
 	isOverseasRegion: ( id ) => metadata.overseasRegions.some( ( region ) => region.id === id ),
+	isCountryAdminArea: (id) => metadata.adminAreas.some( (adminArea) => adminArea.id === id),
 	isSector: ( id ) => metadata.sectors.some( ( sector ) => sector.id === id ),
 	isOneBoolCheckboxChecked: ( values ) => {
 

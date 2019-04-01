@@ -342,6 +342,79 @@ describe( 'metadata', () => {
 			} );
 		} );
 
+		describe( 'adminAreas', () => {
+
+			let nonDisabledAdminAreas;
+			let adminAreasByCountry;
+			let countryId;
+
+			beforeEach( () => {
+				nonDisabledAdminAreas = fakeData.country_admin_areas.filter( ( adminArea ) => adminArea.disabled_on === null );
+			});
+
+			describe( 'adminAreas', () => {
+				it( 'Should return all admin areas', () => {
+					expect( metadata.adminAreas ).toEqual( nonDisabledAdminAreas );
+				});
+			});
+
+			describe( 'adminAreasByCountry', () => {
+				it('Should return an object containing all countries with their corresponding admin areas', () => {
+					adminAreasByCountry = metadata.adminAreasByCountry;
+
+					expect(Object.keys(adminAreasByCountry).length).toEqual(2);
+					expect(Object.keys(adminAreasByCountry)).toEqual(
+						[ '81756b9a-5d95-e211-a939-e4115bead28a', '5daf72a6-5d95-e211-a939-e4115bead28a' ]
+					);
+				});
+			});
+
+			describe( 'getCountryAdminAreasList', () => {
+				beforeEach( () => {
+					countryId = '81756b9a-5d95-e211-a939-e4115bead28a';
+					adminAreasByCountry = metadata.adminAreasByCountry;
+				});
+
+				describe( 'Without specifying the default text', () => {
+					it( 'Should return all admin areas that are not disabled for the selected country', () => {
+
+						const affectedAdminAreasList = adminAreasByCountry[countryId].map( ( adminArea ) => ({ value: adminArea.id, text: adminArea.name } ) );
+
+						affectedAdminAreasList.unshift( { value: '', text: 'Select an admin area' } );
+
+						expect( metadata.getCountryAdminAreasList(countryId) ).toEqual( affectedAdminAreasList );
+					} );
+				} );
+
+				describe( 'Specifying the default text', () => {
+					it( 'Should return all admin areas that are not disabled for the selected country', () => {
+
+						const text = 'All admin areas';
+						const affectedAdminAreasList = adminAreasByCountry[countryId].map( ( adminArea ) => ({ value: adminArea.id, text: adminArea.name } ) );
+
+						affectedAdminAreasList.unshift( { value: '', text } );
+
+						expect( metadata.getCountryAdminAreasList(countryId, text) ).toEqual( affectedAdminAreasList );
+
+					} );
+				} );
+			} );
+
+			describe('isCountryWithAdminArea', () => {
+				describe('with a valid country', () => {
+					it('Should return true', () => {
+						expect (metadata.isCountryWithAdminArea('81756b9a-5d95-e211-a939-e4115bead28a')).toEqual(true);
+					});
+				});
+				describe('without a valid country', () => {
+					it('Should return false', () => {
+						expect (metadata.isCountryWithAdminArea('81756b9a-5d95-e211-a939-e4115bxyd78a')).toEqual(false);
+					});
+				});
+			});
+
+		});
+
 		describe( 'sectors', () => {
 
 			let nonDisabledSectors;

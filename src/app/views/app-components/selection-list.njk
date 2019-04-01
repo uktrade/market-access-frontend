@@ -37,3 +37,10 @@
 		button: { text: 'Add another company' }
 	}) }}
 {% endmacro %}
+
+{% macro adminAreasList( adminAreas, params ) %}
+	{{ selectionList( adminAreas, params, {
+		heading: { text: 'Selected admin areas' },
+		button: { text: 'Add another admin area' }
+	}) }}
+{% endmacro %}
