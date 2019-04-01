@@ -199,7 +199,7 @@ describe( 'Barrier companies controller', () => {
 
 		describe( 'a GET request', () => {
 			describe( 'With companies in the session', () => {
-				it( 'Should overwrite the session companies and render the templste', async () => {
+				it( 'Should overwrite the session companies and render the template', async () => {
 
 					companies = createCompanies();
 
@@ -243,6 +243,61 @@ describe( 'Barrier companies controller', () => {
 						csrfToken,
 						companyList: []
 					} );
+				} );
+			} );
+		} );
+	} );
+
+	describe( 'new', () => {
+
+		const template = 'barriers/views/companies/search';
+
+		afterEach( () => {
+
+			const templateValues = {
+				...getTemplateValuesResponse,
+				companies: [],
+				results: undefined,
+				error: undefined,
+			};
+
+			expect( req.session.barrierCompanies ).toEqual( [] );
+			expect( res.render ).toHaveBeenCalledWith( template, templateValues );
+		} );
+
+		fdescribe( 'a GET request', () => {
+			it( 'Should setup the form correctly', async () => {
+
+				await controller.new( req, res, next );
+
+				const config = Form.calls.argsFor( 0 )[ 1 ];
+
+				expect( config.query ).toBeDefined();
+				expect( config.query.required ).toBeDefined();
+			} );
+
+			describe( 'With companies in the session', () => {
+				it( 'Should remove the session companies and render the template', async () => {
+
+					req.session.barrierCompanies = createCompanies();
+
+					await controller.new( req, res, next );
+				} );
+			} );
+
+			describe( 'With no companies in the session', () => {
+				it( 'Should render the template', async () => {
+
+					req.session.barrierCompanies = [];
+
+					await controller.new( req, res, next );
+				} );
+			} );
+
+			describe( 'With no session', () => {
+				it( 'Should create an empty array and render the template', async () => {
+
+					await controller.new( req, res, next );
 				} );
 			} );
 		} );
