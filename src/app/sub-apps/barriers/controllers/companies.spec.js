@@ -265,7 +265,7 @@ describe( 'Barrier companies controller', () => {
 			expect( res.render ).toHaveBeenCalledWith( template, templateValues );
 		} );
 
-		fdescribe( 'a GET request', () => {
+		describe( 'a GET request', () => {
 			it( 'Should setup the form correctly', async () => {
 
 				await controller.new( req, res, next );
@@ -434,6 +434,27 @@ describe( 'Barrier companies controller', () => {
 
 						expect( res.render ).toHaveBeenCalledWith( template, templateValues );
 					}
+
+					describe( 'When it retuns a 400', () => { // the POST body is invalid for the company search endpoint
+						it( 'Should render the template with an error', async () => {
+
+							await check( 400, 'There was an error finding the company' );
+						} );
+					} );
+
+					describe( 'When it returns a 401', () => { // there was a problem with the credentials (IP or Hawk header)
+						it( 'Should render the template with an error', async () => {
+
+							await check( 401, 'There was an error finding the company' );
+						} );
+					} );
+
+					describe( 'When it retuns a 403', () => {
+						it( 'Should render the template with an error', async () => {
+
+							await check( 403, 'There was an error finding the company' );
+						} );
+					} );
 
 					describe( 'When it retuns a 404', () => {
 						it( 'Should render the template with an error', async () => {
