@@ -35,7 +35,7 @@ describe( 'makeRequest', () => {
 
 			requestOptions.headers.Authorization = `Bearer ${ opts.token }`;
 
-		} else {
+		} else if( !opts.skipCheckForHawk ){
 
 			requestOptions.headers.Authorization = hawkHeaderResponse;
 		}
@@ -71,9 +71,7 @@ describe( 'makeRequest', () => {
 	beforeEach( () => {
 
 		logger = jasmine.helpers.mockLogger.create();
-		reporter = {
-			captureException: jasmine.createSpy( 'reporter.captureException' )
-		},
+		reporter = jasmine.helpers.mocks.reporter();
 		request = jasmine.createSpy( 'request' );
 		hawkHeaderResponse = 'a hawk header';
 		hawk = {
@@ -267,6 +265,25 @@ describe( 'makeRequest', () => {
 				expect( () => makeRequest( domain, hawkParams ) );
 			} );
 
+			describe( 'When setting hawkParams.enabled to false', () => {
+				it( 'Should not create a token or hawk header', async () => {
+
+					const path = '/a-path-here';
+
+					hawkParams.enabled = false;
+
+					sendRequest = makeRequest( domain, hawkParams );
+
+					respondWithMocks();
+
+					const responseData = await sendRequest( POST, path );
+
+					checkRequest( POST, path, { skipCheckForHawk: true } );
+					checkForMockResponse( responseData );
+					expect( hawk.client.header ).not.toHaveBeenCalled();
+				} );
+			} );
+
 			describe( 'A POST request', () => {
 
 				beforeEach( () => {
@@ -367,16 +384,18 @@ describe( 'makeRequest', () => {
 							} );
 
 							describe( 'With an invalid JSON body', () => {
-								it( 'Should log an error create the correct options', async () => {
+								it( 'Should log an error', async () => {
 
 									const circularReference = { otherData: 123 };
+									const message = 'Unable to stringify request body';
 									circularReference.myself = circularReference;
 
 									const responseData = await sendRequest( POST, path, { body: circularReference } );
 
 									checkRequest( POST, path, { circularReference } );
 									checkForMockResponse( responseData );
-									expect( logger.debug ).toHaveBeenCalledWith( 'Unable to stringify request body' );
+									expect( logger.debug ).toHaveBeenCalledWith( message );
+									expect( reporter.message ).toHaveBeenCalledWith( 'info', message );
 								} );
 							} );
 

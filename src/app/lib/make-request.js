@@ -78,7 +78,10 @@ module.exports = ( domain, hawkParams ) => {
 
 			} catch( e ){
 
-				logger.debug( 'Unable to stringify request body' );
+				const message = 'Unable to stringify request body';
+
+				logger.debug( message );
+				reporter.message( 'info', message );
 			}
 		}
 
