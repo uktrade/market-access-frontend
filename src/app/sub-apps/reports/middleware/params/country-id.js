@@ -1,9 +1,8 @@
-const { isUuid, isCountry } = require( '../../../../lib/validators' );
-const maxUuidLength = 60;
+const { isCountry } = require( '../../../../lib/validators' );
 
 module.exports = async ( req, res, next, countryId ) => {
     if (isCountry(countryId)){
-        next()
+        next();
     } else {
         next( new Error( 'Invalid countryId' ) );
     }

@@ -63,51 +63,52 @@ module.exports = {
     },
     remove: ( req, res ) => {
 
-		const countryId = req.params.countryId;
-		const adminAreaToRemove = req.body.adminArea;
+			const report  = ( req.report || {} );
+			const countryId = req.params.countryId;
+			const adminAreaToRemove = req.body.adminArea;
 
-		req.session.adminAreas = req.session.adminAreas.filter( ( adminArea ) => adminArea !== adminAreaToRemove );
+			req.session.adminAreas = req.session.adminAreas.filter( ( adminArea ) => adminArea !== adminAreaToRemove );
 
-		res.redirect( urls.reports.adminAreas( req.report.id, countryId ) );
+			res.redirect( urls.reports.adminAreas( report.id, countryId ) );
     },
     add: ( req, res ) => {
 
-		const countryId = req.params.countryId;
+			const countryId = req.params.countryId;
 
-		const report  = ( req.report || {} );
+			const report  = ( req.report || {} );
 
-        if( !req.session.adminAreas ){
-			req.session.adminAreas = [];
-		}
-
-		const adminAreas = req.session.adminAreas;
-
-		const form = new Form( req, {
-
-			adminAreas: {
-				type: Form.SELECT,
-				items: metadata.getCountryAdminAreasList(countryId).filter( ( adminArea ) => !adminAreas.includes( adminArea.value ) ),
-				validators: [ {
-					fn: validators.isCountryAdminArea,
-					message: 'Select an admin area affected by the barrier'
-				},{
-					fn: ( value ) => !adminAreas.includes( value ),
-					message: 'Admin area already added, choose another'
-				} ]
+			if( !req.session.adminAreas ){
+				req.session.adminAreas = [];
 			}
-		} );
 
-		if( form.isPost ){
+			const adminAreas = req.session.adminAreas;
 
-			form.validate();
+			const form = new Form( req, {
 
-			if( !form.hasErrors() ){
+				adminAreas: {
+					type: Form.SELECT,
+					items: metadata.getCountryAdminAreasList(countryId).filter( ( adminArea ) => !adminAreas.includes( adminArea.value ) ),
+					validators: [ {
+						fn: validators.isCountryAdminArea,
+						message: 'Select an admin area affected by the barrier'
+					},{
+						fn: ( value ) => !adminAreas.includes( value ),
+						message: 'Admin area already added, choose another'
+					} ]
+				}
+			} );
 
-				req.session.adminAreas.push( form.getValues().adminAreas );
-				return res.redirect( urls.reports.adminAreas( report.id, countryId ) );
+			if( form.isPost ){
+
+				form.validate();
+
+				if( !form.hasErrors() ){
+
+					req.session.adminAreas.push( form.getValues().adminAreas );
+					return res.redirect( urls.reports.adminAreas( report.id, countryId ) );
+				}
 			}
-		}
 
-		res.render( 'reports/views/add-admin-area', {countryId, ...form.getTemplateValues(), currentAdminAreas: adminAreas.map( metadata.getAdminArea ) } );
-	},
+			res.render( 'reports/views/add-admin-area', {countryId, ...form.getTemplateValues(), currentAdminAreas: adminAreas.map( metadata.getAdminArea ) } );
+		},
 };
