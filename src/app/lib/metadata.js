@@ -26,19 +26,17 @@ function cleanCountry( item ){
 // Groups the admin areas into seperate areas of objects relating to country
 function alterAdminAreasData( adminAreas ) {
 
-	let alteredAdminAreas = {};
+	const alteredAdminAreas = {};
 
 	// Loop through each admin area and push it to the corresponding 
 	// array based on country ID 
+
 	adminAreas.forEach( ( countryAdminArea ) => {
 		// Key already exists for country
-		if (countryAdminArea.country.id in alteredAdminAreas) {
-			alteredAdminAreas[countryAdminArea.country.id].push(countryAdminArea);
-		// Key does not exist for country
-		} else {
-			alteredAdminAreas[countryAdminArea.country.id] = [];
-			alteredAdminAreas[countryAdminArea.country.id].push(countryAdminArea);
-		}
+		const countryId = countryAdminArea.country.id;
+		const list = ( alteredAdminAreas[ countryId ] || [] );
+		list.push( countryAdminArea );
+		alteredAdminAreas[ countryId ] = list;
 	} );
 
 	return alteredAdminAreas;
@@ -254,11 +252,10 @@ const OPEN = 2;
 const RESOLVED = 4;
 const HIBERNATED = 5;
 
-module.exports.getCountryAdminAreasList = ( countryID, defaultText = 'Select an admin area') => createAdminAreaList(countryID, adminAreasByCountry, defaultText);
+module.exports.getCountryAdminAreasList = ( countryId, defaultText = 'Select an admin area') => createAdminAreaList(countryId, adminAreasByCountry, defaultText);
 module.exports.isCountryWithAdminArea = ( countryID ) => countryID in adminAreasByCountry;
-module.exports.getAdminArea = (adminAreaId) => {
-	return adminAreas.find( ( AdminArea ) => AdminArea.id === adminAreaId );
-} 
+module.exports.getAdminArea = (adminAreaId) => adminAreas.find( ( AdminArea ) => AdminArea.id === adminAreaId );
+
 
 module.exports.barrier = {
 	status: {

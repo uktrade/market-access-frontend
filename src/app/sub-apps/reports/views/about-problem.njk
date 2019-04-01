@@ -30,6 +30,21 @@
 		{{ govukInput( {
 
 			label: {
+				text: 'Suggest a title for this barrier',
+				classes: 'govuk-label--s'
+			},
+			hint: {
+				text: 'Include both the product or service name and the country being exported to, for example, Import quotas for steel rods in India.'
+			},
+			id: 'barrier-title',
+			name: 'barrierTitle',
+			value: barrierTitle,
+			errorMessage: errors | errorForName( 'barrier-title' )
+		} ) }}
+
+		{{ govukInput( {
+
+			label: {
 				text: "What product or service is being exported?",
 				classes: 'govuk-label--s'
 			},
@@ -70,21 +85,6 @@
 			} ),
 			errorMessage: errors | errorForName( 'barrier-source-1' )
 		}) }}
-
-		{{ govukInput( {
-
-			label: {
-				text: 'Suggest a title for this barrier',
-				classes: 'govuk-label--s'
-			},
-			hint: {
-				text: 'Include both the product or service name and the country being exported to, for example, Import quotas for steel rods in India.'
-			},
-			id: 'barrier-title',
-			name: 'barrierTitle',
-			value: barrierTitle,
-			errorMessage: errors | errorForName( 'barrier-title' )
-		} ) }}
 
 		{{ govukRadios( {
 

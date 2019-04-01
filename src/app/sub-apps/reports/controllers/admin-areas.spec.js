@@ -112,6 +112,8 @@ describe( 'Report controllers', () => {
             } );
             describe( 'When it is a POST', () => {
 
+                let sessionValues;
+
                 beforeEach( () => {
                     req.method = 'POST';
                     req.session.adminAreas = ['1234', '5678'];
@@ -265,30 +267,55 @@ describe( 'Report controllers', () => {
             });
         }) ;
         describe( 'Remove', () => {
-            it( 'Should remove the adminArea in the session list and redirect', () => {
 
-				const adminArea = uuid();
-				const adminAreas = [ uuid(), uuid(), adminArea ];
-				const expected = adminAreas.slice( 0, 2 );
-				const adminAreasResponse = '/to/admin/areas';
-				const reportId = '123';
+            beforeEach(() => {
+                req.report = {};
+            });
 
-				urls.reports.adminAreas.and.callFake( () => adminAreasResponse );
-				req.session.adminAreas = adminAreas;
-				req.body = { adminArea };
-				req.report = { id: reportId };
+            describe( 'When there is a report', () => {
+                it( 'Should remove the adminArea in the session list and redirect', () => {
+                    const adminArea = uuid();
+                    const adminAreas = [ uuid(), uuid(), adminArea ];
+                    const expected = adminAreas.slice( 0, 2 );
+                    const adminAreasResponse = '/to/admin/areas';
 
-				controller.remove( req, res );
+                    urls.reports.adminAreas.and.callFake( () => adminAreasResponse );
+                    req.session.adminAreas = adminAreas;
+                    req.body = { adminArea };
 
-				expect( req.session.adminAreas ).toEqual( expected );
-				expect( res.redirect ).toHaveBeenCalledWith( adminAreasResponse );
-				expect( urls.reports.adminAreas ).toHaveBeenCalledWith( reportId, '1234' );
-			} );
+                    controller.remove( req, res );
+
+                    expect( req.session.adminAreas ).toEqual( expected );
+                    expect( res.redirect ).toHaveBeenCalledWith( adminAreasResponse );
+                    expect( urls.reports.adminAreas ).toHaveBeenCalledWith( undefined, '1234' );
+                    });
+            });
+            describe( 'When there is not a report', () => {
+
+                it( 'Should remove the adminArea in the session list and redirect', () => {
+                    const adminArea = uuid();
+                    const adminAreas = [ uuid(), uuid(), adminArea ];
+                    const expected = adminAreas.slice( 0, 2 );
+                    const adminAreasResponse = '/to/admin/areas';
+                    const reportId = '123';
+
+                    urls.reports.adminAreas.and.callFake( () => adminAreasResponse );
+                    req.session.adminAreas = adminAreas;
+                    req.body = { adminArea };
+                    req.report = { id: reportId };
+
+                    controller.remove( req, res );
+
+                    expect( req.session.adminAreas ).toEqual( expected );
+                    expect( res.redirect ).toHaveBeenCalledWith( adminAreasResponse );
+                    expect( urls.reports.adminAreas ).toHaveBeenCalledWith( reportId, '1234' );
+                });
+            });
         });
         describe( 'Add', () => {
 
-            template = 'reports/views/add-admin-area';
-            getAddAdminAreaTemplateValuesResponse = { countryId: '1234', c: 3, d: 4, currentAdminAreas: [] };
+            let template = 'reports/views/add-admin-area';
+            let getAddAdminAreaTemplateValuesResponse = { countryId: '1234', c: 3, d: 4, currentAdminAreas: [] };
 
             it( 'Should setup the form correctly',  () => {
                 controller.add( req, res, next );
@@ -306,7 +333,7 @@ describe( 'Report controllers', () => {
                 expect( config.adminAreas.validators[ 0 ].fn ).toEqual( validators.isCountryAdminArea );
             });
             describe( 'When it is a GET', () => {
-            
+
                 it( 'Should render the correct template', () => {
 
                     controller.add( req, res, next );
@@ -337,9 +364,9 @@ describe( 'Report controllers', () => {
                 describe( 'When there are sectors in the session', () => {
 					it( 'Should render with the session sectors', () => {
 
-                        adminAreas = [ 1, 2]
+                        const adminAreas = [ 1, 2];
                         req.session.adminAreas = adminAreas;
-                        expected = Object.assign( {}, getAddAdminAreaTemplateValuesResponse, { currentAdminAreas: adminAreas.map( metadata.getAdminArea ) } );
+                        const expected = Object.assign( {}, getAddAdminAreaTemplateValuesResponse, { currentAdminAreas: adminAreas.map( metadata.getAdminArea ) } );
                         
                         controller.add( req, res );
 
@@ -362,7 +389,7 @@ describe( 'Report controllers', () => {
                         controller.add( req, res, next );
 
                         expect( res.redirect ).not.toHaveBeenCalled();
-                    })
+                    });
                 });
                 describe( 'When the form does not have errors', () => {
                     it( 'Should add the admin area to the list and redirect', () => {

@@ -158,7 +158,7 @@ describe( 'Report controllers', () => {
 
 				beforeEach( () => {
 					form.hasErrors.and.callFake( () => false );
-				})
+				});
 
 				describe( 'When selecting the entire country', () => {
 

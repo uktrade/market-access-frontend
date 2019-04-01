@@ -346,6 +346,7 @@ describe( 'metadata', () => {
 
 			let nonDisabledAdminAreas;
 			let adminAreasByCountry;
+			let countryId;
 
 			beforeEach( () => {
 				nonDisabledAdminAreas = fakeData.country_admin_areas.filter( ( adminArea ) => adminArea.disabled_on === null );

@@ -725,6 +725,7 @@ describe( 'Backend Service', () => {
 				let isResolved;
 				let resolvedDate;
 				let country;
+				let adminAreas;
 
 				beforeEach( () => {
 
@@ -732,7 +733,7 @@ describe( 'Backend Service', () => {
 					isResolved = true;
 					resolvedDate = { year: '2018', month:'02' };
 					country = uuid();
-					adminAreas = [uuid()]
+					adminAreas = [uuid()];
 				} );
 
 				describe( 'When isResolved is true', () => {
