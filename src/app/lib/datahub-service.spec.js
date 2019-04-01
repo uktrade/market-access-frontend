@@ -42,7 +42,7 @@ describe( 'Datahub Service', () => {
 					service.searchCompany( name );
 
 					expect( datahubStub.post ).toHaveBeenCalledWith( `/v4/public/search/company`, {
-						name,
+						original_query: name,
 						offset: 0,
 						limit: 20
 					} );
@@ -88,7 +88,7 @@ describe( 'Datahub Service', () => {
 					service.searchCompany( name );
 
 					expect( datahub.post ).toHaveBeenCalledWith( `/v4/public/search/company`, {
-						name,
+						original_query: name,
 						offset: 0,
 						limit: 20
 					} );

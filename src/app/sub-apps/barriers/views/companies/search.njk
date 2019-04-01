@@ -4,14 +4,14 @@
 
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Barrier - Add an affected company or organisation{% endblock %}
+{% block page_title %}{{ super() }} - Barrier - Add an affected company{% endblock %}
 
 {% block page_content %}
 
 	{{ heading({
 		back: { href: urls.barriers.detail( barrier.id ) },
 		caption: barrier.barrier_title,
-		text: 'Company or organisation affected',
+		text: 'Name of company affected',
 		errors: errors
 	}) }}
 
@@ -24,10 +24,10 @@
 		{{ searchForm( {
 				action: urls.barriers.companies.search( barrier.id ),
 				label: {
-					text: 'Find the company or organisation record'
+					text: 'Find details of the company affected'
 				},
 				hint: {
-					text: 'Search for the registered company name, company number or address'
+					text: 'You can search by name, address or company number'
 				},
 				csrfToken: csrfToken,
 				input: {
@@ -58,12 +58,14 @@
 
 						<h3 class="company-card__heading">{{ company.name | highlight( query ) | safe }}</h3>
 						<dl class="company-card__values">
-							<dt class="company-card__values__key">Companies house no.</dt>
+							{% if company.company_number %}
+							<dt class="company-card__values__key">Companies House number</dt>
 							<dd class="company-card__values__value">{{ company.company_number | highlight( query ) | safe }}</dd>
-
+							{% endif %}
+							{% if company.headquarter_type %}
 							<dt class="company-card__values__key">Type</dt>
-							<dd class="company-card__values__value">{{ company.headquarter_type | highlight( query ) | safe }}</dd>
-
+							<dd class="company-card__values__value">{{ company.headquarter_type.name | highlight( query ) | safe }}</dd>
+							{% endif %}
 							<dt class="company-card__values__key">Sector</dt>
 							<dd class="company-card__values__value">{{ company.sector.name | highlight( query ) | safe }}</dd>
 
@@ -73,12 +75,12 @@
 							<dt class="company-card__values__key">Primary address</dt>
 							<dd class="company-card__values__value">
 								{{ [
-									company.registered_address_1 | highlight( query ),
-									company.registered_address_2 | highlight( query ),
-									company.registered_address_town | highlight( query ),
-									company.registered_address_county | highlight( query ),
-									company.registered_address_postcode | highlight( query ),
-									company.registered_address_country.name | highlight( query )
+									company.address.line_1 | highlight( query ),
+									company.address.line_2 | highlight( query ),
+									company.address.town | highlight( query ),
+									company.address.county | highlight( query ),
+									company.address.postcode | highlight( query ),
+									company.address.country.name | highlight( query )
 								] | removeEmpty | join( ', ' ) | safe }}
 							</dd>
 						</dl>
@@ -92,6 +94,7 @@
 
 		<a href="{{ urls.barriers.detail( barrier.id ) }}" class="govuk-button button--secondary">Cancel</a>
 
+	{% if results or error %} {# only show when the user has done a search #}
 		<div class="info-panel">
 			<h4 class="info-panel__heading">Can't find the company?</h4>
 			<p class="info-panel__text">
@@ -99,6 +102,7 @@
 			</p>
 		</div>
 	</div>
+	{% endif %}
 
 {% endblock %}
 

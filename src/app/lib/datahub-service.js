@@ -5,12 +5,12 @@ module.exports = {
 
 	getCompany: ( id ) => datahub.get( `/v4/public/company/${ id }` ),
 
-	searchCompany: ( name, page = 1, limit = 20 ) => {
+	searchCompany: ( query, page = 1, limit = 20 ) => {
 
 		const body = {
-			name,
+			original_query: query,
 			offset: (page * limit) - limit,
-			limit
+			limit,
 		};
 
 		//const url = '/v3/activity-stream/'; // generate a 403

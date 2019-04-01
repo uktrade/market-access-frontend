@@ -450,7 +450,7 @@ describe( 'App', function(){
 
 							app
 								.get( urls.barriers.companies.edit( barrierId ) )
-								.end( checkPage( 'Market Access - Barrier - Save or add another affected company or organisation', done ) );
+								.end( checkPage( 'Market Access - Barrier - Save or add another company', done ) );
 						} );
 					} );
 
@@ -459,7 +459,7 @@ describe( 'App', function(){
 
 							app
 								.get( urls.barriers.companies.list( barrierId ) )
-								.end( checkPage( 'Market Access - Barrier - Save or add another affected company or organisation', done ) );
+								.end( checkPage( 'Market Access - Barrier - Save or add another company', done ) );
 						} );
 					} );
 
@@ -469,7 +469,7 @@ describe( 'App', function(){
 
 								app
 									.get( urls.barriers.companies.search( barrierId ) )
-									.end( checkPage( 'Market Access - Barrier - Add an affected company or organisation', done ) );
+									.end( checkPage( 'Market Access - Barrier - Add an affected company', done ) );
 							} );
 						} );
 
@@ -508,7 +508,7 @@ describe( 'App', function(){
 										.post( '/v4/public/search/company' )
 										.reply( 200, intercept.stub( '/datahub/search/company' ) );
 
-										doPost( 200, checkPage( 'Market Access - Barrier - Add an affected company or organisation', done ) );
+										doPost( 200, checkPage( 'Market Access - Barrier - Add an affected company', done ) );
 								} );
 							} );
 
@@ -556,7 +556,7 @@ describe( 'App', function(){
 
 								app
 									.get( barrierUrl )
-									.end( checkPage( 'Market Access - Barrier - Company or organisation details', done ) );
+									.end( checkPage( 'Market Access - Barrier - Company details', done ) );
 							} );
 						} );
 
