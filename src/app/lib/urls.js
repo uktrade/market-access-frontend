@@ -104,6 +104,7 @@ module.exports = {
 		},
 		location: {
 			list: ( barrierId ) => `/barriers/${ barrierId }/location/`,
+			edit: ( barrierId ) => `/barriers/${ barrierId }/location/edit`,
 			country: ( barrierId ) => `/barriers/${ barrierId }/location/country`,
 			add_admin_area: ( barrierId ) => `/barriers/${ barrierId }/location/admin-areas/add`,
 			remove_admin_area: ( barrierId ) => `/barriers/${ barrierId }/location/admin-areas/remove`,

@@ -6,7 +6,7 @@ const backend = require( '../../../lib/backend-service' );
 
 module.exports = {
 
-  list: async (req, res, next) => {
+   list: async (req, res, next) => {
 		const barrier = req.barrier;
 		const isPost = req.method === 'POST';
 
@@ -51,6 +51,25 @@ module.exports = {
 		});
 	},
 	
+	edit: ( req, res ) => {
+		const barrier = req.barrier;
+
+		req.session.location = {
+			country: barrier.export_country,
+			adminAreas: (barrier.country_admin_areas || [])
+		};
+
+		const { country, adminAreas } = req.session.location;
+		const isCountryWithAdminAreas = metadata.isCountryWithAdminArea(country);
+
+		res.render( 'barriers/views/location/list', {
+			country: metadata.getCountry(country).name, 
+			showAdminAreas: isCountryWithAdminAreas,
+			adminAreas: adminAreas.map( metadata.getAdminArea),
+			csrfToken: req.csrfToken()
+		});
+	},
+	
 	country: ( req, res ) => {
 
 		const barrier = req.barrier;
@@ -76,6 +95,10 @@ module.exports = {
 			if( !form.hasErrors() ){
 	
 				req.session.location.country = form.getValues().country;
+				
+				if (!metadata.isCountryWithAdminArea(form.getValues().country)) {
+					req.session.location.adminAreas = [];
+				}
 
 				return res.redirect( urls.barriers.location.list( barrier.id ) );
 			}

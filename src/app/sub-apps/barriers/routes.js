@@ -57,6 +57,8 @@ module.exports = ( express, app ) => {
 
 	app.get( '/:barrierId/location/', controller.location.list );
 	app.post( '/:barrierId/location/', controller.location.list );
+	app.get( '/:barrierId/location/edit', controller.location.edit );
+	app.post( '/:barrierId/location/edit', controller.location.edit );
 	app.get( '/:barrierId/location/country', controller.location.country );
 	app.post( '/:barrierId/location/country', controller.location.country );
 	app.get( '/:barrierId/location/admin-areas/add', controller.location.add_admin_area );

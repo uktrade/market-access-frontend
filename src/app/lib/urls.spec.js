@@ -234,7 +234,14 @@ describe( 'URLs', () => {
 
 		describe( 'location', () => {
 			describe( 'list', () => {
-
+				it( 'Should return the correct path', () => {
+					expect( urls.barriers.location.list( barrierId ) ).toEqual( `/barriers/${ barrierId }/location/` );
+				} );
+			});
+			describe( 'edit', () => {
+				it( 'Should return the correct path', () => {
+					expect( urls.barriers.location.edit( barrierId ) ).toEqual( `/barriers/${ barrierId }/location/edit` );
+				} );
 			});
 			describe( 'country', () => {
 				it( 'Should return the correct path', () => {
