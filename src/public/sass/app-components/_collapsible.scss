@@ -1,0 +1,14 @@
+#collapsible {
+    &__content {
+        display: none;
+    }
+    &__label {
+        color: $govuk-blue;
+        cursor: pointer;
+        text-decoration: underline;
+    }
+}
+
+:checked + #collapsible__content {
+    display: block;
+}
