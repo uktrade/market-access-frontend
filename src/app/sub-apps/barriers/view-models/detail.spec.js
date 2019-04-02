@@ -3,6 +3,7 @@ const faker = require( 'faker' );
 const modulePath = './detail';
 
 describe( 'Barrier detail view model', () => {
+	// Add in the admin areas 
 
 	let viewModel;
 	let metadata;
@@ -15,11 +16,14 @@ describe( 'Barrier detail view model', () => {
 
 		metadata = {
 			countries: [
-				{ id: faker.random.uuid(), name: faker.address.country() },
+				{ id: '1234', name: 'Fake Country Name' },
 				{ id: faker.random.uuid(), name: faker.address.country() },
 				{ id: faker.random.uuid(), name: faker.address.country() },
 				{ id: faker.random.uuid(), name: faker.address.country() },
 				{ id: faker.random.uuid(), name: faker.address.country() }
+			],
+			adminAreas: [
+				{ id: '3456', name: 'Fake admin area 1', country: { name: 'Fake Country Name', id: '1234'} },
 			],
 			sectors: [
 				{ id: faker.random.uuid(), name: faker.lorem.words() },
@@ -31,6 +35,7 @@ describe( 'Barrier detail view model', () => {
 				'2': 'Problem status two'
 			},
 			getCountry: jasmine.createSpy( 'metadata.getCountry' ),
+			getAdminArea: jasmine.createSpy('meta.getAdminArea'),
 			getSector: jasmine.createSpy( 'metadata.getSector' ),
 			barrierSource: {
 				'COMPANY': 'company',
@@ -52,6 +57,7 @@ describe( 'Barrier detail view model', () => {
 
 		metadata.getCountry.and.callFake( () => metadata.countries[ 3 ] );
 		metadata.getSector.and.callFake( () => metadata.sectors[ 1 ] );
+		metadata.getAdminArea.and.callFake( () => metadata.adminAreas[0]);
 
 		viewModel = proxyquire( modulePath, {
 			'../../../lib/metadata': metadata,
@@ -92,7 +98,7 @@ describe( 'Barrier detail view model', () => {
 			} );
 			expect( outputBarrier.reportedOn ).toEqual( inputBarrier.reported_on );
 			expect( outputBarrier.addedBy ).toEqual( inputBarrier.reported_by );
-			expect( outputBarrier.country ).toEqual( metadata.getCountry( inputBarrier.export_country ) );
+			expect( outputBarrier.location ).toEqual( metadata.getCountry( inputBarrier.export_country ).name );
 			expect( outputBarrier.sectors ).toEqual( barrierSectors );
 			expect( outputBarrier.source ).toEqual( {
 				id: inputBarrier.source,
@@ -118,6 +124,17 @@ describe( 'Barrier detail view model', () => {
 		} );
 	} );
 
+	describe( 'With admin areas on an open barrier', () => {
+		it( 'Should create all the correct properties', () => {
+			inputBarrier.country_admin_areas = ['3456'];
+
+			const output = viewModel( inputBarrier );
+			const outputBarrier = output.barrier;
+
+			expect( outputBarrier.location ).toEqual( `Fake admin area 1 (${metadata.countries[ 3 ].name})` );
+		});
+	});
+	
 	describe( 'With sectors missing on an open barrier', () => {
 		it( 'Should create all the correct properties', () => {
 

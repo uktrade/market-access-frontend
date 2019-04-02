@@ -128,6 +128,21 @@ describe( 'validators', () => {
 		} );
 	} );
 
+	describe( 'isCountryAdminArea', () => {
+		describe( 'With a valid admin area', () => {
+			it( 'Should return true', () => {
+
+				expect( validators.isCountryAdminArea( '8ad3f33a-ace8-40ec-bd2c-638fdc3024ea' ) ).toEqual( true );
+			} );
+		} );
+
+		describe( 'With an invalid admin area', () => {
+			it( 'Should return false', () => {
+
+				expect( validators.isCountryAdminArea( '1234' ) ).toEqual( false );
+			});
+		});
+	});
 	describe( 'isOverseasRegion', () => {
 		describe( 'With a valid overseas region', () => {
 			it( 'Should return true', () => {

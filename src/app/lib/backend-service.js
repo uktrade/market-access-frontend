@@ -305,13 +305,15 @@ module.exports = {
 			problem_status: getValue( values.status ),
 			is_resolved: getValue( values.isResolved ),
 			resolved_date: getValue( getDefaultedDate( values.resolvedDate ) ),
-			export_country: getValue( values.country )
+			export_country: getValue( values.country ),
+			country_admin_areas: getValue(values.adminAreas)
 		} ),
 		update: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 			problem_status: getValue( values.status ),
 			is_resolved: getValue( values.isResolved ),
 			resolved_date: getValue( getDefaultedDate( values.resolvedDate ) ),
-			export_country: getValue( values.country )
+			export_country: getValue( values.country ),
+			country_admin_areas: getValue(values.adminAreas)
 		} ),
 		saveHasSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 			sectors_affected: getValue( values.hasSectors )
