@@ -1,14 +1,41 @@
-#collapsible {
-    &__content {
-        display: none;
+.collapsible__widget {
+    display: table;
+    #initial__content {
+        display: table-header-group;
     }
-    &__label {
-        color: $govuk-blue;
-        cursor: pointer;
-        text-decoration: underline;
+    #collapsible {
+        display: table-header-group;
+        &__content {
+            display: none;
+        }
+        &__label {
+            position: relative;
+            display: block;
+            color: $govuk-blue;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        &:checked {
+    
+            & + #collapsible__label:after {
+                content: "show less";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: #f8f8f8;
+                text-decoration: underline;
+            }   
+    
+            & + #collapsible__label {
+                & + #initial__content {
+                    display: none;
+                    & + #collapsible__content {
+                        display: table-header-group;
+                    }
+                }
+            }
+        }
     }
-}
-
-:checked + #collapsible__content {
-    display: block;
 }

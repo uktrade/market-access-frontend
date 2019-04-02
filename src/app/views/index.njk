@@ -33,17 +33,21 @@
 						</a>
 						{{ barrier.code }}
 					</td>
-					<td class="standard-table__cell">
-						{% if barrier.sectors|length > 5 %}
-							{{ barrier.sectors.slice(0, 2) | join( ', ' ) }}
-							<input type="checkbox" id="collapsible" style="display:none;">
-							<label id="collapsible__label" for="collapsible">show {{ barrier.sectors|length - 2}} more</label>
-							<div id="collapsible__content">
-								{{ barrier.sectors.slice() | join( ', ' ) }}
-							</div>
-						{% else %}
-							{{ barrier.sectors | join( ', ' ) }}
-						{% endif %}
+					<td class="standard-table__cell collapsible-content">
+						<div class="collapsible__widget">
+							{% if barrier.sectors|length > 3 %}
+								<input type="checkbox" id="collapsible" style="display:none;">
+								<label id="collapsible__label" for="collapsible">show more</label>
+								<div id="initial__content"> 
+									{{ barrier.sectors.slice(0, 2) | join( ', ' ) }} ...
+								</div>
+								<div id="collapsible__content">
+									{{ barrier.sectors | join( ', ' ) }}
+								</div>
+							{% else %}
+								{{ barrier.sectors | join( ', ' ) }}
+							{% endif %}
+						</div>
 					</td>
 					<td class="standard-table__cell">{{ barrier.country.name }}</td>
 					<td class="standard-table__cell"><span class="barrier-status-table-badge barrier-status-table-badge--{{ barrier.status.modifyer }}">{{ barrier.status.name }}</span></td>
