@@ -104,13 +104,13 @@ module.exports = {
 			}
 		}
 	
-		res.render( 'barriers/views/location/country', form.getTemplateValues() )
+		res.render( 'barriers/views/location/country', form.getTemplateValues() );
 	},
 
 	add_admin_area: ( req, res ) => {
 		const barrier = req.barrier;
 		const adminAreas = req.session.location.adminAreas;
-		const country =  req.session.location.country
+		const country =  req.session.location.country;
 
 		const form = new Form( req, {
 
@@ -154,4 +154,4 @@ module.exports = {
 		res.redirect( urls.barriers.location.list( req.barrier.id ) );
 		
 	},
-}
+};
