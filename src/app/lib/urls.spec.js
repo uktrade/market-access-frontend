@@ -124,10 +124,10 @@ describe( 'URLs', () => {
 					expect( urls.barriers.edit.status( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/status/` );
 				} );
 			} );
-			describe( 'barrier resolution', () => {
+			describe( 'resolution', () => {
 				it( 'Should return the correct path', () => {
 
-					expect( urls.barriers.edit.barrierResolution( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/barrier-resolution/` );
+					expect( urls.barriers.edit.resolution( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/barrier-resolution/` );
 				} );
 			} );
 		} );

@@ -224,7 +224,7 @@
 				<h2 class="barrier-status-details__heading">Barrier {{ 'resolved' if barrier.isResolved else 'paused' }} <span class="barrier-status-details__heading__caption">in {{ barrier.status.date | dateOnly( day=false ) }}</span></2>
 				<h3 class="barrier-status-details__sub-heading">Summary {{ ' of resolution' if barrier.isResolved }}</h3>
 				<p class="barrier-status-details__text">{{ barrier.status.description | escape | nl2br }}</p>
-				<a href="{{ urls.barriers.edit.barrierResolution(barrier.id)}}"> Edit</a>
+				<a href="{{ urls.barriers.edit.resolution(barrier.id)}}"> Edit</a>
 			</div>
 
 		{% endif -%}

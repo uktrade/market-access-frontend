@@ -93,7 +93,7 @@ module.exports = {
 		}
 	},
 
-	barrierResolution: async ( req, res, next ) => {
+	resolution: async ( req, res, next ) => {
 
 		const barrier = req.barrier;
 		const invalidDateMessage = 'Enter resolution date and include a month and year';

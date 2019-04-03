@@ -469,7 +469,7 @@ describe( 'Edit barrier controller', () => {
 		} );
 	} );
 
-	describe('barrierResolution', () => {
+	describe('resolution', () => {
 
 		const template = 'barriers/views/edit/barrier-resolution';
 		let barrier;
@@ -483,20 +483,23 @@ describe( 'Edit barrier controller', () => {
 
 		it( 'Should configure the Form correctly', async () => {
 
+			const monthResponse = { month: true };
+			const yearResponse = { year: true };
+
 			validators.isDateValue.and.callFake( ( key ) => {
-				if( key === 'month' ){ return true; }
-				if( key === 'year' ){ return true; }
+				if( key === 'month' ){ return monthResponse; }
+				if( key === 'year' ){ return yearResponse; }
 			} );
 
-			await controller.barrierResolution( req, res, next );
+			await controller.resolution( req, res, next );
 
 			const config = Form.calls.argsFor( 0 )[ 1 ];
 
 			expect( config.resolvedDate ).toBeDefined();
 			expect( config.resolvedDate.type ).toEqual( Form.GROUP );
 			expect( config.resolvedDate.validators.length ).toEqual( 5 );
-			expect( config.resolvedDate.validators[ 0 ].fn ).toEqual( true );
-			expect( config.resolvedDate.validators[ 1 ].fn ).toEqual( true );
+			expect( config.resolvedDate.validators[ 0 ].fn ).toEqual( monthResponse );
+			expect( config.resolvedDate.validators[ 1 ].fn ).toEqual( yearResponse );
 			expect( config.resolvedDate.validators[ 2 ].fn ).toEqual( validators.isDateNumeric );
 			expect( config.resolvedDate.validators[ 3 ].fn ).toEqual( validators.isDateValid );
 			expect( config.resolvedDate.validators[ 4 ].fn ).toEqual( validators.isDateInPast );
@@ -516,7 +519,7 @@ describe( 'Edit barrier controller', () => {
 
 		it( 'Should configure the FormProcessor correctly', async () => {
 
-			await controller.barrierResolution( req, res );
+			await controller.resolution( req, res );
 
 			const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
 			const templateValues = { abc: '123' };
@@ -546,7 +549,7 @@ describe( 'Edit barrier controller', () => {
 		describe( 'When the processor does not throw an error', () => {
 			it( 'Should not call next', async () => {
 
-				await controller.barrierResolution( req, res, next );
+				await controller.resolution( req, res, next );
 
 				expect( next ).not.toHaveBeenCalled();
 			} );
@@ -559,7 +562,7 @@ describe( 'Edit barrier controller', () => {
 
 				processor.process.and.callFake( () => { throw err; } );
 
-				await controller.barrierResolution( req, res, next );
+				await controller.resolution( req, res, next );
 
 				expect( next ).toHaveBeenCalledWith( err );
 			} );
