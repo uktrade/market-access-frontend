@@ -1,4 +1,5 @@
 const uuid = require( 'uuid/v4' );
+const faker = require( 'faker' );
 
 if( typeof jasmine !== 'undefined' ){
 
@@ -51,6 +52,25 @@ if( typeof jasmine !== 'undefined' ){
 		reporter: () => ({
 			message: jasmine.createSpy( 'reporter.message' ),
 			captureException: jasmine.createSpy( 'reporter.captureException' ),
-		})
+		}),
+
+		strings: () => {
+
+			const methods = [ 'location', 'locations', 'types', 'sectors', 'regions', 'priorities' ];
+			const spies =  {};
+
+			methods.forEach( ( name ) => {
+
+				const spy = jasmine.createSpy( 'strings.' + name );
+				const response = `${ name } ${ faker.lorem.word() }`;
+
+				spy.and.callFake( () => response );
+				spy.response = response;
+
+				spies[ name ] = spy;
+			} );
+
+			return spies;
+		}
 	};
 }

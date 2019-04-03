@@ -28,10 +28,8 @@
 				<div class="multiselect__clear" v-if="selectedOptions" @mousedown.prevent.stop="clearAll(props.search)"></div>
 			</template>
 
-			<template slot="option" slot-scope="props">
-				<div class="multiselect__option-label" v-html="$options.filters.highlight(props.option.text, props.search)">
-					{{ props.option.text }}
-				</div>
+			 <template slot="option" slot-scope="props">
+				<div class="multiselect__option-label" v-html="$options.filters.highlight(props.option.text, props.search, props.option.parentName)"></div>
 			</template>
 
 			<template slot="caret" slot-scope="methods">
@@ -51,7 +49,7 @@
 
 	const Multiselect = require( 'vue-multiselect' ).default;
 	const { highlight } = require( './filters' );
-	const uuid = require( 'uuid' );
+	const uuid = require( 'uuid/v4' );
 
 	/**
 	 * matchWords
@@ -129,6 +127,19 @@
 
 			setOptions: function( options ){
 
+				options.forEach( ( option ) => {
+
+					const token = ' > ';
+					const text = option.text;
+					const tokenPosition = text.indexOf( token );
+
+					if( tokenPosition > 0 ){
+
+						option.parentName = text.substring( 0, tokenPosition );
+						option.text = text.substring( tokenPosition + token.length );
+					}
+				} );
+
 				this.options = options;
 				this.optionsData = options;
 				this.selectedOptions = options.filter( ( item ) => item.selected );
@@ -140,6 +151,20 @@
 					return matchWords( item.text, query );
 				})
 			},
+
+			customLabel: function( { text, parentName } ){
+
+				console.log( 'custom label' );
+
+				if( parentName ){
+
+					return `${ parentName } > ${ text }`;
+
+				} else {
+
+					return text;
+				}
+			}
 		},
 
 		computed: {
