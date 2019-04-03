@@ -76,12 +76,6 @@ describe( 'URLs', () => {
 		} );
 
 		describe( 'edit', () => {
-			describe( 'headlines', () => {
-				it( 'Should return the correct path', () => {
-
-					expect( urls.barriers.edit.headlines( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/` );
-				} );
-			} );
 
 			describe( 'product', () => {
 				it( 'Should return the correct path', () => {
