@@ -8,32 +8,21 @@ const urls = require( '../../../lib/urls' );
 
 module.exports = {
 
-	headlines: async ( req, res, next ) => {
+	title: async ( req, res, next ) => {
 
 		const barrier = req.barrier;
-
 		const form = new Form( req, {
+
 			title: {
 				values: [ barrier.barrier_title ],
 				required: 'Enter a title for this barrier'
-			},
-			country: {
-				type: Form.SELECT,
-				values: [ barrier.export_country ],
-				items: metadata.getCountryList(),
-				validators: [
-					{
-						fn: validators.isCountry,
-						message: 'Select a location for this barrier'
-					}
-				]
 			},
 		} );
 
 		const processor = new FormProcessor( {
 			form,
-			render: ( templateValues ) => res.render( 'barriers/views/edit/headlines', templateValues ),
-			saveFormData: ( formValues ) => backend.barriers.saveDetails( req, barrier.id, formValues ),
+			render: ( templateValues ) => res.render( 'barriers/views/edit/title', templateValues ),
+			saveFormData: ( formValues ) => backend.barriers.saveTitle( req, barrier.id, formValues ),
 			saved: () => res.redirect( urls.barriers.detail( barrier.id ) )
 		} );
 
