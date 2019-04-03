@@ -76,43 +76,43 @@ module.exports = {
 				next( e );
 
 			}
-		}
-
-		if( countryId ){
-
-			template = 'reports/views/my-country';
-			promise = backend.reports.getForCountry( req, countryId );
-
 		} else {
+			if( countryId ){
 
-			promise = backend.reports.getAll( req );
-		}
-
-		try {
-
-			const { response, body } = await promise;
-			const { reports } = reportsViewModel( body.results, country );
-			
-			let currentReport = {}
-
-			reports.some((report) => {
-				if (report.id === currentReportId) {
-					currentReport = report;
-					return
-				}
-			});
-			
-			if( response.isSuccess ){
-
-				res.render( template, Object.assign({},{ currentReport, reports, csrfToken: req.csrfToken(), isDelete: true }) );
-
+				template = 'reports/views/my-country';
+				promise = backend.reports.getForCountry( req, countryId );
+	
 			} else {
-
-				throw new Error( `Got ${ response.statusCode } response from backend` );
+	
+				promise = backend.reports.getAll( req );
 			}
-
-		} catch( e ){
-			next( e );
+	
+			try {
+	
+				const { response, body } = await promise;
+				const { reports } = reportsViewModel( body.results, country );
+				
+				let currentReport = {}
+	
+				reports.some((report) => {
+					if (report.id === currentReportId) {
+						currentReport = report;
+						return
+					}
+				});
+				
+				if( response.isSuccess ){
+	
+					res.render( template, Object.assign({},{ currentReport, reports, csrfToken: req.csrfToken(), isDelete: true }) );
+	
+				} else {
+	
+					throw new Error( `Got ${ response.statusCode } response from backend` );
+				}
+	
+			} catch( e ){
+				next( e );
+			}
 		}
 	},
 

@@ -75,7 +75,9 @@
 					</td>
 					<td class="standard-table__cell">
 						<a class="table__link" href="{{ urls.reports.detail( report.id ) }}">Continue</a>
-						<a class="table__link" href="{{ urls.reports.delete( report.id ) }}">Delete</a>
+						{% if report.created_by === user.username %}
+							<a class="table__link" href="{{ urls.reports.delete( report.id ) }}">Delete</a>
+						{% endif %}
 					</td>
 				</tr>
 				{% endfor %}
