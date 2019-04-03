@@ -18,6 +18,9 @@ describe( 'Edit barrier location controller', () => {
 	let csrfToken;
 	let backend;
 	let urls;
+	let getCountryValuesResponse;
+	let getAdminAreaValuesResponse;
+	let getTemplateValuesResponse;
 
 	beforeEach( () => {
 
@@ -108,9 +111,7 @@ describe( 'Edit barrier location controller', () => {
 				it( 'renders with page with the admin area section', async () => {
 
 					metadata.isCountryWithAdminArea.and.callFake( () => true );
-					metadata.getCountry.and.callFake( () => {
-						return { id: 1, name: 'country 1'}
-					});
+					metadata.getCountry.and.callFake( () => ({ id: 1, name: 'country 1'}));
 
 					await controller.list(req, res, next);
 
@@ -121,14 +122,12 @@ describe( 'Edit barrier location controller', () => {
 						csrfToken: req.csrfToken()
 					});
 				});
-			})
+			});
 			describe('if the country does not have admin areas', () => {
 				it( 'renders with page without the admin area section', async () => {
 
 					metadata.isCountryWithAdminArea.and.callFake( () => false );
-					metadata.getCountry.and.callFake( () => {
-						return { id: 1, name: 'country 1'}
-					});
+					metadata.getCountry.and.callFake( () => ({ id: 1, name: 'country 1'}));
 
 					await controller.list(req, res, next);
 
@@ -138,7 +137,7 @@ describe( 'Edit barrier location controller', () => {
 						adminAreas: [],
 						csrfToken: req.csrfToken()
 					});
-				})
+				});
 			});
 		});
 		describe( 'if it is a POST', () => {
@@ -168,7 +167,7 @@ describe( 'Edit barrier location controller', () => {
 					expect( next ).not.toHaveBeenCalled();
 					expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
 				} );
-			})
+			});
 
 			describe( 'When the response is not a success', () => {
 				it( 'Should call next with an error', async () => {
@@ -183,7 +182,7 @@ describe( 'Edit barrier location controller', () => {
 
 					expect( next ).toHaveBeenCalledWith( err );
 				} );
-			})
+			});
 
 			describe( 'When the service throws an error', () => {
 				it( 'Should call next with the error', async () => {
@@ -198,7 +197,7 @@ describe( 'Edit barrier location controller', () => {
 					expect( next ).toHaveBeenCalledWith( err );
 					expect( res.render ).not.toHaveBeenCalled();
 				} );
-			})
+			});
 		});
 	});
 
@@ -210,7 +209,7 @@ describe( 'Edit barrier location controller', () => {
 					country: 'country 1',
 					adminAreas: []
 				}
-			}
+			};
 		});
 
 		it( 'Should configure the Form correctly', () => {
@@ -245,7 +244,7 @@ describe( 'Edit barrier location controller', () => {
 							adminAreas: getAdminAreaValuesResponse.adminAreas,
 							currentAdminAreas: []
 						}
-					)
+					);
 				});
 			});
 	
@@ -257,7 +256,7 @@ describe( 'Edit barrier location controller', () => {
 							country: 'country 1',
 							adminAreas: [2]
 						}
-					}
+					};
 				});
 
 				it( 'renders the page with admin areas', () => {
@@ -272,7 +271,7 @@ describe( 'Edit barrier location controller', () => {
 							adminAreas: getAdminAreaValuesResponse.adminAreas,
 							currentAdminAreas: req.session.location.adminAreas.map( metadata.getAdminArea ) 
 						}
-					)
+					);
 				});
 			});
 		});
@@ -296,7 +295,7 @@ describe( 'Edit barrier location controller', () => {
 						{currentAdminAreas: []}
 					) );
 				} );
-			})
+			});
 
 			describe('When the form does not have errors', () => {
 				it('Should add the country to the session', () => {
@@ -312,9 +311,9 @@ describe( 'Edit barrier location controller', () => {
 
 					expect(req.session.location.adminAreas).toEqual(['1234']);
 					expect( res.redirect).toHaveBeenCalledWith(listResponse);
-				})
-			})
-		})
+				});
+			});
+		});
 	});
 
 	describe( 'remove admin area', () => {
@@ -340,7 +339,7 @@ describe( 'Edit barrier location controller', () => {
 		beforeEach( () => {
 			req.session = {
 				location: { country: 'country 1' }
-			}
+			};
 		});
 
 		it( 'Should configure the Form correctly', () => {
@@ -390,7 +389,7 @@ describe( 'Edit barrier location controller', () => {
 						getTemplateValuesResponse,
 					) );
 				} );
-			})
+			});
 
 			describe('When the form does not have errors', () => {
 				it('Should add the country to the session', () => {
@@ -404,8 +403,8 @@ describe( 'Edit barrier location controller', () => {
 
 					expect(req.session.location.country).toEqual('country 2');
 					expect( res.redirect).toHaveBeenCalledWith(listResponse);
-				})
-			})
+				});
+			});
 		});
 	} );
 } );
