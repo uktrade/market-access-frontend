@@ -70,7 +70,7 @@
 		const queryWords = words.split( ' ' );
 		const count = queryWords.reduce( ( allWords, word ) => {
 
-			if( str.search( new RegExp( word, 'i' ) ) !== -1 ){
+			if( str.toLowerCase().includes( word.toLowerCase() ) ){
 				allWords++;
 			}
 
@@ -148,23 +148,9 @@
 			search: function( query ){
 				//filter options when typing
 				this.options = this.optionsData.filter( ( item ) => {
-					return matchWords( item.text, query );
+					return matchWords( item.text + ( item.parentName || '' ), query );
 				})
 			},
-
-			customLabel: function( { text, parentName } ){
-
-				console.log( 'custom label' );
-
-				if( parentName ){
-
-					return `${ parentName } > ${ text }`;
-
-				} else {
-
-					return text;
-				}
-			}
 		},
 
 		computed: {
