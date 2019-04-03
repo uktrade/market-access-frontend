@@ -480,7 +480,7 @@ describe( 'Edit barrier controller', () => {
 		} );
 	} );
 
-	fdescribe('barrierResolution', () => {
+	describe('barrierResolution', () => {
 
 		const template = 'barriers/views/edit/barrier-resolution';
 		let barrier;
