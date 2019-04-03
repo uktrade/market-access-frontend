@@ -64,6 +64,7 @@ describe( 'Edit barrier controller', () => {
 				savePriority: jasmine.createSpy( 'backend.barriers.savePriority' ),
 				saveEuExitRelated: jasmine.createSpy( 'backend.barriers.saveEuExitRelated' ),
 				saveStatus: jasmine.createSpy( 'backend.barriers.saveStatus' ),
+				resolve: jasmine.createSpy( 'backend.barriers.resolve' ),
 			}
 		};
 
@@ -478,6 +479,103 @@ describe( 'Edit barrier controller', () => {
 			} );
 		} );
 	} );
+
+	fdescribe('barrierResolution', () => {
+
+		const template = 'barriers/views/edit/barrier-resolution';
+		let barrier;
+
+		beforeEach( () => {
+			barrier = jasmine.helpers.getFakeData( '/backend/barriers/barrier' );
+			validators.isDateValue = jasmine.createSpy( 'validators.isDateValue' );
+			req.barrier = barrier;
+			barrier.current_status.status_summary = "hello";
+		} );
+
+		it( 'Should configure the Form correctly', async () => {
+
+			validators.isDateValue.and.callFake( ( key ) => {
+				if( key === 'month' ){ return true; }
+				if( key === 'year' ){ return true; }
+			} );
+
+			await controller.barrierResolution( req, res, next );
+
+			const config = Form.calls.argsFor( 0 )[ 1 ];
+
+			expect( config.resolvedDate ).toBeDefined();
+			expect( config.resolvedDate.type ).toEqual( Form.GROUP );
+			expect( config.resolvedDate.validators.length ).toEqual( 5 );
+			expect( config.resolvedDate.validators[ 0 ].fn ).toEqual( true );
+			expect( config.resolvedDate.validators[ 1 ].fn ).toEqual( true );
+			expect( config.resolvedDate.validators[ 2 ].fn ).toEqual( validators.isDateNumeric );
+			expect( config.resolvedDate.validators[ 3 ].fn ).toEqual( validators.isDateValid );
+			expect( config.resolvedDate.validators[ 4 ].fn ).toEqual( validators.isDateInPast );
+			expect( config.resolvedDate.items ).toEqual( {
+				month: {
+					values: [ '03' ]
+				},
+				year: {
+					values: [ '2019' ]
+				}
+			} );
+
+			expect( config.resolvedSummary ).toBeDefined();
+			expect( config.resolvedSummary.required ).toBeDefined();
+			expect( config.resolvedSummary.values).toEqual(['hello']);
+		});
+
+		it( 'Should configure the FormProcessor correctly', async () => {
+
+			await controller.barrierResolution( req, res );
+
+			const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
+			const templateValues = { abc: '123' };
+			const formValues = { def: 456 };
+			const detailResponse = '/barrier/details';
+
+			expect( config.form ).toEqual( form );
+			expect( typeof config.render ).toEqual( 'function' );
+			expect( typeof config.saveFormData ).toEqual( 'function' );
+			expect( typeof config.saved ).toEqual( 'function' );
+
+			config.render( templateValues );
+
+			expect( res.render ).toHaveBeenCalledWith( template, templateValues );
+
+			config.saveFormData( formValues );
+
+			expect( backend.barriers.resolve ).toHaveBeenCalledWith( req, barrier.id, formValues );
+
+			urls.barriers.detail.and.callFake( () => detailResponse );
+
+			config.saved();
+
+			expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
+			expect( urls.barriers.detail ).toHaveBeenCalledWith( barrier.id );
+		} );
+		describe( 'When the processor does not throw an error', () => {
+			it( 'Should not call next', async () => {
+
+				await controller.barrierResolution( req, res, next );
+
+				expect( next ).not.toHaveBeenCalled();
+			} );
+		} );
+
+		describe( 'When the processor throws an errror', () => {
+			it( 'Should call next with the error', async () => {
+
+				const err = new Error( 'a random error' );
+
+				processor.process.and.callFake( () => { throw err; } );
+
+				await controller.barrierResolution( req, res, next );
+
+				expect( next ).toHaveBeenCalledWith( err );
+			} );
+		} );
+	});
 
 	describe( 'euExitRelated', () => {
 

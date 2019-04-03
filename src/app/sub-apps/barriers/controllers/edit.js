@@ -3,6 +3,7 @@ const FormProcessor = require( '../../../lib/FormProcessor' );
 const metadata = require( '../../../lib/metadata' );
 const validators = require( '../../../lib/validators' );
 const govukItemsFromObj = require( '../../../lib/govuk-items-from-object' );
+const getDateParts = require( '../../../lib/get-date-parts' );
 const backend = require( '../../../lib/backend-service' );
 const urls = require( '../../../lib/urls' );
 
@@ -90,6 +91,63 @@ module.exports = {
 			form,
 			render: ( templateValues ) => res.render( 'barriers/views/edit/description', templateValues ),
 			saveFormData: ( formValues ) => backend.barriers.saveDescription( req, barrier.id, formValues ),
+			saved: () => res.redirect( urls.barriers.detail( barrier.id ) )
+		} );
+
+		try {
+
+			await processor.process();
+
+		} catch( e ){
+
+			next( e );
+		}
+	},
+
+	barrierResolution: async ( req, res, next ) => {
+
+		const barrier = req.barrier;
+		const invalidDateMessage = 'Enter resolution date and include a month and year';
+		const resolvedDateValues = getDateParts(barrier.current_status.status_date );
+		
+		const form = new Form( req, {
+			resolvedDate: {
+				type: Form.GROUP,
+				validators: [ {
+					fn: validators.isDateValue( 'month' ),
+					message: invalidDateMessage
+				},{
+					fn: validators.isDateValue( 'year' ),
+					message: invalidDateMessage
+				},{
+					fn: validators.isDateNumeric,
+					message: 'Resolution date must only include numbers'
+				},{
+					fn: validators.isDateValid,
+					message: invalidDateMessage
+				},{
+					fn: validators.isDateInPast,
+					message: 'Resolution date must be this month or in the past'
+				} ],
+				items: {
+					month: {
+						values: [ resolvedDateValues.month ]
+					},
+					year: {
+						values: [ resolvedDateValues.year ]
+					}
+				}
+			},
+			resolvedSummary: {
+				values: [ barrier.current_status.status_summary ],
+				required: 'Enter a summary'
+			},
+		} );
+
+		const processor = new FormProcessor( {
+			form,
+			render: ( templateValues ) => res.render( 'barriers/views/edit/barrier-resolution', templateValues ),
+			saveFormData: ( formValues ) => backend.barriers.resolve( req, barrier.id, formValues ),
 			saved: () => res.redirect( urls.barriers.detail( barrier.id ) )
 		} );
 

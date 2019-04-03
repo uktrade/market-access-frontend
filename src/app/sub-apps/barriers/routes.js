@@ -40,6 +40,8 @@ module.exports = ( express, app ) => {
 	app.post( '/:barrierId/edit/eu-exit-related/', controller.edit.euExitRelated );
 	app.get( '/:barrierId/edit/status/', controller.edit.status );
 	app.post( '/:barrierId/edit/status/', controller.edit.status );
+	app.get( '/:barrierId/edit/barrier-resolution/', controller.edit.barrierResolution );
+	app.post( '/:barrierId/edit/barrier-resolution/', controller.edit.barrierResolution );
 
 	app.post( '/:uuid/interactions/documents/add/', fileUpload, controller.interactions.documents.add );
 	app.get( '/:uuid/interactions/documents/cancel/', controller.interactions.documents.cancel );
