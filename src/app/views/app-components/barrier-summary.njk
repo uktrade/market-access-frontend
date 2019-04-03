@@ -4,7 +4,11 @@
 			{{ barrier.code }}
 			<h1 class="barrier-summary__heading__text">{{ barrier.title }}</h1>
 			<p class="barrier-summary__heading__country"> in {{ barrier.location }}</p>
-			<a class="barrier-summary__heading__link" href="{{ urls.barriers.edit.headlines( barrier.id ) }}">Edit title or location</a>
+			<p>
+				<a href="{{ urls.barriers.edit.title( barrier.id ) }}">Edit title</a>
+				or 
+				<a href="{{ urls.barriers.location.edit( barrier.id ) }}">location</a>
+			</p>
 		</div>
 		<div class="barrier-summary__status">
 			<span class="barrier-summary__status__badge barrier-status-badge barrier-status-badge--{{ barrier.status.modifyer }}">

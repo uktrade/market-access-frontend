@@ -116,7 +116,6 @@ function createAdminAreaList (country, adminAreas, text) {
 	} ) );
 
 	adminAreaList.unshift( { value: '', text } );
-
 	return adminAreaList;
 }
 

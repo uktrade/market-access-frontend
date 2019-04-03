@@ -1,14 +1,13 @@
 {% from 'components/input/macro.njk' import govukInput %}
-{% from 'components/select/macro.njk' import govukSelect %}
 {% from 'app-components/heading.njk' import heading %}
 
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Barrier - Edit{% endblock %}
+{% block page_title %}{{ super() }} - Barrier - Edit title{% endblock %}
 
 {% block body_script %}
 	<script>
-		ma.pages.barrier.edit.headlines();
+		ma.pages.barrier.edit.title();
 	</script>
 {% endblock %}
 
@@ -17,11 +16,11 @@
 	{{ heading({
 		back: { href: urls.barriers.detail( barrier.id ) },
 		caption: barrier.barrier_title,
-		text: 'Edit barrier header',
+		text: 'Edit title',
 		errors: errors
 	}) }}
 
-	<form action="{{ urls.barriers.edit.headlines( barrier.id ) }}" method="POST" class="restrict-width">
+	<form action="{{ urls.barriers.edit.title( barrier.id ) }}" method="POST" class="restrict-width">
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
 		{{ govukInput( {
@@ -39,19 +38,7 @@
 			errorMessage: errors | errorForName( 'title' )
 		} ) }}
 
-		{{ govukSelect( {
-
-			label: {
-				text: "Exports to which country are affected by this issue?",
-				classes: 'govuk-label--s'
-			},
-			id: 'country',
-			name: 'country',
-			classes: 'govuk-!-width-full',
-			items: country,
-			errorMessage: errors | errorForName( 'country' )
-		} ) }}
-
 		<input type="submit" value="Save and exit to barrier" class="govuk-button">
+		<a href="{{ urls.barriers.detail( barrier.id ) }}" class="govuk-button button--secondary">Cancel</a>
 	</form>
 {% endblock %}

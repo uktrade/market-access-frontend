@@ -76,17 +76,18 @@ describe( 'URLs', () => {
 		} );
 
 		describe( 'edit', () => {
-			describe( 'headlines', () => {
-				it( 'Should return the correct path', () => {
-
-					expect( urls.barriers.edit.headlines( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/` );
-				} );
-			} );
 
 			describe( 'product', () => {
 				it( 'Should return the correct path', () => {
 
 					expect( urls.barriers.edit.product( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/product/` );
+				} );
+			} );
+
+			describe( 'title', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.edit.title( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/title/` );
 				} );
 			} );
 
@@ -230,6 +231,24 @@ describe( 'URLs', () => {
 				} );
 			} );
 		} );
+
+		describe( 'location', () => {
+			describe( 'list', () => {
+				it( 'Should return the correct path', () => {
+					expect( urls.barriers.location.list( barrierId ) ).toEqual( `/barriers/${ barrierId }/location/` );
+				} );
+			});
+			describe( 'edit', () => {
+				it( 'Should return the correct path', () => {
+					expect( urls.barriers.location.edit( barrierId ) ).toEqual( `/barriers/${ barrierId }/location/edit` );
+				} );
+			});
+			describe( 'country', () => {
+				it( 'Should return the correct path', () => {
+					expect( urls.barriers.location.country( barrierId ) ).toEqual( `/barriers/${ barrierId }/location/country` );
+				} );
+			});
+		});
 
 		describe( 'sectors', () => {
 			describe( 'edit', () => {

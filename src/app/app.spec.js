@@ -335,12 +335,12 @@ describe( 'App', function(){
 				} );
 
 				describe( 'Edit barrier', () => {
-					describe( 'headlines', () => {
+					describe( 'title', () => {
 						it( 'Should fetch the barrier and render the page', ( done ) => {
 
 							app
-								.get( urls.barriers.edit.headlines( barrierId ) )
-								.end( checkPage( 'Market Access - Barrier - Edit', done ) );
+								.get( urls.barriers.edit.title( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier - Edit title', done ) );
 						} );
 					} );
 					describe( 'product', () => {
