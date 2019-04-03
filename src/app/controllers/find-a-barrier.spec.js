@@ -368,7 +368,7 @@ describe( 'Find a barrier controller', () => {
 				describe( 'As a csv', () => {
 
 					beforeEach( () => {
-						priority = [ faker.lorem.word().toUpperCase(), faker.lorem.word().toUpperCase() ];
+						priority = [ 'ABC', 'DEF' ];
 						req.query.priority = priority.join( ',' );
 					} );
 

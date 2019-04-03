@@ -127,7 +127,7 @@ describe( 'URLs', () => {
 			describe( 'resolution', () => {
 				it( 'Should return the correct path', () => {
 
-					expect( urls.barriers.edit.resolution( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/barrier-resolution/` );
+					expect( urls.barriers.edit.resolution( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/resolution/` );
 				} );
 			} );
 		} );
