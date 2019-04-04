@@ -45,32 +45,34 @@ describe( 'Typeahead', () => {
 		});
 
 		describe( 'when there are suggestions to display', () => {
+			describe( 'With default data', () => {
 
-			beforeEach( ( done ) => {
+				beforeEach( ( done ) => {
 
-				const dataWithOptions = Object.assign( {}, defaultProps, {
-					options: [{
-						value: '1234',
-						text: 'Fred Smith',
-					}, {
-						value: '4321',
-						text: 'Jane Jones',
-					}],
+					const dataWithOptions = Object.assign( {}, defaultProps, {
+						options: [{
+							value: '1234',
+							text: 'Fred Smith',
+						}, {
+							value: '4321',
+							text: 'Jane Jones',
+						}],
+					});
+
+					component.setData( dataWithOptions );
+					Vue.nextTick( done );
 				});
 
-				component.setData( dataWithOptions );
-				Vue.nextTick( done );
-			});
+				it( 'should render an item for each option', () => {
+					const options = component.findAll( '.multiselect__element .multiselect__option' );
+					expect( options.length ).toEqual( 2 );
+				});
 
-			it( 'should render an item for each option', () => {
-				const options = component.findAll( '.multiselect__element .multiselect__option' );
-				expect( options.length ).toEqual( 2 );
-			});
-
-			it( 'should render the correct markup for an option', () => {
-				const markup = component.find( '.multiselect__element .multiselect__option' ).element.innerHTML;
-				expect( markup ).toEqual( '<div class="multiselect__option-label">Fred Smith</div>' );
-			});
+				it( 'should render the correct markup for an option', () => {
+					const markup = component.find( '.multiselect__element .multiselect__option' ).element.innerHTML;
+					expect( markup ).toEqual( '<div class="multiselect__option-label">Fred Smith</div>' );
+				});
+			} );
 		});
 
 		describe( 'when advisers are selected', () => {
@@ -120,25 +122,73 @@ describe( 'Typeahead', () => {
 		});
 
 		describe( 'when created with previously selected advisers', () => {
-			it( 'should populate the selection options value', () => {
+			describe( 'With simple data', () => {
 
-				const defaultOptions = [{
-					value: '1234',
-					text: 'Fred Smith',
-				}, {
-					value: '4321',
-					text: 'Jane Jones',
-					selected: true
-				}];
+				let component;
+				let defaultOptions;
 
-				component = mount( Typeahead, {
-					propsData: defaultProps,
+				beforeEach( () => {
+
+					defaultOptions = [{
+						value: '1234',
+						text: 'Fred Smith',
+					}, {
+						value: '4321',
+						text: 'Jane Jones',
+						selected: true
+					}];
+
+					component = mount( Typeahead, {
+						propsData: defaultProps,
+					});
+
+					component.vm.setOptions( defaultOptions );
+
+				} );
+
+				it( 'should populate the selection options value', () => {
+					expect( component.vm.selectedOptions ).toEqual( [ { value: defaultOptions[ 1 ].value, text: defaultOptions[ 1 ].text, selected: true } ] );
+				});
+			} );
+
+			describe( 'With parent > child data', () => {
+
+				let defaultOptions;
+				let component;
+
+				beforeEach( () => {
+
+					defaultOptions = [{
+						value: '1234',
+						text: 'Country1 > child1',
+					}, {
+						value: '4321',
+						text: 'Country2 > child2',
+						selected: true
+					}];
+
+					component = mount( Typeahead, {
+						propsData: defaultProps,
+					});
+
+					component.vm.setOptions( defaultOptions );
+				} );
+
+				it( 'Should populate the selection options correctly', () => {
+
+					expect( component.vm.selectedOptions ).toEqual( [ { value: defaultOptions[ 1 ].value, text: 'child2', parentName: 'Country2', selected: true } ] );
+				} );
+
+				it( 'should render an item for each option', () => {
+					const options = component.findAll( '.multiselect__element .multiselect__option' );
+					expect( options.length ).toEqual( 1 );
 				});
 
-				component.vm.setOptions( defaultOptions );
-
-				expect( component.vm.selectedOptions ).toEqual( [ { value: defaultOptions[ 1 ].value, text: defaultOptions[ 1 ].text, selected: true } ] );
-			});
+				it( 'should render the correct markup for an option', () => {
+					const markup = component.find( '.multiselect__element .multiselect__option' ).element.innerHTML;
+					expect( markup ).toEqual( '<div class="multiselect__option-label"><span class="parent-text">Country1 &gt; </span>child1</div>' );
+				});
+			} );
 		});
 	});
 
