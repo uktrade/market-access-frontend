@@ -1,9 +1,9 @@
 const backend = require( '../../../../lib/backend-service' );
-const isUuid = /^[0-9a-zA-Z-]+$/;
+const validators = require( '../../../../lib/validators' );
 
 module.exports = async ( req, res, next, barrierId ) => {
 
-	if( isUuid.test( barrierId ) ){
+	if( validators.isUuid( barrierId ) ){
 
 		let barrier;
 
