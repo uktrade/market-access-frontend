@@ -70,7 +70,7 @@ describe( 'Report controllers', () => {
 		} );
 	} );
 
-	fdescribe( 'allSectors', () => {
+	describe( 'allSectors', () => {
 
 		let report;
 
