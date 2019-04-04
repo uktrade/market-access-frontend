@@ -103,7 +103,6 @@ function transformUser( { response, body } ){
 
 		body.country = metadata.getCountry( body.location );
 	}
-
 	if( config.assignDefaultCountry && !body.country ){
 
 		body.country = metadata.countries && metadata.countries[ 1 ];

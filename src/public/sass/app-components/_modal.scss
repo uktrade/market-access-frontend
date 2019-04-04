@@ -8,7 +8,8 @@
     background: rgba(11, 12, 12, 0.7);
     display: block;
 
-    .modal-box {
+    .modal__content {
+        @include govuk-font( $size: 19);
         padding: govuk-em( 20, 16 );
         display: block;
         position: relative;
@@ -16,7 +17,6 @@
         width: 60%;
         top: 15%;
         background: white;
-        font-size: govuk-em( 19, 16 );
     }
 
     .govuk-button {
@@ -37,8 +37,8 @@
             font-weight: bold;
         }
     }
-    .modal-title {
-        font-size: govuk-em( 24, 16 );
+    .modal__box__title {
+        @include govuk-font( $size: 24);
         line-height: 1;
         margin: 0;
     }

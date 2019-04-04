@@ -104,13 +104,17 @@ describe( 'Report controllers', () => {
 					it( 'Should get the reports and render the index page', async () => {
 
 						const country = { id: 1, name: 'test' };
+						
 						const unfinishedReportsResponse = {
 							response: { isSuccess: true  },
 							body: {
 								results: [ { id: 1 } ]
 							}
 						};
-						const reportsViewModelResponse = { reports: true };
+						const reportsViewModelResponse = { 
+							reports: true, 
+							currentReport: undefined, 
+						};
 
 						req.user.country = country;
 
@@ -121,8 +125,14 @@ describe( 'Report controllers', () => {
 
 						expect( next ).not.toHaveBeenCalled();
 						expect( backend.reports.getForCountry ).toHaveBeenCalledWith( req, country.id );
-						expect( reportsViewModel ).toHaveBeenCalledWith( unfinishedReportsResponse.body.results, country );
-						expect( res.render ).toHaveBeenCalledWith( 'reports/views/my-country', reportsViewModelResponse );
+						expect( reportsViewModel ).toHaveBeenCalledWith( unfinishedReportsResponse.body.results, undefined );
+						expect( res.render ).toHaveBeenCalledWith( 
+							'reports/views/my-country', 
+							Object.assign( {},
+								reportsViewModelResponse,
+								{ country: country, csrfToken: req.csrfToken(), isDelete: false }
+							)
+						);
 					} );
 				} );
 
@@ -135,7 +145,10 @@ describe( 'Report controllers', () => {
 								results: [ { id: 1 } ]
 							}
 						};
-						const reportsViewModelResponse = { reports: true };
+						const reportsViewModelResponse = { 
+							reports: true, 
+							currentReport: undefined
+						};
 
 						reportsViewModel.and.callFake( () => reportsViewModelResponse );
 						backend.reports.getAll.and.callFake( () => Promise.resolve( unfinishedReportsResponse ) );
@@ -144,8 +157,14 @@ describe( 'Report controllers', () => {
 
 						expect( next ).not.toHaveBeenCalled();
 						expect( backend.reports.getAll ).toHaveBeenCalledWith( req );
-						expect( reportsViewModel ).toHaveBeenCalledWith( unfinishedReportsResponse.body.results, req.user.country );
-						expect( res.render ).toHaveBeenCalledWith( 'reports/views/index', reportsViewModelResponse );
+						expect( reportsViewModel ).toHaveBeenCalledWith( unfinishedReportsResponse.body.results, undefined );
+						expect( res.render ).toHaveBeenCalledWith( 
+							'reports/views/index',
+							Object.assign( {},
+								reportsViewModelResponse,
+								{ country: undefined, csrfToken: req.csrfToken(), isDelete: false }
+							)
+						);
 					} );
 				} );
 			} );
@@ -202,11 +221,10 @@ describe( 'Report controllers', () => {
 									results: [ { id: 1 } ]
 								}
 							};
-							const reportsViewModelResponse = { reports: [
-								{
-									id: '1234'
-								}
-							] };
+							const reportsViewModelResponse = { 
+								reports: true,
+								currentReport: '1234'
+							};
 	
 							req.user.country = country;
 	
@@ -217,13 +235,13 @@ describe( 'Report controllers', () => {
 	
 							expect( next ).not.toHaveBeenCalled();
 							expect( backend.reports.getForCountry ).toHaveBeenCalledWith( req, country.id );
-							expect( reportsViewModel ).toHaveBeenCalledWith( unfinishedReportsResponse.body.results, country );
+							expect( reportsViewModel ).toHaveBeenCalledWith( unfinishedReportsResponse.body.results, '1234' );
 							expect( res.render ).toHaveBeenCalledWith(
 								'reports/views/my-country', 
 								Object.assign(
 									{}, 
 									reportsViewModelResponse, 
-									{csrfToken: req.csrfToken(), isDelete: true, currentReport: { id: '1234' }}
+									{ country: country, csrfToken: req.csrfToken(), isDelete: true}
 								)
 							);
 						} );
@@ -238,7 +256,10 @@ describe( 'Report controllers', () => {
 									results: [ { id: 1 } ]
 								}
 							};
-							const reportsViewModelResponse = { reports: [] };
+							const reportsViewModelResponse = { 
+								reports: true, 
+								currentReport: '1234'
+							};
 	
 							reportsViewModel.and.callFake( () => reportsViewModelResponse );
 							backend.reports.getAll.and.callFake( () => Promise.resolve( unfinishedReportsResponse ) );
@@ -247,13 +268,13 @@ describe( 'Report controllers', () => {
 	
 							expect( next ).not.toHaveBeenCalled();
 							expect( backend.reports.getAll ).toHaveBeenCalledWith( req );
-							expect( reportsViewModel ).toHaveBeenCalledWith( unfinishedReportsResponse.body.results, req.user.country );
+							expect( reportsViewModel ).toHaveBeenCalledWith( unfinishedReportsResponse.body.results, '1234' );
 							expect( res.render ).toHaveBeenCalledWith( 
 								'reports/views/index', 
 								Object.assign(
 									{}, 
 									reportsViewModelResponse, 
-									{csrfToken: req.csrfToken(), isDelete: true, currentReport: {}}
+									{ country: undefined, csrfToken: req.csrfToken(), isDelete: true }
 								)
 							);
 						} );
@@ -295,10 +316,10 @@ describe( 'Report controllers', () => {
 					expect( next ).toHaveBeenCalledWith( err );
 				} );
 			} );
-		})
+		});
 		describe(' When the request is a POST', () => {
 			beforeEach( () => {
-				req.method = 'POST'
+				req.method = 'POST';
 			} );
 			describe( 'When the service throws an error', () => {
 				it( 'Should call next with the error', async () => {
@@ -343,8 +364,8 @@ describe( 'Report controllers', () => {
 					expect( urls.reports.index ).toHaveBeenCalled();
 				} );
 			} );
-		})
-	})
+		});
+	});
 
 	describe( 'New', () => {
 		it( 'Should render the reports page', () => {

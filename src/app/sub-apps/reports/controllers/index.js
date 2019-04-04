@@ -4,6 +4,42 @@ const urls = require( '../../../lib/urls' );
 const reportDetailViewModel = require( '../view-models/detail' );
 const reportsViewModel = require( '../view-models/reports' );
 
+async function renderDashboard(req, res, next, template, isDelete=false, currentReportId){
+	const country = req.user.country;
+	const countryId = country && req.user.country.id;
+	const csrfToken = req.csrfToken();
+	let viewTemplate = template;
+	let promise;
+
+	if( countryId ){
+
+		viewTemplate = 'reports/views/my-country';
+		promise = backend.reports.getForCountry( req, countryId );
+
+	} else {
+
+		promise = backend.reports.getAll( req );
+	}
+
+	try {
+
+		const { response, body } = await promise;
+
+		if( response.isSuccess ){
+			
+			const { reports, currentReport } = reportsViewModel( body.results, currentReportId );
+			res.render( viewTemplate, Object.assign({},{ currentReport, reports, country, csrfToken, isDelete }) );
+
+		} else {
+
+			throw new Error( `Got ${ response.statusCode } response from backend` );
+		}
+
+	} catch( e ){
+		next( e );
+	}
+}
+
 module.exports = {
 
 	start: require( './start' ),
@@ -17,48 +53,15 @@ module.exports = {
 	summary: require( './summary' ),
 
 	index: async ( req, res, next ) => {
-
-		const country = req.user.country;
-		const countryId = country && req.user.country.id;
 		let template = 'reports/views/index';
-		let promise;
-
-		if( countryId ){
-
-			template = 'reports/views/my-country';
-			promise = backend.reports.getForCountry( req, countryId );
-
-		} else {
-
-			promise = backend.reports.getAll( req );
-		}
-
-		try {
-
-			const { response, body } = await promise;
-
-			if( response.isSuccess ){
-
-				res.render( template, reportsViewModel( body.results, country ) );
-
-			} else {
-
-				throw new Error( `Got ${ response.statusCode } response from backend` );
-			}
-
-		} catch( e ){
-			next( e );
-		}
+		renderDashboard(req, res, next, template);
 	},
 
 	delete: async (req, res, next) => {
-		const country = req.user.country;
-		const countryId = country && req.user.country.id;
 		const currentReportId = req.params.reportId;
 		const isPost = req.method === 'POST';
 
 		let template = 'reports/views/index';
-		let promise;
 
 		if(isPost){
 			try {
@@ -77,42 +80,7 @@ module.exports = {
 
 			}
 		} else {
-			if( countryId ){
-
-				template = 'reports/views/my-country';
-				promise = backend.reports.getForCountry( req, countryId );
-	
-			} else {
-	
-				promise = backend.reports.getAll( req );
-			}
-	
-			try {
-	
-				const { response, body } = await promise;
-				const { reports } = reportsViewModel( body.results, country );
-				
-				let currentReport = {}
-	
-				reports.some((report) => {
-					if (report.id === currentReportId) {
-						currentReport = report;
-						return
-					}
-				});
-				
-				if( response.isSuccess ){
-	
-					res.render( template, Object.assign({},{ currentReport, reports, csrfToken: req.csrfToken(), isDelete: true }) );
-	
-				} else {
-	
-					throw new Error( `Got ${ response.statusCode } response from backend` );
-				}
-	
-			} catch( e ){
-				next( e );
-			}
+			renderDashboard(req, res, next, template, true, currentReportId);
 		}
 	},
 

@@ -17,12 +17,21 @@ function update( item ){
 	return item;
 }
 
-module.exports = ( reports, country ) => {
-
+module.exports = ( reports, currentReportId ) => {
+	let currentReport;
 	if( reports && reports.length ){
-
+		
 		reports = reports.map( update );
+
+		if (currentReportId) {
+			reports.some((report) => {
+				if (report.id === currentReportId) {
+					return currentReport = report;
+				}
+			});
+		}
 	}
 
-	return {	reports, country };
+
+	return { reports, currentReport };
 };
