@@ -321,6 +321,9 @@ module.exports = {
 		saveHasSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 			sectors_affected: getValue( values.hasSectors )
 		} ),
+		saveAllSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
+			alL_sectors: getValue( values.hasSectors )
+		} ),
 		saveSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 			sectors: getValue( values.sectors )
 		} ),

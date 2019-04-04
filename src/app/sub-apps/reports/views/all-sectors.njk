@@ -1,0 +1,39 @@
+{% from 'components/radios/macro.njk' import govukRadios %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Report - Does the barrier affect all sectors?{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.reports.hasSectors( report.id ) },
+		caption: 'Add a barrier',
+		text: 'Sectors affected by the barrier',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.reports.allSectors( report.id ) }}" method="POST">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{{ govukRadios( {
+
+			idPrefix: 'all-sectors',
+			name: 'allSectors',
+			classes: 'all-sectors',
+			fieldset: {
+				legend: {
+					text: 'Does the barrier effect all sectors, or just some sectors?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: allSectors,
+			errorMessage: errors | errorForName( 'all-sectors-1' )
+			} )
+		}}
+
+		<input type="submit" value="Save and continue" class="govuk-button">
+		<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>
+	</form>
+{% endblock %}

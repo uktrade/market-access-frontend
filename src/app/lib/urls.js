@@ -32,6 +32,7 @@ const reportUrl = {
 	addAdminArea: ( reportId, countryId ) => `/reports/${ getReportPath( reportId ) }/country/${countryId}/admin-areas/add/`,
 	removeAdminArea: ( reportId, countryId ) => `/reports/${ getReportPath( reportId ) }/country/${countryId}/admin-areas/remove/`,
 	hasSectors: ( reportId ) => `/reports/${ reportId }/has-sectors/`,
+	allSectors: ( reportId ) => `/reports/${ reportId }/all-sectors/`,
 	sectors: ( reportId ) => `/reports/${ reportId }/sectors/`,
 	addSector: ( reportId ) => `/reports/${ reportId }/sectors/add/`,
 	removeSector: ( reportId ) => `/reports/${ reportId }/sectors/remove/`,
