@@ -73,8 +73,8 @@ module.exports = {
 			source: ( barrierId ) => `/barriers/${ barrierId }/edit/source/`,
 			priority: ( barrierId ) => `/barriers/${ barrierId }/edit/priority/`,
 			euExitRelated: (barrierId) => `/barriers/${barrierId}/edit/eu-exit-related/`,
+			problemStatus: ( barrierId ) => `/barriers/${ barrierId }/edit/problem-status/`,
 			status: ( barrierId ) => `/barriers/${ barrierId }/edit/status/`,
-			resolution: ( barrierId ) => `/barriers/${ barrierId }/edit/resolution/`,
 		},
 		documents: {
 			add: ( barrierId ) => `/barriers/${ barrierId }/interactions/documents/add/`,

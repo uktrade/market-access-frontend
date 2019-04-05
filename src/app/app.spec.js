@@ -388,11 +388,11 @@ describe( 'App', function(){
 						} );
 					} );
 
-					describe( 'status', () => {
+					describe( 'problemStatus', () => {
 						it( 'Should fetch the barrier and render the page', ( done ) => {
 
 							app
-								.get( urls.barriers.edit.status( barrierId ) )
+								.get( urls.barriers.edit.problemStatus( barrierId ) )
 								.end( checkPage( 'Market Access - Barrier - Edit barrier scope', done ) );
 						} );
 					} );

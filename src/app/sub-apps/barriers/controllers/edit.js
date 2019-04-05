@@ -93,14 +93,15 @@ module.exports = {
 		}
 	},
 
-	resolution: async ( req, res, next ) => {
+	status: async ( req, res, next ) => {
 
 		const barrier = req.barrier;
+
 		const invalidDateMessage = 'Enter resolution date and include a month and year';
 		const resolvedDateValues = getDateParts(barrier.current_status.status_date );
 		
 		const form = new Form( req, {
-			resolvedDate: {
+			statusDate: {
 				type: Form.GROUP,
 				validators: [ {
 					fn: validators.isDateValue( 'month' ),
@@ -127,7 +128,7 @@ module.exports = {
 					}
 				}
 			},
-			resolvedSummary: {
+			statusSummary: {
 				values: [ barrier.current_status.status_summary ],
 				required: 'Enter a summary'
 			},
@@ -135,7 +136,7 @@ module.exports = {
 
 		const processor = new FormProcessor( {
 			form,
-			render: ( templateValues ) => res.render( 'barriers/views/edit/barrier-resolution', templateValues ),
+			render: ( templateValues ) => res.render( 'barriers/views/edit/status', templateValues ),
 			saveFormData: ( formValues ) => backend.barriers.resolve( req, barrier.id, formValues ),
 			saved: () => res.redirect( urls.barriers.detail( barrier.id ) )
 		} );
@@ -258,12 +259,12 @@ module.exports = {
 		}
 	},
 
-	status: async ( req, res, next ) => {
+	problemStatus: async ( req, res, next ) => {
 
 		const barrier = req.barrier;
 
 		const form = new Form( req, {
-			status: {
+			problemStatus: {
 				type: Form.RADIO,
 				values: [ barrier.problem_status ],
 				items: govukItemsFromObj( metadata.statusTypes ),
@@ -276,7 +277,7 @@ module.exports = {
 
 		const processor = new FormProcessor( {
 			form,
-			render: ( templateValues ) => res.render( 'barriers/views/edit/status', templateValues ),
+			render: ( templateValues ) => res.render( 'barriers/views/edit/problem-status', templateValues ),
 			saveFormData: ( formValues ) => backend.barriers.saveStatus( req, barrier.id, formValues ),
 			saved: () => res.redirect( urls.barriers.detail( barrier.id ) )
 		} );

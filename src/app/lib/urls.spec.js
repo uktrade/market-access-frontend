@@ -118,16 +118,16 @@ describe( 'URLs', () => {
 					expect( urls.barriers.edit.euExitRelated( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/eu-exit-related/` );
 				});
 			});
+			describe( 'problem-status', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.edit.problemStatus( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/problem-status/` );
+				} );
+			} );
 			describe( 'status', () => {
 				it( 'Should return the correct path', () => {
 
 					expect( urls.barriers.edit.status( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/status/` );
-				} );
-			} );
-			describe( 'resolution', () => {
-				it( 'Should return the correct path', () => {
-
-					expect( urls.barriers.edit.resolution( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/resolution/` );
 				} );
 			} );
 		} );

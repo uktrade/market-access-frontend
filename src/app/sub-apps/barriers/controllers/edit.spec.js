@@ -469,9 +469,9 @@ describe( 'Edit barrier controller', () => {
 		} );
 	} );
 
-	describe('resolution', () => {
+	describe('status', () => {
 
-		const template = 'barriers/views/edit/barrier-resolution';
+		const template = 'barriers/views/edit/status';
 		let barrier;
 
 		beforeEach( () => {
@@ -491,19 +491,19 @@ describe( 'Edit barrier controller', () => {
 				if( key === 'year' ){ return yearResponse; }
 			} );
 
-			await controller.resolution( req, res, next );
+			await controller.status( req, res, next );
 
 			const config = Form.calls.argsFor( 0 )[ 1 ];
 
-			expect( config.resolvedDate ).toBeDefined();
-			expect( config.resolvedDate.type ).toEqual( Form.GROUP );
-			expect( config.resolvedDate.validators.length ).toEqual( 5 );
-			expect( config.resolvedDate.validators[ 0 ].fn ).toEqual( monthResponse );
-			expect( config.resolvedDate.validators[ 1 ].fn ).toEqual( yearResponse );
-			expect( config.resolvedDate.validators[ 2 ].fn ).toEqual( validators.isDateNumeric );
-			expect( config.resolvedDate.validators[ 3 ].fn ).toEqual( validators.isDateValid );
-			expect( config.resolvedDate.validators[ 4 ].fn ).toEqual( validators.isDateInPast );
-			expect( config.resolvedDate.items ).toEqual( {
+			expect( config.statusDate ).toBeDefined();
+			expect( config.statusDate.type ).toEqual( Form.GROUP );
+			expect( config.statusDate.validators.length ).toEqual( 5 );
+			expect( config.statusDate.validators[ 0 ].fn ).toEqual( monthResponse );
+			expect( config.statusDate.validators[ 1 ].fn ).toEqual( yearResponse );
+			expect( config.statusDate.validators[ 2 ].fn ).toEqual( validators.isDateNumeric );
+			expect( config.statusDate.validators[ 3 ].fn ).toEqual( validators.isDateValid );
+			expect( config.statusDate.validators[ 4 ].fn ).toEqual( validators.isDateInPast );
+			expect( config.statusDate.items ).toEqual( {
 				month: {
 					values: [ '03' ]
 				},
@@ -512,14 +512,14 @@ describe( 'Edit barrier controller', () => {
 				}
 			} );
 
-			expect( config.resolvedSummary ).toBeDefined();
-			expect( config.resolvedSummary.required ).toBeDefined();
-			expect( config.resolvedSummary.values).toEqual(['hello']);
+			expect( config.statusSummary ).toBeDefined();
+			expect( config.statusSummary.required ).toBeDefined();
+			expect( config.statusSummary.values).toEqual(['hello']);
 		});
 
 		it( 'Should configure the FormProcessor correctly', async () => {
 
-			await controller.resolution( req, res );
+			await controller.status( req, res );
 
 			const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
 			const templateValues = { abc: '123' };
@@ -549,7 +549,7 @@ describe( 'Edit barrier controller', () => {
 		describe( 'When the processor does not throw an error', () => {
 			it( 'Should not call next', async () => {
 
-				await controller.resolution( req, res, next );
+				await controller.status( req, res, next );
 
 				expect( next ).not.toHaveBeenCalled();
 			} );
@@ -562,7 +562,7 @@ describe( 'Edit barrier controller', () => {
 
 				processor.process.and.callFake( () => { throw err; } );
 
-				await controller.resolution( req, res, next );
+				await controller.status( req, res, next );
 
 				expect( next ).toHaveBeenCalledWith( err );
 			} );
@@ -661,9 +661,9 @@ describe( 'Edit barrier controller', () => {
 		} );
 	});
 
-	describe( 'status', () => {
+	describe( 'problemStatus', () => {
 
-		const template = 'barriers/views/edit/status';
+		const template = 'barriers/views/edit/problem-status';
 
 		it( 'Should configure the Form correctly', async () => {
 
@@ -671,23 +671,23 @@ describe( 'Edit barrier controller', () => {
 
 			validators.isMetadata.and.callFake( () => isMetadataResponse );
 
-			await controller.status( req, res, next );
+			await controller.problemStatus( req, res, next );
 
 			const config = Form.calls.argsFor( 0 )[ 1 ];
 
-			expect( config.status ).toBeDefined();
-			expect( config.status.type ).toEqual( RADIO );
-			expect( config.status.values ).toEqual( [ barrier.problem_status ] );
-			expect( config.status.items ).toEqual( govukItemsFromObjResponse );
+			expect( config.problemStatus ).toBeDefined();
+			expect( config.problemStatus.type ).toEqual( RADIO );
+			expect( config.problemStatus.values ).toEqual( [ barrier.problem_status ] );
+			expect( config.problemStatus.items ).toEqual( govukItemsFromObjResponse );
 			expect( govukItemsFromObj ).toHaveBeenCalledWith( metadata.statusTypes );
-			expect( config.status.validators.length ).toEqual( 1 );
-			expect( config.status.validators[ 0 ].fn ).toEqual( isMetadataResponse );
+			expect( config.problemStatus.validators.length ).toEqual( 1 );
+			expect( config.problemStatus.validators[ 0 ].fn ).toEqual( isMetadataResponse );
 			expect( validators.isMetadata ).toHaveBeenCalledWith( 'statusTypes' );
 		} );
 
 		it( 'Should configure the FormProcessor correctly', async () => {
 
-			await controller.status( req, res );
+			await controller.problemStatus( req, res );
 
 			const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
 			const templateValues = { abc: '123' };
@@ -718,7 +718,7 @@ describe( 'Edit barrier controller', () => {
 		describe( 'When the processor does not throw an error', () => {
 			it( 'Should not call next', async () => {
 
-				await controller.status( req, res, next );
+				await controller.problemStatus( req, res, next );
 
 				expect( next ).not.toHaveBeenCalled();
 			} );
@@ -731,7 +731,7 @@ describe( 'Edit barrier controller', () => {
 
 				processor.process.and.callFake( () => { throw err; } );
 
-				await controller.status( req, res, next );
+				await controller.problemStatus( req, res, next );
 
 				expect( next ).toHaveBeenCalledWith( err );
 			} );
