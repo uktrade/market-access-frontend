@@ -1,23 +1,24 @@
-.collapsible__widget {
+.collapsible-widget {
     display: table;
-    #initial__content {
+    .collapsible-widget__content--initial {
         display: table-header-group;
     }
-    #collapsible {
+    .collapsible-widget__content--toggled {
+        display: none;
+    }
+    .collapsible-widget__label {
+        position: relative;
+        display: block;
+        color: $govuk-blue;
+        cursor: pointer;
+        text-decoration: underline;
+    }
+    #collapsible-widget__toggle { 
         display: table-header-group;
-        &__content {
-            display: none;
-        }
-        &__label {
-            position: relative;
-            display: block;
-            color: $govuk-blue;
-            cursor: pointer;
-            text-decoration: underline;
-        }
+        background: orange;
         &:checked {
-    
-            & + #collapsible__label:after {
+
+            & + .collapsible-widget__label:after {
                 content: "show less";
                 position: absolute;
                 top: 0;
@@ -28,10 +29,10 @@
                 text-decoration: underline;
             }   
     
-            & + #collapsible__label {
-                & + #initial__content {
+            & + .collapsible-widget__label {
+                & + .collapsible-widget__content--initial {
                     display: none;
-                    & + #collapsible__content {
+                    & + .collapsible-widget__content--toggled {
                         display: table-header-group;
                     }
                 }

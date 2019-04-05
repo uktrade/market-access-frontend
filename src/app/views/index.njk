@@ -34,14 +34,14 @@
 						{{ barrier.code }}
 					</td>
 					<td class="standard-table__cell collapsible-content">
-						<div class="collapsible__widget">
+						<div class="collapsible-widget">
 							{% if barrier.sectors|length > 3 %}
-								<input type="checkbox" id="collapsible" style="display:none;">
-								<label id="collapsible__label" for="collapsible">show more</label>
-								<div id="initial__content"> 
+								<input type="checkbox" id="collapsible-widget__toggle" style="display:none;">
+								<label class="collapsible-widget__label" for="collapsible-widget__toggle">show more</label>
+								<div class="collapsible-widget__content--initial"> 
 									{{ barrier.sectors.slice(0, 2) | join( ', ' ) }} ...
 								</div>
-								<div id="collapsible__content">
+								<div class="collapsible-widget__content--toggled">
 									{{ barrier.sectors | join( ', ' ) }}
 								</div>
 							{% else %}
