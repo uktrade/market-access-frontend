@@ -877,7 +877,7 @@ describe( 'Backend Service', () => {
 				} );
 			} );
 
-			fdescribe( 'saveAllSectors', () => {
+			describe( 'saveAllSectors', () => {
 
 				const allSectors = 'true';
 
