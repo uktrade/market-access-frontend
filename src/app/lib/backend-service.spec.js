@@ -587,12 +587,12 @@ describe( 'Backend Service', () => {
 			} );
 		});
 
-		describe( 'saveStatus', () => {
+		describe( 'saveProblemStatus', () => {
 			it( 'Should PUT to the correct path with the correct values', async () => {
 
 				const status = '1';
 
-				await service.barriers.saveStatus( req, barrierId, {
+				await service.barriers.saveProblemStatus( req, barrierId, {
 					status
 				} );
 

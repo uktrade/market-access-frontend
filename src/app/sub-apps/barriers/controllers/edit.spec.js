@@ -469,7 +469,7 @@ describe( 'Edit barrier controller', () => {
 		} );
 	} );
 
-	fdescribe('status', () => {
+	describe('status', () => {
 
 		const template = 'barriers/views/edit/status';
 		let barrier;
