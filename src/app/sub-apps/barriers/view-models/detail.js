@@ -32,7 +32,7 @@ function buildLocationString( country, adminAreas ){
 
 module.exports = ( barrier, addCompany = false ) => {
 
-	const barrierStatusCode = barrier.current_status.status;
+	const barrierStatusCode = barrier.status;
 	const status = barrierStatusTypeInfo[ barrierStatusCode ] || {};
 	const sectors = ( barrier.sectors || [] ).map( metadata.getSector );
 	const sectorsList = sectors.map( ( sector ) => ( sector && { text: sector.name } || { text: 'Unknown' } ) );
@@ -44,8 +44,8 @@ module.exports = ( barrier, addCompany = false ) => {
 		return ( code ? metadata.optionalBool[ code ] : 'Unknown' );
 	}
 
-	status.description = barrier.current_status.status_summary;
-	status.date = barrier.current_status.status_date;
+	status.description = barrier.status_summary;
+	status.date = barrier.status_date;
 
 	return {
 		addCompany,

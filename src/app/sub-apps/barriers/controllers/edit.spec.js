@@ -478,13 +478,13 @@ describe( 'Edit barrier controller', () => {
 			barrier = jasmine.helpers.getFakeData( '/backend/barriers/barrier' );
 			validators.isDateValue = jasmine.createSpy( 'validators.isDateValue' );
 			req.barrier = barrier;
-			barrier.current_status.status_summary = "hello";
+			barrier.status_summary = "hello";
 		} );
 
 		describe( 'If configuring the form for a resolved barrier', () => {
 			it( 'Should configure the Form correctly', async () => {
 
-				barrier.current_status.status = 4;
+				barrier.status = 4;
 
 				const monthResponse = { month: true };
 				const yearResponse = { year: true };

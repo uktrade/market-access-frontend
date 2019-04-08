@@ -68,7 +68,7 @@ describe( 'Barrier detail view model', () => {
 	describe( 'With all the data on an open barrier', () => {
 		it( 'Should create all the correct properties', () => {
 
-			inputBarrier.current_status.status = 2;
+			inputBarrier.status = 2;
 			inputBarrier.problem_status = '2';
 
 			const output = viewModel( inputBarrier );
@@ -79,7 +79,7 @@ describe( 'Barrier detail view model', () => {
 			expect( outputBarrier.code ).toEqual( inputBarrier.code );
 			expect( outputBarrier.title ).toEqual( inputBarrier.barrier_title );
 			expect( outputBarrier.product ).toEqual( inputBarrier.product );
-			expect( outputBarrier.problem.status ).toEqual( metadata.statusTypes[ inputBarrier.problem_status ] );
+			expect( outputBarrier.problem.problemStatus ).toEqual( metadata.statusTypes[ inputBarrier.problem_status ] );
 			expect( outputBarrier.problem.description ).toEqual( inputBarrier.problem_description );
 			expect( outputBarrier.type ).toEqual( {
 				id: inputBarrier.barrier_type.id,
@@ -93,8 +93,8 @@ describe( 'Barrier detail view model', () => {
 			expect( outputBarrier.status ).toEqual( {
 				name: 'Open',
 				modifyer: 'assessment',
-				date: inputBarrier.current_status.status_date,
-				description: inputBarrier.current_status.status_summary
+				date: inputBarrier.status_date,
+				description: inputBarrier.status_summary
 			} );
 			expect( outputBarrier.reportedOn ).toEqual( inputBarrier.reported_on );
 			expect( outputBarrier.addedBy ).toEqual( inputBarrier.reported_by );
@@ -138,7 +138,7 @@ describe( 'Barrier detail view model', () => {
 	describe( 'With sectors missing on an open barrier', () => {
 		it( 'Should create all the correct properties', () => {
 
-			inputBarrier.current_status.status = 2;
+			inputBarrier.status = 2;
 			inputBarrier.sectors = null;
 
 			const output = viewModel( inputBarrier );
@@ -158,7 +158,7 @@ describe( 'Barrier detail view model', () => {
 
 			metadata.getSector.and.callFake( () => null );
 
-			inputBarrier.current_status.status = 2;
+			inputBarrier.status = 2;
 			inputBarrier.sectors = [ null ];
 
 			const output = viewModel( inputBarrier );
@@ -196,7 +196,7 @@ describe( 'Barrier detail view model', () => {
 	describe( 'A resolved barrier', () => {
 		it( 'Should have the correct properties', () => {
 
-			inputBarrier.current_status.status = 4;
+			inputBarrier.status = 4;
 
 			const output = viewModel( inputBarrier );
 			const outputBarrier = output.barrier;
@@ -204,8 +204,8 @@ describe( 'Barrier detail view model', () => {
 			expect( outputBarrier.status ).toEqual( {
 				name: 'Resolved',
 				modifyer: 'resolved',
-				date: inputBarrier.current_status.status_date,
-				description: inputBarrier.current_status.status_summary
+				date: inputBarrier.status_date,
+				description: inputBarrier.status_summary
 			} );
 
 			expect( outputBarrier.isOpen ).toEqual( false );
@@ -229,7 +229,7 @@ describe( 'Barrier detail view model', () => {
 	describe( 'A hibernated barrier', () => {
 		it( 'Should have the correct properties', () => {
 
-			inputBarrier.current_status.status = 5;
+			inputBarrier.status = 5;
 
 			const output = viewModel( inputBarrier );
 			const outputBarrier = output.barrier;
@@ -237,8 +237,8 @@ describe( 'Barrier detail view model', () => {
 			expect( outputBarrier.status ).toEqual( {
 				name: 'Paused',
 				modifyer: 'hibernated',
-				date: inputBarrier.current_status.status_date,
-				description: inputBarrier.current_status.status_summary
+				date: inputBarrier.status_date,
+				description: inputBarrier.status_summary
 			} );
 
 			expect( outputBarrier.isOpen ).toEqual( false );

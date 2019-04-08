@@ -97,17 +97,17 @@ module.exports = {
 
 		
 		const barrier = req.barrier;
-		const isResolved = barrier.current_status.status === metadata.barrier.status.types.RESOLVED;
+		const isResolved = barrier.status === metadata.barrier.status.types.RESOLVED;
 
 		const formFields = {
 			statusSummary: {
-				values: [ barrier.current_status.status_summary ],
+				values: [ barrier.status_summary ],
 				required: 'Enter a summary'
 			}
 		};
 		if (isResolved) { 
 			const invalidDateMessage = 'Enter resolution date and include a month and year';
-			const resolvedDateValues = getDateParts(barrier.current_status.status_date );
+			const resolvedDateValues = getDateParts(barrier.status_date );
 
 			formFields.statusDate = {
 				type: Form.GROUP,

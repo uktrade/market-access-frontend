@@ -33,7 +33,7 @@ describe( 'Find a barrier view model', () => {
 		for( let barrier of barriers ){
 
 			const sectors = ( barrier.sectors ? barrier.sectors.map( () => mockSector ) : [] );
-			const barrierStatusCode = barrier.current_status.status;
+			const barrierStatusCode = barrier.status;
 			const status = metadata.barrier.status.typeInfo[ barrierStatusCode ] || {};
 
 			expected.push({
@@ -49,7 +49,7 @@ describe( 'Find a barrier view model', () => {
 				status,
 				date: {
 					reported: barrier.reported_on,
-					status: barrier.current_status.status_date,
+					status: barrier.status_date,
 					created: barrier.created_on,
 				},
 				priority: barrier.priority
