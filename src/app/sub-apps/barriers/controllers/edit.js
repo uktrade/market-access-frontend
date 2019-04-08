@@ -95,13 +95,21 @@ module.exports = {
 
 	status: async ( req, res, next ) => {
 
-		const barrier = req.barrier;
-
-		const invalidDateMessage = 'Enter resolution date and include a month and year';
-		const resolvedDateValues = getDateParts(barrier.current_status.status_date );
 		
-		const form = new Form( req, {
-			statusDate: {
+		const barrier = req.barrier;
+		const isResolved = barrier.current_status.status === metadata.barrier.status.types.RESOLVED;
+
+		const formFields = {
+			statusSummary: {
+				values: [ barrier.current_status.status_summary ],
+				required: 'Enter a summary'
+			}
+		};
+		if (isResolved) { 
+			const invalidDateMessage = 'Enter resolution date and include a month and year';
+			const resolvedDateValues = getDateParts(barrier.current_status.status_date );
+
+			formFields.statusDate = {
 				type: Form.GROUP,
 				validators: [ {
 					fn: validators.isDateValue( 'month' ),
@@ -127,17 +135,15 @@ module.exports = {
 						values: [ resolvedDateValues.year ]
 					}
 				}
-			},
-			statusSummary: {
-				values: [ barrier.current_status.status_summary ],
-				required: 'Enter a summary'
-			},
-		} );
+			};
+		}
+		
+		const form = new Form( req, formFields);
 
 		const processor = new FormProcessor( {
 			form,
-			render: ( templateValues ) => res.render( 'barriers/views/edit/status', templateValues ),
-			saveFormData: ( formValues ) => backend.barriers.resolve( req, barrier.id, formValues ),
+			render: ( templateValues ) => res.render( 'barriers/views/edit/status', Object.assign(templateValues, {isResolved}) ),
+			saveFormData: ( formValues ) => backend.barriers.saveStatus( req, barrier.id, formValues ),
 			saved: () => res.redirect( urls.barriers.detail( barrier.id ) )
 		} );
 
@@ -278,7 +284,7 @@ module.exports = {
 		const processor = new FormProcessor( {
 			form,
 			render: ( templateValues ) => res.render( 'barriers/views/edit/problem-status', templateValues ),
-			saveFormData: ( formValues ) => backend.barriers.saveStatus( req, barrier.id, formValues ),
+			saveFormData: ( formValues ) => backend.barriers.saveProblemStatus( req, barrier.id, formValues ),
 			saved: () => res.redirect( urls.barriers.detail( barrier.id ) )
 		} );
 

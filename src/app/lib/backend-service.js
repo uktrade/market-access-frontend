@@ -294,9 +294,16 @@ module.exports = {
 		saveEuExitRelated: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
 			eu_exit_related: values.euExitRelated,
 		}),
-		saveStatus: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
+		saveProblemStatus: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
 			problem_status: values.status
 		} ),
+		saveStatus: ( req, barrierId, values ) => {
+			const status_details = { status_summary: values.statusSummary };
+			if (values.statusDate) {
+				status_details.status_date = values.statusDate;
+			}
+			return updateBarrier( getToken( req ), barrierId, status_details); 
+		},
 	},
 
 	reports: {
