@@ -17,29 +17,12 @@
         width: 60%;
         top: 15%;
         background: white;
-    }
 
-    .govuk-button {
-        display: inline-block;
-        margin-bottom: 0;
-    }
-    dl {
-        overflow: hidden;
-        dt, dd {
-            float: left;
-            margin-bottom: govuk-em( 10, 16 );
-        }
-        dt { 
-            clear:both;
-            width: govuk-em( 80, 16 );
-        }
-        dd {
+        &__title {
+            @include govuk-font( $size: 24);
             font-weight: bold;
+            line-height: 1;
+            margin: 0;
         }
-    }
-    .modal__box__title {
-        @include govuk-font( $size: 24);
-        line-height: 1;
-        margin: 0;
     }
 }

@@ -1,15 +1,21 @@
 {% from 'app-components/dashboard-heading.njk' import dashboardHeading %}
+{% from 'app-components/modal.njk' import modal %}
 {% extends 'layout.njk' %}
 
 {% block page_title %}{{ super() }} - Draft barriers{% endblock %}
 
-{% block modal %}
-{% if isDelete %}
-	<div class="modal">
-		<div class="modal__content">
-			<h3 class="modal__box__title"> Delete unfinished barrier</h3>
+{% block outsideContent %}
+	{% if isDelete %}
+		{% call modal(
+				{ 
+					'title': "Delete unfinished barrier", 
+					'action': { 'url': urls.reports.delete( report.id ), 'text': "Yes, delete" },
+					'cancel': { 'url': urls.reports.index(), 'text': "No, cancel" }
+				}
+			)
+		%}
 			<p> Are you sure you want to delete this unfinished barrier? </p>
-			<dl>
+			<dl class="inline-definition-list">
 				<dt>Barrier ID </dt>
 				<dd>{{ currentReport.code }}</dd>
 				<dt>Location</dt>
@@ -24,16 +30,9 @@
 				{% endif %}
 
 			</dl>
-			<form action="{{ urls.reports.delete( report.id ) }}" method="POST">
-				<input type="hidden" name="_csrf" value="{{ csrfToken }}">
-				<input type="submit" value="Yes, delete" class="govuk-button">
-				<a href="{{ urls.reports.index() }}" class="govuk-button button--secondary">No, cancel</a>
-			</form>
-		</div>
-	</div>
-{% endif %}
+		{% endcall %}
+	{% endif %}
 {% endblock %}
-
 {% block page_content %}
 
 	{{ dashboardHeading( dashboard, isReports = true ) }}
