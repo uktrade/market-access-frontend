@@ -31,7 +31,7 @@ function addTypeForm( req, res, href ){
 
 		barrierType: {
 			type: Form.RADIO,
-			items: metadata.barrierTypes.filter( ( type ) => !types.includes( String( type.id ) ) ).map( barrierTypeToRadio ).sort( sortGovukItems.alphabetical ),
+			items: metadata.barrierTypes.filter( ( type ) => !types.includes( type.id ) ).map( barrierTypeToRadio ).sort( sortGovukItems.alphabetical ),
 			validators: [ {
 				fn: validators.isBarrierType,
 				message: 'Select a barrier type'
@@ -48,7 +48,7 @@ function addTypeForm( req, res, href ){
 
 		if( !form.hasErrors() ){
 
-			types.push( form.getValues().barrierType );
+			types.push( parseInt( form.getValues().barrierType, 10 ) );
 			req.barrierSession.types.set( types );
 
 			return res.redirect( urls.barriers.types.list( barrier.id ) );

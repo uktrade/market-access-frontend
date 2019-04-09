@@ -281,20 +281,22 @@ describe( 'Barrier types controller', () => {
 		} );
 
 		describe( 'remove', () => {
-			it( 'Should remove the matching type', () => {
+			describe( 'When the session values are numbers', () => {
+				it( 'Should remove the matching type', () => {
 
-				const type1 = types[ 0 ];
-				const type2 = types[ 1 ];
-				const listResponse = '/list/types';
+					const type1 = types[ 0 ];
+					const type2 = types[ 1 ];
+					const listResponse = '/list/types';
 
-				req.body = { type: String( type1 ) };
-				req.barrierSession.types.get.and.callFake( () => types );
-				urls.barriers.types.list.and.callFake( () => listResponse );
+					req.body = { type: String( type1 ) };
+					req.barrierSession.types.get.and.callFake( () => types );
+					urls.barriers.types.list.and.callFake( () => listResponse );
 
-				controller.remove( req, res );
+					controller.remove( req, res );
 
-				expect( req.barrierSession.types.set ).toHaveBeenCalledWith( [ type2 ] );
-				expect( res.redirect ).toHaveBeenCalledWith( listResponse );
+					expect( req.barrierSession.types.set ).toHaveBeenCalledWith( [ type2 ] );
+					expect( res.redirect ).toHaveBeenCalledWith( listResponse );
+				} );
 			} );
 		} );
 
@@ -383,7 +385,7 @@ describe( 'Barrier types controller', () => {
 
 							controller.add( req, res );
 
-							checkFormConfig( getTypeList().filter( ( type ) => !types.includes( String( type.value ) ) ) );
+							checkFormConfig( getTypeList().filter( ( type ) => !types.includes( type.value ) ) );
 							checkRender();
 							expect( req.barrierSession.types.setIfNotAlready ).toHaveBeenCalledWith( types );
 						} );
@@ -423,7 +425,7 @@ describe( 'Barrier types controller', () => {
 
 							type = 200;
 							form.hasErrors = () => false;
-							getValuesResponse.barrierType = type;
+							getValuesResponse.barrierType = String( type );
 							urls.barriers.types.list.and.callFake( () => listResponse );
 						} );
 
@@ -514,7 +516,7 @@ describe( 'Barrier types controller', () => {
 
 							type = 300;
 							form.hasErrors = () => false;
-							getValuesResponse.barrierType = type;
+							getValuesResponse.barrierType = String( type );
 							urls.barriers.types.list.and.callFake( () => listResponse );
 						} );
 
