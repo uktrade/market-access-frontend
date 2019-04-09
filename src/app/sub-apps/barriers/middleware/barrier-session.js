@@ -47,5 +47,7 @@ module.exports = ( req, res, next ) => {
 			...methods,
 			types: createMethods( 'types' )
 		};
+
+		next();
 	}
 };
