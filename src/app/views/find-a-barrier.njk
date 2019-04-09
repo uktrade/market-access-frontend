@@ -134,14 +134,12 @@
 		<div class="govuk-grid-column-three-quarters">
 
 			{%- macro activeFilter( name, filter ) -%}
-				{% if filter.active.length %}
+				{% if filter.text %}
 				<li class="active-filters__item">
 					<a href="{{ filter.removeUrl }}" class="active-filters__item__link" title="Remove {{ name }} filter">
 						<h4 class="active-filter__heading">{{ name }}:</h4>
 						<p class="active-filter__text">
-							{% for item in filter.active %}
-							{{- item.name }}{{ ', ' if not loop.last -}}
-							{% endfor %}
+							{{ filter.text }}
 						</p>
 					</a>
 				</li>
@@ -181,7 +179,7 @@
 								{% endif %}
 
 								<dt class="filter-results-list__item__definitions__key">Barrier location:</dt>
-								<dd class="filter-results-list__item__definitions__value">{{ barrier.country.name }}</dd>
+								<dd class="filter-results-list__item__definitions__value">{{ barrier.location }}</dd>
 							</dl>
 						</div>
 

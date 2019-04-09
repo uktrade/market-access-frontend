@@ -75,6 +75,16 @@ $highlight-colour: $govuk-grey-4;;
 		border: 0;
 		outline: 0;
 	}
+
+	.parent-text {
+		color: $govuk-grey-1;
+	}
+
+	&.multiselect__option--highlight {
+		.parent-text {
+			color: #fff;
+		}
+	}
 }
 
 .multiselect__option--highlight,

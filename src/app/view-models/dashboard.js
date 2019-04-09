@@ -1,19 +1,13 @@
 const metadata = require( '../lib/metadata' );
+const strings = require( '../lib/strings' );
 
 const barrierStatusTypeInfo = metadata.barrier.status.typeInfo;
 
-const checkAllSectors = (barrier) => barrier.all_sectors ? 'All Sectors' : ( barrier.sectors && barrier.sectors.map( getSector ) || [ 'Unknown' ] );
-
-function getSector( sectorId ){
-
-	const sector = metadata.getSector( sectorId );
-
-	return ( sector && sector.name );
-}
+const checkAllSectors = (barrier) => barrier.all_sectors ? 'All Sectors' : barrier.sectors ? strings.sectors(barrier.sectors) : 'Unknown';
 
 function update( barrier ){
 
-	barrier.all_sectors = true;
+	// barrier.all_sectors = true;
 	const countryId = barrier.export_country;
 	const country = metadata.countries.find( ( country ) => country.id === countryId );
 	const barrierStatusCode = barrier.current_status.status;

@@ -28,8 +28,8 @@ function alterAdminAreasData( adminAreas ) {
 
 	const alteredAdminAreas = {};
 
-	// Loop through each admin area and push it to the corresponding 
-	// array based on country ID 
+	// Loop through each admin area and push it to the corresponding
+	// array based on country ID
 
 	adminAreas.forEach( ( countryAdminArea ) => {
 		// Key already exists for country
@@ -110,6 +110,7 @@ function createList( items, text ){
 }
 
 function createAdminAreaList (country, adminAreas, text) {
+
 	const adminAreaList = adminAreas[country].map( ( adminArea ) => ( {
 		value: adminArea.id,
 		text: adminArea.name

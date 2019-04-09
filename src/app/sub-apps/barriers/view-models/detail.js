@@ -1,4 +1,5 @@
 const metadata = require( '../../../lib/metadata' );
+const strings = require( '../../../lib/strings' );
 
 const { OPEN, RESOLVED, HIBERNATED } = metadata.barrier.status.types;
 const barrierStatusTypeInfo = metadata.barrier.status.typeInfo;
@@ -18,16 +19,6 @@ function getBarrierType( type ){
 			name: metadata.barrierTypeCategories[ category ]
 		}
 	};
-}
-
-function buildLocationString( country, adminAreas ){
-
-	const countryName = ( metadata.getCountry( country ) || {} ).name;
-	const adminAreasString = adminAreas ? adminAreas.map(
-		(adminAreaId) => ( metadata.getAdminArea( adminAreaId ) || {} ).name
-	).join( ', ' ) : '';
-
-	return adminAreasString ? `${ adminAreasString } (${ countryName })` : countryName;
 }
 
 module.exports = ( barrier, addCompany = false ) => {
@@ -66,7 +57,7 @@ module.exports = ( barrier, addCompany = false ) => {
 			reportedOn: barrier.reported_on,
 			addedBy: barrier.reported_by,
 			euExitRelated: getEuExitRelatedText( barrier.eu_exit_related ),
-			location: buildLocationString( barrier.export_country, barrier.country_admin_areas ),
+			location: strings.location( barrier.export_country, barrier.country_admin_areas ),
 			sectors,
 			source: {
 				id: barrier.source,
