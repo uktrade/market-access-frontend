@@ -7,7 +7,7 @@ describe( 'Barriers controller', () => {
 	let controller;
 
 	let edit;
-	let type;
+	let types;
 	let interactions;
 	let status;
 	let sectors;
@@ -16,7 +16,7 @@ describe( 'Barriers controller', () => {
 	beforeEach( () => {
 
 		edit = jasmine.createSpy( 'edit' );
-		type = jasmine.createSpy( 'type' );
+		types = jasmine.createSpy( 'types' );
 		interactions = jasmine.createSpy( 'interactions' );
 		status = jasmine.createSpy( 'status' );
 		sectors = jasmine.createSpy( 'sectors' );
@@ -24,7 +24,7 @@ describe( 'Barriers controller', () => {
 
 		controller = proxyquire( modulePath, {
 			'./edit': edit,
-			'./type': type,
+			'./types': types,
 			'./interactions': interactions,
 			'./status': status,
 			'./sectors': sectors,
@@ -35,7 +35,7 @@ describe( 'Barriers controller', () => {
 	it( 'Should require the other controllers', () => {
 
 		expect( controller.edit ).toEqual( edit );
-		expect( controller.type ).toEqual( type );
+		expect( controller.types ).toEqual( types );
 		expect( controller.interactions ).toEqual( interactions );
 		expect( controller.status ).toEqual( status );
 		expect( controller.sectors ).toEqual( sectors );

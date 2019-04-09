@@ -3,31 +3,13 @@
 	"title": "Detail of a report",
 
 	"type": "object",
-	"required": [ "id", "company_name", "barrier_type", "progress" ],
+	"required": [ "id", "progress" ],
 	"properties": {
 
 		"id": {
 			"type": "number",
 			"faker": {
 				"finance.amount": [ 0, 100, 0 ]
-			}
-		},
-
-		"company_name": {
-			"type": "string",
-			"faker": "lorem.words"
-		},
-
-		"barrier_type": {
-			"type": "object",
-			"required": [
-				"id",
-				"title"
-			],
-			"properties": {
-
-				"id": { "$ref": "$refs/common.json#/small-int" },
-				"title": { "$ref": "$refs/common.json#/words" }
 			}
 		},
 

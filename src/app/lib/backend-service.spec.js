@@ -380,19 +380,15 @@ describe( 'Backend Service', () => {
 			} );
 		} );
 
-		describe( 'saveType', () => {
+		describe( 'saveTypes', () => {
 			it( 'Should PUT to the correct path with the correct values', async () => {
 
-				const barrierType = 'my type';
-				const category = 'my category';
+				const types = [ 'a', 'b' ];
 
-				await service.barriers.saveType( req, barrierId, {
-					barrierType
-				}, category );
+				await service.barriers.saveTypes( req, barrierId, types );
 
 				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
-					barrier_type: barrierType,
-					barrier_type_category: category
+					barrier_types: types,
 				} );
 			} );
 		} );
