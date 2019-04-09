@@ -3,7 +3,7 @@ const validators = require( '../lib/validators' );
 const viewModel = require( '../view-models/find-a-barrier' );
 
 const FILTERS = Object.entries( {
-	country: validators.isCountry,
+	country: validators.isCountryOrAdminArea,
 	sector: validators.isSector,
 	type: validators.isBarrierType,
 	priority: validators.isBarrierPriority,

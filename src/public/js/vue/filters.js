@@ -1,8 +1,18 @@
+function getString( parentName, text ){
+
+	if( parentName ){
+
+		text = `<span class="parent-text">${ parentName } > </span>${ text }`;
+	}
+
+	return text;
+}
+
 module.exports = {
 
-	highlight: ( str, words ) => {
+	highlight: ( str, words, parentName ) => {
 
-		if( !words ){ return str; }
+		if( !words ){ return getString( parentName, str ); }
 
 		const queryWords = words.split( ' ' ).filter( ( word ) => word.length >= 1 );
 		const openTag = '<span class=\'highlight\'>';
@@ -13,6 +23,6 @@ module.exports = {
 			str = str.replace( query, ( matchedTxt ) => ( openTag + matchedTxt + closeTag ) );
 		});
 
-		return str;
+		return getString( parentName, str );
 	}
 };

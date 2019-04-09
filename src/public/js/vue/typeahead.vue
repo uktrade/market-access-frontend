@@ -28,10 +28,8 @@
 				<div class="multiselect__clear" v-if="selectedOptions" @mousedown.prevent.stop="clearAll(props.search)"></div>
 			</template>
 
-			<template slot="option" slot-scope="props">
-				<div class="multiselect__option-label" v-html="$options.filters.highlight(props.option.text, props.search)">
-					{{ props.option.text }}
-				</div>
+			 <template slot="option" slot-scope="props">
+				<div class="multiselect__option-label" v-html="$options.filters.highlight(props.option.text, props.search, props.option.parentName)"></div>
 			</template>
 
 			<template slot="caret" slot-scope="methods">
@@ -51,7 +49,7 @@
 
 	const Multiselect = require( 'vue-multiselect' ).default;
 	const { highlight } = require( './filters' );
-	const uuid = require( 'uuid' );
+	const uuid = require( 'uuid/v4' );
 
 	/**
 	 * matchWords
@@ -72,7 +70,7 @@
 		const queryWords = words.split( ' ' );
 		const count = queryWords.reduce( ( allWords, word ) => {
 
-			if( str.search( new RegExp( word, 'i' ) ) !== -1 ){
+			if( str.toLowerCase().includes( word.toLowerCase() ) ){
 				allWords++;
 			}
 
@@ -129,6 +127,19 @@
 
 			setOptions: function( options ){
 
+				options.forEach( ( option ) => {
+
+					const token = ' > ';
+					const text = option.text;
+					const tokenPosition = text.indexOf( token );
+
+					if( tokenPosition > 0 ){
+
+						option.parentName = text.substring( 0, tokenPosition );
+						option.text = text.substring( tokenPosition + token.length );
+					}
+				} );
+
 				this.options = options;
 				this.optionsData = options;
 				this.selectedOptions = options.filter( ( item ) => item.selected );
@@ -137,7 +148,7 @@
 			search: function( query ){
 				//filter options when typing
 				this.options = this.optionsData.filter( ( item ) => {
-					return matchWords( item.text, query );
+					return matchWords( item.text + ( item.parentName || '' ), query );
 				})
 			},
 		},
