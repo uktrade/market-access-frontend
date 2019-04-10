@@ -63,7 +63,6 @@ describe( 'Edit barrier location controller', () => {
 				detail: jasmine.createSpy( 'urls.barriers.detail' ),
 				location: {
 					list: jasmine.createSpy( 'urls.barriers.location.list' ),
-					add_admin_area: jasmine.createSpy( 'urls.barriers.location.add_admin_area' )
 				}
 			}
 		};
@@ -77,7 +76,7 @@ describe( 'Edit barrier location controller', () => {
 			params: {},
 			query: {}
 		};
-		
+
 
 		res = {
 			render: jasmine.createSpy( 'res.render' ),
@@ -116,7 +115,7 @@ describe( 'Edit barrier location controller', () => {
 					await controller.list(req, res, next);
 
 					expect(res.render).toHaveBeenCalledWith( 'barriers/views/location/list', {
-						country: 'country 1', 
+						country: 'country 1',
 						showAdminAreas: true,
 						adminAreas: [],
 						csrfToken: req.csrfToken()
@@ -132,7 +131,7 @@ describe( 'Edit barrier location controller', () => {
 					await controller.list(req, res, next);
 
 					expect(res.render).toHaveBeenCalledWith( 'barriers/views/location/list', {
-						country: 'country 1', 
+						country: 'country 1',
 						showAdminAreas: false,
 						adminAreas: [],
 						csrfToken: req.csrfToken()
@@ -151,7 +150,7 @@ describe( 'Edit barrier location controller', () => {
 				};
 
 			} );
-			
+
 			describe( 'When the response is a success', () => {
 				it( 'Should redirect to the barrir detail page', async () => {
 
@@ -201,138 +200,140 @@ describe( 'Edit barrier location controller', () => {
 		});
 	});
 
-	describe( 'add admin area', () => {
-
-		beforeEach( () => {
-			req.session = {
-				location: { 
-					country: 'country 1',
-					adminAreas: []
-				}
-			};
-		});
-
-		it( 'Should configure the Form correctly', () => {
-
-			const isMetadataResponse = { ab: '12', cd: '34' };
-
-			validators.isMetadata.and.callFake( () => isMetadataResponse );
-
-			controller.add_admin_area( req, res );
-
-			const config = Form.calls.argsFor( 0 )[ 1 ];
-
-			expect( config.adminAreas ).toBeDefined();
-			expect( config.adminAreas.type ).toEqual( SELECT );
-			expect( config.adminAreas.items ).toEqual( metadata.getCountryAdminAreasList() );
-			expect( config.adminAreas.validators.length ).toEqual( 2 );
-			expect( config.adminAreas.validators[ 0 ].fn ).toEqual( validators.isCountryAdminArea );
-
-			expect( config.status ).not.toBeDefined();
-		} );
-
-		describe( 'when it is a GET', () => {
-			describe( 'without admin areas in the session', () => {
-				it( 'renders the page without admin areas', () => {
-					form.getTemplateValues.and.callFake( () => ({ adminAreas: '1234' }) );
-
-					controller.add_admin_area( req, res );
-
-					expect(res.render).toHaveBeenCalledWith(
-						'barriers/views/location/add-admin-area',
-						{
-							adminAreas: getAdminAreaValuesResponse.adminAreas,
-							currentAdminAreas: []
-						}
-					);
-				});
-			});
-	
-			describe( 'with admin areas in the session', () => {
-
-				beforeEach( () => {
-					req.session = {
-						location: { 
-							country: 'country 1',
-							adminAreas: [2]
-						}
-					};
-				});
-
-				it( 'renders the page with admin areas', () => {
-
-					form.getTemplateValues.and.callFake( () => ({ adminAreas: '1234' }) );
-
-					controller.add_admin_area( req, res );
-
-					expect(res.render).toHaveBeenCalledWith(
-						'barriers/views/location/add-admin-area',
-						{
-							adminAreas: getAdminAreaValuesResponse.adminAreas,
-							currentAdminAreas: req.session.location.adminAreas.map( metadata.getAdminArea ) 
-						}
-					);
-				});
-			});
-		});
-		describe( 'when it is a POST', () => {
+	describe( 'adminAreas', () => {
+		describe( 'add admin area', () => {
 
 			beforeEach( () => {
-				form.isPost = true;
+				req.session = {
+					location: {
+						country: 'country 1',
+						adminAreas: []
+					}
+				};
 			});
 
-			describe('When the form has errors', () => {
-				it( 'Should render the template', () => {
+			it( 'Should configure the Form correctly', () => {
 
-					form.getTemplateValues.and.callFake( () => ({ adminAreas: '1234' }) );
+				const isMetadataResponse = { ab: '12', cd: '34' };
 
-					form.hasErrors = () => true;
+				validators.isMetadata.and.callFake( () => isMetadataResponse );
 
-					controller.add_admin_area( req, res );
+				controller.adminAreas.add( req, res );
 
-					expect( res.render ).toHaveBeenCalledWith( 'barriers/views/location/add-admin-area', Object.assign( {},
-						getAdminAreaValuesResponse,
-						{currentAdminAreas: []}
-					) );
-				} );
+				const config = Form.calls.argsFor( 0 )[ 1 ];
+
+				expect( config.adminAreas ).toBeDefined();
+				expect( config.adminAreas.type ).toEqual( SELECT );
+				expect( config.adminAreas.items ).toEqual( metadata.getCountryAdminAreasList() );
+				expect( config.adminAreas.validators.length ).toEqual( 2 );
+				expect( config.adminAreas.validators[ 0 ].fn ).toEqual( validators.isCountryAdminArea );
+
+				expect( config.status ).not.toBeDefined();
+			} );
+
+			describe( 'when it is a GET', () => {
+				describe( 'without admin areas in the session', () => {
+					it( 'renders the page without admin areas', () => {
+						form.getTemplateValues.and.callFake( () => ({ adminAreas: '1234' }) );
+
+						controller.adminAreas.add( req, res );
+
+						expect(res.render).toHaveBeenCalledWith(
+							'barriers/views/location/add-admin-area',
+							{
+								adminAreas: getAdminAreaValuesResponse.adminAreas,
+								currentAdminAreas: []
+							}
+						);
+					});
+				});
+
+				describe( 'with admin areas in the session', () => {
+
+					beforeEach( () => {
+						req.session = {
+							location: {
+								country: 'country 1',
+								adminAreas: [2]
+							}
+						};
+					});
+
+					it( 'renders the page with admin areas', () => {
+
+						form.getTemplateValues.and.callFake( () => ({ adminAreas: '1234' }) );
+
+						controller.adminAreas.add( req, res );
+
+						expect(res.render).toHaveBeenCalledWith(
+							'barriers/views/location/add-admin-area',
+							{
+								adminAreas: getAdminAreaValuesResponse.adminAreas,
+								currentAdminAreas: req.session.location.adminAreas.map( metadata.getAdminArea )
+							}
+						);
+					});
+				});
 			});
+			describe( 'when it is a POST', () => {
 
-			describe('When the form does not have errors', () => {
-				it('Should add the country to the session', () => {
-				
-					form.hasErrors = () => false;
+				beforeEach( () => {
+					form.isPost = true;
+				});
 
-					form.getValues.and.callFake( () => ({ adminAreas: '1234' }) );
+				describe('When the form has errors', () => {
+					it( 'Should render the template', () => {
 
-					const listResponse = '/list/location';
-					urls.barriers.location.list.and.callFake( () => listResponse );
+						form.getTemplateValues.and.callFake( () => ({ adminAreas: '1234' }) );
 
-					controller.add_admin_area( req, res );
+						form.hasErrors = () => true;
 
-					expect(req.session.location.adminAreas).toEqual(['1234']);
-					expect( res.redirect).toHaveBeenCalledWith(listResponse);
+						controller.adminAreas.add( req, res );
+
+						expect( res.render ).toHaveBeenCalledWith( 'barriers/views/location/add-admin-area', Object.assign( {},
+							getAdminAreaValuesResponse,
+							{currentAdminAreas: []}
+						) );
+					} );
+				});
+
+				describe('When the form does not have errors', () => {
+					it('Should add the country to the session', () => {
+
+						form.hasErrors = () => false;
+
+						form.getValues.and.callFake( () => ({ adminAreas: '1234' }) );
+
+						const listResponse = '/list/location';
+						urls.barriers.location.list.and.callFake( () => listResponse );
+
+						controller.adminAreas.add( req, res );
+
+						expect(req.session.location.adminAreas).toEqual(['1234']);
+						expect( res.redirect).toHaveBeenCalledWith(listResponse);
+					});
 				});
 			});
 		});
-	});
 
-	describe( 'remove admin area', () => {
-		it( 'removes the admin area from the session', () => {
-			const adminArea1 = uuid();
-			const adminArea2 = uuid();
-			const adminAreas = [ adminArea1, adminArea2 ];
-			const listResponse = '/list/location';
+		describe( 'remove admin area', () => {
+			it( 'removes the admin area from the session', () => {
+				const adminArea1 = uuid();
+				const adminArea2 = uuid();
+				const adminAreas = [ adminArea1, adminArea2 ];
+				const listResponse = '/list/location';
 
-			req.body = { adminArea: adminArea1 };
-			req.session = {location: {adminAreas: adminAreas}};
-			urls.barriers.location.list.and.callFake( () => listResponse );
+				req.body = { adminArea: adminArea1 };
+				req.session = {location: {adminAreas: adminAreas}};
+				urls.barriers.location.list.and.callFake( () => listResponse );
 
-			controller.remove_admin_area( req, res );
+				controller.adminAreas.remove( req, res );
 
-			expect( req.session.location.adminAreas ).toEqual( [ adminArea2 ] );
-			expect( res.redirect ).toHaveBeenCalledWith( listResponse );
+				expect( req.session.location.adminAreas ).toEqual( [ adminArea2 ] );
+				expect( res.redirect ).toHaveBeenCalledWith( listResponse );
+			});
 		});
-	});
+	} );
 
 	describe( 'country', () => {
 
@@ -393,7 +394,7 @@ describe( 'Edit barrier location controller', () => {
 
 			describe('When the form does not have errors', () => {
 				it('Should add the country to the session', () => {
-				
+
 					form.hasErrors = () => false;
 
 					const listResponse = '/list/location';

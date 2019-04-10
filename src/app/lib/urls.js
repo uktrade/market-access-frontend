@@ -27,10 +27,12 @@ const reportUrl = {
 	start: ( reportId ) => `/reports/${ getReportPath( reportId ) }/start/`,
 	isResolved: ( reportId ) => `/reports/${ getReportPath( reportId ) }/is-resolved/`,
 	country: ( reportId ) => `/reports/${ getReportPath( reportId ) }/country/`,
-	hasAdminAreas: ( reportId, countryId ) => `/reports/${ getReportPath( reportId ) }/country/${countryId}/has-admin-areas/`,
-	adminAreas: (reportId, countryId) => `/reports/${ getReportPath( reportId ) }/country/${countryId}/admin-areas/`,
-	addAdminArea: ( reportId, countryId ) => `/reports/${ getReportPath( reportId ) }/country/${countryId}/admin-areas/add/`,
-	removeAdminArea: ( reportId, countryId ) => `/reports/${ getReportPath( reportId ) }/country/${countryId}/admin-areas/remove/`,
+	hasAdminAreas: ( reportId, countryId ) => `/reports/${ getReportPath( reportId ) }/country/${ countryId }/has-admin-areas/`,
+	adminAreas: {
+		list: ( reportId, countryId ) => `/reports/${ getReportPath( reportId ) }/country/${ countryId }/admin-areas/`,
+		add: ( reportId, countryId ) => `/reports/${ getReportPath( reportId ) }/country/${ countryId }/admin-areas/add/`,
+		remove: ( reportId, countryId ) => `/reports/${ getReportPath( reportId ) }/country/${ countryId }/admin-areas/remove/`,
+	},
 	hasSectors: ( reportId ) => `/reports/${ reportId }/has-sectors/`,
 	sectors: ( reportId ) => `/reports/${ reportId }/sectors/`,
 	addSector: ( reportId ) => `/reports/${ reportId }/sectors/add/`,
@@ -103,10 +105,12 @@ module.exports = {
 		},
 		location: {
 			list: ( barrierId ) => `/barriers/${ barrierId }/location/`,
-			edit: ( barrierId ) => `/barriers/${ barrierId }/location/edit`,
-			country: ( barrierId ) => `/barriers/${ barrierId }/location/country`,
-			add_admin_area: ( barrierId ) => `/barriers/${ barrierId }/location/admin-areas/add`,
-			remove_admin_area: ( barrierId ) => `/barriers/${ barrierId }/location/admin-areas/remove`,
+			edit: ( barrierId ) => `/barriers/${ barrierId }/location/edit/`,
+			country: ( barrierId ) => `/barriers/${ barrierId }/location/country/`,
+			adminAreas: {
+				add: ( barrierId ) => `/barriers/${ barrierId }/location/admin-areas/`,
+				remove: ( barrierId ) => `/barriers/${ barrierId }/location/admin-areas/remove/`,
+			}
 		},
 		companies: {
 			new: ( barrierId ) => `/barriers/${ barrierId }/companies/new/`,

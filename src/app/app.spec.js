@@ -180,7 +180,7 @@ describe( 'App', function(){
 			} );
 		} );
 
-		describe( 'what is a barrier page', function(){
+		describe( 'What is a barrier page', function(){
 			it( 'Should render the page', function( done ){
 
 				app
@@ -251,6 +251,8 @@ describe( 'App', function(){
 				beforeEach( () => {
 
 					barrier = intercept.stub( '/backend/barriers/barrier' );
+					barrier.id = barrierId;
+
 					intercept.backend()
 						.get( `/barriers/${ barrierId }` )
 						.reply( 200, barrier )
@@ -575,6 +577,8 @@ describe( 'App', function(){
 									.get( barrierUrl )
 									.end( ( err, res ) => {
 
+										if( err ){ return done.fail( err ); }
+
 										token = getCsrfToken( res, done.fail );
 										done();
 									} );
@@ -691,6 +695,104 @@ describe( 'App', function(){
 										expect( res.statusCode ).toEqual( 200 );
 										expect( res.text ).toEqual( '{}' );
 										done();
+									} );
+							} );
+						} );
+					} );
+				} );
+
+				describe( 'Barrier location', () => {
+					describe( 'list', () => {
+						it( 'Should render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.location.list( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier - Edit location', done ) );
+						} );
+					} );
+
+					describe( 'edit', () => {
+						it( 'Should render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.location.edit( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier - Edit location', done ) );
+						} );
+					} );
+
+					describe( 'country', () => {
+						it( 'Should render the page', ( done ) => {
+
+							const agent = supertest.agent( appInstance );
+
+							agent
+								.get( urls.barriers.location.edit( barrierId ) )
+								.end( ( err ) => {
+
+									if( err ){ return done.fail( err ); }
+
+									agent
+										.get( urls.barriers.location.country( barrierId ) )
+										.end( checkPage( 'Market Access - Barrier - Edit Country', done ) );
+								} );
+						} );
+					} );
+
+					describe( 'adminAreas', () => {
+
+						let agent;
+
+						beforeEach( ( done ) => {
+
+							agent = supertest.agent( appInstance );
+
+							agent
+								.get( urls.barriers.location.edit( barrierId ) )
+								.end( ( err ) => {
+
+									if( err ){ return done.fail( err ); }
+
+									done();
+								} );
+						} );
+
+						describe( 'add', () => {
+							it( 'Should render the page', ( done ) => {
+
+								agent
+									.get( urls.barriers.location.adminAreas.add( barrierId ) )
+									.end( checkPage( 'Market Access - Barrier - Add an admin area', done ) );
+							} );
+						} );
+
+						describe( 'remove', () => {
+							it( 'Should redirect back to the add page', ( done ) => {
+
+								const adminAreaId = '8ad3f33a-ace8-40ec-bd2c-638fdc3024ea'//Alabama
+
+								agent
+									.get( urls.barriers.location.adminAreas.add( barrierId ) )
+									.end( ( err, res ) => {
+
+										if( err ){ return done.fail( err ); }
+
+										const token = getCsrfToken( res, done.fail );
+
+										agent
+											.post( urls.barriers.location.adminAreas.add( barrierId ) )
+											.send( `_csrf=${ token }&adminAreas=${ adminAreaId }` )
+											.redirects( 1 )
+											.end( ( err, res ) => {
+
+												if( err ){ return done.fail( err ); }
+
+												const token = getCsrfToken( res, done.fail );
+
+												agent
+													.post( urls.barriers.location.adminAreas.remove( barrierId ) )
+													.send( `_csrf=${ token }&adminArea=${ adminAreaId }` )
+													.end( checkRedirect( urls.barriers.location.list( barrierId ), done ) );
+											 } );
 									} );
 							} );
 						} );
@@ -883,6 +985,64 @@ describe( 'App', function(){
 							agent
 								.get( urls.reports.country( reportId ) )
 								.end( checkPage( title, done ) );
+						} );
+					} );
+
+					describe( 'Has admin areas', () => {
+						describe( 'A country with admin areas', () => {
+
+							const countryId = '81756b9a-5d95-e211-a939-e4115bead28a';//USA
+							let token;
+
+							beforeEach( ( done ) => {
+
+								agent
+									.get( urls.reports.country() )
+									.end( ( err, res ) => {
+
+										token = getCsrfToken( res, done.fail );
+
+										done();
+									} );
+							} );
+
+							describe( 'Without a reportId', () => {
+								it( 'Should render the has admin areas page', ( done ) => {
+
+									agent
+										.post( urls.reports.country() )
+										.send( `_csrf=${ token }&country=${ countryId }` )
+										.end( checkRedirect( urls.reports.hasAdminAreas( undefined, countryId ), () => {
+
+											agent
+												.get( urls.reports.hasAdminAreas( undefined, countryId ) )
+												.end( checkPage( 'Market Access - Add - Location of the barrier', done ) );
+										} ) );
+								} );
+							} );
+
+							describe( 'With a reportId', () => {
+								it( 'Should render the has admin areas page', ( done ) => {
+
+									const reportId = '1-2-3';
+									const mockReport = intercept.stub( '/backend/reports/report' );
+
+									intercept.backend()
+										.get( `/reports/${ reportId }` )
+										.reply( 200, mockReport )
+										.persist();
+
+									agent
+										.post( urls.reports.country( reportId ) )
+										.send( `_csrf=${ token }&country=${ countryId }` )
+										.end( checkRedirect( urls.reports.hasAdminAreas( mockReport.id, countryId ), () => {
+
+											agent
+												.get( urls.reports.hasAdminAreas( reportId, countryId ) )
+												.end( checkPage( 'Market Access - Add - Location of the barrier', done ) );
+										} ) );
+								} );
+							} );
 						} );
 					} );
 				} );

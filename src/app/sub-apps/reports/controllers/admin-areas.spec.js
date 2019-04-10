@@ -21,8 +21,9 @@ describe( 'Report controllers', () => {
 
 	beforeEach( () => {
 
-        ( { req, res, next, csrfToken } = jasmine.helpers.mocks.middleware() );
-        
+		( { req, res, next, csrfToken } = jasmine.helpers.mocks.middleware() );
+
+		req.params.countryId = '1234';
 
 		getValuesResponse = { adminAreas: 'admin area 1'};
 		getTemplateValuesResponse = { countryId: '1234', c: 3, d: 4 };
@@ -55,10 +56,13 @@ describe( 'Report controllers', () => {
 
 		urls = {
 			reports: {
+				detail: jasmine.createSpy( 'urls.reports.detail' ),
 				hasSectors: jasmine.createSpy( 'urls.reports.hasSectors' ),
-                adminAreas: jasmine.createSpy( 'urls.reports.adminAreas' ),
-                addAdminArea: jasmine.createSpy( 'urls.reports.addAdminArea' ),
-                removeAdminArea: jasmine.createSpy( 'urls.reports.removeAdminArea' ),
+				adminAreas: {
+					list: jasmine.createSpy( 'urls.reports.adminAreas.list' ),
+					add: jasmine.createSpy( 'urls.reports.adminAreas.add' ),
+					remove: jasmine.createSpy( 'urls.reports.adminAreas.remove' ),
+				 }
 			},
 		};
 
@@ -70,13 +74,12 @@ describe( 'Report controllers', () => {
 			'../../../lib/Form': Form,
 			'../../../lib/urls': urls,
 			'../../../lib/validators': validators,
-        } );
-        req.params.countryId = '1234';
+		} );
 	} );
 
 	describe( 'Admin areas', () => {
 
-        function checkRender( adminAreas ){
+		function checkRender( adminAreas ){
 
 			expect( res.render ).toHaveBeenCalledWith( 'reports/views/admin-areas', { countryId: '1234', adminAreas: adminAreas.map( metadata.getAdminArea ), csrfToken } );
 		}
@@ -91,21 +94,21 @@ describe( 'Report controllers', () => {
             describe( 'When it is a GET', () => {
                 describe( 'With admin areas in the session', () => {
                     it( 'Should render the page with the admin areas', async () => {
-    
+
                         const adminAreas = [ uuid(), uuid(), uuid() ];
-    
+
                         req.session.adminAreas = adminAreas;
-    
+
                         await controller.list( req, res, next );
-    
+
                         checkRender( adminAreas );
                     } );
                 } );
                 describe( 'With no admin areas', () => {
                     it( 'Should render the page with and empty list', async () => {
-    
+
                         await controller.list( req, res, next );
-    
+
                         checkRender( [] );
                     } );
                 } );
@@ -137,7 +140,7 @@ describe( 'Report controllers', () => {
                             isResolved: false,
                             resolvedDate: report.resolved_date,
                             country: '1234',
-                            adminAreas: [ '1234', '5678'] 
+                            adminAreas: [ '1234', '5678']
                         } );
 
                         req.report = report;
@@ -198,7 +201,8 @@ describe( 'Report controllers', () => {
                             } );
                         } );
                     } );
-                });
+					 });
+
                 describe( 'If there is only session data', () => {
                     beforeEach( () => {
 
@@ -238,18 +242,36 @@ describe( 'Report controllers', () => {
                         } );
 
                         describe( 'When there is a body with id', () => {
-                            it( 'Should redirect to the correct url', async () => {
+									describe( 'When it is save and exit', () => {
+										it( 'Should redirect to the correct url', async () => {
 
-                                const hasSectorsResponse = '/a/b/c';
+											const detailResponse = '/a/b/c';
 
-                                urls.reports.hasSectors.and.callFake( () => hasSectorsResponse );
-                                backend.reports.save.and.callFake( () => Promise.resolve( { response, body: { id: 10 } } ) );
+											req.body.action = 'exit';
+											urls.reports.detail.and.callFake( () => detailResponse );
+											backend.reports.save.and.callFake( () => Promise.resolve( { response, body: { id: 10 } } ) );
 
-                                await controller.list( req, res, next );
+											await controller.list( req, res, next );
 
-                                expect( res.redirect ).toHaveBeenCalledWith( hasSectorsResponse  );
-                                expect( urls.reports.hasSectors ).toHaveBeenCalledWith( 10 );
-                            } );
+											expect( res.redirect ).toHaveBeenCalledWith( detailResponse  );
+											expect( urls.reports.detail ).toHaveBeenCalledWith( 10 );
+										} );
+									} );
+
+									describe( 'When it is save and continue', () => {
+										it( 'Should redirect to the correct url', async () => {
+
+											const hasSectorsResponse = '/a/b/c';
+
+											urls.reports.hasSectors.and.callFake( () => hasSectorsResponse );
+											backend.reports.save.and.callFake( () => Promise.resolve( { response, body: { id: 10 } } ) );
+
+											await controller.list( req, res, next );
+
+											expect( res.redirect ).toHaveBeenCalledWith( hasSectorsResponse  );
+											expect( urls.reports.hasSectors ).toHaveBeenCalledWith( 10 );
+										} );
+									} );
                         } );
                     } );
 
@@ -279,7 +301,7 @@ describe( 'Report controllers', () => {
                     const expected = adminAreas.slice( 0, 2 );
                     const adminAreasResponse = '/to/admin/areas';
 
-                    urls.reports.adminAreas.and.callFake( () => adminAreasResponse );
+                    urls.reports.adminAreas.list.and.callFake( () => adminAreasResponse );
                     req.session.adminAreas = adminAreas;
                     req.body = { adminArea };
 
@@ -287,7 +309,7 @@ describe( 'Report controllers', () => {
 
                     expect( req.session.adminAreas ).toEqual( expected );
                     expect( res.redirect ).toHaveBeenCalledWith( adminAreasResponse );
-                    expect( urls.reports.adminAreas ).toHaveBeenCalledWith( undefined, '1234' );
+                    expect( urls.reports.adminAreas.list ).toHaveBeenCalledWith( undefined, '1234' );
                     });
             });
             describe( 'When there is not a report', () => {
@@ -299,7 +321,7 @@ describe( 'Report controllers', () => {
                     const adminAreasResponse = '/to/admin/areas';
                     const reportId = '123';
 
-                    urls.reports.adminAreas.and.callFake( () => adminAreasResponse );
+                    urls.reports.adminAreas.list.and.callFake( () => adminAreasResponse );
                     req.session.adminAreas = adminAreas;
                     req.body = { adminArea };
                     req.report = { id: reportId };
@@ -308,10 +330,11 @@ describe( 'Report controllers', () => {
 
                     expect( req.session.adminAreas ).toEqual( expected );
                     expect( res.redirect ).toHaveBeenCalledWith( adminAreasResponse );
-                    expect( urls.reports.adminAreas ).toHaveBeenCalledWith( reportId, '1234' );
+                    expect( urls.reports.adminAreas.list ).toHaveBeenCalledWith( reportId, '1234' );
                 });
             });
-        });
+		  });
+
         describe( 'Add', () => {
 
             let template = 'reports/views/add-admin-area';
@@ -319,21 +342,21 @@ describe( 'Report controllers', () => {
 
             it( 'Should setup the form correctly',  () => {
                 controller.add( req, res, next );
-    
+
                 const args = Form.calls.argsFor( 0 );
                 const config = args[ 1 ];
-    
+
                 expect( Form ).toHaveBeenCalled();
                 expect( args[ 0 ] ).toEqual( req );
-    
+
                 expect( config.adminAreas ).toBeDefined();
                 expect( config.adminAreas.type ).toEqual( Form.SELECT );
                 expect( config.adminAreas.items ).toEqual( metadata.getCountryAdminAreasList() );
                 expect( config.adminAreas.validators.length ).toEqual( 2 );
                 expect( config.adminAreas.validators[ 0 ].fn ).toEqual( validators.isCountryAdminArea );
-            });
-            describe( 'When it is a GET', () => {
+				});
 
+            describe( 'When it is a GET', () => {
                 it( 'Should render the correct template', () => {
 
                     controller.add( req, res, next );
@@ -361,13 +384,13 @@ describe( 'Report controllers', () => {
                     } );
                 } );
 
-                describe( 'When there are sectors in the session', () => {
+				describe( 'When there are sectors in the session', () => {
 					it( 'Should render with the session sectors', () => {
 
                         const adminAreas = [ 1, 2];
                         req.session.adminAreas = adminAreas;
                         const expected = Object.assign( {}, getAddAdminAreaTemplateValuesResponse, { currentAdminAreas: adminAreas.map( metadata.getAdminArea ) } );
-                        
+
                         controller.add( req, res );
 
 						expect( res.render ).toHaveBeenCalledWith( template, expected );
@@ -375,11 +398,11 @@ describe( 'Report controllers', () => {
 				} );
             } );
             describe( 'When it is a POST', () => {
-                
+
                 beforeEach( () => {
                     form.isPost = true;
                 } );
-            
+
                 describe( 'When the form has errors', () => {
                     // Should probably test both errors show correctly
                     it ('Should render the template ', () => {
@@ -399,7 +422,7 @@ describe( 'Report controllers', () => {
 
 						form.hasErrors = () => false;
 						form.getValues.and.callFake( () => ({ adminAreas: adminArea }) );
-						urls.reports.adminAreas.and.callFake( () => adminAreasResponse );
+						urls.reports.adminAreas.list.and.callFake( () => adminAreasResponse );
 
 						controller.add( req, res );
 
