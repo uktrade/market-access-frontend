@@ -4,11 +4,11 @@ const urls = require( '../../../lib/urls' );
 const reportDetailViewModel = require( '../view-models/detail' );
 const reportsViewModel = require( '../view-models/reports' );
 
-async function renderDashboard(req, res, next, template, isDelete=false, currentReportId){
+async function renderDashboard(req, res, next, isDelete=false, currentReportId){
 	const country = req.user.country;
 	const countryId = country && req.user.country.id;
 	const csrfToken = req.csrfToken();
-	let viewTemplate = template;
+	let viewTemplate = 'reports/views/index';
 	let promise;
 
 	if( countryId ){
@@ -52,16 +52,13 @@ module.exports = {
 	aboutProblem: require( './about-problem' ),
 	summary: require( './summary' ),
 
-	index: async ( req, res, next ) => {
-		let template = 'reports/views/index';
-		renderDashboard(req, res, next, template);
+	index: ( req, res, next ) => {
+		renderDashboard(req, res, next);
 	},
 
 	delete: async (req, res, next) => {
 		const currentReportId = req.params.reportId;
 		const isPost = req.method === 'POST';
-
-		let template = 'reports/views/index';
 
 		if(isPost){
 			try {
@@ -80,7 +77,7 @@ module.exports = {
 
 			}
 		} else {
-			renderDashboard(req, res, next, template, true, currentReportId);
+			renderDashboard(req, res, next, true, currentReportId);
 		}
 	},
 

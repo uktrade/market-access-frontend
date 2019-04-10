@@ -10,7 +10,8 @@
 				{ 
 					'title': "Delete unfinished barrier", 
 					'action': { 'url': urls.reports.delete( report.id ), 'text': "Yes, delete" },
-					'cancel': { 'url': urls.reports.index(), 'text': "No, cancel" }
+					'cancel': { 'url': urls.reports.index(), 'text': "No, cancel" },
+					'csrfToken': csrfToken
 				}
 			)
 		%}

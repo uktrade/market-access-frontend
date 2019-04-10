@@ -4,7 +4,7 @@
             <h3 class="modal__content__title"> {{params.title}} </h3>
             {{ caller() }}
             <form action="{{ params.action.url }}" method="POST">
-                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                <input type="hidden" name="_csrf" value="{{ params.csrfToken }}">
                 <input type="submit" value="{{ params.action.text }}" class="govuk-button">
                 <a href="{{ params.cancel.url }}" class="govuk-button button--secondary">{{ params.cancel.text }}</a>
             </form>
