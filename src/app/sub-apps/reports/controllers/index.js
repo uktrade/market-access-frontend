@@ -52,7 +52,7 @@ module.exports = {
 	aboutProblem: require( './about-problem' ),
 	summary: require( './summary' ),
 
-	index: ( req, res, next ) => {
+	index: async ( req, res, next ) => {
 		renderDashboard(req, res, next);
 	},
 
