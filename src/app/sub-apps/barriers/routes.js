@@ -86,6 +86,7 @@ module.exports = ( express, app ) => {
 	app.post( '/:barrierId/sectors/new/', controller.sectors.new );
 
 	app.get( '/:barrierId/companies/edit/', controller.companies.edit );
+	app.get( '/:barrierId/companies/new/', controller.companies.new );
 	app.get( '/:barrierId/companies/', controller.companies.list );
 	app.post( '/:barrierId/companies/', controller.companies.list );
 	app.post( '/:barrierId/companies/remove/', controller.companies.remove );

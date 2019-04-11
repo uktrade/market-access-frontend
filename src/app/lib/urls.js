@@ -109,6 +109,7 @@ module.exports = {
 			remove_admin_area: ( barrierId ) => `/barriers/${ barrierId }/location/admin-areas/remove`,
 		},
 		companies: {
+			new: ( barrierId ) => `/barriers/${ barrierId }/companies/new/`,
 			edit: ( barrierId ) => `/barriers/${ barrierId }/companies/edit/`,
 			list: ( barrierId ) => `/barriers/${ barrierId }/companies/`,
 			details: ( barrierId, companyId ) => `/barriers/${ barrierId }/companies/${ companyId }/`,
