@@ -58,7 +58,7 @@ let config = {
 	logLevel,
 	isDebug: ( logLevel === 'debug' ),
 	environment: {
-		banner: bool( "ENV_BANNER", false ),
+		banner: bool( 'ENV_BANNER', false ),
 		name: env( 'ENV_NAME' ),
 	},
 	showErrors: isDev,

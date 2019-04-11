@@ -12,7 +12,7 @@ module.exports = async ( req, res, next ) => {
 
 	const isSameCountry = report.export_country == countryId;
 	const hasAdminAreasInReport = report.country_admin_areas && report.country_admin_areas.length > 0;
-	const alreadyContainsStates = isSameCountry && hasAdminAreasInReport ? "false": null;
+	const alreadyContainsStates = isSameCountry && hasAdminAreasInReport ? 'false': null;
 
 	const boolItems = govukItemsFromObj( metadata.bool );
 	const items = boolItems.map( ( item ) => item.value === 'false' ? { value: item.value, text: 'No - just part of the country' } : item );
@@ -26,14 +26,14 @@ module.exports = async ( req, res, next ) => {
 				message: 'Does it affect the entire country?'
 			} ]
 		}
-	 } );
+	} );
 
-	 if( form.isPost ){
+	if( form.isPost ){
 
 		form.validate();
 
 		if( !form.hasErrors() ){
-			if (form.getValues().hasAdminAreas === "true") {
+			if (form.getValues().hasAdminAreas === 'true') {
 
 					try {
 

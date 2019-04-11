@@ -17,7 +17,7 @@ describe( 'Report controllers', () => {
 	let backend;
 	let validators;
 	let getValuesResponse;
-    let getTemplateValuesResponse;
+	let getTemplateValuesResponse;
 
 	beforeEach( () => {
 
@@ -62,7 +62,7 @@ describe( 'Report controllers', () => {
 					list: jasmine.createSpy( 'urls.reports.adminAreas.list' ),
 					add: jasmine.createSpy( 'urls.reports.adminAreas.add' ),
 					remove: jasmine.createSpy( 'urls.reports.adminAreas.remove' ),
-				 }
+				}
 			},
 		};
 
@@ -86,336 +86,341 @@ describe( 'Report controllers', () => {
 
 		describe( 'List', () => {
 
-            beforeEach( () => {
+				beforeEach( () => {
 
-                req.report = {};
-            } );
+					req.report = {};
+				} );
 
-            describe( 'When it is a GET', () => {
-                describe( 'With admin areas in the session', () => {
-                    it( 'Should render the page with the admin areas', async () => {
+				describe( 'When it is a GET', () => {
+					describe( 'With admin areas in the session', () => {
+						it( 'Should render the page with the admin areas', async () => {
 
-                        const adminAreas = [ uuid(), uuid(), uuid() ];
+								const adminAreas = [ uuid(), uuid(), uuid() ];
 
-                        req.session.adminAreas = adminAreas;
+								req.session.adminAreas = adminAreas;
 
-                        await controller.list( req, res, next );
+								await controller.list( req, res, next );
 
-                        checkRender( adminAreas );
-                    } );
-                } );
-                describe( 'With no admin areas', () => {
-                    it( 'Should render the page with and empty list', async () => {
+								checkRender( adminAreas );
+						} );
+					} );
+					describe( 'With no admin areas', () => {
+						it( 'Should render the page with and empty list', async () => {
 
-                        await controller.list( req, res, next );
+								await controller.list( req, res, next );
 
-                        checkRender( [] );
-                    } );
-                } );
-            } );
-            describe( 'When it is a POST', () => {
+								checkRender( [] );
+						} );
+					} );
+				} );
 
-                let sessionValues;
+				describe( 'When it is a POST', () => {
 
-                beforeEach( () => {
-                    req.method = 'POST';
-                    req.session.adminAreas = ['1234', '5678'];
-                } );
+					let sessionValues;
 
-                describe( 'If there is a report', () => {
-                    let report;
-                    let saveValues;
+					beforeEach( () => {
+						req.method = 'POST';
+						req.session.adminAreas = ['1234', '5678'];
+					} );
 
-                    beforeEach( () => {
+					describe( 'If there is a report', () => {
 
-                        report = {
-                            id: 1,
-                            problem_status: { a: 1 },
-                            is_resolved: false,
-                            resolved_date: { c: 3 }
-                        };
+						let report;
+						let saveValues;
 
-                        saveValues = Object.assign( {}, {
-                            status: report.problem_status,
-                            isResolved: false,
-                            resolvedDate: report.resolved_date,
-                            country: '1234',
-                            adminAreas: [ '1234', '5678']
-                        } );
+						beforeEach( () => {
 
-                        req.report = report;
-                    } );
+								report = {
+									id: 1,
+									problem_status: { a: 1 },
+									is_resolved: false,
+									resolved_date: { c: 3 }
+								};
 
-                    it( 'Should update the report with the report data', async () => {
+								saveValues = Object.assign( {}, {
+									status: report.problem_status,
+									isResolved: false,
+									resolvedDate: report.resolved_date,
+									country: '1234',
+									adminAreas: [ '1234', '5678']
+								} );
 
-                        await controller.list( req, res, next );
+								req.report = report;
+						} );
 
-                        const args = backend.reports.update.calls.argsFor( 0 );
+						it( 'Should update the report with the report data', async () => {
 
-                        expect( args[ 0 ] ).toEqual( req );
-                        expect( args[ 1 ] ).toEqual( report.id );
-                        expect( args[ 2 ] ).toEqual( saveValues );
-                    } );
+							await controller.list( req, res, next );
 
-                    describe( 'When the update throws an error', () => {
-                        it( 'Should call next with the error', async () => {
+							const args = backend.reports.update.calls.argsFor( 0 );
 
-                            const err = new Error( 'an update error' );
+							expect( args[ 0 ] ).toEqual( req );
+							expect( args[ 1 ] ).toEqual( report.id );
+							expect( args[ 2 ] ).toEqual( saveValues );
+						} );
 
-                            backend.reports.update.and.callFake( () => Promise.reject( err ) );
+						describe( 'When the update throws an error', () => {
+							it( 'Should call next with the error', async () => {
 
-                            await controller.list( req, res, next );
+								const err = new Error( 'an update error' );
 
-                            expect( next ).toHaveBeenCalledWith( err );
-                            expect( res.redirect ).not.toHaveBeenCalled();
-                        } );
-                    } );
+								backend.reports.update.and.callFake( () => Promise.reject( err ) );
 
-                    describe( 'When the update does not throw an error', () => {
-                        describe( 'When the response is a success', () => {
-                            it( 'Should redirect to the correct url', async () => {
+								await controller.list( req, res, next );
 
-                                const hasSectorsResponse = '/a/sector/url';
-                                const body = { id: 2 };
+								expect( next ).toHaveBeenCalledWith( err );
+								expect( res.redirect ).not.toHaveBeenCalled();
+							} );
+						} );
 
-                                backend.reports.update.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body } ) );
-                                urls.reports.hasSectors.and.callFake( () => hasSectorsResponse );
+						describe( 'When the update does not throw an error', () => {
+							describe( 'When the response is a success', () => {
+								it( 'Should redirect to the correct url', async () => {
 
-                                await controller.list( req, res, next );
+									const hasSectorsResponse = '/a/sector/url';
+									const body = { id: 2 };
 
-                                expect( res.redirect ).toHaveBeenCalledWith( hasSectorsResponse );
-                                expect( urls.reports.hasSectors ).toHaveBeenCalledWith( body.id );
-                                expect( next ).not.toHaveBeenCalled();
-                            } );
-                        } );
+									backend.reports.update.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body } ) );
+									urls.reports.hasSectors.and.callFake( () => hasSectorsResponse );
 
-                        describe( 'When the response is NOT a success', () => {
-                            it( 'Should redirect to the correct url', async () => {
+									await controller.list( req, res, next );
 
-                                backend.reports.update.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode: 404 } } ) );
+									expect( res.redirect ).toHaveBeenCalledWith( hasSectorsResponse );
+									expect( urls.reports.hasSectors ).toHaveBeenCalledWith( body.id );
+									expect( next ).not.toHaveBeenCalled();
+								} );
+							} );
 
-                                await controller.list( req, res, next );
+							describe( 'When the response is NOT a success', () => {
+								it( 'Should redirect to the correct url', async () => {
 
-                                expect( res.redirect ).not.toHaveBeenCalled();
-                                expect( next ).toHaveBeenCalledWith( new Error( 'Unable to update report, got 404 response code' ) );
-                            } );
-                        } );
-                    } );
-					 });
+									backend.reports.update.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode: 404 } } ) );
 
-                describe( 'If there is only session data', () => {
-                    beforeEach( () => {
+									await controller.list( req, res, next );
 
-                        req.method = 'POST';
+									expect( res.redirect ).not.toHaveBeenCalled();
+									expect( next ).toHaveBeenCalledWith( new Error( 'Unable to update report, got 404 response code' ) );
+								} );
+							} );
+						} );
+					});
 
-                        sessionValues = {
-                            startFormValues: { x: 1 },
-                            isResolvedFormValues: { y: 2 },
-                            adminAreas: ['1234', '5678']
-                        };
+					describe( 'If there is only session data', () => {
+						beforeEach( () => {
 
-                        req.session = sessionValues;
-                    } );
+								req.method = 'POST';
 
-                    describe( 'When the response is a success', () => {
+								sessionValues = {
+									startFormValues: { x: 1 },
+									isResolvedFormValues: { y: 2 },
+									adminAreas: ['1234', '5678']
+								};
 
-                        const response = { isSuccess: true };
+								req.session = sessionValues;
+						} );
 
-                        it( 'Should delete the session data', async () => {
+						describe( 'When the response is a success', () => {
 
-                            backend.reports.save.and.callFake( () => Promise.resolve( { response } ) );
+							const response = { isSuccess: true };
 
-                            await controller.list( req, res, next );
+							it( 'Should delete the session data', async () => {
 
-                            expect( req.session ).toEqual( {} );
-                        } );
+								backend.reports.save.and.callFake( () => Promise.resolve( { response } ) );
 
-                        describe( 'When there is not a body with an id', () => {
-                            it( 'Should call next with an error', async () => {
+								await controller.list( req, res, next );
 
-                                backend.reports.save.and.callFake( () => Promise.resolve( { response, body: {} } ) );
+								expect( req.session ).toEqual( {} );
+							} );
 
-                                await controller.list( req, res, next );
+							describe( 'When there is not a body with an id', () => {
+								it( 'Should call next with an error', async () => {
 
-                                expect( next ).toHaveBeenCalledWith( new Error( 'No id created for report' ) );
-                            } );
-                        } );
+									backend.reports.save.and.callFake( () => Promise.resolve( { response, body: {} } ) );
 
-                        describe( 'When there is a body with id', () => {
-									describe( 'When it is save and exit', () => {
-										it( 'Should redirect to the correct url', async () => {
+									await controller.list( req, res, next );
 
-											const detailResponse = '/a/b/c';
+									expect( next ).toHaveBeenCalledWith( new Error( 'No id created for report' ) );
+								} );
+							} );
 
-											req.body.action = 'exit';
-											urls.reports.detail.and.callFake( () => detailResponse );
-											backend.reports.save.and.callFake( () => Promise.resolve( { response, body: { id: 10 } } ) );
+							describe( 'When there is a body with id', () => {
+								describe( 'When it is save and exit', () => {
+									it( 'Should redirect to the correct url', async () => {
 
-											await controller.list( req, res, next );
+										const detailResponse = '/a/b/c';
 
-											expect( res.redirect ).toHaveBeenCalledWith( detailResponse  );
-											expect( urls.reports.detail ).toHaveBeenCalledWith( 10 );
-										} );
+										req.body.action = 'exit';
+										urls.reports.detail.and.callFake( () => detailResponse );
+										backend.reports.save.and.callFake( () => Promise.resolve( { response, body: { id: 10 } } ) );
+
+										await controller.list( req, res, next );
+
+										expect( res.redirect ).toHaveBeenCalledWith( detailResponse  );
+										expect( urls.reports.detail ).toHaveBeenCalledWith( 10 );
 									} );
+								} );
 
-									describe( 'When it is save and continue', () => {
-										it( 'Should redirect to the correct url', async () => {
+								describe( 'When it is save and continue', () => {
+									it( 'Should redirect to the correct url', async () => {
 
-											const hasSectorsResponse = '/a/b/c';
+										const hasSectorsResponse = '/a/b/c';
 
-											urls.reports.hasSectors.and.callFake( () => hasSectorsResponse );
-											backend.reports.save.and.callFake( () => Promise.resolve( { response, body: { id: 10 } } ) );
+										urls.reports.hasSectors.and.callFake( () => hasSectorsResponse );
+										backend.reports.save.and.callFake( () => Promise.resolve( { response, body: { id: 10 } } ) );
 
-											await controller.list( req, res, next );
+										await controller.list( req, res, next );
 
-											expect( res.redirect ).toHaveBeenCalledWith( hasSectorsResponse  );
-											expect( urls.reports.hasSectors ).toHaveBeenCalledWith( 10 );
-										} );
+										expect( res.redirect ).toHaveBeenCalledWith( hasSectorsResponse  );
+										expect( urls.reports.hasSectors ).toHaveBeenCalledWith( 10 );
 									} );
-                        } );
-                    } );
+								} );
+							} );
+						} );
 
-                    describe( 'When the response is not a success', () => {
-                        it( 'Should call next with an error', async () => {
+						describe( 'When the response is not a success', () => {
+							it( 'Should call next with an error', async () => {
 
-                            backend.reports.save.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode: 123 } } ) );
+								backend.reports.save.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode: 123 } } ) );
 
-                            await controller.list( req, res, next );
+								await controller.list( req, res, next );
 
-                            expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save report, got 123 response code' ) );
-                        } );
-                    } );
-                });
-            });
-        }) ;
-        describe( 'Remove', () => {
+								expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save report, got 123 response code' ) );
+							} );
+						} );
+					});
+			});
+		}) ;
+		describe( 'Remove', () => {
 
-            beforeEach(() => {
-                req.report = {};
-            });
+			beforeEach(() => {
+				req.report = {};
+			});
 
-            describe( 'When there is a report', () => {
-                it( 'Should remove the adminArea in the session list and redirect', () => {
-                    const adminArea = uuid();
-                    const adminAreas = [ uuid(), uuid(), adminArea ];
-                    const expected = adminAreas.slice( 0, 2 );
-                    const adminAreasResponse = '/to/admin/areas';
+			describe( 'When there is a report', () => {
+				it( 'Should remove the adminArea in the session list and redirect', () => {
+					const adminArea = uuid();
+					const adminAreas = [ uuid(), uuid(), adminArea ];
+					const expected = adminAreas.slice( 0, 2 );
+					const adminAreasResponse = '/to/admin/areas';
 
-                    urls.reports.adminAreas.list.and.callFake( () => adminAreasResponse );
-                    req.session.adminAreas = adminAreas;
-                    req.body = { adminArea };
+					urls.reports.adminAreas.list.and.callFake( () => adminAreasResponse );
+					req.session.adminAreas = adminAreas;
+					req.body = { adminArea };
 
-                    controller.remove( req, res );
+					controller.remove( req, res );
 
-                    expect( req.session.adminAreas ).toEqual( expected );
-                    expect( res.redirect ).toHaveBeenCalledWith( adminAreasResponse );
-                    expect( urls.reports.adminAreas.list ).toHaveBeenCalledWith( undefined, '1234' );
-                    });
-            });
-            describe( 'When there is not a report', () => {
-
-                it( 'Should remove the adminArea in the session list and redirect', () => {
-                    const adminArea = uuid();
-                    const adminAreas = [ uuid(), uuid(), adminArea ];
-                    const expected = adminAreas.slice( 0, 2 );
-                    const adminAreasResponse = '/to/admin/areas';
-                    const reportId = '123';
-
-                    urls.reports.adminAreas.list.and.callFake( () => adminAreasResponse );
-                    req.session.adminAreas = adminAreas;
-                    req.body = { adminArea };
-                    req.report = { id: reportId };
-
-                    controller.remove( req, res );
-
-                    expect( req.session.adminAreas ).toEqual( expected );
-                    expect( res.redirect ).toHaveBeenCalledWith( adminAreasResponse );
-                    expect( urls.reports.adminAreas.list ).toHaveBeenCalledWith( reportId, '1234' );
-                });
-            });
-		  });
-
-        describe( 'Add', () => {
-
-            let template = 'reports/views/add-admin-area';
-            let getAddAdminAreaTemplateValuesResponse = { countryId: '1234', c: 3, d: 4, currentAdminAreas: [] };
-
-            it( 'Should setup the form correctly',  () => {
-                controller.add( req, res, next );
-
-                const args = Form.calls.argsFor( 0 );
-                const config = args[ 1 ];
-
-                expect( Form ).toHaveBeenCalled();
-                expect( args[ 0 ] ).toEqual( req );
-
-                expect( config.adminAreas ).toBeDefined();
-                expect( config.adminAreas.type ).toEqual( Form.SELECT );
-                expect( config.adminAreas.items ).toEqual( metadata.getCountryAdminAreasList() );
-                expect( config.adminAreas.validators.length ).toEqual( 2 );
-                expect( config.adminAreas.validators[ 0 ].fn ).toEqual( validators.isCountryAdminArea );
+					expect( req.session.adminAreas ).toEqual( expected );
+					expect( res.redirect ).toHaveBeenCalledWith( adminAreasResponse );
+					expect( urls.reports.adminAreas.list ).toHaveBeenCalledWith( undefined, '1234' );
 				});
+			});
 
-            describe( 'When it is a GET', () => {
-                it( 'Should render the correct template', () => {
+			describe( 'When there is not a report', () => {
+				it( 'Should remove the adminArea in the session list and redirect', () => {
+					const adminArea = uuid();
+					const adminAreas = [ uuid(), uuid(), adminArea ];
+					const expected = adminAreas.slice( 0, 2 );
+					const adminAreasResponse = '/to/admin/areas';
+					const reportId = '123';
 
-                    controller.add( req, res, next );
+					urls.reports.adminAreas.list.and.callFake( () => adminAreasResponse );
+					req.session.adminAreas = adminAreas;
+					req.body = { adminArea };
+					req.report = { id: reportId };
 
-                    expect( res.render ).toHaveBeenCalledWith( template, getAddAdminAreaTemplateValuesResponse );
-                } );
+					controller.remove( req, res );
 
-                describe( 'When there is one sector in the session', () => {
-                    it( 'Should setup the form correctly', async () => {
+					expect( req.session.adminAreas ).toEqual( expected );
+					expect( res.redirect ).toHaveBeenCalledWith( adminAreasResponse );
+					expect( urls.reports.adminAreas.list ).toHaveBeenCalledWith( reportId, '1234' );
+				});
+			});
+		});
 
-                        req.session.adminAreas = [ 2 ];
+		describe( 'Add', () => {
 
-                        controller.add( req, res );
+			let template = 'reports/views/add-admin-area';
+			let getAddAdminAreaTemplateValuesResponse = { countryId: '1234', c: 3, d: 4, currentAdminAreas: [] };
 
-                        const args = Form.calls.argsFor( 0 );
-                        const config = args[ 1 ];
+			it( 'Should setup the form correctly',  () => {
 
-                        expect( Form ).toHaveBeenCalled();
-                        expect( args[ 0 ] ).toEqual( req );
+				controller.add( req, res, next );
 
-                        expect( config.adminAreas ).toBeDefined();
-                        expect( config.adminAreas.type ).toEqual( Form.SELECT );
-                        expect( config.adminAreas.items ).toEqual( metadata.getCountryAdminAreasList().filter( ( adminArea ) => adminArea.value != 2 ) );
-                        expect( config.adminAreas.validators[ 0 ].fn ).toEqual( validators.isCountryAdminArea );
-                    } );
-                } );
+				const args = Form.calls.argsFor( 0 );
+				const config = args[ 1 ];
+
+				expect( Form ).toHaveBeenCalled();
+				expect( args[ 0 ] ).toEqual( req );
+
+				expect( config.adminAreas ).toBeDefined();
+				expect( config.adminAreas.type ).toEqual( Form.SELECT );
+				expect( config.adminAreas.items ).toEqual( metadata.getCountryAdminAreasList() );
+				expect( config.adminAreas.validators.length ).toEqual( 2 );
+				expect( config.adminAreas.validators[ 0 ].fn ).toEqual( validators.isCountryAdminArea );
+			});
+
+			describe( 'When it is a GET', () => {
+				it( 'Should render the correct template', () => {
+
+					controller.add( req, res, next );
+
+					expect( res.render ).toHaveBeenCalledWith( template, getAddAdminAreaTemplateValuesResponse );
+				} );
+
+				describe( 'When there is one sector in the session', () => {
+					it( 'Should setup the form correctly', async () => {
+
+						req.session.adminAreas = [ 2 ];
+
+						controller.add( req, res );
+
+						const args = Form.calls.argsFor( 0 );
+						const config = args[ 1 ];
+
+						expect( Form ).toHaveBeenCalled();
+						expect( args[ 0 ] ).toEqual( req );
+
+						expect( config.adminAreas ).toBeDefined();
+						expect( config.adminAreas.type ).toEqual( Form.SELECT );
+						expect( config.adminAreas.items ).toEqual( metadata.getCountryAdminAreasList().filter( ( adminArea ) => adminArea.value != 2 ) );
+						expect( config.adminAreas.validators[ 0 ].fn ).toEqual( validators.isCountryAdminArea );
+					} );
+				} );
 
 				describe( 'When there are sectors in the session', () => {
 					it( 'Should render with the session sectors', () => {
 
-                        const adminAreas = [ 1, 2];
-                        req.session.adminAreas = adminAreas;
-                        const expected = Object.assign( {}, getAddAdminAreaTemplateValuesResponse, { currentAdminAreas: adminAreas.map( metadata.getAdminArea ) } );
+						const adminAreas = [ 1, 2];
+						req.session.adminAreas = adminAreas;
+						const expected = Object.assign( {}, getAddAdminAreaTemplateValuesResponse, { currentAdminAreas: adminAreas.map( metadata.getAdminArea ) } );
 
-                        controller.add( req, res );
+						controller.add( req, res );
 
 						expect( res.render ).toHaveBeenCalledWith( template, expected );
 					} );
 				} );
-            } );
-            describe( 'When it is a POST', () => {
+			} );
 
-                beforeEach( () => {
-                    form.isPost = true;
-                } );
+			describe( 'When it is a POST', () => {
 
-                describe( 'When the form has errors', () => {
-                    // Should probably test both errors show correctly
-                    it ('Should render the template ', () => {
+				beforeEach( () => {
+					form.isPost = true;
+				} );
 
-                        form.hasErrors.and.callFake( () => true );
+				describe( 'When the form has errors', () => {
+					// Should probably test both errors show correctly
+					it ('Should render the template ', () => {
 
-                        controller.add( req, res, next );
+						form.hasErrors.and.callFake( () => true );
 
-                        expect( res.redirect ).not.toHaveBeenCalled();
-                    });
-                });
-                describe( 'When the form does not have errors', () => {
-                    it( 'Should add the admin area to the list and redirect', () => {
+						controller.add( req, res, next );
+
+						expect( res.redirect ).not.toHaveBeenCalled();
+					});
+				});
+
+				describe( 'When the form does not have errors', () => {
+					it( 'Should add the admin area to the list and redirect', () => {
 
 						const adminArea = uuid();
 						const adminAreasResponse = '/list/admin-areas';
@@ -429,8 +434,8 @@ describe( 'Report controllers', () => {
 						expect( req.session.adminAreas ).toEqual( [ adminArea ] );
 						expect( res.redirect ).toHaveBeenCalledWith( adminAreasResponse );
 					} );
-                });
-            } );
-        });
+				});
+			} );
+		});
 	} );
 } );

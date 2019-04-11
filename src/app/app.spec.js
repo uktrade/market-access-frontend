@@ -768,7 +768,7 @@ describe( 'App', function(){
 						describe( 'remove', () => {
 							it( 'Should redirect back to the add page', ( done ) => {
 
-								const adminAreaId = '8ad3f33a-ace8-40ec-bd2c-638fdc3024ea'//Alabama
+								const adminAreaId = '8ad3f33a-ace8-40ec-bd2c-638fdc3024ea';//Alabama
 
 								agent
 									.get( urls.barriers.location.adminAreas.add( barrierId ) )
@@ -792,7 +792,7 @@ describe( 'App', function(){
 													.post( urls.barriers.location.adminAreas.remove( barrierId ) )
 													.send( `_csrf=${ token }&adminArea=${ adminAreaId }` )
 													.end( checkRedirect( urls.barriers.location.list( barrierId ), done ) );
-											 } );
+											} );
 									} );
 							} );
 						} );
@@ -1007,17 +1007,107 @@ describe( 'App', function(){
 							} );
 
 							describe( 'Without a reportId', () => {
-								it( 'Should render the has admin areas page', ( done ) => {
+
+								beforeEach( ( done ) => {
 
 									agent
 										.post( urls.reports.country() )
 										.send( `_csrf=${ token }&country=${ countryId }` )
-										.end( checkRedirect( urls.reports.hasAdminAreas( undefined, countryId ), () => {
+										.end( checkRedirect( urls.reports.hasAdminAreas( undefined, countryId ), done ) );
+								} );
+
+								it( 'Should render the has admin areas page', ( done ) => {
+
+									agent
+										.get( urls.reports.hasAdminAreas( undefined, countryId ) )
+										.end( checkPage( 'Market Access - Add - Location of the barrier', done ) );
+								} );
+
+								describe( 'Answering the question', () => {
+
+									let hasAdminAreasUrl;
+									let token;
+									let id;
+
+									beforeEach( ( done ) => {
+
+										hasAdminAreasUrl = urls.reports.hasAdminAreas( undefined, countryId );
+
+										agent
+											.get( hasAdminAreasUrl )
+											.end( ( err, res ) => {
+
+												if( err ){ return done.fail( err ); }
+
+												token = getCsrfToken( res, done );
+												id = uuid();
+
+												intercept.backend()
+													.post( '/reports' )
+													.reply( 200, { id } );
+
+												done();
+											} );
+									} );
+
+									describe( 'When answering yes', () => {
+										it( 'Should redirect to the next step', ( done ) => {
 
 											agent
-												.get( urls.reports.hasAdminAreas( undefined, countryId ) )
-												.end( checkPage( 'Market Access - Add - Location of the barrier', done ) );
-										} ) );
+												.post( hasAdminAreasUrl )
+												.send( `_csrf=${ token }&hasAdminAreas=true` )
+												.end( checkRedirect( urls.reports.hasSectors( id ), done ) );
+										} );
+									} );
+
+									describe( 'When answering no', () => {
+										it( 'Should render the admin areas page', ( done ) => {
+
+											agent
+												.post( hasAdminAreasUrl )
+												.send( `_csrf=${ token }&hasAdminAreas=false` )
+												.end( checkRedirect( urls.reports.adminAreas.add( undefined, countryId ), done ) );
+										} );
+
+										describe( 'Adding an admin area', () => {
+
+											let addUrl = urls.reports.adminAreas.add( undefined, countryId );
+
+											beforeEach( ( done ) => {
+												agent
+													.post( hasAdminAreasUrl )
+													.send( `_csrf=${ token }&hasAdminAreas=false` )
+													.end( checkRedirect( addUrl, done ) );
+											} );
+
+											it( 'Should render the page', ( done ) => {
+
+												agent
+													.get( addUrl )
+													.end( checkPage( 'Market Access - Report - Add an admin area', done ) );
+											} );
+
+											describe( 'POSTing the form', () => {
+												it( 'Should redirect back to the list page', ( done ) => {
+
+													agent
+														.get( addUrl )
+														.end( ( err, res ) => {
+
+															if( err ){ return done.fail( err ); }
+
+															const token = getCsrfToken( res, done );
+															const adminAreaId = '8ad3f33a-ace8-40ec-bd2c-638fdc3024ea';//Alabama
+
+															agent
+																.post( addUrl )
+																.send( `_csrf=${ token }&adminAreas=${ adminAreaId }` )
+																.end( checkRedirect( urls.reports.adminAreas.list( undefined, countryId ), done ) );
+														} );
+												} );
+											} );
+										} );
+									} );
 								} );
 							} );
 
