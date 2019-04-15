@@ -202,9 +202,9 @@
 	} ) }}
 
 	<section class="barrier-content">
-
+		{{ barrier.isResolved }}
 		{%- if barrier.isResolved or barrier.isHibernated -%}
-
+			
 			<div class="barrier-status-details">
 				<span class="barrier-status-details__icon barrier-status-details__icon--{{ barrier.status.modifyer }}">
 					{% if barrier.isResolved %}
@@ -336,9 +336,7 @@
 					{%- endif %}
 					</p>
 					<ul>
-					{% for name, item in item.state %}
-						<li>{{ name }}: {{ item }}</li>
-					{% endfor %}
+					
 					</ul>
 					{% if item.event === 'BARRIER_STATUS_CHANGE' and item.state.isOpen -%}
 						<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
