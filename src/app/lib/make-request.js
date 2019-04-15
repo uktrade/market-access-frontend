@@ -148,7 +148,7 @@ module.exports = ( domain, hawkParams ) => {
 							return reject( err );
 						}
 
-						logger.verbose( `Response isValid:` + !!isValid );
+						logger.verbose( 'Response isValid:' + !!isValid );
 
 						if( !isValid ){
 

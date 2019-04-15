@@ -27,8 +27,8 @@ module.exports = function( express, app ){
 	app.use( user );
 	app.use( formErrors );
 
-	app.get( '/me', csrfProtection, indexController.me );
-	app.post( '/me', parseBody, csrfProtection, indexController.me );
+	app.get( '/me/', csrfProtection, indexController.me );
+	app.post( '/me/', parseBody, csrfProtection, indexController.me );
 
 	app.get( '/documents/:uuid/download/', indexController.documents.download ),
 

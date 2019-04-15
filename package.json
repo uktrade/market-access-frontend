@@ -84,7 +84,7 @@
     "babel-loader": "^8.0.5",
     "backstopjs": "^3.8.8",
     "cucumber": "^4.2.1",
-    "eslint": "^5.13.0",
+    "eslint": "^5.16.0",
     "faker": "^4.1.0",
     "grunt": "^1.0.3",
     "grunt-contrib-clean": "^2.0.0",
