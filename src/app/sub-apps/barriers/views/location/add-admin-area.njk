@@ -1,0 +1,41 @@
+{% from 'components/select/macro.njk' import govukSelect %}
+{% from 'app-components/heading.njk' import heading %}
+{% from 'app-components/selection-list.njk' import adminAreasList %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Barrier - Add an admin area{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.barriers.location.list( barrier.id ) },
+		caption: barrier.barrier_title,
+		text: 'Edit location',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.barriers.location.adminAreas.add( barrier.id ) }}" method="POST" class="restrict-width">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{{ govukSelect( {
+
+			label: {
+				text: "Choose the parts of the country that are affected",
+				classes: 'govuk-label--s'
+			},
+			id: 'adminAreas',
+			name: 'adminAreas',
+			classes: 'govuk-!-width-full',
+			items: adminAreas,
+			errorMessage: errors | errorForName( 'adminAreas' )
+		} ) }}
+
+		{% if currentAdminAreas and currentAdminAreas.length %}
+		    {{ adminAreasList( currentAdminAreas ) }}
+		{% endif %}
+
+		<input type="submit" value="Add administrative area" class="govuk-button">
+        <a href="{{ urls.barriers.location.list( barrier.id ) }}" class="govuk-button button--secondary">Cancel</a>
+	</form>
+{% endblock %}

@@ -1,4 +1,5 @@
 const metadata = require( '../../../lib/metadata' );
+const strings = require( '../../../lib/strings' );
 
 const { OPEN, RESOLVED, HIBERNATED } = metadata.barrier.status.types;
 const barrierStatusTypeInfo = metadata.barrier.status.typeInfo;
@@ -56,7 +57,7 @@ module.exports = ( barrier, addCompany = false ) => {
 			reportedOn: barrier.reported_on,
 			addedBy: barrier.reported_by,
 			euExitRelated: getEuExitRelatedText( barrier.eu_exit_related ),
-			country: metadata.getCountry( barrier.export_country ),
+			location: strings.location( barrier.export_country, barrier.country_admin_areas ),
 			sectors,
 			source: {
 				id: barrier.source,

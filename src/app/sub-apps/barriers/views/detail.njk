@@ -148,11 +148,11 @@
 					href: urls.barriers.edit.euExitRelated( barrier.id )
 				}
 			},{
-				title: 'Company or organisation affected',
+				title: 'Companies affected',
 				items: companiesList if companiesList.length,
 				add: {
 					text: 'Add one or more companies',
-					href: urls.barriers.companies.search( barrier.id )
+					href: urls.barriers.companies.new( barrier.id )
 				},
 				edit: {
 					href: urls.barriers.companies.edit( barrier.id )
@@ -229,7 +229,7 @@
 		{% endif -%}
 
 		<h2 class="section-heading">
-			Updates and documents
+			Progress and documents
 		</h2>
 
 		{% if showNoteForm %}

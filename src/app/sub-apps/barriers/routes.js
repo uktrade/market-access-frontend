@@ -26,8 +26,8 @@ module.exports = ( express, app ) => {
 
 	app.get( '/:barrierId/', controller.interactions.list );
 
-	app.get( '/:barrierId/edit/', controller.edit.headlines );
-	app.post( '/:barrierId/edit/', controller.edit.headlines );
+	app.get( '/:barrierId/edit/title/', controller.edit.title );
+	app.post( '/:barrierId/edit/title/', controller.edit.title );
 	app.get( '/:barrierId/edit/product/', controller.edit.product );
 	app.post( '/:barrierId/edit/product/', controller.edit.product );
 	app.get( '/:barrierId/edit/description/', controller.edit.description );
@@ -47,13 +47,24 @@ module.exports = ( express, app ) => {
 
 	app.get( '/:barrierId/interactions/add-note/', controller.interactions.notes.add );
 	app.post( '/:barrierId/interactions/add-note/', fileUpload, controller.interactions.notes.add );
-	app.get( '/:barrierId/interactions/edit-note/:noteId', controller.interactions.notes.edit );
-	app.post( '/:barrierId/interactions/edit-note/:noteId', fileUpload, controller.interactions.notes.edit );
+	app.get( '/:barrierId/interactions/edit-note/:noteId/', controller.interactions.notes.edit );
+	app.post( '/:barrierId/interactions/edit-note/:noteId/', fileUpload, controller.interactions.notes.edit );
 
 	app.post( '/:uuid/interactions/notes/:noteId/documents/add/', fileUpload, controller.interactions.notes.documents.add );
 	app.get( '/:uuid/interactions/notes/:noteId/documents/cancel/', controller.interactions.notes.documents.cancel );
 	app.get( '/:uuid/interactions/notes/:noteId/documents/:id/delete/', controller.interactions.notes.documents.delete );
 	app.post( '/:uuid/interactions/notes/:noteId/documents/:id/delete/', controller.interactions.notes.documents.delete );
+
+	app.get( '/:barrierId/location/', controller.location.list );
+	app.post( '/:barrierId/location/', controller.location.list );
+	app.get( '/:barrierId/location/edit/', controller.location.edit );
+	app.post( '/:barrierId/location/edit/', controller.location.edit );
+	app.get( '/:barrierId/location/country/', controller.location.country );
+	app.post( '/:barrierId/location/country/', controller.location.country );
+	app.get( '/:barrierId/location/add-admin-area/', controller.location.adminAreas.add );
+	app.post( '/:barrierId/location/add-admin-area/', controller.location.adminAreas.add );
+	app.get( '/:barrierId/location/remove-admin-area/', controller.location.adminAreas.remove );
+	app.post( '/:barrierId/location/remove-admin-area/', controller.location.adminAreas.remove );
 
 	app.get( '/:barrierId/status/', controller.status.index );
 	app.post( '/:barrierId/status/', controller.status.index );
@@ -74,6 +85,7 @@ module.exports = ( express, app ) => {
 	app.post( '/:barrierId/sectors/new/', controller.sectors.new );
 
 	app.get( '/:barrierId/companies/edit/', controller.companies.edit );
+	app.get( '/:barrierId/companies/new/', controller.companies.new );
 	app.get( '/:barrierId/companies/', controller.companies.list );
 	app.post( '/:barrierId/companies/', controller.companies.list );
 	app.post( '/:barrierId/companies/remove/', controller.companies.remove );

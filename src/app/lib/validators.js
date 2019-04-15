@@ -3,6 +3,14 @@ const metadata = require( './metadata' );
 const uuid = /^[a-zA-Z0-9-]+$/;
 const isNumeric = /^[0-9]+$/;
 
+function isCountry( id ){
+	return metadata.countries.some( ( country ) => country.id === id );
+}
+
+function isCountryAdminArea( id ){
+	return metadata.adminAreas.some( ( adminArea ) => adminArea.id === id );
+}
+
 module.exports = {
 	isNumeric: ( value ) => isNumeric.test( value ),
 	isDefined: ( value ) => {
@@ -16,8 +24,9 @@ module.exports = {
 	},
 	isUuid: ( id ) => uuid.test( id ),
 	isMetadata: ( key ) => ( value ) => Object.keys( metadata[ key ] ).includes( value ),
-	isCountry: ( id ) => metadata.countries.some( ( country ) => country.id === id ),
+	isCountry,
 	isOverseasRegion: ( id ) => metadata.overseasRegions.some( ( region ) => region.id === id ),
+	isCountryAdminArea,
 	isSector: ( id ) => metadata.sectors.some( ( sector ) => sector.id === id ),
 	isOneBoolCheckboxChecked: ( values ) => {
 
@@ -42,4 +51,5 @@ module.exports = {
 	},
 	isValidFile: ( file ) => config.files.types.includes( file.type ),
 	isBarrierPriority: ( value ) => metadata.barrierPriorities.some( ( priority ) => priority.code === value ),
+	isCountryOrAdminArea: ( id ) => isCountry( id ) || isCountryAdminArea( id ),
 };

@@ -3,21 +3,19 @@ const datahub = config.datahub.stub ? require( './datahub-request.stub' ) : requ
 
 module.exports = {
 
-	getCompany: ( req, id ) => datahub.get( `/v3/company/${ id }`, req.session.ssoToken ),
+	getCompany: ( id ) => datahub.get( `/v4/public/company/${ id }` ),
 
-	searchCompany: ( req, name, page = 1, limit = 20 ) => {
+	searchCompany: ( query, page = 1, limit = 20 ) => {
 
 		const body = {
-			name,
+			original_query: query,
 			offset: (page * limit) - limit,
-			limit
+			limit,
 		};
 
-		const url = '/v3/search/company';
+		//const url = '/v3/activity-stream/'; // generate a 403
+		const url = '/v4/public/search/company';
 
-		return datahub.post( url, req.session.ssoToken, body );
+		return datahub.post( url, body );
 	},
-
-	//getCompanyContacts: ( req, companyId ) => datahub.get( `/v3/contact?company_id=${ encodeURIComponent( companyId ) }`, req.session.ssoToken ),
-	getContact: ( req, contactId ) => datahub.get( `/v3/contact/${ encodeURIComponent( contactId ) }`, req.session.ssoToken )
 };

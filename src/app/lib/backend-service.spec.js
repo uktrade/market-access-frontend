@@ -453,20 +453,17 @@ describe( 'Backend Service', () => {
 			} );
 		} );
 
-		describe( 'saveDetails', () => {
+		describe( 'saveTitle', () => {
 			it( 'Should PUT to the correct path with the correct values', async () => {
 
 				const title = 'my title';
-				const country = uuid();
 
-				await service.barriers.saveDetails( req, barrierId, {
+				await service.barriers.saveTitle( req, barrierId, {
 					title,
-					country,
 				} );
 
 				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
 					barrier_title: title,
-					export_country: country,
 				} );
 			} );
 		} );
@@ -708,14 +705,16 @@ describe( 'Backend Service', () => {
 						status: '',
 						isResolved: '',
 						resolvedDate: '',
-						country: ''
+						country: '',
+						adminAreas: []
 					} );
 
 					expect( backend.post ).toHaveBeenCalledWith( '/reports', token, {
 						problem_status: null,
 						is_resolved: null,
 						resolved_date: null,
-						export_country: null
+						export_country: null,
+						country_admin_areas: []
 					} );
 				} );
 			} );
@@ -726,6 +725,7 @@ describe( 'Backend Service', () => {
 				let isResolved;
 				let resolvedDate;
 				let country;
+				let adminAreas;
 
 				beforeEach( () => {
 
@@ -733,6 +733,7 @@ describe( 'Backend Service', () => {
 					isResolved = true;
 					resolvedDate = { year: '2018', month:'02' };
 					country = uuid();
+					adminAreas = [uuid()];
 				} );
 
 				describe( 'When isResolved is true', () => {
@@ -742,14 +743,16 @@ describe( 'Backend Service', () => {
 							status,
 							isResolved,
 							resolvedDate,
-							country
+							country,
+							adminAreas
 						} );
 
 						expect( backend.post ).toHaveBeenCalledWith( '/reports', token, {
 							problem_status: status,
 							is_resolved: isResolved,
 							resolved_date: '2018-02-01',
-							export_country: country
+							export_country: country,
+							country_admin_areas: adminAreas
 						} );
 					} );
 				} );
@@ -761,14 +764,16 @@ describe( 'Backend Service', () => {
 							status,
 							isResolved: false,
 							resolvedDate,
-							country
+							country,
+							adminAreas
 						} );
 
 						expect( backend.post ).toHaveBeenCalledWith( '/reports', token, {
 							problem_status: status,
 							is_resolved: false,
 							resolved_date: '2018-02-01',
-							export_country: country
+							export_country: country,
+							country_admin_areas: adminAreas
 						} );
 					} );
 				} );
@@ -824,6 +829,7 @@ describe( 'Backend Service', () => {
 				const isResolved = true;
 				const resolvedDate = { year: '2018', month:'02' };
 				const country = uuid();
+				const adminAreas = [uuid()];
 
 				describe( 'When the resolvedDate has a year and month', () => {
 
@@ -831,12 +837,14 @@ describe( 'Backend Service', () => {
 						status,
 						isResolved,
 						resolvedDate,
-						country
+						country,
+						adminAreas
 					}, {
 						problem_status: status,
 						is_resolved: isResolved,
 						resolved_date: '2018-02-01',
-						export_country: country
+						export_country: country,
+						country_admin_areas: adminAreas
 					} );
 				} );
 
@@ -846,12 +854,14 @@ describe( 'Backend Service', () => {
 						status,
 						isResolved,
 						resolvedDate: {},
-						country
+						country,
+						adminAreas
 					}, {
 						problem_status: status,
 						is_resolved: isResolved,
 						resolved_date: null,
-						export_country: country
+						export_country: country,
+						country_admin_areas: adminAreas
 					} );
 				} );
 			} );

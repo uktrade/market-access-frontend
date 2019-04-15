@@ -1,6 +1,8 @@
 const backend = require( './backend-request' );
 
 let countries;
+let adminAreasByCountry;
+let adminAreas;
 let overseasRegions;
 let sectors;
 let level0Sectors;
@@ -21,6 +23,25 @@ function cleanCountry( item ){
 	};
 }
 
+// Groups the admin areas into seperate areas of objects relating to country
+function alterAdminAreasData( adminAreas ) {
+
+	const alteredAdminAreas = {};
+
+	// Loop through each admin area and push it to the corresponding
+	// array based on country ID
+
+	adminAreas.forEach( ( countryAdminArea ) => {
+		// Key already exists for country
+		const countryId = countryAdminArea.country.id;
+		const list = ( alteredAdminAreas[ countryId ] || [] );
+		list.push( countryAdminArea );
+		alteredAdminAreas[ countryId ] = list;
+	} );
+
+	return alteredAdminAreas;
+
+}
 function getOverseasRegions( countries ){
 
 	const regions = {};
@@ -88,6 +109,17 @@ function createList( items, text ){
 	return list;
 }
 
+function createAdminAreaList (country, adminAreas, text) {
+
+	const adminAreaList = adminAreas[country].map( ( adminArea ) => ( {
+		value: adminArea.id,
+		text: adminArea.name
+	} ) );
+
+	adminAreaList.unshift( { value: '', text } );
+	return adminAreaList;
+}
+
 function dedupeBarrierTypes( barrierTypes ){
 
 	const typeIds = [];
@@ -133,6 +165,8 @@ module.exports.fetch = async () => {
 			const availableCountries = body.countries.filter( notDisabled );
 
 			overseasRegions = getOverseasRegions( availableCountries ).sort( sortOverseasRegions );
+			adminAreas = body.country_admin_areas.filter( notDisabled );
+			adminAreasByCountry = alterAdminAreasData(adminAreas);
 			countries = availableCountries.map( cleanCountry );
 			sectors = body.sectors.filter( notDisabled );
 			level0Sectors = sectors.filter( ( sector ) => sector.level === 0 );
@@ -148,6 +182,8 @@ module.exports.fetch = async () => {
 			module.exports.lossScale = body.loss_range;
 			module.exports.optionalBool = body.adv_boolean;
 			module.exports.countries = countries;
+			module.exports.adminAreas = adminAreas;
+			module.exports.adminAreasByCountry = adminAreasByCountry;
 			module.exports.overseasRegions = overseasRegions;
 			module.exports.govResponse = body.govt_response;
 			module.exports.publishResponse = body.publish_response;
@@ -216,6 +252,11 @@ module.exports.getBarrierPrioritiesList = ( opts = {} ) => barrierPriorities.map
 const OPEN = 2;
 const RESOLVED = 4;
 const HIBERNATED = 5;
+
+module.exports.getCountryAdminAreasList = ( countryId, defaultText = 'Select an admin area') => createAdminAreaList(countryId, adminAreasByCountry, defaultText);
+module.exports.isCountryWithAdminArea = ( countryID ) => countryID in adminAreasByCountry;
+module.exports.getAdminArea = (adminAreaId) => adminAreas.find( ( AdminArea ) => AdminArea.id === adminAreaId );
+
 
 module.exports.barrier = {
 	status: {
