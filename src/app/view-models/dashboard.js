@@ -3,8 +3,6 @@ const strings = require( '../lib/strings' );
 
 const barrierStatusTypeInfo = metadata.barrier.status.typeInfo;
 
-const checkAllSectors = (barrier) => barrier.all_sectors ? 'All Sectors' : barrier.sectors ? strings.sectors(barrier.sectors) : 'Unknown';
-
 function update( barrier ){
 
 	// barrier.all_sectors = true;
@@ -25,7 +23,7 @@ function update( barrier ){
 			id: countryId,
 			name: ( country && country.name )
 		},
-		sectors: checkAllSectors(barrier),
+		sectors: strings.sectors(barrier.sectors, barrier.all_sectors),
 		supportNeeded: barrier.support_type === 1,
 		hasContributors: barrier.contributor_count > 0,
 		problemStatus: metadata.statusTypes[ barrier.problem_status ],

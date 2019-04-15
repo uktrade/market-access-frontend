@@ -67,7 +67,7 @@ describe( 'Dashboard view model', () => {
 					supportNeeded: barrier.support_type === 1,
 					hasContributors: barrier.contributor_count > 0,
 					problemStatus: metadata.statusTypes[ barrier.problem_status ],
-					sectors: ( barrier.sectors && barrier.sectors.map( () => getSector().name ) || [ 'Unknown' ] ),
+					sectors: ( barrier.sectors && barrier.sectors.map( () => getSector().name ) ||  'Unknown'  ),
 					date: {
 						reported: barrier.reported_on,
 						created: barrier.created_on,

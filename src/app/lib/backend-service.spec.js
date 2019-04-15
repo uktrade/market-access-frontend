@@ -877,14 +877,15 @@ describe( 'Backend Service', () => {
 				} );
 			} );
 
-			describe( 'saveAllSectors', () => {
+			fdescribe( 'saveAllSectors', () => {
 
 				const allSectors = 'true';
 
 				checkWithAndWithoutValues( 'saveAllSectors', {
-					allSectors
+					allSectors,
 				}, {
-					all_sectors: allSectors
+					all_sectors: allSectors,
+					sectors: []
 				} );
 			} );
 

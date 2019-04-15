@@ -232,6 +232,18 @@ describe( 'Barrier detail view model', () => {
 		} );
 	} );
 
+	describe( 'When all sectors is selected', () => {
+		it( 'Should have the correct properties', () => {
+			inputBarrier.all_sectors = true;
+
+			const output = viewModel( inputBarrier );
+			
+			const sectorsList = output.sectorsList;
+
+			expect(sectorsList).toEqual([{ text: 'All sectors' }]);
+		});
+	});
+
 	describe( 'A hibernated barrier', () => {
 		it( 'Should have the correct properties', () => {
 
