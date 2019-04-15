@@ -19,7 +19,7 @@
 
 		<div class="search-form__input-group">
 			<input
-				class="govuk-input search-form__input"
+				class="govuk-input search-form__input{{ ' govuk-input--error' if params.input.error }}"
 				id="{{ params.input.id }}"
 				name="{{ params.input.name }}"
 				type="text"
@@ -27,7 +27,7 @@
 				placeholder="{{ params.input.placeholder }}"
 				{{ 'autofocus' if not params.input.value.length and not params.input.error }}
 				aria-describedby="{{ params.input.id }}-hint">
-			<button type="submit" class="search-form__button"><span class="visually-hidden">Search</span></button>
+			<button type="submit" class="search-form__button govuk-button">Search</button>
 		</div>
 	</div>
 

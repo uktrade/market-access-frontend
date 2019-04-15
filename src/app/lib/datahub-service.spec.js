@@ -1,16 +1,9 @@
 const proxyquire = require( 'proxyquire' );
-const uuid = require( 'uuid/v4' );
 const modulePath = './datahub-service';
 
 describe( 'Datahub Service', () => {
 
 	let service;
-	let req;
-
-	beforeEach( () => {
-
-		req = { session: { ssoToken: uuid() } };
-	} );
 
 	describe( 'In stub mode', () => {
 
@@ -34,9 +27,9 @@ describe( 'Datahub Service', () => {
 
 				const id = '123-456';
 
-				service.getCompany( req, id );
+				service.getCompany( id );
 
-				expect( datahubStub.get ).toHaveBeenCalledWith( `/v3/company/${ id }`, req.session.ssoToken );
+				expect( datahubStub.get ).toHaveBeenCalledWith( `/v4/public/company/${ id }` );
 			} );
 		} );
 
@@ -46,10 +39,10 @@ describe( 'Datahub Service', () => {
 
 					const name = 'test-name';
 
-					service.searchCompany( req, name );
+					service.searchCompany( name );
 
-					expect( datahubStub.post ).toHaveBeenCalledWith( `/v3/search/company`, req.session.ssoToken, {
-						name,
+					expect( datahubStub.post ).toHaveBeenCalledWith( `/v4/public/search/company`, {
+						original_query: name,
 						offset: 0,
 						limit: 20
 					} );
@@ -80,9 +73,9 @@ describe( 'Datahub Service', () => {
 
 				const id = '123-456';
 
-				service.getCompany( req, id );
+				service.getCompany( id );
 
-				expect( datahub.get ).toHaveBeenCalledWith( `/v3/company/${ id }`, req.session.ssoToken );
+				expect( datahub.get ).toHaveBeenCalledWith( `/v4/public/company/${ id }` );
 			} );
 		} );
 
@@ -92,25 +85,14 @@ describe( 'Datahub Service', () => {
 
 					const name = 'test-name';
 
-					service.searchCompany( req, name );
+					service.searchCompany( name );
 
-					expect( datahub.post ).toHaveBeenCalledWith( `/v3/search/company`, req.session.ssoToken, {
-						name,
+					expect( datahub.post ).toHaveBeenCalledWith( `/v4/public/search/company`, {
+						original_query: name,
 						offset: 0,
 						limit: 20
 					} );
 				} );
-			} );
-		} );
-
-		describe( 'getContact', () => {
-			it( 'Should call the correct path', () => {
-
-				const id = '123-456';
-
-				service.getContact( req, id );
-
-				expect( datahub.get ).toHaveBeenCalledWith( `/v3/contact/${ encodeURIComponent( id ) }`, req.session.ssoToken );
 			} );
 		} );
 	} );

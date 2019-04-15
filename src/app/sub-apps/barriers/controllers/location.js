@@ -25,7 +25,7 @@ module.exports = {
 			try {
 
 				const { response } = await backend.barriers.saveLocation( req, barrier.id, req.session.location );
-				
+
 				delete req.session.location;
 
 				if( response.isSuccess ){
@@ -44,13 +44,13 @@ module.exports = {
 		}
 
 		res.render( 'barriers/views/location/list', {
-			country: metadata.getCountry(country).name, 
+			country: metadata.getCountry( country ).name,
 			showAdminAreas: isCountryWithAdminAreas,
-			adminAreas: adminAreas.map( metadata.getAdminArea),
+			adminAreas: adminAreas.map( metadata.getAdminArea ),
 			csrfToken: req.csrfToken()
 		});
 	},
-	
+
 	edit: ( req, res ) => {
 		const barrier = req.barrier;
 
@@ -63,13 +63,13 @@ module.exports = {
 		const isCountryWithAdminAreas = metadata.isCountryWithAdminArea(country);
 
 		res.render( 'barriers/views/location/list', {
-			country: metadata.getCountry(country).name, 
+			country: metadata.getCountry(country).name,
 			showAdminAreas: isCountryWithAdminAreas,
 			adminAreas: adminAreas.map( metadata.getAdminArea),
 			csrfToken: req.csrfToken()
 		});
 	},
-	
+
 	country: ( req, res ) => {
 
 		const barrier = req.barrier;
@@ -91,11 +91,11 @@ module.exports = {
 		if( form.isPost ){
 
 			form.validate();
-	
+
 			if( !form.hasErrors() ){
-	
+
 				req.session.location.country = form.getValues().country;
-				
+
 				if (!metadata.isCountryWithAdminArea(form.getValues().country)) {
 					req.session.location.adminAreas = [];
 				}
@@ -103,55 +103,56 @@ module.exports = {
 				return res.redirect( urls.barriers.location.list( barrier.id ) );
 			}
 		}
-	
+
 		res.render( 'barriers/views/location/country', form.getTemplateValues() );
 	},
 
-	add_admin_area: ( req, res ) => {
-		const barrier = req.barrier;
-		const adminAreas = req.session.location.adminAreas;
-		const country =  req.session.location.country;
+	adminAreas: {
+		add: ( req, res ) => {
+			const barrier = req.barrier;
+			const adminAreas = req.session.location.adminAreas;
+			const country =  req.session.location.country;
 
-		const form = new Form( req, {
+			const form = new Form( req, {
 
-			adminAreas: {
-				type: Form.SELECT,
-				items: metadata.getCountryAdminAreasList(country).filter( ( adminArea ) => !adminAreas.includes( adminArea.value ) ),
-				validators: [ {
-					fn: validators.isCountryAdminArea,
-					message: 'Select a admin area affected by the barrier'
-				},{
-					fn: ( value ) => !adminAreas.includes( value ),
-					message: 'Admin area already added, choose another'
-				} ]
+				adminAreas: {
+					type: Form.SELECT,
+					items: metadata.getCountryAdminAreasList( country ).filter( ( adminArea ) => !adminAreas.includes( adminArea.value ) ),
+					validators: [ {
+						fn: validators.isCountryAdminArea,
+						message: 'Select a admin area affected by the barrier'
+					},{
+						fn: ( value ) => !adminAreas.includes( value ),
+						message: 'Admin area already added, choose another'
+					} ]
+				}
+			} );
+
+			if( form.isPost ){
+
+				form.validate();
+
+				if( !form.hasErrors() ){
+
+					adminAreas.push( form.getValues().adminAreas );
+					req.session.location.adminAreas = adminAreas;
+
+					return res.redirect( urls.barriers.location.list( barrier.id ) );
+				}
 			}
-		} );
 
-		if( form.isPost ){
+			res.render( 'barriers/views/location/add-admin-area', Object.assign(
+				form.getTemplateValues(),
+				{ currentAdminAreas: adminAreas.map( metadata.getAdminArea ) },
+			) );
+		},
 
-			form.validate();
+		remove: ( req, res ) => {
+			const adminAreaToRemove = req.body.adminArea;
 
-			if( !form.hasErrors() ){
+			req.session.location.adminAreas = req.session.location.adminAreas.filter( ( adminArea ) => adminArea !== adminAreaToRemove );
 
-				adminAreas.push( form.getValues().adminAreas );
-				req.session.location.adminAreas = adminAreas;
-
-				return res.redirect( urls.barriers.location.list( barrier.id ) );
-			}
-		}
-
-		res.render( 'barriers/views/location/add-admin-area', Object.assign(
-			form.getTemplateValues(),
-			{ currentAdminAreas: adminAreas.map( metadata.getAdminArea ) },
-		) );
-	},
-
-	remove_admin_area: ( req, res ) => {
-		const adminAreaToRemove = req.body.adminArea;
-
-		req.session.location.adminAreas = req.session.location.adminAreas.filter( ( adminArea ) => adminArea !== adminAreaToRemove );
-
-		res.redirect( urls.barriers.location.list( req.barrier.id ) );
-		
-	},
+			res.redirect( urls.barriers.location.list( req.barrier.id ) );
+		},
+	}
 };
