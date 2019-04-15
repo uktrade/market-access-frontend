@@ -340,7 +340,7 @@
 						<li>{{ name }}: {{ item }}</li>
 					{% endfor %}
 					</ul>
-					{% if item.event === 'BARRIER_STATUS_CHANGE' and item.state.to === 'Open' -%}
+					{% if item.event === 'BARRIER_STATUS_CHANGE' and item.state.isOpen -%}
 						<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
 					{% endif -%}
 
