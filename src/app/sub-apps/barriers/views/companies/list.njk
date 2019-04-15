@@ -4,20 +4,20 @@
 
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Barrier - Save or add another affected company or organisation{% endblock %}
+{% block page_title %}{{ super() }} - Barrier - Save or add another company{% endblock %}
 
 {% block page_content %}
 
 	{{ heading({
 		back: { href: urls.barriers.detail( barrier.id ) },
 		caption: barrier.barrier_title,
-		text: 'Company or organisation affected',
+		text: 'Name of company affected',
 		errors: errors
 	}) }}
 
 	<div class="restrict-width">
 
-		<h3 class="">Save or add another company or organisation</h3>
+		<h3 class="">Save or add another company</h3>
 
 		{{ companiesList( companyList, {
 			csrfToken: csrfToken,

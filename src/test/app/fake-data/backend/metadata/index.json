@@ -127,6 +127,11 @@
       }
    ],
    "countries": [
+		{
+			"name": "United States",
+			"id": "81756b9a-5d95-e211-a939-e4115bead28a",
+			"disabled_on": null
+		},
       {
          "id": "68496eb0-effd-42e0-91d8-349323b6fe5e",
          "name": "Saint Lucia",

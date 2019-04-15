@@ -1,84 +1,17 @@
-const request = require( 'request' );
 const config = require( '../config' );
-const logger = require( './logger' );
-const reporter = require( './reporter' );
+const makeRequest = require( './make-request' );
 
-const datahubToken = config.datahub.token;
-
-function makeRequest( method, path, token, opts = {} ){
-
-	if( !path ){
-		throw new Error( 'Path is required' );
-	}
-
-	if( !token ){
-		throw new Error( 'Token is required' );
-	}
-
-	const uri = ( config.datahub.url + path );
-
-	// Temporary workaround to specify a known token
-	if( datahubToken ){
-
-		token = datahubToken;
-	}
-
-	const requestOptions = {
-		uri,
-		method,
-		json: true,
-		headers: {
-			Authorization: `Bearer ${ token }`
-		}
-	};
-
-	if( opts.body ){
-
-		requestOptions.body = opts.body;
-	}
-
-	return new Promise( ( resolve, reject ) => {
-
-		logger.debug( `Sending ${ method } request to: ${ uri }` );
-
-		request( requestOptions, ( err, response, body ) => {
-
-			if( err ){
-
-				reject( err );
-
-			} else {
-
-				const statusCode = response.statusCode;
-
-				if( config.isDebug ){
-
-					logger.debug( 'Response headers: ' + JSON.stringify( response.headers, null, 2 ) );
-					logger.debug( 'Response body: ' + ( response.headers[ 'content-type' ] === 'application/json' ? JSON.stringify( body, null, 2 ) : body ) );
-				}
-
-				response.isSuccess = ( statusCode >= 200 && statusCode <= 300 );
-
-				if( response.isSuccess || statusCode === 404 || statusCode === 403 ){
-
-					resolve( { response, body } );
-
-					if( statusCode === 403 ){
-
-						reporter.message( 'info', 'Data Hub API returned 403 for user' );
-					}
-
-				} else {
-
-					reject( new Error( `Got at ${ statusCode } response code from datahub` ) );
-				}
-			}
-		} );
-	} );
-}
+const sendRequest = makeRequest( config.datahub.url, {
+	credentials: {
+		id: config.datahub.hawk.id,
+		key: config.datahub.hawk.key,
+		algorithm: 'sha256',
+	},
+	defaultContentType: ''
+} );
 
 module.exports = {
 
-	get: ( path, token ) => makeRequest( 'GET', path, token ),
-	post: ( path, token, body ) => makeRequest( 'POST', path, token, { body } )
+	get: ( path ) => sendRequest( 'GET', path ),
+	post: ( path, body ) => sendRequest( 'POST', path, { body } )
 };

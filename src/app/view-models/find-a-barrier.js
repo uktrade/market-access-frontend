@@ -1,6 +1,7 @@
 const metadata = require( '../lib/metadata' );
 const sortGovukItems = require( '../lib/sort-govuk-items' );
 const urls = require( '../lib/urls' );
+const strings = require( '../lib/strings' );
 
 const { OPEN, RESOLVED, HIBERNATED } = metadata.barrier.status.types;
 const barrierStatusTypeInfo = metadata.barrier.status.typeInfo;
@@ -52,7 +53,7 @@ module.exports = function( { count, barriers, filters } ){
 			isOpen: ( barrierStatusCode === OPEN ),
 			isResolved: ( barrierStatusCode === RESOLVED ),
 			isHibernated: ( barrierStatusCode === HIBERNATED ),
-			country: metadata.getCountry( barrier.export_country ),
+			location: strings.location( barrier.export_country, barrier.country_admin_areas ),
 			sectors,
 			sectorsList: sectors.map( ( sector ) => sector.name ),
 			status,
@@ -65,39 +66,49 @@ module.exports = function( { count, barriers, filters } ){
 		} );
 	}
 
+	const countries = metadata.getCountryList( 'All locations' );
+	countries.forEach( ( country ) => { // forEach does not get affected by pushing new elements into the array
+
+		const name = country.text;
+		const id = country.value;
+		const adminAreas = metadata.adminAreasByCountry[ id ];
+
+		if( adminAreas ){
+
+			const adminList = adminAreas.map( ( adminArea ) => ({ value: adminArea.id, text: `${ name } > ${ adminArea.name }` } ) );
+			countries.push( ...adminList );
+		}
+	} );
+
+
 	return {
 		count,
 		barriers: barrierList,
 		hasFilters: !!Object.keys( filters ).length,
 		filters: {
 			country: {
-				items: metadata.getCountryList( 'All locations' ).map( isChecked( filters.country ) ),
-				active: filters.country && filters.country.map( metadata.getCountry ),
+				items: countries.sort( sortGovukItems.alphabetical ).map( isChecked( filters.country ) ),
+				text: strings.locations( filters.country ),
 				removeUrl: getRemoveUrl( filters, 'country' ),
 			},
 			region: {
 				items: metadata.getOverseasRegionList( 'All regions' ).map( isChecked( filters.region ) ),
-				active: filters.region && filters.region.map( metadata.getOverseasRegion ),
+				text: strings.regions( filters.region ),
 				removeUrl: getRemoveUrl( filters, 'region' ),
 			},
 			sector: {
 				items: metadata.getSectorList( 'All sectors' ).map( isChecked( filters.sector ) ),
-				active: filters.sector && filters.sector.map( metadata.getSector ),
+				text: strings.sectors( filters.sector ),
 				removeUrl: getRemoveUrl( filters, 'sector' ),
 			},
 			type: {
 				items: metadata.getBarrierTypeList().sort( sortGovukItems.alphabetical ).map( isChecked( filters.type ) ),
-				active: filters.type && filters.type.map( ( id ) => {
-
-					const { title } = metadata.getBarrierType( id );
-
-					return { name: title };
-				} ),
+				text: strings.types( filters.type ),
 				removeUrl: getRemoveUrl( filters, 'type' ),
 			},
 			priority: {
 				items: metadata.getBarrierPrioritiesList( { suffix: false } ).map( isChecked( filters.priority ) ),
-				active: filters.priority && filters.priority.map( metadata.getBarrierPriority ),
+				text: strings.priorities( filters.priority ),
 				removeUrl: getRemoveUrl( filters, 'priority' ),
 			},
 		}

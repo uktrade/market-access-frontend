@@ -125,7 +125,8 @@ describe( 'metadata', () => {
 				const output = [
 					fakeData.countries[ 0 ],
 					fakeData.countries[ 1 ],
-					fakeData.countries[ 3 ]
+					fakeData.countries[ 2 ],
+					fakeData.countries[ 4 ],
 				].map( ( { id, name } ) => ({ id, name }) );
 
 				expect( metadata.countries ).toEqual( output );
@@ -136,8 +137,8 @@ describe( 'metadata', () => {
 			it( 'Should get the country', () => {
 
 				const country = {
-					id: fakeData.countries[ 1 ].id,
-					name: fakeData.countries[ 1 ].name
+					id: fakeData.countries[ 2 ].id,
+					name: fakeData.countries[ 2 ].name
 				};
 
 				expect( metadata.getCountry( '9a662aa0-99ba-4f3b-835a-859fe210e9c2' ) ).toEqual( country );
@@ -181,8 +182,8 @@ describe( 'metadata', () => {
 			it( 'Should return the data', () => {
 
 				expect( metadata.overseasRegions ).toEqual( [
-					fakeData.countries[ 3 ].overseas_region,
-					fakeData.countries[ 1 ].overseas_region,
+					fakeData.countries[ 4 ].overseas_region,
+					fakeData.countries[ 2 ].overseas_region,
 				] );
 			} );
 		} );
@@ -191,8 +192,8 @@ describe( 'metadata', () => {
 			it( 'Should get the region', () => {
 
 				const region = {
-					id: fakeData.countries[ 1 ].overseas_region.id,
-					name: fakeData.countries[ 1 ].overseas_region.name
+					id: fakeData.countries[ 2 ].overseas_region.id,
+					name: fakeData.countries[ 2 ].overseas_region.name
 				};
 
 				expect( metadata.getOverseasRegion( 'd9fdeed8-247e-4f54-8fd2-e86077e9faf3' ) ).toEqual( region );
