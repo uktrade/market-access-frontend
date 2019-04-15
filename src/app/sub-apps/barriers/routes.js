@@ -61,10 +61,10 @@ module.exports = ( express, app ) => {
 	app.post( '/:barrierId/location/edit/', controller.location.edit );
 	app.get( '/:barrierId/location/country/', controller.location.country );
 	app.post( '/:barrierId/location/country/', controller.location.country );
-	app.get( '/:barrierId/location/admin-areas/', controller.location.adminAreas.add );
-	app.post( '/:barrierId/location/admin-areas/', controller.location.adminAreas.add );
-	app.get( '/:barrierId/location/admin-areas/remove/', controller.location.adminAreas.remove );
-	app.post( '/:barrierId/location/admin-areas/remove/', controller.location.adminAreas.remove );
+	app.get( '/:barrierId/location/add-admin-area/', controller.location.adminAreas.add );
+	app.post( '/:barrierId/location/add-admin-area/', controller.location.adminAreas.add );
+	app.get( '/:barrierId/location/remove-admin-area/', controller.location.adminAreas.remove );
+	app.post( '/:barrierId/location/remove-admin-area/', controller.location.adminAreas.remove );
 
 	app.get( '/:barrierId/status/', controller.status.index );
 	app.post( '/:barrierId/status/', controller.status.index );

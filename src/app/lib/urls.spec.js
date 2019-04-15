@@ -150,8 +150,8 @@ describe( 'URLs', () => {
 				expect( urls.barriers.location.list( barrierId ) ).toEqual( `/barriers/${ barrierId }/location/` );
 				expect( urls.barriers.location.edit( barrierId ) ).toEqual( `/barriers/${ barrierId }/location/edit/` );
 				expect( urls.barriers.location.country( barrierId ) ).toEqual( `/barriers/${ barrierId }/location/country/` );
-				expect( urls.barriers.location.adminAreas.add( barrierId ) ).toEqual( `/barriers/${ barrierId }/location/admin-areas/` );
-				expect( urls.barriers.location.adminAreas.remove( barrierId ) ).toEqual( `/barriers/${ barrierId }/location/admin-areas/remove/` );
+				expect( urls.barriers.location.adminAreas.add( barrierId ) ).toEqual( `/barriers/${ barrierId }/location/add-admin-area/` );
+				expect( urls.barriers.location.adminAreas.remove( barrierId ) ).toEqual( `/barriers/${ barrierId }/location/remove-admin-area/` );
 			});
 		});
 

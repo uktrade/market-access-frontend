@@ -108,8 +108,8 @@ module.exports = {
 			edit: ( barrierId ) => `/barriers/${ barrierId }/location/edit/`,
 			country: ( barrierId ) => `/barriers/${ barrierId }/location/country/`,
 			adminAreas: {
-				add: ( barrierId ) => `/barriers/${ barrierId }/location/admin-areas/`,
-				remove: ( barrierId ) => `/barriers/${ barrierId }/location/admin-areas/remove/`,
+				add: ( barrierId ) => `/barriers/${ barrierId }/location/add-admin-area/`,
+				remove: ( barrierId ) => `/barriers/${ barrierId }/location/remove-admin-area/`,
 			}
 		},
 		companies: {
