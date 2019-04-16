@@ -143,20 +143,66 @@ describe( 'Backend Service', () => {
 		} );
 
 		describe( 'getScanStatus', () => {
-			it( 'Should call the correct API', async () => {
+			describe( 'When the API returns success', () => {
+				it( 'Should call the correct API and resolve', async () => {
 
-				const documentId = uuid();
+					const documentId = uuid();
 
-				backend.post.and.callFake( () => Promise.resolve( {
-					response: { isSuccess: true },
-					body: { status: 'virus_scanned' },
-				} ) );
+					backend.post.and.callFake( () => Promise.resolve( {
+						response: { isSuccess: true },
+						body: { status: 'virus_scanned' },
+					} ) );
 
-				const { status, passed } = await service.documents.getScanStatus( req, documentId );
+					const { status, passed } = await service.documents.getScanStatus( req, documentId );
 
-				expect( backend.post ).toHaveBeenCalledWith( `/documents/${ documentId }/upload-callback`, token );
-				expect( status ).toEqual( 'virus_scanned' );
-				expect( passed ).toEqual( true );
+					expect( backend.post ).toHaveBeenCalledWith( `/documents/${ documentId }/upload-callback`, token );
+					expect( status ).toEqual( 'virus_scanned' );
+					expect( passed ).toEqual( true );
+				} );
+			} );
+
+			describe( 'When the API returns a 500', () => {
+				it( 'Should call the correct API and reject', async () => {
+
+					const documentId = uuid();
+
+					backend.post.and.callFake( () => Promise.resolve( {
+						response: { isSuccess: false, statusCode: 500 },
+						body: {},
+					} ) );
+
+					try {
+
+						await service.documents.getScanStatus( req, documentId );
+						fail();
+
+					} catch( e ){
+
+						expect( backend.post ).toHaveBeenCalledWith( `/documents/${ documentId }/upload-callback`, token );
+						expect( e ).toEqual( new Error( 'Not a successful response from the backend, got 500' ) );
+					}
+				} );
+			} );
+
+			describe( 'When the API rejects', () => {
+				it( 'Should call the correct API and reject', async () => {
+
+					const documentId = uuid();
+					const err = new Error( 'Not a successful response' );
+
+					backend.post.and.callFake( () => Promise.reject( err ) );
+
+					try {
+
+						await service.documents.getScanStatus( req, documentId );
+						fail();
+
+					} catch( e ){
+
+						expect( backend.post ).toHaveBeenCalledWith( `/documents/${ documentId }/upload-callback`, token );
+						expect( e ).toEqual( err );
+					}
+				} );
 			} );
 		} );
 	} );
@@ -416,6 +462,62 @@ describe( 'Backend Service', () => {
 
 					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
 						sectors
+					} );
+				} );
+			} );
+		} );
+
+		describe( 'saveLocation', () => {
+
+			let location;
+			let country;
+
+			beforeEach( () => {
+
+				country = uuid();
+				location = { country };
+			} );
+
+			describe( 'With no adminAreas', () => {
+				it( 'Should PUT to the correct path with a empty array', async () => {
+
+					await service.barriers.saveLocation( req, barrierId, location );
+
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+						export_country: country,
+						country_admin_areas: []
+					} );
+				} );
+			} );
+
+			describe( 'With a list of adminAreas', () => {
+				describe( 'When the list is empty', () => {
+					it( 'Should PUT to the correct path with the correct values', async () => {
+
+						location.adminAreas = [];
+
+						await service.barriers.saveLocation( req, barrierId, location );
+
+						expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+							export_country: country,
+							country_admin_areas: []
+						} );
+					} );
+				} );
+
+				describe( 'When the list has some adminAreas', () => {
+					it( 'Should PUT to the correct path with the adminAreas', async () => {
+
+						const adminAreas = [ uuid(), uuid() ];
+
+						location.adminAreas = adminAreas;
+
+						await service.barriers.saveLocation( req, barrierId, location );
+
+						expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+							export_country: country,
+							country_admin_areas: adminAreas
+						} );
 					} );
 				} );
 			} );
