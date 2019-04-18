@@ -1,0 +1,31 @@
+{% from 'app-components/heading.njk' import heading %}
+{% from 'app-components/selection-list.njk' import barrierTypesList %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Define type of market access barrier{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.barriers.detail( barrier.id ) },
+		caption: barrier.barrier_title,
+		text: 'Define type of market access barrier',
+		errors: errors
+	}) }}
+
+	<h3 class="report-sectors-heading">Save or add another barrier type</h3>
+
+	{{ barrierTypesList( types, {
+			csrfToken: csrfToken,
+			inputName: 'type',
+			add: urls.barriers.types.add( barrier.id ),
+			remove: urls.barriers.types.remove( barrier.id )
+		}
+	) }}
+
+	<form action="{{ urls.barriers.types.list( barrier.id ) }}" method="POST">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+		<input type="submit" value="Save and exit to barrier" class="govuk-button">
+	</form>
+{% endblock %}

@@ -30,6 +30,18 @@ if( typeof jasmine !== 'undefined' ){
 		next: () => jasmine.createSpy( 'next' ),
 	};
 
+	function createBarrierSessionSpies( key ){
+
+		const namespace = 'barrierSession.' + ( key ? ( key + '.' ) : '' );
+
+		return {
+			get: jasmine.createSpy( namespace + 'get' ),
+			delete: jasmine.createSpy( namespace + 'delete' ),
+			set: jasmine.createSpy( namespace + 'set' ),
+			setIfNotAlready: jasmine.createSpy( namespace + 'setIfNotAlready' ),
+		};
+	};
+
 	jasmine.helpers.mocks = {
 
 		...mocks,
@@ -71,6 +83,11 @@ if( typeof jasmine !== 'undefined' ){
 			} );
 
 			return spies;
-		}
+		},
+
+		barrierSession: () => ({
+			...createBarrierSessionSpies(),
+			types: createBarrierSessionSpies( 'types' ),
+		})
 	};
 }

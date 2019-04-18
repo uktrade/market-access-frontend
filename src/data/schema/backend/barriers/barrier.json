@@ -15,7 +15,7 @@
 		"product",
 		"source",
 		"other_source",
-		"barrier_type",
+		"barrier_types",
 		"barrier_title",
 		"problem_description",
 		"current_status",
@@ -76,7 +76,12 @@
 		},
 
 		"other_source":{ "$ref": "$refs/common.json#/words" },
-		"barrier_type": { "$ref": "$refs/common.json#/barrier_type" },
+		"barrier_types": {
+			"type": "array",
+			"minItems": 0,
+			"maxItems": 5,
+			"items": { "$ref": "$refs/common.json#/small-int" }
+		},
 
 		"barrier_title": {
 			"type": "string",

@@ -4,23 +4,6 @@ const strings = require( '../../../lib/strings' );
 const { OPEN, RESOLVED, HIBERNATED } = metadata.barrier.status.types;
 const barrierStatusTypeInfo = metadata.barrier.status.typeInfo;
 
-function getBarrierType( type ){
-
-	if( !type ){ return type; }
-
-	const { id, title, description, category } = type;
-
-	return {
-		id,
-		title,
-		description,
-		category: {
-			id: category,
-			name: metadata.barrierTypeCategories[ category ]
-		}
-	};
-}
-
 module.exports = ( barrier, addCompany = false ) => {
 
 	const barrierStatusCode = barrier.current_status.status;
@@ -29,6 +12,7 @@ module.exports = ( barrier, addCompany = false ) => {
 	const sectorsList = sectors.map( ( sector ) => ( sector && { text: sector.name } || { text: 'Unknown' } ) );
 	const companies = barrier.companies || [];
 	const companiesList = companies.map( ( company ) => ( { text: company.name } ) );
+	const barrierTypes = ( barrier.barrier_types || [] );
 
 	function getEuExitRelatedText( code ){
 
@@ -52,7 +36,7 @@ module.exports = ( barrier, addCompany = false ) => {
 				status: metadata.statusTypes[ barrier.problem_status ],
 				description: barrier.problem_description
 			},
-			type: getBarrierType( barrier.barrier_type ),
+			types: barrierTypes.map( metadata.getBarrierType ).map( ( type = {} ) => ({ text: type.title }) ),
 			status,
 			reportedOn: barrier.reported_on,
 			addedBy: barrier.reported_by,
