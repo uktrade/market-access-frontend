@@ -24,7 +24,8 @@ describe( 'Edit barrier location controller', () => {
 
 	beforeEach( () => {
 
-		csrfToken = uuid();
+		({ csrfToken, req, res, next } = jasmine.helpers.mocks.middleware() );
+
 		metadata = {
 			getCountryList: () => [
 				{ id: 0, name: 'Choose one' },
@@ -36,8 +37,8 @@ describe( 'Edit barrier location controller', () => {
 				{ id: 1, name: 'admin area 1' },
 				{ id: 2, name: 'admin area 2' }
 			],
-			getAdminArea: jasmine.createSpy( 'metadata.getAdminArea' ).and.callFake(() => 'admin area 2'),
-			isCountryWithAdminArea: jasmine.createSpy( 'metadata.isCountryWithAdminArea' ).and.callFake(() => false),
+			getAdminArea: jasmine.createSpy( 'metadata.getAdminArea' ).and.callFake( () => 'admin area 2' ),
+			isCountryWithAdminArea: jasmine.createSpy( 'metadata.isCountryWithAdminArea' ).and.callFake( () => false ),
 			getCountry: jasmine.createSpy( 'metadata.getCountry' )
 		};
 
@@ -68,20 +69,7 @@ describe( 'Edit barrier location controller', () => {
 		};
 
 		barrier = jasmine.helpers.getFakeData( '/backend/barriers/barrier' );
-
-		req = {
-			barrier,
-			session: {},
-			csrfToken: () => csrfToken,
-			params: {},
-			query: {}
-		};
-
-
-		res = {
-			render: jasmine.createSpy( 'res.render' ),
-			redirect: jasmine.createSpy( 'res.redirect' )
-		};
+		req.barrier = barrier;
 
 		getCountryValuesResponse = { country: 'country 2' };
 		getAdminAreaValuesResponse = { adminAreas: '1234'};
@@ -92,8 +80,6 @@ describe( 'Edit barrier location controller', () => {
 			getValues: jasmine.createSpy( 'form.getValues' ).and.callFake( () => getCountryValuesResponse ),
 			getTemplateValues: jasmine.createSpy( 'form.getTemplateValues' ).and.callFake( () => Object.assign( {}, getTemplateValuesResponse ) )
 		};
-
-		next = jasmine.createSpy( 'next' );
 
 		controller = proxyquire( modulePath, {
 			'../../../lib/metadata': metadata,
@@ -107,21 +93,78 @@ describe( 'Edit barrier location controller', () => {
 	describe( 'list', () => {
 		describe( 'if it is a GET', () => {
 			describe('if the country has admin areas', () => {
-				it( 'renders with page with the admin area section', async () => {
+
+				beforeEach( () => {
 
 					metadata.isCountryWithAdminArea.and.callFake( () => true );
 					metadata.getCountry.and.callFake( () => ({ id: 1, name: 'country 1'}));
+				} );
 
-					await controller.list(req, res, next);
+				function checkRender( showAdminAreas ){
 
 					expect(res.render).toHaveBeenCalledWith( 'barriers/views/location/list', {
 						country: 'country 1',
-						showAdminAreas: true,
-						adminAreas: [],
+						showAdminAreas,
+						adminAreas: req.session.location.adminAreas.map( metadata.getAdminArea ),
 						csrfToken: req.csrfToken()
 					});
-				});
+				}
+
+				describe( 'If there is already a location in the session', () => {
+					it( 'uses the session and renders with page with the admin area section', async () => {
+
+						const country = uuid();
+						const adminAreas = [ uuid(), uuid() ];
+
+						req.session.location = {
+							country,
+							adminAreas,
+						};
+
+						await controller.list(req, res, next);
+
+						checkRender( true );
+
+						expect( req.session.location ).toEqual( { country, adminAreas } );
+					});
+				} );
+
+				describe( 'When there is not any location in the session', () => {
+					describe( 'When the barrier has admin areas', () => {
+						it( 'Should add the barrier details to the session and render the page with the admin areas section', async () => {
+
+							const adminAreas = [ uuid(), uuid() ];
+							barrier.country_admin_areas = adminAreas;
+
+							await controller.list( req, res, next );
+
+							checkRender( true );
+
+							expect( req.session.location ).toEqual( {
+								country: barrier.export_country,
+								adminAreas,
+							} );
+						} );
+					} );
+
+					describe( 'When the barrier does not have and admin areas', () => {
+						it( 'Should add the barrier country to the session, default the adminAreas and render the page with the admin areas section', async () => {
+
+							barrier.country_admin_areas = null;
+
+							await controller.list( req, res, next );
+
+							checkRender( true );
+
+							expect( req.session.location ).toEqual( {
+								country: barrier.export_country,
+								adminAreas: [],
+							} );
+						} );
+					} );
+				} );
 			});
+
 			describe('if the country does not have admin areas', () => {
 				it( 'renders with page without the admin area section', async () => {
 
@@ -139,6 +182,7 @@ describe( 'Edit barrier location controller', () => {
 				});
 			});
 		});
+
 		describe( 'if it is a POST', () => {
 			beforeEach( () => {
 
@@ -199,6 +243,71 @@ describe( 'Edit barrier location controller', () => {
 			});
 		});
 	});
+
+	describe( 'edit', () => {
+
+		beforeEach( () => {
+
+			metadata.getCountry.and.callFake( () => ({ id: 1, name: 'country 1'}));
+		} );
+
+		async function checkRender( showAdminAreas, sessionAdminAreas = [] ){
+
+			expect( req.session.location ).toEqual( {
+				country: barrier.export_country,
+				adminAreas: sessionAdminAreas,
+			});
+
+			expect( res.render ).toHaveBeenCalledWith( 'barriers/views/location/list', {
+				csrfToken,
+				showAdminAreas,
+				country: 'country 1',
+				adminAreas: sessionAdminAreas.map( metadata.getAdminArea ),
+			});
+		}
+
+		describe( 'if the country has admin areas', () => {
+
+			beforeEach( () => {
+
+				metadata.isCountryWithAdminArea.and.callFake( () => true );
+			} );
+
+			describe( 'When the barrier has admin areas', () => {
+				it( 'Puts them in the session and render the page with the admin area section', async () => {
+
+					const adminAreas = [ uuid(), uuid() ];
+					barrier.country_admin_areas = adminAreas;
+
+					await controller.edit( req, res, next );
+
+					checkRender( true, adminAreas );
+				} );
+			} );
+
+			describe( 'When the barrier does not have admin areas', () => {
+				it( 'Should default the admin areas to an empty array and render the page with the admin area section', async () => {
+
+					barrier.country_admin_areas = null;
+
+					await controller.edit( req, res, next );
+
+					checkRender( true );
+				} );
+			} );
+		});
+
+		describe( 'if the country does not have admin areas', () => {
+			it( 'sets the session to the barrier values and renders with page without the admin area section', async () => {
+
+				metadata.isCountryWithAdminArea.and.callFake( () => false );
+
+				await controller.edit( req, res, next );
+
+				checkRender( false );
+			});
+		});
+	} );
 
 	describe( 'adminAreas', () => {
 		describe( 'add admin area', () => {
@@ -393,18 +502,52 @@ describe( 'Edit barrier location controller', () => {
 			});
 
 			describe('When the form does not have errors', () => {
-				it('Should add the country to the session', () => {
+
+				beforeEach( () => {
 
 					form.hasErrors = () => false;
+				} );
+
+				it('Should add the country to the session', () => {
 
 					const listResponse = '/list/location';
 					urls.barriers.location.list.and.callFake( () => listResponse );
 
 					controller.country( req, res );
 
-					expect(req.session.location.country).toEqual('country 2');
-					expect( res.redirect).toHaveBeenCalledWith(listResponse);
+					expect( req.session.location.country ).toEqual( 'country 2' );
+					expect( res.redirect).toHaveBeenCalledWith( listResponse );
 				});
+
+				describe( 'With admin areas in the session', () => {
+
+					let sessionAdminArea = uuid();
+
+					beforeEach( () => {
+
+						req.session.location.adminAreas = [ sessionAdminArea ];
+					} );
+
+					describe( 'If the country does not have admin areas', () => {
+						it( 'Should remove the admin areas in the session', () => {
+
+							controller.country( req, res );
+
+							expect( req.session.location.adminAreas ).toEqual( [] );
+						} );
+					} );
+
+					describe( 'If the country has admin areas', () => {
+						it( 'Should leave the session values as they are', () => {
+
+							metadata.isCountryWithAdminArea.and.callFake( () => true );
+
+							controller.country( req, res );
+
+							expect( req.session.location.adminAreas ).toEqual( [ sessionAdminArea ] );
+						} );
+					} );
+				} );
 			});
 		});
 	} );
