@@ -49,7 +49,7 @@ module.exports = ( barrier, addCompany = false ) => {
 			title: barrier.barrier_title,
 			product: barrier.product,
 			problem: {
-				problemStatus: metadata.statusTypes[ barrier.problem_status ],
+				status: metadata.statusTypes[ barrier.problem_status ],
 				description: barrier.problem_description
 			},
 			type: getBarrierType( barrier.barrier_type ),

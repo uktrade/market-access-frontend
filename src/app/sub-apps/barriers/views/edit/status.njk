@@ -4,14 +4,14 @@
 
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Barrier - Edit resolution{% endblock %}
+{% block page_title %}{{ super() }} - Barrier - Edit status{% endblock %}
 
 {% block page_content %}
 
 	{{ heading({
 		back: { href: urls.barriers.detail( barrier.id ) },
 		caption: barrier.barrier_title,
-		text: 'Barrier resolution',
+		text: 'Barrier status',
 		errors: errors
 	}) }}
 

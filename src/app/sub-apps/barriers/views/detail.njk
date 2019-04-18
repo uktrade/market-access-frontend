@@ -135,7 +135,7 @@
 				}
 			},{
 				title: 'Barrier scope',
-				html: barrier.problem.problemStatus,
+				html: barrier.problem.status,
 				edit: {
 					href: urls.barriers.edit.problemStatus( barrier.id )
 				},
@@ -202,7 +202,7 @@
 	} ) }}
 
 	<section class="barrier-content">
-		{{ barrier.isResolved }}
+
 		{%- if barrier.isResolved or barrier.isHibernated -%}
 			
 			<div class="barrier-status-details">
@@ -335,9 +335,7 @@
 						{%- endif %}
 					{%- endif %}
 					</p>
-					<ul>
 					
-					</ul>
 					{% if item.event === 'BARRIER_STATUS_CHANGE' and item.state.isOpen -%}
 						<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
 					{% endif -%}

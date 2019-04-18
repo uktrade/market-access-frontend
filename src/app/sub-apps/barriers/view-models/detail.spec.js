@@ -82,7 +82,7 @@ describe( 'Barrier detail view model', () => {
 			expect( outputBarrier.code ).toEqual( inputBarrier.code );
 			expect( outputBarrier.title ).toEqual( inputBarrier.barrier_title );
 			expect( outputBarrier.product ).toEqual( inputBarrier.product );
-			expect( outputBarrier.problem.problemStatus ).toEqual( metadata.statusTypes[ inputBarrier.problem_status ] );
+			expect( outputBarrier.problem.status ).toEqual( metadata.statusTypes[ inputBarrier.problem_status ] );
 			expect( outputBarrier.problem.description ).toEqual( inputBarrier.problem_description );
 			expect( outputBarrier.type ).toEqual( {
 				id: inputBarrier.barrier_type.id,
