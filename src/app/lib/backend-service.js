@@ -251,7 +251,7 @@ module.exports = {
 			} ),
 		},
 		resolve: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/resolve`, getToken( req ), {
-			status_date: getDefaultedDate( values.resolvedDate ) + 'T00:00',
+			status_date: getDefaultedDate( values.resolvedDate ),
 			status_summary: values.resolvedSummary
 		} ),
 		hibernate: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/hibernate`, getToken( req ), {
@@ -293,9 +293,16 @@ module.exports = {
 		saveEuExitRelated: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
 			eu_exit_related: values.euExitRelated,
 		}),
-		saveStatus: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
+		saveProblemStatus: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
 			problem_status: values.status
 		} ),
+		saveStatus: ( req, barrierId, values ) => {
+			const status_details = { status_summary: values.statusSummary };
+			if (values.statusDate) {
+				status_details.status_date = getDefaultedDate( values.statusDate );
+			}
+			return updateBarrier( getToken( req ), barrierId, status_details); 
+		},
 	},
 
 	reports: {

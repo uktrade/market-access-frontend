@@ -39,6 +39,8 @@ module.exports = ( express, app ) => {
 	app.post( '/:barrierId/edit/priority/', controller.edit.priority );
 	app.get( '/:barrierId/edit/eu-exit-related/', controller.edit.euExitRelated );
 	app.post( '/:barrierId/edit/eu-exit-related/', controller.edit.euExitRelated );
+	app.get( '/:barrierId/edit/problem-status/', controller.edit.problemStatus );
+	app.post( '/:barrierId/edit/problem-status/', controller.edit.problemStatus );
 	app.get( '/:barrierId/edit/status/', controller.edit.status );
 	app.post( '/:barrierId/edit/status/', controller.edit.status );
 

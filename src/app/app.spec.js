@@ -390,11 +390,11 @@ describe( 'App', function(){
 						} );
 					} );
 
-					describe( 'status', () => {
+					describe( 'problemStatus', () => {
 						it( 'Should fetch the barrier and render the page', ( done ) => {
 
 							app
-								.get( urls.barriers.edit.status( barrierId ) )
+								.get( urls.barriers.edit.problemStatus( barrierId ) )
 								.end( checkPage( 'Market Access - Barrier - Edit barrier scope', done ) );
 						} );
 					} );
@@ -816,7 +816,7 @@ describe( 'App', function(){
 				it( 'Should render the page', ( done ) => {
 
 					const barrier = intercept.stub( '/backend/barriers/barrier' );
-					barrier.current_status.status = 2;
+					barrier.status = 2;
 
 					intercept.backend()
 						.get( `/barriers/${ barrierId }` )

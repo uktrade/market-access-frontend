@@ -132,7 +132,7 @@
 				title: 'Barrier scope',
 				text: barrier.problem.status,
 				edit: {
-					href: urls.barriers.edit.status( barrier.id )
+					href: urls.barriers.edit.problemStatus( barrier.id )
 				},
 				halfWidth: true
 			},{
@@ -199,7 +199,7 @@
 	<section class="barrier-content">
 
 		{%- if barrier.isResolved or barrier.isHibernated -%}
-
+			
 			<div class="barrier-status-details">
 				<span class="barrier-status-details__icon barrier-status-details__icon--{{ barrier.status.modifyer }}">
 					{% if barrier.isResolved %}
@@ -219,6 +219,7 @@
 				<h2 class="barrier-status-details__heading">Barrier {{ 'resolved' if barrier.isResolved else 'paused' }} <span class="barrier-status-details__heading__caption">in {{ barrier.status.date | dateOnly( day=false ) }}</span></2>
 				<h3 class="barrier-status-details__sub-heading">Summary {{ ' of resolution' if barrier.isResolved }}</h3>
 				<p class="barrier-status-details__text">{{ barrier.status.description | escape | nl2br }}</p>
+				<a href="{{ urls.barriers.edit.status(barrier.id)}}"> Edit</a>
 			</div>
 
 		{% endif -%}
@@ -329,8 +330,8 @@
 						{%- endif %}
 					{%- endif %}
 					</p>
-
-					{% if item.event === 'BARRIER_STATUS_CHANGE' -%}
+					
+					{% if item.event === 'BARRIER_STATUS_CHANGE' and item.state.isOpen -%}
 						<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
 					{% endif -%}
 

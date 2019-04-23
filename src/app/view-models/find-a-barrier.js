@@ -43,7 +43,7 @@ module.exports = function( { count, barriers, filters } ){
 	for( let barrier of barriers ){
 
 		const sectors = ( barrier.sectors && barrier.sectors.map( metadata.getSector ) || [] );
-		const barrierStatusCode = barrier.current_status.status;
+		const barrierStatusCode = barrier.status;
 		const status = barrierStatusTypeInfo[ barrierStatusCode ] || {};
 
 		barrierList.push( {
@@ -60,7 +60,7 @@ module.exports = function( { count, barriers, filters } ){
 			priority: barrier.priority,
 			date: {
 				reported: barrier.reported_on,
-				status: barrier.current_status.status_date,
+				status: barrier.status_date,
 				created: barrier.created_on,
 			}
 		} );

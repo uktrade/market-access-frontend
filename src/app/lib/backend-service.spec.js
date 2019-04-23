@@ -390,7 +390,7 @@ describe( 'Backend Service', () => {
 				} );
 
 				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/resolve`, token, {
-					status_date: [ year, month, '01' ].join( '-' ) + 'T00:00',
+					status_date: [ year, month, '01' ].join( '-' ),
 					status_summary: resolvedSummary
 				} );
 			} );
@@ -551,6 +551,40 @@ describe( 'Backend Service', () => {
 			} );
 		} );
 
+		describe( 'saveStatus', () => {
+			describe( 'With a status date', () => {
+				it( 'Should PUT to the correct path with the correct values', async () => {
+
+					const [ month, year ] = [ '11', '2000' ];
+					const statusSummary = 'my summary text';
+	
+					await service.barriers.saveStatus( req, barrierId, {
+						statusDate: { month, year },
+						statusSummary
+					} );
+	
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+						status_date: [ year, month, '01' ].join( '-' ),
+						status_summary: statusSummary
+					} );
+				} );
+			});
+			describe( 'Without a status date', () => {
+				it( 'Should PUT to the correct path with the correct values', async () => {
+
+					const statusSummary = 'my summary text';
+	
+					await service.barriers.saveStatus( req, barrierId, {
+						statusSummary
+					} );
+	
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+						status_summary: statusSummary
+					} );
+				} );
+			});
+		} );
+
 		describe( 'saveTitle', () => {
 			it( 'Should PUT to the correct path with the correct values', async () => {
 
@@ -685,12 +719,12 @@ describe( 'Backend Service', () => {
 			} );
 		});
 
-		describe( 'saveStatus', () => {
+		describe( 'saveProblemStatus', () => {
 			it( 'Should PUT to the correct path with the correct values', async () => {
 
 				const status = '1';
 
-				await service.barriers.saveStatus( req, barrierId, {
+				await service.barriers.saveProblemStatus( req, barrierId, {
 					status
 				} );
 

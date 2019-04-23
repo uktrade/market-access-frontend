@@ -85,6 +85,7 @@ describe( 'URLs', () => {
 				expect( urls.barriers.edit.priority( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/priority/` );
 				expect( urls.barriers.edit.euExitRelated( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/eu-exit-related/` );
 				expect( urls.barriers.edit.status( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/status/` );
+				expect( urls.barriers.edit.problemStatus( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/problem-status/` );
 			} );
 		} );
 

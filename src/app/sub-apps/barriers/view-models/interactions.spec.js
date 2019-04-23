@@ -39,7 +39,7 @@ describe( 'Interactions view model', () => {
 		};
 	}
 
-	function createStatus( item, from, to, isResolved ){
+	function createStatus( item, from, to, isResolved, isOpen){
 		return {
 			isStatus: true,
 			modifier: 'status',
@@ -49,7 +49,8 @@ describe( 'Interactions view model', () => {
 				from,
 				to,
 				date: item.field_info.status_date,
-				isResolved
+				isResolved,
+				isOpen
 			},
 			text: item.field_info.status_summary,
 			user: item.user,
@@ -82,15 +83,15 @@ describe( 'Interactions view model', () => {
 			createNote( interactionsResults[ 3 ], true ),
 			createNote( interactionsResults[ 4 ] ),
 			createNote( interactionsResults[ 2 ] ),
-			createStatus( historyResults[ 2 ], RESOLVED, OPEN, false ),
+			createStatus( historyResults[ 2 ], RESOLVED, OPEN, false, true ),
 			createNote( interactionsResults[ 0 ] ),
-			createStatus( historyResults[ 4 ], OPEN, PAUSED, false ),
+			createStatus( historyResults[ 4 ], OPEN, PAUSED, false, false ),
 			createPriority( historyResults[ 6 ] ),
-			createStatus( historyResults[ 3 ], OPEN, RESOLVED, true ),
+			createStatus( historyResults[ 3 ], OPEN, RESOLVED, true, false ),
 			createPriority( historyResults[ 5 ] ),
 			createNote( interactionsResults[ 1 ] ),
-			createStatus( historyResults[ 1 ], 0, OPEN, false ),
-			createStatus( historyResults[ 0 ], null, 0, false ),
+			createStatus( historyResults[ 1 ], 0, OPEN, false, true ),
+			createStatus( historyResults[ 0 ], null, 0, false, false ),
 		] );
 	} );
 } );
