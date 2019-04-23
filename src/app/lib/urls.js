@@ -93,9 +93,12 @@ module.exports = {
 			},
 		},
 		status: ( barrierId ) => `/barriers/${ barrierId }/status/`,
-		type: {
-			category: ( barrierId ) => `/barriers/${ barrierId }/type/`,
-			list: ( barrierId, category ) => `/barriers/${ barrierId }/type/${ category }/`
+		types: {
+			list: ( barrierId ) => `/barriers/${ barrierId }/types/`,
+			edit: ( barrierId ) => `/barriers/${ barrierId }/types/edit/`,
+			new: ( barrierId ) => `/barriers/${ barrierId }/types/new/`,
+			add: ( barrierId ) => `/barriers/${ barrierId }/types/add/`,
+			remove: ( barrierId ) => `/barriers/${ barrierId }/types/remove/`,
 		},
 		sectors: {
 			edit: ( barrierId ) => `/barriers/${ barrierId }/sectors/edit/`,

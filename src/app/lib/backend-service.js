@@ -260,14 +260,13 @@ module.exports = {
 		open: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/open`, getToken( req ), {
 			status_summary: values.reopenSummary
 		} ),
-		saveType: ( req, barrierId, values, category ) => updateBarrier( getToken( req ), barrierId, {
-			barrier_type: getValue( values.barrierType ),
-			barrier_type_category: category
+		saveTypes: ( req, barrierId, types ) => updateBarrier( getToken( req ), barrierId, {
+			barrier_types: getValue( types )
 		} ),
 		saveSectors: ( req, barrierId, sectors ) => updateBarrier( getToken( req ), barrierId, {
 			sectors: ( sectors && sectors.length ? sectors : null )
 		} ),
-		saveLocation: (req, barrierId, location) => updateBarrier( getToken( req ), barrierId, {
+		saveLocation: ( req, barrierId, location ) => updateBarrier( getToken( req ), barrierId, {
 			export_country: location.country,
 			country_admin_areas: ( location.adminAreas && location.adminAreas.length ? location.adminAreas : [] )
 		} ),

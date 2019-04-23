@@ -1,6 +1,6 @@
 module.exports = {
 	edit: require( './edit' ),
-	type: require( './type' ),
+	types: require( './types' ),
 	interactions: require( './interactions' ),
 	status: require( './status' ),
 	location: require('./location'),

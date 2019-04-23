@@ -3,7 +3,7 @@
 
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Barrier - Define type of market access barrier{% endblock %}
+{% block page_title %}{{ super() }} - Barrier - Add Type{% endblock %}
 
 {% block body_script %}
 	<script>
@@ -14,13 +14,13 @@
 {% block page_content %}
 
 	{{ heading({
-		back: { href: urls.barriers.type.category( barrier.id ) },
+		back: { href: urls.barriers.detail( barrier.id ) },
 		caption: barrier.barrier_title,
 		text: 'Define type of market access barrier',
 		errors: errors
 	}) }}
 
-	<form action="{{ urls.barriers.type.list( barrier.id, category ) }}" method="POST" class="restrict-width">
+	<form action="{{ href.form }}" method="POST" class="restrict-width">
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
 		{# Select a market access barrier type which most applies to the situation #}
@@ -41,6 +41,7 @@
 			} )
 		}}
 
-		<input type="submit" class="govuk-button" value="Save and exit to barrier">
+		<input type="submit" value="Add barrier type" class="govuk-button">
+		<a class="form-cancel" href="{{ href.cancel }}">cancel</a>
 	</form>
 {% endblock %}

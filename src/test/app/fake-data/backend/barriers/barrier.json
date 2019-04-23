@@ -27,12 +27,12 @@
    "product": "quas quis est",
    "source": "TRADE",
    "other_source": "aliquid voluptatibus repellendus",
-   "barrier_type": {
-      "id": 45540,
-      "title": "repellendus dignissimos ut",
-      "description": "Necessitatibus vitae quisquam. Qui harum enim et iste non. Asperiores quis autem eum at autem ex quibusdam. Quae voluptas tempora omnis molestias expedita eos natus corporis optio. Deserunt deleniti nihil labore.",
-      "category": "GOODS"
-   },
+   "barrier_types": [
+      10,
+      13,
+      3,
+      13
+   ],
    "barrier_title": "nemo nobis ut",
    "problem_description": "Accusamus saepe sed non in molestiae minima voluptas. Quis atque ipsa est laborum voluptatem sed fugit autem quos. Et sit omnis praesentium debitis odit sint officiis.",
    "status": 1,
