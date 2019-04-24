@@ -1,13 +1,13 @@
 {% macro modal( params ) %}
-    <div class="modal">
-        <div class="modal__content">
-            <h3 class="modal__content__title"> {{params.title}} </h3>
-            {{ caller() }}
-            <form action="{{ params.action.url }}" method="POST">
-                <input type="hidden" name="_csrf" value="{{ params.csrfToken }}">
-                <input type="submit" value="{{ params.action.text }}" class="govuk-button">
-                <a href="{{ params.cancel.url }}" class="govuk-button button--secondary">{{ params.cancel.text }}</a>
-            </form>
-        </div>
-    </div>
+	<div class="modal">
+		<div class="modal__content" role="alertdialog" tabindex="1" aria-describedby="modal-label">
+			<h3 class="modal__content__title" id="modal-label">{{ params.title }}</h3>
+			{{ caller() }}
+			<form action="{{ params.action.url }}" method="POST">
+				<input type="hidden" name="_csrf" value="{{ params.csrfToken }}">
+				<input type="submit" value="{{ params.action.text }}" class="govuk-button" tabindex="2">
+				<a href="{{ params.cancel.url }}" class="govuk-button button--secondary js-modal-cancel" tabindex="3">{{ params.cancel.text }}</a>
+			</form>
+		</div>
+	</div>
 {% endmacro %}

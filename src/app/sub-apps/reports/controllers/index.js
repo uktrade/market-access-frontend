@@ -4,10 +4,12 @@ const urls = require( '../../../lib/urls' );
 const reportDetailViewModel = require( '../view-models/detail' );
 const reportsViewModel = require( '../view-models/reports' );
 
-async function renderDashboard(req, res, next, isDelete=false, currentReportId){
+async function renderDashboard(req, res, next, isDelete=false, currentReportId ){
+
 	const country = req.user.country;
 	const countryId = country && req.user.country.id;
 	const csrfToken = req.csrfToken();
+
 	let viewTemplate = 'reports/views/index';
 	let promise;
 
@@ -26,9 +28,9 @@ async function renderDashboard(req, res, next, isDelete=false, currentReportId){
 		const { response, body } = await promise;
 
 		if( response.isSuccess ){
-			
+
 			const { reports, currentReport } = reportsViewModel( body.results, currentReportId );
-			res.render( viewTemplate, Object.assign({},{ currentReport, reports, country, csrfToken, isDelete }) );
+			res.render( viewTemplate, { currentReport, reports, country, csrfToken, isDelete } );
 
 		} else {
 
@@ -36,6 +38,7 @@ async function renderDashboard(req, res, next, isDelete=false, currentReportId){
 		}
 
 	} catch( e ){
+
 		next( e );
 	}
 }
@@ -52,32 +55,44 @@ module.exports = {
 	aboutProblem: require( './about-problem' ),
 	summary: require( './summary' ),
 
-	index: async ( req, res, next ) => {
-		renderDashboard(req, res, next);
-	},
+	index: renderDashboard,
 
 	delete: async (req, res, next) => {
+
 		const currentReportId = req.params.reportId;
 		const isPost = req.method === 'POST';
 
-		if(isPost){
+		if( isPost ){
+
 			try {
+
 				const { response } = await backend.reports.delete( req, currentReportId );
+
 				if( response.isSuccess ){
 
-					res.redirect(urls.reports.index());
-	
+					res.redirect( urls.reports.index() );
+
 				} else {
-	
+
 					throw new Error( `Got ${ response.statusCode } response from backend` );
 				}
-			} catch( e ){
-				
-				next( e );
 
+			} catch( e ){
+
+				next( e );
 			}
+
 		} else {
-			renderDashboard(req, res, next, true, currentReportId);
+
+			if( req.xhr ){
+
+				const { reports } = reportsViewModel( [ req.report ] );
+				res.render( 'reports/views/partials/delete-report-modal', { report: reports[ 0 ], csrfToken: req.csrfToken() } );
+
+			} else {
+
+				renderDashboard( req, res, next, true, currentReportId );
+			}
 		}
 	},
 

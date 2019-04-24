@@ -1,4 +1,5 @@
 const proxyquire = require( 'proxyquire' );
+const uuid = require( 'uuid/v4' );
 
 const modulePath = './index';
 
@@ -104,16 +105,16 @@ describe( 'Report controllers', () => {
 					it( 'Should get the reports and render the index page', async () => {
 
 						const country = { id: 1, name: 'test' };
-						
+
 						const unfinishedReportsResponse = {
 							response: { isSuccess: true  },
 							body: {
 								results: [ { id: 1 } ]
 							}
 						};
-						const reportsViewModelResponse = { 
-							reports: true, 
-							currentReport: undefined, 
+						const reportsViewModelResponse = {
+							reports: true,
+							currentReport: undefined,
 						};
 
 						req.user.country = country;
@@ -126,8 +127,8 @@ describe( 'Report controllers', () => {
 						expect( next ).not.toHaveBeenCalled();
 						expect( backend.reports.getForCountry ).toHaveBeenCalledWith( req, country.id );
 						expect( reportsViewModel ).toHaveBeenCalledWith( unfinishedReportsResponse.body.results, undefined );
-						expect( res.render ).toHaveBeenCalledWith( 
-							'reports/views/my-country', 
+						expect( res.render ).toHaveBeenCalledWith(
+							'reports/views/my-country',
 							Object.assign( {},
 								reportsViewModelResponse,
 								{ country: country, csrfToken: req.csrfToken(), isDelete: false }
@@ -145,8 +146,8 @@ describe( 'Report controllers', () => {
 								results: [ { id: 1 } ]
 							}
 						};
-						const reportsViewModelResponse = { 
-							reports: true, 
+						const reportsViewModelResponse = {
+							reports: true,
 							currentReport: undefined
 						};
 
@@ -158,7 +159,7 @@ describe( 'Report controllers', () => {
 						expect( next ).not.toHaveBeenCalled();
 						expect( backend.reports.getAll ).toHaveBeenCalledWith( req );
 						expect( reportsViewModel ).toHaveBeenCalledWith( unfinishedReportsResponse.body.results, undefined );
-						expect( res.render ).toHaveBeenCalledWith( 
+						expect( res.render ).toHaveBeenCalledWith(
 							'reports/views/index',
 							Object.assign( {},
 								reportsViewModelResponse,
@@ -211,9 +212,29 @@ describe( 'Report controllers', () => {
 		describe( 'When the request is a GET', () => {
 			describe( 'Without an error', () => {
 				describe( 'With a success response', () => {
+					describe( 'When it is an XHR request', () => {
+						it( 'Should render the modal and return it', async () => {
+
+							const reportId = uuid();
+							const viewModelResponse = [ { test: 2 } ];
+
+							req.xhr = true;
+							req.report = {
+								id: reportId,
+								test: 1
+							};
+
+							reportsViewModel.and.callFake( () => ({ reports: viewModelResponse }) );
+
+							await controller.delete( req, res, next );
+
+							expect( reportsViewModel ).toHaveBeenCalledWith( [ req.report ] );
+							expect( res.render ).toHaveBeenCalledWith( 'reports/views/partials/delete-report-modal', { report: viewModelResponse[ 0 ], csrfToken } );
+						} );
+					} );
 					describe( 'When the user has a country', () => {
 						it( 'Should get the reports and render the index page', async () => {
-	
+
 							const country = { id: 1, name: 'test' };
 							const unfinishedReportsResponse = {
 								response: { isSuccess: true  },
@@ -221,106 +242,108 @@ describe( 'Report controllers', () => {
 									results: [ { id: 1 } ]
 								}
 							};
-							const reportsViewModelResponse = { 
+							const reportsViewModelResponse = {
 								reports: true,
 								currentReport: '1234'
 							};
-	
+
 							req.user.country = country;
-	
+
 							reportsViewModel.and.callFake( () => reportsViewModelResponse );
 							backend.reports.getForCountry.and.callFake( () => Promise.resolve( unfinishedReportsResponse ) );
-	
+
 							await controller.delete( req, res, next );
-	
+
 							expect( next ).not.toHaveBeenCalled();
 							expect( backend.reports.getForCountry ).toHaveBeenCalledWith( req, country.id );
 							expect( reportsViewModel ).toHaveBeenCalledWith( unfinishedReportsResponse.body.results, '1234' );
 							expect( res.render ).toHaveBeenCalledWith(
-								'reports/views/my-country', 
+								'reports/views/my-country',
 								Object.assign(
-									{}, 
-									reportsViewModelResponse, 
+									{},
+									reportsViewModelResponse,
 									{ country: country, csrfToken: req.csrfToken(), isDelete: true}
 								)
 							);
 						} );
 					} );
-	
+
 					describe( 'When the user does NOT have a country', () => {
 						it( 'Should get the reports and render the index page', async () => {
-	
+
 							const unfinishedReportsResponse = {
 								response: { isSuccess: true  },
 								body: {
 									results: [ { id: 1 } ]
 								}
 							};
-							const reportsViewModelResponse = { 
-								reports: true, 
+							const reportsViewModelResponse = {
+								reports: true,
 								currentReport: '1234'
 							};
-	
+
 							reportsViewModel.and.callFake( () => reportsViewModelResponse );
 							backend.reports.getAll.and.callFake( () => Promise.resolve( unfinishedReportsResponse ) );
-	
+
 							await controller.delete( req, res, next );
-	
+
 							expect( next ).not.toHaveBeenCalled();
 							expect( backend.reports.getAll ).toHaveBeenCalledWith( req );
 							expect( reportsViewModel ).toHaveBeenCalledWith( unfinishedReportsResponse.body.results, '1234' );
-							expect( res.render ).toHaveBeenCalledWith( 
-								'reports/views/index', 
+							expect( res.render ).toHaveBeenCalledWith(
+								'reports/views/index',
 								Object.assign(
-									{}, 
-									reportsViewModelResponse, 
+									{},
+									reportsViewModelResponse,
 									{ country: undefined, csrfToken: req.csrfToken(), isDelete: true }
 								)
 							);
 						} );
 					} );
 				} );
-	
+
 				describe( 'Without a success response', () => {
-					it( 'Should get the reports and render the index page', async () => {
-	
+					it( 'Should call next with an error', async () => {
+
 						const unfinishedReportsResponse = {
 							response: { isSuccess: false  },
 							body: {}
 						};
 
 						const reportsViewModelResponse = { reports: [] };
-	
+
 						reportsViewModel.and.callFake( () => reportsViewModelResponse );
-	
+
 						backend.reports.getAll.and.callFake( () => Promise.resolve( unfinishedReportsResponse ) );
-	
+
 						await controller.delete( req, res, next );
-	
+
 						expect( next ).toHaveBeenCalledWith( new Error( `Got ${ unfinishedReportsResponse.response.statusCode } response from backend` ) );
 						expect( backend.reports.getAll ).toHaveBeenCalledWith( req );
 						expect( res.render ).not.toHaveBeenCalled();
 					} );
 				} );
 			} );
-	
+
 			describe( 'With an error', () => {
 				it( 'Should call next with the error', async () => {
-	
+
 					const err = new Error( 'issue with backend' );
-	
+
 					backend.reports.getAll.and.callFake( () => Promise.reject( err ) );
-	
+
 					await controller.delete( req, res, next );
-	
+
 					expect( next ).toHaveBeenCalledWith( err );
 				} );
 			} );
 		});
 		describe(' When the request is a POST', () => {
+
 			beforeEach( () => {
 				req.method = 'POST';
 			} );
+
 			describe( 'When the service throws an error', () => {
 				it( 'Should call next with the error', async () => {
 
@@ -353,7 +376,7 @@ describe( 'Report controllers', () => {
 				it( 'Should delete the report and redirect to the index page', async () => {
 
 					backend.reports.delete.and.callFake( () => ({ response: { isSuccess: true } }) );
-					
+
 					const indexResponse = '/reports';
 					urls.reports.index.and.callFake( () => indexResponse );
 
