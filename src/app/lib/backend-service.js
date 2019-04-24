@@ -251,7 +251,7 @@ module.exports = {
 			} ),
 		},
 		resolve: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/resolve`, getToken( req ), {
-			status_date: getDefaultedDate( values.resolvedDate ) + 'T00:00',
+			status_date: getDefaultedDate( values.resolvedDate ),
 			status_summary: values.resolvedSummary
 		} ),
 		hibernate: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/hibernate`, getToken( req ), {
@@ -260,14 +260,13 @@ module.exports = {
 		open: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/open`, getToken( req ), {
 			status_summary: values.reopenSummary
 		} ),
-		saveType: ( req, barrierId, values, category ) => updateBarrier( getToken( req ), barrierId, {
-			barrier_type: getValue( values.barrierType ),
-			barrier_type_category: category
+		saveTypes: ( req, barrierId, types ) => updateBarrier( getToken( req ), barrierId, {
+			barrier_types: getValue( types )
 		} ),
 		saveSectors: ( req, barrierId, sectors ) => updateBarrier( getToken( req ), barrierId, {
 			sectors: ( sectors && sectors.length ? sectors : null )
 		} ),
-		saveLocation: (req, barrierId, location) => updateBarrier( getToken( req ), barrierId, {
+		saveLocation: ( req, barrierId, location ) => updateBarrier( getToken( req ), barrierId, {
 			export_country: location.country,
 			country_admin_areas: ( location.adminAreas && location.adminAreas.length ? location.adminAreas : [] )
 		} ),
@@ -294,9 +293,16 @@ module.exports = {
 		saveEuExitRelated: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
 			eu_exit_related: values.euExitRelated,
 		}),
-		saveStatus: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
+		saveProblemStatus: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
 			problem_status: values.status
 		} ),
+		saveStatus: ( req, barrierId, values ) => {
+			const status_details = { status_summary: values.statusSummary };
+			if (values.statusDate) {
+				status_details.status_date = getDefaultedDate( values.statusDate );
+			}
+			return updateBarrier( getToken( req ), barrierId, status_details); 
+		},
 	},
 
 	reports: {

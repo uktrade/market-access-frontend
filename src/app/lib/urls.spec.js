@@ -85,6 +85,7 @@ describe( 'URLs', () => {
 				expect( urls.barriers.edit.priority( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/priority/` );
 				expect( urls.barriers.edit.euExitRelated( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/eu-exit-related/` );
 				expect( urls.barriers.edit.status( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/status/` );
+				expect( urls.barriers.edit.problemStatus( barrierId ) ).toEqual( `/barriers/${ barrierId }/edit/problem-status/` );
 			} );
 		} );
 
@@ -128,19 +129,39 @@ describe( 'URLs', () => {
 			} );
 		} );
 
-		describe( 'type', () => {
-			describe( 'category', () => {
+		describe( 'types', () => {
+			describe( 'edit', () => {
 				it( 'Should return the correct path', () => {
 
-					expect( urls.barriers.type.category( barrierId ) ).toEqual( `/barriers/${ barrierId }/type/` );
+					expect( urls.barriers.types.edit( barrierId ) ).toEqual( `/barriers/${ barrierId }/types/edit/` );
 				} );
 			} );
+
 			describe( 'list', () => {
 				it( 'Should return the correct path', () => {
 
-					const category = 'abc';
+					expect( urls.barriers.types.list( barrierId ) ).toEqual( `/barriers/${ barrierId }/types/` );
+				} );
+			} );
 
-					expect( urls.barriers.type.list( barrierId, category ) ).toEqual( `/barriers/${ barrierId }/type/${ category }/` );
+			describe( 'add', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.types.add( barrierId ) ).toEqual( `/barriers/${ barrierId }/types/add/` );
+				} );
+			} );
+
+			describe( 'remove', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.types.remove( barrierId ) ).toEqual( `/barriers/${ barrierId }/types/remove/` );
+				} );
+			} );
+
+			describe( 'new', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.barriers.types.new( barrierId ) ).toEqual( `/barriers/${ barrierId }/types/new/` );
 				} );
 			} );
 		} );
@@ -275,16 +296,18 @@ describe( 'URLs', () => {
 				countryId = uuid();
 			} );
 
-			describe( 'With a reportId', () => {
-				it( 'Should return the correct path', () => {
+			describe( 'list', () => {
+				describe( 'With a reportId', () => {
+					it( 'Should return the correct path', () => {
 
-					expect( urls.reports.adminAreas.list( reportId, countryId ) ).toEqual( `/reports/${ reportId }/country/${ countryId }/admin-areas/` );
+						expect( urls.reports.adminAreas.list( reportId, countryId ) ).toEqual( `/reports/${ reportId }/country/${ countryId }/admin-areas/` );
+					} );
 				} );
-			} );
-			describe( 'Without a reportId', () => {
-				it( 'Should return the correct path', () => {
+				describe( 'Without a reportId', () => {
+					it( 'Should return the correct path', () => {
 
-					expect( urls.reports.adminAreas.list( undefined, countryId ) ).toEqual( `/reports/new/country/${ countryId }/admin-areas/` );
+						expect( urls.reports.adminAreas.list( undefined, countryId ) ).toEqual( `/reports/new/country/${ countryId }/admin-areas/` );
+					} );
 				} );
 			} );
 

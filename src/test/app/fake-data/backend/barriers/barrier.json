@@ -27,18 +27,17 @@
    "product": "quas quis est",
    "source": "TRADE",
    "other_source": "aliquid voluptatibus repellendus",
-   "barrier_type": {
-      "id": 45540,
-      "title": "repellendus dignissimos ut",
-      "description": "Necessitatibus vitae quisquam. Qui harum enim et iste non. Asperiores quis autem eum at autem ex quibusdam. Quae voluptas tempora omnis molestias expedita eos natus corporis optio. Deserunt deleniti nihil labore.",
-      "category": "GOODS"
-   },
+   "barrier_types": [
+      10,
+      13,
+      3,
+      13
+   ],
    "barrier_title": "nemo nobis ut",
    "problem_description": "Accusamus saepe sed non in molestiae minima voluptas. Quis atque ipsa est laborum voluptatem sed fugit autem quos. Et sit omnis praesentium debitis odit sint officiis.",
-   "current_status": {
-      "status": 1,
-      "status_summary": "Iste ducimus hic et perspiciatis. Soluta doloremque incidunt ab. Tempore aut consequatur saepe quis. Enim quidem quam tempore eveniet et ab harum ratione. Rerum ea ut voluptatum nobis. Doloribus sapiente qui dignissimos rem est ut eum nemo."
-   },
+   "status": 1,
+   "status_date":  "2019-03-01T00:00:00Z",
+   "status_summary": "Cheese",
    "reported_on": "Fri Mar 30 2018 01:46:38 GMT+0100 (BST)",
    "reported_by": "Stanton Walsh IV",
    "export_country": "81756b9a-5d95-e211-a939-e4115bead28a",

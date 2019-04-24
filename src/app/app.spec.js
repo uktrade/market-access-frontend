@@ -390,11 +390,11 @@ describe( 'App', function(){
 						} );
 					} );
 
-					describe( 'status', () => {
+					describe( 'problemStatus', () => {
 						it( 'Should fetch the barrier and render the page', ( done ) => {
 
 							app
-								.get( urls.barriers.edit.status( barrierId ) )
+								.get( urls.barriers.edit.problemStatus( barrierId ) )
 								.end( checkPage( 'Market Access - Barrier - Edit barrier scope', done ) );
 						} );
 					} );
@@ -816,7 +816,7 @@ describe( 'App', function(){
 				it( 'Should render the page', ( done ) => {
 
 					const barrier = intercept.stub( '/backend/barriers/barrier' );
-					barrier.current_status.status = 2;
+					barrier.status = 2;
 
 					intercept.backend()
 						.get( `/barriers/${ barrierId }` )
@@ -1271,65 +1271,6 @@ describe( 'App', function(){
 											.post( urls.reports.summary( reportId ) )
 											.send( `_csrf=${ token }&description=test1` )
 											.end( checkRedirect( urls.barriers.detail( stubId ), done ) );
-									} );
-								} );
-							} );
-						} );
-
-						xdescribe( 'Define type of market access barrier', () => {
-
-							describe( 'Selecting the category', () => {
-								it( 'Should fetch the report and render the category options', ( done ) => {
-
-									app
-										.get( urls.reports.typeCategory( reportId ) )
-										.end( checkPage( 'Market Access - Report - Define type of market access barrier - Category', done ) );
-								} );
-							} );
-
-							describe( 'Selecting a barrier type', () => {
-								describe( 'When a category has not been chosen', () => {
-									it( 'Should redirect to the category page', ( done ) => {
-
-										app
-											.get( urls.reports.type( reportId ) )
-											.end( ( err, res ) => {
-												checkResponse( res, 302 );
-												done();
-											} );
-									} );
-								} );
-
-								describe( 'When a category has been selected', () => {
-
-									let agent;
-
-									beforeEach( ( done ) => {
-
-										agent = supertest.agent( appInstance );
-
-										agent
-											.get( urls.reports.typeCategory( reportId ) )
-											.end( ( err, res ) => {
-
-												const token = getCsrfToken( res, done.fail );
-
-												interceptReport( reportId );
-
-												agent
-													.post( urls.reports.typeCategory( reportId ) )
-													.send( `_csrf=${ token }&category=GOODS` )
-													.expect( 302, done );
-											} );
-									} );
-
-									it( 'Should fetch the report and render the page', ( done ) => {
-
-										interceptReport( reportId );
-
-										agent
-											.get( urls.reports.type( reportId ) )
-											.end( checkPage( 'Market Access - Report - Define type of market access barrier', done ) );
 									} );
 								} );
 							} );
