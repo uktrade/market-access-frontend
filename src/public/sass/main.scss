@@ -58,6 +58,7 @@ $govuk-images-path: '/govuk-public/images/';
 @import 'app-objects/filter-group';
 @import 'app-objects/attachments';
 @import 'app-objects/info-panel';
+@import 'app-objects/inline-definition-list';
 
 @import 'app-components/dash-button';
 @import 'app-components/dash-card';
@@ -78,6 +79,7 @@ $govuk-images-path: '/govuk-public/images/';
 @import 'app-components/toast';
 @import 'app-components/checkbox-filter';
 @import 'app-components/typeahead';
+@import 'app-components/modal';
 
 @import 'pages/index';
 @import 'pages/what-is-a-barrier';

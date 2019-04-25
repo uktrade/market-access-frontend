@@ -5,6 +5,7 @@
 	},
 	"globals": {
 		"ma": true,
-		"jessie": false
+		"jessie": false,
+		"bodyScrollLock": false
 	}
 }
