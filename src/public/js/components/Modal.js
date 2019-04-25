@@ -4,7 +4,6 @@ ma.components.Modal = (function( doc ){
 		'bind', 'addClass', 'removeClass', 'getEventTarget', 'attachListener', 'cancelDefault'
 	) ){ return; }
 
-	var MODAL_OPEN_CLASS = 'modal-open';
 	var MODAL_CANCEL_CLASS = 'js-modal-cancel';
 	var ESC_KEY = 27;
 
@@ -36,14 +35,14 @@ ma.components.Modal = (function( doc ){
 		this.bg.appendChild( this.content );
 
 		doc.body.appendChild( this.bg );
-		jessie.addClass( doc.body, MODAL_OPEN_CLASS );
+		bodyScrollLock.disableBodyScroll( this.bg );
 		this.content.focus();
 		this.isOpen = true;
 	};
 
 	Modal.prototype.close = function(){
 
-		jessie.removeClass( doc.body, MODAL_OPEN_CLASS );
+		bodyScrollLock.enableBodyScroll( this.bg );
 		doc.body.removeChild( this.bg );
 		this.activeElement.focus();
 		this.activeElement = null;
