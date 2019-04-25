@@ -8,10 +8,11 @@ ma.pages.report.index = (function(){
 			'bind', 'ajaxGet', 'hasClass', 'getEventTarget', 'attachListener', 'cancelDefault', 'queryOne'
 		) ){ return; }
 
-		if( !ma.components.Modal ){ return; }
+		var container = jessie.queryOne( '.js-modal-delete' );
+
+		if( !( ma.components.Modal && container ) ){ return; }
 
 		var modal = new ma.components.Modal();
-		var container = jessie.queryOne( '.js-modal-delete' );
 
 		function handleClick( e ){
 
@@ -45,9 +46,6 @@ ma.pages.report.index = (function(){
 			} );
 		}
 
-		if( container ){
-
-			jessie.attachListener( container, 'click', handleClick );
-		}
+		jessie.attachListener( container, 'click', handleClick );
 	};
 })();
