@@ -338,53 +338,77 @@ describe( 'Report controllers', () => {
 				} );
 			} );
 		});
+
 		describe(' When the request is a POST', () => {
 
 			beforeEach( () => {
 				req.method = 'POST';
 			} );
 
-			describe( 'When the service throws an error', () => {
-				it( 'Should call next with the error', async () => {
-
-					const err = new Error( 'boom' );
-					backend.reports.delete.and.callFake( () => { throw err; } );
-
-					await controller.delete( req, res, next );
-
-					expect( next ).toHaveBeenCalledWith( err );
-					expect( res.render ).not.toHaveBeenCalled();
-				} );
-			} );
-
-			describe( 'When the service response is not a success', () => {
+			describe( 'When the current user does not match the created by user', () => {
 				it( 'Should call next with an error', async () => {
 
-					const statusCode = 500;
-					const err = new Error( `Got ${ statusCode } response from backend` );
-
-					backend.reports.delete.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
+					req.report = { id: 1, created_by: { id: 2 } };
+					req.user = { id: 3 };
 
 					await controller.delete( req, res, next );
 
-					expect( next ).toHaveBeenCalledWith( err );
+					expect( backend.reports.delete ).not.toHaveBeenCalled();
 					expect( res.render ).not.toHaveBeenCalled();
+					expect( next ).toHaveBeenCalledWith( new Error( 'Cannot delete a note that is not created by the current user' ) );
 				} );
 			} );
 
-			describe( 'When the service response is success', () => {
-				it( 'Should delete the report and redirect to the index page', async () => {
+			describe( 'When the current user matches the created by user', () => {
 
-					backend.reports.delete.and.callFake( () => ({ response: { isSuccess: true } }) );
+				beforeEach( () => {
 
-					const indexResponse = '/reports';
-					urls.reports.index.and.callFake( () => indexResponse );
+					req.report = { id: 4, created_by: { id: 5 } };
+					req.user = { id: 5 };
+				} );
 
-					await controller.delete( req, res, next );
+				describe( 'When the service throws an error', () => {
+					it( 'Should call next with the error', async () => {
 
-					expect( res.render ).not.toHaveBeenCalled();
-					expect( res.redirect ).toHaveBeenCalledWith( indexResponse );
-					expect( urls.reports.index ).toHaveBeenCalled();
+						const err = new Error( 'boom' );
+						backend.reports.delete.and.callFake( () => { throw err; } );
+
+						await controller.delete( req, res, next );
+
+						expect( next ).toHaveBeenCalledWith( err );
+						expect( res.render ).not.toHaveBeenCalled();
+					} );
+				} );
+
+				describe( 'When the service response is not a success', () => {
+					it( 'Should call next with an error', async () => {
+
+						const statusCode = 500;
+						const err = new Error( `Got ${ statusCode } response from backend` );
+
+						backend.reports.delete.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
+
+						await controller.delete( req, res, next );
+
+						expect( next ).toHaveBeenCalledWith( err );
+						expect( res.render ).not.toHaveBeenCalled();
+					} );
+				} );
+
+				describe( 'When the service response is success', () => {
+					it( 'Should delete the report and redirect to the index page', async () => {
+
+						backend.reports.delete.and.callFake( () => ({ response: { isSuccess: true } }) );
+
+						const indexResponse = '/reports';
+						urls.reports.index.and.callFake( () => indexResponse );
+
+						await controller.delete( req, res, next );
+
+						expect( res.render ).not.toHaveBeenCalled();
+						expect( res.redirect ).toHaveBeenCalledWith( indexResponse );
+						expect( urls.reports.index ).toHaveBeenCalled();
+					} );
 				} );
 			} );
 		});
