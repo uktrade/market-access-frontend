@@ -12,15 +12,12 @@
 {% block body_script %}
 	{{ super() }}
 	<script>
-		if( ma.components.BarrierSummary ){
-			new ma.components.BarrierSummary( {
+		ma.pages.barrier.detail( {
+			noteErrorText: '{{ noteErrorText }}',
+			barrierSummary: {
 				text: 'Update the barrier',
 				linkClass: '.js-barrier-summary-link'
-			} );
-		}
-
-		ma.pages.barrier.detail( {
-			noteErrorText: '{{ noteErrorText }}'
+			}
 		} );
 	</script>
 {% endblock %}
@@ -32,7 +29,7 @@
 {% endblock %}
 
 {% block mastheadContent %}
-    {{ barrierSummary( barrier ) }}
+	{{ barrierSummary( barrier ) }}
 {% endblock %}
 
 {% macro noteForm( params ) %}
@@ -250,7 +247,7 @@
 			<a class="govuk-button button--primary" href="{{ urls.barriers.notes.add( barrier.id ) }}">Add note</a>
 		{% endif %}
 
-		<ol class="event-list">
+		<ol class="event-list js-delete-modal-container">
 		{% if interactions and interactions.length %}
 			{%- for item in interactions %}
 
@@ -263,7 +260,6 @@
 						<span class="event-list__item__heading__recede"> by </span>{{ item.user.name }}
 						{%- endif -%}
 					</h4>
-
 
 					{% if item.edit %}
 
@@ -284,7 +280,7 @@
 						<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
 						<a class="event-list__item__edit-link" href="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}">Edit</a>
 						{% if item.user.id == user.id %}
-							<a class="event-list__item__delete-link js-modal" href="{{ urls.barriers.notes.delete( barrier.id, item.id ) }}">Delete</a>
+							<a class="event-list__item__delete-link js-delete-modal" href="{{ urls.barriers.notes.delete( barrier.id, item.id ) }}">Delete</a>
 						{% endif %}
 
 						{% if item.hasDocuments -%}

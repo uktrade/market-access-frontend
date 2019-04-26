@@ -1,6 +1,6 @@
 ma.pages.barrier.detail = (function( doc, jessie ){
 
-	return function( opts ){
+	function setupAttachments( noteErrorText ){
 
 		if( !( ma.components.FileUpload && ma.components.Attachments && ma.components.TextArea && ma.xhr2 && ( typeof FormData !== 'undefined' ) && jessie.hasFeatures(
 			'queryOne', 'cancelDefault', 'getElementData'
@@ -147,7 +147,7 @@ ma.pages.barrier.detail = (function( doc, jessie ){
 			if( !note.hasValue() ){
 
 				jessie.cancelDefault( e );
-				note.setError( opts.noteErrorText );
+				note.setError( noteErrorText );
 				note.focus();
 			}
 		}
@@ -169,6 +169,19 @@ ma.pages.barrier.detail = (function( doc, jessie ){
 		attachments.events.delete.subscribe( deleteDocument );
 
 		jessie.attachListener( form, 'submit', handleFormSubmit );
+	}
+
+	return function( opts ){
+
+		setupAttachments( opts.noteErrorText );
+
+		if( ma.components.BarrierSummary ){
+			new ma.components.BarrierSummary( opts.barrierSummary );
+		}
+
+		if( ma.components.DeleteModal ){
+			new ma.components.DeleteModal();
+		}
 	};
 
 }( document, jessie ));

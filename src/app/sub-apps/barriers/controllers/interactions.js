@@ -495,13 +495,20 @@ module.exports = {
 
 			} else {
 
-				await renderInteractions( req, res, next, {
-					data: {
-						isDelete: true,
-						currentNote: req.note,
-						csrfToken: req.csrfToken(),
-					}
-				} );
+				if( req.xhr ){
+
+					res.render( 'barriers/views/partials/delete-note-modal', { note: req.note, csrfToken: req.csrfToken() } );
+
+				} else {
+
+					await renderInteractions( req, res, next, {
+						data: {
+							isDelete: true,
+							currentNote: req.note,
+							csrfToken: req.csrfToken(),
+						}
+					} );
+				}
 			}
 		}
 	},
