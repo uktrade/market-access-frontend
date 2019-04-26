@@ -376,6 +376,17 @@ describe( 'Backend Service', () => {
 					} );
 				} );
 			} );
+
+			describe( 'delete', () => {
+				it( 'Should DELETE to the correct path with the correct values', async () => {
+
+					const noteId = '123';
+
+					await service.barriers.notes.delete( req, noteId );
+
+					expect( backend.delete ).toHaveBeenCalledWith( `/barriers/interactions/${ noteId }`, token );
+				} );
+			} );
 		} );
 
 		describe( 'resolve', () => {
@@ -557,12 +568,12 @@ describe( 'Backend Service', () => {
 
 					const [ month, year ] = [ '11', '2000' ];
 					const statusSummary = 'my summary text';
-	
+
 					await service.barriers.saveStatus( req, barrierId, {
 						statusDate: { month, year },
 						statusSummary
 					} );
-	
+
 					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
 						status_date: [ year, month, '01' ].join( '-' ),
 						status_summary: statusSummary
@@ -573,11 +584,11 @@ describe( 'Backend Service', () => {
 				it( 'Should PUT to the correct path with the correct values', async () => {
 
 					const statusSummary = 'my summary text';
-	
+
 					await service.barriers.saveStatus( req, barrierId, {
 						statusSummary
 					} );
-	
+
 					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
 						status_summary: statusSummary
 					} );

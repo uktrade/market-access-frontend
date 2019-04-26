@@ -248,6 +248,7 @@ module.exports = {
 				text: values.note,
 				documents: values.documentIds
 			} ),
+			delete: ( req, noteId ) => backend.delete( `/barriers/interactions/${ noteId }`, getToken( req ) ),
 		},
 		resolve: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/resolve`, getToken( req ), {
 			status_date: getDefaultedDate( values.resolvedDate ),
@@ -300,7 +301,7 @@ module.exports = {
 			if (values.statusDate) {
 				status_details.status_date = getDefaultedDate( values.statusDate );
 			}
-			return updateBarrier( getToken( req ), barrierId, status_details); 
+			return updateBarrier( getToken( req ), barrierId, status_details);
 		},
 	},
 

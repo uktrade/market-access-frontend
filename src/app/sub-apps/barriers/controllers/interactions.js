@@ -303,7 +303,7 @@ function createUploadHandler( passedCb ){
 
 module.exports = {
 
-	list: async ( req, res, next ) => await renderInteractions( req, res, next ),
+	list: renderInteractions,
 
 	documents: {
 		add: createUploadHandler( ( req, document ) => {
@@ -466,6 +466,43 @@ module.exports = {
 				},
 				saveFormData: ( values ) => backend.barriers.notes.update( req, note.id, values ),
 			} );
+		},
+
+		delete: async( req, res, next ) => {
+
+			if( req.method === 'POST' ){
+
+				const noteId = req.note.id;
+				const barrierId = req.barrier.id;
+
+				try {
+
+					const { response } = await backend.barriers.notes.delete( req, noteId );
+
+					if( response.isSuccess ){
+
+						res.redirect( urls.barriers.detail( barrierId ) );
+
+					} else {
+
+						next( new Error( `Could not delete note, got ${ response.statusCode } from backend` ) );
+					}
+
+				} catch( e ){
+
+					next( e );
+				}
+
+			} else {
+
+				await renderInteractions( req, res, next, {
+					data: {
+						isDelete: true,
+						currentNote: req.note,
+						csrfToken: req.csrfToken(),
+					}
+				} );
+			}
 		}
 	},
 };

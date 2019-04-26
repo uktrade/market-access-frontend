@@ -86,6 +86,7 @@ module.exports = {
 		},
 		notes: {
 			add: ( barrierId ) => `/barriers/${ barrierId }/interactions/add-note/`,
+			delete: ( barrierId, noteId ) => `/barriers/${ barrierId }/interactions/delete-note/${ noteId }/`,
 			edit: ( barrierId, noteId ) => `/barriers/${ barrierId }/interactions/edit-note/${ noteId }/`,
 			documents: {
 				add: ( barrierId, noteId ) => `/barriers/${ barrierId }/interactions/notes/${ noteId }/documents/add/`,
