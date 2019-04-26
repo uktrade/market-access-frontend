@@ -57,7 +57,7 @@ module.exports = {
 
 	index: renderDashboard,
 
-	delete: async (req, res, next) => {
+	delete: async ( req, res, next ) => {
 
 		const currentReportId = req.params.reportId;
 		const isPost = req.method === 'POST';
