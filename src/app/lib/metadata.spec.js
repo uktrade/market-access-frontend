@@ -572,5 +572,34 @@ describe( 'metadata', () => {
 				expect( metadata.mimeTypes[ 'text/plain' ] ).toEqual( '.txt' );
 			} );
 		} );
+
+		describe( 'barrier', () => {
+			it( 'Should expose the required data', () => {
+
+				const OPEN = 2;
+				const RESOLVED = 4;
+				const HIBERNATED = 5;
+
+				expect( metadata.barrier ).toEqual( {
+					status: {
+						types: {
+							OPEN,
+							RESOLVED,
+							HIBERNATED
+						},
+						typeInfo: {
+							[ OPEN ]: { name: 'Open', modifyer: 'assessment' },
+							[ RESOLVED ]: { name: 'Resolved', modifyer: 'resolved' },
+							[ HIBERNATED ]: { name: 'Paused', modifyer: 'hibernated' }
+						}
+					},
+					priority: {
+						codes: {
+							UNKNOWN: 'UNKNOWN'
+						}
+					}
+				} );
+			} );
+		} );
 	} );
 } );

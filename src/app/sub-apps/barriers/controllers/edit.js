@@ -218,7 +218,10 @@ module.exports = {
 
 		const processor = new FormProcessor( {
 			form,
-			render: ( templateValues ) => res.render( 'barriers/views/edit/priority', templateValues ),
+			render: ( templateValues ) => res.render( 'barriers/views/edit/priority', {
+				...templateValues,
+				isUnknown: ( barrier.priority.code === metadata.barrier.priority.codes.UNKNOWN )
+			} ),
 			saveFormData: ( formValues ) => backend.barriers.savePriority( req, barrier.id, formValues ),
 			saved: () => res.redirect( urls.barriers.detail( barrier.id ) )
 		} );
