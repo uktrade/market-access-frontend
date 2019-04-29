@@ -843,6 +843,52 @@ describe( 'App', function(){
 				} );
 			} );
 
+			describe( 'Delete', () => {
+
+				let reportId;
+
+				beforeEach( () => {
+
+					reportId = uuid();
+
+					intercept.backend()
+						.get( `/reports/${ reportId }` )
+						.reply( 200, intercept.stub( '/backend/reports/report' ) );
+				} );
+
+				describe( 'With AJAX', () => {
+					it( 'Should return a snippet', ( done ) => {
+
+						app
+							.get( urls.reports.delete( reportId ) )
+							.set( 'X-Requested-With', 'XMLHttpRequest' )
+							.end( ( err, res ) => {
+
+								if( err ){ done.fail( err ); }
+
+								//console.log( res.text );
+
+								expect( res.text.indexOf( '<html' ) ).toEqual( -1 );
+								expect( /.*?<div class="modal">/.test( res.text ) ).toEqual( true );
+								done();
+							} );
+					} );
+				} );
+
+				describe( 'A normal request', () => {
+					it( 'Should return the page', ( done ) => {
+
+						intercept.backend()
+							.get( /^\/reports(\?.+)?$/ )
+							.reply( 200, intercept.stub( '/backend/reports/' ) );
+
+						app
+							.get( urls.reports.delete( reportId ) )
+							.end( checkPage( 'Market Access - Draft barriers', done ) );
+					} );
+				} );
+			} );
+
 			describe( 'Report a barrier', () => {
 				describe( 'New report page', () => {
 					it( 'Should render the new page', ( done ) => {
