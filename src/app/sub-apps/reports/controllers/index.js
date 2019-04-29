@@ -4,7 +4,7 @@ const urls = require( '../../../lib/urls' );
 const reportDetailViewModel = require( '../view-models/detail' );
 const reportsViewModel = require( '../view-models/reports' );
 
-async function renderDashboard(req, res, next, isDelete=false, currentReportId ){
+async function renderDashboard( req, res, next, isDelete = false, currentReportId ){
 
 	const country = req.user.country;
 	const countryId = country && req.user.country.id;
@@ -57,12 +57,17 @@ module.exports = {
 
 	index: renderDashboard,
 
-	delete: async (req, res, next) => {
+	delete: async ( req, res, next ) => {
 
 		const currentReportId = req.params.reportId;
 		const isPost = req.method === 'POST';
 
 		if( isPost ){
+
+			if( req.report.created_by.id !== req.user.id ){
+
+				return next( new Error( 'Cannot delete a note that is not created by the current user' ) );
+			}
 
 			try {
 
