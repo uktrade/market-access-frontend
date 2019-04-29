@@ -52,6 +52,8 @@ module.exports = ( express, app ) => {
 	app.post( '/:barrierId/interactions/add-note/', fileUpload, controller.interactions.notes.add );
 	app.get( '/:barrierId/interactions/edit-note/:noteId/', controller.interactions.notes.edit );
 	app.post( '/:barrierId/interactions/edit-note/:noteId/', fileUpload, controller.interactions.notes.edit );
+	app.get( '/:barrierId/interactions/delete-note/:noteId/', controller.interactions.notes.delete );
+	app.post( '/:barrierId/interactions/delete-note/:noteId/', controller.interactions.notes.delete );
 
 	app.post( '/:uuid/interactions/notes/:noteId/documents/add/', fileUpload, controller.interactions.notes.documents.add );
 	app.get( '/:uuid/interactions/notes/:noteId/documents/cancel/', controller.interactions.notes.documents.cancel );

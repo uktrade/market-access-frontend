@@ -107,6 +107,7 @@ describe( 'URLs', () => {
 
 				expect( urls.barriers.notes.add( barrierId ) ).toEqual( `/barriers/${ barrierId }/interactions/add-note/` );
 				expect( urls.barriers.notes.edit( barrierId, noteId ) ).toEqual( `/barriers/${ barrierId }/interactions/edit-note/${ noteId }/` );
+				expect( urls.barriers.notes.delete( barrierId, noteId ) ).toEqual( `/barriers/${ barrierId }/interactions/delete-note/${ noteId }/` );
 			} );
 
 			describe( 'note documents', () => {

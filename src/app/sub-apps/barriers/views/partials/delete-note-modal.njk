@@ -1,0 +1,3 @@
+{% from 'barriers/views/macros/delete-note.njk' import deleteNote %}
+
+{{ deleteNote( barrier.id, note, csrfToken ) }}

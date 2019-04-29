@@ -1,0 +1,15 @@
+{% from 'app-components/modal.njk' import modal %}
+
+{% macro deleteNote( barrierId, note, csrfToken ) %}
+	{% call modal(
+			{
+				title: 'Delete note',
+				action: { url: urls.barriers.notes.delete( barrierId, note.id ), text: 'Yes, delete' },
+				cancel: { url: urls.barriers.detail( barrierId ), text: 'No, cancel' },
+				csrfToken: csrfToken
+			}
+		)
+	%}
+		<p>Are you sure you want to delete this note{{ ' and its attached documents' if note.documents.length }}?</p>
+	{% endcall %}
+{% endmacro %}

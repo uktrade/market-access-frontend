@@ -68,6 +68,18 @@ function checkPage( title, done, responseCode = 200 ){
 	};
 }
 
+function checkModal( done ){
+
+	return ( err, res ) => {
+
+		if( err ){ done.fail( err ); }
+
+		expect( res.text.indexOf( '<html' ) ).toEqual( -1 );
+		expect( /.*?<div class="modal">/.test( res.text ) ).toEqual( true );
+		done();
+	};
+}
+
 function checkRedirect( location, done, responseCode = 302 ){
 
 	return ( err, res ) => {
@@ -303,6 +315,27 @@ describe( 'App', function(){
 
 									app.get( urls.barriers.notes.edit( barrierId, 7 ) )
 										.end( checkPage( 'Market Access - Barrier details - Edit a note', done ) );
+								} );
+							} );
+						} );
+
+						describe( 'Deleting', () => {
+							describe( 'A GET', () => {
+								describe( 'A normal request', () => {
+									it( 'Should render the page', ( done ) => {
+
+										app.get( urls.barriers.notes.delete( barrierId, 7 ) )
+											.end( checkPage( 'Market Access - Barrier details', done ) );
+									} );
+								} );
+
+								describe( 'An AJAX request', () => {
+									it( 'Should render a snippet', ( done ) => {
+
+										app.get( urls.barriers.notes.delete( barrierId, 7 ) )
+											.set( 'X-Requested-With', 'XMLHttpRequest' )
+											.end( checkModal( done ) );
+									} );
 								} );
 							} );
 						} );
@@ -840,6 +873,43 @@ describe( 'App', function(){
 					app
 						.get( urls.reports.index() )
 						.end( checkPage( 'Market Access - Draft barriers', done ) );
+				} );
+			} );
+
+			describe( 'Delete', () => {
+
+				let reportId;
+
+				beforeEach( () => {
+
+					reportId = uuid();
+
+					intercept.backend()
+						.get( `/reports/${ reportId }` )
+						.reply( 200, intercept.stub( '/backend/reports/report' ) );
+				} );
+
+				describe( 'With AJAX', () => {
+					it( 'Should return a snippet', ( done ) => {
+
+						app
+							.get( urls.reports.delete( reportId ) )
+							.set( 'X-Requested-With', 'XMLHttpRequest' )
+							.end( checkModal( done ) );
+					} );
+				} );
+
+				describe( 'A normal request', () => {
+					it( 'Should return the page', ( done ) => {
+
+						intercept.backend()
+							.get( /^\/reports(\?.+)?$/ )
+							.reply( 200, intercept.stub( '/backend/reports/' ) );
+
+						app
+							.get( urls.reports.delete( reportId ) )
+							.end( checkPage( 'Market Access - Draft barriers', done ) );
+					} );
 				} );
 			} );
 
