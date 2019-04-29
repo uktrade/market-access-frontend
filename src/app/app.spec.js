@@ -68,6 +68,18 @@ function checkPage( title, done, responseCode = 200 ){
 	};
 }
 
+function checkModal( done ){
+
+	return ( err, res ) => {
+
+		if( err ){ done.fail( err ); }
+
+		expect( res.text.indexOf( '<html' ) ).toEqual( -1 );
+		expect( /.*?<div class="modal">/.test( res.text ) ).toEqual( true );
+		done();
+	};
+}
+
 function checkRedirect( location, done, responseCode = 302 ){
 
 	return ( err, res ) => {
@@ -303,6 +315,27 @@ describe( 'App', function(){
 
 									app.get( urls.barriers.notes.edit( barrierId, 7 ) )
 										.end( checkPage( 'Market Access - Barrier details - Edit a note', done ) );
+								} );
+							} );
+						} );
+
+						describe( 'Deleting', () => {
+							describe( 'A GET', () => {
+								describe( 'A normal request', () => {
+									it( 'Should render the page', ( done ) => {
+
+										app.get( urls.barriers.notes.delete( barrierId, 7 ) )
+											.end( checkPage( 'Market Access - Barrier details', done ) );
+									} );
+								} );
+
+								describe( 'An AJAX request', () => {
+									it( 'Should render a snippet', ( done ) => {
+
+										app.get( urls.barriers.notes.delete( barrierId, 7 ) )
+											.set( 'X-Requested-With', 'XMLHttpRequest' )
+											.end( checkModal( done ) );
+									} );
 								} );
 							} );
 						} );
@@ -862,16 +895,7 @@ describe( 'App', function(){
 						app
 							.get( urls.reports.delete( reportId ) )
 							.set( 'X-Requested-With', 'XMLHttpRequest' )
-							.end( ( err, res ) => {
-
-								if( err ){ done.fail( err ); }
-
-								//console.log( res.text );
-
-								expect( res.text.indexOf( '<html' ) ).toEqual( -1 );
-								expect( /.*?<div class="modal">/.test( res.text ) ).toEqual( true );
-								done();
-							} );
+							.end( checkModal( done ) );
 					} );
 				} );
 
