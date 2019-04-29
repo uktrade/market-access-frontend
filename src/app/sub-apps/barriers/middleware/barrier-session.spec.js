@@ -52,6 +52,45 @@ describe( 'barrier session middleware', () => {
 			checkForSession();
 			expect( next ).toHaveBeenCalledWith();
 		} );
+
+		describe( 'When there is a session object', () => {
+			it( 'Should append to it', () => {
+
+				req.session.barriers = { abc: true };
+
+				middleware( req, res, next );
+
+				expect( req.session.barriers ).toEqual( { abc: true, [ id ]: {} } );
+
+				req.barrierSession.set( 'test', 1 );
+
+				expect( req.session.barriers ).toEqual( { abc: true, [ id ]: { test: 1 } } );
+			} );
+		} );
+
+		describe( 'When there is a session and barrier object', () => {
+			it( 'Should append to it', () => {
+
+				req.session.barriers = {
+					[ id ]: { test: 1 },
+					abc: 'def',
+				};
+
+				middleware( req, res, next );
+
+				expect( req.session.barriers ).toEqual( {
+					[ id ]: { test: 1 },
+					abc: 'def',
+				} );
+
+				req.barrierSession.set( 'test-two', true );
+
+				expect( req.session.barriers ).toEqual( {
+					[ id ]: { test: 1, 'test-two': true },
+					abc: 'def',
+				} );
+			} );
+		} );
 	} );
 
 	describe( 'With a barrier', () => {
@@ -180,7 +219,7 @@ describe( 'barrier session middleware', () => {
 				describe( 'With no data', () => {
 					it( 'Sould return undefined', () => {
 
-						expect( req.barrierSession.get( key ) ).toEqual( undefined );
+						expect( req.barrierSession.types.get() ).toEqual( undefined );
 					} );
 				} );
 
@@ -189,7 +228,7 @@ describe( 'barrier session middleware', () => {
 
 						req.session.barriers[ id ][ key ] = value;
 
-						expect( req.barrierSession.get( key ) ).toEqual( value );
+						expect( req.barrierSession.types.get() ).toEqual( value );
 					} );
 				} );
 			} );
@@ -198,7 +237,7 @@ describe( 'barrier session middleware', () => {
 				describe( 'With no data', () => {
 					it( 'Should do nothing', () => {
 
-						expect( () => req.barrierSession.delete( key ) ).not.toThrow();
+						expect( () => req.barrierSession.types.delete() ).not.toThrow();
 					} );
 				} );
 
@@ -206,7 +245,7 @@ describe( 'barrier session middleware', () => {
 					it( 'Should delete the data', () => {
 
 						req.session.barriers[ id ][ key ] = value;
-						req.barrierSession.delete( key );
+						req.barrierSession.types.delete();
 
 						expect( typeof req.session.barriers[ id ][ key ] ).toEqual( 'undefined' );
 					} );
@@ -217,7 +256,7 @@ describe( 'barrier session middleware', () => {
 				describe( 'With no data', () => {
 					it( 'Should set the data', () => {
 
-						req.barrierSession.set( key, value );
+						req.barrierSession.types.set( value );
 
 						expect( req.session.barriers[ id ][ key ] ).toEqual( value );
 					} );
@@ -227,7 +266,7 @@ describe( 'barrier session middleware', () => {
 					it( 'Should overwrite the data', () => {
 
 						req.session.barriers[ id ][ key ] = { existing: true };
-						req.barrierSession.set( key, value );
+						req.barrierSession.types.set( value );
 
 						expect( req.session.barriers[ id ][ key ] ).toEqual( value );
 					} );
@@ -238,7 +277,7 @@ describe( 'barrier session middleware', () => {
 				describe( 'With no data', () => {
 					it( 'Should set the data', () => {
 
-						req.barrierSession.setIfNotAlready( key, value );
+						req.barrierSession.types.setIfNotAlready( value );
 
 						expect( req.session.barriers[ id ][ key ] ).toEqual( value );
 					} );
@@ -250,7 +289,7 @@ describe( 'barrier session middleware', () => {
 						const existingValue = { existing: true };
 
 						req.session.barriers[ id ][ key ] = existingValue;
-						req.barrierSession.setIfNotAlready( key, value );
+						req.barrierSession.types.setIfNotAlready( value );
 
 						expect( req.session.barriers[ id ][ key ] ).toEqual( existingValue );
 					} );
