@@ -6,10 +6,15 @@ let controller;
 let req;
 let res;
 let next;
+let csrfToken;
 let backend;
 let ssoToken;
 let dashboardViewModel;
 let urls;
+let metadata;
+
+const OPEN = '100';
+const HIBERNATED = '101';
 
 describe( 'Index controller', () => {
 
@@ -32,31 +37,33 @@ describe( 'Index controller', () => {
 			me: jasmine.createSpy( 'urls.me' )
 		};
 
-		req = {
-			session: { ssoToken },
-			user: {},
-			params: {},
-			csrfToken: jasmine.createSpy( 'csrfToken' )
+		metadata = {
+			barrier: {
+				status: {
+					types: {
+						OPEN,
+						HIBERNATED
+					}
+				}
+			}
 		};
 
-		res = {
-			render: jasmine.createSpy( 'res.render' ),
-			redirect: jasmine.createSpy( 'res.redirect' ),
-			status: jasmine.createSpy( 'res.status' ),
-			json: jasmine.createSpy( 'res.json' ),
-			send: jasmine.createSpy( 'res.send' ),
-		};
+		( { req, res, next, csrfToken } = jasmine.helpers.mocks.middleware() );
 
-		next = jasmine.createSpy( 'next' );
+		req.session = { ssoToken };
 
 		controller = proxyquire( modulePath, {
 			'../lib/backend-service': backend,
 			'../lib/urls': urls,
 			'../view-models/dashboard': dashboardViewModel,
+			'../lib/metadata': metadata,
 		} );
 	} );
 
 	describe( 'Index', () => {
+
+		const status = [ OPEN, HIBERNATED ].join( ',' );
+
 		describe( 'Without an error', () => {
 			describe( 'With a success response', () => {
 				describe( 'When the user has a country', () => {
@@ -79,32 +86,61 @@ describe( 'Index controller', () => {
 						await controller.index( req, res, next );
 
 						expect( next ).not.toHaveBeenCalled();
-						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { country: country.id, status: '2,5' } );
+						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { country: country.id, status }, 'reported_on', 'desc' );
 						expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, country );
 						expect( res.render ).toHaveBeenCalledWith( 'my-country', dashboardViewModelResponse );
 					} );
 				} );
 
 				describe( 'When the user does NOT have a country', () => {
-					it( 'Should get all the reports and render the correct template', async () => {
 
-						const barriersResponse = {
+					let barriersResponse;
+					let dashboardViewModelResponse;
+
+					beforeEach( () => {
+
+						barriersResponse = {
 							response: { isSuccess: true  },
 							body: {
 								results: [ { id: 1 } ]
 							}
 						};
-						const dashboardViewModelResponse = { dashboard: true };
+						dashboardViewModelResponse = { dashboard: true };
 
 						dashboardViewModel.and.callFake( () => dashboardViewModelResponse );
 						backend.barriers.getAll.and.callFake( () => Promise.resolve( barriersResponse ) );
+					} );
 
-						await controller.index( req, res, next );
+					afterEach( () => {
 
 						expect( next ).not.toHaveBeenCalled();
-						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status: '2,5' } );
-						expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, req.user.country );
 						expect( res.render ).toHaveBeenCalledWith( 'index', dashboardViewModelResponse );
+					} );
+
+					describe( 'When there is not any sorting', () => {
+						it( 'Should get all the reports and render the correct template', async () => {
+
+							await controller.index( req, res, next );
+
+							expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'reported_on', 'desc' );
+							expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, req.user.country );
+						} );
+					} );
+
+					describe( 'When there is sorting', () => {
+						describe( 'Sorting by priority', () => {
+							it( 'Should get the report sorted correctly and render the correct template', async () => {
+
+								req.query = {
+									sortBy: 'priority',
+								};
+
+								await controller.index( req, res, next );
+
+								expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'priority', 'desc' );
+								expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, req.user.country );
+							} );
+						} );
 					} );
 				} );
 			} );
@@ -122,7 +158,7 @@ describe( 'Index controller', () => {
 					await controller.index( req, res, next );
 
 					expect( next ).toHaveBeenCalledWith( new Error( `Got ${ barriersResponse.response.statusCode } response from backend` ) );
-					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status: '2,5' } );
+					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'reported_on', 'desc' );
 					expect( res.render ).not.toHaveBeenCalled();
 				} );
 			} );
@@ -146,13 +182,9 @@ describe( 'Index controller', () => {
 		describe( 'a GET', () => {
 			it( 'Should render the me page', () => {
 
-				const token = uuid();
-
-				req.csrfToken.and.callFake( () => token );
-
 				controller.me( req, res );
 
-				expect( res.render ).toHaveBeenCalledWith( 'me', { csrfToken: token } );
+				expect( res.render ).toHaveBeenCalledWith( 'me', { csrfToken } );
 			} );
 		} );
 

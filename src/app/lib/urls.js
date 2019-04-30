@@ -43,7 +43,7 @@ const reportUrl = {
 	delete: ( reportId ) => `/reports/${ reportId }/delete/`,
 };
 
-function getParams( map ){
+function addParams( path, map = [] ){
 
 	const params = [];
 
@@ -52,16 +52,16 @@ function getParams( map ){
 		params.push( key + '=' + value );
 	}
 
-	return ( params.length ? '?' + params.join( '&' ) : '' );
+	return path + ( params.length ? '?' + params.join( '&' ) : '' );
 }
 
 module.exports = {
 
-	index: () => '/',
+	index: ( params ) => addParams( '/', params ),
 	login: () => '/login/',
 	me: () => '/me',
 	whatIsABarrier: () => '/what-is-a-barrier/',
-	findABarrier: ( params ) => '/find-a-barrier/' + ( params ? getParams( params ) : '' ),
+	findABarrier: ( params ) => addParams( '/find-a-barrier/', params ),
 
 	documents: {
 		download: ( documentId ) => `/documents/${ documentId }/download/`,

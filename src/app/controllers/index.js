@@ -1,6 +1,18 @@
 const urls = require( '../lib/urls' );
 const backend = require( '../lib/backend-service' );
+const { OPEN, HIBERNATED } = require( '../lib/metadata' ).barrier.status.types;
 const dashboardViewModel = require( '../view-models/dashboard' );
+
+const sortableFields = [ 'priority', 'date', 'location', 'status' ];
+const sortDirections = [ 'asc', 'desc' ];
+
+function getSort( { sortBy, sortDirection } ){
+
+	return {
+		sortBy: ( sortableFields.includes( sortBy ) ? sortBy : 'reported_on' ),
+		sortDirection: ( sortDirections.includes( sortDirection ) ? sortDirection : 'desc' ),
+	};
+}
 
 module.exports = {
 
@@ -8,10 +20,11 @@ module.exports = {
 
 		const country = req.user.country;
 		const countryId = country && req.user.country.id;
-		let template = 'index';
 		const filters = {
-			status: '2,5'
+			status: [ OPEN, HIBERNATED ].join( ',' ),
 		};
+		const { sortBy, sortDirection } = getSort( req.query );
+		let template = 'index';
 
 		if( countryId ){
 
@@ -21,7 +34,7 @@ module.exports = {
 
 		try {
 
-			const { response, body } = await backend.barriers.getAll( req, filters );
+			const { response, body } = await backend.barriers.getAll( req, filters, sortBy, sortDirection );
 
 			if( response.isSuccess ){
 
