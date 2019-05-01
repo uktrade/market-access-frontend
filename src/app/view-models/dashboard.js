@@ -5,7 +5,6 @@ const barrierStatusTypeInfo = metadata.barrier.status.typeInfo;
 
 function update( barrier ){
 
-	// barrier.all_sectors = true;
 	const countryId = barrier.export_country;
 	const country = metadata.countries.find( ( country ) => country.id === countryId );
 	const barrierStatusCode = barrier.status;
