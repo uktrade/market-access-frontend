@@ -5,11 +5,11 @@
       "id": "36542b85-7ee3-4077-8975-611cde06fa40",
       "name": "omnis eius illum"
    },
-   "registered_address_1": "Larson Street",
-   "registered_address_town": "Cristshire",
-   "registered_address_county": "Buckinghamshire",
-   "registered_address_postcode": "39226-5480",
-   "registered_address_country": {
+   "address.line_1": "Larson Street",
+   "address.town": "Cristshire",
+   "address.county": "Buckinghamshire",
+   "address.postcode": "39226-5480",
+   "address.country": {
       "name": "Belgium"
    }
 }

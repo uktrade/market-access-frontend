@@ -76,13 +76,13 @@ describe( 'metadata', () => {
 
 	describe( 'With fakeData', () => {
 
-		let duplicateBarrierTypes;
+		let uniqueBarrierTypes;
 
 		beforeEach( async () => {
 
 			const body = getFakeData( '/backend/metadata/' );
+			uniqueBarrierTypes = [ ...body.barrier_types ];
 			body.barrier_types.push( fakeData.barrier_types[ 0 ], fakeData.barrier_types[ 1 ] );
-			duplicateBarrierTypes = body.barrier_types;
 
 			backend.get.and.callFake( () => Promise.resolve( {
 				response: { isSuccess: true },
@@ -125,7 +125,8 @@ describe( 'metadata', () => {
 				const output = [
 					fakeData.countries[ 0 ],
 					fakeData.countries[ 1 ],
-					fakeData.countries[ 3 ]
+					fakeData.countries[ 2 ],
+					fakeData.countries[ 4 ],
 				].map( ( { id, name } ) => ({ id, name }) );
 
 				expect( metadata.countries ).toEqual( output );
@@ -136,8 +137,8 @@ describe( 'metadata', () => {
 			it( 'Should get the country', () => {
 
 				const country = {
-					id: fakeData.countries[ 1 ].id,
-					name: fakeData.countries[ 1 ].name
+					id: fakeData.countries[ 2 ].id,
+					name: fakeData.countries[ 2 ].name
 				};
 
 				expect( metadata.getCountry( '9a662aa0-99ba-4f3b-835a-859fe210e9c2' ) ).toEqual( country );
@@ -181,8 +182,8 @@ describe( 'metadata', () => {
 			it( 'Should return the data', () => {
 
 				expect( metadata.overseasRegions ).toEqual( [
-					fakeData.countries[ 3 ].overseas_region,
-					fakeData.countries[ 1 ].overseas_region,
+					fakeData.countries[ 4 ].overseas_region,
+					fakeData.countries[ 2 ].overseas_region,
 				] );
 			} );
 		} );
@@ -191,8 +192,8 @@ describe( 'metadata', () => {
 			it( 'Should get the region', () => {
 
 				const region = {
-					id: fakeData.countries[ 1 ].overseas_region.id,
-					name: fakeData.countries[ 1 ].overseas_region.name
+					id: fakeData.countries[ 2 ].overseas_region.id,
+					name: fakeData.countries[ 2 ].overseas_region.name
 				};
 
 				expect( metadata.getOverseasRegion( 'd9fdeed8-247e-4f54-8fd2-e86077e9faf3' ) ).toEqual( region );
@@ -311,7 +312,7 @@ describe( 'metadata', () => {
 			it( 'Should return the list', () => {
 
 				expect( metadata.barrierTypes ).toBeDefined();
-				expect( metadata.barrierTypes ).toEqual( duplicateBarrierTypes );
+				expect( metadata.barrierTypes ).toEqual( uniqueBarrierTypes );
 			} );
 		} );
 
@@ -569,6 +570,35 @@ describe( 'metadata', () => {
 
 				expect( metadata.mimeTypes ).toBeDefined();
 				expect( metadata.mimeTypes[ 'text/plain' ] ).toEqual( '.txt' );
+			} );
+		} );
+
+		describe( 'barrier', () => {
+			it( 'Should expose the required data', () => {
+
+				const OPEN = 2;
+				const RESOLVED = 4;
+				const HIBERNATED = 5;
+
+				expect( metadata.barrier ).toEqual( {
+					status: {
+						types: {
+							OPEN,
+							RESOLVED,
+							HIBERNATED
+						},
+						typeInfo: {
+							[ OPEN ]: { name: 'Open', modifyer: 'assessment' },
+							[ RESOLVED ]: { name: 'Resolved', modifyer: 'resolved' },
+							[ HIBERNATED ]: { name: 'Paused', modifyer: 'hibernated' }
+						}
+					},
+					priority: {
+						codes: {
+							UNKNOWN: 'UNKNOWN'
+						}
+					}
+				} );
 			} );
 		} );
 	} );

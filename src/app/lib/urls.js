@@ -27,10 +27,12 @@ const reportUrl = {
 	start: ( reportId ) => `/reports/${ getReportPath( reportId ) }/start/`,
 	isResolved: ( reportId ) => `/reports/${ getReportPath( reportId ) }/is-resolved/`,
 	country: ( reportId ) => `/reports/${ getReportPath( reportId ) }/country/`,
-	hasAdminAreas: ( reportId, countryId ) => `/reports/${ getReportPath( reportId ) }/country/${countryId}/has-admin-areas/`,
-	adminAreas: (reportId, countryId) => `/reports/${ getReportPath( reportId ) }/country/${countryId}/admin-areas/`,
-	addAdminArea: ( reportId, countryId ) => `/reports/${ getReportPath( reportId ) }/country/${countryId}/admin-areas/add/`,
-	removeAdminArea: ( reportId, countryId ) => `/reports/${ getReportPath( reportId ) }/country/${countryId}/admin-areas/remove/`,
+	hasAdminAreas: ( reportId, countryId ) => `/reports/${ getReportPath( reportId ) }/country/${ countryId }/has-admin-areas/`,
+	adminAreas: {
+		list: ( reportId, countryId ) => `/reports/${ getReportPath( reportId ) }/country/${ countryId }/admin-areas/`,
+		add: ( reportId, countryId ) => `/reports/${ getReportPath( reportId ) }/country/${ countryId }/admin-areas/add/`,
+		remove: ( reportId, countryId ) => `/reports/${ getReportPath( reportId ) }/country/${ countryId }/admin-areas/remove/`,
+	},
 	hasSectors: ( reportId ) => `/reports/${ reportId }/has-sectors/`,
 	allSectors: ( reportId ) => `/reports/${ reportId }/all-sectors/`,
 	sectors: ( reportId ) => `/reports/${ reportId }/sectors/`,
@@ -39,6 +41,7 @@ const reportUrl = {
 	aboutProblem: ( reportId ) => `/reports/${ reportId }/problem/`,
 	summary: ( reportId ) => `/reports/${ reportId }/summary/`,
 	submit: ( reportId ) => `/reports/${ reportId }/submit/`,
+	delete: ( reportId ) => `/reports/${ reportId }/delete/`,
 };
 
 function getParams( map ){
@@ -74,6 +77,7 @@ module.exports = {
 			source: ( barrierId ) => `/barriers/${ barrierId }/edit/source/`,
 			priority: ( barrierId ) => `/barriers/${ barrierId }/edit/priority/`,
 			euExitRelated: (barrierId) => `/barriers/${barrierId}/edit/eu-exit-related/`,
+			problemStatus: ( barrierId ) => `/barriers/${ barrierId }/edit/problem-status/`,
 			status: ( barrierId ) => `/barriers/${ barrierId }/edit/status/`,
 		},
 		documents: {
@@ -83,6 +87,7 @@ module.exports = {
 		},
 		notes: {
 			add: ( barrierId ) => `/barriers/${ barrierId }/interactions/add-note/`,
+			delete: ( barrierId, noteId ) => `/barriers/${ barrierId }/interactions/delete-note/${ noteId }/`,
 			edit: ( barrierId, noteId ) => `/barriers/${ barrierId }/interactions/edit-note/${ noteId }/`,
 			documents: {
 				add: ( barrierId, noteId ) => `/barriers/${ barrierId }/interactions/notes/${ noteId }/documents/add/`,
@@ -91,9 +96,12 @@ module.exports = {
 			},
 		},
 		status: ( barrierId ) => `/barriers/${ barrierId }/status/`,
-		type: {
-			category: ( barrierId ) => `/barriers/${ barrierId }/type/`,
-			list: ( barrierId, category ) => `/barriers/${ barrierId }/type/${ category }/`
+		types: {
+			list: ( barrierId ) => `/barriers/${ barrierId }/types/`,
+			edit: ( barrierId ) => `/barriers/${ barrierId }/types/edit/`,
+			new: ( barrierId ) => `/barriers/${ barrierId }/types/new/`,
+			add: ( barrierId ) => `/barriers/${ barrierId }/types/add/`,
+			remove: ( barrierId ) => `/barriers/${ barrierId }/types/remove/`,
 		},
 		sectors: {
 			edit: ( barrierId ) => `/barriers/${ barrierId }/sectors/edit/`,
@@ -104,12 +112,15 @@ module.exports = {
 		},
 		location: {
 			list: ( barrierId ) => `/barriers/${ barrierId }/location/`,
-			edit: ( barrierId ) => `/barriers/${ barrierId }/location/edit`,
-			country: ( barrierId ) => `/barriers/${ barrierId }/location/country`,
-			add_admin_area: ( barrierId ) => `/barriers/${ barrierId }/location/admin-areas/add`,
-			remove_admin_area: ( barrierId ) => `/barriers/${ barrierId }/location/admin-areas/remove`,
+			edit: ( barrierId ) => `/barriers/${ barrierId }/location/edit/`,
+			country: ( barrierId ) => `/barriers/${ barrierId }/location/country/`,
+			adminAreas: {
+				add: ( barrierId ) => `/barriers/${ barrierId }/location/add-admin-area/`,
+				remove: ( barrierId ) => `/barriers/${ barrierId }/location/remove-admin-area/`,
+			}
 		},
 		companies: {
+			new: ( barrierId ) => `/barriers/${ barrierId }/companies/new/`,
 			edit: ( barrierId ) => `/barriers/${ barrierId }/companies/edit/`,
 			list: ( barrierId ) => `/barriers/${ barrierId }/companies/`,
 			details: ( barrierId, companyId ) => `/barriers/${ barrierId }/companies/${ companyId }/`,

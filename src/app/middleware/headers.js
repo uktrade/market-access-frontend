@@ -1,3 +1,4 @@
+/* eslint quotes: 0 */
 const cspValues = [
 
 	`default-src 'none'`,

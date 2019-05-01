@@ -5,6 +5,56 @@ const urls = require( '../../../lib/urls' );
 
 const LIST_TEMPLATE = 'barriers/views/companies/list';
 
+async function search( req, res, next ){
+
+	let results;
+	let error;
+	const companies = ( req.session.barrierCompanies || req.barrier.companies );
+	const form = new Form( req, {
+		query: {
+			required: 'Enter a company or organisation affect by the barrier'
+		}
+	} );
+
+	if( form.isPost ){
+
+		form.validate();
+
+		if( !form.hasErrors() ){
+
+			try {
+
+				const { response, body } = await datahub.searchCompany( form.getValues().query, 1, 100 );
+
+				if( response.isSuccess ){
+
+					results = body;
+
+				} else {
+
+					switch( response.statusCode ){
+
+						case 404:
+							error = 'No company found';
+						break;
+						default:
+							error = 'There was an error finding the company';
+					}
+				}
+
+			} catch( e ){
+
+				return next( e );
+			}
+		}
+	}
+
+	res.render( 'barriers/views/companies/search', Object.assign(
+		form.getTemplateValues(),
+		{ results, error, companies }
+	) );
+}
+
 module.exports = {
 
 	edit: ( req, res ) => {
@@ -15,6 +65,13 @@ module.exports = {
 			csrfToken: req.csrfToken(),
 			companyList: req.session.barrierCompanies
 		} );
+	},
+
+	new: ( req, res, next ) => {
+
+		req.session.barrierCompanies = [];
+
+		search( req, res, next );
 	},
 
 	list: async ( req, res, next ) => {
@@ -60,58 +117,7 @@ module.exports = {
 		}
 	},
 
-	search: async ( req, res, next ) => {
-
-		let results;
-		let error;
-		const companies = ( req.session.barrierCompanies || req.barrier.companies );
-		const form = new Form( req, {
-			query: {
-				required: 'Enter a company or organisation affect by the barrier'
-			}
-		} );
-
-		if( form.isPost ){
-
-			form.validate();
-
-			if( !form.hasErrors() ){
-
-				try {
-
-					const { response, body } = await datahub.searchCompany( req, form.getValues().query, 1, 100 );
-
-					if( response.isSuccess ){
-
-						results = body;
-
-					} else {
-
-						switch( response.statusCode ){
-
-							case 404:
-								error = 'No company found';
-							break;
-							case 403:
-								error = 'You do not have permission to search for a company, please contact Data Hub support.';
-							break;
-							default:
-								error = 'There was an error finding the company';
-						}
-					}
-
-				} catch( e ){
-
-					return next( e );
-				}
-			}
-		}
-
-		res.render( 'barriers/views/companies/search', Object.assign(
-			form.getTemplateValues(),
-			{ results, error, companies }
-		) );
-	},
+	search,
 
 	details: ( req, res ) => {
 

@@ -3,6 +3,7 @@ const FormProcessor = require( '../../../lib/FormProcessor' );
 const metadata = require( '../../../lib/metadata' );
 const validators = require( '../../../lib/validators' );
 const govukItemsFromObj = require( '../../../lib/govuk-items-from-object' );
+const getDateParts = require( '../../../lib/get-date-parts' );
 const backend = require( '../../../lib/backend-service' );
 const urls = require( '../../../lib/urls' );
 
@@ -92,6 +93,70 @@ module.exports = {
 		}
 	},
 
+	status: async ( req, res, next ) => {
+
+		
+		const barrier = req.barrier;
+		const isResolved = barrier.status === metadata.barrier.status.types.RESOLVED;
+
+		const formFields = {
+			statusSummary: {
+				values: [ barrier.status_summary ],
+				required: 'Enter a summary'
+			}
+		};
+		if (isResolved) { 
+			const invalidDateMessage = 'Enter resolution date and include a month and year';
+			const resolvedDateValues = getDateParts(barrier.status_date );
+
+			formFields.statusDate = {
+				type: Form.GROUP,
+				validators: [ {
+					fn: validators.isDateValue( 'month' ),
+					message: invalidDateMessage
+				},{
+					fn: validators.isDateValue( 'year' ),
+					message: invalidDateMessage
+				},{
+					fn: validators.isDateNumeric,
+					message: 'Resolution date must only include numbers'
+				},{
+					fn: validators.isDateValid,
+					message: invalidDateMessage
+				},{
+					fn: validators.isDateInPast,
+					message: 'Resolution date must be this month or in the past'
+				} ],
+				items: {
+					month: {
+						values: [ resolvedDateValues.month ]
+					},
+					year: {
+						values: [ resolvedDateValues.year ]
+					}
+				}
+			};
+		}
+		
+		const form = new Form( req, formFields);
+
+		const processor = new FormProcessor( {
+			form,
+			render: ( templateValues ) => res.render( 'barriers/views/edit/status', Object.assign(templateValues, {isResolved}) ),
+			saveFormData: ( formValues ) => backend.barriers.saveStatus( req, barrier.id, formValues ),
+			saved: () => res.redirect( urls.barriers.detail( barrier.id ) )
+		} );
+
+		try {
+
+			await processor.process();
+
+		} catch( e ){
+
+			next( e );
+		}
+	},
+
 	source:  async ( req, res, next ) => {
 
 		const barrier = req.barrier;
@@ -153,7 +218,10 @@ module.exports = {
 
 		const processor = new FormProcessor( {
 			form,
-			render: ( templateValues ) => res.render( 'barriers/views/edit/priority', templateValues ),
+			render: ( templateValues ) => res.render( 'barriers/views/edit/priority', {
+				...templateValues,
+				isUnknown: ( barrier.priority.code === metadata.barrier.priority.codes.UNKNOWN )
+			} ),
 			saveFormData: ( formValues ) => backend.barriers.savePriority( req, barrier.id, formValues ),
 			saved: () => res.redirect( urls.barriers.detail( barrier.id ) )
 		} );
@@ -200,12 +268,12 @@ module.exports = {
 		}
 	},
 
-	status: async ( req, res, next ) => {
+	problemStatus: async ( req, res, next ) => {
 
 		const barrier = req.barrier;
 
 		const form = new Form( req, {
-			status: {
+			problemStatus: {
 				type: Form.RADIO,
 				values: [ barrier.problem_status ],
 				items: govukItemsFromObj( metadata.statusTypes ),
@@ -218,8 +286,8 @@ module.exports = {
 
 		const processor = new FormProcessor( {
 			form,
-			render: ( templateValues ) => res.render( 'barriers/views/edit/status', templateValues ),
-			saveFormData: ( formValues ) => backend.barriers.saveStatus( req, barrier.id, formValues ),
+			render: ( templateValues ) => res.render( 'barriers/views/edit/problem-status', templateValues ),
+			saveFormData: ( formValues ) => backend.barriers.saveProblemStatus( req, barrier.id, formValues ),
 			saved: () => res.redirect( urls.barriers.detail( barrier.id ) )
 		} );
 

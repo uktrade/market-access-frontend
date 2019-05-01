@@ -31,7 +31,7 @@ describe( 'Find a barrier controller', () => {
 		};
 		viewModel = jasmine.createSpy( 'view-model' );
 		validators = {
-			isCountry: jasmine.createSpy( 'validators.isCountry' ),
+			isCountryOrAdminArea: jasmine.createSpy( 'validators.isCountryOrAdminArea' ),
 			isOverseasRegion: jasmine.createSpy( 'validators.isOverseasRegion' ),
 			isSector: jasmine.createSpy( 'validators.isSector' ),
 			isBarrierType: jasmine.createSpy( 'validators.isBarrierType' ),
@@ -95,7 +95,7 @@ describe( 'Find a barrier controller', () => {
 			describe( 'When the country is valid', () => {
 				it( 'Should render the template with a filter', async () => {
 
-					validators.isCountry.and.callFake( () => true );
+					validators.isCountryOrAdminArea.and.callFake( () => true );
 
 					await controller( req, res, next );
 
@@ -106,7 +106,7 @@ describe( 'Find a barrier controller', () => {
 			describe( 'When the country is NOT valid', () => {
 				it( 'Should render the template without filters', async () => {
 
-					validators.isCountry.and.callFake( () => false );
+					validators.isCountryOrAdminArea.and.callFake( () => false );
 
 					await controller( req, res, next );
 

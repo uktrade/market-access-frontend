@@ -132,7 +132,7 @@ describe( 'Barrier status controller', () => {
 
 			expect( config.status ).toBeDefined();
 			expect( config.status.type ).toEqual( RADIO );
-			expect( config.status.values ).toEqual( [ barrier.current_status.status ] );
+			expect( config.status.values ).toEqual( [ barrier.status ] );
 			expect( Array.isArray( config.status.items ) ).toEqual( true );
 			expect( typeof config.status.validators[ 0 ].fn ).toEqual( 'function' );
 
@@ -177,7 +177,6 @@ describe( 'Barrier status controller', () => {
 
 			barrier = {
 				id: uuid(),
-				current_status: {}
 			};
 			req.barrier = barrier;
 
@@ -200,7 +199,7 @@ describe( 'Barrier status controller', () => {
 
 			beforeEach( () => {
 
-				barrier.current_status.status = 2;
+				barrier.status = 2;
 			} );
 
 			it( 'Should setup the form correctly', () => {
@@ -473,7 +472,7 @@ describe( 'Barrier status controller', () => {
 
 			beforeEach( () => {
 
-				barrier.current_status.status = 4;
+				barrier.status = 4;
 			} );
 
 			it( 'Should setup the form correctly', () => {
@@ -540,7 +539,7 @@ describe( 'Barrier status controller', () => {
 
 			beforeEach( () => {
 
-				barrier.current_status.status = 5;
+				barrier.status = 5;
 			} );
 
 			it( 'Should setup the form correctly', () => {

@@ -11,6 +11,7 @@ describe( 'Barrier interactions controller', () => {
 	let req;
 	let res;
 	let next;
+	let csrfToken;
 	let backend;
 	let urls;
 	let config;
@@ -29,7 +30,7 @@ describe( 'Barrier interactions controller', () => {
 
 	beforeEach( () => {
 
-		( { req, res, next } = mocks.middleware() );
+		( { req, res, next, csrfToken } = mocks.middleware() );
 		barrierId = uuid();
 		config = {
 			addCompany: false,
@@ -51,6 +52,7 @@ describe( 'Barrier interactions controller', () => {
 				notes: {
 					save: jasmine.createSpy( 'backend.barriers.notes.save' ),
 					update: jasmine.createSpy( 'backend.barriers.notes.update' ),
+					delete: jasmine.createSpy( 'backend.barriers.notes.delete' ),
 				}
 			}
 		};
@@ -150,12 +152,12 @@ describe( 'Barrier interactions controller', () => {
 		return { barrierDetailViewModelResponse, interactionsViewModelResponse };
 	}
 
-	async function check( addCompany ){
+	async function check( controller, addCompany, data = {} ){
 
 		const { interactionsResponse, historyResponse } = returnSuccessResponses();
 		const { barrierDetailViewModelResponse, interactionsViewModelResponse } = returnViewModels();
 
-		await controller.list( req, res, next );
+		await controller( req, res, next );
 
 		expect( next ).not.toHaveBeenCalled();
 		expect( backend.barriers.getInteractions ).toHaveBeenCalledWith( req, barrierId );
@@ -166,10 +168,11 @@ describe( 'Barrier interactions controller', () => {
 			history: historyResponse.body
 		}, undefined );
 
-		expect( res.render ).toHaveBeenCalledWith( 'barriers/views/detail', Object.assign( {},
-			barrierDetailViewModelResponse,
-			{ interactions: interactionsViewModelResponse }
-		) );
+		expect( res.render ).toHaveBeenCalledWith( 'barriers/views/detail',  {
+			...barrierDetailViewModelResponse,
+			interactions: interactionsViewModelResponse,
+			...data
+		} );
 	}
 
 	function checkAddDocument( getMethod, passedCb ){
@@ -309,7 +312,7 @@ describe( 'Barrier interactions controller', () => {
 		} );
 	}
 
-	describe( 'With an missing mime type map', () => {
+	describe( 'With a missing mime type map', () => {
 		it( 'Should report the error', () => {
 
 			config.files.types.push( 'fake/mime' );
@@ -332,6 +335,12 @@ describe( 'Barrier interactions controller', () => {
 	} );
 
 	describe( 'list', () => {
+
+		async function checkList( addCompany ){
+
+			await check( controller.list, addCompany );
+		}
+
 		describe( 'Without an error', () => {
 			describe( 'With a success response', () => {
 				describe( 'With config.addCompany set to true', () => {
@@ -344,7 +353,7 @@ describe( 'Barrier interactions controller', () => {
 					describe( 'With no query', () => {
 						it( 'Should render the barrier detail page with addCompany true', async () => {
 
-							await check( true );
+							await checkList( true );
 						} );
 					} );
 
@@ -353,7 +362,7 @@ describe( 'Barrier interactions controller', () => {
 
 							req.query.addCompany = true;
 
-							await check( true );
+							await checkList( true );
 						} );
 					} );
 				} );
@@ -367,7 +376,7 @@ describe( 'Barrier interactions controller', () => {
 					describe( 'With no query', () => {
 						it( 'Should render the barrier detail page with addCompany false', async () => {
 
-							await check( false );
+							await checkList( false );
 						} );
 					} );
 
@@ -376,7 +385,7 @@ describe( 'Barrier interactions controller', () => {
 
 							req.query.addCompany = true;
 
-							await check( true );
+							await checkList( true );
 						} );
 					} );
 				} );
@@ -468,14 +477,6 @@ describe( 'Barrier interactions controller', () => {
 	describe( 'notes', () => {
 
 		const template = 'barriers/views/detail';
-		let barrier;
-
-		beforeEach( () => {
-
-			barrier = getFakeData( '/backend/barriers/barrier' );
-
-			req.barrier = barrier;
-		} );
 
 		function checkFormConfig(){
 
@@ -616,7 +617,7 @@ describe( 'Barrier interactions controller', () => {
 						config.saved();
 
 						expect( res.redirect ).toHaveBeenCalledWith( detailUrlResponse );
-						expect( urls.barriers.detail ).toHaveBeenCalledWith( barrier.id );
+						expect( urls.barriers.detail ).toHaveBeenCalledWith( barrierId );
 						expect( next ).not.toHaveBeenCalled();
 						expect( req.session.barrierDocuments ).toEqual( sessionDocs );
 					}
@@ -645,7 +646,7 @@ describe( 'Barrier interactions controller', () => {
 						describe( 'With a matching doc', () => {
 							it( 'Should configure the FormProcessor correctly', async () => {
 
-								const matchingDoc = { barrierId: barrier.id, document: { name: 'match.jpg', size: 30 } };
+								const matchingDoc = { barrierId, document: { name: 'match.jpg', size: 30 } };
 								req.session.barrierDocuments = [ nonMatchingDoc1, nonMatchingDoc2, matchingDoc ];
 
 								await checkProcessor({
@@ -848,7 +849,7 @@ describe( 'Barrier interactions controller', () => {
 					config.saved();
 
 					expect( res.redirect ).toHaveBeenCalledWith( detailUrlResponse );
-					expect( urls.barriers.detail ).toHaveBeenCalledWith( barrier.id );
+					expect( urls.barriers.detail ).toHaveBeenCalledWith( barrierId );
 				}
 
 				describe( 'With no documents in the session', () => {
@@ -943,6 +944,96 @@ describe( 'Barrier interactions controller', () => {
 					await controller.notes.edit( req, res, next );
 
 					expect( next ).toHaveBeenCalledWith( err );
+				} );
+			} );
+		} );
+
+		describe( 'delete', () => {
+
+			let note;
+
+			beforeEach( () => {
+
+				note = {	id: 123 };
+				req.note = note;
+			} );
+
+			describe( 'A GET request', () => {
+				describe( 'An XHR request', () => {
+					it( 'Should render the partial with the correct context', async () => {
+
+						req.xhr = true;
+
+						await controller.notes.delete( req, res, next );
+
+						expect( res.render ).toHaveBeenCalledWith( 'barriers/views/partials/delete-note-modal', { note, csrfToken } );
+					} );
+				} );
+
+				describe( 'A normal request', () => {
+					describe( 'With a success resonse', () => {
+						it( 'Should render the view with the correct context', async () => {
+
+							await check( controller.notes.delete, false, {
+								isDelete: true,
+								currentNote: note,
+								csrfToken,
+							} );
+						} );
+					} );
+				} );
+			} );
+
+			describe( 'A POST', () => {
+
+				beforeEach( () => {
+
+					req.method = 'POST';
+				} );
+
+				describe( 'When the service rejects', () => {
+					it( 'Should call next with an error', async () => {
+
+						const err = new Error( 'some rejection' );
+
+						backend.barriers.notes.delete.and.callFake( () => Promise.reject( err ) );
+
+						await controller.notes.delete( req, res, next );
+
+						expect( next ).toHaveBeenCalledWith( err );
+						expect( res.render ).not.toHaveBeenCalled();
+					} );
+				} );
+
+				describe( 'When the service resolves', () => {
+					describe( 'When it is a success', () => {
+						it( 'Should redirect to the detail page', async () => {
+
+							const detailResponse = { detail: true };
+
+							urls.barriers.detail.and.callFake( () => detailResponse );
+							backend.barriers.notes.delete.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+
+							await controller.notes.delete( req, res, next );
+
+							expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
+							expect( urls.barriers.detail ).toHaveBeenCalledWith( barrierId );
+						} );
+					} );
+
+					describe( 'When it is a 500', () => {
+						it( 'Should call next with an error', async () => {
+
+							const statusCode = 500;
+
+							backend.barriers.notes.delete.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
+
+							await controller.notes.delete( req, res, next );
+
+							expect( res.redirect ).not.toHaveBeenCalled();
+							expect( next ).toHaveBeenCalledWith( new Error( `Could not delete note, got ${ statusCode } from backend` ) );
+						} );
+					} );
 				} );
 			} );
 		} );
