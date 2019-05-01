@@ -38,6 +38,7 @@ describe( 'Barrier detail view model', () => {
 			getCountry: jasmine.createSpy( 'metadata.getCountry' ),
 			getAdminArea: jasmine.createSpy('meta.getAdminArea'),
 			getSector: jasmine.createSpy( 'metadata.getSector' ),
+			getBarrierType: jasmine.createSpy( 'metdata.getBarrierType' ),
 			barrierSource: {
 				'COMPANY': 'company',
 				'TRADE': 'trade',
@@ -51,7 +52,12 @@ describe( 'Barrier detail view model', () => {
 				1: 'A',
 				2: 'B',
 				3: 'C'
-			}
+			},
+			barrierTypes: [
+				{ title: 'A', description: 'a description' },
+				{ title: 'B', description: 'b description' },
+				{ title: 'C', description: 'c description' },
+			]
 		};
 
 		config = { addCompany: false };
@@ -59,7 +65,8 @@ describe( 'Barrier detail view model', () => {
 
 		metadata.getCountry.and.callFake( () => metadata.countries[ 3 ] );
 		metadata.getSector.and.callFake( () => metadata.sectors[ 1 ] );
-		metadata.getAdminArea.and.callFake( () => metadata.adminAreas[0]);
+		metadata.getAdminArea.and.callFake( () => metadata.adminAreas[ 0 ] );
+		metadata.getBarrierType.and.callFake( () => metadata.barrierTypes[ 1 ] );
 
 		viewModel = proxyquire( modulePath, {
 			'../../../lib/metadata': metadata,
@@ -71,7 +78,7 @@ describe( 'Barrier detail view model', () => {
 	describe( 'With all the data on an open barrier', () => {
 		it( 'Should create all the correct properties', () => {
 
-			inputBarrier.current_status.status = 2;
+			inputBarrier.status = 2;
 			inputBarrier.problem_status = '2';
 
 			const output = viewModel( inputBarrier );
@@ -84,20 +91,17 @@ describe( 'Barrier detail view model', () => {
 			expect( outputBarrier.product ).toEqual( inputBarrier.product );
 			expect( outputBarrier.problem.status ).toEqual( metadata.statusTypes[ inputBarrier.problem_status ] );
 			expect( outputBarrier.problem.description ).toEqual( inputBarrier.problem_description );
-			expect( outputBarrier.type ).toEqual( {
-				id: inputBarrier.barrier_type.id,
-				title: inputBarrier.barrier_type.title,
-				description: inputBarrier.barrier_type.description,
-				category: {
-					id: inputBarrier.barrier_type.category,
-					name: metadata.barrierTypeCategories[ inputBarrier.barrier_type.category ]
-				}
-			} );
+			expect( outputBarrier.types ).toEqual( [
+				{ text: metadata.barrierTypes[ 1 ].title },
+				{ text: metadata.barrierTypes[ 1 ].title },
+				{ text: metadata.barrierTypes[ 1 ].title },
+				{ text: metadata.barrierTypes[ 1 ].title },
+			] );
 			expect( outputBarrier.status ).toEqual( {
 				name: 'Open',
 				modifyer: 'assessment',
-				date: inputBarrier.current_status.status_date,
-				description: inputBarrier.current_status.status_summary
+				date: inputBarrier.status_date,
+				description: inputBarrier.status_summary
 			} );
 			expect( outputBarrier.reportedOn ).toEqual( inputBarrier.reported_on );
 			expect( outputBarrier.addedBy ).toEqual( inputBarrier.reported_by );
@@ -144,7 +148,7 @@ describe( 'Barrier detail view model', () => {
 	describe( 'With sectors missing on an open barrier', () => {
 		it( 'Should create all the correct properties', () => {
 
-			inputBarrier.current_status.status = 2;
+			inputBarrier.status = 2;
 			inputBarrier.sectors = null;
 
 			const output = viewModel( inputBarrier );
@@ -164,7 +168,7 @@ describe( 'Barrier detail view model', () => {
 
 			metadata.getSector.and.callFake( () => null );
 
-			inputBarrier.current_status.status = 2;
+			inputBarrier.status = 2;
 			inputBarrier.sectors = [ null ];
 
 			const output = viewModel( inputBarrier );
@@ -178,12 +182,12 @@ describe( 'Barrier detail view model', () => {
 	describe( 'With barrier_type missing', () => {
 		it( 'Should create all the correct properties', () => {
 
-			inputBarrier.barrier_type = null;
+			inputBarrier.barrier_types = null;
 
 			const output = viewModel( inputBarrier );
 			const outputBarrier = output.barrier;
 
-			expect( outputBarrier.type ).toEqual( null );
+			expect( outputBarrier.types ).toEqual( [] );
 		} );
 	} );
 
@@ -202,7 +206,7 @@ describe( 'Barrier detail view model', () => {
 	describe( 'A resolved barrier', () => {
 		it( 'Should have the correct properties', () => {
 
-			inputBarrier.current_status.status = 4;
+			inputBarrier.status = 4;
 
 			const output = viewModel( inputBarrier );
 			const outputBarrier = output.barrier;
@@ -210,8 +214,8 @@ describe( 'Barrier detail view model', () => {
 			expect( outputBarrier.status ).toEqual( {
 				name: 'Resolved',
 				modifyer: 'resolved',
-				date: inputBarrier.current_status.status_date,
-				description: inputBarrier.current_status.status_summary
+				date: inputBarrier.status_date,
+				description: inputBarrier.status_summary
 			} );
 
 			expect( outputBarrier.isOpen ).toEqual( false );
@@ -247,7 +251,7 @@ describe( 'Barrier detail view model', () => {
 	describe( 'A hibernated barrier', () => {
 		it( 'Should have the correct properties', () => {
 
-			inputBarrier.current_status.status = 5;
+			inputBarrier.status = 5;
 
 			const output = viewModel( inputBarrier );
 			const outputBarrier = output.barrier;
@@ -255,8 +259,8 @@ describe( 'Barrier detail view model', () => {
 			expect( outputBarrier.status ).toEqual( {
 				name: 'Paused',
 				modifyer: 'hibernated',
-				date: inputBarrier.current_status.status_date,
-				description: inputBarrier.current_status.status_summary
+				date: inputBarrier.status_date,
+				description: inputBarrier.status_summary
 			} );
 
 			expect( outputBarrier.isOpen ).toEqual( false );

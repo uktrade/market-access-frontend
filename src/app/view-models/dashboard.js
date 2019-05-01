@@ -8,7 +8,7 @@ function update( barrier ){
 	// barrier.all_sectors = true;
 	const countryId = barrier.export_country;
 	const country = metadata.countries.find( ( country ) => country.id === countryId );
-	const barrierStatusCode = barrier.current_status.status;
+	const barrierStatusCode = barrier.status;
 	const status = barrierStatusTypeInfo[ barrierStatusCode ] || {};
 	const priority = {
 		...barrier.priority,

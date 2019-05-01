@@ -76,13 +76,13 @@ describe( 'metadata', () => {
 
 	describe( 'With fakeData', () => {
 
-		let duplicateBarrierTypes;
+		let uniqueBarrierTypes;
 
 		beforeEach( async () => {
 
 			const body = getFakeData( '/backend/metadata/' );
+			uniqueBarrierTypes = [ ...body.barrier_types ];
 			body.barrier_types.push( fakeData.barrier_types[ 0 ], fakeData.barrier_types[ 1 ] );
-			duplicateBarrierTypes = body.barrier_types;
 
 			backend.get.and.callFake( () => Promise.resolve( {
 				response: { isSuccess: true },
@@ -312,7 +312,7 @@ describe( 'metadata', () => {
 			it( 'Should return the list', () => {
 
 				expect( metadata.barrierTypes ).toBeDefined();
-				expect( metadata.barrierTypes ).toEqual( duplicateBarrierTypes );
+				expect( metadata.barrierTypes ).toEqual( uniqueBarrierTypes );
 			} );
 		} );
 
@@ -570,6 +570,35 @@ describe( 'metadata', () => {
 
 				expect( metadata.mimeTypes ).toBeDefined();
 				expect( metadata.mimeTypes[ 'text/plain' ] ).toEqual( '.txt' );
+			} );
+		} );
+
+		describe( 'barrier', () => {
+			it( 'Should expose the required data', () => {
+
+				const OPEN = 2;
+				const RESOLVED = 4;
+				const HIBERNATED = 5;
+
+				expect( metadata.barrier ).toEqual( {
+					status: {
+						types: {
+							OPEN,
+							RESOLVED,
+							HIBERNATED
+						},
+						typeInfo: {
+							[ OPEN ]: { name: 'Open', modifyer: 'assessment' },
+							[ RESOLVED ]: { name: 'Resolved', modifyer: 'resolved' },
+							[ HIBERNATED ]: { name: 'Paused', modifyer: 'hibernated' }
+						}
+					},
+					priority: {
+						codes: {
+							UNKNOWN: 'UNKNOWN'
+						}
+					}
+				} );
 			} );
 		} );
 	} );

@@ -16,7 +16,6 @@
 		"countries",
 		"sectors",
 		"barrier_status",
-		"barrier_type_categories",
 		"barrier_source",
 		"barrier_priorities"
 	],
@@ -121,7 +120,7 @@
 			"type": "array",
 			"minItems": 10,
 			"maxItems": 20,
-			"items": { "$ref": "$refs/common.json#/barrier_type" }
+			"items": { "$ref": "$refs/common.json#/uuid" }
 		},
 
 		"countries": {

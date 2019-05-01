@@ -4,6 +4,45 @@ const urls = require( '../../../lib/urls' );
 const reportDetailViewModel = require( '../view-models/detail' );
 const reportsViewModel = require( '../view-models/reports' );
 
+async function renderDashboard( req, res, next, isDelete = false, currentReportId ){
+
+	const country = req.user.country;
+	const countryId = country && req.user.country.id;
+	const csrfToken = req.csrfToken();
+
+	let viewTemplate = 'reports/views/index';
+	let promise;
+
+	if( countryId ){
+
+		viewTemplate = 'reports/views/my-country';
+		promise = backend.reports.getForCountry( req, countryId );
+
+	} else {
+
+		promise = backend.reports.getAll( req );
+	}
+
+	try {
+
+		const { response, body } = await promise;
+
+		if( response.isSuccess ){
+
+			const { reports, currentReport } = reportsViewModel( body.results, currentReportId );
+			res.render( viewTemplate, { currentReport, reports, country, csrfToken, isDelete } );
+
+		} else {
+
+			throw new Error( `Got ${ response.statusCode } response from backend` );
+		}
+
+	} catch( e ){
+
+		next( e );
+	}
+}
+
 module.exports = {
 
 	start: require( './start' ),
@@ -17,39 +56,52 @@ module.exports = {
 	aboutProblem: require( './about-problem' ),
 	summary: require( './summary' ),
 
-	index: async ( req, res, next ) => {
+	index: renderDashboard,
 
-		const country = req.user.country;
-		const countryId = country && req.user.country.id;
-		let template = 'reports/views/index';
-		let promise;
+	delete: async ( req, res, next ) => {
 
-		if( countryId ){
+		const currentReportId = req.params.reportId;
+		const isPost = req.method === 'POST';
 
-			template = 'reports/views/my-country';
-			promise = backend.reports.getForCountry( req, countryId );
+		if( isPost ){
+
+			if( req.report.created_by.id !== req.user.id ){
+
+				return next( new Error( 'Cannot delete a note that is not created by the current user' ) );
+			}
+
+			try {
+
+				const { response } = await backend.reports.delete( req, currentReportId );
+
+				if( response.isSuccess ){
+
+					res.redirect( urls.reports.index() );
+
+				} else {
+
+					throw new Error( `Got ${ response.statusCode } response from backend` );
+				}
+
+			} catch( e ){
+
+				next( e );
+			}
 
 		} else {
 
-			promise = backend.reports.getAll( req );
-		}
+			if( req.xhr ){
 
-		try {
+				//setTimeout( () => {
+					const { reports } = reportsViewModel( [ req.report ] );
+					res.render( 'reports/views/partials/delete-report-modal', { report: reports[ 0 ], csrfToken: req.csrfToken() } );
+				//}, 3000 );
 
-			const { response, body } = await promise;
-
-			if( response.isSuccess ){
-
-				res.render( template, reportsViewModel( body.results, country ) );
 
 			} else {
 
-				throw new Error( `Got ${ response.statusCode } response from backend` );
+				renderDashboard( req, res, next, true, currentReportId );
 			}
-
-		} catch( e ){
-
-			next( e );
 		}
 	},
 

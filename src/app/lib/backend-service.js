@@ -103,7 +103,6 @@ function transformUser( { response, body } ){
 
 		body.country = metadata.getCountry( body.location );
 	}
-
 	if( config.assignDefaultCountry && !body.country ){
 
 		body.country = metadata.countries && metadata.countries[ 1 ];
@@ -249,9 +248,10 @@ module.exports = {
 				text: values.note,
 				documents: values.documentIds
 			} ),
+			delete: ( req, noteId ) => backend.delete( `/barriers/interactions/${ noteId }`, getToken( req ) ),
 		},
 		resolve: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/resolve`, getToken( req ), {
-			status_date: getDefaultedDate( values.resolvedDate ) + 'T00:00',
+			status_date: getDefaultedDate( values.resolvedDate ),
 			status_summary: values.resolvedSummary
 		} ),
 		hibernate: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/hibernate`, getToken( req ), {
@@ -260,14 +260,13 @@ module.exports = {
 		open: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/open`, getToken( req ), {
 			status_summary: values.reopenSummary
 		} ),
-		saveType: ( req, barrierId, values, category ) => updateBarrier( getToken( req ), barrierId, {
-			barrier_type: getValue( values.barrierType ),
-			barrier_type_category: category
+		saveTypes: ( req, barrierId, types ) => updateBarrier( getToken( req ), barrierId, {
+			barrier_types: getValue( types )
 		} ),
 		saveSectors: ( req, barrierId, sectors ) => updateBarrier( getToken( req ), barrierId, {
 			sectors: ( sectors && sectors.length ? sectors : null )
 		} ),
-		saveLocation: (req, barrierId, location) => updateBarrier( getToken( req ), barrierId, {
+		saveLocation: ( req, barrierId, location ) => updateBarrier( getToken( req ), barrierId, {
 			export_country: location.country,
 			country_admin_areas: ( location.adminAreas && location.adminAreas.length ? location.adminAreas : [] )
 		} ),
@@ -294,9 +293,16 @@ module.exports = {
 		saveEuExitRelated: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
 			eu_exit_related: values.euExitRelated,
 		}),
-		saveStatus: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
+		saveProblemStatus: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
 			problem_status: values.status
 		} ),
+		saveStatus: ( req, barrierId, values ) => {
+			const status_details = { status_summary: values.statusSummary };
+			if (values.statusDate) {
+				status_details.status_date = getDefaultedDate( values.statusDate );
+			}
+			return updateBarrier( getToken( req ), barrierId, status_details);
+		},
 	},
 
 	reports: {
@@ -304,6 +310,7 @@ module.exports = {
 		getAll: ( req ) => backend.get( '/reports?ordering=-created_on', getToken( req ) ).then( transformReportList ),
 		getForCountry: ( req, countryId ) => backend.get( `/reports?export_country=${ countryId }&ordering=-created_on`, getToken( req ) ).then( transformReportList ),
 		get: ( req, reportId ) => backend.get( `/reports/${ reportId }`, getToken( req ) ).then( transformSingleReport ),
+		delete: ( req, reportId ) => backend.delete( `/reports/${ reportId }`, getToken( req ) ),
 		save: ( req, values ) => backend.post( '/reports', getToken( req ), {
 			problem_status: getValue( values.status ),
 			is_resolved: getValue( values.isResolved ),

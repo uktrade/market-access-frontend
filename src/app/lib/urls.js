@@ -41,6 +41,7 @@ const reportUrl = {
 	aboutProblem: ( reportId ) => `/reports/${ reportId }/problem/`,
 	summary: ( reportId ) => `/reports/${ reportId }/summary/`,
 	submit: ( reportId ) => `/reports/${ reportId }/submit/`,
+	delete: ( reportId ) => `/reports/${ reportId }/delete/`,
 };
 
 function getParams( map ){
@@ -76,6 +77,7 @@ module.exports = {
 			source: ( barrierId ) => `/barriers/${ barrierId }/edit/source/`,
 			priority: ( barrierId ) => `/barriers/${ barrierId }/edit/priority/`,
 			euExitRelated: (barrierId) => `/barriers/${barrierId}/edit/eu-exit-related/`,
+			problemStatus: ( barrierId ) => `/barriers/${ barrierId }/edit/problem-status/`,
 			status: ( barrierId ) => `/barriers/${ barrierId }/edit/status/`,
 		},
 		documents: {
@@ -85,6 +87,7 @@ module.exports = {
 		},
 		notes: {
 			add: ( barrierId ) => `/barriers/${ barrierId }/interactions/add-note/`,
+			delete: ( barrierId, noteId ) => `/barriers/${ barrierId }/interactions/delete-note/${ noteId }/`,
 			edit: ( barrierId, noteId ) => `/barriers/${ barrierId }/interactions/edit-note/${ noteId }/`,
 			documents: {
 				add: ( barrierId, noteId ) => `/barriers/${ barrierId }/interactions/notes/${ noteId }/documents/add/`,
@@ -93,9 +96,12 @@ module.exports = {
 			},
 		},
 		status: ( barrierId ) => `/barriers/${ barrierId }/status/`,
-		type: {
-			category: ( barrierId ) => `/barriers/${ barrierId }/type/`,
-			list: ( barrierId, category ) => `/barriers/${ barrierId }/type/${ category }/`
+		types: {
+			list: ( barrierId ) => `/barriers/${ barrierId }/types/`,
+			edit: ( barrierId ) => `/barriers/${ barrierId }/types/edit/`,
+			new: ( barrierId ) => `/barriers/${ barrierId }/types/new/`,
+			add: ( barrierId ) => `/barriers/${ barrierId }/types/add/`,
+			remove: ( barrierId ) => `/barriers/${ barrierId }/types/remove/`,
 		},
 		sectors: {
 			edit: ( barrierId ) => `/barriers/${ barrierId }/sectors/edit/`,

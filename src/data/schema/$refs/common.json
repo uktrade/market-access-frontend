@@ -106,21 +106,6 @@
 		}
 	},
 
-	"barrier_type": {
-		"type": "object",
-		"required": [ "id", "title", "description", "category" ],
-		"properties": {
-
-			"id": { "$ref": "#/int" },
-			"title": { "$ref": "#/words" },
-			"description": { "$ref": "#/paragraph" },
-			"category": {
-				"type": "string",
-				"pattern": "GOODS|SERVICES"
-			}
-		}
-	},
-
 	"priority-code": {
 		"type": "string",
 		"pattern": "HIGH|MEDIUM|LOW|UNKNOWN"

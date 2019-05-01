@@ -189,7 +189,7 @@ module.exports.fetch = async () => {
 			module.exports.publishResponse = body.publish_response;
 			module.exports.reportStages = body.report_stages;
 			module.exports.reportTaskList = createTaskList( body.report_stages );
-			module.exports.barrierTypes = barrierTypes;
+			module.exports.barrierTypes = uniqueBarrierTypes;
 			module.exports.barrierTypeCategories = body.barrier_type_categories;
 			module.exports.supportType = body.support_type;
 			module.exports.sectors = sectors;
@@ -269,6 +269,11 @@ module.exports.barrier = {
 			[ OPEN ]: { name: 'Open', modifyer: 'assessment' },
 			[ RESOLVED ]: { name: 'Resolved', modifyer: 'resolved' },
 			[ HIBERNATED ]: { name: 'Paused', modifyer: 'hibernated' }
+		}
+	},
+	priority: {
+		codes: {
+			UNKNOWN: 'UNKNOWN'
 		}
 	}
 };

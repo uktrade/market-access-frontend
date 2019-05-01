@@ -63,7 +63,7 @@ describe( 'Dashboard view model', () => {
 						id: barrier.export_country,
 						name: ( country && country.name )
 					},
-					status: metadata.barrier.status.typeInfo[ barrier.current_status.status ],
+					status: metadata.barrier.status.typeInfo[ barrier.status ],
 					supportNeeded: barrier.support_type === 1,
 					hasContributors: barrier.contributor_count > 0,
 					problemStatus: metadata.statusTypes[ barrier.problem_status ],

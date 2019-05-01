@@ -1,7 +1,25 @@
 {% from 'app-components/dashboard-heading.njk' import dashboardHeading %}
+{% from 'reports/views/macros/delete-report.njk' import deleteReport %}
 {% extends 'layout.njk' %}
 
 {% block page_title %}{{ super() }} - Draft barriers{% endblock %}
+
+{% if isDelete %}
+	{% set bodyClasses = 'modal-open' %}
+{% endif %}
+
+{% block body_script %}
+	{{ super() }}
+	<script>
+		ma.pages.report.index();
+	</script>
+{% endblock %}
+
+{% block outsideContent %}
+	{% if isDelete %}
+		{{ deleteReport( currentReport, csrfToken ) }}
+	{% endif %}
+{% endblock %}
 
 {% block page_content %}
 
@@ -21,7 +39,7 @@
 					<th class="standard-table__heading">Action</th>
 				</tr>
 			</thead>
-			<tbody>
+			<tbody class="js-delete-modal-container">
 				{% for report in reports %}
 				<tr class="standard-table__row">
 					<td class="standard-table__cell">
@@ -40,10 +58,13 @@
 						{{ report.problem_status.name or '---' }}
 					</td>
 					<td class="standard-table__cell">
-						{{ report.created_by or '---' }}
+						{{ report.created_by.name or '---' }}
 					</td>
 					<td class="standard-table__cell">
-						<a href="{{ urls.reports.detail( report.id ) }}">Continue</a>
+						<a class="table__link" href="{{ urls.reports.detail( report.id ) }}">Continue</a>
+						{% if report.created_by.id === user.id %}
+							<a class="table__link js-delete-modal" href="{{ urls.reports.delete( report.id ) }}">Delete</a>
+						{% endif %}
 					</td>
 				</tr>
 				{% endfor %}

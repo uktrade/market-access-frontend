@@ -44,3 +44,10 @@
 		button: { text: 'Add another admin area' }
 	}) }}
 {% endmacro %}
+
+{% macro barrierTypesList( types, params ) %}
+	{{ selectionList( types, params, {
+		heading: { text: 'Selected barrier types' },
+		button: { text: 'Add another barrier type' }
+	}) }}
+{% endmacro %}

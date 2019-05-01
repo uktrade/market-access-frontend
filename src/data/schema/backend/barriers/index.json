@@ -31,7 +31,7 @@
 				"export_country",
 				"support_type",
 				"contributor_count",
-				"current_status",
+				"status",
 				"priority",
 				"created_on"
 			],
@@ -65,19 +65,9 @@
 				"priority": { "$ref": "$refs/common.json#/priority" },
 				"contributor_count": { "$ref": "$refs/common.json#/small-int" },
 
-				"current_status": {
-					"type": "object",
-					"required": [ "status", "created_on", "created_by" ],
-					"properties": {
-
-						"status": {
-							"type": "number",
-							"enum": [ 0, 1, 2, 3, 4 ]
-						},
-
-						"created_on": { "$ref": "$refs/common.json#/past-date" },
-						"created_by": { "$ref": "$refs/common.json#/words" }
-					}
+				"status": {
+					"type": "number",
+					"enum": [ 0, 1, 2, 3, 4 ]
 				},
 
 				"created_on": { "$ref": "$refs/common.json#/past-date" }
