@@ -5,7 +5,8 @@ const validators = require( '../../../lib/validators' );
 const metadata = require( '../../../lib/metadata' );
 
 function renderSectors( req, res, sectors ){
-	res.render( 'barriers/views/sectors/list', { sectors: sectors.map( metadata.getSector ), csrfToken: req.csrfToken() } );
+	let sectorsList = req.barrier.all_sectors && sectors.length === 0 ? [{name: 'All Sectors'}] : sectors.map( metadata.getSector );
+	res.render( 'barriers/views/sectors/list', { sectors: sectorsList, csrfToken: req.csrfToken(), } );
 }
 
 function addSectorForm( req, res, href ){

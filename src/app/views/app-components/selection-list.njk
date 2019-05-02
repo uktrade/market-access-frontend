@@ -27,7 +27,7 @@
 {% macro sectorsList( sectors, params ) %}
 	{{ selectionList( sectors, params, {
 		heading: { text: 'Selected sectors' },
-		button: { text: 'Add another sector' }
+		button: { text: 'Add specific sectors' if sectors[0].name === 'All Sectors' else 'Add another sector' }
 	}) }}
 {% endmacro %}
 
