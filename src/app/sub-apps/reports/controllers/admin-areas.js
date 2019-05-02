@@ -8,8 +8,8 @@ module.exports = {
 	list: async ( req, res, next ) => {
 
 		const isPost = req.method === 'POST';
-		const countryId = req.params.countryId; 
-		
+		const countryId = req.params.countryId;
+
 		if( !req.session.adminAreas ){
 			req.session.adminAreas = [];
 		}
@@ -17,13 +17,14 @@ module.exports = {
 		const adminAreas = req.session.adminAreas;
 
 		if( isPost ){
-			
+
 			try {
 				const report  = ( req.report || {} );
 				const sessionStartForm = ( req.session.startFormValues || req.report && { status: req.report.problem_status } );
 				const sessionResolvedForm = ( req.session.isResolvedFormValues || req.report && { isResolved: req.report.is_resolved, resolvedDate: req.report.resolved_date } );
 				const isUpdate = !!report.id;
-		
+				const isExit = req.body.action === 'exit';
+
 				let response;
 				let body;
 				let values = Object.assign( {}, sessionStartForm, sessionResolvedForm, {country: countryId}, {adminAreas});
@@ -33,27 +34,34 @@ module.exports = {
 				} else {
 					({ response, body } = await backend.reports.save( req, values ));
 				}
-		
+
 				if( response.isSuccess ){
-		
+
 					delete req.session.startFormValues;
 					delete req.session.isResolvedFormValues;
 					delete req.session.adminAreas;
-		
+
 					if( !isUpdate && !body.id ){
-		
+
 						return next( new Error( 'No id created for report' ) );
-		
+
 					} else {
-		
-						return res.redirect( urls.reports.hasSectors( body.id ) );
+
+						if( isExit ){
+
+							return res.redirect( urls.reports.detail( body.id ) );
+
+						} else {
+
+							return res.redirect( urls.reports.hasSectors( body.id ) );
+						}
 					}
-		
+
 				} else {
-		
+
 					return next( new Error( `Unable to ${ isUpdate ? 'update' : 'save' } report, got ${ response.statusCode } response code` ) );
 				}
-		
+
 			} catch( e ){
 				return next( e );
 			}
@@ -69,12 +77,11 @@ module.exports = {
 
 			req.session.adminAreas = req.session.adminAreas.filter( ( adminArea ) => adminArea !== adminAreaToRemove );
 
-			res.redirect( urls.reports.adminAreas( report.id, countryId ) );
+			res.redirect( urls.reports.adminAreas.list( report.id, countryId ) );
     },
     add: ( req, res ) => {
 
 			const countryId = req.params.countryId;
-
 			const report  = ( req.report || {} );
 
 			if( !req.session.adminAreas ){
@@ -82,7 +89,6 @@ module.exports = {
 			}
 
 			const adminAreas = req.session.adminAreas;
-
 			const form = new Form( req, {
 
 				adminAreas: {
@@ -105,7 +111,7 @@ module.exports = {
 				if( !form.hasErrors() ){
 
 					req.session.adminAreas.push( form.getValues().adminAreas );
-					return res.redirect( urls.reports.adminAreas( report.id, countryId ) );
+					return res.redirect( urls.reports.adminAreas.list( report.id, countryId ) );
 				}
 			}
 

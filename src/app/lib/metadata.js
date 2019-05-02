@@ -28,8 +28,8 @@ function alterAdminAreasData( adminAreas ) {
 
 	const alteredAdminAreas = {};
 
-	// Loop through each admin area and push it to the corresponding 
-	// array based on country ID 
+	// Loop through each admin area and push it to the corresponding
+	// array based on country ID
 
 	adminAreas.forEach( ( countryAdminArea ) => {
 		// Key already exists for country
@@ -110,13 +110,13 @@ function createList( items, text ){
 }
 
 function createAdminAreaList (country, adminAreas, text) {
+
 	const adminAreaList = adminAreas[country].map( ( adminArea ) => ( {
 		value: adminArea.id,
 		text: adminArea.name
 	} ) );
 
 	adminAreaList.unshift( { value: '', text } );
-
 	return adminAreaList;
 }
 
@@ -189,7 +189,7 @@ module.exports.fetch = async () => {
 			module.exports.publishResponse = body.publish_response;
 			module.exports.reportStages = body.report_stages;
 			module.exports.reportTaskList = createTaskList( body.report_stages );
-			module.exports.barrierTypes = barrierTypes;
+			module.exports.barrierTypes = uniqueBarrierTypes;
 			module.exports.barrierTypeCategories = body.barrier_type_categories;
 			module.exports.supportType = body.support_type;
 			module.exports.sectors = sectors;
@@ -269,6 +269,11 @@ module.exports.barrier = {
 			[ OPEN ]: { name: 'Open', modifyer: 'assessment' },
 			[ RESOLVED ]: { name: 'Resolved', modifyer: 'resolved' },
 			[ HIBERNATED ]: { name: 'Paused', modifyer: 'hibernated' }
+		}
+	},
+	priority: {
+		codes: {
+			UNKNOWN: 'UNKNOWN'
 		}
 	}
 };

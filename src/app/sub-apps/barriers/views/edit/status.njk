@@ -1,38 +1,61 @@
-{% from 'components/radios/macro.njk' import govukRadios %}
+{% from 'components/textarea/macro.njk' import govukTextarea %}
+{% from 'components/date-input/macro.njk' import govukDateInput %}
 {% from 'app-components/heading.njk' import heading %}
 
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Barrier - Edit barrier scope{% endblock %}
+{% block page_title %}{{ super() }} - Barrier - Edit status{% endblock %}
 
 {% block page_content %}
 
 	{{ heading({
 		back: { href: urls.barriers.detail( barrier.id ) },
 		caption: barrier.barrier_title,
-		text: 'Edit barrier scope',
+		text: 'Barrier status',
 		errors: errors
 	}) }}
 
 	<form action="{{ urls.barriers.edit.status( barrier.id ) }}" method="POST" class="restrict-width">
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+		{% if isResolved %}
+			{{ govukDateInput( {
 
-		{{ govukRadios({
+				id: 'status-date',
+				fieldset: {
+					legend: {
+						text: 'Date the barrier was resolved',
+						classes: 'govuk-fieldset__legend--s'
+					}
+				},
+				errorMessage: errors | errorForName( 'status-date' ),
+				items: [
+					{
+						name: 'month',
+						value: statusDate.month,
+						classes: 'govuk-input--width-2'
+					},
+					{
+						name: 'year',
+						value: statusDate.year,
+						classes: 'govuk-input--width-4'
+					}
+				]
+			} ) }}
+		{% endif %}
 
-			name: 'status',
-			fieldset: {
-				legend: {
-					text: 'What is the scope of the barrier?',
-					classes: 'govuk-fieldset__legend--s'
-				}
+		{{ govukTextarea( {
+
+			label: {
+				text: 'Provide a summary of how this barrier was resolved' if isResolved else 'Provide a summary of why this barrier is being paused',
+				classes: 'govuk-label--s'
 			},
-			items: status | addToRadio( {
-				'1': { hint: { text: 'for example, goods stuck at the border or documentation issue' } },
-				'2': { hint: { text: 'for example, a change of regulation' } }
-			} ),
-			errorMessage: errors | errorForName( 'status-1' )
-		}) }}
+			id: 'status-summary',
+			name: 'statusSummary',
+			value: statusSummary,
+			errorMessage: errors | errorForName( 'status-summary' )
+		} ) }}
 
 		<input type="submit" value="Save and exit to barrier" class="govuk-button">
+        <a href="{{ urls.barriers.detail( barrier.id ) }}" class="govuk-button button--secondary">Cancel</a>
 	</form>
 {% endblock %}

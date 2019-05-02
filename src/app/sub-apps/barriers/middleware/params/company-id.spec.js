@@ -46,7 +46,7 @@ describe( 'Company Id param middleware', () => {
 
 				await middleware( req, res, next, id );
 
-				expect( datahub.getCompany ).toHaveBeenCalledWith( req, id );
+				expect( datahub.getCompany ).toHaveBeenCalledWith( id );
 				expect( req.company ).toEqual( company );
 				expect( res.locals.company ).toEqual( company );
 				expect( next ).toHaveBeenCalledWith();
@@ -62,28 +62,10 @@ describe( 'Company Id param middleware', () => {
 
 				await middleware( req, res, next, id );
 
-				expect( datahub.getCompany ).toHaveBeenCalledWith( req, id );
+				expect( datahub.getCompany ).toHaveBeenCalledWith( id );
 				expect( req.company ).not.toBeDefined();
 				expect( res.locals.company ).not.toBeDefined();
 				expect( next ).toHaveBeenCalledWith( new Error( 'Not a successful response from datahub' ) );
-			} );
-
-			describe( 'When the statusCode is 403', () => {
-				it( 'Should render the 403 page', async () => {
-
-					const promise = Promise.resolve( { response: { isSuccess: false, statusCode: 403 }, body: {} } );
-
-					datahub.getCompany.and.callFake( () => promise );
-					res.status.and.callFake( () => res );
-
-					await middleware( req, res, next, id );
-
-					expect( datahub.getCompany ).toHaveBeenCalledWith( req, id );
-					expect( req.company ).not.toBeDefined();
-					expect( res.locals.company ).not.toBeDefined();
-					expect( res.status ).toHaveBeenCalledWith( 403 );
-					expect( res.render ).toHaveBeenCalledWith( 'barriers/views/companies/data-hub-403' );
-				} );
 			} );
 		} );
 
@@ -97,7 +79,7 @@ describe( 'Company Id param middleware', () => {
 
 				await middleware( req, res, next, id );
 
-				expect( datahub.getCompany ).toHaveBeenCalledWith( req, id );
+				expect( datahub.getCompany ).toHaveBeenCalledWith( id );
 				expect( next ).toHaveBeenCalledWith( err );
 			} );
 		} );

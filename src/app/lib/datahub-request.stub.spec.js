@@ -15,17 +15,8 @@ describe( 'Datahub request stub', () => {
 		describe( 'company details', () => {
 			it( 'Should match and return the stub', async () => {
 
-				const data = await stub.get( '/v3/company/abc-123' );
+				const data = await stub.get( '/v4/public/company/abc-123' );
 				expect( data.body ).toEqual( getStub( '/datahub/company/details' ) );
-				expect( data.response.isSuccess ).toEqual( true );
-			} );
-		} );
-
-		describe( 'getContact', () => {
-			it( 'Should match and return the stub', async () => {
-
-				const data = await stub.get( '/v3/contact/abc-123' );
-				expect( data.body ).toEqual( getStub( '/datahub/contact/details' ));
 				expect( data.response.isSuccess ).toEqual( true );
 			} );
 		} );
@@ -35,7 +26,7 @@ describe( 'Datahub request stub', () => {
 		describe( 'company search', () => {
 			it( 'Should match and return a stub', async () => {
 
-				const data = await stub.post( '/v3/search/company' );
+				const data = await stub.post( '/v4/public/search/company' );
 				expect( data.body ).toEqual( getStub( '/datahub/search/company' ) );
 				expect( data.response.isSuccess ).toEqual( true );
 			} );

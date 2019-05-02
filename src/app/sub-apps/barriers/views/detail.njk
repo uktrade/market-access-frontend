@@ -3,30 +3,33 @@
 {% from "components/textarea/macro.njk" import govukTextarea %}
 {% from "components/file-upload/macro.njk" import govukFileUpload %}
 {% from 'app-components/toast.njk' import toastAlert %}
+{% from 'barriers/views/macros/delete-note.njk' import deleteNote %}
 
 {% extends 'layout.njk' %}
 
 {% block page_title %}{{ super() }} - Barrier details{{ pageTitleSuffix }}{% endblock %}
 
 {% block body_script %}
-	<script>
-		if( ma.components.BarrierSummary ){
-			new ma.components.BarrierSummary( {
-				text: 'Update the barrier',
-				linkClass: '.js-barrier-summary-link'
-			} );
-		}
-	</script>
 	{{ super() }}
 	<script>
 		ma.pages.barrier.detail( {
-			noteErrorText: '{{ noteErrorText }}'
+			noteErrorText: '{{ noteErrorText }}',
+			barrierSummary: {
+				text: 'Update the barrier',
+				linkClass: '.js-barrier-summary-link'
+			}
 		} );
 	</script>
 {% endblock %}
 
+{% block outsideContent %}
+	{% if isDelete %}
+		{{ deleteNote( barrier.id, currentNote, csrfToken ) }}
+	{% endif %}
+{% endblock %}
+
 {% block mastheadContent %}
-    {{ barrierSummary( barrier ) }}
+	{{ barrierSummary( barrier ) }}
 {% endblock %}
 
 {% macro noteForm( params ) %}
@@ -108,26 +111,20 @@
 		{{ toastAlert( toast ) }}
 	{% endif %}
 
-	{%- set barrierTypeHtml %}
-		{{ barrier.type.title }}
-		{{ barrier.type.description | safe }}
-	{% endset -%}
-	<h3>Admin Area: {{ barrier.adminArea }}</h3>
-
-    {{ summaryGroup( {
+	{{ summaryGroup( {
 		heading: {
 			level: ( 3 if barrier.isResolved or barrier.isHibernated else 2 ),
 			text: 'Barrier headlines'
 		},
 		items: [
-            {
+			{
 				title: 'Last Modified',
-				html: barrier.modifiedOn | dateOnly,
-                halfWidth: true
+				text: barrier.modifiedOn | dateOnly,
+				halfWidth: true
 			},{
 				title: 'Date added',
-				html: barrier.reportedOn | dateOnly,
-                halfWidth: true
+				text: barrier.reportedOn | dateOnly,
+				halfWidth: true
 			},{
 				title: 'Summary of the problem',
 				html: barrier.problem.description | escape | nl2br,
@@ -136,24 +133,24 @@
 				}
 			},{
 				title: 'Barrier scope',
-				html: barrier.problem.status,
+				text: barrier.problem.status,
 				edit: {
-					href: urls.barriers.edit.status( barrier.id )
+					href: urls.barriers.edit.problemStatus( barrier.id )
 				},
 				halfWidth: true
 			},{
 				title: 'Related to EU Exit',
-				html: barrier.euExitRelated,
+				text: barrier.euExitRelated,
 				halfWidth: true,
 				edit: {
 					href: urls.barriers.edit.euExitRelated( barrier.id )
 				}
 			},{
-				title: 'Company or organisation affected',
+				title: 'Companies affected',
 				items: companiesList if companiesList.length,
 				add: {
 					text: 'Add one or more companies',
-					href: urls.barriers.companies.search( barrier.id )
+					href: urls.barriers.companies.new( barrier.id )
 				},
 				edit: {
 					href: urls.barriers.companies.edit( barrier.id )
@@ -173,15 +170,15 @@
 			{
 				title: 'Market access barrier type',
 				heading: {
-					text: ( barrier.type.category.name + ':' ) if barrier.type.category.name
+					text: ( barrier.types.category.name + ':' ) if barrier.type.category.name
 				},
-				html: barrierTypeHtml if barrier.type.title,
+				items: barrier.types,
 				add: {
-					text: 'Add a type of Market Access Barrier',
-					href: urls.barriers.type.category( barrier.id )
+					text: 'Add type of Market Access Barrier',
+					href: urls.barriers.types.new( barrier.id )
 				},
 				edit: {
-					href: urls.barriers.type.category( barrier.id )
+					href: urls.barriers.types.edit( barrier.id )
 				}
 			},{
 				title: 'Product or service being exported or invested',
@@ -225,6 +222,7 @@
 				<h2 class="barrier-status-details__heading">Barrier {{ 'resolved' if barrier.isResolved else 'paused' }} <span class="barrier-status-details__heading__caption">in {{ barrier.status.date | dateOnly( day=false ) }}</span></2>
 				<h3 class="barrier-status-details__sub-heading">Summary {{ ' of resolution' if barrier.isResolved }}</h3>
 				<p class="barrier-status-details__text">{{ barrier.status.description | escape | nl2br }}</p>
+				<a href="{{ urls.barriers.edit.status(barrier.id)}}"> Edit</a>
 			</div>
 
 		{% endif -%}
@@ -249,7 +247,7 @@
 			<a class="govuk-button button--primary" href="{{ urls.barriers.notes.add( barrier.id ) }}">Add note</a>
 		{% endif %}
 
-		<ol class="event-list">
+		<ol class="event-list js-delete-modal-container">
 		{% if interactions and interactions.length %}
 			{%- for item in interactions %}
 
@@ -262,7 +260,6 @@
 						<span class="event-list__item__heading__recede"> by </span>{{ item.user.name }}
 						{%- endif -%}
 					</h4>
-
 
 					{% if item.edit %}
 
@@ -282,6 +279,9 @@
 
 						<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
 						<a class="event-list__item__edit-link" href="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}">Edit</a>
+						{% if item.user.id == user.id %}
+							<a class="event-list__item__delete-link js-delete-modal" href="{{ urls.barriers.notes.delete( barrier.id, item.id ) }}">Delete</a>
+						{% endif %}
 
 						{% if item.hasDocuments -%}
 
@@ -336,7 +336,7 @@
 					{%- endif %}
 					</p>
 
-					{% if item.event === 'BARRIER_STATUS_CHANGE' -%}
+					{% if item.event === 'BARRIER_STATUS_CHANGE' and item.state.isOpen -%}
 						<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
 					{% endif -%}
 

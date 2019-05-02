@@ -115,16 +115,27 @@ describe( 'Reports view model', () => {
 			expect( output.reports[ 2 ].id ).toEqual( 3 );
 			expect( output.reports[ 3 ].id ).toEqual( 4 );
 		} );
+
+		describe( 'When there is a current report', () => {
+			it( 'Sets the current report', () => {
+
+				const currentReportId = 1;
+
+				const output = viewModel( getReports(), currentReportId );
+
+				expect( output.currentReport).toBeDefined();
+				expect( output.currentReport.id).toEqual(1);
+			});
+		});
 	} );
 
 	describe( 'When the list of reports is empty', () => {
 		it( 'Should return the reports', () => {
 
-			const country = { country: true };
 			const input = [];
-			const output = viewModel( input, country );
+			const output = viewModel( input, undefined );
 
-			expect( output ).toEqual( { reports: input, country } );
+			expect( output ).toEqual( { reports: input, currentReport: undefined } );
 		} );
 	} );
 } );

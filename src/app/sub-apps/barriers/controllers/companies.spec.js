@@ -199,7 +199,7 @@ describe( 'Barrier companies controller', () => {
 
 		describe( 'a GET request', () => {
 			describe( 'With companies in the session', () => {
-				it( 'Should overwrite the session companies and render the templste', async () => {
+				it( 'Should overwrite the session companies and render the template', async () => {
 
 					companies = createCompanies();
 
@@ -243,6 +243,61 @@ describe( 'Barrier companies controller', () => {
 						csrfToken,
 						companyList: []
 					} );
+				} );
+			} );
+		} );
+	} );
+
+	describe( 'new', () => {
+
+		const template = 'barriers/views/companies/search';
+
+		afterEach( () => {
+
+			const templateValues = {
+				...getTemplateValuesResponse,
+				companies: [],
+				results: undefined,
+				error: undefined,
+			};
+
+			expect( req.session.barrierCompanies ).toEqual( [] );
+			expect( res.render ).toHaveBeenCalledWith( template, templateValues );
+		} );
+
+		describe( 'a GET request', () => {
+			it( 'Should setup the form correctly', async () => {
+
+				await controller.new( req, res, next );
+
+				const config = Form.calls.argsFor( 0 )[ 1 ];
+
+				expect( config.query ).toBeDefined();
+				expect( config.query.required ).toBeDefined();
+			} );
+
+			describe( 'With companies in the session', () => {
+				it( 'Should remove the session companies and render the template', async () => {
+
+					req.session.barrierCompanies = createCompanies();
+
+					await controller.new( req, res, next );
+				} );
+			} );
+
+			describe( 'With no companies in the session', () => {
+				it( 'Should render the template', async () => {
+
+					req.session.barrierCompanies = [];
+
+					await controller.new( req, res, next );
+				} );
+			} );
+
+			describe( 'With no session', () => {
+				it( 'Should create an empty array and render the template', async () => {
+
+					await controller.new( req, res, next );
 				} );
 			} );
 		} );
@@ -332,7 +387,7 @@ describe( 'Barrier companies controller', () => {
 				} );
 
 				describe( 'When the service throws an error', () => {
-					it( 'Should call next with an erro', async () => {
+					it( 'Should call next with an error', async () => {
 
 						const err = new Error( 'a service error' );
 
@@ -345,7 +400,7 @@ describe( 'Barrier companies controller', () => {
 					} );
 				} );
 
-				describe( 'When the service retuns a success', () => {
+				describe( 'When the service returns a success', () => {
 					it( 'Should render the template with the results', async () => {
 
 						results = [ { id: 1, name: 'one' } ];
@@ -380,17 +435,31 @@ describe( 'Barrier companies controller', () => {
 						expect( res.render ).toHaveBeenCalledWith( template, templateValues );
 					}
 
-					describe( 'When it retuns a 404', () => {
+					describe( 'When it retuns a 400', () => { // the POST body is invalid for the company search endpoint
 						it( 'Should render the template with an error', async () => {
 
-							await check( 404, 'No company found' );
+							await check( 400, 'There was an error finding the company' );
+						} );
+					} );
+
+					describe( 'When it returns a 401', () => { // there was a problem with the credentials (IP or Hawk header)
+						it( 'Should render the template with an error', async () => {
+
+							await check( 401, 'There was an error finding the company' );
 						} );
 					} );
 
 					describe( 'When it retuns a 403', () => {
 						it( 'Should render the template with an error', async () => {
 
-							await check( 403, 'You do not have permission to search for a company, please contact Data Hub support.' );
+							await check( 403, 'There was an error finding the company' );
+						} );
+					} );
+
+					describe( 'When it retuns a 404', () => {
+						it( 'Should render the template with an error', async () => {
+
+							await check( 404, 'No company found' );
 						} );
 					} );
 

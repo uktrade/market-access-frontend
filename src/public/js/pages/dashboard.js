@@ -1,0 +1,4 @@
+ma.pages.dashboard = function(){
+
+	
+};

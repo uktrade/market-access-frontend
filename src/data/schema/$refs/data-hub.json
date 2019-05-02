@@ -1,7 +1,7 @@
 {
 	"company": {
 		"type": "object",
-		"required": [ "id", "name", "sector", "registered_address_1", "registered_address_town", "registered_address_county", "registered_address_postcode", "registered_address_country" ],
+		"required": [ "id", "name", "sector", "address" ],
 		"properties": {
 			"id": { "$ref": "./common.json#/uuid" },
 			"name": { "$ref": "./common.json#/words" },
@@ -13,32 +13,38 @@
 					"name": { "$ref": "./common.json#/words" }
 				}
 			},
-			"registered_address_1": {
-				"type": "string",
-				"faker": "address.streetName"
-			},
-			"registered_address_town": {
-				"type": "string",
-				"faker": "address.city"
-			},
-			"registered_address_county": {
-				"type": "string",
-				"faker": "address.county"
-			},
-			"registered_address_country": {
+			"address": {
 				"type": "object",
-				"required": [ "id", "name" ],
+				"required": [ "line_1", "town", "county", "postcode", "country" ],
 				"properties": {
-					"id": { "$ref": "./common.json#/uuid" },
-					"name": {
+					"line_1": {
 						"type": "string",
-						"faker": "address.country"
+						"faker": "address.streetName"
+					},
+					"town": {
+						"type": "string",
+						"faker": "address.city"
+					},
+					"county": {
+						"type": "string",
+						"faker": "address.county"
+					},
+					"country": {
+						"type": "object",
+						"required": [ "id", "name" ],
+						"properties": {
+							"id": { "$ref": "./common.json#/uuid" },
+							"name": {
+								"type": "string",
+								"faker": "address.country"
+							}
+						}
+					},
+					"postcode": {
+						"type": "string",
+						"faker": "address.zipCode"
 					}
 				}
-			},
-			"registered_address_postcode": {
-				"type": "string",
-				"faker": "address.zipCode"
 			}
 		}
 	}
