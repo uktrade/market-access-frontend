@@ -1,6 +1,6 @@
 ma.pages.barrier.edit = {
 
-	headlines: function(){
+	title: function(){
 
 		if( !( jessie.queryOne && jessie.attachListener ) ){ return; }
 

@@ -7,14 +7,15 @@
 	"rules": {
 		"no-undefined": 0,
 		"no-global-assign": 2,
-		"no-shadow-restricted-names": 2
+		"no-shadow-restricted-names": 2,
+		"no-undef": 2
 	},
-	"overrides": {
+	"overrides": [{
 		"files": "**/*.spec.js",
 		"rules": {
 			"no-console": 0
 		}
-	},
+	}],
 	"parserOptions": {
 		"ecmaVersion": 9
 	}

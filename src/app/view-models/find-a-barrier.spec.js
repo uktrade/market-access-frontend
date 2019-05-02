@@ -25,6 +25,7 @@ describe( 'Find a barrier view model', () => {
 	let barrierPriorityList;
 	let urls;
 	let findABarrierResponse;
+	let strings;
 
 	function getExpectedBarrierOutput( barriers ){
 
@@ -33,7 +34,7 @@ describe( 'Find a barrier view model', () => {
 		for( let barrier of barriers ){
 
 			const sectors = ( barrier.sectors ? barrier.sectors.map( () => mockSector ) : [] );
-			const barrierStatusCode = barrier.current_status.status;
+			const barrierStatusCode = barrier.status;
 			const status = metadata.barrier.status.typeInfo[ barrierStatusCode ] || {};
 
 			expected.push({
@@ -43,13 +44,13 @@ describe( 'Find a barrier view model', () => {
 				isOpen: ( barrierStatusCode === OPEN ),
 				isResolved: ( barrierStatusCode === RESOLVED ),
 				isHibernated: ( barrierStatusCode === HIBERNATED ),
-				country: mockCountry,
+				location: strings.location.response,
 				sectors,
 				sectorsList: sectors.map( () => mockSector.name ),
 				status,
 				date: {
 					reported: barrier.reported_on,
-					status: barrier.current_status.status_date,
+					status: barrier.status_date,
 					created: barrier.created_on,
 				},
 				priority: barrier.priority
@@ -76,6 +77,7 @@ describe( 'Find a barrier view model', () => {
 					}
 				}
 			},
+			adminAreasByCountry: {},
 			getSector: jasmine.createSpy( 'metadata.getSector' ),
 			getSectorList: jasmine.createSpy( 'metadata.getSectorList' ),
 			getCountry: jasmine.createSpy( 'metadata.getCountry' ),
@@ -147,10 +149,13 @@ describe( 'Find a barrier view model', () => {
 			findABarrier: jasmine.createSpy( 'urls.findABarrier' ).and.callFake( () => findABarrierResponse ),
 		};
 
+		strings = jasmine.helpers.mocks.strings();
+
 		viewModel = proxyquire( modulePath, {
 			'../lib/metadata': metadata,
 			'../lib/sort-govuk-items': sortGovukItems,
 			'../lib/urls': urls,
+			'../lib/strings': strings,
 		} );
 	} );
 
@@ -169,11 +174,11 @@ describe( 'Find a barrier view model', () => {
 	function getFilters( overrides = {} ){
 
 		return {
-			country: overrides.country || { items: countryList, active: undefined, removeUrl: findABarrierResponse },
-			region: overrides.region || { items: overseasRegionList, active: undefined, removeUrl: findABarrierResponse },
-			sector: overrides.sector || { items: sectorList, active: undefined, removeUrl: findABarrierResponse },
-			type: overrides.type || { items: barrierTypeList, active: undefined, removeUrl: findABarrierResponse },
-			priority: overrides.priority || { items: barrierPriorityList, active: undefined, removeUrl: findABarrierResponse },
+			country: overrides.country || { items: countryList, text: strings.locations.response, removeUrl: findABarrierResponse },
+			region: overrides.region || { items: overseasRegionList, text: strings.regions.response, removeUrl: findABarrierResponse },
+			sector: overrides.sector || { items: sectorList, text: strings.sectors.response, removeUrl: findABarrierResponse },
+			type: overrides.type || { items: barrierTypeList, text: strings.types.response, removeUrl: findABarrierResponse },
+			priority: overrides.priority || { items: barrierPriorityList, text: strings.priorities.response, removeUrl: findABarrierResponse },
 		};
 	}
 
@@ -213,14 +218,15 @@ describe( 'Find a barrier view model', () => {
 			expect( output.count ).toEqual( count );
 			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
 			expect( output.filters ).toEqual( getFilters( {
-				country: { items: countryList, active: [ mockCountry ], removeUrl: findABarrierResponse },
+				country: { items: countryList, text: strings.locations.response, removeUrl: findABarrierResponse },
 			} ) );
-			expect( countryList[ 2 ].checked ).toEqual( true );
+			expect( countryList.find( ( country ) => country.value === filters.country[ 0 ] ).checked ).toEqual( true );
 			expect( output.hasFilters ).toEqual( true );
+			expect( strings.locations ).toHaveBeenCalledWith( filters.country );
 		} );
 	} );
 
-	describe( 'With a overseas region filter', () => {
+	describe( 'With an overseas region filter', () => {
 		it( 'Should return the correct data', () => {
 
 			const count = 10;
@@ -236,11 +242,10 @@ describe( 'Find a barrier view model', () => {
 
 			expect( output.count ).toEqual( count );
 			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
-			expect( output.filters ).toEqual( getFilters({
-				region: { items: overseasRegionList, active: [ mockRegion ], removeUrl: findABarrierResponse },
-			}) );
+			expect( output.filters ).toEqual( getFilters() );
 			expect( overseasRegionList[ 2 ].checked ).toEqual( true );
 			expect( output.hasFilters ).toEqual( true );
+			expect( strings.regions ).toHaveBeenCalledWith( filters.region );
 		} );
 	} );
 
@@ -260,11 +265,10 @@ describe( 'Find a barrier view model', () => {
 
 			expect( output.count ).toEqual( count );
 			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
-			expect( output.filters ).toEqual( getFilters({
-				sector: { items: sectorList, active: [ mockSector ], removeUrl: findABarrierResponse },
-			}) );
+			expect( output.filters ).toEqual( getFilters() );
 			expect( sectorList[ 2 ].checked ).toEqual( true );
 			expect( output.hasFilters ).toEqual( true );
+			expect( strings.sectors ).toHaveBeenCalledWith( filters.sector );
 		} );
 	} );
 
@@ -298,11 +302,12 @@ describe( 'Find a barrier view model', () => {
 						return item;
 
 					} ).sort( ( a, b ) => a.text.localeCompare( b.text ) ),
-					active: [ { name: mockType.title } ],
+					text: strings.types.response,
 					removeUrl: findABarrierResponse
 				},
 			}) );
 			expect( output.hasFilters ).toEqual( true );
+			expect( strings.types ).toHaveBeenCalledWith( filters.type );
 		} );
 	} );
 
@@ -334,11 +339,12 @@ describe( 'Find a barrier view model', () => {
 
 						return item;
 					} ),
-					active: [ mockPriority ],
+					text: strings.priorities.response,
 					removeUrl: findABarrierResponse,
 				},
 			}) );
 			expect( output.hasFilters ).toEqual( true );
+			expect( strings.priorities ).toHaveBeenCalledWith( filters.priority );
 		} );
 	} );
 } );

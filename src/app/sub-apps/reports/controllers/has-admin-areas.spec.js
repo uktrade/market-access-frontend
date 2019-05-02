@@ -45,8 +45,10 @@ describe( 'Report controllers', () => {
 		urls = {
 			reports: {
 				detail: jasmine.createSpy( 'urls.reports.detail' ),
-				adminAreas: jasmine.createSpy( 'urls.reports.adminAreas' ),
-				addAdminArea: jasmine.createSpy( 'urls.reports.addAdminArea' ),
+				adminAreas: {
+					list: jasmine.createSpy( 'urls.reports.adminAreas.list' ),
+					add: jasmine.createSpy( 'urls.reports.adminAreas.add' ),
+				},
 				hasSectors: jasmine.createSpy( 'urls.reports.hasSectors' ),
 			},
 		};
@@ -194,15 +196,15 @@ describe( 'Report controllers', () => {
 						} );
 
 						it( 'Should update the report with the report data', async () => {
-							
+
 							await controller( req, res, next );
-							
+
 							const args = backend.reports.update.calls.argsFor( 0 );
 
 							expect( args[ 0 ] ).toEqual( req );
 							expect( args[ 1 ] ).toEqual( report.id );
 							expect( args[ 2 ] ).toEqual( saveValues );
-							
+
 						} );
 
 						describe( 'When the update throws an error', () => {
@@ -321,13 +323,13 @@ describe( 'Report controllers', () => {
 
 					beforeEach( () => {
 						getValuesResponse = { hasAdminAreas: 'false'};
-					} ); 
+					} );
 
 					describe( 'When there is no report or the selected country is different', () => {
 						it( 'Should delete the admin areas session and redirect to add an admin area', () => {
 							const addAdminAreaResponse = 'add/admin/area';
 
-							urls.reports.addAdminArea.and.callFake( () => addAdminAreaResponse );
+							urls.reports.adminAreas.add.and.callFake( () => addAdminAreaResponse );
 
 							controller( req, res, next );
 
@@ -349,7 +351,7 @@ describe( 'Report controllers', () => {
 
 							const adminAreasResponse = 'admin/area';
 
-							urls.reports.adminAreas.and.callFake( () => adminAreasResponse );
+							urls.reports.adminAreas.list.and.callFake( () => adminAreasResponse );
 
 							controller( req, res, next );
 

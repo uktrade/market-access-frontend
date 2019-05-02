@@ -15,11 +15,7 @@
          "export_country": "50fef455-fdef-4500-8752-8261f86b1d0e",
          "support_type": 1,
          "contributor_count": 17,
-         "current_status": {
-            "status": 1,
-            "created_on": "Fri Oct 19 2018 10:48:16 GMT+0100 (BST)",
-            "created_by": "asperiores dolores ratione"
-         },
+         "status": 1,
          "priority": {
             "code": "ABC",
             "name": "id",
@@ -40,11 +36,7 @@
          "export_country": "42d1ee10-5abb-4981-b333-8d3bad342f4c",
          "support_type": 2,
          "contributor_count": 4,
-         "current_status": {
-            "status": 4,
-            "created_on": "Thu Mar 08 2018 21:45:51 GMT+0000 (GMT)",
-            "created_by": "modi commodi ut"
-         },
+         "status": 4,
          "priority": {
             "code": "DEF",
             "name": "at",
@@ -65,11 +57,7 @@
          "export_country": "767cb79b-41a0-48f7-ae2a-ebeaa1c31527",
          "support_type": 1,
          "contributor_count": 11,
-         "current_status": {
-            "status": 1,
-            "created_on": "Tue Jul 31 2018 03:01:56 GMT+0100 (BST)",
-            "created_by": "autem eos possimus"
-         },
+         "status": 1,
          "priority": {
             "code": "ABC",
             "name": "maxime",
@@ -90,11 +78,7 @@
          "export_country": "9b80fd65-4475-4731-815e-4cd529f28b07",
          "support_type": 1,
          "contributor_count": 6,
-         "current_status": {
-            "status": 1,
-            "created_on": "Thu Feb 22 2018 15:55:04 GMT+0000 (GMT)",
-            "created_by": "voluptatem dolorem harum"
-         },
+         "status": 1,
          "priority": {
             "code": "ABC",
             "name": "molestiae",

@@ -4,6 +4,12 @@
 
 {% block page_title %}{{ super() }} - Homepage{% endblock %}
 
+{% block body_script %}
+	<script>
+		ma.pages.dashboard();
+	</script>
+{% endblock %}
+
 {% block page_content %}
 
 	{{ dashboardHeading( dashboard, isBarriers = true ) }}

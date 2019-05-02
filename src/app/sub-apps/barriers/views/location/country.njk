@@ -1,0 +1,37 @@
+{% from 'components/input/macro.njk' import govukInput %}
+{% from 'components/select/macro.njk' import govukSelect %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Barrier - Edit Country{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.barriers.location.list( barrier.id ) },
+		caption: barrier.barrier_title,
+		text: 'Edit barrier country',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.barriers.location.country( barrier.id ) }}" method="POST" class="restrict-width">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{{ govukSelect( {
+
+			label: {
+				text: "Exports to which country are affected by this issue?",
+				classes: 'govuk-label--s'
+			},
+			id: 'country',
+			name: 'country',
+			classes: 'govuk-!-width-full',
+			items: country,
+			errorMessage: errors | errorForName( 'country' )
+		} ) }}
+
+		<input type="submit" value="Change country" class="govuk-button">
+		<a href="{{ urls.barriers.location.list( barrier.id ) }}" class="govuk-button button--secondary">Cancel</a>
+	</form>
+{% endblock %}

@@ -64,6 +64,9 @@ module.exports = ( express, app ) => {
 
 	app.post( '/:reportId/submit/', controller.submit );
 
+	app.get( '/:reportId/delete/', headerNav( { isDashboard: true } ), dashboardData, controller.delete ),
+	app.post( '/:reportId/delete/', headerNav( { isDashboard: true } ), dashboardData, controller.delete ),
+
 	// detail must be last route
 	app.get( '/:reportId/', controller.report );
 

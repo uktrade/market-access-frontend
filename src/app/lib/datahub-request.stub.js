@@ -16,9 +16,8 @@ const response = { statusCode: 200, isSuccess: true, elapsedTime: 0 };
 
 const stubs = [
 
-	[ /^\/v3\/search\/company$/, 'search/company' ],
-	[ /^\/v3\/company\/[a-z0-9-]+$/, 'company/details' ],
-	[ /^\/v3\/contact\/[a-z0-9-]+$/, 'contact/details' ]
+	[ /^\/v4\/public\/search\/company$/, 'search/company' ],
+	[ /^\/v4\/public\/company\/[a-z0-9-]+$/, 'company/details' ],
 ];
 
 //ensure that we don't return a modified response

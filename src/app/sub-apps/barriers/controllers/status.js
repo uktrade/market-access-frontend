@@ -13,7 +13,7 @@ module.exports = {
 		const OPEN = 'open';
 
 		const barrier = req.barrier;
-		const currentStatus = barrier.current_status.status;
+		const currentStatus = barrier.status;
 		const invalidDateMessage = 'Enter resolution date and include a month and year';
 		const configItems = {
 			[ RESOLVE ]: {

@@ -57,12 +57,13 @@ describe( 'Edit barrier controller', () => {
 
 		backend = {
 			barriers: {
-				saveDetails: jasmine.createSpy( 'backend.barriers.saveDetails' ),
+				saveTitle: jasmine.createSpy( 'backend.barriers.saveTitle' ),
 				saveProduct: jasmine.createSpy( 'backend.barriers.saveProduct' ),
 				saveDescription: jasmine.createSpy( 'backend.barriers.saveDescription' ),
 				saveSource: jasmine.createSpy( 'backend.barriers.saveSource' ),
 				savePriority: jasmine.createSpy( 'backend.barriers.savePriority' ),
 				saveEuExitRelated: jasmine.createSpy( 'backend.barriers.saveEuExitRelated' ),
+				saveProblemStatus: jasmine.createSpy( 'backend.barriers.saveProblemStatus' ),
 				saveStatus: jasmine.createSpy( 'backend.barriers.saveStatus' ),
 			}
 		};
@@ -99,17 +100,13 @@ describe( 'Edit barrier controller', () => {
 		} );
 	} );
 
-	describe( 'headlines', () => {
+	describe( 'title', () => {
 
-		const template = 'barriers/views/edit/headlines';
+		const template = 'barriers/views/edit/title';
 
 		it( 'Should configure the Form correctly', async () => {
 
-			const isMetadataResponse = { ab: '12', cd: '34' };
-
-			validators.isMetadata.and.callFake( () => isMetadataResponse );
-
-			await controller.headlines( req, res, next );
+			await controller.title( req, res, next );
 
 			const config = Form.calls.argsFor( 0 )[ 1 ];
 
@@ -117,19 +114,12 @@ describe( 'Edit barrier controller', () => {
 			expect( config.title.values ).toEqual( [ barrier.barrier_title ] );
 			expect( config.title.required ).toBeDefined();
 
-			expect( config.country ).toBeDefined();
-			expect( config.country.type ).toEqual( SELECT );
-			expect( config.country.values ).toEqual( [ barrier.export_country ] );
-			expect( config.country.items ).toEqual( metadata.getCountryList() );
-			expect( config.country.validators.length ).toEqual( 1 );
-			expect( config.country.validators[ 0 ].fn ).toEqual( validators.isCountry );
-
 			expect( config.status ).not.toBeDefined();
 		} );
 
 		it( 'Should configure the FormProcessor correctly', async () => {
 
-			await controller.headlines( req, res );
+			await controller.title( req, res );
 
 			const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
 			const templateValues = { abc: '123' };
@@ -147,7 +137,7 @@ describe( 'Edit barrier controller', () => {
 
 			config.saveFormData( formValues );
 
-			expect( backend.barriers.saveDetails ).toHaveBeenCalledWith( req, barrier.id, formValues );
+			expect( backend.barriers.saveTitle ).toHaveBeenCalledWith( req, barrier.id, formValues );
 
 			urls.barriers.detail.and.callFake( () => detailResponse );
 
@@ -160,7 +150,7 @@ describe( 'Edit barrier controller', () => {
 		describe( 'When the processor does not throw an error', () => {
 			it( 'Should not call next', async () => {
 
-				await controller.headlines( req, res, next );
+				await controller.title( req, res, next );
 
 				expect( next ).not.toHaveBeenCalled();
 			} );
@@ -173,7 +163,7 @@ describe( 'Edit barrier controller', () => {
 
 				processor.process.and.callFake( () => { throw err; } );
 
-				await controller.headlines( req, res, next );
+				await controller.title( req, res, next );
 
 				expect( next ).toHaveBeenCalledWith( err );
 			} );
@@ -426,34 +416,56 @@ describe( 'Edit barrier controller', () => {
 			expect( config.priorityDescription ).toBeDefined();
 		} );
 
-		it( 'Should configure the FormProcessor correctly', async () => {
+		describe( 'When the barrier priority is unknown', () => {
+			it( 'Should configure the FormProcessor correctly and set isUnknown to true', async () => {
 
-			await controller.priority( req, res );
+				barrier.priority.code = 'UNKNOWN';
 
-			const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
-			const templateValues = { abc: '123' };
-			const formValues = { def: 456 };
-			const detailResponse = '/barrier/details';
+				await controller.priority( req, res );
 
-			expect( config.form ).toEqual( form );
-			expect( typeof config.render ).toEqual( 'function' );
-			expect( typeof config.saveFormData ).toEqual( 'function' );
-			expect( typeof config.saved ).toEqual( 'function' );
+				const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
+				const templateValues = { abc: '123' };
+				const formValues = { def: 456 };
+				const detailResponse = '/barrier/details';
 
-			config.render( templateValues );
+				expect( config.form ).toEqual( form );
+				expect( typeof config.render ).toEqual( 'function' );
+				expect( typeof config.saveFormData ).toEqual( 'function' );
+				expect( typeof config.saved ).toEqual( 'function' );
 
-			expect( res.render ).toHaveBeenCalledWith( template, templateValues );
+				config.render( templateValues );
 
-			config.saveFormData( formValues );
+				expect( res.render ).toHaveBeenCalledWith( template, { ...templateValues, isUnknown: true } );
 
-			expect( backend.barriers.savePriority ).toHaveBeenCalledWith( req, barrier.id, formValues );
+				config.saveFormData( formValues );
 
-			urls.barriers.detail.and.callFake( () => detailResponse );
+				expect( backend.barriers.savePriority ).toHaveBeenCalledWith( req, barrier.id, formValues );
 
-			config.saved();
+				urls.barriers.detail.and.callFake( () => detailResponse );
 
-			expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
-			expect( urls.barriers.detail ).toHaveBeenCalledWith( barrier.id );
+				config.saved();
+
+				expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
+				expect( urls.barriers.detail ).toHaveBeenCalledWith( barrier.id );
+			} );
+		} );
+
+		describe( 'When the barrier priority is not unknown', () => {
+			it( 'Should configure the FormProcessor correcty and set isUnknown to false', async () => {
+
+				barrier.priority.code = 'HIGH';
+
+				await controller.priority( req, res );
+
+				const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
+				const templateValues = { abc: '123' };
+
+				expect( config.form ).toEqual( form );
+
+				config.render( templateValues );
+
+				expect( res.render ).toHaveBeenCalledWith( template, { ...templateValues, isUnknown: false } );
+			} );
 		} );
 
 		describe( 'When the processor does not throw an error', () => {
@@ -478,6 +490,125 @@ describe( 'Edit barrier controller', () => {
 			} );
 		} );
 	} );
+
+	describe('status', () => {
+
+		const template = 'barriers/views/edit/status';
+		let barrier;
+
+		beforeEach( () => {
+			barrier = jasmine.helpers.getFakeData( '/backend/barriers/barrier' );
+			validators.isDateValue = jasmine.createSpy( 'validators.isDateValue' );
+			req.barrier = barrier;
+			barrier.status_summary = "hello";
+		} );
+
+		describe( 'If configuring the form for a resolved barrier', () => {
+			it( 'Should configure the Form correctly', async () => {
+
+				barrier.status = 4;
+
+				const monthResponse = { month: true };
+				const yearResponse = { year: true };
+	
+				validators.isDateValue.and.callFake( ( key ) => {
+					if( key === 'month' ){ return monthResponse; }
+					if( key === 'year' ){ return yearResponse; }
+				} );
+	
+				await controller.status( req, res, next );
+	
+				const config = Form.calls.argsFor( 0 )[ 1 ];
+	
+				expect( config.statusDate ).toBeDefined();
+				expect( config.statusDate.type ).toEqual( Form.GROUP );
+				expect( config.statusDate.validators.length ).toEqual( 5 );
+				expect( config.statusDate.validators[ 0 ].fn ).toEqual( monthResponse );
+				expect( config.statusDate.validators[ 1 ].fn ).toEqual( yearResponse );
+				expect( config.statusDate.validators[ 2 ].fn ).toEqual( validators.isDateNumeric );
+				expect( config.statusDate.validators[ 3 ].fn ).toEqual( validators.isDateValid );
+				expect( config.statusDate.validators[ 4 ].fn ).toEqual( validators.isDateInPast );
+				expect( config.statusDate.items ).toEqual( {
+					month: {
+						values: [ '03' ]
+					},
+					year: {
+						values: [ '2019' ]
+					}
+				} );
+	
+				expect( config.statusSummary ).toBeDefined();
+				expect( config.statusSummary.required ).toBeDefined();
+				expect( config.statusSummary.values).toEqual(['hello']);
+			});
+		});
+
+		describe( 'If configuring the form for a paused barrier', () => {
+			it( 'Should configure the Form correctly', async () => {
+	
+				await controller.status( req, res, next );
+	
+				const config = Form.calls.argsFor( 0 )[ 1 ];
+	
+				expect( config.statusDate ).toBeUndefined();
+	
+				expect( config.statusSummary ).toBeDefined();
+				expect( config.statusSummary.required ).toBeDefined();
+				expect( config.statusSummary.values).toEqual(['hello']);
+			});
+		});
+
+		it( 'Should configure the FormProcessor correctly', async () => {
+
+			await controller.status( req, res );
+
+			const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
+			const templateValues = { abc: '123' };
+			const formValues = { def: 456 };
+			const detailResponse = '/barrier/details';
+
+			expect( config.form ).toEqual( form );
+			expect( typeof config.render ).toEqual( 'function' );
+			expect( typeof config.saveFormData ).toEqual( 'function' );
+			expect( typeof config.saved ).toEqual( 'function' );
+
+			config.render( templateValues );
+
+			expect( res.render ).toHaveBeenCalledWith( template, templateValues );
+
+			config.saveFormData( formValues );
+
+			expect( backend.barriers.saveStatus ).toHaveBeenCalledWith( req, barrier.id, formValues );
+
+			urls.barriers.detail.and.callFake( () => detailResponse );
+
+			config.saved();
+
+			expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
+			expect( urls.barriers.detail ).toHaveBeenCalledWith( barrier.id );
+		} );
+		describe( 'When the processor does not throw an error', () => {
+			it( 'Should not call next', async () => {
+
+				await controller.status( req, res, next );
+
+				expect( next ).not.toHaveBeenCalled();
+			} );
+		} );
+
+		describe( 'When the processor throws an errror', () => {
+			it( 'Should call next with the error', async () => {
+
+				const err = new Error( 'a random error' );
+
+				processor.process.and.callFake( () => { throw err; } );
+
+				await controller.status( req, res, next );
+
+				expect( next ).toHaveBeenCalledWith( err );
+			} );
+		} );
+	});
 
 	describe( 'euExitRelated', () => {
 
@@ -571,9 +702,9 @@ describe( 'Edit barrier controller', () => {
 		} );
 	});
 
-	describe( 'status', () => {
+	describe( 'problemStatus', () => {
 
-		const template = 'barriers/views/edit/status';
+		const template = 'barriers/views/edit/problem-status';
 
 		it( 'Should configure the Form correctly', async () => {
 
@@ -581,23 +712,23 @@ describe( 'Edit barrier controller', () => {
 
 			validators.isMetadata.and.callFake( () => isMetadataResponse );
 
-			await controller.status( req, res, next );
+			await controller.problemStatus( req, res, next );
 
 			const config = Form.calls.argsFor( 0 )[ 1 ];
 
-			expect( config.status ).toBeDefined();
-			expect( config.status.type ).toEqual( RADIO );
-			expect( config.status.values ).toEqual( [ barrier.problem_status ] );
-			expect( config.status.items ).toEqual( govukItemsFromObjResponse );
+			expect( config.problemStatus ).toBeDefined();
+			expect( config.problemStatus.type ).toEqual( RADIO );
+			expect( config.problemStatus.values ).toEqual( [ barrier.problem_status ] );
+			expect( config.problemStatus.items ).toEqual( govukItemsFromObjResponse );
 			expect( govukItemsFromObj ).toHaveBeenCalledWith( metadata.statusTypes );
-			expect( config.status.validators.length ).toEqual( 1 );
-			expect( config.status.validators[ 0 ].fn ).toEqual( isMetadataResponse );
+			expect( config.problemStatus.validators.length ).toEqual( 1 );
+			expect( config.problemStatus.validators[ 0 ].fn ).toEqual( isMetadataResponse );
 			expect( validators.isMetadata ).toHaveBeenCalledWith( 'statusTypes' );
 		} );
 
 		it( 'Should configure the FormProcessor correctly', async () => {
 
-			await controller.status( req, res );
+			await controller.problemStatus( req, res );
 
 			const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
 			const templateValues = { abc: '123' };
@@ -615,7 +746,7 @@ describe( 'Edit barrier controller', () => {
 
 			config.saveFormData( formValues );
 
-			expect( backend.barriers.saveStatus ).toHaveBeenCalledWith( req, barrier.id, formValues );
+			expect( backend.barriers.saveProblemStatus ).toHaveBeenCalledWith( req, barrier.id, formValues );
 
 			urls.barriers.detail.and.callFake( () => detailResponse );
 
@@ -628,7 +759,7 @@ describe( 'Edit barrier controller', () => {
 		describe( 'When the processor does not throw an error', () => {
 			it( 'Should not call next', async () => {
 
-				await controller.status( req, res, next );
+				await controller.problemStatus( req, res, next );
 
 				expect( next ).not.toHaveBeenCalled();
 			} );
@@ -641,7 +772,7 @@ describe( 'Edit barrier controller', () => {
 
 				processor.process.and.callFake( () => { throw err; } );
 
-				await controller.status( req, res, next );
+				await controller.problemStatus( req, res, next );
 
 				expect( next ).toHaveBeenCalledWith( err );
 			} );

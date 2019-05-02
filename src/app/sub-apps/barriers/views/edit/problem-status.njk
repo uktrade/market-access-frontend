@@ -1,0 +1,38 @@
+{% from 'components/radios/macro.njk' import govukRadios %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Barrier - Edit barrier scope{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.barriers.detail( barrier.id ) },
+		caption: barrier.barrier_title,
+		text: 'Edit barrier scope',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.barriers.edit.problemStatus( barrier.id ) }}" method="POST" class="restrict-width">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{{ govukRadios({
+
+			name: 'problemStatus',
+			fieldset: {
+				legend: {
+					text: 'What is the scope of the barrier?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: problemStatus | addToRadio( {
+				'1': { hint: { text: 'for example, goods stuck at the border or documentation issue' } },
+				'2': { hint: { text: 'for example, a change of regulation' } }
+			} ),
+			errorMessage: errors | errorForName( 'problem-status-1' )
+		}) }}
+
+		<input type="submit" value="Save and exit to barrier" class="govuk-button">
+	</form>
+{% endblock %}

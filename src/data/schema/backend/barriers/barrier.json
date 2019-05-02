@@ -15,10 +15,12 @@
 		"product",
 		"source",
 		"other_source",
-		"barrier_type",
+		"barrier_types",
 		"barrier_title",
 		"problem_description",
-		"current_status",
+		"status",
+		"status_date",
+		"status_summary",
 		"reported_on",
 		"reported_by",
 		"created_on",
@@ -76,7 +78,12 @@
 		},
 
 		"other_source":{ "$ref": "$refs/common.json#/words" },
-		"barrier_type": { "$ref": "$refs/common.json#/barrier_type" },
+		"barrier_types": {
+			"type": "array",
+			"minItems": 0,
+			"maxItems": 5,
+			"items": { "$ref": "$refs/common.json#/small-int" }
+		},
 
 		"barrier_title": {
 			"type": "string",
@@ -88,17 +95,14 @@
 		"problem_description": { "$ref": "$refs/common.json#/paragraph" },
 		"priority": { "$ref": "$refs/common.json#/priority" },
 
-		"current_status": {
-			"type": "object",
-			"required": [ "status", "status_summary" ],
-			"properties": {
-				"status": {
-					"type": "number",
-					"enum": [ 1, 2, 3, 4 ]
-				},
-				"status_summary": { "$ref": "$refs/common.json#/paragraph" }
-			}
+		"status": {
+			"type": "number",
+			"enum": [ 0, 1, 2, 3, 4, 5, 6 ]
 		},
+
+		"status_summary": { "$ref": "$refs/common.json#/paragraph" },
+
+		"status_date": { "$ref": "$refs/common.json#/past-date" },
 
 		"reported_on": { "$ref": "$refs/common.json#/past-date" },
 		"reported_by": {

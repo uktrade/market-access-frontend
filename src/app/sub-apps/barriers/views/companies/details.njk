@@ -5,37 +5,37 @@
 
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Barrier - Company or organisation details{% endblock %}
+{% block page_title %}{{ super() }} - Barrier - Company details{% endblock %}
 
 {% block page_content %}
 
 	{{ heading({
 		back: { href: urls.barriers.companies.search( barrier.id ) },
 		caption: barrier.barrier_title,
-		text: 'Company or organisation affected',
+		text: 'Name of company affected',
 		errors: errors
 	}) }}
 
 	<section class="restrict-width">
 
-		<h2 class="govuk-heading-s">Review and confirm</h2>
+		<h2 class="govuk-heading-s">Company details</h2>
 
 		{{ detailsList( [
 			{
 				key: 'Registered name',
 				value: company.name
 			},{
-				key: 'Companies house no.',
+				key: 'Companies House number',
 				value: company.company_number
 			},{
 				key: 'Primary address',
 				value: [
-						company.registered_address_1,
-						company.registered_address_2,
-						company.registered_address_town,
-						company.registered_address_county,
-						company.registered_address_postcode,
-						company.registered_address_country.name
+						company.address.line_1,
+						company.address.line_2,
+						company.address.town,
+						company.address.county,
+						company.address.postcode,
+						company.address.country.name
 					] | removeEmpty | join( ', ' )
 			},{
 				key: 'Sector',
@@ -58,7 +58,7 @@
 		<form action="{{ urls.barriers.companies.details( barrier.id, company.id ) }}" method="POST">
 			<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 			<input type="hidden" name="companyId" value="{{ company.id }}">
-			<input type="submit" class="govuk-button" value="Select company">
+			<input type="submit" class="govuk-button" value="Add company">
 		</form>
 
 	</section>
