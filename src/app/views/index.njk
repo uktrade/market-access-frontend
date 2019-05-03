@@ -6,7 +6,7 @@
 
 {% block body_script %}
 	<script>
-		ma.pages.dashboard();
+		ma.pages.index();
 	</script>
 {% endblock %}
 
@@ -39,21 +39,20 @@
 						</a>
 						{{ barrier.code }}
 					</td>
-					<td class="standard-table__cell collapsible-content">
-						<div class="collapsible-widget">
-							{% if barrier.sectors|length > 3 %}
-								<input type="checkbox" id="collapsible-widget__toggle" style="display:none;">
-								<label class="collapsible-widget__label" for="collapsible-widget__toggle">show more</label>
+					<td class="standard-table__cell">
+						{% if barrier.sectors|length > 3 %}
+							<div class="collapsible-widget">
+								<label class="collapsible-widget__label">show more</label>
 								<div class="collapsible-widget__content--initial"> 
 									{{ barrier.sectors.slice(0, 2) | join( ', ' ) }} ...
 								</div>
 								<div class="collapsible-widget__content--toggled">
 									{{ barrier.sectors | join( ', ' ) }}
 								</div>
-							{% else %}
-								{{ barrier.sectors | join( ', ' ) }}
-							{% endif %}
-						</div>
+							</div>
+						{% else %}
+							{{ barrier.sectors | join( ', ' ) }}
+						{% endif %}
 					</td>
 					<td class="standard-table__cell">{{ barrier.country.name }}</td>
 					<td class="standard-table__cell"><span class="barrier-status-table-badge barrier-status-table-badge--{{ barrier.status.modifyer }}">{{ barrier.status.name }}</span></td>

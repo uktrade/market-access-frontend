@@ -1,5 +1,6 @@
 .collapsible-widget {
     display: table;
+    position: relative;
     .collapsible-widget__content--initial {
         display: table-header-group;
     }
@@ -13,29 +14,21 @@
         cursor: pointer;
         text-decoration: underline;
     }
-    #collapsible-widget__toggle { 
-        display: table-header-group;
-        background: orange;
-        &:checked {
-
-            & + .collapsible-widget__label:after {
-                content: "show less";
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: #f8f8f8;
-                text-decoration: underline;
-            }   
-    
-            & + .collapsible-widget__label {
-                & + .collapsible-widget__content--initial {
-                    display: none;
-                    & + .collapsible-widget__content--toggled {
-                        display: table-header-group;
-                    }
-                }
+    .collapsible-widget__label.opened { 
+        &:after {
+            content: "show less";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: inherit;
+            text-decoration: underline;
+        }   
+        & + .collapsible-widget__content--initial {
+            display: none;
+            & + .collapsible-widget__content--toggled {
+                display: table-header-group;
             }
         }
     }
