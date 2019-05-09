@@ -18,7 +18,6 @@
 			:multiple="true"
 			:options="options"
 			:options-limit="500"
-			:show-no-results="true"
 			:showLabels="false"
 			:searchable="true"
 			:id="id"
@@ -32,9 +31,9 @@
 				<div class="multiselect__option-label" v-html="$options.filters.highlight(props.option.text, props.search, props.option.parentName)"></div>
 			</template>
 
-			<span slot="noResult">
-				No results found
-			</span>
+			<template slot="noResult">
+				<span>No results found</span>
+			</template>
 
 			<template slot="caret" slot-scope="methods">
 				<div v-if="showCaret">
