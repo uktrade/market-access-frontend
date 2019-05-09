@@ -21,6 +21,10 @@
 
 .standard-table__row {
 
+	.standard-table__cell {
+		background-color: white;
+	}
+	
 	&:nth-of-type( odd ) {
 
 		.standard-table__cell {
