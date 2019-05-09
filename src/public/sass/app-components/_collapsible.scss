@@ -1,6 +1,7 @@
 .collapsible-widget {
     display: table;
     position: relative;
+    background: inherit;
     .collapsible-widget__content--initial {
         display: table-header-group;
     }
@@ -15,6 +16,7 @@
         text-decoration: underline;
     }
     .collapsible-widget__label.opened { 
+        background: inherit;
         &:after {
             content: "show less";
             position: absolute;
