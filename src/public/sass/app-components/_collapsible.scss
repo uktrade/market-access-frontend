@@ -1,37 +1,38 @@
 .collapsible-widget {
-    display: table;
-    position: relative;
-    background: inherit;
-    .collapsible-widget__content--initial {
-        display: table-header-group;
-    }
-    .collapsible-widget__content--toggled {
-        display: none;
-    }
-    .collapsible-widget__label {
-        position: relative;
-        display: block;
-        color: $govuk-blue;
-        cursor: pointer;
-        text-decoration: underline;
-    }
-    .collapsible-widget__label.opened { 
-        background: inherit;
-        &:after {
-            content: "show less";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: inherit;
-            text-decoration: underline;
-        }   
-        & + .collapsible-widget__content--initial {
-            display: none;
-            & + .collapsible-widget__content--toggled {
-                display: table-header-group;
-            }
-        }
-    }
+
+	display: table;
+	position: relative;
+	background: inherit;
+
+	&--closed {
+
+		.collapsible-widget__content--initial {
+
+			display: table-header-group;
+
+			&:after {
+				content: ' ...';
+			}
+		}
+
+		.collapsible-widget__content--toggled {
+			display: none;
+		}
+	}
+
+	&--opened {
+
+		.collapsible-widget__content--initial {
+
+			display: table-header-group;
+
+			&:after {
+				display: none;
+			}
+		}
+
+		.collapsible-widget__content--toggled {
+			display: table-header-group;
+		}
+	}
 }

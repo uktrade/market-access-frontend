@@ -4,7 +4,7 @@ ma.pages.index = (function(){
 
 		if( ma.components.Collapsible ){
 
-			new ma.components.Collapsible();
+			ma.components.Collapsible.initAll();
 		}
 	};
 })();
