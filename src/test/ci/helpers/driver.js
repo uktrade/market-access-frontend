@@ -65,7 +65,7 @@ module.exports = {
 		}
 
 		AxeBuilder( driver )
-			.disableRules( [ 'definition-list', 'dlitem' ] )// disable these rules as <div>s are allowed inside a <dl> but their rules are not updated yet!
+			.disableRules( [ 'autocomplete-valid' ] )// disable auto complete checks as vue-multiselect is using a hack: https://github.com/shentao/vue-multiselect/pull/922
 			.analyze( async ( err, results ) => {
 
 				if( err ){
