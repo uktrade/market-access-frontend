@@ -66,7 +66,8 @@ describe( 'Index controller', () => {
 			fields: [ 'priority', 'date', 'location', 'status' ],
 			directions: [ 'asc', 'desc' ],
 			serviceParamMap: {
-				date: 'reported_on'
+				date: 'reported_on',
+				location: 'export_country',
 			},
 		};
 		const defaultCurrentSort = {
