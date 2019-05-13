@@ -45,7 +45,7 @@
 	padding-right: 11px;
 
 	&:before {
-		content: " \25bc";
+		content: "\25bc";
 		position: absolute;
 		right: -1px;
 		top: 7px;
@@ -53,11 +53,21 @@
 	}
 
 	&:after {
-		content: " \25b2";
+		content: "\25b2";
 		position: absolute;
 		right: -1px;
 		top: -2px;
 		font-size: 10px;
+	}
+}
+
+.standard-table__heading__sortable,
+.standard-table__heading__sorted-ascending,
+.standard-table__heading__sorted-descending {
+
+	&:visited,
+	&:link {
+		color: $govuk-blue;
 	}
 }
 
