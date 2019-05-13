@@ -1028,7 +1028,11 @@ describe( 'Backend Service', () => {
 					allSectors,
 				}, {
 					all_sectors: allSectors,
+<<<<<<< HEAD
 					sectors: []
+=======
+					sectors: null
+>>>>>>> 429875be7962fe4b4580a04f0e2dc9c6c00b68df
 				} );
 			} );
 
