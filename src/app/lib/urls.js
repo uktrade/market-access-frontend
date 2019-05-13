@@ -40,9 +40,10 @@ const reportUrl = {
 	aboutProblem: ( reportId ) => `/reports/${ reportId }/problem/`,
 	summary: ( reportId ) => `/reports/${ reportId }/summary/`,
 	submit: ( reportId ) => `/reports/${ reportId }/submit/`,
+	delete: ( reportId ) => `/reports/${ reportId }/delete/`,
 };
 
-function getParams( map ){
+function addParams( path, map = [] ){
 
 	const params = [];
 
@@ -51,16 +52,16 @@ function getParams( map ){
 		params.push( key + '=' + value );
 	}
 
-	return ( params.length ? '?' + params.join( '&' ) : '' );
+	return path + ( params.length ? '?' + params.join( '&' ) : '' );
 }
 
 module.exports = {
 
-	index: () => '/',
+	index: ( params ) => addParams( '/', params ),
 	login: () => '/login/',
 	me: () => '/me',
 	whatIsABarrier: () => '/what-is-a-barrier/',
-	findABarrier: ( params ) => '/find-a-barrier/' + ( params ? getParams( params ) : '' ),
+	findABarrier: ( params ) => addParams( '/find-a-barrier/', params ),
 
 	documents: {
 		download: ( documentId ) => `/documents/${ documentId }/download/`,
@@ -85,6 +86,7 @@ module.exports = {
 		},
 		notes: {
 			add: ( barrierId ) => `/barriers/${ barrierId }/interactions/add-note/`,
+			delete: ( barrierId, noteId ) => `/barriers/${ barrierId }/interactions/delete-note/${ noteId }/`,
 			edit: ( barrierId, noteId ) => `/barriers/${ barrierId }/interactions/edit-note/${ noteId }/`,
 			documents: {
 				add: ( barrierId, noteId ) => `/barriers/${ barrierId }/interactions/notes/${ noteId }/documents/add/`,

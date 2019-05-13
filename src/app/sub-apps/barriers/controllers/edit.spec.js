@@ -416,34 +416,56 @@ describe( 'Edit barrier controller', () => {
 			expect( config.priorityDescription ).toBeDefined();
 		} );
 
-		it( 'Should configure the FormProcessor correctly', async () => {
+		describe( 'When the barrier priority is unknown', () => {
+			it( 'Should configure the FormProcessor correctly and set isUnknown to true', async () => {
 
-			await controller.priority( req, res );
+				barrier.priority.code = 'UNKNOWN';
 
-			const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
-			const templateValues = { abc: '123' };
-			const formValues = { def: 456 };
-			const detailResponse = '/barrier/details';
+				await controller.priority( req, res );
 
-			expect( config.form ).toEqual( form );
-			expect( typeof config.render ).toEqual( 'function' );
-			expect( typeof config.saveFormData ).toEqual( 'function' );
-			expect( typeof config.saved ).toEqual( 'function' );
+				const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
+				const templateValues = { abc: '123' };
+				const formValues = { def: 456 };
+				const detailResponse = '/barrier/details';
 
-			config.render( templateValues );
+				expect( config.form ).toEqual( form );
+				expect( typeof config.render ).toEqual( 'function' );
+				expect( typeof config.saveFormData ).toEqual( 'function' );
+				expect( typeof config.saved ).toEqual( 'function' );
 
-			expect( res.render ).toHaveBeenCalledWith( template, templateValues );
+				config.render( templateValues );
 
-			config.saveFormData( formValues );
+				expect( res.render ).toHaveBeenCalledWith( template, { ...templateValues, isUnknown: true } );
 
-			expect( backend.barriers.savePriority ).toHaveBeenCalledWith( req, barrier.id, formValues );
+				config.saveFormData( formValues );
 
-			urls.barriers.detail.and.callFake( () => detailResponse );
+				expect( backend.barriers.savePriority ).toHaveBeenCalledWith( req, barrier.id, formValues );
 
-			config.saved();
+				urls.barriers.detail.and.callFake( () => detailResponse );
 
-			expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
-			expect( urls.barriers.detail ).toHaveBeenCalledWith( barrier.id );
+				config.saved();
+
+				expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
+				expect( urls.barriers.detail ).toHaveBeenCalledWith( barrier.id );
+			} );
+		} );
+
+		describe( 'When the barrier priority is not unknown', () => {
+			it( 'Should configure the FormProcessor correcty and set isUnknown to false', async () => {
+
+				barrier.priority.code = 'HIGH';
+
+				await controller.priority( req, res );
+
+				const config = FormProcessor.calls.argsFor( 0 )[ 0 ];
+				const templateValues = { abc: '123' };
+
+				expect( config.form ).toEqual( form );
+
+				config.render( templateValues );
+
+				expect( res.render ).toHaveBeenCalledWith( template, { ...templateValues, isUnknown: false } );
+			} );
 		} );
 
 		describe( 'When the processor does not throw an error', () => {

@@ -3,30 +3,33 @@
 {% from "components/textarea/macro.njk" import govukTextarea %}
 {% from "components/file-upload/macro.njk" import govukFileUpload %}
 {% from 'app-components/toast.njk' import toastAlert %}
+{% from 'barriers/views/macros/delete-note.njk' import deleteNote %}
 
 {% extends 'layout.njk' %}
 
 {% block page_title %}{{ super() }} - Barrier details{{ pageTitleSuffix }}{% endblock %}
 
 {% block body_script %}
-	<script>
-		if( ma.components.BarrierSummary ){
-			new ma.components.BarrierSummary( {
-				text: 'Update the barrier',
-				linkClass: '.js-barrier-summary-link'
-			} );
-		}
-	</script>
 	{{ super() }}
 	<script>
 		ma.pages.barrier.detail( {
-			noteErrorText: '{{ noteErrorText }}'
+			noteErrorText: '{{ noteErrorText }}',
+			barrierSummary: {
+				text: 'Update the barrier',
+				linkClass: '.js-barrier-summary-link'
+			}
 		} );
 	</script>
 {% endblock %}
 
+{% block outsideContent %}
+	{% if isDelete %}
+		{{ deleteNote( barrier.id, currentNote, csrfToken ) }}
+	{% endif %}
+{% endblock %}
+
 {% block mastheadContent %}
-    {{ barrierSummary( barrier ) }}
+	{{ barrierSummary( barrier ) }}
 {% endblock %}
 
 {% macro noteForm( params ) %}
@@ -143,7 +146,7 @@
 					href: urls.barriers.edit.euExitRelated( barrier.id )
 				}
 			},{
-				title: 'Companies affected',
+				title: 'Companies known to be affected',
 				items: companiesList if companiesList.length,
 				add: {
 					text: 'Add one or more companies',
@@ -199,7 +202,7 @@
 	<section class="barrier-content">
 
 		{%- if barrier.isResolved or barrier.isHibernated -%}
-			
+
 			<div class="barrier-status-details">
 				<span class="barrier-status-details__icon barrier-status-details__icon--{{ barrier.status.modifyer }}">
 					{% if barrier.isResolved %}
@@ -244,7 +247,7 @@
 			<a class="govuk-button button--primary" href="{{ urls.barriers.notes.add( barrier.id ) }}">Add note</a>
 		{% endif %}
 
-		<ol class="event-list">
+		<ol class="event-list js-delete-modal-container">
 		{% if interactions and interactions.length %}
 			{%- for item in interactions %}
 
@@ -257,7 +260,6 @@
 						<span class="event-list__item__heading__recede"> by </span>{{ item.user.name }}
 						{%- endif -%}
 					</h4>
-
 
 					{% if item.edit %}
 
@@ -277,6 +279,9 @@
 
 						<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
 						<a class="event-list__item__edit-link" href="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}">Edit</a>
+						{% if item.user.id == user.id %}
+							<a class="event-list__item__delete-link js-delete-modal" href="{{ urls.barriers.notes.delete( barrier.id, item.id ) }}">Delete</a>
+						{% endif %}
 
 						{% if item.hasDocuments -%}
 
@@ -330,7 +335,7 @@
 						{%- endif %}
 					{%- endif %}
 					</p>
-					
+
 					{% if item.event === 'BARRIER_STATUS_CHANGE' and item.state.isOpen -%}
 						<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
 					{% endif -%}

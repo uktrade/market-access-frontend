@@ -270,6 +270,11 @@ module.exports.barrier = {
 			[ RESOLVED ]: { name: 'Resolved', modifyer: 'resolved' },
 			[ HIBERNATED ]: { name: 'Paused', modifyer: 'hibernated' }
 		}
+	},
+	priority: {
+		codes: {
+			UNKNOWN: 'UNKNOWN'
+		}
 	}
 };
 

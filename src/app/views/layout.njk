@@ -67,6 +67,8 @@
 	}) }}
 {% endblock %}
 
+{% block outsideContent %}{% endblock %}
+
 {% block masthead %}
 	<div class="govuk-masthead">
 		{% block mastheadContent %}{% endblock %}
@@ -74,7 +76,7 @@
 {% endblock %}
 
 {% block content %}
-{% block page_content %}{% endblock %}
+	{% block page_content %}{% endblock %}
 {% endblock %}
 
 {% block footer %}
@@ -113,6 +115,7 @@
 {% block bodyEnd %}
 	<!-- build:js(src) /public/js/vendor.min.js -->
 	<script src="/public/js/vendor/jessie.js"></script>
+	<script src="/public/js/vendor/body-scroll-lock.js"></script>
 	<!-- endbuild -->
 	<!-- build:js(src) /public/js/app.min.js -->
 	<script src="/public/js/ma.js"></script>
@@ -121,11 +124,16 @@
 	<script src="/public/js/components/Header.js"></script>
 	<script src="/public/js/components/ConditionalRadioContent.js"></script>
 	<script src="/public/js/components/FileUpload.js"></script>
+	<script src="/public/js/components/Collapsible.js"></script>
 	<script src="/public/js/components/TextArea.js"></script>
 	<script src="/public/js/components/BarrierSummary.js"></script>
 	<script src="/public/js/components/Toast.js"></script>
 	<script src="/public/js/components/CharacterCount.js"></script>
 	<script src="/public/js/components/Attachments.js"></script>
+	<script src="/public/js/components/Modal.js"></script>
+	<script src="/public/js/components/DeleteModal.js"></script>
+	<script src="/public/js/pages/index.js"></script>
+	<script src="/public/js/pages/report/index.js"></script>
 	<script src="/public/js/pages/report/is-resolved.js"></script>
 	<script src="/public/js/pages/report/about-problem.js"></script>
 	<script src="/public/js/pages/barrier/status.js"></script>

@@ -103,7 +103,6 @@ function transformUser( { response, body } ){
 
 		body.country = metadata.getCountry( body.location );
 	}
-
 	if( config.assignDefaultCountry && !body.country ){
 
 		body.country = metadata.countries && metadata.countries[ 1 ];
@@ -223,19 +222,13 @@ module.exports = {
 	},
 
 	barriers: {
-		getAll: async ( req, filters = {} ) => {
+		getAll: async ( req, filters = {}, orderBy = 'reported_on', orderDirection ) => {
 
 			const params = getFilterParams( filters );
-			let path = '/barriers';
 
-			params.push( 'ordering=-reported_on' );
+			params.push( `ordering=${ orderDirection === 'asc' ? '' :  '-' }${ orderBy }` );
 
-			if( params.length ){
-
-				path += '?' + params.join( '&' );
-			}
-
-			return backend.get( path, getToken( req ) );
+			return backend.get( `/barriers?${ params.join( '&' ) }`, getToken( req ) );
 		},
 		get: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }`, getToken( req ) ),
 		getInteractions: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }/interactions`, getToken( req ) ),
@@ -249,6 +242,7 @@ module.exports = {
 				text: values.note,
 				documents: values.documentIds
 			} ),
+			delete: ( req, noteId ) => backend.delete( `/barriers/interactions/${ noteId }`, getToken( req ) ),
 		},
 		resolve: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/resolve`, getToken( req ), {
 			status_date: getDefaultedDate( values.resolvedDate ),
@@ -301,7 +295,7 @@ module.exports = {
 			if (values.statusDate) {
 				status_details.status_date = getDefaultedDate( values.statusDate );
 			}
-			return updateBarrier( getToken( req ), barrierId, status_details); 
+			return updateBarrier( getToken( req ), barrierId, status_details);
 		},
 	},
 
@@ -310,6 +304,7 @@ module.exports = {
 		getAll: ( req ) => backend.get( '/reports?ordering=-created_on', getToken( req ) ).then( transformReportList ),
 		getForCountry: ( req, countryId ) => backend.get( `/reports?export_country=${ countryId }&ordering=-created_on`, getToken( req ) ).then( transformReportList ),
 		get: ( req, reportId ) => backend.get( `/reports/${ reportId }`, getToken( req ) ).then( transformSingleReport ),
+		delete: ( req, reportId ) => backend.delete( `/reports/${ reportId }`, getToken( req ) ),
 		save: ( req, values ) => backend.post( '/reports', getToken( req ), {
 			problem_status: getValue( values.status ),
 			is_resolved: getValue( values.isResolved ),

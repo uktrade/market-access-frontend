@@ -217,46 +217,60 @@ describe( 'Backend Service', () => {
 		} );
 
 		describe( 'getAll', () => {
+
+			async function testWithOrdering( filters, expectedParams ){
+
+				const path = ( '/barriers?' + ( expectedParams ? expectedParams + '&' : '' ) );
+
+				await service.barriers.getAll( req, filters );
+
+				expect( backend.get ).toHaveBeenCalledWith( `${ path }ordering=-reported_on`, token );
+
+				await service.barriers.getAll( req, filters, 'reported_on' );
+
+				expect( backend.get ).toHaveBeenCalledWith( `${ path }ordering=-reported_on`, token );
+
+				await service.barriers.getAll( req, filters, 'reported_on', 'desc' );
+
+				expect( backend.get ).toHaveBeenCalledWith( `${ path }ordering=-reported_on`, token );
+
+				await service.barriers.getAll( req, filters, 'reported_on', 'asc' );
+
+				expect( backend.get ).toHaveBeenCalledWith( `${ path }ordering=reported_on`, token );
+			}
+
 			describe( 'With no filters', () => {
-				it( 'Should call the correct path with default sort order', async () => {
+				it( 'Should call the correct path with default sort order', () => {
 
-					await service.barriers.getAll( req );
-
-					expect( backend.get ).toHaveBeenCalledWith( '/barriers?ordering=-reported_on', token );
+					testWithOrdering();
 				} );
 			} );
 
 			describe( 'With a country filter', () => {
-				it( 'Should call the correct path with default sort order', async () => {
+				it( 'Should call the correct path with default sort order', () => {
 
 					const country = uuid();
 
-					await service.barriers.getAll( req, { country } );
-
-					expect( backend.get ).toHaveBeenCalledWith( `/barriers?location=${ country }&ordering=-reported_on`, token );
+					testWithOrdering( { country }, `location=${ country }` );
 				} );
 			} );
 
 			describe( 'With an overseas region filter', () => {
-				it( 'Should call the correct path with default sort order', async () => {
+				it( 'Should call the correct path with default sort order', () => {
 
 					const region = uuid();
 
-					await service.barriers.getAll( req, { region } );
-
-					expect( backend.get ).toHaveBeenCalledWith( `/barriers?location=${ region }&ordering=-reported_on`, token );
+					testWithOrdering( { region }, `location=${ region }` );
 				} );
 			} );
 
 			describe( 'With a country and an overseas region filter', () => {
-				it( 'Should call the correct path with default sort order', async () => {
+				it( 'Should call the correct path with default sort order', () => {
 
 					const country = uuid();
 					const region = uuid();
 
-					await service.barriers.getAll( req, { region, country } );
-
-					expect( backend.get ).toHaveBeenCalledWith( `/barriers?location=${ country },${ region }&ordering=-reported_on`, token );
+					testWithOrdering( { region, country }, `location=${ country },${ region }` );
 				} );
 			} );
 
@@ -272,13 +286,11 @@ describe( 'Backend Service', () => {
 			} );
 
 			describe( 'With a type filter', () => {
-				it( 'Should call the correct path with default sort order', async () => {
+				it( 'Should call the correct path with default sort order', () => {
 
 					const type = faker.lorem.word().toUpperCase();
 
-					await service.barriers.getAll( req, { type } );
-
-					expect( backend.get ).toHaveBeenCalledWith( `/barriers?barrier_type=${ type }&ordering=-reported_on`, token );
+					testWithOrdering( { type }, `barrier_type=${ type }` );
 				} );
 			} );
 
@@ -287,9 +299,7 @@ describe( 'Backend Service', () => {
 
 					const status = '2,5';
 
-					await service.barriers.getAll( req, { status } );
-
-					expect( backend.get ).toHaveBeenCalledWith( `/barriers?status=${ status }&ordering=-reported_on`, token );
+					testWithOrdering( { status }, `status=${ status }` );
 				} );
 			} );
 		} );
@@ -374,6 +384,17 @@ describe( 'Backend Service', () => {
 						text: note,
 						documents: documentIds
 					} );
+				} );
+			} );
+
+			describe( 'delete', () => {
+				it( 'Should DELETE to the correct path with the correct values', async () => {
+
+					const noteId = '123';
+
+					await service.barriers.notes.delete( req, noteId );
+
+					expect( backend.delete ).toHaveBeenCalledWith( `/barriers/interactions/${ noteId }`, token );
 				} );
 			} );
 		} );
@@ -557,12 +578,12 @@ describe( 'Backend Service', () => {
 
 					const [ month, year ] = [ '11', '2000' ];
 					const statusSummary = 'my summary text';
-	
+
 					await service.barriers.saveStatus( req, barrierId, {
 						statusDate: { month, year },
 						statusSummary
 					} );
-	
+
 					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
 						status_date: [ year, month, '01' ].join( '-' ),
 						status_summary: statusSummary
@@ -573,11 +594,11 @@ describe( 'Backend Service', () => {
 				it( 'Should PUT to the correct path with the correct values', async () => {
 
 					const statusSummary = 'my summary text';
-	
+
 					await service.barriers.saveStatus( req, barrierId, {
 						statusSummary
 					} );
-	
+
 					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
 						status_summary: statusSummary
 					} );
@@ -1072,6 +1093,17 @@ describe( 'Backend Service', () => {
 				service.reports.submit( req, reportId );
 
 				expect( backend.put ).toHaveBeenCalledWith( `/reports/${ reportId }/submit`, token );
+			} );
+		} );
+
+		describe( 'delete', () => {
+			it( 'Should call the correct path', () => {
+
+				const reportId = 200;
+
+				service.reports.delete( req, reportId );
+
+				expect( backend.delete ).toHaveBeenCalledWith( `/reports/${ reportId }`, token );
 			} );
 		} );
 

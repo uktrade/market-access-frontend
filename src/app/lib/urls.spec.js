@@ -4,9 +4,20 @@ const uuid = require( 'uuid/v4' );
 describe( 'URLs', () => {
 
 	describe( 'Index', () => {
-		it( 'Should return the correct path', () => {
+		describe( 'Without params', () => {
+			it( 'Should return the correct path', () => {
 
-			expect( urls.index() ).toEqual( '/' );
+				expect( urls.index() ).toEqual( '/' );
+			} );
+		} );
+
+		describe( 'With params', () => {
+			it( 'Should return the correct path', () => {
+
+				expect( urls.index( {} ) ).toEqual( '/' );
+				expect( urls.index( { test1: '1' } ) ).toEqual( '/?test1=1' );
+				expect( urls.index( { test1: '1', test2: '2' } ) ).toEqual( '/?test1=1&test2=2' );
+			} );
 		} );
 	} );
 
@@ -25,7 +36,7 @@ describe( 'URLs', () => {
 	} );
 
 	describe( 'What is a barrier', () => {
-		it( 'Should return the login path', () => {
+		it( 'Should return the correct path', () => {
 
 			expect( urls.whatIsABarrier() ).toEqual( '/what-is-a-barrier/' );
 		} );
@@ -33,14 +44,14 @@ describe( 'URLs', () => {
 
 	describe( 'Find a barrier', () => {
 		describe( 'Without any filters', () => {
-			it( 'Should return the login path', () => {
+			it( 'Should return the correct path', () => {
 
 				expect( urls.findABarrier() ).toEqual( '/find-a-barrier/' );
 			} );
 		} );
 
 		describe( 'With filters', () => {
-			it( 'Should return the login path', () => {
+			it( 'Should return the correct path', () => {
 
 				expect( urls.findABarrier( {} ) ).toEqual( '/find-a-barrier/' );
 				expect( urls.findABarrier( { country: '1' } ) ).toEqual( '/find-a-barrier/?country=1' );
@@ -107,6 +118,7 @@ describe( 'URLs', () => {
 
 				expect( urls.barriers.notes.add( barrierId ) ).toEqual( `/barriers/${ barrierId }/interactions/add-note/` );
 				expect( urls.barriers.notes.edit( barrierId, noteId ) ).toEqual( `/barriers/${ barrierId }/interactions/edit-note/${ noteId }/` );
+				expect( urls.barriers.notes.delete( barrierId, noteId ) ).toEqual( `/barriers/${ barrierId }/interactions/delete-note/${ noteId }/` );
 			} );
 
 			describe( 'note documents', () => {
@@ -369,6 +381,7 @@ describe( 'URLs', () => {
 					[ 'aboutProblem', 'problem' ],
 					[ 'summary', 'summary' ],
 					[ 'submit', 'submit' ],
+					['delete', 'delete']
 				] );
 			} );
 		} );

@@ -22,7 +22,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 
 /*
 Return URI:
-http://127.0.0.1:1337/?addClass=1&hasClass=1&removeClass=1&toggleClass=1&getDescendantsByClassName=1&getElement=1&getElementData=3&getElementPositionStyles=1&query=1&queryOne=1&setAriaAttribute=1&setElementData=3&attachListener=1&cancelDefault=1&detachListener=1&getEventTarget=1&bind=2&getInputValue=1&toArray=2
+http://127.0.0.1:1337/?addClass=1&hasClass=1&removeClass=1&toggleClass=1&ajaxGet=1&xhrCreate=1&xhrGet=1&getDescendantsByClassName=1&getElement=1&getElementData=3&getElementPositionStyles=1&query=1&queryOne=1&setAriaAttribute=1&setElementData=3&attachListener=1&cancelDefault=1&cancelPropagation=2&detachListener=1&getEventTarget=1&bind=2&getInputValue=1&isOwnProperty=1&mixin=1&toArray=2
 */
 
 var jessie;
@@ -53,6 +53,122 @@ jessie = jessie || {};
 		html = isHostObjectProperty(globalDocument, 'documentElement') && globalDocument.documentElement,
 		canCall = !!Function.prototype.call,
 		isStyleCapable = !!(html && isHostObjectProperty(html, 'style'));
+
+
+
+var isOwnProperty;
+
+/*
+Description:
+Cutting edge. Relises on `Object.prototype.hasOwnProperty`
+*/
+
+/*
+Author:
+David Mark
+*/
+
+if(Object.prototype.hasOwnProperty) {
+	isOwnProperty = function(o, p) {
+		return o.hasOwnProperty(p);
+	};
+}
+
+
+
+var mixin;
+
+/*
+Description:
+Relies on `jessie.isOwnProperty`
+*/
+
+/*
+Degrades:
+*/
+
+// TODO: Test the old iteration bug with shadowed built-in properties (e.g. toString)
+//       Need another rendition that handles that bug
+
+if(isOwnProperty) {
+	mixin = function(target, source) {
+		for(var property in source) {
+			if(isOwnProperty(source, property)) {
+				target[property] = source[property];
+			}
+		}
+	};
+}
+
+
+
+
+/*
+Description:
+Relies on `Function.prototype.bind` and `Function.prototype.apply` and `Array.prototype.slice`
+*/
+
+/*
+Degrades:
+IE5, IE4, IE3
+*/
+
+var bind;
+
+if (Function.prototype.bind) {
+	bind = function(fn, thisObject) {
+		return fn.bind.apply(fn, Array.prototype.slice.call(arguments, 1));
+	};
+}
+else if (canCall && Array.prototype.slice) {
+	bind = function(fn, context) {
+		var prependArgs = Array.prototype.slice.call(arguments, 2);
+
+		if (prependArgs.length) {
+			return function() {
+				return fn.apply(context, Array.prototype.concat.apply(prependArgs, arguments));
+			};
+		}
+		return function() {
+			return fn.apply(context, arguments);
+		};
+	};
+
+}
+
+
+
+
+/*
+Description:
+Relies on W3C `window.XMLHttpRequest`.
+
+NOTE: IE7+ native version does not support overrideMimeType or local file
+requests
+*/
+
+/*
+Degrades:
+IE6, IE5.5, IE5, IE4, IE3
+*/
+
+/*
+Author:
+David Mark
+*/
+
+var xhrCreate;
+
+if(isHostMethod(global, "XMLHttpRequest")) {
+	try {
+		if(new global.XMLHttpRequest()) {
+			xhrCreate = function() {
+				return new XMLHttpRequest();
+			};
+		}
+	}
+	catch(e) {}
+}
 
 
 
@@ -111,6 +227,94 @@ if (isHostMethod(document, 'getElementById')) {
 		return (doc || document).getElementById(id);
 	};
 }
+
+
+
+/*
+Description:
+For making XHR get HTTP requests.
+*/
+
+/*
+Author:
+Adam Silver
+*/
+
+var xhrGet;
+
+// if you can't create one then you certainly can't send one
+if (xhrCreate && bind && mixin && isOwnProperty) {
+	xhrGet = function(xhr, url, options) {
+
+		options = options || {};
+		options.thisObject = options.thisObject || xhr;
+
+		var successFn,
+			failFn,
+			completeFn,
+			headers = {
+				'X-Requested-With' : 'XMLHttpRequest'
+			};
+
+		if (options.headers) {
+			mixin(headers, options.headers);
+		}
+
+		if (options.success) {
+			successFn = bind(options.success, options.thisObject);
+		}
+
+		if (options.fail) {
+			failFn = bind(options.fail, options.thisObject);
+		}
+
+		if (options.complete) {
+			completeFn = bind(options.complete, options.thisObject);
+		}
+
+		function isSuccessfulResponse(xhr) {
+			var success = false,
+				status = xhr.status,
+				between200and300 = (status >= 200 && status < 300),
+				notModified = (status === 304);
+
+			if (between200and300 || notModified || (status === 0 && xhr.responseText)) {
+				success = true;
+			}
+			return success;
+		}
+
+		function handleReadyStateChange() {
+			if (xhr.readyState === 4) {
+				if (isSuccessfulResponse(xhr)) {
+					if (successFn) {
+						successFn(xhr.responseText, xhr);
+					}
+				}
+				else if (failFn) {
+					failFn(xhr);
+				}
+				if (completeFn) {
+					completeFn(xhr);
+				}
+			}
+		}
+
+		xhr.open('GET', url);
+
+		for (var key in headers) {
+			if (isOwnProperty( headers, key )){
+				xhr.setRequestHeader(key, headers[key]);
+			}
+		}
+
+		xhr.onreadystatechange = handleReadyStateChange;
+		xhr.send(null);
+
+		return xhr;
+	};
+}
+
 
 
 
@@ -208,42 +412,6 @@ getInputValue = function(elInput, defaultValue) {
 
 /*
 Description:
-Relies on `Function.prototype.bind` and `Function.prototype.apply` and `Array.prototype.slice`
-*/
-
-/*
-Degrades:
-IE5, IE4, IE3
-*/
-
-var bind;
-
-if (Function.prototype.bind) {
-	bind = function(fn, thisObject) {
-		return fn.bind.apply(fn, Array.prototype.slice.call(arguments, 1));
-	};
-}
-else if (canCall && Array.prototype.slice) {
-	bind = function(fn, context) {
-		var prependArgs = Array.prototype.slice.call(arguments, 2);
-
-		if (prependArgs.length) {
-			return function() {
-				return fn.apply(context, Array.prototype.concat.apply(prependArgs, arguments));
-			};
-		}
-		return function() {
-			return fn.apply(context, arguments);
-		};
-	};
-
-}
-
-
-
-
-/*
-Description:
 Cutting edge (W3 compliant)
 */
 
@@ -288,6 +456,36 @@ var detachListener;
 if(html && isHostMethod(html, 'removeEventListener')) {
 	detachListener = function(el, eventType, fn) {
 		el.removeEventListener(eventType, fn, false);
+	};
+}
+
+
+
+/*
+Description:
+Cutting edge (W3 compliant) and Microsoft event model providing the widest support.
+*/
+
+/*
+Degrades:
+IE4, IE3, NN4
+*/
+
+/*
+Author:
+Adam Silver
+*/
+
+var cancelPropagation;
+
+if(html && isHostMethod(html, 'addEventListener')) {
+	cancelPropagation = function(e) {
+		e.stopPropagation();
+	};
+}
+else if(html && isHostMethod(html, 'attachEvent')) {
+	cancelPropagation = function(e) {
+		e.cancelBubble = true;
 	};
 }
 
@@ -606,6 +804,27 @@ if (globalDocument && isHostMethod(globalDocument, "getElementsByClassName") && 
 
 
 /*
+Description:
+Relies on `jessie.xhrCreate` and `jessie.xhrGet`
+*/
+
+/*
+Author:
+Adam Silver
+*/
+
+var ajaxGet;
+
+if(xhrCreate && xhrGet) {
+	ajaxGet = function(url, options) {
+		var xhr = xhrCreate();
+		return xhrGet(xhr, url, options);
+	};
+}
+
+
+
+/*
  Description:
  Relies on the `jessie.hasClass` && `jessie.addClass` && `jessie.removeClass`
  */
@@ -628,15 +847,20 @@ if (hasClass && addClass && removeClass) {
 jessie.isHostMethod = isHostMethod;
 jessie.isHostObjectProperty = isHostObjectProperty;
 jessie.hasFeatures = hasFeatures;
+jessie.isOwnProperty = isOwnProperty;
+jessie.mixin = mixin;
+jessie.bind = bind;
+jessie.xhrCreate = xhrCreate;
 jessie.toArray = toArray;
 jessie.getElement = getElement;
+jessie.xhrGet = xhrGet;
 jessie.removeClass = removeClass;
 jessie.hasClass = hasClass;
 jessie.addClass = addClass;
 jessie.getInputValue = getInputValue;
-jessie.bind = bind;
 jessie.getEventTarget = getEventTarget;
 jessie.detachListener = detachListener;
+jessie.cancelPropagation = cancelPropagation;
 jessie.cancelDefault = cancelDefault;
 jessie.attachListener = attachListener;
 jessie.setElementData = setElementData;
@@ -646,6 +870,7 @@ jessie.query = query;
 jessie.getElementPositionStyles = getElementPositionStyles;
 jessie.getElementData = getElementData;
 jessie.getDescendantsByClassName = getDescendantsByClassName;
+jessie.ajaxGet = ajaxGet;
 jessie.toggleClass = toggleClass;
 
 	globalDocument = html = null;

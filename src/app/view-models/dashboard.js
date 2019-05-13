@@ -1,4 +1,5 @@
 const metadata = require( '../lib/metadata' );
+const urls = require( '../lib/urls' );
 
 const barrierStatusTypeInfo = metadata.barrier.status.typeInfo;
 
@@ -41,12 +42,34 @@ function update( barrier ){
 	};
 }
 
-module.exports = ( barriers, country ) => {
+function getSortableFields( sortData ){
+
+	const sortableFields = {};
+	const currentSort = sortData.currentSort;
+
+	sortData.fields.forEach( ( field ) => {
+
+		const isActive = ( field === currentSort.field );
+
+		sortableFields[ field ] = {
+			isActive,
+			key: field,
+			direction: ( isActive ? currentSort.direction : 'desc' ),
+			url: urls.index( { sortBy: field, sortDirection: ( isActive ? ( currentSort.direction === 'asc' ? 'desc' : 'asc' ) : 'desc' ) } ),
+		};
+	} );
+
+	return sortableFields;
+}
+
+module.exports = ( barriers, country, sortData ) => {
 
 	if( barriers && barriers.length ){
 
 		barriers = barriers.map( update );
 	}
 
-	return {	barriers, country	};
+	const sortableFields = getSortableFields( sortData );
+
+	return {	barriers, country, sortableFields };
 };
