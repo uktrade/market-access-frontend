@@ -1,5 +1,6 @@
 {% from 'app-components/dashboard-heading.njk' import dashboardHeading %}
 {% from 'app-components/collapsible.njk' import collapsible %}
+{% from 'macros/standard-table-heading.njk' import tableHeading %}
 
 {% extends 'layout.njk' %}
 
@@ -10,22 +11,6 @@
 		ma.pages.index();
 	</script>
 {% endblock %}
-
-{% macro tableHeading( text, field ) %}
-
-	{%- if field -%}
-		{% set text %}
-			{% set isAsc = ( field.direction == 'asc' ) %}
-			{%- if field.isActive -%}
-				<a href="{{ field.url }}" title="Sort by {{ text }} {{ 'descending' if isAsc else 'ascending' }}" class="standard-table__heading__sorted-{{ 'ascending' if isAsc else 'descending' }}">{{ text }}</a>
-			{%- else -%}
-				<a href="{{ field.url }}" title="Sort by {{ text }} {{ 'ascending' if isAsc else 'descending' }}" class="standard-table__heading__sortable">{{ text }}</a>
-			{%- endif -%}
-		{% endset %}
-	{%- endif -%}
-
-	<th class="standard-table__heading{{ ' standard-table__heading--active' if field.isActive }}">{{ text | safe }}</th>
-{% endmacro %}
 
 {% block page_content %}
 
