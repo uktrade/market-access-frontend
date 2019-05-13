@@ -65,6 +65,8 @@
 .standard-table__heading__sorted-ascending,
 .standard-table__heading__sorted-descending {
 
+	text-decoration: none;
+
 	&:visited,
 	&:link {
 		color: $govuk-blue;
