@@ -3,14 +3,22 @@ const backend = require( '../lib/backend-service' );
 const { OPEN, HIBERNATED } = require( '../lib/metadata' ).barrier.status.types;
 const dashboardViewModel = require( '../view-models/dashboard' );
 
-const sortableFields = [ 'priority', 'date', 'location', 'status' ];
-const sortDirections = [ 'asc', 'desc' ];
+const sortData = {
+	fields: [ 'priority', 'date', 'location', 'status' ],
+	directions: [ 'asc', 'desc' ],
+	serviceParamMap: {
+		date: 'reported_on'
+	},
+};
 
-function getSort( { sortBy, sortDirection } ){
+function getCurrentSort( { sortBy, sortDirection } ){
+
+	const field = ( sortData.fields.includes( sortBy ) ? sortBy : 'date' );
 
 	return {
-		sortBy: ( sortableFields.includes( sortBy ) ? sortBy : 'reported_on' ),
-		sortDirection: ( sortDirections.includes( sortDirection ) ? sortDirection : 'desc' ),
+		field,
+		serviceParam: ( sortData.serviceParamMap[ field ] || field ),
+		direction: ( sortData.directions.includes( sortDirection ) ? sortDirection : 'desc' ),
 	};
 }
 
@@ -23,7 +31,7 @@ module.exports = {
 		const filters = {
 			status: [ OPEN, HIBERNATED ].join( ',' ),
 		};
-		const { sortBy, sortDirection } = getSort( req.query );
+		const currentSort = getCurrentSort( req.query );
 		let template = 'index';
 
 		if( countryId ){
@@ -34,11 +42,14 @@ module.exports = {
 
 		try {
 
-			const { response, body } = await backend.barriers.getAll( req, filters, sortBy, sortDirection );
+			const { response, body } = await backend.barriers.getAll( req, filters, currentSort.serviceParam, currentSort.direction );
 
 			if( response.isSuccess ){
 
-				res.render( template, dashboardViewModel( body.results, country ) );
+				res.render( template, dashboardViewModel( body.results, country, {
+					...sortData,
+					currentSort,
+				} ) );
 
 			} else {
 

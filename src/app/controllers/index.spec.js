@@ -1,5 +1,4 @@
 const proxyquire = require( 'proxyquire' );
-const uuid = require( 'uuid' );
 const modulePath = './index';
 
 let controller;
@@ -63,6 +62,18 @@ describe( 'Index controller', () => {
 	describe( 'Index', () => {
 
 		const status = [ OPEN, HIBERNATED ].join( ',' );
+		const sortData = {
+			fields: [ 'priority', 'date', 'location', 'status' ],
+			directions: [ 'asc', 'desc' ],
+			serviceParamMap: {
+				date: 'reported_on'
+			},
+		};
+		const defaultCurrentSort = {
+			field: 'date',
+			serviceParam: 'reported_on',
+			direction: 'desc',
+		};
 
 		describe( 'Without an error', () => {
 			describe( 'With a success response', () => {
@@ -87,7 +98,10 @@ describe( 'Index controller', () => {
 
 						expect( next ).not.toHaveBeenCalled();
 						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { country: country.id, status }, 'reported_on', 'desc' );
-						expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, country );
+						expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, country, {
+							...sortData,
+							currentSort: defaultCurrentSort
+						} );
 						expect( res.render ).toHaveBeenCalledWith( 'my-country', dashboardViewModelResponse );
 					} );
 				} );
@@ -123,22 +137,94 @@ describe( 'Index controller', () => {
 							await controller.index( req, res, next );
 
 							expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'reported_on', 'desc' );
-							expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, req.user.country );
+							expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, req.user.country, {
+								...sortData,
+								currentSort: defaultCurrentSort
+							} );
 						} );
 					} );
 
 					describe( 'When there is sorting', () => {
 						describe( 'Sorting by priority', () => {
-							it( 'Should get the report sorted correctly and render the correct template', async () => {
 
+							beforeEach( () => {
 								req.query = {
 									sortBy: 'priority',
 								};
+							} );
 
-								await controller.index( req, res, next );
+							describe( 'With no direction specified', () => {
+								it( 'Should get the report sorted correctly and render the correct template', async () => {
 
-								expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'priority', 'desc' );
-								expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, req.user.country );
+									await controller.index( req, res, next );
+
+									expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'priority', 'desc' );
+									expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, req.user.country, {
+										...sortData,
+										currentSort: {
+											field: 'priority',
+											serviceParam: 'priority',
+											direction: 'desc',
+										}
+									} );
+								} );
+							} );
+
+							describe( 'With asc direction specified', () => {
+								it( 'Should get the report sorted correctly and render the correct template', async () => {
+
+									req.query.sortDirection = 'asc';
+
+									await controller.index( req, res, next );
+
+									expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'priority', 'asc' );
+									expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, req.user.country, {
+										...sortData,
+										currentSort: {
+											field: 'priority',
+											serviceParam: 'priority',
+											direction: 'asc',
+										}
+									} );
+								} );
+							} );
+
+							describe( 'With desc direction specified', () => {
+								it( 'Should get the report sorted correctly and render the correct template', async () => {
+
+									req.query.sortDirection = 'desc';
+
+									await controller.index( req, res, next );
+
+									expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'priority', 'desc' );
+									expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, req.user.country, {
+										...sortData,
+										currentSort: {
+											field: 'priority',
+											serviceParam: 'priority',
+											direction: 'desc',
+										}
+									} );
+								} );
+							} );
+
+							describe( 'With an unknown direction specified', () => {
+								it( 'Should get the report sorted correctly and render the correct template', async () => {
+
+									req.query.sortDirection = 'descabc';
+
+									await controller.index( req, res, next );
+
+									expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'priority', 'desc' );
+									expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, req.user.country, {
+										...sortData,
+										currentSort: {
+											field: 'priority',
+											serviceParam: 'priority',
+											direction: 'desc',
+										}
+									} );
+								} );
 							} );
 						} );
 					} );
