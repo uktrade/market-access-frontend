@@ -1,8 +1,15 @@
 {% from 'app-components/dashboard-heading.njk' import dashboardHeading %}
+{% from 'app-components/collapsible.njk' import collapsible %}
 
 {% extends 'layout.njk' %}
 
 {% block page_title %}{{ super() }} - Homepage{% endblock %}
+
+{% block body_script %}
+	<script>
+		ma.pages.index();
+	</script>
+{% endblock %}
 
 {% block page_content %}
 
@@ -33,7 +40,9 @@
 						</a>
 						{{ barrier.code }}
 					</td>
-					<td class="standard-table__cell">{{ barrier.sectors }}</td>
+					<td class="standard-table__cell">
+						{{ collapsible( barrier.sectors ) }}
+					</td>
 					<td class="standard-table__cell">{{ barrier.country.name }}</td>
 					<td class="standard-table__cell"><span class="barrier-status-table-badge barrier-status-table-badge--{{ barrier.status.modifyer }}">{{ barrier.status.name }}</span></td>
 				</tr>

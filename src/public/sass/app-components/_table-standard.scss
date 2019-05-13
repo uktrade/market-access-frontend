@@ -21,6 +21,10 @@
 
 .standard-table__row {
 
+	.standard-table__cell {
+		background-color: white;
+	}
+	
 	&:nth-of-type( odd ) {
 
 		.standard-table__cell {
@@ -30,9 +34,9 @@
 }
 
 .standard-table__cell {
-
 	padding: govuk-em( 10, 16 );
 	border-bottom: 1px solid $govuk-grey-2;
+	vertical-align: top;
 	
 	.table__link {
 		&:visited {
