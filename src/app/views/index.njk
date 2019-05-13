@@ -1,5 +1,6 @@
 {% from 'app-components/dashboard-heading.njk' import dashboardHeading %}
 {% from 'app-components/collapsible.njk' import collapsible %}
+{% from 'macros/standard-table-heading.njk' import tableHeading %}
 
 {% extends 'layout.njk' %}
 
@@ -21,12 +22,12 @@
 		<table class="standard-table standard-table--barriers">
 			<thead>
 				<tr class="standard-table__heading-row">
-					<th class="standard-table__heading">Priority</th>
-					<th class="standard-table__heading standard-table__heading--active">Date added</th>
-					<th class="standard-table__heading">Barrier title</th>
-					<th class="standard-table__heading">Sectors affected</th>
-					<th class="standard-table__heading">Barrier location</th>
-					<th class="standard-table__heading">Status</th>
+					{{ tableHeading( 'Priority', sortableFields.priority ) }}
+					{{ tableHeading( 'Date added', sortableFields.date ) }}
+					{{ tableHeading( 'Barrier title' ) }}
+					{{ tableHeading( 'Sectors affected' ) }}
+					{{ tableHeading( 'Barrier location', sortableFields.location ) }}
+					{{ tableHeading( 'Status', sortableFields.status ) }}
 				</tr>
 			</thead>
 			<tbody>
