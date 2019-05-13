@@ -1027,7 +1027,8 @@ describe( 'Backend Service', () => {
 				checkWithAndWithoutValues( 'saveAllSectors', {
 					allSectors
 				}, {
-					all_sectors: allSectors
+					all_sectors: allSectors,
+					sectors: null
 				} );
 			} );
 
