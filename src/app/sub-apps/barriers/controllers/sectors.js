@@ -4,9 +4,8 @@ const urls = require( '../../../lib/urls' );
 const validators = require( '../../../lib/validators' );
 const metadata = require( '../../../lib/metadata' );
 
-function renderSectors( req, res, sectors ){
-	let sectorsList = req.barrier.all_sectors && sectors.length === 0 ? [{name: 'All Sectors'}] : sectors.map( metadata.getSector );
-	res.render( 'barriers/views/sectors/list', { sectors: sectorsList, csrfToken: req.csrfToken(), } );
+function renderSectors( req, res, sectors, allSectors ){
+	res.render( 'barriers/views/sectors/list', { sectors: sectors.map( metadata.getSector ), allSectors, csrfToken: req.csrfToken(), } );
 }
 
 function addSectorForm( req, res, href ){
@@ -51,9 +50,9 @@ function addSectorForm( req, res, href ){
 module.exports = {
 
 	edit: ( req, res ) => {
-
+		req.session.allSectors = ( req.barrier.all_sectors || false );
 		req.session.barrierSectors = ( req.barrier.sectors || [] );
-		renderSectors( req, res, req.session.barrierSectors );
+		renderSectors( req, res, req.session.barrierSectors, req.session.allSectors );
 	},
 
 	list: async ( req, res, next ) => {
@@ -67,14 +66,18 @@ module.exports = {
 		}
 
 		const sectors = req.session.barrierSectors;
-
+		const allSectors = req.session.allSectors;
+	
 		if( isPost ){
 
 			try {
 
-				delete req.session.barrierSectors;
+				console.log('allsectors', allSectors);
 
-				const { response } = await backend.barriers.saveSectors( req, barrierId, sectors );
+				delete req.session.barrierSectors;
+				delete req.session.allSectors; 
+
+				const { response } = await backend.barriers.saveSectors( req, barrierId, sectors, allSectors );
 
 				if( response.isSuccess ){
 
@@ -91,7 +94,7 @@ module.exports = {
 			}
 		}
 
-		renderSectors( req, res, sectors );
+		renderSectors( req, res, sectors, req.session.allSectors );
 	},
 
 	remove: ( req, res ) => {
@@ -99,6 +102,13 @@ module.exports = {
 		const sectorToRemove = req.body.sector;
 
 		req.session.barrierSectors = req.session.barrierSectors.filter( ( sector ) => sector !== sectorToRemove );
+
+		res.redirect( urls.barriers.sectors.list( req.barrier.id ) );
+	},
+
+	removeAllSectors: ( req, res ) => {
+
+		req.session.allSectors = false;
 
 		res.redirect( urls.barriers.sectors.list( req.barrier.id ) );
 	},
@@ -117,6 +127,14 @@ module.exports = {
 		}
 
 		addSectorForm( req, res, href );
+	},
+
+	addAllSectors: ( req, res ) => {
+		
+		req.session.allSectors = true;
+		req.session.barrierSectors = [];
+
+		res.redirect( urls.barriers.sectors.list( req.barrier.id ) );
 	},
 
 	new: ( req, res ) => {

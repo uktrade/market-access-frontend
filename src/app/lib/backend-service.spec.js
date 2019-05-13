@@ -451,15 +451,22 @@ describe( 'Backend Service', () => {
 		} );
 
 		describe( 'saveSectors', () => {
+			let allSectors;
+			beforeEach( () => {
+				allSectors = false;
+			} );
+			
 			describe( 'With no sectors', () => {
 				it( 'Should PUT to the correct path with a null value', async () => {
 
 					const sectors = [];
 
-					await service.barriers.saveSectors( req, barrierId, sectors );
+					await service.barriers.saveSectors( req, barrierId, sectors, allSectors );
 
 					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
-						sectors: null
+						sectors: null,
+						sectors_affected: false,
+						allSectors
 					} );
 				} );
 			} );
@@ -469,10 +476,28 @@ describe( 'Backend Service', () => {
 
 					const sectors = [ 'sector 1', 'sector 2' ];
 
-					await service.barriers.saveSectors( req, barrierId, sectors );
+					await service.barriers.saveSectors( req, barrierId, sectors, allSectors );
 
 					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
-						sectors
+						sectors,
+						sectors_affected: true,
+						allSectors
+					} );
+				} );
+			} );
+
+			describe( 'With a all sectors', () => {
+				it( 'Should PUT to the correct path with the correct values', async () => {
+
+					const sectors = [];
+					allSectors = true;
+
+					await service.barriers.saveSectors( req, barrierId, sectors, allSectors );
+
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+						sectors,
+						sectors_affected: true,
+						allSectors
 					} );
 				} );
 			} );
