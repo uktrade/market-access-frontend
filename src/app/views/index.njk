@@ -1,4 +1,5 @@
 {% from 'app-components/dashboard-heading.njk' import dashboardHeading %}
+{% from 'app-components/collapsible.njk' import collapsible %}
 
 {% extends 'layout.njk' %}
 
@@ -40,19 +41,7 @@
 						{{ barrier.code }}
 					</td>
 					<td class="standard-table__cell">
-						{% if barrier.sectors|length > 3 %}
-							<div class="collapsible-widget">
-								<label class="collapsible-widget__label">show more</label>
-								<div class="collapsible-widget__content--initial"> 
-									{{ barrier.sectors.slice(0, 2) | join( ', ' ) }} ...
-								</div>
-								<div class="collapsible-widget__content--toggled">
-									{{ barrier.sectors | join( ', ' ) }}
-								</div>
-							</div>
-						{% else %}
-							{{ barrier.sectors | join( ', ' ) }}
-						{% endif %}
+						{{ collapsible( barrier.sectors ) }}
 					</td>
 					<td class="standard-table__cell">{{ barrier.country.name }}</td>
 					<td class="standard-table__cell"><span class="barrier-status-table-badge barrier-status-table-badge--{{ barrier.status.modifyer }}">{{ barrier.status.name }}</span></td>
