@@ -22,7 +22,7 @@ module.exports = async ( req, res, next ) => {
 			values: [ report.all_sectors ],
 			validators: [ {
 				fn: validators.isMetadata( 'bool' ),
-				message: 'Select if the barrier effect all sectors, or just some sectors'
+				message: 'Select if the barrier affect all sectors, or just some sectors'
 			} ]
 		}
 	} );

@@ -222,19 +222,13 @@ module.exports = {
 	},
 
 	barriers: {
-		getAll: async ( req, filters = {} ) => {
+		getAll: async ( req, filters = {}, orderBy = 'reported_on', orderDirection ) => {
 
 			const params = getFilterParams( filters );
-			let path = '/barriers';
 
-			params.push( 'ordering=-reported_on' );
+			params.push( `ordering=${ orderDirection === 'asc' ? '' :  '-' }${ orderBy }` );
 
-			if( params.length ){
-
-				path += '?' + params.join( '&' );
-			}
-
-			return backend.get( path, getToken( req ) );
+			return backend.get( `/barriers?${ params.join( '&' ) }`, getToken( req ) );
 		},
 		get: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }`, getToken( req ) ),
 		getInteractions: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }/interactions`, getToken( req ) ),
@@ -330,13 +324,10 @@ module.exports = {
 		saveHasSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 			sectors_affected: getValue( values.hasSectors )
 		} ),
-		saveAllSectors: ( req, reportId, values ) => {
-			const sectorValues = {all_sectors: getValue( values.allSectors)};
-			if (getValue( values.allSectors )){
-				sectorValues.sectors = [];
-			}
-			return updateReport( getToken( req ), reportId, sectorValues);
-		},
+		saveAllSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
+			all_sectors: getValue( values.allSectors),
+			sectors: null
+		} ),
 		saveSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 			sectors: getValue( values.sectors )
 		} ),

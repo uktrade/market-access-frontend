@@ -220,15 +220,15 @@ describe( 'Typeahead', () => {
 				expect( textInput.attributes().placeholder ).toEqual( 'Search teams' );
 			});
 
-			describe( 'when the user enters less than 3 characters', () => {
+			describe( 'when the user enters a query that has no results', () => {
 
 				beforeEach( () => {
-					textInput.setValue( 'z' );
+					textInput.setValue( 'cheese' );
 				});
 
 				it( 'should not have fetched results', () => {
 					const listItem = wrapper.find( '.multiselect__content li' );
-					expect( listItem.text() ).toEqual( 'No elements found. Consider changing the search query.' );
+					expect( listItem.text() ).toEqual( 'No results found' );
 				});
 			});
 

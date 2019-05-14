@@ -241,7 +241,6 @@ describe( 'Barrier detail view model', () => {
 			inputBarrier.all_sectors = true;
 
 			const output = viewModel( inputBarrier );
-			
 			const sectorsList = output.sectorsList;
 
 			expect(sectorsList).toEqual([{ text: 'All sectors' }]);

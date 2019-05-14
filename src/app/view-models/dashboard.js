@@ -1,7 +1,14 @@
 const metadata = require( '../lib/metadata' );
-const strings = require( '../lib/strings' );
+const urls = require( '../lib/urls' );
 
 const barrierStatusTypeInfo = metadata.barrier.status.typeInfo;
+
+function getSector( sectorId ){
+
+	const sector = metadata.getSector( sectorId );
+
+	return ( sector && sector.name );
+}
 
 function update( barrier ){
 
@@ -22,7 +29,7 @@ function update( barrier ){
 			id: countryId,
 			name: ( country && country.name )
 		},
-		sectors: strings.sectors(barrier.sectors, barrier.all_sectors),
+		sectors: ( barrier.all_sectors ? [ 'All sectors'] : barrier.sectors && barrier.sectors.map( getSector ) || [ 'Unknown' ] ),
 		supportNeeded: barrier.support_type === 1,
 		hasContributors: barrier.contributor_count > 0,
 		problemStatus: metadata.statusTypes[ barrier.problem_status ],
@@ -35,12 +42,34 @@ function update( barrier ){
 	};
 }
 
-module.exports = ( barriers, country ) => {
+function getSortableFields( sortData ){
+
+	const sortableFields = {};
+	const currentSort = sortData.currentSort;
+
+	sortData.fields.forEach( ( field ) => {
+
+		const isActive = ( field === currentSort.field );
+
+		sortableFields[ field ] = {
+			isActive,
+			key: field,
+			direction: ( isActive ? currentSort.direction : 'desc' ),
+			url: urls.index( { sortBy: field, sortDirection: ( isActive ? ( currentSort.direction === 'asc' ? 'desc' : 'asc' ) : 'desc' ) } ),
+		};
+	} );
+
+	return sortableFields;
+}
+
+module.exports = ( barriers, country, sortData ) => {
 
 	if( barriers && barriers.length ){
 
 		barriers = barriers.map( update );
 	}
 
-	return {	barriers, country	};
+	const sortableFields = getSortableFields( sortData );
+
+	return {	barriers, country, sortableFields };
 };

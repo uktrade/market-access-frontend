@@ -217,46 +217,60 @@ describe( 'Backend Service', () => {
 		} );
 
 		describe( 'getAll', () => {
+
+			async function testWithOrdering( filters, expectedParams ){
+
+				const path = ( '/barriers?' + ( expectedParams ? expectedParams + '&' : '' ) );
+
+				await service.barriers.getAll( req, filters );
+
+				expect( backend.get ).toHaveBeenCalledWith( `${ path }ordering=-reported_on`, token );
+
+				await service.barriers.getAll( req, filters, 'reported_on' );
+
+				expect( backend.get ).toHaveBeenCalledWith( `${ path }ordering=-reported_on`, token );
+
+				await service.barriers.getAll( req, filters, 'reported_on', 'desc' );
+
+				expect( backend.get ).toHaveBeenCalledWith( `${ path }ordering=-reported_on`, token );
+
+				await service.barriers.getAll( req, filters, 'reported_on', 'asc' );
+
+				expect( backend.get ).toHaveBeenCalledWith( `${ path }ordering=reported_on`, token );
+			}
+
 			describe( 'With no filters', () => {
-				it( 'Should call the correct path with default sort order', async () => {
+				it( 'Should call the correct path with default sort order', () => {
 
-					await service.barriers.getAll( req );
-
-					expect( backend.get ).toHaveBeenCalledWith( '/barriers?ordering=-reported_on', token );
+					testWithOrdering();
 				} );
 			} );
 
 			describe( 'With a country filter', () => {
-				it( 'Should call the correct path with default sort order', async () => {
+				it( 'Should call the correct path with default sort order', () => {
 
 					const country = uuid();
 
-					await service.barriers.getAll( req, { country } );
-
-					expect( backend.get ).toHaveBeenCalledWith( `/barriers?location=${ country }&ordering=-reported_on`, token );
+					testWithOrdering( { country }, `location=${ country }` );
 				} );
 			} );
 
 			describe( 'With an overseas region filter', () => {
-				it( 'Should call the correct path with default sort order', async () => {
+				it( 'Should call the correct path with default sort order', () => {
 
 					const region = uuid();
 
-					await service.barriers.getAll( req, { region } );
-
-					expect( backend.get ).toHaveBeenCalledWith( `/barriers?location=${ region }&ordering=-reported_on`, token );
+					testWithOrdering( { region }, `location=${ region }` );
 				} );
 			} );
 
 			describe( 'With a country and an overseas region filter', () => {
-				it( 'Should call the correct path with default sort order', async () => {
+				it( 'Should call the correct path with default sort order', () => {
 
 					const country = uuid();
 					const region = uuid();
 
-					await service.barriers.getAll( req, { region, country } );
-
-					expect( backend.get ).toHaveBeenCalledWith( `/barriers?location=${ country },${ region }&ordering=-reported_on`, token );
+					testWithOrdering( { region, country }, `location=${ country },${ region }` );
 				} );
 			} );
 
@@ -272,13 +286,11 @@ describe( 'Backend Service', () => {
 			} );
 
 			describe( 'With a type filter', () => {
-				it( 'Should call the correct path with default sort order', async () => {
+				it( 'Should call the correct path with default sort order', () => {
 
 					const type = faker.lorem.word().toUpperCase();
 
-					await service.barriers.getAll( req, { type } );
-
-					expect( backend.get ).toHaveBeenCalledWith( `/barriers?barrier_type=${ type }&ordering=-reported_on`, token );
+					testWithOrdering( { type }, `barrier_type=${ type }` );
 				} );
 			} );
 
@@ -287,9 +299,7 @@ describe( 'Backend Service', () => {
 
 					const status = '2,5';
 
-					await service.barriers.getAll( req, { status } );
-
-					expect( backend.get ).toHaveBeenCalledWith( `/barriers?status=${ status }&ordering=-reported_on`, token );
+					testWithOrdering( { status }, `status=${ status }` );
 				} );
 			} );
 		} );
@@ -1053,7 +1063,7 @@ describe( 'Backend Service', () => {
 					allSectors,
 				}, {
 					all_sectors: allSectors,
-					sectors: []
+					sectors: null
 				} );
 			} );
 

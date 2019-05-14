@@ -43,7 +43,7 @@ describe( 'Dashboard view model', () => {
 		it( 'Should transform and not sort them', () => {
 
 			const barriers = jasmine.helpers.getFakeData( '/backend/barriers/index.dashboard' ).results;
-			const output = viewModel( JSON.parse( JSON.stringify( barriers ) ) );
+			const output = viewModel( JSON.parse( JSON.stringify( barriers ) ), undefined, { fields: [] } );
 
 			function checkBarrier( id, index ){
 
@@ -67,7 +67,7 @@ describe( 'Dashboard view model', () => {
 					supportNeeded: barrier.support_type === 1,
 					hasContributors: barrier.contributor_count > 0,
 					problemStatus: metadata.statusTypes[ barrier.problem_status ],
-					sectors: ( barrier.sectors && barrier.sectors.map( () => getSector().name ) ||  'Unknown'  ),
+					sectors: ( barrier.all_sectors ? [ 'All sectors'] : barrier.sectors && barrier.sectors.map( getSector ) || [ 'Unknown' ] ),
 					date: {
 						reported: barrier.reported_on,
 						created: barrier.created_on,
@@ -88,9 +88,13 @@ describe( 'Dashboard view model', () => {
 
 			const input = [];
 			let country;
-			const output = viewModel( input, country );
+			const sortData = {
+				fields: [],
+				currentSort: {},
+			};
+			const output = viewModel( input, country, sortData );
 
-			expect( output ).toEqual( { barriers: input, country } );
+			expect( output ).toEqual( { barriers: input, country, sortableFields: {} } );
 		} );
 	} );
 } );

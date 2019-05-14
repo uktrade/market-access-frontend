@@ -18,7 +18,6 @@
 			:multiple="true"
 			:options="options"
 			:options-limit="500"
-			:show-no-results="false"
 			:showLabels="false"
 			:searchable="true"
 			:id="id"
@@ -28,8 +27,12 @@
 				<div class="multiselect__clear" v-if="selectedOptions" @mousedown.prevent.stop="clearAll(props.search)"></div>
 			</template>
 
-			 <template slot="option" slot-scope="props">
+			<template slot="option" slot-scope="props">
 				<div class="multiselect__option-label" v-html="$options.filters.highlight(props.option.text, props.search, props.option.parentName)"></div>
+			</template>
+
+			<template slot="noResult">
+				<span>No results found</span>
 			</template>
 
 			<template slot="caret" slot-scope="methods">
@@ -148,7 +151,7 @@
 			search: function( query ){
 				//filter options when typing
 				this.options = this.optionsData.filter( ( item ) => {
-					return matchWords( item.text + ( item.parentName || '' ), query );
+ 					return matchWords( item.text + ( item.parentName || '' ), query );
 				})
 			},
 		},

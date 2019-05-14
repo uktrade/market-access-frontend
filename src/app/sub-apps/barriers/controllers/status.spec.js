@@ -43,7 +43,6 @@ describe( 'Barrier status controller', () => {
 		next = jasmine.createSpy( 'next' );
 		backend = {
 			barriers: {
-				getAll: jasmine.createSpy( 'backend.barriers.getAll' ),
 				get: jasmine.createSpy( 'backend.barriers.get' ),
 				getInteractions: jasmine.createSpy( 'backend.barriers.getInteractions' ),
 				saveNote: jasmine.createSpy( 'backend.barriers.saveNote' ),
