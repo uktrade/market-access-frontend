@@ -476,7 +476,7 @@ describe( 'Backend Service', () => {
 					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
 						sectors: null,
 						sectors_affected: false,
-						allSectors
+						all_sectors: allSectors
 					} );
 				} );
 			} );
@@ -491,15 +491,15 @@ describe( 'Backend Service', () => {
 					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
 						sectors,
 						sectors_affected: true,
-						allSectors
+						all_sectors: allSectors
 					} );
 				} );
 			} );
 
-			describe( 'With a all sectors', () => {
+			describe( 'With all sectors', () => {
 				it( 'Should PUT to the correct path with the correct values', async () => {
 
-					const sectors = [];
+					const sectors = null;
 					allSectors = true;
 
 					await service.barriers.saveSectors( req, barrierId, sectors, allSectors );
@@ -507,7 +507,7 @@ describe( 'Backend Service', () => {
 					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
 						sectors,
 						sectors_affected: true,
-						allSectors
+						all_sectors: allSectors
 					} );
 				} );
 			} );
@@ -1055,7 +1055,7 @@ describe( 'Backend Service', () => {
 				} );
 			} );
 
-			fdescribe( 'saveAllSectors', () => {
+			describe( 'saveAllSectors', () => {
 
 				const allSectors = 'true';
 

@@ -65,14 +65,16 @@ module.exports = {
 			req.session.barrierSectors = ( barrier.sectors || [] );
 		}
 
+		if( !req.session.allSectors ){
+			req.session.allSectors = ( req.barrier.all_sectors || false );
+		}
+
 		const sectors = req.session.barrierSectors;
 		const allSectors = req.session.allSectors;
 	
 		if( isPost ){
 
 			try {
-
-				console.log('allsectors', allSectors);
 
 				delete req.session.barrierSectors;
 				delete req.session.allSectors; 

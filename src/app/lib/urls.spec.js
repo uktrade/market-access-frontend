@@ -196,7 +196,7 @@ describe( 'URLs', () => {
 				expect( urls.barriers.sectors.add( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/add/` );
 				expect( urls.barriers.sectors.addAllSectors( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/add/all/` );
 				expect( urls.barriers.sectors.remove( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/remove/` );
-				expect( urls.barriers.sectors.removeAllSectors( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/remove/all` );
+				expect( urls.barriers.sectors.removeAllSectors( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/remove/all/` );
 			} );
 		} );
 
