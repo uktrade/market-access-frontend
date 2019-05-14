@@ -27,14 +27,13 @@ describe( 'Barrier sectors controller', () => {
 		csrfToken = uuid();
 		barrierId = uuid();
 
-		req = {
-			barrier: {
-				id: barrierId
-			},
-			csrfToken: () => csrfToken,
-			session: {},
-			params: {}
+		( { req, res, next, csrfToken } = jasmine.helpers.mocks.middleware() );
+
+		req.barrierSession = jasmine.helpers.mocks.barrierSession();
+		req.barrier = {
+			id: barrierId
 		};
+
 		res = {
 			render: jasmine.createSpy( 'res.render' ),
 			redirect: jasmine.createSpy( 'res.redirect' )
@@ -141,29 +140,12 @@ describe( 'Barrier sectors controller', () => {
 				describe( 'With sectors in the session', () => {
 					it( 'Should use the list and render the template', () => {
 
-						req.session.barrierSectors = sectors;
+						req.barrierSession.sectors.barrierSectors.get.and.callFake( () => sectors );
+						req.barrierSession.sectors.allSectors.get.and.callFake( () => false );
 
 						controller.list( req, res, next );
 
 						expect( metadata.getSector.calls.count() ).toEqual( sectors.length );
-
-						expect( res.render ).toHaveBeenCalledWith( template, {
-							sectors: sectors.map( () => sectorResponse ),
-							allSectors: false,
-							csrfToken
-						} );
-					} );
-				} );
-
-				describe( 'With sectors in the barrier', () => {
-					it( 'Should put the list in the session and render the template', () => {
-
-						req.barrier.sectors = sectors;
-
-						controller.list( req, res, next );
-
-						expect( metadata.getSector.calls.count() ).toEqual( sectors.length );
-						expect( req.session.barrierSectors ).toEqual( sectors );
 
 						expect( res.render ).toHaveBeenCalledWith( template, {
 							sectors: sectors.map( () => sectorResponse ),
@@ -176,6 +158,9 @@ describe( 'Barrier sectors controller', () => {
 				describe( 'Without any sectors', () => {
 					it( 'Should render the template with an empty list', () => {
 
+						req.barrierSession.sectors.barrierSectors.get.and.callFake( () => [] );
+						req.barrierSession.sectors.allSectors.get.and.callFake( () => false );
+
 						controller.list( req, res, next );
 
 						expect( res.render ).toHaveBeenCalledWith( template, { sectors: [], allSectors: false, csrfToken } );
@@ -185,7 +170,8 @@ describe( 'Barrier sectors controller', () => {
 				describe( 'With all sectors selected', () => {
 					it( 'Should render the template with an empty list', () => {
 
-						req.session.allSectors = true;
+						req.barrierSession.sectors.barrierSectors.get.and.callFake( () => [] );
+						req.barrierSession.sectors.allSectors.get.and.callFake( () => true );
 
 						controller.list( req, res, next );
 
@@ -199,8 +185,8 @@ describe( 'Barrier sectors controller', () => {
 				beforeEach( () => {
 
 					req.method = 'POST';
-					req.session.barrierSectors = sectors;
-					req.session.allSectors = false;
+					req.barrierSession.sectors.barrierSectors.get.and.callFake( () => sectors );
+					req.barrierSession.sectors.allSectors.get.and.callFake( () => false );
 				} );
 
 				describe( 'With an error', () => {
@@ -213,7 +199,7 @@ describe( 'Barrier sectors controller', () => {
 						await controller.list( req, res, next );
 
 						expect( backend.barriers.saveSectors ).toHaveBeenCalledWith( req, req.barrier.id, sectors, false );
-						expect( req.session.barrierSectors ).not.toBeDefined();
+						expect( req.barrierSession.sectors.delete ).toHaveBeenCalled();
 						expect( next ).toHaveBeenCalledWith( err );
 						expect( res.render ).not.toHaveBeenCalled();
 					} );
@@ -231,7 +217,7 @@ describe( 'Barrier sectors controller', () => {
 
 							await controller.list( req, res, next );
 
-							expect( req.session.barrierSectors ).not.toBeDefined();
+							expect( req.barrierSession.sectors.delete ).toHaveBeenCalled();
 							expect( next ).not.toHaveBeenCalled();
 							expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
 						} );
@@ -248,7 +234,7 @@ describe( 'Barrier sectors controller', () => {
 
 							const err = new Error( `Unable to update barrier, got ${ response.statusCode } response code` );
 
-							expect( req.session.barrierSectors ).not.toBeDefined();
+							expect( req.barrierSession.sectors.delete ).toHaveBeenCalled();
 							expect( next ).toHaveBeenCalledWith( err );
 						} );
 					} );
@@ -261,17 +247,19 @@ describe( 'Barrier sectors controller', () => {
 			const template = 'barriers/views/sectors/list';
 
 			describe( 'a GET request', () => {
+
+				beforeEach(() => {
+					req.barrierSession.sectors.barrierSectors.get.and.callFake( () => sectors );
+					req.barrierSession.sectors.allSectors.get.and.callFake( () => false );
+				});
+
 				describe( 'With sectors in the session', () => {
 					it( 'Should overwrite the list and render the template', () => {
-
-						req.barrier.sectors = sectors;
-						req.session.barrierSectors = createSectors();
 
 						controller.edit( req, res, next );
 
 						expect( metadata.getSector.calls.count() ).toEqual( sectors.length );
 
-						expect( req.session.barrierSectors ).toEqual( sectors );
 						expect( res.render ).toHaveBeenCalledWith( template, {
 							sectors: sectors.map( () => sectorResponse ),
 							allSectors: false,
@@ -288,9 +276,7 @@ describe( 'Barrier sectors controller', () => {
 						controller.edit( req, res, next );
 
 						expect( metadata.getSector.calls.count() ).toEqual( sectors.length );
-						expect( req.session.barrierSectors ).toEqual( sectors );
 
-						expect( req.session.barrierSectors ).toEqual( sectors );
 						expect( res.render ).toHaveBeenCalledWith( template, {
 							sectors: sectors.map( () => sectorResponse ),
 							allSectors: false,
@@ -302,9 +288,11 @@ describe( 'Barrier sectors controller', () => {
 				describe( 'Without any sectors', () => {
 					it( 'Should put an empty list in the session and render the template', () => {
 
+						req.barrierSession.sectors.barrierSectors.get.and.callFake( () => [] );
+
 						controller.edit( req, res, next );
 
-						expect( req.session.barrierSectors ).toEqual( [] );
+						expect( metadata.getSector.calls.count() ).toEqual( 0 );
 						expect( res.render ).toHaveBeenCalledWith( template, { sectors: [], allSectors: false, csrfToken } );
 					} );
 				} );
@@ -312,11 +300,12 @@ describe( 'Barrier sectors controller', () => {
 				describe( 'With all sectors', () => {
 					it( 'Should put an empty list in the session and render the template', () => {
 
-						req.barrier.all_sectors = true;
+						req.barrierSession.sectors.barrierSectors.get.and.callFake( () => [] );
+						req.barrierSession.sectors.allSectors.get.and.callFake( () => true );
 
 						controller.edit( req, res, next );
 
-						expect( req.session.barrierSectors ).toEqual( [] );
+						expect( metadata.getSector.calls.count() ).toEqual( 0 );
 						expect( res.render ).toHaveBeenCalledWith( template, { sectors: [], allSectors: true, csrfToken } );
 					} );
 				} );
@@ -332,12 +321,12 @@ describe( 'Barrier sectors controller', () => {
 				const listResponse = '/list/sectors';
 
 				req.body = { sector: sector1 };
-				req.session.barrierSectors = sectors;
+				req.barrierSession.sectors.barrierSectors.get.and.callFake( () => sectors );
 				urls.barriers.sectors.list.and.callFake( () => listResponse );
 
 				controller.remove( req, res );
 
-				expect( req.session.barrierSectors ).toEqual( [ sector2 ] );
+				expect( req.barrierSession.sectors.barrierSectors.set ).toHaveBeenCalledWith( [sector2] );
 				expect( res.redirect ).toHaveBeenCalledWith( listResponse );
 			} );
 		} );
@@ -368,8 +357,8 @@ describe( 'Barrier sectors controller', () => {
 				expect( typeof config.sectors.validators[ 1 ].fn ).toEqual( 'function' );
 				expect( config.sectors.validators[ 1 ].fn() ).toEqual( true );
 
-				if( req.session.barrierSectors.length ){
-					expect( config.sectors.validators[ 1 ].fn( req.session.barrierSectors[ 0 ] ) ).toEqual( false );
+				if( req.barrierSession.sectors.barrierSectors.get.length ){
+					expect( config.sectors.validators[ 1 ].fn( req.barrierSession.sectors.barrierSectors.get[ 0 ] ) ).toEqual( false );
 				}
 			}
 
@@ -387,6 +376,7 @@ describe( 'Barrier sectors controller', () => {
 				}
 
 				beforeEach( () => {
+					req.barrierSession.sectors.barrierSectors.get.and.callFake( () => sectors);
 
 					urls.barriers.sectors.list.and.callFake( () => urlsSectorsListResponse );
 					urls.barriers.sectors.add.and.callFake( () => urlsSectorsAddResponse );
@@ -396,6 +386,8 @@ describe( 'Barrier sectors controller', () => {
 
 					describe( 'When there are no sectors in the session', () => {
 						it( 'Should render the template', () => {
+
+							req.barrierSession.sectors.barrierSectors.get.and.callFake( () => []);
 
 							controller.add( req, res );
 
@@ -425,7 +417,6 @@ describe( 'Barrier sectors controller', () => {
 
 							checkFormConfig( sectorsList.filter( ( sector ) => !sectors.includes( sector.value ) ) );
 							checkRender( sectors );
-							expect( req.session.barrierSectors ).toEqual( sectors );
 						} );
 					} );
 				} );
@@ -439,6 +430,8 @@ describe( 'Barrier sectors controller', () => {
 
 					describe( 'When the form has errors', () => {
 						it( 'Should render the template', () => {
+
+							req.barrierSession.sectors.barrierSectors.get.and.callFake( () => []);
 
 							form.hasErrors = () => true;
 
@@ -470,8 +463,7 @@ describe( 'Barrier sectors controller', () => {
 							it( 'Should add the sector to the session', () => {
 
 								controller.add( req, res );
-
-								expect( req.session.barrierSectors ).toEqual( [ sector ] );
+								expect(req.barrierSession.sectors.barrierSectors.set).toHaveBeenCalledWith(sectors);
 							} );
 						} );
 
@@ -501,8 +493,8 @@ describe( 'Barrier sectors controller', () => {
 					
 					controller.addAllSectors( req, res );
 
-					expect( req.session.barrierSectors ).toEqual( [] );
-					expect( req.session.allSectors ).toEqual( true );
+					expect( req.barrierSession.sectors.allSectors.set ).toHaveBeenCalledWith( true );
+					expect( req.barrierSession.sectors.barrierSectors.set ).toHaveBeenCalledWith( [] );
 
 					expect( res.redirect ).toHaveBeenCalledWith( listResponse );
 				});
@@ -518,7 +510,7 @@ describe( 'Barrier sectors controller', () => {
 					
 					controller.removeAllSectors( req, res );
 
-					expect( req.session.allSectors ).toEqual( false );
+					expect( req.barrierSession.sectors.allSectors.set ).toHaveBeenCalledWith( false );
 
 					expect( res.redirect ).toHaveBeenCalledWith( listResponse );
 				});
@@ -541,9 +533,11 @@ describe( 'Barrier sectors controller', () => {
 
 					urls.barriers.detail.and.callFake( () => urlsBarrierDetailResponse );
 					urls.barriers.sectors.new.and.callFake( () => urlsSectorsNewResponse );
+					req.barrierSession.sectors.barrierSectors.get.and.callFake( () => []);
 				} );
 
 				describe( 'a GET request', () => {
+
 
 					describe( 'When there are no sectors in the session', () => {
 						it( 'Should render the template', () => {
@@ -552,20 +546,20 @@ describe( 'Barrier sectors controller', () => {
 
 							checkFormConfig( sectorsList );
 							checkRender( [] );
-							expect( req.session.barrierSectors ).toEqual( [] );
+							expect(req.barrierSession.sectors.barrierSectors.set).toHaveBeenCalledWith([]);
 						} );
 					} );
 
 					describe( 'When there are some sectors in the session', () => {
 						it( 'Should render with an empty list and remove the session sectors', () => {
 
-							req.session.barrierSectors = sectors;
+							req.barrierSession.sectors.barrierSectors.get.and.callFake( () => []);
 
 							controller.new( req, res );
 
 							checkFormConfig( sectorsList );
 							checkRender( [] );
-							expect( req.session.barrierSectors ).toEqual( [] );
+							expect(req.barrierSession.sectors.barrierSectors.set).toHaveBeenCalledWith([]);
 						} );
 					} );
 
@@ -578,7 +572,7 @@ describe( 'Barrier sectors controller', () => {
 
 							checkFormConfig( sectorsList );
 							checkRender( [] );
-							expect( req.session.barrierSectors ).toEqual( [] );
+							expect(req.barrierSession.sectors.barrierSectors.set).toHaveBeenCalledWith( [] );
 						} );
 					} );
 				} );
@@ -588,6 +582,7 @@ describe( 'Barrier sectors controller', () => {
 					beforeEach( () => {
 
 						form.isPost = true;
+
 					} );
 
 					describe( 'When the form has errors', () => {
@@ -612,6 +607,8 @@ describe( 'Barrier sectors controller', () => {
 							form.hasErrors = () => false;
 							getValuesResponse.sectors = sector;
 							urls.barriers.sectors.list.and.callFake( () => listResponse );
+
+							req.barrierSession.sectors.barrierSectors.get.and.callFake( () => []);
 						} );
 
 						afterEach( () => {
@@ -622,9 +619,10 @@ describe( 'Barrier sectors controller', () => {
 						describe( 'When there aren\'t any sectors in the session', () => {
 							it( 'Should add the sector to the session', () => {
 
-								controller.new( req, res );
+								controller.new( req, res );	
 
-								expect( req.session.barrierSectors ).toEqual( [ sector ] );
+								expect(req.barrierSession.sectors.barrierSectors.set).toHaveBeenCalledWith([sector]);
+								expect(req.barrierSession.sectors.allSectors.set).toHaveBeenCalledWith(false);
 							} );
 						} );
 
@@ -635,7 +633,8 @@ describe( 'Barrier sectors controller', () => {
 
 								controller.new( req, res );
 
-								expect( req.session.barrierSectors ).toEqual( [ sector ] );
+								expect(req.barrierSession.sectors.barrierSectors.set).toHaveBeenCalledWith([sector]);
+								expect(req.barrierSession.sectors.allSectors.set).toHaveBeenCalledWith(false);
 							} );
 						} );
 					} );

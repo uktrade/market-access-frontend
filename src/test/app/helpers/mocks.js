@@ -88,6 +88,11 @@ if( typeof jasmine !== 'undefined' ){
 		barrierSession: () => ({
 			...createBarrierSessionSpies(),
 			types: createBarrierSessionSpies( 'types' ),
+			sectors: {
+				...createBarrierSessionSpies(),
+				barrierSectors: createBarrierSessionSpies( 'barrierSectors' ),
+				allSectors: createBarrierSessionSpies( 'allSectors' ),
+			}
 		})
 	};
 }

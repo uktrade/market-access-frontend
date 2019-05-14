@@ -83,16 +83,16 @@ module.exports = ( express, app ) => {
 	app.get( '/:barrierId/types/add/', barrierSession, controller.types.add );
 	app.post( '/:barrierId/types/add/', barrierSession, controller.types.add );
 
-	app.get( '/:barrierId/sectors/', controller.sectors.list );
-	app.post( '/:barrierId/sectors/', controller.sectors.list );
-	app.get( '/:barrierId/sectors/edit/', controller.sectors.edit );
-	app.post( '/:barrierId/sectors/remove/', controller.sectors.remove );
-	app.post( '/:barrierId/sectors/remove/all/', controller.sectors.removeAllSectors );
-	app.get( '/:barrierId/sectors/add/', controller.sectors.add );
-	app.post( '/:barrierId/sectors/add/', controller.sectors.add );
-	app.get( '/:barrierId/sectors/add/all/', controller.sectors.addAllSectors );
-	app.get( '/:barrierId/sectors/new/', controller.sectors.new );
-	app.post( '/:barrierId/sectors/new/', controller.sectors.new );
+	app.get( '/:barrierId/sectors/', barrierSession, controller.sectors.list );
+	app.post( '/:barrierId/sectors/', barrierSession, controller.sectors.list );
+	app.get( '/:barrierId/sectors/edit/', barrierSession, controller.sectors.edit );
+	app.post( '/:barrierId/sectors/remove/', barrierSession, controller.sectors.remove );
+	app.post( '/:barrierId/sectors/remove/all/', barrierSession, controller.sectors.removeAllSectors );
+	app.get( '/:barrierId/sectors/add/', barrierSession, controller.sectors.add );
+	app.post( '/:barrierId/sectors/add/', barrierSession, controller.sectors.add );
+	app.get( '/:barrierId/sectors/add/all/', barrierSession, controller.sectors.addAllSectors );
+	app.get( '/:barrierId/sectors/new/', barrierSession, controller.sectors.new );
+	app.post( '/:barrierId/sectors/new/', barrierSession, controller.sectors.new );
 
 	app.get( '/:barrierId/companies/', controller.companies.list );
 	app.post( '/:barrierId/companies/', controller.companies.list );

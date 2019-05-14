@@ -45,7 +45,12 @@ module.exports = ( req, res, next ) => {
 
 		req.barrierSession = {
 			...methods,
-			types: createMethods( 'types' )
+			types: createMethods( 'types' ),
+			sectors: {
+				...methods,
+				allSectors: createMethods( 'allSectors'),
+				barrierSectors: createMethods('barrierSectors')
+			},
 		};
 
 		next();
