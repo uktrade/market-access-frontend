@@ -9,7 +9,7 @@ module.exports = ( barrier, addCompany = false ) => {
 	const barrierStatusCode = barrier.status;
 	const status = barrierStatusTypeInfo[ barrierStatusCode ] || {};
 	const sectors = ( barrier.sectors || [] ).map( metadata.getSector );
-	const sectorsList = sectors.map( ( sector ) => ( sector && { text: sector.name } || { text: 'Unknown' } ) );
+	const sectorsList =  barrier.all_sectors ? [{ text: 'All sectors' }] : sectors.map( ( sector ) => ( sector && { text: sector.name } || { text: 'Unknown' } ) );
 	const companies = barrier.companies || [];
 	const companiesList = companies.map( ( company ) => ( { text: company.name } ) );
 	const barrierTypes = ( barrier.barrier_types || [] );
