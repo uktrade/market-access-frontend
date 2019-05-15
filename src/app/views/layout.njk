@@ -1,6 +1,7 @@
 {% from 'app-components/govuk-footer-ma.njk' import govukFooterMa %}
 {% from "components/phase-banner/macro.njk" import govukPhaseBanner %}
 {% from 'app-components/govuk-header-ma.njk' import govukHeaderMa %}
+{% from 'app-components/datahub-header.njk' import datahubHeader %}
 
 {% set assetPath = '/govuk-public' %}
 
@@ -23,8 +24,9 @@
 {% endblock %}
 
 {% block header %}
-	<div class="header-wrapper">
-		{{ govukHeaderMa({
+{#
+	<div class="header-wrapper" >
+		govukHeaderMa({
 			classes: 'govuk-header--ma',
 			logoText: 'Data Hub',
 			serviceName: 'Market access barriers',
@@ -45,8 +47,7 @@
 					active: headerNav.isFind
 				}
 			]
-		}) }}
-
+		})
 
 		<div class="header-wrapper__user" role="complementary">
 			<p class="header-wrapper__user__content">
@@ -56,6 +57,7 @@
 			</p>
 		</div>
 	</div>
+
 	{{ govukPhaseBanner({
 		attributes: { role: 'complementary' },
 		classes: 'govuk-phase-banner--ma',
@@ -65,14 +67,33 @@
 		},
 		html: 'This is a new service – your <a class="govuk-link" href="mailto:' + feedbackEmail +'">feedback</a> will help us to improve it.'
 	}) }}
-{% endblock %}
+#}
 
-{% block outsideContent %}{% endblock %}
+	{{ datahubHeader( user.permitted_applications, {
+		active: 'market-access',
+		domains: {
+			marketAccess: '/'
+		},
+		user: {
+			name: 'Test User'
+		},
+		subNavigation: [
+			{
+				text: 'Dashboard',
+				href: urls.index(),
+				active: headerNav.isDashboard
+			}, {
+				text: 'Add a barrier',
+				href: urls.reports.new(),
+				active: headerNav.isReport
+			}, {
+				text: 'Find a barrier',
+				href: urls.findABarrier(),
+				active: headerNav.isFind
+			}
+		]
+	} ) }}
 
-{% block masthead %}
-	<div class="govuk-masthead">
-		{% block mastheadContent %}{% endblock %}
-	</div>
 {% endblock %}
 
 {% block content %}

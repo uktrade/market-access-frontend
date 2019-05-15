@@ -10,7 +10,31 @@ module.exports = async ( req, res, next ) => {
 
 			if( response.isSuccess ){
 
-				req.session.user = body;
+				req.session.user = {
+					...body,
+					'permitted_applications': [
+						{
+							'key': 'datahub-crm',
+							'url': '',
+							'name': ''
+						},
+						{
+							'key': 'datahub-mi',
+							'url': '',
+							'name': ''
+						},
+						{
+							'key': 'market-access',
+							'url': '',
+							'name': ''
+						},
+						{
+							'key': 'find-exporters',
+							'url': '',
+							'name': ''
+						}
+					]
+				};
 
 			} else {
 

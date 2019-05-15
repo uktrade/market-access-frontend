@@ -28,8 +28,10 @@
 	{% endif %}
 {% endblock %}
 
-{% block mastheadContent %}
-	{{ barrierSummary( barrier ) }}
+{% block masthead %}
+	<div class="ma-masthead">
+		{{ barrierSummary( barrier ) }}
+	</div>
 {% endblock %}
 
 {% macro noteForm( params ) %}
