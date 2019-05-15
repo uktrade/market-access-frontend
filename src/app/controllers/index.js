@@ -27,19 +27,11 @@ module.exports = {
 
 	index: async ( req, res, next ) => {
 
-		const country = req.user.country;
-		const countryId = country && req.user.country.id;
 		const filters = {
 			status: [ OPEN, HIBERNATED ].join( ',' ),
 		};
 		const currentSort = getCurrentSort( req.query );
 		let template = 'index';
-
-		if( countryId ){
-
-			template = 'my-country';
-			filters.country = countryId;
-		}
 
 		try {
 
@@ -47,7 +39,7 @@ module.exports = {
 
 			if( response.isSuccess ){
 
-				res.render( template, dashboardViewModel( body.results, country, {
+				res.render( template, dashboardViewModel( body.results, {
 					...sortData,
 					currentSort,
 				} ) );

@@ -62,7 +62,7 @@ function getSortableFields( sortData ){
 	return sortableFields;
 }
 
-module.exports = ( barriers, country, sortData ) => {
+module.exports = ( barriers, sortData ) => {
 
 	if( barriers && barriers.length ){
 
@@ -71,5 +71,5 @@ module.exports = ( barriers, country, sortData ) => {
 
 	const sortableFields = getSortableFields( sortData );
 
-	return {	barriers, country, sortableFields };
+	return {	barriers, sortableFields };
 };
