@@ -67,18 +67,14 @@
 	margin: 0;
 	padding: 0;
 	overflow: hidden;
-	clip: rect(0 0 0 0);
-	-webkit-clip-path: inset(50%);
-	clip-path: inset(50%);
+	clip: rect( 0 0 0 0 );
+	-webkit-clip-path: inset( 50% );
+	clip-path: inset( 50% );
 	border: 0;
 	// For long content, line feeds are not interpreted as spaces and small width
 	// causes content to wrap 1 word per line:
 	// https://medium.com/@jessebeach/beware-smushed-off-screen-accessible-text-5952a4c2cbfe
 	white-space: nowrap;
-}
-
-.js-enabled .datahub-header__menu-button {
-	display: none;
 }
 
 .datahub-header__navigation {
@@ -139,3 +135,93 @@
 	background-color: #F8F8F8;
 	border-bottom: 1px solid #DEE0E2;
 }
+
+.datahub-header__menu-button {
+	font-weight: 400;
+	font-size: 14px;
+	line-height: 1.14286;
+	display: none;
+	position: absolute;
+	top: 20px;
+	right: 0;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	color: #fff;
+	background: 0 0;
+}
+
+@media print {
+	.datahub-header__menu-button {
+		font-family: sans-serif;
+		font-size: 14pt;
+		line-height: 1.2;
+	}
+}
+
+@media ( min-width: 40.0625em ){
+	.datahub-header__menu-button {
+		font-size:16px;
+		line-height: 1.25;
+		top: 15px;
+	}
+}
+
+.datahub-header__menu-button:hover {
+	text-decoration: underline;
+}
+
+.datahub-header__menu-button::after {
+	display: inline-block;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-color: transparent;
+	-webkit-clip-path: polygon( 0 0,50% 100%,100% 0 );
+	clip-path: polygon( 0 0,50% 100%,100% 0 );
+	border-width: 8.66px 5px 0 5px;
+	border-top-color: inherit;
+	content: "";
+	margin-left: 5px;
+}
+
+.datahub-header__menu-button:focus {
+	outline: 3px solid #ffbf47;
+	outline-offset: 0;
+}
+
+.datahub-header__menu-button--open::after {
+	display: inline-block;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-color: transparent;
+	-webkit-clip-path: polygon( 50% 0,0 100%,100% 100% );
+	clip-path: polygon( 50% 0,0 100%,100% 100% );
+	border-width: 0 5px 8.66px 5px;
+	border-bottom-color: inherit;
+}
+
+.js-enabled {
+	.datahub-header__menu-button {
+		display: block;
+		@media ( min-width: 48.0625em ){ /* from desktop */
+			display: none;
+		}
+	}
+
+	.datahub-header__navigation,
+	.datahub-header__links {
+		display: none;
+		@media ( min-width: 48.0625em ){ /* from desktop */
+			display: block;
+		}
+	}
+
+	.datahub-header--open {
+		.datahub-header__navigation,
+		.datahub-header__links {
+			display: block;
+		}
+	}
+ }
