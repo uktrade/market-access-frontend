@@ -92,9 +92,9 @@
 			{% for link in headerLinks %}
 			<li class="datahub-header__links__item">
 				{% if link.href %}
-				<a href="{{ link.href }}">{{ link.text }}</a>
+				<a class="datahub-header__links__item__text" href="{{ link.href }}">{{ link.text }}</a>
 				{% else %}
-				{{ link.text }}
+				<span class="datahub-header__links__item__text">{{ link.text }}</span>
 				{% endif %}
 			</li>
 			{% endfor %}

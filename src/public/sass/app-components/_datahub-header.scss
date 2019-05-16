@@ -43,8 +43,8 @@
 }
 
 .datahub-header__links {
+	display: block;
 	font-size: 16px;
-	float: right;
 	list-style: none;
 	margin: 0;
 	padding: 0;
@@ -55,8 +55,22 @@
 }
 
 .datahub-header__links__item {
+	display: block;
+	border-bottom: 1px solid #6f777b;
+}
+
+.datahub-header__links__item:last-of-type {
+	border-bottom: 0;
+}
+
+.datahub-header__links__item__text {
 	display: inline-block;
-	padding: 10px;
+	padding: 5px 0;
+	width: 100%;
+}
+
+.datahub-header__links__item .datahub-header__links__item__text:hover {
+	text-decoration: underline;
 }
 
 .datahub-header__logo__site-name { /* visually-hidden */
@@ -88,7 +102,7 @@
 
 .datahub-header__navigation__item {
 
-	display: inline-block;
+	display: block;
 	padding-right: 20px;
 
 	&:last-of-type {
@@ -98,8 +112,8 @@
 
 .datahub-header__navigation__item__link {
 
-	display: inline-block;
-	padding: 8px 0;
+	display: block;
+	padding: 5px 0;
 	margin: 0;
 	font-size: 16px;
 	line-height: 23px;
@@ -112,17 +126,13 @@
 	}
 
 	&:hover {
-		color: #0b0c0c;
-		padding-bottom: 3px;
-		border-bottom: 5px solid #2b8cc4;
+		color: #005ea5;
 	}
 }
 
 .datahub-header__navigation__item__link--active {
 
 	color: #005ea5;
-	padding-bottom: 3px;
-	border-bottom: 5px solid #005ea5;
 
 	&:visited,
 	&:link {
@@ -143,7 +153,7 @@
 	display: none;
 	position: absolute;
 	top: 20px;
-	right: 0;
+	right: 30px;
 	margin: 0;
 	padding: 0;
 	border: 0;
@@ -156,14 +166,6 @@
 		font-family: sans-serif;
 		font-size: 14pt;
 		line-height: 1.2;
-	}
-}
-
-@media ( min-width: 40.0625em ){
-	.datahub-header__menu-button {
-		font-size:16px;
-		line-height: 1.25;
-		top: 15px;
 	}
 }
 
@@ -205,7 +207,7 @@
 .js-enabled {
 	.datahub-header__menu-button {
 		display: block;
-		@media ( min-width: 48.0625em ){ /* from desktop */
+		@media ( min-width: 40.0625em ){ /* from tablet */
 			display: none;
 		}
 	}
@@ -213,7 +215,7 @@
 	.datahub-header__navigation,
 	.datahub-header__links {
 		display: none;
-		@media ( min-width: 48.0625em ){ /* from desktop */
+		@media ( min-width: 40.0625em ){ /* from tablet */
 			display: block;
 		}
 	}
@@ -225,3 +227,43 @@
 		}
 	}
  }
+
+ @media ( min-width: 40.0625em ){
+	.datahub-header__menu-button {
+		font-size:16px;
+		line-height: 1.25;
+		top: 15px;
+	}
+
+	.datahub-header__links {
+		float: right;
+	}
+
+	.datahub-header__links__item {
+		display: inline-block;
+		padding: 5px 10px;
+		border-bottom: 0;
+	}
+
+	.datahub-header__navigation__item {
+
+		display: inline-block;
+	}
+
+	.datahub-header__navigation__item__link {
+		display: inline-block;
+		padding: 8px 0;
+	}
+
+	.datahub-header__navigation__item__link:hover {
+		color: #0b0c0c;
+		padding-bottom: 3px;
+		border-bottom: 5px solid #005ea5;
+	}
+
+	.datahub-header__navigation__item__link--active {
+
+		padding-bottom: 3px;
+		border-bottom: 5px solid #005ea5;
+	}
+}
