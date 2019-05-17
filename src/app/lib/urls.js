@@ -68,6 +68,11 @@ module.exports = {
 		download: ( documentId ) => `/documents/${ documentId }/download/`,
 	},
 
+	watchList: {
+		save: ( params ) => addParams( '/watch-list/save/', params ),
+		remove:	() => '/watch-list/remove/',
+	},
+
 	barriers: {
 		detail: ( barrierId ) => `/barriers/${ barrierId }/`,
 		edit: {

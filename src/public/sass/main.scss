@@ -80,6 +80,7 @@ $govuk-images-path: '/govuk-public/images/';
 @import 'app-components/checkbox-filter';
 @import 'app-components/typeahead';
 @import 'app-components/collapsible';
+@import 'app-components/toggle-box';
 @import 'app-components/modal';
 
 @import 'pages/index';
@@ -106,12 +107,13 @@ $govuk-images-path: '/govuk-public/images/';
 	padding: govuk-em( 30, 16 );
 }
 
-.no-results-message {
-	@include govuk-font( 19 );
-	padding: govuk-em( 30, 19 );
-	text-align: center;
+.no-results-box {
 	background-color: $govuk-grey-4;
-	margin: govuk-em( 30, 19 ) 0 0 0;
+	border: 2px dashed #BFC1C3;
+	@include govuk-font( 19 );
+	padding: govuk-em( 20, 16 );
+	text-align: center;
+	padding-top: 0;
 }
 
 .conditional-content {

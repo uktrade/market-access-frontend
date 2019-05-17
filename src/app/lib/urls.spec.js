@@ -60,6 +60,32 @@ describe( 'URLs', () => {
 		} );
 	} );
 
+	describe( 'Watch List', () => {
+		describe( 'save', () => {
+			describe( 'Without any filters', () => {
+				it( 'Should return the correct path', () => {
+					expect( urls.watchList.save() ).toEqual( '/watch-list/save/' );
+				} );
+			} );
+	
+			describe( 'With filters', () => {
+				it( 'Should return the correct path', () => {
+	
+					expect( urls.watchList.save( {} ) ).toEqual( '/watch-list/save/' );
+					expect( urls.watchList.save( { country: '1' } ) ).toEqual( '/watch-list/save/?country=1' );
+					expect( urls.watchList.save( { country: '1', sector: '2' } ) ).toEqual( '/watch-list/save/?country=1&sector=2' );
+				} );
+			} );
+		});
+		describe( 'remove', () => {
+			it( 'Should return the correct path', () => {
+
+				expect( urls.watchList.remove() ).toEqual( '/watch-list/remove/' );
+				
+			} );
+		});
+	});
+
 	describe( 'Documents', () => {
 		describe( 'download', () => {
 			it( 'Should return the correct path', () => {

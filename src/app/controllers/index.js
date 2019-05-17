@@ -2,6 +2,7 @@ const urls = require( '../lib/urls' );
 const backend = require( '../lib/backend-service' );
 const { OPEN, HIBERNATED } = require( '../lib/metadata' ).barrier.status.types;
 const dashboardViewModel = require( '../view-models/dashboard' );
+const transformFilterValue = require('./watch-list').transformFilterValue;
 
 const sortData = {
 	fields: [ 'priority', 'date', 'location', 'status' ],
@@ -27,31 +28,46 @@ module.exports = {
 
 	index: async ( req, res, next ) => {
 
-		const filters = {
-			status: [ OPEN, HIBERNATED ].join( ',' ),
-		};
 		const currentSort = getCurrentSort( req.query );
-		let template = 'index';
+		const userProfile = req.session.user.userProfile || {};
+		let hasWatchList = false;
+		let watchListFilters = {};
 
-		try {
+		const filters = {
+			status: [[ OPEN, HIBERNATED ].join( ',' )],
+		};
 
-			const { response, body } = await backend.barriers.getAll( req, filters, currentSort.serviceParam, currentSort.direction );
+		if (userProfile.watchList) {
+			hasWatchList = true;
+			Object.assign(filters, userProfile.watchList.filters);
+			watchListFilters = Object.entries(userProfile.watchList.filters).map(([key, value]) => ({key, value: transformFilterValue(key, value)}));
 
-			if( response.isSuccess ){
+			try {
 
-				res.render( template, dashboardViewModel( body.results, {
-					...sortData,
-					currentSort,
-				} ) );
-
-			} else {
-
-				throw new Error( `Got ${ response.statusCode } response from backend` );
+				const { response, body } = await backend.barriers.getAll( req, filters, currentSort.serviceParam, currentSort.direction );
+	
+				if( response.isSuccess ){
+					
+					res.render('index', dashboardViewModel( 
+						body.results, 
+						{ ...sortData, currentSort}, 
+						hasWatchList, 
+						watchListFilters,
+						userProfile.watchList.filters,
+					));
+	
+				} else {
+	
+					throw new Error( `Got ${ response.statusCode } response from backend` );
+				}
+	
+			} catch( e ){
+	
+				next( e );
 			}
 
-		} catch( e ){
-
-			next( e );
+		} else {
+			res.render('index');
 		}
 	},
 

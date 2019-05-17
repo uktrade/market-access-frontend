@@ -42,7 +42,8 @@ module.exports = async function( req, res, next ){
 			res.render( 'find-a-barrier', viewModel( {
 				count: body.count,
 				barriers: body.results,
-				filters
+				filters,
+				queryString: req.query
 			} ) );
 
 		} else {

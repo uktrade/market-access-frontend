@@ -9,6 +9,7 @@ let csrfToken;
 let backend;
 let ssoToken;
 let dashboardViewModel;
+let watchList;
 let urls;
 let metadata;
 
@@ -20,6 +21,10 @@ describe( 'Index controller', () => {
 	beforeEach( () => {
 
 		ssoToken = 'abc-123';
+		watchList = {
+			transformFilterValue: jasmine.createSpy( 'watchList.transformFilterValue' )
+		};
+		
 		backend = {
 			barriers: {
 				getAll: jasmine.createSpy( 'backend.barriers.getAll' ),
@@ -56,6 +61,7 @@ describe( 'Index controller', () => {
 			'../lib/urls': urls,
 			'../view-models/dashboard': dashboardViewModel,
 			'../lib/metadata': metadata,
+			'./watch-list': watchList
 		} );
 	} );
 
@@ -76,161 +82,164 @@ describe( 'Index controller', () => {
 			direction: 'desc',
 		};
 
-		describe( 'Without an error', () => {
-			describe( 'With a success response', () => {
-				let barriersResponse;
-				let dashboardViewModelResponse;
-
-				beforeEach( () => {
-
-					barriersResponse = {
-						response: { isSuccess: true  },
-						body: {
-							results: [ { id: 1 } ]
-						}
-					};
-					dashboardViewModelResponse = { dashboard: true };
-
-					dashboardViewModel.and.callFake( () => dashboardViewModelResponse );
-					backend.barriers.getAll.and.callFake( () => Promise.resolve( barriersResponse ) );
+		describe( 'When there is a watch list', () => {
+			describe( 'Without an error', () => {
+				describe( 'With a success response', () => {
+					let barriersResponse;
+					let dashboardViewModelResponse;
+	
+					beforeEach( () => {
+	
+						barriersResponse = {
+							response: { isSuccess: true  },
+							body: {
+								results: [ { id: 1 } ]
+							}
+						};
+						dashboardViewModelResponse = { dashboard: true };
+	
+						dashboardViewModel.and.callFake( () => dashboardViewModelResponse );
+						backend.barriers.getAll.and.callFake( () => Promise.resolve( barriersResponse ) );
+					} );
+	
+					afterEach( () => {
+	
+						expect( next ).not.toHaveBeenCalled();
+						expect( res.render ).toHaveBeenCalledWith( 'index', dashboardViewModelResponse );
+					} );
+	
+					describe( 'When there is not any sorting', () => {
+						it( 'Should get all the reports and render the correct template', async () => {
+	
+							await controller.index( req, res, next );
+	
+							expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'reported_on', 'desc' );
+							expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, {
+								...sortData,
+								currentSort: defaultCurrentSort
+							} );
+						} );
+					} );
+	
+					describe( 'When there is sorting', () => {
+						describe( 'Sorting by priority', () => {
+	
+							beforeEach( () => {
+								req.query = {
+									sortBy: 'priority',
+								};
+							} );
+	
+							describe( 'With no direction specified', () => {
+								it( 'Should get the report sorted correctly and render the correct template', async () => {
+	
+									await controller.index( req, res, next );
+	
+									expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'priority', 'desc' );
+									expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, {
+										...sortData,
+										currentSort: {
+											field: 'priority',
+											serviceParam: 'priority',
+											direction: 'desc',
+										}
+									} );
+								} );
+							} );
+	
+							describe( 'With asc direction specified', () => {
+								it( 'Should get the report sorted correctly and render the correct template', async () => {
+	
+									req.query.sortDirection = 'asc';
+	
+									await controller.index( req, res, next );
+	
+									expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'priority', 'asc' );
+									expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, {
+										...sortData,
+										currentSort: {
+											field: 'priority',
+											serviceParam: 'priority',
+											direction: 'asc',
+										}
+									} );
+								} );
+							} );
+	
+							describe( 'With desc direction specified', () => {
+								it( 'Should get the report sorted correctly and render the correct template', async () => {
+	
+									req.query.sortDirection = 'desc';
+	
+									await controller.index( req, res, next );
+	
+									expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'priority', 'desc' );
+									expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, {
+										...sortData,
+										currentSort: {
+											field: 'priority',
+											serviceParam: 'priority',
+											direction: 'desc',
+										}
+									} );
+								} );
+							} );
+	
+							describe( 'With an unknown direction specified', () => {
+								it( 'Should get the report sorted correctly and render the correct template', async () => {
+	
+									req.query.sortDirection = 'descabc';
+	
+									await controller.index( req, res, next );
+	
+									expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'priority', 'desc' );
+									expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, {
+										...sortData,
+										currentSort: {
+											field: 'priority',
+											serviceParam: 'priority',
+											direction: 'desc',
+										}
+									} );
+								} );
+							} );
+						} );
+					} );
 				} );
-
-				afterEach( () => {
-
-					expect( next ).not.toHaveBeenCalled();
-					expect( res.render ).toHaveBeenCalledWith( 'index', dashboardViewModelResponse );
-				} );
-
-				describe( 'When there is not any sorting', () => {
-					it( 'Should get all the reports and render the correct template', async () => {
-
+	
+				describe( 'Without a success response', () => {
+					it( 'Should get the reports and render the index page', async () => {
+	
+						const barriersResponse = {
+							response: { isSuccess: false  },
+							body: {}
+						};
+	
+						backend.barriers.getAll.and.callFake( () => Promise.resolve( barriersResponse ) );
+	
 						await controller.index( req, res, next );
-
+	
+						expect( next ).toHaveBeenCalledWith( new Error( `Got ${ barriersResponse.response.statusCode } response from backend` ) );
 						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'reported_on', 'desc' );
-						expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, {
-							...sortData,
-							currentSort: defaultCurrentSort
-						} );
-					} );
-				} );
-
-				describe( 'When there is sorting', () => {
-					describe( 'Sorting by priority', () => {
-
-						beforeEach( () => {
-							req.query = {
-								sortBy: 'priority',
-							};
-						} );
-
-						describe( 'With no direction specified', () => {
-							it( 'Should get the report sorted correctly and render the correct template', async () => {
-
-								await controller.index( req, res, next );
-
-								expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'priority', 'desc' );
-								expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, {
-									...sortData,
-									currentSort: {
-										field: 'priority',
-										serviceParam: 'priority',
-										direction: 'desc',
-									}
-								} );
-							} );
-						} );
-
-						describe( 'With asc direction specified', () => {
-							it( 'Should get the report sorted correctly and render the correct template', async () => {
-
-								req.query.sortDirection = 'asc';
-
-								await controller.index( req, res, next );
-
-								expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'priority', 'asc' );
-								expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, {
-									...sortData,
-									currentSort: {
-										field: 'priority',
-										serviceParam: 'priority',
-										direction: 'asc',
-									}
-								} );
-							} );
-						} );
-
-						describe( 'With desc direction specified', () => {
-							it( 'Should get the report sorted correctly and render the correct template', async () => {
-
-								req.query.sortDirection = 'desc';
-
-								await controller.index( req, res, next );
-
-								expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'priority', 'desc' );
-								expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, {
-									...sortData,
-									currentSort: {
-										field: 'priority',
-										serviceParam: 'priority',
-										direction: 'desc',
-									}
-								} );
-							} );
-						} );
-
-						describe( 'With an unknown direction specified', () => {
-							it( 'Should get the report sorted correctly and render the correct template', async () => {
-
-								req.query.sortDirection = 'descabc';
-
-								await controller.index( req, res, next );
-
-								expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'priority', 'desc' );
-								expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, {
-									...sortData,
-									currentSort: {
-										field: 'priority',
-										serviceParam: 'priority',
-										direction: 'desc',
-									}
-								} );
-							} );
-						} );
+						expect( res.render ).not.toHaveBeenCalled();
 					} );
 				} );
 			} );
-
-			describe( 'Without a success response', () => {
-				it( 'Should get the reports and render the index page', async () => {
-
-					const barriersResponse = {
-						response: { isSuccess: false  },
-						body: {}
-					};
-
-					backend.barriers.getAll.and.callFake( () => Promise.resolve( barriersResponse ) );
-
+			describe( 'With an error', () => {
+				it( 'Should call next with the error', async () => {
+	
+					const err = new Error( 'issue with backend' );
+	
+					backend.barriers.getAll.and.callFake( () => Promise.reject( err ) );
+	
 					await controller.index( req, res, next );
-
-					expect( next ).toHaveBeenCalledWith( new Error( `Got ${ barriersResponse.response.statusCode } response from backend` ) );
-					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'reported_on', 'desc' );
-					expect( res.render ).not.toHaveBeenCalled();
+	
+					expect( next ).toHaveBeenCalledWith( err );
 				} );
 			} );
-		} );
-
-		describe( 'With an error', () => {
-			it( 'Should call next with the error', async () => {
-
-				const err = new Error( 'issue with backend' );
-
-				backend.barriers.getAll.and.callFake( () => Promise.reject( err ) );
-
-				await controller.index( req, res, next );
-
-				expect( next ).toHaveBeenCalledWith( err );
-			} );
-		} );
+		});
+		describe( 'When there is not a watch list', () => {
+		});
 	} );
 
 	describe( 'me', () => {

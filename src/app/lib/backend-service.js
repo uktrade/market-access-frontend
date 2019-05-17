@@ -221,6 +221,10 @@ module.exports = {
 		} )
 	},
 
+	watchList: {
+		save: (req, user_profile) => backend.patch( '/whoami', getToken( req ), { user_profile })
+	},
+
 	barriers: {
 		getAll: async ( req, filters = {}, orderBy = 'reported_on', orderDirection ) => {
 
@@ -298,7 +302,7 @@ module.exports = {
 				status_details.status_date = getDefaultedDate( values.statusDate );
 			}
 			return updateBarrier( getToken( req ), barrierId, status_details);
-		},
+		}
 	},
 
 	reports: {

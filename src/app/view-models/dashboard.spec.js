@@ -43,7 +43,7 @@ describe( 'Dashboard view model', () => {
 		it( 'Should transform and not sort them', () => {
 
 			const barriers = jasmine.helpers.getFakeData( '/backend/barriers/index.dashboard' ).results;
-			const output = viewModel( JSON.parse( JSON.stringify( barriers ) ), { fields: [] } );
+			const output = viewModel( JSON.parse( JSON.stringify( barriers ) ), { fields: [] }, true, { a: 'b'}, {c: 'd'}) ;
 
 			function checkBarrier( id, index ){
 
@@ -78,6 +78,10 @@ describe( 'Dashboard view model', () => {
 					}
 				} );
 			}
+			expect(output.barrierCount).toEqual(4);
+			expect(output.isWatchList).toEqual(true);
+			expect(output.watchListFilters).toEqual({ a: 'b'});
+			expect(output.queryString).toEqual({c: 'd'});
 
 			[ '7de', '1ec', '648', '553' ].forEach( checkBarrier );
 		} );
@@ -91,9 +95,17 @@ describe( 'Dashboard view model', () => {
 				fields: [],
 				currentSort: {},
 			};
-			const output = viewModel( input, sortData );
+			const output = viewModel( input, sortData, true, { a: 'b'}, {c: 'd'} );
 
-			expect( output ).toEqual( { barriers: input, sortableFields: {} } );
+			expect( output ).toEqual({ 
+				barriers: input, 
+				sortableFields: {}, 
+				barrierCount: 0, 
+				isWatchList: true, 
+				watchListFilters: { a: 'b'},
+				queryString: {c: 'd'}
+			});
 		} );
 	} );
+	
 } );
