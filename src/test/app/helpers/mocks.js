@@ -89,9 +89,8 @@ if( typeof jasmine !== 'undefined' ){
 			...createBarrierSessionSpies(),
 			types: createBarrierSessionSpies( 'types' ),
 			sectors: {
-				...createBarrierSessionSpies(),
-				barrierSectors: createBarrierSessionSpies( 'barrierSectors' ),
-				allSectors: createBarrierSessionSpies( 'allSectors' ),
+				list: createBarrierSessionSpies( 'list' ),
+				all: createBarrierSessionSpies( 'all' ),
 			}
 		})
 	};

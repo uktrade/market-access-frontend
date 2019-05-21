@@ -11,7 +11,7 @@ function renderSectors( req, res, sectors, allSectors ){
 function addSectorForm( req, res, href ){
 
 	const barrier = req.barrier;
-	const sectors = req.barrierSession.sectors.barrierSectors.get();
+	const sectors = req.barrierSession.sectors.list.get();
 	const form = new Form( req, {
 
 		sectors: {
@@ -34,8 +34,8 @@ function addSectorForm( req, res, href ){
 		if( !form.hasErrors() ){
 
 			sectors.push( form.getValues().sectors );
-			req.barrierSession.sectors.barrierSectors.set( sectors );
-			req.barrierSession.sectors.allSectors.set(false);
+			req.barrierSession.sectors.list.set( sectors );
+			req.barrierSession.sectors.all.set(false);
 
 			return res.redirect( urls.barriers.sectors.list( barrier.id ) );
 		}
@@ -51,10 +51,10 @@ function addSectorForm( req, res, href ){
 module.exports = {
 	
 	edit: ( req, res ) => {
-		req.barrierSession.sectors.allSectors.set( req.barrier.all_sectors || false );
-		req.barrierSession.sectors.barrierSectors.set( req.barrier.sectors || [] );
+		req.barrierSession.sectors.all.set( req.barrier.all_sectors || false );
+		req.barrierSession.sectors.list.set( req.barrier.sectors || [] );
 
-		renderSectors( req, res, req.barrierSession.sectors.barrierSectors.get(), req.barrierSession.sectors.allSectors.get() );
+		renderSectors( req, res, req.barrierSession.sectors.list.get(), req.barrierSession.sectors.all.get() );
 	},
 
 	list: async ( req, res, next ) => {
@@ -63,17 +63,18 @@ module.exports = {
 		const barrierId = barrier.id;
 		const isPost = req.method === 'POST';
 
-		req.barrierSession.sectors.barrierSectors.setIfNotAlready([]);
-		req.barrierSession.sectors.allSectors.setIfNotAlready(false);
+		req.barrierSession.sectors.list.setIfNotAlready([]);
+		req.barrierSession.sectors.all.setIfNotAlready(false);
 
-		const sectors = req.barrierSession.sectors.barrierSectors.get();
-		const allSectors = req.barrierSession.sectors.allSectors.get();
+		const sectors = req.barrierSession.sectors.list.get();
+		const allSectors = req.barrierSession.sectors.all.get();
 	
 		if( isPost ){
 
 			try {
 
-				req.barrierSession.sectors.delete();
+				req.barrierSession.sectors.all.delete();
+				req.barrierSession.sectors.list.delete();
 
 				const { response } = await backend.barriers.saveSectors( req, barrierId, sectors, allSectors );
 
@@ -98,16 +99,16 @@ module.exports = {
 	remove: ( req, res ) => {
 
 		const sectorToRemove = req.body.sector;
-		let sectors = req.barrierSession.sectors.barrierSectors.get();
+		let sectors = req.barrierSession.sectors.list.get();
 
-		req.barrierSession.sectors.barrierSectors.set( sectors.filter( ( sector ) => sector !== sectorToRemove ) );
+		req.barrierSession.sectors.list.set( sectors.filter( ( sector ) => sector !== sectorToRemove ) );
 
 		res.redirect( urls.barriers.sectors.list( req.barrier.id ) );
 	},
 
 	removeAllSectors: ( req, res ) => {
 
-		req.barrierSession.sectors.allSectors.set( false );
+		req.barrierSession.sectors.all.set( false );
 
 		res.redirect( urls.barriers.sectors.list( req.barrier.id ) );
 	},
@@ -120,15 +121,15 @@ module.exports = {
 			form: urls.barriers.sectors.add( barrier.id )
 		};
 
-		req.barrierSession.sectors.barrierSectors.setIfNotAlready([]);
+		req.barrierSession.sectors.list.setIfNotAlready([]);
 
 		addSectorForm( req, res, href );
 	},
 
 	addAllSectors: ( req, res ) => {
 		
-		req.barrierSession.sectors.allSectors.set( true );
-		req.barrierSession.sectors.barrierSectors.set( [] );
+		req.barrierSession.sectors.all.set( true );
+		req.barrierSession.sectors.list.set( [] );
 
 		res.redirect( urls.barriers.sectors.list( req.barrier.id ) );
 	},
@@ -141,7 +142,7 @@ module.exports = {
 			form: urls.barriers.sectors.new( barrier.id )
 		};
 
-		req.barrierSession.sectors.barrierSectors.set( [] );
+		req.barrierSession.sectors.list.set( [] );
 
 		addSectorForm( req, res, href );
 	}

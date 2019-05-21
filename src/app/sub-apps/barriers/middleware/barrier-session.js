@@ -47,9 +47,8 @@ module.exports = ( req, res, next ) => {
 			...methods,
 			types: createMethods( 'types' ),
 			sectors: {
-				...methods,
-				allSectors: createMethods( 'allSectors'),
-				barrierSectors: createMethods('barrierSectors')
+				all: createMethods( 'all'),
+				list: createMethods('list')
 			},
 		};
 
