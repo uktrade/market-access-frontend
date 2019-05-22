@@ -1030,6 +1030,18 @@ describe( 'Backend Service', () => {
 				} );
 			} );
 
+			describe( 'saveAllSectors', () => {
+
+				const allSectors = 'true';
+
+				checkWithAndWithoutValues( 'saveAllSectors', {
+					allSectors
+				}, {
+					all_sectors: allSectors,
+					sectors: null
+				} );
+			} );
+
 			describe( 'saveSectors', () => {
 
 				const sectors = [

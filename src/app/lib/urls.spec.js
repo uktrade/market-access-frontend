@@ -375,6 +375,7 @@ describe( 'URLs', () => {
 				checkUrls( [
 					[ 'detail', '' ],
 					[ 'hasSectors', 'has-sectors' ],
+					[ 'allSectors', 'all-sectors' ],
 					[ 'sectors', 'sectors' ],
 					[ 'addSector', 'sectors/add' ],
 					[ 'removeSector', 'sectors/remove' ],

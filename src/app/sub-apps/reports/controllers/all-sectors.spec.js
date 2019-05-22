@@ -1,7 +1,7 @@
 const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
 
-const modulePath = './has-sectors';
+const modulePath = './all-sectors';
 
 describe( 'Report controllers', () => {
 
@@ -45,14 +45,15 @@ describe( 'Report controllers', () => {
 		urls = {
 			reports: {
 				detail: jasmine.createSpy( 'urls.reports.detail' ),
-				allSectors: jasmine.createSpy( 'urls.reports.allSectors' ),
+                addSector:  jasmine.createSpy( 'urls.reports.addSector' ),
+                sectors:  jasmine.createSpy( 'urls.reports.sectors' ),
 				aboutProblem: jasmine.createSpy( 'urls.reports.aboutProblem' ),
 			},
 		};
 
 		backend = {
 			reports: {
-				saveHasSectors: jasmine.createSpy( 'backend.reports.saveHasSectors' ),
+				saveAllSectors: jasmine.createSpy( 'backend.reports.saveAllSectors' ),
 			}
 		};
 
@@ -69,7 +70,7 @@ describe( 'Report controllers', () => {
 		} );
 	} );
 
-	describe( 'hasSectors', () => {
+	describe( 'allSectors', () => {
 
 		let report;
 
@@ -78,7 +79,7 @@ describe( 'Report controllers', () => {
 			report = {
 				id: uuid(),
 				sectors: null,
-				sectors_affected: true
+				all_sectors: true
 			};
 			req.report = report;
 		} );
@@ -117,17 +118,17 @@ describe( 'Report controllers', () => {
 				expect( Form ).toHaveBeenCalled();
 				expect( args[ 0 ] ).toEqual( req );
 
-				expect( config.hasSectors ).toBeDefined();
-				expect( config.hasSectors.type ).toEqual( Form.RADIO );
-				expect( config.hasSectors.values ).toEqual( [ report.sectors_affected ] );
-				expect( config.hasSectors.validators[ 0 ].fn ).toEqual( boolResponse );
-				expect( config.hasSectors.items ).toEqual( [
+				expect( config.allSectors ).toBeDefined();
+				expect( config.allSectors.type ).toEqual( Form.RADIO );
+				expect( config.allSectors.values ).toEqual( [ report.all_sectors ] );
+				expect( config.allSectors.validators[ 0 ].fn ).toEqual( boolResponse );
+				expect( config.allSectors.items ).toEqual( [
 					{
 						value: 'true',
-						text: 'yes'
+						text: 'All sectors'
 					},{
 						value: 'false',
-						text: 'No, I don\'t know at the moment'
+						text: 'Just some sectors'
 					}
 				] );
 			} );
@@ -174,7 +175,7 @@ describe( 'Report controllers', () => {
 			describe( 'render', () => {
 				it( 'Should render the template with the correct data', () => {
 
-					const template = 'reports/views/has-sectors';
+					const template = 'reports/views/all-sectors';
 
 					args.render( getTemplateValuesResponse );
 
@@ -182,14 +183,14 @@ describe( 'Report controllers', () => {
 				} );
 			} );
 
-			describe( 'safeFormData', () => {
+			describe( 'saveFormData', () => {
 				it( 'Should call the correct method with the correct data', () => {
 
-					const myFormData = { a: true, b: false };
+					const myFormData = { allSectors: true };
 
 					args.saveFormData( myFormData );
 
-					expect( backend.reports.saveHasSectors ).toHaveBeenCalledWith( req, report.id, myFormData );
+					expect( backend.reports.saveAllSectors ).toHaveBeenCalledWith( req, report.id, myFormData );
 				} );
 			} );
 
@@ -209,29 +210,63 @@ describe( 'Report controllers', () => {
 					} );
 				} );
 
-				describe( 'When hasSectors is true', () => {
+				describe( 'When allSectors is false', () => {
 
-					it( 'Should redirect to the correct URL', () => {
+					beforeEach( () => {
+						getValuesResponse = { allSectors: 'false' };
+					} );
 
-						const allSectorsResponse = '/all-sectors';
+					describe( 'When there are sectors', () => {
 
-						urls.reports.allSectors.and.callFake( () => allSectorsResponse );
-						getValuesResponse = { hasSectors: 'true' };
+						afterEach( () => {
 
-						args.saved();
+							const sectorsResponse = '/sectors';
 
-						expect( urls.reports.allSectors ).toHaveBeenCalledWith( report.id );
-						expect( res.redirect ).toHaveBeenCalledWith( allSectorsResponse );
+							urls.reports.sectors.and.callFake( () => sectorsResponse );
+
+							args.saved();
+
+							expect( urls.reports.sectors ).toHaveBeenCalledWith( report.id );
+							expect( res.redirect ).toHaveBeenCalledWith( sectorsResponse );
+						} );
+
+						describe( 'When the sectors are in the report', () => {
+							it( 'Should call the correct url', () => {
+
+								report.sectors = [ uuid(), uuid() ];
+							} );
+						} );
+
+						describe( 'When the sectors are in the session', () => {
+							it( 'Should call the correct url', () => {
+
+								req.session.sectors = [ uuid(), uuid() ];
+							} );
+						} );
+					} );
+
+					describe( 'When there are NOT any sectors', () => {
+						it( 'Should redirect to the correct URL', () => {
+
+							const addSectorResponse = '/add/sector';
+
+							urls.reports.addSector.and.callFake( () => addSectorResponse );
+
+							args.saved();
+
+							expect( urls.reports.addSector ).toHaveBeenCalledWith( report.id );
+							expect( res.redirect ).toHaveBeenCalledWith( addSectorResponse );
+						} );
 					} );
 				} );
 
-				describe( 'When hasSectors is false', () => {
+				describe( 'When allSectors is true', () => {
 					it( 'Should redirect to the correct URL', () => {
 
 						const aboutProblemResponse = '/about/sector';
 
 						urls.reports.aboutProblem.and.callFake( () => aboutProblemResponse );
-						getValuesResponse = { hasSectors: 'false' };
+						getValuesResponse = { allSectors: 'true' };
 
 						args.saved();
 
