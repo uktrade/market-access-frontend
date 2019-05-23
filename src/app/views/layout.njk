@@ -1,7 +1,7 @@
-{% from 'app-components/govuk-footer-ma.njk' import govukFooterMa %}
 {% from "components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from 'datahub-header/component/header.njk' import datahubHeader %}
+{% from 'app-components/govuk-footer-ma.njk' import govukFooterMa %}
 {% from 'app-components/govuk-header-ma.njk' import govukHeaderMa %}
-{% from 'app-components/datahub-header.njk' import datahubHeader %}
 
 {% set assetPath = '/govuk-public' %}
 
@@ -24,50 +24,6 @@
 {% endblock %}
 
 {% block header %}
-{#
-	<div class="header-wrapper" >
-		govukHeaderMa({
-			classes: 'govuk-header--ma',
-			logoText: 'Data Hub',
-			serviceName: 'Market access barriers',
-			serviceUrl: '/',
-			navigation: [
-				{
-					href: urls.index(),
-					text: 'Dashboard',
-					active: headerNav.isDashboard
-				},{
-					href: urls.reports.new(),
-					text: 'Add a barrier',
-					active: headerNav.isReport
-				},
-				{
-					href: urls.findABarrier(),
-					text: 'Find a barrier',
-					active: headerNav.isFind
-				}
-			]
-		})
-
-		<div class="header-wrapper__user" role="complementary">
-			<p class="header-wrapper__user__content">
-				{% if user %}
-				<span class="user-info">{{ user.username }} <a href="#">Logout</a></span>
-				{% endif %}
-			</p>
-		</div>
-	</div>
-
-	{{ govukPhaseBanner({
-		attributes: { role: 'complementary' },
-		classes: 'govuk-phase-banner--ma',
-		tag: {
-			text: "beta",
-			classes: 'govuk-tag--ma'
-		},
-		html: 'This is a new service – your <a class="govuk-link" href="mailto:' + feedbackEmail +'">feedback</a> will help us to improve it.'
-	}) }}
-#}
 
 	{{ datahubHeader( user.permitted_applications, {
 		active: 'market-access',
@@ -75,7 +31,7 @@
 			marketAccess: '/'
 		},
 		user: {
-			name: 'Test User'
+			name: user.username
 		},
 		subNavigation: [
 			{
@@ -138,11 +94,11 @@
 	<script src="/public/js/vendor/jessie.js"></script>
 	<script src="/public/js/vendor/body-scroll-lock.js"></script>
 	<!-- endbuild -->
-	<!-- build:js(src) /public/js/app.min.js -->
+	<!-- build:js({src,node_modules/@uktrade}) /public/js/app.min.js -->
+	<script src="/datahub-header/component/header.js"></script>
 	<script src="/public/js/ma.js"></script>
 	<script src="/public/js/ma.CustomEvent.js"></script>
 	<script src="/public/js/ma.xhr2.js"></script>
-	<script src="/public/js/components/DatahubHeader.js"></script>
 	<script src="/public/js/components/ConditionalRadioContent.js"></script>
 	<script src="/public/js/components/FileUpload.js"></script>
 	<script src="/public/js/components/Collapsible.js"></script>

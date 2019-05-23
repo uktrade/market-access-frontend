@@ -109,7 +109,7 @@ Then( 'there should be a link to add a barrier', async () => {
 
  Then( /^the active heading link should be (.+)$/, async ( text ) => {
 
-	const activeLink = await driver.byCss( '.govuk-header__navigation-item--active' );
+	const activeLink = await driver.byCss( '#sub-navigation .datahub-header__navigation__item__link--active' );
 	const linkText = await activeLink.getText();
 
 	assert.equal( text, linkText );

@@ -3,6 +3,7 @@ $govuk-font-family-tabular: Arial,'Helvetica Neue',Helvetica,sans-serif;
 $govuk-images-path: '/govuk-public/images/';
 
 @import 'node_modules/vue-multiselect/dist/vue-multiselect.min';
+@import 'node_modules/@uktrade/datahub-header/component/header';
 
 @import 'settings/all';
 @import 'helpers/all';
@@ -60,7 +61,6 @@ $govuk-images-path: '/govuk-public/images/';
 @import 'app-objects/info-panel';
 @import 'app-objects/inline-definition-list';
 
-@import 'app-components/datahub-header';
 @import 'app-components/dash-button';
 @import 'app-components/dash-card';
 @import 'app-components/task-list';
