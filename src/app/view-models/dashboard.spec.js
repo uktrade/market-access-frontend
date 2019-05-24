@@ -103,7 +103,8 @@ describe( 'Dashboard view model', () => {
 				barrierCount: 0, 
 				isWatchList: true, 
 				watchListFilters: { a: 'b'},
-				queryString: {c: 'd'}
+				queryString: {c: 'd'},
+				editQueryString: {c: 'd', editWatchList: true}
 			});
 		} );
 	} );

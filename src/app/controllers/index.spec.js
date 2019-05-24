@@ -24,7 +24,7 @@ describe( 'Index controller', () => {
 		watchList = {
 			transformFilterValue: jasmine.createSpy( 'watchList.transformFilterValue' )
 		};
-		
+
 		backend = {
 			barriers: {
 				getAll: jasmine.createSpy( 'backend.barriers.getAll' ),
@@ -54,7 +54,7 @@ describe( 'Index controller', () => {
 
 		( { req, res, next, csrfToken } = jasmine.helpers.mocks.middleware() );
 
-		req.session = { ssoToken };
+		req.session = { ssoToken, user: { user_profile: {} } };
 
 		controller = proxyquire( modulePath, {
 			'../lib/backend-service': backend,
@@ -67,7 +67,7 @@ describe( 'Index controller', () => {
 
 	describe( 'Index', () => {
 
-		const status = [ OPEN, HIBERNATED ].join( ',' );
+		const status = [[ OPEN, HIBERNATED ].join( ',' )];
 		const sortData = {
 			fields: [ 'priority', 'date', 'location', 'status' ],
 			directions: [ 'asc', 'desc' ],
@@ -83,6 +83,17 @@ describe( 'Index controller', () => {
 		};
 
 		describe( 'When there is a watch list', () => {
+
+			beforeEach(() => {
+				req.session.user.user_profile.watchList = {
+					name: 'hello1',
+					filters: {
+						country: '1234'
+					}
+				};
+				watchList.transformFilterValue.and.callFake( () => 'Country 1' );
+			});
+
 			describe( 'Without an error', () => {
 				describe( 'With a success response', () => {
 					let barriersResponse;
@@ -113,11 +124,14 @@ describe( 'Index controller', () => {
 	
 							await controller.index( req, res, next );
 	
-							expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'reported_on', 'desc' );
-							expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, {
-								...sortData,
-								currentSort: defaultCurrentSort
-							} );
+							expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status, country: '1234' }, 'reported_on', 'desc' );
+							expect( dashboardViewModel ).toHaveBeenCalledWith( 
+								barriersResponse.body.results, 
+								{ ...sortData, currentSort: defaultCurrentSort},
+								true,
+								[{key: 'country', value: 'Country 1' }],
+								{ country: '1234'},
+							);
 						} );
 					} );
 	
@@ -135,15 +149,14 @@ describe( 'Index controller', () => {
 	
 									await controller.index( req, res, next );
 	
-									expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'priority', 'desc' );
-									expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, {
-										...sortData,
-										currentSort: {
-											field: 'priority',
-											serviceParam: 'priority',
-											direction: 'desc',
-										}
-									} );
+									expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status, country: '1234' }, 'priority', 'desc' );
+									expect( dashboardViewModel ).toHaveBeenCalledWith( 
+										barriersResponse.body.results, 
+										{ ...sortData, currentSort: { field: 'priority', serviceParam: 'priority', direction: 'desc', }},
+										true,
+										[{key: 'country', value: 'Country 1' }],
+										{ country: '1234'}, 
+									);
 								} );
 							} );
 	
@@ -154,15 +167,14 @@ describe( 'Index controller', () => {
 	
 									await controller.index( req, res, next );
 	
-									expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'priority', 'asc' );
-									expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, {
-										...sortData,
-										currentSort: {
-											field: 'priority',
-											serviceParam: 'priority',
-											direction: 'asc',
-										}
-									} );
+									expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status, country: '1234' }, 'priority', 'asc' );
+									expect( dashboardViewModel ).toHaveBeenCalledWith( 
+										barriersResponse.body.results, 
+										{ ...sortData, currentSort: { field: 'priority', serviceParam: 'priority', direction: 'asc', }},
+										true,
+										[{key: 'country', value: 'Country 1' }],
+										{ country: '1234'}, 
+									);
 								} );
 							} );
 	
@@ -173,15 +185,14 @@ describe( 'Index controller', () => {
 	
 									await controller.index( req, res, next );
 	
-									expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'priority', 'desc' );
-									expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, {
-										...sortData,
-										currentSort: {
-											field: 'priority',
-											serviceParam: 'priority',
-											direction: 'desc',
-										}
-									} );
+									expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status, country: '1234' }, 'priority', 'desc' );
+									expect( dashboardViewModel ).toHaveBeenCalledWith( 
+										barriersResponse.body.results, 
+										{ ...sortData, currentSort: { field: 'priority', serviceParam: 'priority', direction: 'desc', }},
+										true,
+										[{key: 'country', value: 'Country 1' }],
+										{ country: '1234'}, 
+									);
 								} );
 							} );
 	
@@ -192,15 +203,14 @@ describe( 'Index controller', () => {
 	
 									await controller.index( req, res, next );
 	
-									expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'priority', 'desc' );
-									expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, {
-										...sortData,
-										currentSort: {
-											field: 'priority',
-											serviceParam: 'priority',
-											direction: 'desc',
-										}
-									} );
+									expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status, country: '1234' }, 'priority', 'desc' );
+									expect( dashboardViewModel ).toHaveBeenCalledWith( 
+										barriersResponse.body.results, 
+										{ ...sortData, currentSort: { field: 'priority', serviceParam: 'priority', direction: 'desc', }},
+										true,
+										[{key: 'country', value: 'Country 1' }],
+										{ country: '1234'}, 
+									);
 								} );
 							} );
 						} );
@@ -220,7 +230,7 @@ describe( 'Index controller', () => {
 						await controller.index( req, res, next );
 	
 						expect( next ).toHaveBeenCalledWith( new Error( `Got ${ barriersResponse.response.statusCode } response from backend` ) );
-						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'reported_on', 'desc' );
+						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status, country: '1234' }, 'reported_on', 'desc' );
 						expect( res.render ).not.toHaveBeenCalled();
 					} );
 				} );

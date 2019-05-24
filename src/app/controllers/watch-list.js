@@ -49,13 +49,14 @@ module.exports = {
     },
 
     save: async ( req, res, next ) => {
-
         const filters = getFilters( req.query );
+        const userProfile = req.session.user.user_profile || {};
         const filterList = Object.entries(filters).map(([key, value]) => ({key, value: module.exports.transformFilterValue(key, value)}));
     
         const form = new Form( req, {
             name: {
-                required: 'Enter a name for your watch list'
+                required: 'Enter a name for your watch list',
+                values: [ userProfile.watchList ? req.session.user.user_profile.watchList.name : null ],
             }
         } );
         
@@ -70,7 +71,6 @@ module.exports = {
                     filters
                 };
                 
-                const userProfile = req.session.user.userProfile || {};
                 userProfile.watchList = watchList;
                
                 try {
@@ -84,7 +84,7 @@ module.exports = {
         
                     } else {
         
-                        next( new Error( `Unable to get user info, got ${ response.statusCode } response code` ) );
+                        next( new Error( `Unable to save watch list, got ${ response.statusCode } response code` ) );
                     }
         
                 } catch( e ){
@@ -102,8 +102,8 @@ module.exports = {
     },
 
     remove: async ( req, res, next ) => {
-        const userProfile = req.session.user.userProfile;
-        userProfile.watchList = {};
+        const userProfile = req.session.user.user_profile;
+        userProfile.watchList = null;
         
         try {
 

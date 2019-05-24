@@ -36,7 +36,7 @@ function getRemoveUrl( filters, key ){
 //const isSelected = createMatcher( 'selected' );
 const isChecked = createMatcher( 'checked' );
 
-module.exports = function( { count, barriers, filters, queryString } ){
+module.exports = function( { count, barriers, filters, queryString, editWatchList } ){
 
 	const barrierList = [];
 
@@ -86,6 +86,7 @@ module.exports = function( { count, barriers, filters, queryString } ){
 		barriers: barrierList,
 		hasFilters: !!Object.keys( filters ).length,
 		queryString,
+		editWatchList,
 		filters: {
 			country: {
 				items: countries.sort( sortGovukItems.alphabetical ).map( isChecked( filters.country ) ),

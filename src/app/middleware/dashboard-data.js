@@ -2,7 +2,7 @@ const urls = require( '../lib/urls' );
 
 module.exports = ( req, res, next ) => {
 
-	const userProfile = req.session.user.userProfile || {};
+	const userProfile = req.session.user.user_profile || {};
 	const currentUrl = req.originalUrl;
 
 	let tabs = [];

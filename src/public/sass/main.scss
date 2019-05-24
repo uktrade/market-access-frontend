@@ -91,6 +91,12 @@ $govuk-images-path: '/govuk-public/images/';
 @import 'pages/barrier/type';
 @import 'pages/find-a-barrier';
 
+body:not(.js-enabled) {
+	.js-only {
+		display: none;
+	}
+}
+
 .error-message {
 	@include govuk-font( 24 );
 	border: 4px solid $govuk-red;

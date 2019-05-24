@@ -2,6 +2,27 @@
 	display: block;
 }
 
+.dashboard-results-header {
+	border-bottom: 5px solid $govuk-black;
+	position: relative;
+
+	a {
+		margin-left: govuk-em( 5, 16 );
+		display: inline-block;
+	}
+}
+
+.dashboard-results-title {
+	@include govuk-font( 27, $weight: bold );
+	padding: 0 0 govuk-em( 5, 27 ) 0;
+	margin: govuk-em( 10, 27 ) govuk-em( 10, 27 ) govuk-em( 5, 27 ) 0;
+	display: inline-block;
+}
+
+.dashboard-results-title__caption {
+	@include govuk-font( 19 );
+}
+
 .standard-table--barriers {
 
 	min-width: govuk-em( 950, 16 );

@@ -29,15 +29,16 @@ module.exports = {
 	index: async ( req, res, next ) => {
 
 		const currentSort = getCurrentSort( req.query );
-		const userProfile = req.session.user.userProfile || {};
+		const userProfile = req.session.user.user_profile || {};
 		let hasWatchList = false;
 		let watchListFilters = {};
 
 		const filters = {
 			status: [[ OPEN, HIBERNATED ].join( ',' )],
 		};
-
-		if (userProfile.watchList) {
+		if (!userProfile.watchList) {
+			res.render('index');
+		} else {
 			hasWatchList = true;
 			Object.assign(filters, userProfile.watchList.filters);
 			watchListFilters = Object.entries(userProfile.watchList.filters).map(([key, value]) => ({key, value: transformFilterValue(key, value)}));
@@ -66,9 +67,7 @@ module.exports = {
 				next( e );
 			}
 
-		} else {
-			res.render('index');
-		}
+		} 
 	},
 
 	me: ( req, res ) => {

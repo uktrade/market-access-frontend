@@ -43,7 +43,8 @@ module.exports = async function( req, res, next ){
 				count: body.count,
 				barriers: body.results,
 				filters,
-				queryString: req.query
+				queryString: req.query,
+				editWatchList: req.query.editWatchList
 			} ) );
 
 		} else {

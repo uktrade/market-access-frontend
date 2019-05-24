@@ -9,7 +9,7 @@ describe( 'Dashboard data', () => {
 
 	beforeEach( () => {
 		req = { 
-			session: { user: { userProfile: {} } },
+			session: { user: { user_profile: {} } },
 			originalUrl: urls.index()
 		};
 		res = { locals: {} };
@@ -23,7 +23,7 @@ describe( 'Dashboard data', () => {
 	describe('When there is a watch list', () => {
 
 		beforeEach(() => {
-			req.session.user.userProfile.watchList = {
+			req.session.user.user_profile.watchList = {
 				name: 'Hello1'
 			};
 		});

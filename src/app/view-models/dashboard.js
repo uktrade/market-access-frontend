@@ -69,7 +69,9 @@ module.exports = ( barriers, sortData, isWatchList, watchListFilters, queryStrin
 		barriers = barriers.map( update );
 	}
 
+	const editQueryString = {...queryString, editWatchList: true};
+
 	const sortableFields = getSortableFields( sortData );
 
-	return { barriers, sortableFields, barrierCount: barriers.length, isWatchList, watchListFilters, queryString };
+	return { barriers, sortableFields, barrierCount: barriers.length, isWatchList, watchListFilters, queryString, editQueryString };
 };

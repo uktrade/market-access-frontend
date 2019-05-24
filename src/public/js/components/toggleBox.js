@@ -6,6 +6,7 @@ ma.components.ToggleBox = (function( doc ){
 	var removeClass = jessie.removeClass;
 
 	var CONTAINER_CLASS = 'toggle-box';
+	var ELEMENT_T0_ATTACH = 'dashboard-results-title';
 	var CLOSED_CLASS = 'toggle-box--closed';
 	var OPEN_CLASS = 'toggle-box--opened';
 	var LABEL_CLASS = 'toggle-box__label button-as-link';
@@ -25,7 +26,9 @@ ma.components.ToggleBox = (function( doc ){
 		this.label.className = LABEL_CLASS;
 		this.label.innerText = TEXT_MORE;
 
-		this.container.insertAdjacentElement('beforebegin', this.label );
+		var elementToAttach = doc.getElementsByClassName(ELEMENT_T0_ATTACH);
+		elementToAttach[0].insertAdjacentElement('afterend', this.label );
+
 		jessie.attachListener( this.label, 'click', jessie.bind( this.handleClick, this ) );
 	}
 
