@@ -115,11 +115,12 @@ body:not(.js-enabled) {
 
 .no-results-box {
 	background-color: $govuk-grey-4;
-	border: 2px dashed #BFC1C3;
+	border: 2px dashed $govuk-grey-3;
 	@include govuk-font( 19 );
-	padding: govuk-em( 20, 16 );
+	padding: govuk-em( 20, 19 );
 	text-align: center;
 	padding-top: 0;
+	margin-top: govuk-em( 30, 19 );
 }
 
 .conditional-content {
