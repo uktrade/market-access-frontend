@@ -7,9 +7,12 @@ ma.pages.index = (function(){
 			ma.components.Collapsible.initAll();
 		}
 
-		if( ma.components.ToggleBox ){
+		if( jessie.queryOne && ma.components.ToggleBox ){
 
-			ma.components.ToggleBox.init();
+			new ma.components.ToggleBox( jessie.queryOne( '.toggle-box' ), {
+				more: 'Show list filters',
+				less: 'Hide list filters'
+			} );
 		}
 	};
 })();
