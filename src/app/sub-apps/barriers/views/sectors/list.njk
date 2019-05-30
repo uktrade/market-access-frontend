@@ -16,13 +16,24 @@
 
 	<h3 class="report-sectors-heading">Save or add another sector</h3>
 
-	{{ sectorsList( sectors, {
-			csrfToken: csrfToken,
-			inputName: 'sector',
-			add: urls.barriers.sectors.add( barrier.id ),
-			remove: urls.barriers.sectors.remove( barrier.id )
-		}
-	) }}
+	{% if allSectors %}
+		{{ sectorsList( [{name: "All sectors"}], {
+				csrfToken: csrfToken,
+				inputName: 'sector',
+				add: urls.barriers.sectors.add( barrier.id ),
+				remove: urls.barriers.sectors.removeAllSectors( barrier.id )
+			}
+		) }}
+	{% else %}
+		{{ sectorsList( sectors, {
+				csrfToken: csrfToken,
+				inputName: 'sector',
+				add: urls.barriers.sectors.add( barrier.id ),
+				remove: urls.barriers.sectors.remove( barrier.id ),
+				all: urls.barriers.sectors.addAllSectors( barrier.id )
+			}
+		) }}
+	{% endif %}
 
 	<form action="{{ urls.barriers.sectors.list( barrier.id ) }}" method="POST">
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">

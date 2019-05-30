@@ -154,6 +154,7 @@ describe( 'strings', () => {
 		describe( 'Without any ids', () => {
 			it( 'Should not error', () => {
 				expect( () => strings.sectors() ).not.toThrow();
+				expect( strings.sectors() ).toEqual( 'Unknown' );
 			} );
 		} );
 
@@ -163,5 +164,10 @@ describe( 'strings', () => {
 				expect( strings.sectors( [ 's-id-1', 's-id-2' ] ) ).toEqual( 'sector 1, sector 2' );
 			} );
 		} );
+		describe( 'With all sectors', () => {
+			it( 'Should return the correct string', () => {
+				expect( strings.sectors( [], true ) ).toEqual( 'All sectors' );
+			});
+		});
 	} );
 } );

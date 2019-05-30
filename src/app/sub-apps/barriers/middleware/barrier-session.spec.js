@@ -97,7 +97,7 @@ describe( 'barrier session middleware', () => {
 
 		beforeEach( () => {
 
-			req.barrier = { id, };
+			req.barrier = { id };
 
 			middleware( req, res, next );
 		} );
@@ -217,9 +217,9 @@ describe( 'barrier session middleware', () => {
 
 			describe( 'get', () => {
 				describe( 'With no data', () => {
-					it( 'Sould return undefined', () => {
+					it( 'Should return undefined', () => {
 
-						expect( req.barrierSession.types.get() ).toEqual( undefined );
+						expect( req.barrierSession[key].get() ).toEqual( undefined );
 					} );
 				} );
 
@@ -228,7 +228,7 @@ describe( 'barrier session middleware', () => {
 
 						req.session.barriers[ id ][ key ] = value;
 
-						expect( req.barrierSession.types.get() ).toEqual( value );
+						expect( req.barrierSession[key].get() ).toEqual( value );
 					} );
 				} );
 			} );
@@ -237,7 +237,7 @@ describe( 'barrier session middleware', () => {
 				describe( 'With no data', () => {
 					it( 'Should do nothing', () => {
 
-						expect( () => req.barrierSession.types.delete() ).not.toThrow();
+						expect( () => req.barrierSession[key].delete() ).not.toThrow();
 					} );
 				} );
 
@@ -245,7 +245,7 @@ describe( 'barrier session middleware', () => {
 					it( 'Should delete the data', () => {
 
 						req.session.barriers[ id ][ key ] = value;
-						req.barrierSession.types.delete();
+						req.barrierSession[key].delete();
 
 						expect( typeof req.session.barriers[ id ][ key ] ).toEqual( 'undefined' );
 					} );
@@ -256,7 +256,7 @@ describe( 'barrier session middleware', () => {
 				describe( 'With no data', () => {
 					it( 'Should set the data', () => {
 
-						req.barrierSession.types.set( value );
+						req.barrierSession[key].set( value );
 
 						expect( req.session.barriers[ id ][ key ] ).toEqual( value );
 					} );
@@ -266,7 +266,7 @@ describe( 'barrier session middleware', () => {
 					it( 'Should overwrite the data', () => {
 
 						req.session.barriers[ id ][ key ] = { existing: true };
-						req.barrierSession.types.set( value );
+						req.barrierSession[key].set( value );
 
 						expect( req.session.barriers[ id ][ key ] ).toEqual( value );
 					} );
@@ -277,7 +277,7 @@ describe( 'barrier session middleware', () => {
 				describe( 'With no data', () => {
 					it( 'Should set the data', () => {
 
-						req.barrierSession.types.setIfNotAlready( value );
+						req.barrierSession[key].setIfNotAlready( value );
 
 						expect( req.session.barriers[ id ][ key ] ).toEqual( value );
 					} );
@@ -289,9 +289,194 @@ describe( 'barrier session middleware', () => {
 						const existingValue = { existing: true };
 
 						req.session.barriers[ id ][ key ] = existingValue;
-						req.barrierSession.types.setIfNotAlready( value );
+						req.barrierSession[key].setIfNotAlready( value );
 
 						expect( req.session.barriers[ id ][ key ] ).toEqual( existingValue );
+					} );
+				} );
+			} );
+		} );
+		describe( 'sectors', () => {
+
+			describe( 'all', () => {
+
+				const key = 'all';
+				let value;
+	
+				beforeEach( () => {
+	
+					value = uuid();
+				} );
+	
+				describe( 'get', () => {
+					describe( 'With no data', () => {
+						it( 'Should return undefined', () => {
+	
+							expect( req.barrierSession.sectors[key].get() ).toEqual( undefined );
+						} );
+					} );
+	
+					describe( 'With some data set', () => {
+						it( 'Should return the data', () => {
+	
+							req.session.barriers[ id ][ key ] = value;
+	
+							expect( req.barrierSession.sectors[key].get() ).toEqual( value );
+						} );
+					} );
+				} );
+	
+				describe( 'delete', () => {
+					describe( 'With no data', () => {
+						it( 'Should do nothing', () => {
+	
+							expect( () => req.barrierSession.sectors[key].delete() ).not.toThrow();
+						} );
+					} );
+	
+					describe( 'With some data', () => {
+						it( 'Should delete the data', () => {
+	
+							req.session.barriers[ id ][ key ] = value;
+							req.barrierSession.sectors[key].delete();
+	
+							expect( typeof req.session.barriers[ id ][ key ] ).toEqual( 'undefined' );
+						} );
+					} );
+				} );
+	
+				describe( 'set', () => {
+					describe( 'With no data', () => {
+						it( 'Should set the data', () => {
+	
+							req.barrierSession.sectors[key].set( value );
+	
+							expect( req.session.barriers[ id ][ key ] ).toEqual( value );
+						} );
+					} );
+	
+					describe( 'With some existing data', () => {
+						it( 'Should overwrite the data', () => {
+	
+							req.session.barriers[ id ][ key ] = { existing: true };
+							req.barrierSession.sectors[key].set( value );
+	
+							expect( req.session.barriers[ id ][ key ] ).toEqual( value );
+						} );
+					} );
+				} );
+	
+				describe( 'setIfNotAlready', () => {
+					describe( 'With no data', () => {
+						it( 'Should set the data', () => {
+	
+							req.barrierSession.sectors[key].setIfNotAlready( value );
+	
+							expect( req.session.barriers[ id ][ key ] ).toEqual( value );
+						} );
+					} );
+	
+					describe( 'With some existing data', () => {
+						it( 'Should note overwrite the data', () => {
+	
+							const existingValue = { existing: true };
+	
+							req.session.barriers[ id ][ key ] = existingValue;
+							req.barrierSession.sectors[key].setIfNotAlready( value );
+	
+							expect( req.session.barriers[ id ][ key ] ).toEqual( existingValue );
+						} );
+					} );
+				} );
+			} );
+			describe( 'list', () => {
+
+				const key = 'list';
+				let value;
+	
+				beforeEach( () => {
+	
+					value = uuid();
+				} );
+	
+				describe( 'get', () => {
+					describe( 'With no data', () => {
+						it( 'Should return undefined', () => {
+	
+							expect( req.barrierSession.sectors[key].get() ).toEqual( undefined );
+						} );
+					} );
+	
+					describe( 'With some data set', () => {
+						it( 'Should return the data', () => {
+	
+							req.session.barriers[ id ][ key ] = value;
+	
+							expect( req.barrierSession.sectors[key].get() ).toEqual( value );
+						} );
+					} );
+				} );
+	
+				describe( 'delete', () => {
+					describe( 'With no data', () => {
+						it( 'Should do nothing', () => {
+	
+							expect( () => req.barrierSession.sectors[key].delete() ).not.toThrow();
+						} );
+					} );
+	
+					describe( 'With some data', () => {
+						it( 'Should delete the data', () => {
+	
+							req.session.barriers[ id ][ key ] = value;
+							req.barrierSession.sectors[key].delete();
+	
+							expect( typeof req.session.barriers[ id ][ key ] ).toEqual( 'undefined' );
+						} );
+					} );
+				} );
+	
+				describe( 'set', () => {
+					describe( 'With no data', () => {
+						it( 'Should set the data', () => {
+	
+							req.barrierSession.sectors[key].set( value );
+	
+							expect( req.session.barriers[ id ][ key ] ).toEqual( value );
+						} );
+					} );
+	
+					describe( 'With some existing data', () => {
+						it( 'Should overwrite the data', () => {
+	
+							req.session.barriers[ id ][ key ] = { existing: true };
+							req.barrierSession.sectors[key].set( value );
+	
+							expect( req.session.barriers[ id ][ key ] ).toEqual( value );
+						} );
+					} );
+				} );
+	
+				describe( 'setIfNotAlready', () => {
+					describe( 'With no data', () => {
+						it( 'Should set the data', () => {
+	
+							req.barrierSession.sectors[key].setIfNotAlready( value );
+	
+							expect( req.session.barriers[ id ][ key ] ).toEqual( value );
+						} );
+					} );
+	
+					describe( 'With some existing data', () => {
+						it( 'Should note overwrite the data', () => {
+	
+							const existingValue = { existing: true };
+	
+							req.session.barriers[ id ][ key ] = existingValue;
+							req.barrierSession.sectors[key].setIfNotAlready( value );
+	
+							expect( req.session.barriers[ id ][ key ] ).toEqual( existingValue );
+						} );
 					} );
 				} );
 			} );

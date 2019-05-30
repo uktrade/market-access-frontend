@@ -107,7 +107,9 @@ module.exports = {
 			edit: ( barrierId ) => `/barriers/${ barrierId }/sectors/edit/`,
 			list: ( barrierId ) => `/barriers/${ barrierId }/sectors/`,
 			add: ( barrierId ) => `/barriers/${ barrierId }/sectors/add/`,
+			addAllSectors: ( barrierId ) => `/barriers/${ barrierId }/sectors/add/all/`,
 			remove: ( barrierId ) => `/barriers/${ barrierId }/sectors/remove/`,
+			removeAllSectors: ( barrierId ) => `/barriers/${ barrierId }/sectors/remove/all/`,
 			new: ( barrierId ) => `/barriers/${ barrierId }/sectors/new/`,
 		},
 		location: {

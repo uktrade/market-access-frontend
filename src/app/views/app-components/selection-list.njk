@@ -21,13 +21,17 @@
 	{% if params.add %}
 		<a href="{{ params.add }}" class="govuk-button button--secondary selection-list__add-button">{{ config.button.text }}</a>
 	{% endif %}
+	{% if params.all %}
+		<a href="{{ params.all }}" class="govuk-button button--secondary selection-list__add-button">{{ config.all_button.text }}</a>
+	{% endif %}
 	</div>
 {% endmacro %}
 
 {% macro sectorsList( sectors, params ) %}
 	{{ selectionList( sectors, params, {
 		heading: { text: 'Selected sectors' },
-		button: { text: 'Add another sector' }
+		button: { text: 'Add specific sectors' },
+		all_button: { text: 'Select all sectors' }
 	}) }}
 {% endmacro %}
 
