@@ -29,7 +29,7 @@ function update( barrier ){
 			id: countryId,
 			name: ( country && country.name )
 		},
-		sectors: ( barrier.all_sectors ? [ 'All sectors'] : barrier.sectors && barrier.sectors.map( getSector ) || [ 'Unknown' ] ),
+		sectors: ( barrier.all_sectors ? [ 'All sectors' ] : barrier.sectors && barrier.sectors.map( getSector ) || [ 'Unknown' ] ),
 		supportNeeded: barrier.support_type === 1,
 		hasContributors: barrier.contributor_count > 0,
 		problemStatus: metadata.statusTypes[ barrier.problem_status ],
@@ -62,16 +62,23 @@ function getSortableFields( sortData ){
 	return sortableFields;
 }
 
-module.exports = ( barriers, sortData, isWatchList, watchListFilters, queryString) => {
+module.exports = ( barriers, sortData, isWatchList, watchListFilters, queryString ) => {
 
 	if( barriers && barriers.length ){
 
 		barriers = barriers.map( update );
 	}
 
-	const editQueryString = {...queryString, editWatchList: true};
-
+	const editQueryString = { ...queryString, editWatchList: true };
 	const sortableFields = getSortableFields( sortData );
 
-	return { barriers, sortableFields, barrierCount: barriers.length, isWatchList, watchListFilters, queryString, editQueryString };
+	return {
+		barriers,
+		sortableFields,
+		barrierCount: barriers.length,
+		isWatchList,
+		watchListFilters,
+		queryString,
+		editQueryString
+	};
 };

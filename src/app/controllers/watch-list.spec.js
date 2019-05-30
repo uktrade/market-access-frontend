@@ -20,17 +20,17 @@ describe( 'Watch list controller', () => {
 
 	beforeEach( () => {
 
-        backend = { watchList: { save: jasmine.createSpy( 'backend.watchList.save' ) } };
+		backend = { watchList: { save: jasmine.createSpy( 'backend.watchList.save' ) } };
 
 		( { req, res, next, csrfToken } = jasmine.helpers.mocks.middleware() );
 
-        req.session = { user: { user_profile: {} } };
-        
-        urls = {
-			index: jasmine.createSpy( 'urls.index' )
-        };
+		req.session = { user: { user_profile: {} } };
 
-        metadata = {
+		urls = {
+			index: jasmine.createSpy( 'urls.index' )
+		};
+
+		metadata = {
 			getCountry: jasmine.createSpy( 'validators.getCountry' ),
 			getSector: jasmine.createSpy( 'validators.getSector' ),
 			getBarrierType: jasmine.createSpy( 'validators.getBarrierType' ),
@@ -38,23 +38,23 @@ describe( 'Watch list controller', () => {
 			getOverseasRegion: jasmine.createSpy( 'validators.getOverseasRegion' ),
 		};
 
-        validators = {
+		validators = {
 			isCountryOrAdminArea: jasmine.createSpy( 'validators.isCountryOrAdminArea' ),
 			isOverseasRegion: jasmine.createSpy( 'validators.isOverseasRegion' ),
 			isSector: jasmine.createSpy( 'validators.isSector' ),
 			isBarrierType: jasmine.createSpy( 'validators.isBarrierType' ),
 			isBarrierPriority: jasmine.createSpy( 'validators.isBarrierPriority' ),
-        };
-        
-        getValuesResponse = { name: 'Test name' };
+		};
+
+		getValuesResponse = { name: 'Test name' };
 		getTemplateValuesResponse = { c: 3, d: 4 };
 		form = {
 			validate: jasmine.createSpy( 'form.validate' ),
 			getValues: jasmine.createSpy( 'form.getValues' ).and.callFake( () => getValuesResponse ),
 			getTemplateValues: jasmine.createSpy( 'form.getTemplateValues' ).and.callFake( () => Object.assign( {}, getTemplateValuesResponse ) )
 		};
-        
-        Form = jasmine.createSpy( 'Form' ).and.callFake( () => form );
+
+		Form = jasmine.createSpy( 'Form' ).and.callFake( () => form );
 
 		controller = proxyquire( modulePath, {
 			'../lib/metadata': metadata,
@@ -63,185 +63,173 @@ describe( 'Watch list controller', () => {
 			'../lib/backend-service': backend,
 			'../lib/urls': urls,
 		} );
-    } );
+	} );
 
-    describe ( 'Save', () => {
-        describe( 'When it is a get', () => {
-            it( 'Should setup the form correctly', async () => {
-                
-                await controller.save( req, res, next );
-    
-                const config = Form.calls.argsFor( 0 )[1];
+	describe ( 'Save', () => {
+		describe( 'When it is a GET', () => {
+			it( 'Should setup the form correctly', async () => {
 
-                expect( config.name ).toBeDefined();
-                expect( config.name.required ).toBeDefined();
-                expect( config.name.values ).toEqual( [null] );
-            });
+				await controller.save( req, res, next );
 
-            it( 'Should render the template', async () => {
+				const config = Form.calls.argsFor( 0 )[1];
 
-                await controller.save( req, res, next );
+				expect( config.name ).toBeDefined();
+				expect( config.name.required ).toBeDefined();
+				expect( config.name.values ).toEqual( [null] );
+			});
 
-                expect(res.render).toHaveBeenCalledWith(
-                    'watch-list/save', 
-                    { 
-                        c: 3, d: 4, 
-                        filters: {}, 
-                        queryString: {}, 
-                        filterList: [  ], 
-                        csrfToken: csrfToken 
-                    }
-                );
-            });
-        });
-        describe( 'When it is a post', () => {
+			it( 'Should render the template', async () => {
 
-            beforeEach( () => {
+				await controller.save( req, res, next );
+
+				expect( res.render ).toHaveBeenCalledWith( 'watch-list/save', {
+					c: 3, d: 4,
+					filters: {},
+					queryString: {},
+					filterList: [  ],
+					csrfToken: csrfToken
+				} );
+			});
+		});
+
+		describe( 'When it is a POST', () => {
+
+			beforeEach( () => {
 				form.isPost = true;
-            } );
+			} );
 
-            describe( 'When the form data is not valid', () => {
+			describe( 'When the form data is not valid', () => {
 				it( 'Should render the template', async () => {
 
 					form.hasErrors = () => true;
 
 					await controller.save( req, res, next );
 
-					expect(res.render).toHaveBeenCalledWith(
-                        'watch-list/save', 
-                        { 
-                            c: 3, d: 4, 
-                            filters: {}, 
-                            queryString: {}, 
-                            filterList: [  ], 
-                            csrfToken: csrfToken 
-                        }
-                    );
-                    expect(backend.watchList.save).not.toHaveBeenCalled();
+					expect( res.render ).toHaveBeenCalledWith( 'watch-list/save', {
+						c: 3, d: 4,
+						filters: {},
+						queryString: {},
+						filterList: [  ],
+						csrfToken: csrfToken
+					} );
+					expect( backend.watchList.save ).not.toHaveBeenCalled();
 				} );
-            } );
-            
-            describe( 'When the form data is valid', () => {
-
-                beforeEach( () => {
-					form.hasErrors = () => false;
-                } );
-
-                describe( 'When there is are no errors', () => {
-                    describe( 'With a success response', () => {
-                        it( 'Saves the watch list and redirects to the dashboard', async () => {
-
-                            const indexResponse = '/';
-                            const watchListResponse = {
-                                response: { isSuccess: true  }
-                            };
-
-                            urls.index.and.callFake( () => indexResponse );
-                            backend.watchList.save.and.callFake( () => Promise.resolve( watchListResponse ) );
-
-                            await controller.save( req, res, next );
-
-                            expect(backend.watchList.save).toHaveBeenCalledWith(
-                                req, 
-                                { watchList: { name: 'Test name', filters: {} } }
-                            );
-                            expect(req.session.user).not.toBeDefined();
-                            expect(res.redirect).toHaveBeenCalledWith(indexResponse);
-                        });
-
-                    });
-
-                    describe( 'Without a success response', () => {
-                        it( 'Should render the template', async () => {
-	
-                            const watchListResponse = {
-                                response: { isSuccess: false  },
-                            };
-        
-                            backend.watchList.save.and.callFake( () => Promise.resolve( watchListResponse ) );
-        
-                            await controller.save( req, res, next );
-        
-                            expect( next ).toHaveBeenCalledWith( new Error( `Unable to save watch list, got ${ watchListResponse.response.statusCode } response code` ) );
-                        } );
-                    });
-                });
-
-                describe( 'When there is an error', () => {
-                    it( 'Should call next with the error', async () => {
-	
-                        const err = new Error( 'issue with backend' );
-        
-                        backend.watchList.save.and.callFake( () => Promise.reject( err ) );
-        
-                        await controller.save( req, res, next );
-        
-                        expect( next ).toHaveBeenCalledWith( err );
-                    } );
-                }); 
 			} );
-        });
-    });
 
-    describe ( 'Remove', () => {
+			describe( 'When the form data is valid', () => {
 
-        beforeEach(() => {
-            req.session.user.user_profile.watchList = watchList;
-        });
+				beforeEach( () => {
+					form.hasErrors = () => false;
+				} );
 
-        describe( 'Without an error', () => {
-            
-            describe( 'With a success response', () => {
-                it( 'Clears the watch list from the user profile', async () => {
+				describe( 'When there is are no errors', () => {
+					describe( 'With a success response', () => {
+						it( 'Saves the watch list and redirects to the dashboard', async () => {
 
-                    const indexResponse = '/';
-                    const watchListResponse = {
-                        response: { isSuccess: true  }
-                    };
+							const indexResponse = '/';
+							const watchListResponse = {
+									response: { isSuccess: true  }
+							};
 
-                    urls.index.and.callFake( () => indexResponse );
-                    backend.watchList.save.and.callFake( () => Promise.resolve( watchListResponse ) );
+							urls.index.and.callFake( () => indexResponse );
+							backend.watchList.save.and.callFake( () => Promise.resolve( watchListResponse ) );
 
-                    await controller.remove(req, res, next);
+							await controller.save( req, res, next );
 
-                    expect(req.session.user).toBeUndefined();
-                    expect(backend.watchList.save).toHaveBeenCalledWith(
-                        req, 
-                        { watchList: null }
-                    );
+							expect( backend.watchList.save ).toHaveBeenCalledWith(
+									req,
+									{ watchList: { name: 'Test name', filters: {} } }
+							);
+							expect( req.session.user ).not.toBeDefined();
+							expect( res.redirect ).toHaveBeenCalledWith( indexResponse );
+						});
+					});
 
-                    expect( res.redirect ).toHaveBeenCalledWith( indexResponse );
+					describe( 'Without a success response', () => {
+						it( 'Should render the template', async () => {
 
-                });
-            });
+							const watchListResponse = {
+									response: { isSuccess: false  },
+							};
 
-            describe( ' Without a success response', () => {
-                it( 'Should call next with the error', async () => {
-                    const watchListResponse = {
-                        response: { isSuccess: false  }
-                    };
+							backend.watchList.save.and.callFake( () => Promise.resolve( watchListResponse ) );
 
-                    backend.watchList.save.and.callFake( () => Promise.resolve( watchListResponse ) );
+							await controller.save( req, res, next );
 
-                    await controller.remove( req, res, next );
+							expect( next ).toHaveBeenCalledWith( new Error( `Unable to save watch list, got ${ watchListResponse.response.statusCode } response code` ) );
+						});
+					});
+				});
 
-                    expect( next ).toHaveBeenCalledWith( new Error( `Unable to get user info, got ${ watchListResponse.response.statusCode } response code` ) );
+				describe( 'When there is an error', () => {
+					it( 'Should call next with the error', async () => {
 
-                    expect( res.render ).not.toHaveBeenCalled();
-                });
-            });
-        });
+						const err = new Error( 'issue with backend' );
 
-        describe( 'With an error', () => {
-            it( 'Should call next with the error', async () => {
-                const err = new Error( 'issue with backend' );
+						backend.watchList.save.and.callFake( () => Promise.reject( err ) );
 
-                backend.watchList.save.and.callFake( () => Promise.reject( err ) );
+						await controller.save( req, res, next );
 
-                await controller.remove( req, res, next );
+						expect( next ).toHaveBeenCalledWith( err );
+					} );
+				});
+			} );
+		});
+	});
 
-                expect( next ).toHaveBeenCalledWith( err );
-            } );
-        });
-    });
+	describe ( 'Remove', () => {
+
+		beforeEach(() => {
+			req.session.user.user_profile.watchList = watchList;
+		});
+
+		describe( 'Without an error', () => {
+			describe( 'With a success response', () => {
+				it( 'Clears the watch list from the user profile', async () => {
+
+					const indexResponse = '/';
+					const watchListResponse = {
+						response: { isSuccess: true  }
+					};
+
+					urls.index.and.callFake( () => indexResponse );
+					backend.watchList.save.and.callFake( () => Promise.resolve( watchListResponse ) );
+
+					await controller.remove( req, res, next );
+
+					expect( req.session.user ).toBeUndefined();
+					expect( backend.watchList.save ).toHaveBeenCalledWith( req, { watchList: null } );
+					expect( res.redirect ).toHaveBeenCalledWith( indexResponse );
+				});
+			});
+
+			describe( ' Without a success response', () => {
+				it( 'Should call next with the error', async () => {
+					const watchListResponse = {
+						response: { isSuccess: false  }
+					};
+
+					backend.watchList.save.and.callFake( () => Promise.resolve( watchListResponse ) );
+
+					await controller.remove( req, res, next );
+
+					expect( next ).toHaveBeenCalledWith( new Error( `Unable to get user info, got ${ watchListResponse.response.statusCode } response code` ) );
+
+					expect( res.render ).not.toHaveBeenCalled();
+				});
+			});
+		});
+
+		describe( 'With an error', () => {
+			it( 'Should call next with the error', async () => {
+				const err = new Error( 'issue with backend' );
+
+				backend.watchList.save.and.callFake( () => Promise.reject( err ) );
+
+				await controller.remove( req, res, next );
+
+				expect( next ).toHaveBeenCalledWith( err );
+			} );
+		});
+	});
 });

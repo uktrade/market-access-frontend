@@ -5,22 +5,22 @@
 .dashboard-results-header {
 	border-bottom: 5px solid $govuk-black;
 	position: relative;
-
-	a {
-		margin-left: govuk-em( 5, 16 );
-		display: inline-block;
-	}
 }
 
-.dashboard-results-title {
+.dashboard-results-header__title {
 	@include govuk-font( 27, $weight: bold );
 	padding: 0 0 govuk-em( 5, 27 ) 0;
 	margin: govuk-em( 10, 27 ) govuk-em( 10, 27 ) govuk-em( 5, 27 ) 0;
 	display: inline-block;
 }
 
-.dashboard-results-title__caption {
+.dashboard-results-header__title__caption {
 	@include govuk-font( 19 );
+}
+
+.dashboard-results-header__link {
+	margin-left: govuk-em( 5, 16 );
+	display: inline-block;
 }
 
 .standard-table--barriers {

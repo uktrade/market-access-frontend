@@ -36,38 +36,41 @@ module.exports = {
 		const filters = {
 			status: [[ OPEN, HIBERNATED ].join( ',' )],
 		};
-		if (!userProfile.watchList) {
-			res.render('index');
+
+		if( !userProfile.watchList ){
+
+			res.render( 'index' );
+
 		} else {
+
 			hasWatchList = true;
-			Object.assign(filters, userProfile.watchList.filters);
-			watchListFilters = Object.entries(userProfile.watchList.filters).map(([key, value]) => ({key, value: transformFilterValue(key, value)}));
+			Object.assign( filters, userProfile.watchList.filters );
+			watchListFilters = Object.entries( userProfile.watchList.filters ).map( ( [ key, value ] ) => ({ key, value: transformFilterValue( key, value ) }) );
 
 			try {
 
 				const { response, body } = await backend.barriers.getAll( req, filters, currentSort.serviceParam, currentSort.direction );
-	
+
 				if( response.isSuccess ){
-					
-					res.render('index', dashboardViewModel( 
-						body.results, 
-						{ ...sortData, currentSort}, 
-						hasWatchList, 
+
+					res.render('index', dashboardViewModel(
+						body.results,
+						{ ...sortData, currentSort },
+						hasWatchList,
 						watchListFilters,
 						userProfile.watchList.filters,
 					));
-	
+
 				} else {
-	
+
 					throw new Error( `Got ${ response.statusCode } response from backend` );
 				}
-	
+
 			} catch( e ){
-	
+
 				next( e );
 			}
-
-		} 
+		}
 	},
 
 	me: ( req, res ) => {

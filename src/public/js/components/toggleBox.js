@@ -6,28 +6,32 @@ ma.components.ToggleBox = (function( doc ){
 	var removeClass = jessie.removeClass;
 
 	var CONTAINER_CLASS = 'toggle-box';
-	var ELEMENT_T0_ATTACH = 'dashboard-results-title';
+	var ELEMENT_T0_ATTACH = 'js-toggle-box-control';
 	var CLOSED_CLASS = 'toggle-box--closed';
 	var OPEN_CLASS = 'toggle-box--opened';
 	var LABEL_CLASS = 'toggle-box__label button-as-link';
 
-	var TEXT_MORE = 'Show list filters';
-	var TEXT_LESS = 'Hide list filters';
+	var DEFAULT_TEXT_MORE = 'Show list filters';
+	var DEFAULT_TEXT_LESS = 'Hide list filters';
 
-	function ToggleBox( container ){
+	function ToggleBox( container, text ){
 
 		if( !container ){ return; }
 
 		this.container = container;
+		this.text = {
+			more: ( text && text.more || DEFAULT_TEXT_MORE ),
+			less: ( text && text.less || DEFAULT_TEXT_LESS )
+		};
 		this.open = false;
 		addClass( container, CLOSED_CLASS );
 
 		this.label = doc.createElement( 'button' );
 		this.label.className = LABEL_CLASS;
-		this.label.innerText = TEXT_MORE;
+		this.label.innerText = this.text.more;
 
-		var elementToAttach = doc.getElementsByClassName(ELEMENT_T0_ATTACH);
-		elementToAttach[0].insertAdjacentElement('afterend', this.label );
+		var elementToAttach = doc.getElementsByClassName( ELEMENT_T0_ATTACH );
+		elementToAttach[ 0 ].insertAdjacentElement( 'afterend', this.label );
 
 		jessie.attachListener( this.label, 'click', jessie.bind( this.handleClick, this ) );
 	}
@@ -40,7 +44,7 @@ ma.components.ToggleBox = (function( doc ){
 		addClass( container, ( this.open ? OPEN_CLASS : CLOSED_CLASS ) );
 		removeClass( container, ( this.open ? CLOSED_CLASS: OPEN_CLASS ) );
 
-		this.label.innerText = ( jessie.hasClass( container, OPEN_CLASS ) ? TEXT_LESS : TEXT_MORE );
+		this.label.innerText = ( jessie.hasClass( container, OPEN_CLASS ) ? this.text.less : this.text.more );
 	};
 
 	ToggleBox.init = function(){

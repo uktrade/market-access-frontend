@@ -18,18 +18,18 @@
 
 	{% if barriers and barriers.length or isWatchList %}
 		<div class="dashboard-results-header">
-			<h2 class="dashboard-results-title">{{ barrierCount }}<span class="dashboard-results-title__caption"> barrier{{ 's' if barrierCount != 1 }}</span></h2>
-			<a class="js-only" href="{{ urls.findABarrier(editQueryString) }}"> Edit list filters </a>
-			<a href="{{ urls.watchList.save(queryString) }}"> Rename list </a>
-			<a href="{{ urls.watchList.remove() }}"> Delete list </a>
-			<div class="toggle-box">			
+			<h2 class="dashboard-results-header__title js-toggle-box-control">{{ barrierCount }}<span class="dashboard-results-header__title__caption"> barrier{{ 's' if barrierCount != 1 }}</span></h2>
+			<a class="dashboard-results-header__link js-only" href="{{ urls.findABarrier( editQueryString ) }}"> Edit list filters </a>
+			<a class="dashboard-results-header__link" href="{{ urls.watchList.save( queryString ) }}"> Rename list </a>
+			<a class="dashboard-results-header__link" href="{{ urls.watchList.remove() }}"> Delete list </a>
+			<div class="toggle-box">
 				{% if watchListFilters %}
 					<ul>
 						{% for watchListFilter in watchListFilters %}
-							<li>{{ watchListFilter.key }}: <strong>{{ watchListFilter.value }}</strong></li>
+							<li>{{ watchListFilter.key | capitalize }}: <strong>{{ watchListFilter.value }}</strong></li>
 						{% endfor %}
 					</ul>
-					<a href="{{ urls.findABarrier(editQueryString) }}"> Edit list filters </a>
+					<a class="govuk-button button--secondary" href="{{ urls.findABarrier(editQueryString) }}">Edit list filters</a>
 				{% endif %}
 			</div>
 		</div>

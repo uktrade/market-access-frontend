@@ -11,32 +11,32 @@
 	{{ heading({
 		back: { href: urls.findABarrier(queryString) },
 		text: 'Save watch list',
-        errors: errors
+		errors: errors
 	}) }}
 
-    <section class="restrict-width">
+	<section class="restrict-width">
 
-        {{ detailsList( filterList ) }}
+		{{ detailsList( filterList ) }}
 
-        <form action="{{ urls.watchList.save(queryString) }}" method="POST">
-            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+		<form action="{{ urls.watchList.save( queryString ) }}" method="POST">
+			<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
-            {{ govukInput( {
+			{{ govukInput( {
 
-                label: {
-                    text: 'Name your watch list',
-                    classes: 'govuk-label--s'
-                },
-                id: 'name',
-                name: 'name',
-                value: name,
-                errorMessage: errors | errorForName( 'name' )
-            } ) }}
+				label: {
+					text: 'Name your watch list',
+					classes: 'govuk-label--s'
+				},
+				id: 'name',
+				name: 'name',
+				value: name,
+				errorMessage: errors | errorForName( 'name' )
+			} ) }}
 
-            <input type="submit" value="Save" class="govuk-button">
-            <a href="{{ urls.findABarrier(queryString) }}" class="govuk-button button--secondary">Cancel</a>
-        </form>
-        
-    </section>
+			<input type="submit" value="Save" class="govuk-button">
+			<a href="{{ urls.findABarrier(queryString) }}" class="govuk-button button--secondary">Cancel</a>
+		</form>
+
+	</section>
 
 {% endblock %}
