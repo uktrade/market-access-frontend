@@ -175,8 +175,8 @@ ma.pages.barrier.detail = (function( doc, jessie ){
 
 		setupAttachments( opts.noteErrorText );
 
-		if( ma.components.BarrierSummary ){
-			new ma.components.BarrierSummary( opts.barrierSummary );
+		if( ma.components.ToggleLinks ){
+			new ma.components.ToggleLinks( opts.toggleLinks );
 		}
 
 		if( ma.components.DeleteModal ){

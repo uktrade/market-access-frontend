@@ -14,5 +14,12 @@ ma.pages.index = (function(){
 				less: 'Hide list filters'
 			} );
 		}
+
+		if( ma.components.ToggleLinks ){
+			new ma.components.ToggleLinks( {
+				text: 'Manage list',
+				linkClass: 'js-list-link'
+			} );
+		}
 	};
 })();

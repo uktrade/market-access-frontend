@@ -3,8 +3,13 @@
 }
 
 .dashboard-results-header {
+
 	border-bottom: 5px solid $govuk-black;
 	position: relative;
+
+	.toggle-box__label {
+		margin-left: govuk-em( 30, 16 );
+	}
 }
 
 .dashboard-results-header__title {
@@ -16,6 +21,11 @@
 
 .dashboard-results-header__title__caption {
 	@include govuk-font( 19 );
+}
+
+.dashboard-results-header__link-wrapper {
+	float: right;
+	margin-top: govuk-em( 10, 16 );
 }
 
 .dashboard-results-header__link {

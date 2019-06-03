@@ -34,7 +34,7 @@ ma.components.ToggleBox = (function( doc ){
 			this.label.innerText = this.text.more;
 
 			addClass( container, CLOSED_CLASS );
-			elementToAttach.insertAdjacentElement( 'afterend', this.label );
+			elementToAttach.appendChild( this.label );
 			jessie.attachListener( this.label, 'click', jessie.bind( this.handleClick, this ) );
 
 		} else {

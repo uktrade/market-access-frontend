@@ -1,20 +1,20 @@
-ma.components.BarrierSummary = (function( doc, jessie ){
+ma.components.ToggleLinks = (function( doc, jessie ){
 
-	var LINK_CLASS = 'barrier-summary-link-toggle';
-	var LIST_CLASS = 'barrier-summary-link-list';
-	var LIST_ITEM_CLASS = 'barrier-summary-link-list__item';
+	var LINK_CLASS = 'toggle-links-toggle';
+	var LIST_CLASS = 'toggle-links-list';
+	var LIST_ITEM_CLASS = 'toggle-links-list__item';
 
 	if( !jessie.hasFeatures( 'query', 'attachListener', 'bind', 'cancelDefault', 'getElementPositionStyles' ) ){ return; }
 
-	function BarrierSummary( opts ){
+	function ToggleLinks( opts ){
 
-		if( !opts.text ){ throw new Error( 'BarierSummary needs text' ); }
-		if( !opts.linkClass ){ throw new Error( 'BarrierSummary needs linkClass' ); }
+		if( !opts.text ){ throw new Error( 'ToggleLinks needs text' ); }
+		if( !opts.linkClass ){ throw new Error( 'ToggleLinks needs linkClass' ); }
 
 		this.text = opts.text;
-		this.links = jessie.query( opts.linkClass );
+		this.links = jessie.query( '.' + opts.linkClass );
 
-		if( !this.links.length ){ throw new Error( 'BarrierSummary found no links' ); }
+		if( !this.links.length ){ throw new Error( 'ToggleLinks found no links' ); }
 
 		this.setupList();
 		this.setupLink();
@@ -23,7 +23,7 @@ ma.components.BarrierSummary = (function( doc, jessie ){
 		jessie.attachListener( window, 'resize', jessie.bind( this.setListPosition, this ) );
 	}
 
-	BarrierSummary.prototype.setupList = function(){
+	ToggleLinks.prototype.setupList = function(){
 
 		var listItem;
 		var link;
@@ -46,7 +46,7 @@ ma.components.BarrierSummary = (function( doc, jessie ){
 		}
 	};
 
-	BarrierSummary.prototype.setupLink = function(){
+	ToggleLinks.prototype.setupLink = function(){
 
 		var toggle = doc.createElement( 'a' );
 
@@ -59,7 +59,7 @@ ma.components.BarrierSummary = (function( doc, jessie ){
 		this.toggle = toggle;
 	};
 
-	BarrierSummary.prototype.getTogglePosition = function(){
+	ToggleLinks.prototype.getTogglePosition = function(){
 
 		var currentPosition = this.toggle.style.position;
 		this.toggle.style.position = 'static';
@@ -69,7 +69,7 @@ ma.components.BarrierSummary = (function( doc, jessie ){
 		return positions;
 	};
 
-	BarrierSummary.prototype.setListPosition = function(){
+	ToggleLinks.prototype.setListPosition = function(){
 
 		var positions = this.getTogglePosition();
 		var offset = this.toggle.offsetHeight;
@@ -79,7 +79,7 @@ ma.components.BarrierSummary = (function( doc, jessie ){
 		this.list.style.top = ( positions.top + offset ) + 'px';
 	};
 
-	BarrierSummary.prototype.handleClick = function( e ){
+	ToggleLinks.prototype.handleClick = function( e ){
 
 		jessie.cancelDefault( e );
 
@@ -92,6 +92,6 @@ ma.components.BarrierSummary = (function( doc, jessie ){
 		this.list.style.display = ( show ? '' : 'none' );
 	};
 
-	return BarrierSummary;
+	return ToggleLinks;
 
 })( document, jessie );
