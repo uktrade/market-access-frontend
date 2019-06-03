@@ -80,162 +80,164 @@ describe( 'Report controllers', () => {
 
 	describe( 'Sectors', () => {
 		describe( 'List', () => {
+
 			const template = 'reports/views/sectors';
-
-		beforeEach( () => {
-
-			req.report = {};
-		} );
-
-		function checkRender( sectors ){
-
-			expect( res.render ).toHaveBeenCalledWith( template, { sectors: sectors.map( metadata.getSector ), csrfToken } );
-		}
-
-		describe( 'a GET', () => {
-			describe( 'With sectors in the session', () => {
-				it( 'Should render the page with the sectors', async () => {
-
-					const sectors = [ uuid(), uuid(), uuid() ];
-
-					req.session.sectors = sectors;
-
-					await controller.list( req, res, next );
-
-					checkRender( sectors );
-				} );
-			} );
-
-			describe( 'With sectors on the report', () => {
-				it( 'Should render the page with the sectors', async () => {
-
-					const sectors = [ uuid(), uuid(), uuid() ];
-
-					req.report.sectors = sectors;
-
-					await controller.list( req, res, next );
-
-					checkRender( sectors );
-				} );
-			} );
-
-			describe( 'With no sectors', () => {
-				it( 'Should render the page with and empty list', async () => {
-
-					await controller.list( req, res, next );
-
-					checkRender( [] );
-				} );
-			} );
-		} );
-
-		describe( 'a POST', () => {
 
 			beforeEach( () => {
 
-				req.method = 'POST';
-				req.body = {};
+				req.report = {};
 			} );
 
-			describe( 'With no sectors', () => {
-				it( 'Should render the page', async () => {
+			function checkRender( sectors ){
 
-					await controller.list( req, res, next );
+				expect( res.render ).toHaveBeenCalledWith( template, { sectors: sectors.map( metadata.getSector ), csrfToken } );
+			}
 
-					checkRender( [] );
+			describe( 'a GET', () => {
+				describe( 'With sectors in the session', () => {
+					it( 'Should render the page with the sectors', async () => {
+
+						const sectors = [ uuid(), uuid(), uuid() ];
+
+						req.session.sectors = sectors;
+
+						await controller.list( req, res, next );
+
+						checkRender( sectors );
+					} );
+				} );
+
+				describe( 'With sectors on the report', () => {
+					it( 'Should render the page with the sectors', async () => {
+
+						const sectors = [ uuid(), uuid(), uuid() ];
+
+						req.report.sectors = sectors;
+
+						await controller.list( req, res, next );
+
+						checkRender( sectors );
+					} );
+				} );
+
+				describe( 'With no sectors', () => {
+					it( 'Should render the page with and empty list', async () => {
+
+						await controller.list( req, res, next );
+
+						checkRender( [] );
+					} );
 				} );
 			} );
 
-			describe( 'With an empty list of sectors', () => {
-				it( 'Should render the page', async () => {
-
-					await controller.list( req, res, next );
-
-					checkRender( [] );
-				} );
-			} );
-
-			describe( 'With sectors', () => {
+			describe( 'a POST', () => {
 
 				beforeEach( () => {
 
-					req.session.sectors = [ uuid(), uuid() ];
+					req.method = 'POST';
+					req.body = {};
 				} );
 
-				describe( 'When the service throws an error', () => {
-					it( 'Should call next with the error', async () => {
-
-						const err = new Error( 'boom' );
-						backend.reports.saveSectors.and.callFake( () => { throw err; } );
+				describe( 'With no sectors', () => {
+					it( 'Should render the page', async () => {
 
 						await controller.list( req, res, next );
 
-						expect( next ).toHaveBeenCalledWith( err );
-						expect( res.render ).not.toHaveBeenCalled();
-						expect( req.session.sectors ).not.toBeDefined();
+						checkRender( [] );
 					} );
 				} );
 
-				describe( 'When the service response is not a success', () => {
-					it( 'Should call next with an error', async () => {
-
-						const statusCode = 500;
-						const err = new Error( `Unable to update report, got ${ statusCode } response code` );
-
-						backend.reports.saveSectors.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
+				describe( 'With an empty list of sectors', () => {
+					it( 'Should render the page', async () => {
 
 						await controller.list( req, res, next );
 
-						expect( next ).toHaveBeenCalledWith( err );
-						expect( res.render ).not.toHaveBeenCalled();
-						expect( req.session.sectors ).not.toBeDefined();
+						checkRender( [] );
 					} );
 				} );
 
-				describe( 'When the service response is success', () => {
+				describe( 'With sectors', () => {
 
 					beforeEach( () => {
 
-						backend.reports.saveSectors.and.callFake( () => ({ response: { isSuccess: true } }) );
-						req.report.id = uuid();
+						req.session.sectors = [ uuid(), uuid() ];
 					} );
 
-					describe( 'When it is an exit', () => {
-						it( 'Should redirect to the detail page', async () => {
+					describe( 'When the service throws an error', () => {
+						it( 'Should call next with the error', async () => {
 
-							const detailResponse = '/a/detail/';
-
-							urls.reports.detail.and.callFake( () => detailResponse );
-							req.body = { action: 'exit' };
+							const err = new Error( 'boom' );
+							backend.reports.saveSectors.and.callFake( () => { throw err; } );
 
 							await controller.list( req, res, next );
 
-							expect( next ).not.toHaveBeenCalled();
+							expect( next ).toHaveBeenCalledWith( err );
 							expect( res.render ).not.toHaveBeenCalled();
-							expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
-							expect( urls.reports.detail ).toHaveBeenCalledWith( req.report.id );
+							expect( req.session.sectors ).not.toBeDefined();
 						} );
 					} );
 
-					describe( 'When it is NOT an exit', () => {
-						it( 'Should redirect to the aboutProblem page', async () => {
+					describe( 'When the service response is not a success', () => {
+						it( 'Should call next with an error', async () => {
 
-							const aboutResponse = '/about/report/';
+							const statusCode = 500;
+							const err = new Error( `Unable to update report, got ${ statusCode } response code` );
 
-							urls.reports.aboutProblem.and.callFake( () => aboutResponse );
+							backend.reports.saveSectors.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
 
 							await controller.list( req, res, next );
 
-							expect( next ).not.toHaveBeenCalled();
+							expect( next ).toHaveBeenCalledWith( err );
 							expect( res.render ).not.toHaveBeenCalled();
-							expect( res.redirect ).toHaveBeenCalledWith( aboutResponse );
-							expect( urls.reports.aboutProblem ).toHaveBeenCalledWith( req.report.id );
+							expect( req.session.sectors ).not.toBeDefined();
+						} );
+					} );
+
+					describe( 'When the service response is success', () => {
+
+						beforeEach( () => {
+
+							backend.reports.saveSectors.and.callFake( () => ({ response: { isSuccess: true } }) );
+							req.report.id = uuid();
+						} );
+
+						describe( 'When it is an exit', () => {
+							it( 'Should redirect to the detail page', async () => {
+
+								const detailResponse = '/a/detail/';
+
+								urls.reports.detail.and.callFake( () => detailResponse );
+								req.body = { action: 'exit' };
+
+								await controller.list( req, res, next );
+
+								expect( next ).not.toHaveBeenCalled();
+								expect( res.render ).not.toHaveBeenCalled();
+								expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
+								expect( urls.reports.detail ).toHaveBeenCalledWith( req.report.id );
+							} );
+						} );
+
+						describe( 'When it is NOT an exit', () => {
+							it( 'Should redirect to the aboutProblem page', async () => {
+
+								const aboutResponse = '/about/report/';
+
+								urls.reports.aboutProblem.and.callFake( () => aboutResponse );
+
+								await controller.list( req, res, next );
+
+								expect( next ).not.toHaveBeenCalled();
+								expect( res.render ).not.toHaveBeenCalled();
+								expect( res.redirect ).toHaveBeenCalledWith( aboutResponse );
+								expect( urls.reports.aboutProblem ).toHaveBeenCalledWith( req.report.id );
+							} );
 						} );
 					} );
 				} );
 			} );
 		} );
-		} );
+
 		describe( 'Remove', () => {
 			it( 'Should remove the sector in the session list and redirect', () => {
 

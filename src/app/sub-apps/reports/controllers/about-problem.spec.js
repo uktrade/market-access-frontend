@@ -49,6 +49,7 @@ describe( 'Report controllers', () => {
 			reports: {
 				detail: jasmine.createSpy( 'urls.reports.detail' ),
 				sectors: jasmine.createSpy( 'urls.reports.sectors' ),
+				allSectors: jasmine.createSpy( 'urls.reports.allSectors' ),
 				hasSectors: jasmine.createSpy( 'urls.reports.hasSectors' ),
 				summary: jasmine.createSpy( 'urls.reports.summary' ),
 			},
@@ -202,34 +203,73 @@ describe( 'Report controllers', () => {
 			} );
 
 			describe( 'render', () => {
+
+				let renderValues;
+
+				beforeEach( () => {
+
+					renderValues = { some: 'data' };
+				} );
+
 				describe( 'When the report has sectors_affected', () => {
-					it( 'Should render the template with the correct data', () => {
 
-						const myValues = { some: 'data' };
-						const sectorsResponse = 'sectors';
-						const renderValues = Object.assign( {}, myValues, { backHref: sectorsResponse } );
+					beforeEach( () => {
 
-						urls.reports.sectors.and.callFake( () => sectorsResponse );
 						report.sectors_affected = true;
+					} );
 
-						args.render( myValues );
+					describe( 'When the report affects all sectors', () => {
+						it( 'Should render the template with the correct data and backHref', () => {
 
-						expect( res.render ).toHaveBeenCalledWith( template, renderValues );
+							const allResponse = 'all-sectors';
+							const expectedTemplateValues = {
+								...renderValues,
+								backHref: allResponse,
+							};
+
+							urls.reports.allSectors.and.callFake( () => allResponse );
+							report.all_sectors = true;
+
+							args.render( renderValues );
+
+							expect( res.render ).toHaveBeenCalledWith( template, expectedTemplateValues );
+						} );
+					} );
+
+					describe( 'When the report does NOT affect all sectors', () => {
+						it( 'Should render the template with the correct data and backHref', () => {
+
+							const sectorsResponse = 'sectors';
+							const expectedTemplateValues = {
+								...renderValues,
+								backHref: sectorsResponse,
+							};
+
+							urls.reports.sectors.and.callFake( () => sectorsResponse );
+							report.all_sectors = false;
+							renderValues.backHref = sectorsResponse;
+
+							args.render( renderValues );
+
+							expect( res.render ).toHaveBeenCalledWith( template, expectedTemplateValues );
+						} );
 					} );
 				} );
 
 				describe( 'When the report does not have sectors_affected', () => {
 					it( 'Should render the template with the correct data', () => {
 
-						const myValues = { some: 'data' };
 						const hasSectorsResponse = 'hasSectors';
-						const renderValues = Object.assign( {}, myValues, { backHref: hasSectorsResponse  } );
+						const expectedTemplateValues = {
+							...renderValues,
+							backHref: hasSectorsResponse,
+						};
 
 						urls.reports.hasSectors.and.callFake( () => hasSectorsResponse );
 
-						args.render( myValues );
+						args.render( renderValues );
 
-						expect( res.render ).toHaveBeenCalledWith( template, renderValues );
+						expect( res.render ).toHaveBeenCalledWith( template, expectedTemplateValues );
 					} );
 				} );
 			} );
