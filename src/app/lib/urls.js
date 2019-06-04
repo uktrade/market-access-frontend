@@ -34,6 +34,7 @@ const reportUrl = {
 		remove: ( reportId, countryId ) => `/reports/${ getReportPath( reportId ) }/country/${ countryId }/admin-areas/remove/`,
 	},
 	hasSectors: ( reportId ) => `/reports/${ reportId }/has-sectors/`,
+	allSectors: ( reportId ) => `/reports/${ reportId }/all-sectors/`,
 	sectors: ( reportId ) => `/reports/${ reportId }/sectors/`,
 	addSector: ( reportId ) => `/reports/${ reportId }/sectors/add/`,
 	removeSector: ( reportId ) => `/reports/${ reportId }/sectors/remove/`,
@@ -106,7 +107,9 @@ module.exports = {
 			edit: ( barrierId ) => `/barriers/${ barrierId }/sectors/edit/`,
 			list: ( barrierId ) => `/barriers/${ barrierId }/sectors/`,
 			add: ( barrierId ) => `/barriers/${ barrierId }/sectors/add/`,
+			addAllSectors: ( barrierId ) => `/barriers/${ barrierId }/sectors/add/all/`,
 			remove: ( barrierId ) => `/barriers/${ barrierId }/sectors/remove/`,
+			removeAllSectors: ( barrierId ) => `/barriers/${ barrierId }/sectors/remove/all/`,
 			new: ( barrierId ) => `/barriers/${ barrierId }/sectors/new/`,
 		},
 		location: {

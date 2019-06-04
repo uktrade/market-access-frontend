@@ -257,8 +257,10 @@ module.exports = {
 		saveTypes: ( req, barrierId, types ) => updateBarrier( getToken( req ), barrierId, {
 			barrier_types: getValue( types )
 		} ),
-		saveSectors: ( req, barrierId, sectors ) => updateBarrier( getToken( req ), barrierId, {
-			sectors: ( sectors && sectors.length ? sectors : null )
+		saveSectors: ( req, barrierId, sectors, allSectors ) => updateBarrier( getToken( req ), barrierId, {
+			sectors: ( sectors && sectors.length ? sectors : null ),
+			sectors_affected: ( sectors && sectors.length || allSectors ? true : false ),
+			all_sectors: allSectors
 		} ),
 		saveLocation: ( req, barrierId, location ) => updateBarrier( getToken( req ), barrierId, {
 			export_country: location.country,
@@ -317,10 +319,16 @@ module.exports = {
 			is_resolved: getValue( values.isResolved ),
 			resolved_date: getValue( getDefaultedDate( values.resolvedDate ) ),
 			export_country: getValue( values.country ),
-			country_admin_areas: getValue(values.adminAreas)
+			country_admin_areas: getValue( values.adminAreas )
 		} ),
 		saveHasSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
-			sectors_affected: getValue( values.hasSectors )
+			sectors_affected: getValue( values.hasSectors ),
+			all_sectors: null,
+			sectors: null
+		} ),
+		saveAllSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
+			all_sectors: getValue( values.allSectors ),
+			sectors: null
 		} ),
 		saveSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 			sectors: getValue( values.sectors )

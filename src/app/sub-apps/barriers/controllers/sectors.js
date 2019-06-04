@@ -4,14 +4,14 @@ const urls = require( '../../../lib/urls' );
 const validators = require( '../../../lib/validators' );
 const metadata = require( '../../../lib/metadata' );
 
-function renderSectors( req, res, sectors ){
-	res.render( 'barriers/views/sectors/list', { sectors: sectors.map( metadata.getSector ), csrfToken: req.csrfToken() } );
+function renderSectors( req, res, sectors, allSectors ){
+	res.render( 'barriers/views/sectors/list', { sectors: sectors.map( metadata.getSector ), allSectors, csrfToken: req.csrfToken(), } );
 }
 
 function addSectorForm( req, res, href ){
 
 	const barrier = req.barrier;
-	const sectors = req.session.barrierSectors;
+	const sectors = req.barrierSession.sectors.list.get();
 	const form = new Form( req, {
 
 		sectors: {
@@ -34,7 +34,8 @@ function addSectorForm( req, res, href ){
 		if( !form.hasErrors() ){
 
 			sectors.push( form.getValues().sectors );
-			req.session.barrierSectors = sectors;
+			req.barrierSession.sectors.list.set( sectors );
+			req.barrierSession.sectors.all.set(false);
 
 			return res.redirect( urls.barriers.sectors.list( barrier.id ) );
 		}
@@ -51,8 +52,10 @@ module.exports = {
 
 	edit: ( req, res ) => {
 
-		req.session.barrierSectors = ( req.barrier.sectors || [] );
-		renderSectors( req, res, req.session.barrierSectors );
+		req.barrierSession.sectors.all.set( req.barrier.all_sectors || false );
+		req.barrierSession.sectors.list.set( req.barrier.sectors || [] );
+
+		renderSectors( req, res, req.barrierSession.sectors.list.get(), req.barrierSession.sectors.all.get() );
 	},
 
 	list: async ( req, res, next ) => {
@@ -61,19 +64,20 @@ module.exports = {
 		const barrierId = barrier.id;
 		const isPost = req.method === 'POST';
 
-		if( !req.session.barrierSectors ){
-			req.session.barrierSectors = ( barrier.sectors || [] );
-		}
+		req.barrierSession.sectors.list.setIfNotAlready( [] );
+		req.barrierSession.sectors.all.setIfNotAlready( false );
 
-		const sectors = req.session.barrierSectors;
+		const sectors = req.barrierSession.sectors.list.get();
+		const allSectors = req.barrierSession.sectors.all.get();
 
 		if( isPost ){
 
 			try {
 
-				delete req.session.barrierSectors;
+				req.barrierSession.sectors.all.delete();
+				req.barrierSession.sectors.list.delete();
 
-				const { response } = await backend.barriers.saveSectors( req, barrierId, sectors );
+				const { response } = await backend.barriers.saveSectors( req, barrierId, sectors, allSectors );
 
 				if( response.isSuccess ){
 
@@ -90,14 +94,22 @@ module.exports = {
 			}
 		}
 
-		renderSectors( req, res, sectors );
+		renderSectors( req, res, sectors, allSectors );
 	},
 
 	remove: ( req, res ) => {
 
 		const sectorToRemove = req.body.sector;
+		let sectors = req.barrierSession.sectors.list.get();
 
-		req.session.barrierSectors = req.session.barrierSectors.filter( ( sector ) => sector !== sectorToRemove );
+		req.barrierSession.sectors.list.set( sectors.filter( ( sector ) => sector !== sectorToRemove ) );
+
+		res.redirect( urls.barriers.sectors.list( req.barrier.id ) );
+	},
+
+	removeAllSectors: ( req, res ) => {
+
+		req.barrierSession.sectors.all.set( false );
 
 		res.redirect( urls.barriers.sectors.list( req.barrier.id ) );
 	},
@@ -110,24 +122,24 @@ module.exports = {
 			form: urls.barriers.sectors.add( barrier.id )
 		};
 
-		if( !req.session.barrierSectors ){
-
-			req.session.barrierSectors = ( barrier.sectors || [] );
-		}
+		req.barrierSession.sectors.list.setIfNotAlready([]);
 
 		addSectorForm( req, res, href );
 	},
 
+	addAllSectors: ( req, res ) => {
+
+		req.barrierSession.sectors.all.set( true );
+		req.barrierSession.sectors.list.set( [] );
+
+		res.redirect( urls.barriers.sectors.list( req.barrier.id ) );
+	},
+
 	new: ( req, res ) => {
 
-		const barrier = req.barrier;
-		const href = {
-			cancel: urls.barriers.detail( barrier.id ),
-			form: urls.barriers.sectors.new( barrier.id )
-		};
+		req.barrierSession.sectors.list.set( [] );
+		req.barrierSession.sectors.all.set( false );
 
-		req.session.barrierSectors = [];
-
-		addSectorForm( req, res, href );
+		renderSectors( req, res, [], false );
 	}
 };

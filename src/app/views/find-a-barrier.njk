@@ -134,7 +134,7 @@
 		<div class="govuk-grid-column-three-quarters">
 
 			{%- macro activeFilter( name, filter ) -%}
-				{% if filter.text %}
+				{% if filter.active %}
 				<li class="active-filters__item">
 					<a href="{{ filter.removeUrl }}" class="active-filters__item__link" title="Remove {{ name }} filter">
 						<h4 class="active-filter__heading">{{ name }}:</h4>

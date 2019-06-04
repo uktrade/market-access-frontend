@@ -461,15 +461,22 @@ describe( 'Backend Service', () => {
 		} );
 
 		describe( 'saveSectors', () => {
+			let allSectors;
+			beforeEach( () => {
+				allSectors = false;
+			} );
+
 			describe( 'With no sectors', () => {
 				it( 'Should PUT to the correct path with a null value', async () => {
 
 					const sectors = [];
 
-					await service.barriers.saveSectors( req, barrierId, sectors );
+					await service.barriers.saveSectors( req, barrierId, sectors, allSectors );
 
 					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
-						sectors: null
+						sectors: null,
+						sectors_affected: false,
+						all_sectors: allSectors
 					} );
 				} );
 			} );
@@ -479,10 +486,28 @@ describe( 'Backend Service', () => {
 
 					const sectors = [ 'sector 1', 'sector 2' ];
 
-					await service.barriers.saveSectors( req, barrierId, sectors );
+					await service.barriers.saveSectors( req, barrierId, sectors, allSectors );
 
 					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
-						sectors
+						sectors,
+						sectors_affected: true,
+						all_sectors: allSectors
+					} );
+				} );
+			} );
+
+			describe( 'With all sectors', () => {
+				it( 'Should PUT to the correct path with the correct values', async () => {
+
+					const sectors = null;
+					allSectors = true;
+
+					await service.barriers.saveSectors( req, barrierId, sectors, allSectors );
+
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
+						sectors,
+						sectors_affected: true,
+						all_sectors: allSectors
 					} );
 				} );
 			} );
@@ -1026,7 +1051,21 @@ describe( 'Backend Service', () => {
 				checkWithAndWithoutValues( 'saveHasSectors', {
 					hasSectors
 				}, {
-					sectors_affected: hasSectors
+					sectors_affected: hasSectors,
+					all_sectors: null,
+					sectors: null,
+				} );
+			} );
+
+			describe( 'saveAllSectors', () => {
+
+				const allSectors = 'true';
+
+				checkWithAndWithoutValues( 'saveAllSectors', {
+					allSectors,
+				}, {
+					all_sectors: allSectors,
+					sectors: null
 				} );
 			} );
 

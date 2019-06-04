@@ -9,33 +9,38 @@ const govukItemsFromObj = require( '../../../lib/govuk-items-from-object' );
 module.exports = async ( req, res, next ) => {
 
 	const boolItems = govukItemsFromObj( metadata.bool );
-	const items = boolItems.map( ( item ) => item.value === 'false' ? { value: item.value, text: 'No, I don\'t know at the moment' } : item );
+	const items = boolItems.map( 
+        ( item ) => item.value === 'true' ? 
+        { value: item.value, text: 'All sectors' } : 
+        { value: item.value, text: 'Just some sectors' } );
 	const report = req.report;
 	const form = new Form( req, {
 
-		hasSectors: {
+		allSectors: {
 			type: Form.RADIO,
 			items,
-			values: [ report.sectors_affected ],
+			values: [ report.all_sectors ],
 			validators: [ {
 				fn: validators.isMetadata( 'bool' ),
-				message: 'Select if you are aware of a sector affected by the barrier'
+				message: 'Select if the barrier affect all sectors, or just some sectors'
 			} ]
 		}
 	} );
 
 	function getRedirectUrl(){
 
-		const { hasSectors } = form.getValues();
-		const urlMethod = ( hasSectors === 'true' ? 'allSectors' : 'aboutProblem' );
+		const { allSectors } = form.getValues();
+		const sectorsList = ( report.sectors || req.session.sectors );
+		const hasListOfSectors = ( Array.isArray( sectorsList ) && sectorsList.length > 0 );
+		const urlMethod = ( allSectors === 'false' ? ( hasListOfSectors ? 'sectors' : 'addSector' ) : 'aboutProblem' );
 
 		return urls.reports[ urlMethod ]( report.id );
 	}
 
 	const processor = new FormProcessor( {
 		form,
-		render: ( templateValues ) => res.render( 'reports/views/has-sectors', templateValues ),
-		saveFormData: ( formValues ) => backend.reports.saveHasSectors( req, report.id, formValues ),
+        render: ( templateValues ) => res.render( 'reports/views/all-sectors', templateValues ),
+		saveFormData: ( formValues ) => backend.reports.saveAllSectors( req, report.id, formValues ),
 		saved: () => res.redirect( form.isExit ? urls.reports.detail( report.id ) : getRedirectUrl() )
 	} );
 

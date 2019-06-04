@@ -324,10 +324,6 @@ describe( 'Barrier types controller', () => {
 				expect( config.barrierType.validators[ 0 ].fn ).toEqual( validators.isBarrierType );
 				expect( typeof config.barrierType.validators[ 1 ].fn ).toEqual( 'function' );
 				expect( config.barrierType.validators[ 1 ].fn() ).toEqual( true );
-
-				//if( req.session.barrierSectors.length ){
-				//	expect( config.barrierType.validators[ 1 ].fn( req.session.barrierSectors[ 0 ] ) ).toEqual( false );
-				//}
 			}
 
 			describe( 'add', () => {

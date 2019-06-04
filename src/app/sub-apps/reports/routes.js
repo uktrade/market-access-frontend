@@ -49,6 +49,9 @@ module.exports = ( express, app ) => {
 	app.get( '/:reportId/has-sectors/', controller.hasSectors );
 	app.post( '/:reportId/has-sectors/', controller.hasSectors );
 
+	app.get( '/:reportId/all-sectors/', controller.allSectors );
+	app.post( '/:reportId/all-sectors/', controller.allSectors );
+
 	app.get( '/:reportId/sectors/', controller.sectors.list );
 	app.post( '/:reportId/sectors/', controller.sectors.list );
 

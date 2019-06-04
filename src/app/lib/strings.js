@@ -36,7 +36,12 @@ module.exports = {
 	},
 
 	regions: ( ids = [] ) => ids.map( ( id ) => metadata.getOverseasRegion( id ).name ).join( DELIMITER ),
-	sectors: ( ids = [] ) => ids.map( ( id ) => metadata.getSector( id ).name ).join( DELIMITER ),
+	sectors: ( ids, allSectors = false) => {
+		if (allSectors) {
+			return 'All sectors';
+		}
+		return ids ? ids.map( ( id ) => metadata.getSector( id ).name ).join( DELIMITER ) : 'Unknown';
+	},
 	types: ( ids = [] ) => ids.map( ( id ) => metadata.getBarrierType( id ).title ).join( DELIMITER ),
 	priorities: ( ids = [] ) => ids.map( ( id ) => metadata.getBarrierPriority( id ).name ).join( DELIMITER ),
 };

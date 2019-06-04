@@ -194,7 +194,9 @@ describe( 'URLs', () => {
 				expect( urls.barriers.sectors.new( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/new/` );
 				expect( urls.barriers.sectors.edit( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/edit/` );
 				expect( urls.barriers.sectors.add( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/add/` );
+				expect( urls.barriers.sectors.addAllSectors( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/add/all/` );
 				expect( urls.barriers.sectors.remove( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/remove/` );
+				expect( urls.barriers.sectors.removeAllSectors( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/remove/all/` );
 			} );
 		} );
 
@@ -375,6 +377,7 @@ describe( 'URLs', () => {
 				checkUrls( [
 					[ 'detail', '' ],
 					[ 'hasSectors', 'has-sectors' ],
+					[ 'allSectors', 'all-sectors' ],
 					[ 'sectors', 'sectors' ],
 					[ 'addSector', 'sectors/add' ],
 					[ 'removeSector', 'sectors/remove' ],
