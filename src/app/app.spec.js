@@ -466,7 +466,7 @@ describe( 'App', function(){
 
 							app
 								.get( urls.barriers.sectors.new( barrierId ) )
-								.end( checkPage( 'Market Access - Barrier - Add an affected sector', done ) );
+								.end( checkPage( 'Market Access - Sectors affected by the barrier', done ) );
 						} );
 					} );
 				} );

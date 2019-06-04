@@ -465,7 +465,7 @@ describe( 'Backend Service', () => {
 			beforeEach( () => {
 				allSectors = false;
 			} );
-			
+
 			describe( 'With no sectors', () => {
 				it( 'Should PUT to the correct path with a null value', async () => {
 
@@ -1051,7 +1051,9 @@ describe( 'Backend Service', () => {
 				checkWithAndWithoutValues( 'saveHasSectors', {
 					hasSectors
 				}, {
-					sectors_affected: hasSectors
+					sectors_affected: hasSectors,
+					all_sectors: null,
+					sectors: null,
 				} );
 			} );
 

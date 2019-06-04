@@ -88,26 +88,31 @@ module.exports = function( { count, barriers, filters } ){
 		filters: {
 			country: {
 				items: countries.sort( sortGovukItems.alphabetical ).map( isChecked( filters.country ) ),
+				active: !!filters.country,
 				text: strings.locations( filters.country ),
 				removeUrl: getRemoveUrl( filters, 'country' ),
 			},
 			region: {
 				items: metadata.getOverseasRegionList( 'All regions' ).map( isChecked( filters.region ) ),
+				active: !!filters.region,
 				text: strings.regions( filters.region ),
 				removeUrl: getRemoveUrl( filters, 'region' ),
 			},
 			sector: {
 				items: metadata.getSectorList( 'All sectors' ).map( isChecked( filters.sector ) ),
+				active: !!filters.sector,
 				text: strings.sectors( filters.sector ),
 				removeUrl: getRemoveUrl( filters, 'sector' ),
 			},
 			type: {
 				items: metadata.getBarrierTypeList().sort( sortGovukItems.alphabetical ).map( isChecked( filters.type ) ),
+				active: !!filters.type,
 				text: strings.types( filters.type ),
 				removeUrl: getRemoveUrl( filters, 'type' ),
 			},
 			priority: {
 				items: metadata.getBarrierPrioritiesList( { suffix: false } ).map( isChecked( filters.priority ) ),
+				active: !!filters.priority,
 				text: strings.priorities( filters.priority ),
 				removeUrl: getRemoveUrl( filters, 'priority' ),
 			},

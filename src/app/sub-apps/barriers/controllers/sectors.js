@@ -49,8 +49,9 @@ function addSectorForm( req, res, href ){
 }
 
 module.exports = {
-	
+
 	edit: ( req, res ) => {
+
 		req.barrierSession.sectors.all.set( req.barrier.all_sectors || false );
 		req.barrierSession.sectors.list.set( req.barrier.sectors || [] );
 
@@ -63,12 +64,12 @@ module.exports = {
 		const barrierId = barrier.id;
 		const isPost = req.method === 'POST';
 
-		req.barrierSession.sectors.list.setIfNotAlready([]);
-		req.barrierSession.sectors.all.setIfNotAlready(false);
+		req.barrierSession.sectors.list.setIfNotAlready( [] );
+		req.barrierSession.sectors.all.setIfNotAlready( false );
 
 		const sectors = req.barrierSession.sectors.list.get();
 		const allSectors = req.barrierSession.sectors.all.get();
-	
+
 		if( isPost ){
 
 			try {
@@ -127,7 +128,7 @@ module.exports = {
 	},
 
 	addAllSectors: ( req, res ) => {
-		
+
 		req.barrierSession.sectors.all.set( true );
 		req.barrierSession.sectors.list.set( [] );
 
@@ -136,14 +137,9 @@ module.exports = {
 
 	new: ( req, res ) => {
 
-		const barrier = req.barrier;
-		const href = {
-			cancel: urls.barriers.detail( barrier.id ),
-			form: urls.barriers.sectors.new( barrier.id )
-		};
-
 		req.barrierSession.sectors.list.set( [] );
+		req.barrierSession.sectors.all.set( false );
 
-		addSectorForm( req, res, href );
+		renderSectors( req, res, [], false );
 	}
 };

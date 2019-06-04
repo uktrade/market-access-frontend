@@ -92,7 +92,6 @@ module.exports = ( express, app ) => {
 	app.post( '/:barrierId/sectors/add/', barrierSession, controller.sectors.add );
 	app.get( '/:barrierId/sectors/add/all/', barrierSession, controller.sectors.addAllSectors );
 	app.get( '/:barrierId/sectors/new/', barrierSession, controller.sectors.new );
-	app.post( '/:barrierId/sectors/new/', barrierSession, controller.sectors.new );
 
 	app.get( '/:barrierId/companies/', controller.companies.list );
 	app.post( '/:barrierId/companies/', controller.companies.list );

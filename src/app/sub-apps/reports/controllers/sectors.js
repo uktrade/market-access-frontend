@@ -17,30 +17,27 @@ module.exports = {
 
 		const sectors = req.session.sectors;
 
-		if( isPost ){
+		if( isPost && sectors && sectors.length ){
 
-			if( sectors && sectors.length ){
+			try {
 
-				try {
+				delete req.session.sectors;
 
-					delete req.session.sectors;
+				const { response } = await backend.reports.saveSectors( req, reportId, { sectors } );
 
-					const { response } = await backend.reports.saveSectors( req, reportId, { sectors } );
+				if( response.isSuccess ){
 
-					if( response.isSuccess ){
+					const isExit = ( req.body.action === 'exit' );
+					return res.redirect( isExit ? urls.reports.detail( reportId ) : urls.reports.aboutProblem( reportId ) );
 
-						const isExit = ( req.body.action === 'exit' );
-						return res.redirect( isExit ? urls.reports.detail( reportId ) : urls.reports.aboutProblem( reportId ) );
+				} else {
 
-					} else {
-
-						return next( new Error( `Unable to update report, got ${ response.statusCode } response code` ) );
-					}
-
-				} catch( e ){
-
-					return next( e );
+					return next( new Error( `Unable to update report, got ${ response.statusCode } response code` ) );
 				}
+
+			} catch( e ){
+
+				return next( e );
 			}
 		}
 

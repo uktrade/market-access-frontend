@@ -174,11 +174,11 @@ describe( 'Find a barrier view model', () => {
 	function getFilters( overrides = {} ){
 
 		return {
-			country: overrides.country || { items: countryList, text: strings.locations.response, removeUrl: findABarrierResponse },
-			region: overrides.region || { items: overseasRegionList, text: strings.regions.response, removeUrl: findABarrierResponse },
-			sector: overrides.sector || { items: sectorList, text: strings.sectors.response, removeUrl: findABarrierResponse },
-			type: overrides.type || { items: barrierTypeList, text: strings.types.response, removeUrl: findABarrierResponse },
-			priority: overrides.priority || { items: barrierPriorityList, text: strings.priorities.response, removeUrl: findABarrierResponse },
+			country: overrides.country || { items: countryList, active: false, text: strings.locations.response, removeUrl: findABarrierResponse },
+			region: overrides.region || { items: overseasRegionList, active: false, text: strings.regions.response, removeUrl: findABarrierResponse },
+			sector: overrides.sector || { items: sectorList, active: false, text: strings.sectors.response, removeUrl: findABarrierResponse },
+			type: overrides.type || { items: barrierTypeList, active: false, text: strings.types.response, removeUrl: findABarrierResponse },
+			priority: overrides.priority || { items: barrierPriorityList, active: false, text: strings.priorities.response, removeUrl: findABarrierResponse },
 		};
 	}
 
@@ -218,7 +218,7 @@ describe( 'Find a barrier view model', () => {
 			expect( output.count ).toEqual( count );
 			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
 			expect( output.filters ).toEqual( getFilters( {
-				country: { items: countryList, text: strings.locations.response, removeUrl: findABarrierResponse },
+				country: { items: countryList, active: true, text: strings.locations.response, removeUrl: findABarrierResponse },
 			} ) );
 			expect( countryList.find( ( country ) => country.value === filters.country[ 0 ] ).checked ).toEqual( true );
 			expect( output.hasFilters ).toEqual( true );
@@ -242,7 +242,9 @@ describe( 'Find a barrier view model', () => {
 
 			expect( output.count ).toEqual( count );
 			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
-			expect( output.filters ).toEqual( getFilters() );
+			expect( output.filters ).toEqual( getFilters( {
+				region: { items: overseasRegionList, active: true, text: strings.regions.response, removeUrl: findABarrierResponse }
+			} ) );
 			expect( overseasRegionList[ 2 ].checked ).toEqual( true );
 			expect( output.hasFilters ).toEqual( true );
 			expect( strings.regions ).toHaveBeenCalledWith( filters.region );
@@ -265,7 +267,9 @@ describe( 'Find a barrier view model', () => {
 
 			expect( output.count ).toEqual( count );
 			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
-			expect( output.filters ).toEqual( getFilters() );
+			expect( output.filters ).toEqual( getFilters( {
+				sector: { items: sectorList, active: true, text: strings.sectors.response, removeUrl: findABarrierResponse }
+			} ) );
 			expect( sectorList[ 2 ].checked ).toEqual( true );
 			expect( output.hasFilters ).toEqual( true );
 			expect( strings.sectors ).toHaveBeenCalledWith( filters.sector );
@@ -302,6 +306,7 @@ describe( 'Find a barrier view model', () => {
 						return item;
 
 					} ).sort( ( a, b ) => a.text.localeCompare( b.text ) ),
+					active: true,
 					text: strings.types.response,
 					removeUrl: findABarrierResponse
 				},
@@ -339,6 +344,7 @@ describe( 'Find a barrier view model', () => {
 
 						return item;
 					} ),
+					active: true,
 					text: strings.priorities.response,
 					removeUrl: findABarrierResponse,
 				},
