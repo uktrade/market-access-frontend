@@ -14,10 +14,10 @@
 		errors: errors
 	}) }}
 
-	<h3 class="report-sectors-heading">Save or add another sector</h3>
+	<h3 class="report-sectors-heading">Save or add {{ 'another' if sectors.length else 'a' }} sector</h3>
 
 	{% if allSectors %}
-		{{ sectorsList( [{name: "All sectors"}], {
+		{{ sectorsList( [ { name: 'All sectors' } ], {
 				csrfToken: csrfToken,
 				inputName: 'sector',
 				add: urls.barriers.sectors.add( barrier.id ),

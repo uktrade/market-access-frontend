@@ -493,7 +493,7 @@ describe( 'Barrier sectors controller', () => {
 
 					req.session.all = false;
 					req.session.list = ['1234'];
-					
+
 					controller.addAllSectors( req, res );
 
 					expect( req.barrierSession.sectors.all.set ).toHaveBeenCalledWith( true );
@@ -510,7 +510,7 @@ describe( 'Barrier sectors controller', () => {
 
 					const listResponse = '/list/sectors';
 					urls.barriers.sectors.list.and.callFake( () => listResponse );
-					
+
 					controller.removeAllSectors( req, res );
 
 					expect( req.barrierSession.sectors.all.set ).toHaveBeenCalledWith( false );
@@ -518,128 +518,20 @@ describe( 'Barrier sectors controller', () => {
 					expect( res.redirect ).toHaveBeenCalledWith( listResponse );
 				});
 			});
+		} );
 
-			describe( 'new', () => {
+		describe( 'new', () => {
+			describe( 'a GET request', () => {
+				it( 'Should render the template', () => {
 
-				const urlsSectorsNewResponse = '/new/sector/';
-				const urlsBarrierDetailResponse = '/barrier/';
+					controller.new( req, res );
 
-				function checkRender( sectors ){
-
-					checkAddRender( template, sectors, {
-						cancel: urlsBarrierDetailResponse,
-						form: urlsSectorsNewResponse
-					} );
-				}
-
-				beforeEach( () => {
-
-					urls.barriers.detail.and.callFake( () => urlsBarrierDetailResponse );
-					urls.barriers.sectors.new.and.callFake( () => urlsSectorsNewResponse );
-					req.barrierSession.sectors.list.get.and.callFake( () => []);
-				} );
-
-				describe( 'a GET request', () => {
-
-
-					describe( 'When there are no sectors in the session', () => {
-						it( 'Should render the template', () => {
-
-							controller.new( req, res );
-
-							checkFormConfig( sectorsList );
-							checkRender( [] );
-							expect(req.barrierSession.sectors.list.set).toHaveBeenCalledWith([]);
-						} );
-					} );
-
-					describe( 'When there are some sectors in the session', () => {
-						it( 'Should render with an empty list and remove the session sectors', () => {
-
-							req.barrierSession.sectors.list.get.and.callFake( () => []);
-
-							controller.new( req, res );
-
-							checkFormConfig( sectorsList );
-							checkRender( [] );
-							expect(req.barrierSession.sectors.list.set).toHaveBeenCalledWith([]);
-						} );
-					} );
-
-					describe( 'When there are some sectors in the barrier', () => {
-						it( 'Should render an empty list', () => {
-
-							req.barrier.sectors = sectors;
-
-							controller.new( req, res );
-
-							checkFormConfig( sectorsList );
-							checkRender( [] );
-							expect(req.barrierSession.sectors.list.set).toHaveBeenCalledWith( [] );
-						} );
-					} );
-				} );
-
-				describe( 'a POST request', () => {
-
-					beforeEach( () => {
-
-						form.isPost = true;
-
-					} );
-
-					describe( 'When the form has errors', () => {
-						it( 'Should render the template', () => {
-
-							form.hasErrors = () => true;
-
-							controller.new( req, res );
-
-							checkRender( [] );
-						} );
-					} );
-
-					describe( 'When the form does not have any errors', () => {
-
-						const listResponse = '/list/sectors';
-						let sector;
-
-						beforeEach( () => {
-
-							sector = uuid();
-							form.hasErrors = () => false;
-							getValuesResponse.sectors = sector;
-							urls.barriers.sectors.list.and.callFake( () => listResponse );
-
-							req.barrierSession.sectors.list.get.and.callFake( () => []);
-						} );
-
-						afterEach( () => {
-
-							expect( res.redirect ).toHaveBeenCalledWith( listResponse );
-						} );
-
-						describe( 'When there aren\'t any sectors in the session', () => {
-							it( 'Should add the sector to the session', () => {
-
-								controller.new( req, res );	
-
-								expect(req.barrierSession.sectors.list.set).toHaveBeenCalledWith([sector]);
-								expect(req.barrierSession.sectors.all.set).toHaveBeenCalledWith(false);
-							} );
-						} );
-
-						describe( 'When there are some sectors in the session', () => {
-							it( 'Should add the sector to the session list', () => {
-
-								req.session.list = sectors;
-
-								controller.new( req, res );
-
-								expect(req.barrierSession.sectors.list.set).toHaveBeenCalledWith([sector]);
-								expect(req.barrierSession.sectors.all.set).toHaveBeenCalledWith(false);
-							} );
-						} );
+					expect( req.barrierSession.sectors.list.set ).toHaveBeenCalledWith( [] );
+					expect( req.barrierSession.sectors.all.set ).toHaveBeenCalledWith( false );
+					expect( res.render ).toHaveBeenCalledWith( 'barriers/views/sectors/list', {
+						sectors: [],
+						allSectors: false,
+						csrfToken,
 					} );
 				} );
 			} );
