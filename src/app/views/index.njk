@@ -31,7 +31,7 @@
 							<li>{{ watchListFilter.key | capitalize }}: <strong>{{ watchListFilter.value }}</strong></li>
 						{% endfor %}
 					</ul>
-					<a class="govuk-button button--secondary" href="{{ urls.findABarrier(editQueryString) }}">Edit list filters</a>
+					<a href="{{ urls.findABarrier(editQueryString) }}">Edit list filters</a>
 				{% endif %}
 			</div>
 		</div>
