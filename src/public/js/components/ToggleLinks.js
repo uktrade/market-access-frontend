@@ -11,11 +11,12 @@ ma.components.ToggleLinks = (function( doc, jessie ){
 		if( !opts.text ){ throw new Error( 'ToggleLinks needs text' ); }
 		if( !opts.linkClass ){ throw new Error( 'ToggleLinks needs linkClass' ); }
 
-		this.text = opts.text;
 		this.links = jessie.query( '.' + opts.linkClass );
 
-		if( !this.links.length ){ throw new Error( 'ToggleLinks found no links' ); }
+		if( !this.links.length ){ return; }
 
+		this.text = opts.text;
+		this.visible = false;
 		this.setupList();
 		this.setupLink();
 		this.setListPosition();
@@ -71,6 +72,8 @@ ma.components.ToggleLinks = (function( doc, jessie ){
 
 	ToggleLinks.prototype.setListPosition = function(){
 
+		if( !this.visible ){ return; }
+
 		var positions = this.getTogglePosition();
 		var offset = this.toggle.offsetHeight;
 
@@ -85,11 +88,18 @@ ma.components.ToggleLinks = (function( doc, jessie ){
 
 		var show = this.list.style.display === 'none';
 
-		if( !show ){
-			this.toggle.blur();
-		}
-
 		this.list.style.display = ( show ? '' : 'none' );
+
+		if( show ){
+
+			this.visible = true;
+			this.setListPosition();
+
+		} else {
+
+			this.toggle.blur();
+			this.visible = false;
+		}
 	};
 
 	return ToggleLinks;
