@@ -1,6 +1,5 @@
 const urls = require( '../lib/urls' );
 const backend = require( '../lib/backend-service' );
-const { OPEN, HIBERNATED } = require( '../lib/metadata' ).barrier.status.types;
 const dashboardViewModel = require( '../view-models/dashboard' );
 const transformFilterValue = require('./watch-list').transformFilterValue;
 
@@ -29,13 +28,7 @@ module.exports = {
 	index: async ( req, res, next ) => {
 
 		const currentSort = getCurrentSort( req.query );
-		const userProfile = req.session.user.user_profile || {};
-		let hasWatchList = false;
-		let watchListFilters = {};
-
-		const filters = {
-			status: [[ OPEN, HIBERNATED ].join( ',' )],
-		};
+		const userProfile = req.user.user_profile || {};
 
 		if( !userProfile.watchList ){
 
@@ -43,20 +36,18 @@ module.exports = {
 
 		} else {
 
-			hasWatchList = true;
-			Object.assign( filters, userProfile.watchList.filters );
-			watchListFilters = Object.entries( userProfile.watchList.filters ).map( ( [ key, value ] ) => ({ key, value: transformFilterValue( key, value ) }) );
+			const watchListFilters = Object.entries( userProfile.watchList.filters ).map( ( [ key, value ] ) => ({ key, value: transformFilterValue( key, value ) }) );
 
 			try {
 
-				const { response, body } = await backend.barriers.getAll( req, filters, currentSort.serviceParam, currentSort.direction );
+				const { response, body } = await backend.barriers.getAll( req, userProfile.watchList.filters, currentSort.serviceParam, currentSort.direction );
 
 				if( response.isSuccess ){
 
 					res.render('index', dashboardViewModel(
 						body.results,
 						{ ...sortData, currentSort },
-						hasWatchList,
+						true,
 						watchListFilters,
 						userProfile.watchList.filters,
 					));

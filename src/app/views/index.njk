@@ -31,7 +31,7 @@
 							<li>{{ watchListFilter.key | capitalize }}: <strong>{{ watchListFilter.value }}</strong></li>
 						{% endfor %}
 					</ul>
-					<a href="{{ urls.findABarrier(editQueryString) }}">Edit list filters</a>
+					<a href="{{ urls.findABarrier( editQueryString ) }}">Edit list filters</a>
 				{% endif %}
 			</div>
 		</div>
@@ -75,7 +75,7 @@
 	{%- elseif isWatchList -%}
 		<div class="no-results-box">
 			<p><strong>There are no barriers for your search yet</strong></p>
-			<p> We'll update your watch list if you get a match. Or you can <a href="{{ urls.findABarrier() }}"> edit your search </a></p>
+			<p> We'll update your watch list if you get a match. Or you can <a href="{{ urls.findABarrier( editQueryString ) }}"> edit your search </a></p>
 		</div>
 	{% else %}
 		<div class="no-results-box">
