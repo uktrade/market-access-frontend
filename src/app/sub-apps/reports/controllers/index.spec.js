@@ -33,7 +33,6 @@ describe( 'Report controllers', () => {
 		backend = {
 			reports: {
 				getAll: jasmine.createSpy( 'backend.reports.getAll' ),
-				getForCountry: jasmine.createSpy( 'backend.reports.getForCountry' ),
 				submit: jasmine.createSpy( 'backend.reports.submit' ),
 				delete: jasmine.createSpy( 'backend.reports.delete' )
 			}
@@ -121,18 +120,18 @@ describe( 'Report controllers', () => {
 						req.user.country = country;
 
 						reportsViewModel.and.callFake( () => reportsViewModelResponse );
-						backend.reports.getForCountry.and.callFake( () => Promise.resolve( unfinishedReportsResponse ) );
+						backend.reports.getAll.and.callFake( () => Promise.resolve( unfinishedReportsResponse ) );
 
 						await controller.index( req, res, next );
 
 						expect( next ).not.toHaveBeenCalled();
-						expect( backend.reports.getForCountry ).toHaveBeenCalledWith( req, country.id );
+						expect( backend.reports.getAll ).toHaveBeenCalledWith( req );
 						expect( reportsViewModel ).toHaveBeenCalledWith( unfinishedReportsResponse.body.results, undefined );
 						expect( res.render ).toHaveBeenCalledWith(
-							'reports/views/my-country',
+							'reports/views/index',
 							Object.assign( {},
 								reportsViewModelResponse,
-								{ country: country, csrfToken: req.csrfToken(), isDelete: false }
+								{ csrfToken, isDelete: false }
 							)
 						);
 					} );
@@ -164,7 +163,7 @@ describe( 'Report controllers', () => {
 							'reports/views/index',
 							Object.assign( {},
 								reportsViewModelResponse,
-								{ country: undefined, csrfToken: req.csrfToken(), isDelete: false }
+								{ csrfToken, isDelete: false }
 							)
 						);
 					} );
@@ -251,21 +250,18 @@ describe( 'Report controllers', () => {
 							req.user.country = country;
 
 							reportsViewModel.and.callFake( () => reportsViewModelResponse );
-							backend.reports.getForCountry.and.callFake( () => Promise.resolve( unfinishedReportsResponse ) );
+							backend.reports.getAll.and.callFake( () => Promise.resolve( unfinishedReportsResponse ) );
 
 							await controller.delete( req, res, next );
 
 							expect( next ).not.toHaveBeenCalled();
-							expect( backend.reports.getForCountry ).toHaveBeenCalledWith( req, country.id );
+							expect( backend.reports.getAll ).toHaveBeenCalledWith( req );
 							expect( reportsViewModel ).toHaveBeenCalledWith( unfinishedReportsResponse.body.results, '1234' );
-							expect( res.render ).toHaveBeenCalledWith(
-								'reports/views/my-country',
-								Object.assign(
-									{},
-									reportsViewModelResponse,
-									{ country: country, csrfToken: req.csrfToken(), isDelete: true}
-								)
-							);
+							expect( res.render ).toHaveBeenCalledWith( 'reports/views/index', {
+								...reportsViewModelResponse,
+								csrfToken,
+								isDelete: true,
+							} );
 						} );
 					} );
 
@@ -291,14 +287,11 @@ describe( 'Report controllers', () => {
 							expect( next ).not.toHaveBeenCalled();
 							expect( backend.reports.getAll ).toHaveBeenCalledWith( req );
 							expect( reportsViewModel ).toHaveBeenCalledWith( unfinishedReportsResponse.body.results, '1234' );
-							expect( res.render ).toHaveBeenCalledWith(
-								'reports/views/index',
-								Object.assign(
-									{},
-									reportsViewModelResponse,
-									{ country: undefined, csrfToken: req.csrfToken(), isDelete: true }
-								)
-							);
+							expect( res.render ).toHaveBeenCalledWith( 'reports/views/index', {
+								...reportsViewModelResponse,
+								csrfToken,
+								isDelete: true
+							} );
 						} );
 					} );
 				} );
