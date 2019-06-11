@@ -46,13 +46,13 @@ module.exports = {
 	save: async ( req, res, next ) => {
 
 		const filters = getFilters( req.query );
-		const userProfile = req.session.user.user_profile || {};
+		const userProfile = req.user.user_profile || {};
 		const filterList = Object.entries( filters ).map( ( [ key, value ] ) => ({ key, value: module.exports.transformFilterValue( key, value ) }) );
 
 		const form = new Form( req, {
 			name: {
 				required: 'Enter a name for your watch list',
-				values: [ userProfile.watchList ? req.session.user.user_profile.watchList.name : null ],
+				values: [ userProfile.watchList ? userProfile.watchList.name : null ],
 			}
 		} );
 
@@ -90,15 +90,20 @@ module.exports = {
 			}
 		}
 
-		res.render( 'watch-list/save', Object.assign(
-				form.getTemplateValues(),
-				{ filters, queryString: req.query, filterList, csrfToken: req.csrfToken() }
-		) );
+		res.render( 'watch-list/save', {
+				...form.getTemplateValues(),
+				filters,
+				queryString: req.query,
+				filterList,
+				csrfToken: req.csrfToken(),
+				hasWatchList: !!userProfile.watchList,
+			}
+		);
 	},
 
 	remove: async ( req, res, next ) => {
 
-		const userProfile = req.session.user.user_profile;
+		const userProfile = req.user.user_profile;
 		userProfile.watchList = null;
 
 		try {

@@ -24,7 +24,7 @@ describe( 'Watch list controller', () => {
 
 		( { req, res, next, csrfToken } = jasmine.helpers.mocks.middleware() );
 
-		req.session = { user: { user_profile: {} } };
+		req.user.user_profile = {};
 
 		urls = {
 			index: jasmine.createSpy( 'urls.index' )
@@ -78,18 +78,39 @@ describe( 'Watch list controller', () => {
 				expect( config.name.values ).toEqual( [null] );
 			});
 
-			it( 'Should render the template', async () => {
+			describe( 'When the user has a watchlist', () => {
+				it( 'Should render the template with hasWatchlist as true', async () => {
 
-				await controller.save( req, res, next );
+					req.user.user_profile = { watchList: { a: 1 } };
 
-				expect( res.render ).toHaveBeenCalledWith( 'watch-list/save', {
-					c: 3, d: 4,
-					filters: {},
-					queryString: {},
-					filterList: [  ],
-					csrfToken: csrfToken
-				} );
-			});
+					await controller.save( req, res, next );
+
+					expect( res.render ).toHaveBeenCalledWith( 'watch-list/save', {
+						...getTemplateValuesResponse,
+						filters: {},
+						queryString: {},
+						filterList: [],
+						csrfToken,
+						hasWatchList: true,
+					} );
+				});
+			} );
+
+			describe( 'When the user does NOT have a watchlist', () => {
+				it( 'Should render the template with hasWatchlist as false', async () => {
+
+					await controller.save( req, res, next );
+
+					expect( res.render ).toHaveBeenCalledWith( 'watch-list/save', {
+						...getTemplateValuesResponse,
+						filters: {},
+						queryString: {},
+						filterList: [],
+						csrfToken,
+						hasWatchList: false,
+					} );
+				});
+			} );
 		});
 
 		describe( 'When it is a POST', () => {
@@ -106,11 +127,12 @@ describe( 'Watch list controller', () => {
 					await controller.save( req, res, next );
 
 					expect( res.render ).toHaveBeenCalledWith( 'watch-list/save', {
-						c: 3, d: 4,
+						...getTemplateValuesResponse,
 						filters: {},
 						queryString: {},
-						filterList: [  ],
-						csrfToken: csrfToken
+						filterList: [],
+						csrfToken,
+						hasWatchList: false,
 					} );
 					expect( backend.watchList.save ).not.toHaveBeenCalled();
 				} );
@@ -122,7 +144,7 @@ describe( 'Watch list controller', () => {
 					form.hasErrors = () => false;
 				} );
 
-				describe( 'When there is are no errors', () => {
+				describe( 'When there are no errors', () => {
 					describe( 'With a success response', () => {
 						it( 'Saves the watch list and redirects to the dashboard', async () => {
 
@@ -180,7 +202,7 @@ describe( 'Watch list controller', () => {
 	describe ( 'Remove', () => {
 
 		beforeEach(() => {
-			req.session.user.user_profile.watchList = watchList;
+			req.user.user_profile.watchList = watchList;
 		});
 
 		describe( 'Without an error', () => {

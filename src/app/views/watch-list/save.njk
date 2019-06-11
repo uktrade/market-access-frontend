@@ -1,6 +1,7 @@
 {% from 'components/input/macro.njk' import govukInput %}
 {% from 'app-components/heading.njk' import heading %}
 {% from 'app-components/details-list.njk' import detailsList %}
+{% from 'app-components/callout.njk' import callout %}
 
 {% extends 'layout.njk' %}
 
@@ -9,12 +10,22 @@
 {% block page_content %}
 
 	{{ heading({
-		back: { href: urls.findABarrier(queryString) },
+		back: { href: urls.findABarrier( queryString ) },
 		text: 'Save watch list',
 		errors: errors
 	}) }}
 
 	<section class="restrict-width">
+
+		{% if hasWatchList %}
+		{{ callout({
+			state: 'warn',
+			heading: {
+				text: 'Replacing watch list'
+			},
+			text: 'Saving this watch list will replace your existing one.'
+		}) }}
+		{% endif %}
 
 		{{ detailsList( filterList ) }}
 
@@ -34,7 +45,7 @@
 			} ) }}
 
 			<input type="submit" value="Save" class="govuk-button">
-			<a href="{{ urls.findABarrier(queryString) }}" class="govuk-button button--secondary">Cancel</a>
+			<a href="{{ urls.findABarrier( queryString ) }}" class="govuk-button button--secondary">Cancel</a>
 		</form>
 
 	</section>
