@@ -1,14 +1,13 @@
 {% macro tab( item ) %}
 	{%- if item.isCurrent %}
 		<li class="page-tabs__tab page-tabs__tab--active">
-			<span class="page-tabs__tab__text">{{ item.text }} </span>
+			<span class="page-tabs__tab__text">{{ item.text }}</span>
 		</li>
 	{%- else %}
 		<li class="page-tabs__tab">
 			<a class="page-tabs__tab__text" href="{{ item.href }}">{{ item.text }}</a>
 		</li>
 	{%- endif -%}
-
 {% endmacro %}
 
 {% macro tabs( items ) %}

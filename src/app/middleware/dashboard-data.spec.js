@@ -8,8 +8,8 @@ describe( 'Dashboard data', () => {
 	let next;
 
 	beforeEach( () => {
-		req = { 
-			session: { user: { user_profile: {} } },
+		req = {
+			user: { user_profile: {} },
 			originalUrl: urls.index()
 		};
 		res = { locals: {} };
@@ -23,7 +23,7 @@ describe( 'Dashboard data', () => {
 	describe('When there is a watch list', () => {
 
 		beforeEach(() => {
-			req.session.user.user_profile.watchList = {
+			req.user.user_profile.watchList = {
 				name: 'Hello1'
 			};
 		});
@@ -31,10 +31,10 @@ describe( 'Dashboard data', () => {
 		describe('When on the index page', () => {
 			it('creates the tabs and injects them into the response', () => {
 
-				dashboardData(req, res, next);
+				dashboardData( req, res, next );
 
-				expect(res.locals.tabList).toEqual([
-					{ text: 'Hello1', href: '/', isCurrent: true }, 
+				expect( res.locals.dashboardTabs ).toEqual([
+					{ text: 'Hello1', href: '/', isCurrent: true },
 					{ text: 'My draft barriers', href: '/reports/', isCurrent: false }
 				]);
 			});
@@ -42,12 +42,13 @@ describe( 'Dashboard data', () => {
 
 		describe('When on the reports page', () => {
 			it('creates the tabs and injects them into the response', () => {
+
 				req.originalUrl = urls.reports.index();
 
-				dashboardData(req, res, next);
+				dashboardData( req, res, next );
 
-				expect(res.locals.tabList).toEqual([
-					{ text: 'Hello1', href: '/', isCurrent: false }, 
+				expect( res.locals.dashboardTabs ).toEqual([
+					{ text: 'Hello1', href: '/', isCurrent: false },
 					{ text: 'My draft barriers', href: '/reports/', isCurrent: true }
 				]);
 			});
@@ -58,10 +59,10 @@ describe( 'Dashboard data', () => {
 		describe('When on the index page', () => {
 			it('creates the tabs and injects them into the response', () => {
 
-				dashboardData(req, res, next);
+				dashboardData( req, res, next );
 
-				expect(res.locals.tabList).toEqual([
-					{ text: 'My watch list', href: '/', isCurrent: true }, 
+				expect( res.locals.dashboardTabs ).toEqual([
+					{ text: 'My watch list', href: '/', isCurrent: true },
 					{ text: 'My draft barriers', href: '/reports/', isCurrent: false }
 				]);
 			});
@@ -69,12 +70,13 @@ describe( 'Dashboard data', () => {
 
 		describe('When on the reports page', () => {
 			it('creates the tabs and injects them into the response', () => {
+
 				req.originalUrl = urls.reports.index();
 
-				dashboardData(req, res, next);
+				dashboardData( req, res, next );
 
-				expect(res.locals.tabList).toEqual([
-					{ text: 'My watch list', href: '/', isCurrent: false }, 
+				expect(res.locals.dashboardTabs).toEqual([
+					{ text: 'My watch list', href: '/', isCurrent: false },
 					{ text: 'My draft barriers', href: '/reports/', isCurrent: true }
 				]);
 			});

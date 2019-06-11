@@ -2,7 +2,7 @@ const urls = require( '../lib/urls' );
 
 module.exports = ( req, res, next ) => {
 
-	const userProfile = req.session.user.user_profile || {};
+	const userProfile = req.user.user_profile || {};
 	const currentUrl = req.originalUrl;
 
 	let tabs = [];
@@ -12,15 +12,15 @@ module.exports = ( req, res, next ) => {
 			text: userProfile.watchList ? userProfile.watchList.name : 'My watch list',
 			href: urls.index(),
 			isCurrent: currentUrl === urls.index(),
-		}, 
+		},
 		{
 			text: 'My draft barriers',
-			href: urls.reports.index(), 
+			href: urls.reports.index(),
 			isCurrent: currentUrl === urls.reports.index()
 		}
 	];
 
-	res.locals.tabList = tabs;
+	res.locals.dashboardTabs = tabs;
 
 	next();
 };
