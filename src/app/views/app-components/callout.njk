@@ -1,7 +1,5 @@
 {% macro callout( params ) %}
 
-	{%- set headingTag %}{{ params.heading.tag | default( 'h2' ) }}{% endset -%}
-
 	{%- set modifier -%}
 		{%- if params.state == 'success' -%}
 		success
@@ -14,8 +12,15 @@
 		{% set modifier %} callout--{{ modifier }}{% endset %}
 	{% endif %}
 
+	{% if params.button %}
+		{% set modifier %}{{ modifier }} callout--with-button{% endset %}
+	{% endif %}
+
 	<div class="callout{{ modifier }}">
-		<{{ headingTag }} class="callout__heading">{{ params.heading.text }}</{{ headingTag }}>
+		{% if params.heading %}
+			{%- set headingTag %}{{ params.heading.tag | default( 'h2' ) }}{% endset -%}
+			<{{ headingTag }} class="callout__heading">{{ params.heading.text }}</{{ headingTag }}>
+		{% endif %}
 		<p class="callout__text">{{ params.html | safe if params.html else params.text }}</p>
 
 		{% if params.button %}
