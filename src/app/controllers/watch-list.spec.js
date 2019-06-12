@@ -79,37 +79,84 @@ describe( 'Watch list controller', () => {
 			});
 
 			describe( 'When the user has a watchlist', () => {
-				it( 'Should render the template with hasWatchlist as true', async () => {
 
+				beforeEach( () => {
 					req.user.user_profile = { watchList: { a: 1 } };
+				} );
 
-					await controller.save( req, res, next );
+				describe( 'When rename query param is true', () => {
+					it( 'Should render the remplate with showWarning as false', async () => {
 
-					expect( res.render ).toHaveBeenCalledWith( 'watch-list/save', {
-						...getTemplateValuesResponse,
-						filters: {},
-						queryString: {},
-						filterList: [],
-						csrfToken,
-						hasWatchList: true,
+						req.query.rename = 'true';
+
+						await controller.save( req, res, next );
+
+						expect( res.render ).toHaveBeenCalledWith( 'watch-list/save', {
+							...getTemplateValuesResponse,
+							filters: {},
+							isRename: true,
+							queryString: { rename: 'true' },
+							filterList: [],
+							csrfToken,
+							showWarning: false,
+						} );
 					} );
-				});
+				} );
+
+				describe( 'When the rename query param is not present', () => {
+					it( 'Should render the template with showWarning as true', async () => {
+
+						await controller.save( req, res, next );
+
+						expect( res.render ).toHaveBeenCalledWith( 'watch-list/save', {
+							...getTemplateValuesResponse,
+							filters: {},
+							isRename: false,
+							queryString: {},
+							filterList: [],
+							csrfToken,
+							showWarning: true,
+						} );
+					});
+				} );
 			} );
 
 			describe( 'When the user does NOT have a watchlist', () => {
-				it( 'Should render the template with hasWatchlist as false', async () => {
+				describe( 'When rename query param is true', () => {
+					it( 'Should render the template with showWarning as false', async () => {
 
-					await controller.save( req, res, next );
+						req.query.rename = 'true';
 
-					expect( res.render ).toHaveBeenCalledWith( 'watch-list/save', {
-						...getTemplateValuesResponse,
-						filters: {},
-						queryString: {},
-						filterList: [],
-						csrfToken,
-						hasWatchList: false,
-					} );
-				});
+						await controller.save( req, res, next );
+
+						expect( res.render ).toHaveBeenCalledWith( 'watch-list/save', {
+							...getTemplateValuesResponse,
+							filters: {},
+							isRename: true,
+							queryString: { rename: 'true' },
+							filterList: [],
+							csrfToken,
+							showWarning: false,
+						} );
+					});
+				} );
+
+				describe( 'When the rename query param is not present', () => {
+					it( 'Should render the template with showWarning as false', async () => {
+
+						await controller.save( req, res, next );
+
+						expect( res.render ).toHaveBeenCalledWith( 'watch-list/save', {
+							...getTemplateValuesResponse,
+							filters: {},
+							isRename: false,
+							queryString: {},
+							filterList: [],
+							csrfToken,
+							showWarning: false,
+						} );
+					});
+				} );
 			} );
 		});
 
@@ -129,10 +176,11 @@ describe( 'Watch list controller', () => {
 					expect( res.render ).toHaveBeenCalledWith( 'watch-list/save', {
 						...getTemplateValuesResponse,
 						filters: {},
+						isRename: false,
 						queryString: {},
 						filterList: [],
 						csrfToken,
-						hasWatchList: false,
+						showWarning: false,
 					} );
 					expect( backend.watchList.save ).not.toHaveBeenCalled();
 				} );

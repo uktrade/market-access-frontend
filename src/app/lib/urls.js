@@ -70,6 +70,7 @@ module.exports = {
 
 	watchList: {
 		save: ( params ) => addParams( '/watch-list/save/', params ),
+		rename: ( params = {} ) => addParams( '/watch-list/save/', { ...params, rename: true } ),
 		remove:	() => '/watch-list/remove/',
 	},
 

@@ -46,6 +46,7 @@ module.exports = {
 	save: async ( req, res, next ) => {
 
 		const filters = getFilters( req.query );
+		const isRename = ( req.query.rename === 'true' );
 		const userProfile = req.user.user_profile || {};
 		const filterList = Object.entries( filters ).map( ( [ key, value ] ) => ({ key, value: module.exports.transformFilterValue( key, value ) }) );
 
@@ -93,10 +94,11 @@ module.exports = {
 		res.render( 'watch-list/save', {
 				...form.getTemplateValues(),
 				filters,
+				isRename,
 				queryString: req.query,
 				filterList,
 				csrfToken: req.csrfToken(),
-				hasWatchList: !!userProfile.watchList,
+				showWarning: ( isRename ? false : !!userProfile.watchList ),
 			}
 		);
 	},

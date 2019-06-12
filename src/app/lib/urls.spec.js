@@ -67,21 +67,39 @@ describe( 'URLs', () => {
 					expect( urls.watchList.save() ).toEqual( '/watch-list/save/' );
 				} );
 			} );
-	
+
 			describe( 'With filters', () => {
 				it( 'Should return the correct path', () => {
-	
+
 					expect( urls.watchList.save( {} ) ).toEqual( '/watch-list/save/' );
 					expect( urls.watchList.save( { country: '1' } ) ).toEqual( '/watch-list/save/?country=1' );
 					expect( urls.watchList.save( { country: '1', sector: '2' } ) ).toEqual( '/watch-list/save/?country=1&sector=2' );
 				} );
 			} );
 		});
+
+		describe( 'rename', () => {
+			describe( 'Without any filters', () => {
+				it( 'Should return the correct path', () => {
+					expect( urls.watchList.rename() ).toEqual( '/watch-list/save/?rename=true' );
+				} );
+			} );
+
+			describe( 'With filters', () => {
+				it( 'Should return the correct path', () => {
+
+					expect( urls.watchList.rename( {} ) ).toEqual( '/watch-list/save/?rename=true' );
+					expect( urls.watchList.rename( { country: '1' } ) ).toEqual( '/watch-list/save/?country=1&rename=true' );
+					expect( urls.watchList.rename( { country: '1', sector: '2' } ) ).toEqual( '/watch-list/save/?country=1&sector=2&rename=true' );
+				} );
+			} );
+		});
+
 		describe( 'remove', () => {
 			it( 'Should return the correct path', () => {
 
 				expect( urls.watchList.remove() ).toEqual( '/watch-list/remove/' );
-				
+
 			} );
 		});
 	});

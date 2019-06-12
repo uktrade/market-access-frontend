@@ -11,14 +11,14 @@
 {% block page_content %}
 
 	{{ heading({
-		back: { href: urls.findABarrier( queryString ) },
+		back: { href: ( urls.index() if isRename else urls.findABarrier( filters ) ) },
 		text: 'Save watch list',
 		errors: errors
 	}) }}
 
 	<section class="restrict-width">
 
-		{% if hasWatchList %}
+		{% if showWarning %}
 
 			{%- set calloutHtml %}{{
 				govukWarningText({
@@ -51,7 +51,7 @@
 			} ) }}
 
 			<input type="submit" value="Save" class="govuk-button">
-			<a href="{{ urls.findABarrier( queryString ) }}" class="govuk-button button--secondary">Cancel</a>
+			<a href="{{ ( urls.index() if isRename else urls.findABarrier( filters ) ) }}" class="govuk-button button--secondary">Cancel</a>
 		</form>
 
 	</section>
