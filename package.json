@@ -1,6 +1,6 @@
 {
   "name": "market-access-frontend",
-  "version": "6.2.0",
+  "version": "6.3.0",
   "description": "A front end for Market Access",
   "private": true,
   "main": "server.js",
