@@ -99,6 +99,7 @@ aliases:
       ALLOWED_ADMIN_IPS: 123.123.123.123
       REDIS_BASE_URL: redis://localhost
       SLACK_WEBHOOK: ''
+      RESOURCE_SERVER_USER_INFO_URL: 'http://localhost:5000/api/v1/user/me/'
     command: ./start-wait-for-db.sh
 
 jobs:
