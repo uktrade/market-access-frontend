@@ -15,6 +15,7 @@ module.exports = {
 
 	get: ( path, token ) => sendRequest( 'GET', path, { token } ),
 	post: ( path, token, body ) => sendRequest( 'POST', path, { token, body } ),
+	patch: ( path, token, body ) => sendRequest( 'PATCH', path, { token, body } ),
 	put: ( path, token, body ) => sendRequest( 'PUT', path, { token, body } ),
 	delete: ( path, token, body ) => sendRequest( 'DELETE', path, { token, body } ),
 };

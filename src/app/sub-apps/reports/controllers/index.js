@@ -6,31 +6,19 @@ const reportsViewModel = require( '../view-models/reports' );
 
 async function renderDashboard( req, res, next, isDelete = false, currentReportId ){
 
-	const country = req.user.country;
-	const countryId = country && req.user.country.id;
-	const csrfToken = req.csrfToken();
-
-	let viewTemplate = 'reports/views/index';
-	let promise;
-
-	if( countryId ){
-
-		viewTemplate = 'reports/views/my-country';
-		promise = backend.reports.getForCountry( req, countryId );
-
-	} else {
-
-		promise = backend.reports.getAll( req );
-	}
-
 	try {
 
-		const { response, body } = await promise;
+		const { response, body } = await backend.reports.getAll( req );
 
 		if( response.isSuccess ){
 
 			const { reports, currentReport } = reportsViewModel( body.results, currentReportId );
-			res.render( viewTemplate, { currentReport, reports, country, csrfToken, isDelete } );
+			res.render( 'reports/views/index', {
+				currentReport,
+				reports,
+				csrfToken: req.csrfToken(),
+				isDelete
+			} );
 
 		} else {
 
