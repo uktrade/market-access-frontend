@@ -1,0 +1,11 @@
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Unable to download data{% endblock %}
+
+{% block page_content %}
+	<h1 class="error-heading">Download error</h1>
+
+	<p>
+		There was an unexpected error whilst trying to get the download. The team will be notified about this error.
+	</p>
+{% endblock %}

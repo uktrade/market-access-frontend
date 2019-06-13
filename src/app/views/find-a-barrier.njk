@@ -163,11 +163,24 @@
 
 					{%- if not editWatchList %}
 						<div class="filter-results-action-buttons">
-							<a href="{{ urls.watchList.save(queryString) }}" class="govuk-button govuk-button--watch-list"> Save watch list</a>
+							<a href="{{ urls.watchList.save( queryString ) }}" class="govuk-button govuk-button--watch-list"> Save watch list</a>
 						</div>
 					{% endif %}
 				{% endif %}
 			</div>
+
+			<p>
+				{% if count > 0 %}
+					{% if count == 1 %}
+						You can download this barrier
+					{% else %}
+						You can download these {{ count }} barriers
+					{% endif %}
+					<a class="govuk-button" href="{{ urls.downloadBarriers( filterParams ) }}">Download</a>
+				{% else %}
+					There are no barriers to download
+				{% endif %}
+			</p>
 
 			<ol class="filter-results-list">
 				{% for barrier in barriers %}

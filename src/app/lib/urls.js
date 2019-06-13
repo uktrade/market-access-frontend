@@ -63,6 +63,7 @@ module.exports = {
 	me: () => '/me',
 	whatIsABarrier: () => '/what-is-a-barrier/',
 	findABarrier: ( params ) => addParams( '/find-a-barrier/', params ),
+	downloadBarriers: ( params ) => addParams( '/find-a-barrier/download/', params ),
 
 	documents: {
 		download: ( documentId ) => `/documents/${ documentId }/download/`,
@@ -134,7 +135,7 @@ module.exports = {
 			details: ( barrierId, companyId ) => `/barriers/${ barrierId }/companies/${ companyId }/`,
 			search: ( barrierId ) => `/barriers/${ barrierId }/companies/search/`,
 			remove: ( barrierId ) => `/barriers/${ barrierId }/companies/remove/`
-		}
+		},
 	},
 
 	reports: reportUrl,
