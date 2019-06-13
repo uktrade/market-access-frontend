@@ -80,7 +80,9 @@ $govuk-images-path: '/govuk-public/images/';
 @import 'app-components/checkbox-filter';
 @import 'app-components/typeahead';
 @import 'app-components/collapsible';
+@import 'app-components/toggle-box';
 @import 'app-components/modal';
+@import 'app-components/toggle-links';
 
 @import 'pages/index';
 @import 'pages/what-is-a-barrier';
@@ -89,6 +91,12 @@ $govuk-images-path: '/govuk-public/images/';
 @import 'pages/barrier/detail';
 @import 'pages/barrier/type';
 @import 'pages/find-a-barrier';
+
+body:not(.js-enabled) {
+	.js-only {
+		display: none;
+	}
+}
 
 .error-message {
 	@include govuk-font( 24 );
@@ -106,12 +114,14 @@ $govuk-images-path: '/govuk-public/images/';
 	padding: govuk-em( 30, 16 );
 }
 
-.no-results-message {
-	@include govuk-font( 19 );
-	padding: govuk-em( 30, 19 );
-	text-align: center;
+.no-results-box {
 	background-color: $govuk-grey-4;
-	margin: govuk-em( 30, 19 ) 0 0 0;
+	border: 2px dashed $govuk-grey-3;
+	@include govuk-font( 19 );
+	padding: govuk-em( 20, 19 );
+	text-align: center;
+	padding-top: 0;
+	margin-top: govuk-em( 30, 19 );
 }
 
 .conditional-content {

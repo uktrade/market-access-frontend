@@ -5,6 +5,12 @@
 	position: relative;
 	margin-bottom: govuk-em( 30, 16 );
 
+	.govuk-warning-text {
+		margin-bottom: 0;
+	}
+}
+
+.callout--with-button {
 	@include mq( $from: tablet ){
 		padding-right: govuk-em( 200, 16 );
 	}

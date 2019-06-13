@@ -4,6 +4,7 @@ const ssoController = require( './controllers/sso' );
 const indexController = require( './controllers/index' );
 const whatIsABarrierController = require( './controllers/what-is-a-barrier' );
 const findABarrierController = require( './controllers/find-a-barrier' );
+const WatchListController = require( './controllers/watch-list' );
 const reportRoutes = require( './sub-apps/reports/routes' );
 const barrierRoutes = require( './sub-apps/barriers/routes' );
 
@@ -11,6 +12,7 @@ const headerNav = require( './middleware/header-nav' );
 const user = require( './middleware/user' );
 const formErrors = require( './middleware/form-errors' );
 const dashboardData = require( './middleware/dashboard-data' );
+
 const uuidParam = require( './middleware/params/uuid' );
 
 const csrfProtection = csurf();
@@ -37,4 +39,8 @@ module.exports = function( express, app ){
 	app.use( '/barriers/', barrierRoutes( express, express.Router() ) );
 	app.get( '/what-is-a-barrier/', whatIsABarrierController );
 	app.get( '/find-a-barrier/', headerNav( { isFind: true } ), findABarrierController );
+
+	app.get( '/watch-list/save/', csrfProtection, WatchListController.save);
+	app.post( '/watch-list/save/', parseBody, csrfProtection, WatchListController.save);
+	app.get( '/watch-list/remove/', csrfProtection, WatchListController.remove);
 };

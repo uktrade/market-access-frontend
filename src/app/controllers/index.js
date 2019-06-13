@@ -1,7 +1,7 @@
 const urls = require( '../lib/urls' );
 const backend = require( '../lib/backend-service' );
-const { OPEN, HIBERNATED } = require( '../lib/metadata' ).barrier.status.types;
 const dashboardViewModel = require( '../view-models/dashboard' );
+const transformFilterValue = require('./watch-list').transformFilterValue;
 
 const sortData = {
 	fields: [ 'priority', 'date', 'location', 'status' ],
@@ -27,39 +27,40 @@ module.exports = {
 
 	index: async ( req, res, next ) => {
 
-		const country = req.user.country;
-		const countryId = country && req.user.country.id;
-		const filters = {
-			status: [ OPEN, HIBERNATED ].join( ',' ),
-		};
 		const currentSort = getCurrentSort( req.query );
-		let template = 'index';
+		const userProfile = req.user.user_profile || {};
 
-		if( countryId ){
+		if( !userProfile.watchList ){
 
-			template = 'my-country';
-			filters.country = countryId;
-		}
+			res.render( 'index' );
 
-		try {
+		} else {
 
-			const { response, body } = await backend.barriers.getAll( req, filters, currentSort.serviceParam, currentSort.direction );
+			const watchListFilters = Object.entries( userProfile.watchList.filters ).map( ( [ key, value ] ) => ({ key, value: transformFilterValue( key, value ) }) );
 
-			if( response.isSuccess ){
+			try {
 
-				res.render( template, dashboardViewModel( body.results, country, {
-					...sortData,
-					currentSort,
-				} ) );
+				const { response, body } = await backend.barriers.getAll( req, userProfile.watchList.filters, currentSort.serviceParam, currentSort.direction );
 
-			} else {
+				if( response.isSuccess ){
 
-				throw new Error( `Got ${ response.statusCode } response from backend` );
+					res.render('index', dashboardViewModel(
+						body.results,
+						{ ...sortData, currentSort },
+						true,
+						watchListFilters,
+						userProfile.watchList.filters,
+					));
+
+				} else {
+
+					throw new Error( `Got ${ response.statusCode } response from backend` );
+				}
+
+			} catch( e ){
+
+				next( e );
 			}
-
-		} catch( e ){
-
-			next( e );
 		}
 	},
 

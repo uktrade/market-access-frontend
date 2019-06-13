@@ -1,6 +1,18 @@
 const uuid = require( 'uuid/v4' );
 const faker = require( 'faker' );
 
+function createBarrierSessionSpies( key ){
+
+	const namespace = 'barrierSession.' + ( key ? ( key + '.' ) : '' );
+
+	return {
+		get: jasmine.createSpy( namespace + 'get' ),
+		delete: jasmine.createSpy( namespace + 'delete' ),
+		set: jasmine.createSpy( namespace + 'set' ),
+		setIfNotAlready: jasmine.createSpy( namespace + 'setIfNotAlready' ),
+	};
+}
+
 if( typeof jasmine !== 'undefined' ){
 
 	jasmine.helpers = jasmine.helpers || {};
@@ -28,18 +40,6 @@ if( typeof jasmine !== 'undefined' ){
 		}),
 
 		next: () => jasmine.createSpy( 'next' ),
-	};
-
-	function createBarrierSessionSpies( key ){
-
-		const namespace = 'barrierSession.' + ( key ? ( key + '.' ) : '' );
-
-		return {
-			get: jasmine.createSpy( namespace + 'get' ),
-			delete: jasmine.createSpy( namespace + 'delete' ),
-			set: jasmine.createSpy( namespace + 'set' ),
-			setIfNotAlready: jasmine.createSpy( namespace + 'setIfNotAlready' ),
-		};
 	};
 
 	jasmine.helpers.mocks = {

@@ -148,7 +148,10 @@
 
 			<div class="filter-results-header">
 				<h2 class="filter-results-title">{{ count }}<span class="filter-results-title__caption"> barrier{{ 's' if count != 1 }}</span></h2>
-				{% if hasFilters %}
+
+				{%- if hasFilters %}
+					<a class="filter-results-clear-link" href="{{ urls.findABarrier() }}">Remove all filters</a>
+
 					<h3 class="visually-hidden">Active filters:</h3>
 					<ul class="active-filters">
 						{{ activeFilter( 'Barrier location', filters.country ) }}
@@ -157,9 +160,15 @@
 						{{ activeFilter( 'Priority', filters.priority ) }}
 						{{ activeFilter( 'Overseas region', filters.region ) }}
 					</ul>
-					<a class="filter-results-clear-link" href="{{ urls.findABarrier() }}">Remove all filters</a>
+
+					{%- if not editWatchList %}
+						<div class="filter-results-action-buttons">
+							<a href="{{ urls.watchList.save(queryString) }}" class="govuk-button govuk-button--watch-list"> Save watch list</a>
+						</div>
+					{% endif %}
 				{% endif %}
 			</div>
+
 			<ol class="filter-results-list">
 				{% for barrier in barriers %}
 					<li class='filter-results-list__item'>

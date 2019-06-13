@@ -6,6 +6,7 @@ const GET = 'GET';
 const POST = 'POST';
 const PUT = 'PUT';
 const DELETE = 'DELETE';
+const PATCH = 'PATCH';
 
 describe( 'Backend Request', () => {
 
@@ -107,6 +108,15 @@ describe( 'Backend Request', () => {
 						backend.post( path, token, body );
 
 						expect( sendRequest ).toHaveBeenCalledWith( POST, path, { token, body } );
+					} );
+				} );
+
+				describe( 'patch', () => {
+					it( 'Should call sendRequest with the correct params', () => {
+
+						backend.patch( path, token, body );
+
+						expect( sendRequest ).toHaveBeenCalledWith( PATCH, path, { token, body } );
 					} );
 				} );
 

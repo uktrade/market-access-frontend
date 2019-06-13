@@ -9,6 +9,7 @@ let csrfToken;
 let backend;
 let ssoToken;
 let dashboardViewModel;
+let watchList;
 let urls;
 let metadata;
 
@@ -20,6 +21,10 @@ describe( 'Index controller', () => {
 	beforeEach( () => {
 
 		ssoToken = 'abc-123';
+		watchList = {
+			transformFilterValue: jasmine.createSpy( 'watchList.transformFilterValue' )
+		};
+
 		backend = {
 			barriers: {
 				getAll: jasmine.createSpy( 'backend.barriers.getAll' ),
@@ -56,12 +61,12 @@ describe( 'Index controller', () => {
 			'../lib/urls': urls,
 			'../view-models/dashboard': dashboardViewModel,
 			'../lib/metadata': metadata,
+			'./watch-list': watchList
 		} );
 	} );
 
 	describe( 'Index', () => {
 
-		const status = [ OPEN, HIBERNATED ].join( ',' );
 		const sortData = {
 			fields: [ 'priority', 'date', 'location', 'status' ],
 			directions: [ 'asc', 'desc' ],
@@ -76,39 +81,22 @@ describe( 'Index controller', () => {
 			direction: 'desc',
 		};
 
-		describe( 'Without an error', () => {
-			describe( 'With a success response', () => {
-				describe( 'When the user has a country', () => {
-					it( 'Should get the country reports and render the correct template', async () => {
+		describe( 'When there is a watch list', () => {
 
-						const country = { id: 2, name: 'test' };
-						const barriersResponse = {
-							response: { isSuccess: true  },
-							body: {
-								results: [ { id: 1 } ]
-							}
-						};
-						const dashboardViewModelResponse = { dashboard: true };
+			beforeEach(() => {
+				req.user.user_profile = {
+					watchList: {
+						name: 'hello1',
+						filters: {
+							country: '1234'
+						}
+					}
+				};
+				watchList.transformFilterValue.and.callFake( () => 'Country 1' );
+			});
 
-						req.user.country = country;
-
-						dashboardViewModel.and.callFake( () => dashboardViewModelResponse );
-						backend.barriers.getAll.and.callFake( () => Promise.resolve( barriersResponse ) );
-
-						await controller.index( req, res, next );
-
-						expect( next ).not.toHaveBeenCalled();
-						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { country: country.id, status }, 'reported_on', 'desc' );
-						expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, country, {
-							...sortData,
-							currentSort: defaultCurrentSort
-						} );
-						expect( res.render ).toHaveBeenCalledWith( 'my-country', dashboardViewModelResponse );
-					} );
-				} );
-
-				describe( 'When the user does NOT have a country', () => {
-
+			describe( 'Without an error', () => {
+				describe( 'With a success response', () => {
 					let barriersResponse;
 					let dashboardViewModelResponse;
 
@@ -137,11 +125,14 @@ describe( 'Index controller', () => {
 
 							await controller.index( req, res, next );
 
-							expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'reported_on', 'desc' );
-							expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, req.user.country, {
-								...sortData,
-								currentSort: defaultCurrentSort
-							} );
+							expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { country: '1234' }, 'reported_on', 'desc' );
+							expect( dashboardViewModel ).toHaveBeenCalledWith(
+								barriersResponse.body.results,
+								{ ...sortData, currentSort: defaultCurrentSort},
+								true,
+								[{key: 'country', value: 'Country 1' }],
+								{ country: '1234'},
+							);
 						} );
 					} );
 
@@ -159,15 +150,14 @@ describe( 'Index controller', () => {
 
 									await controller.index( req, res, next );
 
-									expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'priority', 'desc' );
-									expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, req.user.country, {
-										...sortData,
-										currentSort: {
-											field: 'priority',
-											serviceParam: 'priority',
-											direction: 'desc',
-										}
-									} );
+									expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { country: '1234' }, 'priority', 'desc' );
+									expect( dashboardViewModel ).toHaveBeenCalledWith(
+										barriersResponse.body.results,
+										{ ...sortData, currentSort: { field: 'priority', serviceParam: 'priority', direction: 'desc', }},
+										true,
+										[{key: 'country', value: 'Country 1' }],
+										{ country: '1234'},
+									);
 								} );
 							} );
 
@@ -178,15 +168,14 @@ describe( 'Index controller', () => {
 
 									await controller.index( req, res, next );
 
-									expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'priority', 'asc' );
-									expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, req.user.country, {
-										...sortData,
-										currentSort: {
-											field: 'priority',
-											serviceParam: 'priority',
-											direction: 'asc',
-										}
-									} );
+									expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { country: '1234' }, 'priority', 'asc' );
+									expect( dashboardViewModel ).toHaveBeenCalledWith(
+										barriersResponse.body.results,
+										{ ...sortData, currentSort: { field: 'priority', serviceParam: 'priority', direction: 'asc', }},
+										true,
+										[{key: 'country', value: 'Country 1' }],
+										{ country: '1234'},
+									);
 								} );
 							} );
 
@@ -197,15 +186,14 @@ describe( 'Index controller', () => {
 
 									await controller.index( req, res, next );
 
-									expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'priority', 'desc' );
-									expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, req.user.country, {
-										...sortData,
-										currentSort: {
-											field: 'priority',
-											serviceParam: 'priority',
-											direction: 'desc',
-										}
-									} );
+									expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { country: '1234' }, 'priority', 'desc' );
+									expect( dashboardViewModel ).toHaveBeenCalledWith(
+										barriersResponse.body.results,
+										{ ...sortData, currentSort: { field: 'priority', serviceParam: 'priority', direction: 'desc', }},
+										true,
+										[{key: 'country', value: 'Country 1' }],
+										{ country: '1234'},
+									);
 								} );
 							} );
 
@@ -216,53 +204,53 @@ describe( 'Index controller', () => {
 
 									await controller.index( req, res, next );
 
-									expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'priority', 'desc' );
-									expect( dashboardViewModel ).toHaveBeenCalledWith( barriersResponse.body.results, req.user.country, {
-										...sortData,
-										currentSort: {
-											field: 'priority',
-											serviceParam: 'priority',
-											direction: 'desc',
-										}
-									} );
+									expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { country: '1234' }, 'priority', 'desc' );
+									expect( dashboardViewModel ).toHaveBeenCalledWith(
+										barriersResponse.body.results,
+										{ ...sortData, currentSort: { field: 'priority', serviceParam: 'priority', direction: 'desc', }},
+										true,
+										[{key: 'country', value: 'Country 1' }],
+										{ country: '1234'},
+									);
 								} );
 							} );
 						} );
 					} );
 				} );
+
+				describe( 'Without a success response', () => {
+					it( 'Should get the reports and render the index page', async () => {
+
+						const barriersResponse = {
+							response: { isSuccess: false  },
+							body: {}
+						};
+
+						backend.barriers.getAll.and.callFake( () => Promise.resolve( barriersResponse ) );
+
+						await controller.index( req, res, next );
+
+						expect( next ).toHaveBeenCalledWith( new Error( `Got ${ barriersResponse.response.statusCode } response from backend` ) );
+						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { country: '1234' }, 'reported_on', 'desc' );
+						expect( res.render ).not.toHaveBeenCalled();
+					} );
+				} );
 			} );
+			describe( 'With an error', () => {
+				it( 'Should call next with the error', async () => {
 
-			describe( 'Without a success response', () => {
-				it( 'Should get the reports and render the index page', async () => {
+					const err = new Error( 'issue with backend' );
 
-					const barriersResponse = {
-						response: { isSuccess: false  },
-						body: {}
-					};
-
-					backend.barriers.getAll.and.callFake( () => Promise.resolve( barriersResponse ) );
+					backend.barriers.getAll.and.callFake( () => Promise.reject( err ) );
 
 					await controller.index( req, res, next );
 
-					expect( next ).toHaveBeenCalledWith( new Error( `Got ${ barriersResponse.response.statusCode } response from backend` ) );
-					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { status }, 'reported_on', 'desc' );
-					expect( res.render ).not.toHaveBeenCalled();
+					expect( next ).toHaveBeenCalledWith( err );
 				} );
 			} );
-		} );
-
-		describe( 'With an error', () => {
-			it( 'Should call next with the error', async () => {
-
-				const err = new Error( 'issue with backend' );
-
-				backend.barriers.getAll.and.callFake( () => Promise.reject( err ) );
-
-				await controller.index( req, res, next );
-
-				expect( next ).toHaveBeenCalledWith( err );
-			} );
-		} );
+		});
+		describe( 'When there is not a watch list', () => {
+		});
 	} );
 
 	describe( 'me', () => {

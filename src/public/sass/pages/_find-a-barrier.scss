@@ -18,25 +18,49 @@
 	margin-bottom: govuk-em( 10, 16 );
 }
 
+
 .filter-results-header {
 	border-bottom: 5px solid $govuk-black;
 	position: relative;
 }
 
 .filter-results-title {
-	@include govuk-font( 27, $weight: bold );
-	padding: 0 0 govuk-em( 5, 27 ) 0;
-	margin: govuk-em( 10, 27 ) 0 govuk-em( 5, 27 ) 0;
+	@include govuk-font( 36, $weight: bold );
+	padding: 0 0 govuk-em( 5, 36 ) 0;
+	margin: govuk-em( 10, 36 ) govuk-em( 10, 36 ) govuk-em( 5, 36 ) 0;
+	display: inline-block;
 }
 
 .filter-results-title__caption {
-	@include govuk-font( 19 );
+	@include govuk-font( 24 );
+}
+
+.filter-results-action-buttons {
+
+	display: block;
+	width: 100%;
+
+	@include mq( $from: tablet ){
+		display: inline-block;
+		position: absolute;
+		top: 0;
+		right: 0;
+		width: auto;
+	}
+
+	& > * {
+		margin-bottom: 10px;
+	}
+
+	.govuk-button {
+		vertical-align: text-top;
+	}
 }
 
 .active-filters {
 	margin: 0;
 	padding: 0;
-	display: inline-block;
+	display: block;
 	padding-bottom: govuk-em( 10, 16 );
 }
 
@@ -58,12 +82,6 @@
 	padding: 0;
 	display: inline;
 	font-weight: bold;
-}
-
-.filter-results-clear-link {
-	position: absolute;
-	top: 0;
-	right: 0;
 }
 
 .filter-results-list {

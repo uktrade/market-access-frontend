@@ -1,6 +1,6 @@
 {% from 'app-components/tabs.njk' import tabs %}
 
-{% macro dashboardHeading( data, isBarriers = false, isReports = false, isMyCountry = false ) %}
+{% macro dashboardHeading( tabList ) %}
 
 	<h1 class="govuk-heading-l">
 		<span class="govuk-caption-m">Market access barriers</span> Dashboard
@@ -12,8 +12,6 @@
 			Add a market access barrier that is emerging, ongoing or has been resolved.
 		</span>
 	</a>
-
-	{%- set isPlural = ( data.counts.barriers.open !== 1 ) %}
 
 	<a href="{{ urls.findABarrier() }}" role="button" class="dash-button">
 		<span class="dash-button__heading">Find a barrier</span>
@@ -31,22 +29,5 @@
 		</p>
 	</div>
 
-	{{ tabs( [
-		{
-			text: 'All barriers',
-			href: urls.index() if not isBarriers,
-			skip: data.tabs.all.skip,
-			count: data.tabs.all.count
-		},{
-			text: 'My country',
-			href: urls.index() if not isMyCountry,
-			skip: data.tabs.country.skip,
-			count: data.tabs.country.count
-		},{
-			text: 'Draft barriers',
-			href: urls.reports.index() if not isReports,
-			skip: data.tabs.unfinished.skip,
-			count: data.tabs.unfinished.count
-		}
-	] ) }}
+	{{ tabs( tabList ) }}
 {% endmacro %}
