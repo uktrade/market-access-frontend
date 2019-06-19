@@ -84,19 +84,46 @@
 	font-weight: bold;
 }
 
+.filter-results-download {
+	overflow: hidden;
+	margin: govuk-em( 10, 16 ) 0 govuk-em( 5, 16 ) 0;
+	padding: govuk-em( 10, 16 ) 0 0 0;
+	border-top: 1px solid $govuk-grey-2;
+}
+
+.filter-results-download__text {
+
+	display: inline-block;
+	padding-bottom: govuk-em( 10, 16 );
+
+	@include mq( $from: tablet ){
+		padding-top: 0.5em;
+	}
+}
+
+.filter-results-download__button {
+
+	@include mq( $from: tablet ){
+		float: right;
+	}
+
+	margin-bottom: govuk-em( 5, 16 );
+}
+
 .filter-results-list {
 	list-style: none;
 	padding: 0;
+	margin-top: 0;
 }
 
 .filter-results-list__item {
 
-	border-bottom: 1px solid $govuk-grey-1;
+	border-bottom: 1px solid $govuk-grey-2;
 	padding: govuk-em( 15, 16 ) 0;
 	overflow: hidden;
 
 	&:first-of-type {
-		border-top: 1px solid $govuk-grey-1;
+		border-top: 1px solid $govuk-grey-2;
 	}
 }
 
