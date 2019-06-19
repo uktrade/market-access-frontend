@@ -472,7 +472,7 @@ describe( 'Find a barrier controller', () => {
 
 			expect( next ).toHaveBeenCalledWith( new Error( 'Unable to download data' ) );
 			expect( err.code ).toEqual( 'DOWNLOAD_FAIL' );
-			expect( request.pipe ).toHaveBeenCalledWith( res );
+			expect( request.pipe ).not.toHaveBeenCalled();
 		}
 
 		describe( 'When the response is a 404', () => {

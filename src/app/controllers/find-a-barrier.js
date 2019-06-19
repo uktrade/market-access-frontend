@@ -62,20 +62,21 @@ module.exports = {
 	download: ( req, res, next ) => {
 
 		const filters = getFilters( req.query );
+		const download = backend.barriers.download( req, filters );
 
-		backend.barriers.download( req, filters )
+		download.on( 'response', ( { statusCode } ) => {
 
-			.on( 'response', ( { statusCode } ) => {
+			if( statusCode === 200 ){
 
-				if( statusCode !== 200 ){
+				download.pipe( res );
 
-					const err = new Error( 'Unable to download data' );
-					err.code = 'DOWNLOAD_FAIL';
+			} else {
 
-					next( err );
-				}
-			} )
+				const err = new Error( 'Unable to download data' );
+				err.code = 'DOWNLOAD_FAIL';
 
-			.pipe( res );
+				next( err );
+			}
+		} );
 	},
 };
