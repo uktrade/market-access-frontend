@@ -277,7 +277,7 @@
 
 					{%- else -%}
 
-						<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
+						<p class="event-list__item__text">{{ item.text | escape | nl2br | linkify | safe  }}</p>
 						<a class="event-list__item__edit-link" href="{{ urls.barriers.notes.edit( barrier.id, item.id ) }}">Edit</a>
 						{% if item.user.id == user.id %}
 							<a class="event-list__item__delete-link js-delete-modal" href="{{ urls.barriers.notes.delete( barrier.id, item.id ) }}">Delete</a>
