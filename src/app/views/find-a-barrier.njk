@@ -169,16 +169,18 @@
 				{% endif %}
 			</div>
 
-			<p>
+			<p class="filter-results-download">
 				{% if count > 0 %}
+					<span class="filter-results-download__text">
 					{% if count == 1 %}
 						You can download this barrier
 					{% else %}
 						You can download these {{ count }} barriers
 					{% endif %}
-					<a class="govuk-button" href="{{ urls.downloadBarriers( filterParams ) }}">Download</a>
+					</span>
+					<a class="govuk-button filter-results-download__button" href="{{ urls.downloadBarriers( filterParams ) }}">Download</a>
 				{% else %}
-					There are no barriers to download
+					<span class="filter-results-download__text">There are no barriers to download</span>
 				{% endif %}
 			</p>
 
