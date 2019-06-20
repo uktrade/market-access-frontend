@@ -216,7 +216,7 @@ module.exports = {
 	},
 
 	watchList: {
-		save: (req, user_profile) => backend.patch( '/whoami', getToken( req ), { user_profile })
+		save: ( req, user_profile ) => backend.patch( '/whoami', getToken( req ), { user_profile } ),
 	},
 
 	barriers: {
