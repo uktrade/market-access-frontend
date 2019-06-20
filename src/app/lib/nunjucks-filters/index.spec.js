@@ -16,6 +16,7 @@ describe( 'Nunjucks filters', function(){
 		[ './metadata-name', 'metadataName' ],
 		[ './add-to-radio', 'addToRadio' ],
 		[ './time', 'time' ],
+		[ './linkify', 'linkify' ],
 	];
 
 	beforeEach( function(){
