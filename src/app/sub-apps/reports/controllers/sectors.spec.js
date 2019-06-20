@@ -148,10 +148,11 @@ describe( 'Report controllers', () => {
 				} );
 
 				describe( 'With an empty list of sectors', () => {
-					it( 'Should render the page', async () => {
+					it( 'Should set an error message and render the page', async () => {
 
 						await controller.list( req, res, next );
 
+						expect( req.error ).toHaveBeenCalledWith( 'add-sector-button', 'You must add at least one sector' );
 						checkRender( [] );
 					} );
 				} );
