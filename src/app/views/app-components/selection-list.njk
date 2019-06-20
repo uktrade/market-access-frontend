@@ -19,10 +19,10 @@
 	{% endif %}
 
 	{% if params.add %}
-		<a href="{{ params.add }}" class="govuk-button button--secondary selection-list__add-button">{{ config.button.text }}</a>
+		<a href="{{ params.add }}"{{ (' id="'+config.button.id+'"') | safe if config.button.id }} class="govuk-button button--secondary selection-list__add-button">{{ config.button.text }}</a>
 	{% endif %}
 	{% if params.all %}
-		<a href="{{ params.all }}" class="govuk-button button--secondary selection-list__add-button">{{ config.all_button.text }}</a>
+		<a href="{{ params.all }}" class="govuk-button button--secondary selection-list__add-button">{{ config.allButton.text }}</a>
 	{% endif %}
 	</div>
 {% endmacro %}
@@ -30,8 +30,8 @@
 {% macro sectorsList( sectors, params ) %}
 	{{ selectionList( sectors, params, {
 		heading: { text: 'Selected sectors' },
-		button: { text: 'Add specific sectors' },
-		all_button: { text: 'Select all sectors' }
+		button: { text: 'Add specific sectors', id: 'add-sector-button' },
+		allButton: { text: 'Select all sectors' }
 	}) }}
 {% endmacro %}
 

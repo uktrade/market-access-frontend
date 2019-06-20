@@ -22,6 +22,7 @@ describe( 'Backend Service', () => {
 			post: jasmine.createSpy( 'backend.post' ),
 			put: jasmine.createSpy( 'backend.put' ),
 			delete: jasmine.createSpy( 'backend.delete' ),
+			patch: jasmine.createSpy( 'backend.patch' ),
 		};
 		metadata = {
 			getCountry: jasmine.createSpy( 'metadata.country' )
@@ -203,6 +204,19 @@ describe( 'Backend Service', () => {
 						expect( e ).toEqual( err );
 					}
 				} );
+			} );
+		} );
+	} );
+
+	describe( 'watchList', () => {
+		describe( 'save', () => {
+			it( 'Should call backend.patch with the correct data', async () => {
+
+				const profile = { a: 1 };
+
+				await service.watchList.save( req, profile );
+
+				expect( backend.patch ).toHaveBeenCalledWith( '/whoami', token, { user_profile: profile } );
 			} );
 		} );
 	} );

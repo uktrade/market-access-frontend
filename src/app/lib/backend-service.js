@@ -1,7 +1,6 @@
 const backend = require( './backend-request' );
 const metadata = require( './metadata' );
 const config = require( '../config' );
-const logger = require( './logger' );
 
 const SCAN_CHECK_INTERVAL = config.files.scan.statusCheckInterval;
 const SCAN_MAX_ATTEMPTS = Math.round( config.files.scan.maxWaitTime / SCAN_CHECK_INTERVAL );
@@ -102,11 +101,6 @@ function transformUser( { response, body } ){
 	if( response.isSuccess ){
 
 		body.country = metadata.getCountry( body.location );
-	}
-	if( config.assignDefaultCountry && !body.country ){
-
-		body.country = metadata.countries && metadata.countries[ 1 ];
-		logger.verbose( 'Assigning country to user ', body.country );
 	}
 
 	body.country = body.country || {};
@@ -222,7 +216,7 @@ module.exports = {
 	},
 
 	watchList: {
-		save: (req, user_profile) => backend.patch( '/whoami', getToken( req ), { user_profile })
+		save: ( req, user_profile ) => backend.patch( '/whoami', getToken( req ), { user_profile } ),
 	},
 
 	barriers: {
