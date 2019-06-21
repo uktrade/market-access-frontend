@@ -7,4 +7,3 @@ _Add any additional information about the change that isn't captured in the tick
 - [ ] Has the branch been rebased to develop?
 - [ ] Automated tests (Any of the following when applicable: Unit, Functional or Acceptance)
 - [ ] Manual compatibility testing (Browsers: Chrome, Firefox, IE11, Safari)
-- [ ] If it affects the dashboards, have the country and non country versions been checked?

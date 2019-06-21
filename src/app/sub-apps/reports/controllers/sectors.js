@@ -17,27 +17,34 @@ module.exports = {
 
 		const sectors = req.session.sectors;
 
-		if( isPost && sectors && sectors.length ){
+		if( isPost ){
 
-			try {
+			if( sectors && sectors.length ){
 
-				delete req.session.sectors;
+				try {
 
-				const { response } = await backend.reports.saveSectors( req, reportId, { sectors } );
+					delete req.session.sectors;
 
-				if( response.isSuccess ){
+					const { response } = await backend.reports.saveSectors( req, reportId, { sectors } );
 
-					const isExit = ( req.body.action === 'exit' );
-					return res.redirect( isExit ? urls.reports.detail( reportId ) : urls.reports.aboutProblem( reportId ) );
+					if( response.isSuccess ){
 
-				} else {
+						const isExit = ( req.body.action === 'exit' );
+						return res.redirect( isExit ? urls.reports.detail( reportId ) : urls.reports.aboutProblem( reportId ) );
 
-					return next( new Error( `Unable to update report, got ${ response.statusCode } response code` ) );
+					} else {
+
+						return next( new Error( `Unable to update report, got ${ response.statusCode } response code` ) );
+					}
+
+				} catch( e ){
+
+					return next( e );
 				}
 
-			} catch( e ){
+			} else {
 
-				return next( e );
+				req.error( 'add-sector-button', 'You must add at least one sector' );
 			}
 		}
 

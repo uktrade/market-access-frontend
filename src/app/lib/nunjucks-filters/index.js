@@ -8,4 +8,5 @@ module.exports = function( env ){
 	env.addFilter( 'metadataName', require( './metadata-name' ) );
 	env.addFilter( 'addToRadio', require( './add-to-radio' ) );
 	env.addFilter( 'time', require( './time' ) );
+	env.addFilter( 'linkify', require( './linkify' ) );
 };
