@@ -163,17 +163,6 @@ describe( 'makeRequest', () => {
 								} );
 							} );
 
-							describe( 'A raw request', () => {
-								it( 'Should return the request without wrapping in a promise', () => {
-
-									const fakeRequest = jasmine.createSpy( 'fake request' );
-									request.and.callFake( () => fakeRequest );
-									const responseFromRequest = sendRequest( GET, path, { token, raw: true } );
-
-									expect( responseFromRequest ).toEqual( fakeRequest );
-								} );
-							} );
-
 							describe( 'An application/json response type', () => {
 
 								beforeEach( () => {

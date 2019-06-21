@@ -147,15 +147,6 @@ function getFilterParams( filters ){
 	return params;
 }
 
-function getBarrierParams( filters = {}, orderBy = 'reported_on', orderDirection ){
-
-	const params = getFilterParams( filters );
-
-	params.push( `ordering=${ orderDirection === 'asc' ? '' :  '-' }${ orderBy }` );
-
-	return params;
-}
-
 const reports = {
 	saveSummary: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 		problem_description: getValue( values.description ),
@@ -229,17 +220,13 @@ module.exports = {
 	},
 
 	barriers: {
-		getAll: async ( req, filters, orderBy, orderDirection ) => {
+		getAll: async ( req, filters = {}, orderBy = 'reported_on', orderDirection ) => {
 
-			const params = getBarrierParams( filters, orderBy, orderDirection );
+			const params = getFilterParams( filters );
+
+			params.push( `ordering=${ orderDirection === 'asc' ? '' :  '-' }${ orderBy }` );
 
 			return backend.get( `/barriers?${ params.join( '&' ) }`, getToken( req ) );
-		},
-		download: ( req, filters, orderBy, orderDirection ) => {
-
-			const params = getBarrierParams( filters, orderBy, orderDirection );
-
-			return backend.raw.get( `/barriers/export?${ params.join( '&' ) }`, getToken( req ) );
 		},
 		get: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }`, getToken( req ) ),
 		getInteractions: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }/interactions`, getToken( req ) ),

@@ -41,79 +41,6 @@ function parseBody( uri, isJson, body ){
 	return body;
 }
 
-function createPromiseRequest( requestOptions, hawkParams, clientHeader ){
-
-	return new Promise( ( resolve, reject ) => {
-
-		const { uri } = requestOptions;
-
-		request( requestOptions, ( err, response, responseBody ) => {
-
-			if( err ){
-
-				reject( err );
-
-			} else {
-
-				const statusCode = response.statusCode;
-				const isJson = ( response.headers[ 'content-type' ] === 'application/json' );
-
-				logger.verbose( `Response code: ${ response.statusCode } for ${ uri }` );
-
-				if( config.isDebug ){
-
-					logger.debug( 'Response headers: ' + JSON.stringify( response.headers, null, 2 ) );
-				}
-
-				if( clientHeader ){
-
-					let isValid = false;
-
-					try {
-
-						// Authenticate the server's response
-						// must use raw response body here
-						isValid = hawk.client.authenticate( response, hawkParams.credentials, clientHeader.artifacts, { payload: responseBody } );
-
-					} catch ( e ){
-
-						const err = new Error( 'Unable to validate response' );
-						err.rootError = e;
-
-						logger.error( err );
-						parseBody( uri, isJson, responseBody );
-
-						return reject( err );
-					}
-
-					logger.verbose( 'Response isValid:' + !!isValid );
-
-					if( !isValid ){
-
-						return reject( new Error( 'Invalid response' ) );
-					}
-				}
-
-				const body = parseBody( uri, isJson, responseBody );
-
-				response.isSuccess = ( statusCode >= 200 && statusCode <= 300 );
-
-				if( response.isSuccess || statusCode === 404 || statusCode === 400 ){
-
-					resolve( { response, body } );
-
-				} else {
-
-					const error = new Error( `Got a ${ statusCode } response code for ${ uri }` );
-					error.responseBody = body;
-
-					reject( error );
-				}
-			}
-		} );
-	} );
-}
-
 module.exports = ( domain, hawkParams ) => {
 
 	if( !domain ){ throw new Error( 'domain is required' ); }
@@ -168,25 +95,84 @@ module.exports = ( domain, hawkParams ) => {
 			requestOptions.headers.Authorization = clientHeader.header;
 		}
 
-		logger.verbose( `Sending ${ method } request to: ${ uri }` );
+		return new Promise( ( resolve, reject ) => {
 
-		if( config.isDev ){
+			logger.verbose( `Sending ${ method } request to: ${ uri }` );
 
-			logger.debug( 'With headers: ' + JSON.stringify( requestOptions.headers, null, 2 ) );
+			if( config.isDev ){
 
-			if( requestOptions.body ){
+				logger.debug( 'With headers: ' + JSON.stringify( requestOptions.headers, null, 2 ) );
 
-				logger.debug( 'With body: ' + requestOptions.body );
+				if( requestOptions.body ){
+
+					logger.debug( 'With body: ' + requestOptions.body );
+				}
 			}
-		}
 
-		if( opts.raw ){
+			request( requestOptions, ( err, response, responseBody ) => {
 
-			return request( requestOptions );
+				if( err ){
 
-		} else {
+					reject( err );
 
-			return createPromiseRequest( requestOptions, hawkParams, clientHeader );
-		}
+				} else {
+
+					const statusCode = response.statusCode;
+					const isJson = ( response.headers[ 'content-type' ] === 'application/json' );
+
+					logger.verbose( `Response code: ${ response.statusCode } for ${ uri }` );
+
+					if( config.isDebug ){
+
+						logger.debug( 'Response headers: ' + JSON.stringify( response.headers, null, 2 ) );
+					}
+
+					if( clientHeader ){
+
+						let isValid = false;
+
+						try {
+
+							// Authenticate the server's response
+							// must use raw response body here
+							isValid = hawk.client.authenticate( response, hawkParams.credentials, clientHeader.artifacts, { payload: responseBody } );
+
+						} catch ( e ){
+
+							const err = new Error( 'Unable to validate response' );
+							err.rootError = e;
+
+							logger.error( err );
+							parseBody( uri, isJson, responseBody );
+
+							return reject( err );
+						}
+
+						logger.verbose( 'Response isValid:' + !!isValid );
+
+						if( !isValid ){
+
+							return reject( new Error( 'Invalid response' ) );
+						}
+					}
+
+					const body = parseBody( uri, isJson, responseBody );
+
+					response.isSuccess = ( statusCode >= 200 && statusCode <= 300 );
+
+					if( response.isSuccess || statusCode === 404 || statusCode === 400 ){
+
+						resolve( { response, body } );
+
+					} else {
+
+						const error = new Error( `Got a ${ statusCode } response code for ${ uri }` );
+						error.responseBody = body;
+
+						reject( error );
+					}
+				}
+			} );
+		} );
 	};
 };
