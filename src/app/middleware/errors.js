@@ -21,26 +21,16 @@ module.exports = {
 
 		} else {
 
-			switch( err.code ){
-
-			case 'TOO_MANY_BYTES':
+			if( err.code === 'TOO_MANY_BYTES' ){
 
 				res.sendStatus( 413 );
 
-			break;
-			case 'EBADCSRFTOKEN':
+			} else if( err.code === 'EBADCSRFTOKEN' ){
 
 				res.status( 400 );
 				res.render( 'error/invalid-csrf-token' );
 
-			break;
-			case 'DOWNLOAD_FAIL':
-
-				res.status( 500 );
-				res.render( 'error/unable-to-download' );
-
-			break;
-			default:
+			} else {
 
 				res.status( 500 );
 				res.render( 'error/default', { error: err, showErrors: config.showErrors } );

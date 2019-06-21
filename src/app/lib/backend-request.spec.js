@@ -137,17 +137,6 @@ describe( 'Backend Request', () => {
 						expect( sendRequest ).toHaveBeenCalledWith( DELETE, path, { token, body } );
 					} );
 				} );
-
-				describe( 'raw methods', () => {
-					describe( 'get', () => {
-						it( 'Should call sendRequest with the correct params', () => {
-
-							backend.raw.get( path, token );
-
-							expect( sendRequest ).toHaveBeenCalledWith( GET, path, { token, raw: true } );
-						} );
-					} );
-				} );
 			} );
 		} );
 	} );

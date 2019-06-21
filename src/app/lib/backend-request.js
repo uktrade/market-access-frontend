@@ -18,8 +18,4 @@ module.exports = {
 	patch: ( path, token, body ) => sendRequest( 'PATCH', path, { token, body } ),
 	put: ( path, token, body ) => sendRequest( 'PUT', path, { token, body } ),
 	delete: ( path, token, body ) => sendRequest( 'DELETE', path, { token, body } ),
-
-	raw: {
-		get: ( path, token ) => sendRequest( 'GET', path, { token, raw: true } ),
-	}
 };

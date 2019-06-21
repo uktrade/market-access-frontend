@@ -23,9 +23,6 @@ describe( 'Backend Service', () => {
 			put: jasmine.createSpy( 'backend.put' ),
 			delete: jasmine.createSpy( 'backend.delete' ),
 			patch: jasmine.createSpy( 'backend.patch' ),
-			raw: {
-				get: jasmine.createSpy( 'backend.raw.get' ),
-			},
 		};
 		metadata = {
 			getCountry: jasmine.createSpy( 'metadata.country' )
@@ -292,97 +289,13 @@ describe( 'Backend Service', () => {
 			} );
 
 			describe( 'With a sector filter', () => {
-				it( 'Should call the correct path with default sort order', () => {
+				it( 'Should call the correct path with default sort order', async () => {
 
 					const sector = uuid();
 
-					testWithOrdering( { sector }, `sector=${ sector }` );
-				} );
-			} );
+					await service.barriers.getAll( req, { sector } );
 
-			describe( 'With a type filter', () => {
-				it( 'Should call the correct path with default sort order', () => {
-
-					const type = faker.lorem.word().toUpperCase();
-
-					testWithOrdering( { type }, `barrier_type=${ type }` );
-				} );
-			} );
-
-			describe( 'With a status filter', () => {
-				it( 'Should call the correct path with default sort order', () => {
-
-					const status = '2,5';
-
-					testWithOrdering( { status }, `status=${ status }` );
-				} );
-			} );
-		} );
-
-		describe( 'download', () => {
-
-			function testWithOrdering( filters, expectedParams ){
-
-				const path = ( '/barriers/export?' + ( expectedParams ? expectedParams + '&' : '' ) );
-
-				service.barriers.download( req, filters );
-
-				expect( backend.raw.get ).toHaveBeenCalledWith( `${ path }ordering=-reported_on`, token );
-
-				service.barriers.download( req, filters, 'reported_on' );
-
-				expect( backend.raw.get ).toHaveBeenCalledWith( `${ path }ordering=-reported_on`, token );
-
-				service.barriers.download( req, filters, 'reported_on', 'desc' );
-
-				expect( backend.raw.get ).toHaveBeenCalledWith( `${ path }ordering=-reported_on`, token );
-
-				service.barriers.download( req, filters, 'reported_on', 'asc' );
-
-				expect( backend.raw.get ).toHaveBeenCalledWith( `${ path }ordering=reported_on`, token );
-			}
-
-			describe( 'With no filters', () => {
-				it( 'Should call the correct path with default sort order', () => {
-
-					testWithOrdering();
-				} );
-			} );
-
-			describe( 'With a country filter', () => {
-				it( 'Should call the correct path with default sort order', () => {
-
-					const country = uuid();
-
-					testWithOrdering( { country }, `location=${ country }` );
-				} );
-			} );
-
-			describe( 'With an overseas region filter', () => {
-				it( 'Should call the correct path with default sort order', () => {
-
-					const region = uuid();
-
-					testWithOrdering( { region }, `location=${ region }` );
-				} );
-			} );
-
-			describe( 'With a country and an overseas region filter', () => {
-				it( 'Should call the correct path with default sort order', () => {
-
-					const country = uuid();
-					const region = uuid();
-
-					testWithOrdering( { region, country }, `location=${ country },${ region }` );
-				} );
-			} );
-
-			describe( 'With a sector filter', () => {
-				it( 'Should call the correct path with default sort order', () => {
-
-					const sector = uuid();
-
-					testWithOrdering( { sector }, `sector=${ sector }` );
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers?sector=${ sector }&ordering=-reported_on`, token );
 				} );
 			} );
 
