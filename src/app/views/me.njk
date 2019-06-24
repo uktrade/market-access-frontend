@@ -61,6 +61,9 @@
 		<dt>Email</dt>
 		<dd>{{ user.email }}</dd>
 
+		<dt>permitted_applications</dt>
+		<dd><pre>{{ user.permitted_applications | dump( 2 ) }}</pre></dd>
+
 		<dt>Country</dt>
 		<dd>{% if user.country %}{{ user.country.name }} ({{ user.country.id }}){% else %}---{% endif %}</dd>
 	</dl>
