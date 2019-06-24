@@ -1,3 +1,4 @@
+const config = require( '../config' );
 const backend = require( '../lib/backend-service' );
 
 module.exports = async ( req, res, next ) => {
@@ -10,9 +11,11 @@ module.exports = async ( req, res, next ) => {
 
 			if( response.isSuccess ){
 
-				req.session.user = {
-					...body,
-					'permitted_applications': [
+				const user = body;
+
+				if( config.sso.bypass ){
+
+					user.permitted_applications = [
 						{
 							'key': 'datahub-crm',
 							'url': '',
@@ -33,8 +36,10 @@ module.exports = async ( req, res, next ) => {
 							'url': '',
 							'name': ''
 						}
-					]
-				};
+					];
+				}
+
+				req.session.user = user;
 
 			} else {
 
