@@ -58,7 +58,7 @@
   },
   "homepage": "https://github.com/uktrade/market-access-frontend#readme",
   "dependencies": {
-    "@uktrade/datahub-header": "^1.0.0",
+    "@uktrade/datahub-header": "^1.2.0",
     "autolinker": "^3.1.0",
     "compression": "^1.7.4",
     "connect-flash": "^0.1.1",
