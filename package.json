@@ -1,12 +1,12 @@
 {
   "name": "market-access-frontend",
-  "version": "6.4.0",
+  "version": "6.4.1",
   "description": "A front end for Market Access",
   "private": true,
   "main": "server.js",
   "engines": {
-    "node": "10.15.1",
-    "npm": "6.4.1"
+    "node": "10.16.0",
+    "npm": "6.9.0"
   },
   "scripts": {
     "preversion": "npm run lint:app && npm run lint:public && npm test && npm run coverage",
