@@ -37,7 +37,8 @@ function update( barrier ){
 		priority,
 		date: {
 			reported: barrier.reported_on,
-			created: barrier.created_on
+			created: barrier.created_on,
+			modified: barrier.modified_on,
 		},
 	};
 }

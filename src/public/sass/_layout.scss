@@ -228,7 +228,7 @@ a {
 
 @include mq( $from: desktop ){
 	.ma-container-full {
-		max-width: 1200px; 
+		max-width: 1300px;
 		margin: 0 govuk-em( 30, 16 );;
 	}
 }

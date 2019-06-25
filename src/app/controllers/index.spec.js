@@ -68,16 +68,17 @@ describe( 'Index controller', () => {
 	describe( 'Index', () => {
 
 		const sortData = {
-			fields: [ 'priority', 'date', 'location', 'status' ],
+			fields: [ 'priority', 'date', 'location', 'status', 'updated' ],
 			directions: [ 'asc', 'desc' ],
 			serviceParamMap: {
 				date: 'reported_on',
 				location: 'export_country',
+				updated: 'modified_on',
 			},
 		};
 		const defaultCurrentSort = {
-			field: 'date',
-			serviceParam: 'reported_on',
+			field: 'updated',
+			serviceParam: 'modified_on',
 			direction: 'desc',
 		};
 
@@ -121,11 +122,11 @@ describe( 'Index controller', () => {
 					} );
 
 					describe( 'When there is not any sorting', () => {
-						it( 'Should get all the reports and render the correct template', async () => {
+						it( 'Should get all the reports with a default sort and render the correct template', async () => {
 
 							await controller.index( req, res, next );
 
-							expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { country: '1234' }, 'reported_on', 'desc' );
+							expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { country: '1234' }, 'modified_on', 'desc' );
 							expect( dashboardViewModel ).toHaveBeenCalledWith(
 								barriersResponse.body.results,
 								{ ...sortData, currentSort: defaultCurrentSort},
@@ -231,7 +232,7 @@ describe( 'Index controller', () => {
 						await controller.index( req, res, next );
 
 						expect( next ).toHaveBeenCalledWith( new Error( `Got ${ barriersResponse.response.statusCode } response from backend` ) );
-						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { country: '1234' }, 'reported_on', 'desc' );
+						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { country: '1234' }, 'modified_on', 'desc' );
 						expect( res.render ).not.toHaveBeenCalled();
 					} );
 				} );
