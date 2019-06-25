@@ -17,7 +17,7 @@
 			:internal-search="false"
 			:multiple="true"
 			:options="options"
-			:options-limit="500"
+			:options-limit="1000"
 			:showLabels="false"
 			:searchable="true"
 			:id="id"
