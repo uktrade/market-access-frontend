@@ -1,3 +1,4 @@
+const config = require( '../config' );
 const backend = require( '../lib/backend-service' );
 
 module.exports = async ( req, res, next ) => {
@@ -10,7 +11,35 @@ module.exports = async ( req, res, next ) => {
 
 			if( response.isSuccess ){
 
-				req.session.user = body;
+				const user = body;
+
+				if( config.sso.bypass ){
+
+					user.permitted_applications = [
+						{
+							'key': 'datahub-crm',
+							'url': '',
+							'name': ''
+						},
+						{
+							'key': 'datahub-mi',
+							'url': '',
+							'name': ''
+						},
+						{
+							'key': 'market-access',
+							'url': '',
+							'name': ''
+						},
+						{
+							'key': 'find-exporters',
+							'url': '',
+							'name': ''
+						}
+					];
+				}
+
+				req.session.user = user;
 
 			} else {
 
