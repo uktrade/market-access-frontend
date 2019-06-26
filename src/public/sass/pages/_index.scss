@@ -62,7 +62,12 @@
 		}
 
 		&:nth-child( 6 ){
-			min-width: govuk-em( 90, 16 );
+			max-width: govuk-em( 150, 16 );
+			width: 15%;
+		}
+
+		&:nth-child( 7 ){
+			min-width: govuk-em( 110, 16 );
 		}
 	}
 }

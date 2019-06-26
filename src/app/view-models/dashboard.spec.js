@@ -71,6 +71,7 @@ describe( 'Dashboard view model', () => {
 					date: {
 						reported: barrier.reported_on,
 						created: barrier.created_on,
+						modified: barrier.modified_on
 					},
 					priority: {
 						...barrier.priority,
@@ -97,16 +98,16 @@ describe( 'Dashboard view model', () => {
 			};
 			const output = viewModel( input, sortData, true, { a: 'b'}, {c: 'd'} );
 
-			expect( output ).toEqual({ 
-				barriers: input, 
-				sortableFields: {}, 
-				barrierCount: 0, 
-				isWatchList: true, 
+			expect( output ).toEqual({
+				barriers: input,
+				sortableFields: {},
+				barrierCount: 0,
+				isWatchList: true,
 				watchListFilters: { a: 'b'},
 				queryString: {c: 'd'},
 				editQueryString: {c: 'd', editWatchList: true}
 			});
 		} );
 	} );
-	
+
 } );
