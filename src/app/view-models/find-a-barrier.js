@@ -87,6 +87,7 @@ module.exports = function( { count, barriers, filters, queryString, editWatchLis
 		hasFilters: !!Object.keys( filters ).length,
 		queryString,
 		editWatchList,
+		filterParams: filters,
 		filters: {
 			country: {
 				items: countries.sort( sortGovukItems.alphabetical ).map( isChecked( filters.country ) ),
