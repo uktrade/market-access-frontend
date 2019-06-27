@@ -29,12 +29,14 @@ module.exports = {
 		const isDev = config.isDev;
 		const pathToPublic = path.resolve( __dirname, '../public' );
 		const pathToGovukAssets = path.resolve( __dirname, '../../node_modules/govuk-frontend/assets' );
+		const pathToNodeModules = path.resolve( __dirname, ( isDev ? '../' : '' ) + '../node_modules' );
 		const staticMaxAge = ( isDev ? 0 : '2y' );
 
 		const nunjucksEnv = nunjucks.configure( [
 				`${__dirname}/views`,
 				`${__dirname}/sub-apps`,
-				path.resolve( __dirname, ( isDev ? '../' : '' ) + '../node_modules/govuk-frontend' )
+				`${ pathToNodeModules }/govuk-frontend`,
+				`${ pathToNodeModules }/@uktrade`,
 			], {
 			trimBlocks: true,
 			lstripBlocks: true,
@@ -61,7 +63,11 @@ module.exports = {
 		nunjucksFilters( nunjucksEnv );
 		reporter.setup( app );
 
-		if( !isDev ){ app.use( compression() ); }
+		if( isDev ){
+			app.use( express.static( `${ pathToNodeModules }/@uktrade` ) );
+		} else {
+			app.use( compression() );
+		}
 		app.use( forceHttps( config.server.secure ) );
 		app.use( '/public', express.static( pathToPublic, { maxAge: staticMaxAge } ) );
 		app.use( '/govuk-public', express.static( pathToGovukAssets, { maxAge: staticMaxAge } ) );

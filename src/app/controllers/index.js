@@ -4,17 +4,18 @@ const dashboardViewModel = require( '../view-models/dashboard' );
 const transformFilterValue = require('./watch-list').transformFilterValue;
 
 const sortData = {
-	fields: [ 'priority', 'date', 'location', 'status' ],
+	fields: [ 'priority', 'date', 'location', 'status', 'updated' ],
 	directions: [ 'asc', 'desc' ],
 	serviceParamMap: {
 		date: 'reported_on',
 		location: 'export_country',
+		updated: 'modified_on',
 	},
 };
 
 function getCurrentSort( { sortBy, sortDirection } ){
 
-	const field = ( sortData.fields.includes( sortBy ) ? sortBy : 'date' );
+	const field = ( sortData.fields.includes( sortBy ) ? sortBy : 'updated' );
 
 	return {
 		field,

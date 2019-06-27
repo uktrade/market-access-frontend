@@ -192,12 +192,13 @@ a {
 	}
 }
 
-.govuk-masthead {
+.ma-masthead {
+
 	max-width: 100%;
-   	padding: 0 govuk-em( 30, 16 );;
-	background: $govuk-grey-3;
-	margin-top: govuk-em( -40, 16 );;
-	margin-bottom: govuk-em( 40, 16 );;
+	padding: 0 govuk-em( 30, 16 ) 0 govuk-em( 30, 16 );
+	background: $govuk-grey-4;
+	//margin-top: govuk-em( -40, 16 );
+	margin-bottom: govuk-em( 20, 16 );
 
 	&:after {
 		content: "";
@@ -226,9 +227,13 @@ a {
 	}
 }
 
+.ma-container-full {
+	padding-top: govuk-em( 30, 16 );
+}
+
 @include mq( $from: desktop ){
 	.ma-container-full {
-		max-width: 1200px; 
+		max-width: 1300px;
 		margin: 0 govuk-em( 30, 16 );;
 	}
 }

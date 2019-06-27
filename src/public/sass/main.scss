@@ -3,6 +3,7 @@ $govuk-font-family-tabular: Arial,'Helvetica Neue',Helvetica,sans-serif;
 $govuk-images-path: '/govuk-public/images/';
 
 @import 'node_modules/vue-multiselect/dist/vue-multiselect.min';
+@import 'node_modules/@uktrade/datahub-header/component/header';
 
 @import 'settings/all';
 @import 'helpers/all';
