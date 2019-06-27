@@ -2,53 +2,31 @@ const urls = require( '../lib/urls' );
 const backend = require( '../lib/backend-service' );
 const strings = require( '../lib/strings' );
 const Form = require( '../lib/Form' );
-const validators = require( '../lib/validators' );
-
-const FILTERS = Object.entries( {
-	country: validators.isCountryOrAdminArea,
-	sector: validators.isSector,
-	type: validators.isBarrierType,
-	priority: validators.isBarrierPriority,
-	region: validators.isOverseasRegion,
-} );
+const barrierFilters = require( '../lib/barrier-filters' );
 
 const filterStringMap = {
 	country: strings.locations,
 	sector: strings.sectors,
 	type: strings.types,
 	priority: strings.priorities,
-	region: strings.regions
+	region: strings.regions,
+	search: ( value ) => value,
 };
 
-function getFilters( query ){
-
-	const filters = {};
-
-	for( let [ name, validator ] of FILTERS ){
-
-		const queryValue = ( query[ name ] || '' );
-		const values = ( Array.isArray( queryValue ) ? queryValue : queryValue.split( ',' ) );
-		const validValues = values.filter( validator );
-
-		if( validValues.length ){
-
-			filters[ name ] = validValues;
-		}
-	}
-
-	return filters;
+function transformFilterValue( key, value ) {
+	return filterStringMap[ key ]( value );
 }
 
 module.exports = {
 
-	transformFilterValue: ( key, value ) => filterStringMap[ key ]( value ),
+	transformFilterValue,
 
 	save: async ( req, res, next ) => {
 
-		const filters = getFilters( req.query );
+		const filters = barrierFilters.getFromQueryString( req.query );
 		const isRename = ( req.query.rename === 'true' );
 		const userProfile = req.user.user_profile || {};
-		const filterList = Object.entries( filters ).map( ( [ key, value ] ) => ({ key, value: module.exports.transformFilterValue( key, value ) }) );
+		const filterList = Object.entries( filters ).map( ( [ key, value ] ) => ({ key, value: transformFilterValue( key, value ) }) );
 
 		const form = new Form( req, {
 			name: {

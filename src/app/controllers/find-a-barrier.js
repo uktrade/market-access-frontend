@@ -1,39 +1,11 @@
 const backend = require( '../lib/backend-service' );
-const validators = require( '../lib/validators' );
 const viewModel = require( '../view-models/find-a-barrier' );
-
-const FILTERS = Object.entries( {
-	country: validators.isCountryOrAdminArea,
-	sector: validators.isSector,
-	type: validators.isBarrierType,
-	priority: validators.isBarrierPriority,
-	region: validators.isOverseasRegion,
-	search: ( str ) => !!str.length,
-} );
-
-function getFilters( query ){
-
-	const filters = {};
-
-	for( let [ name, validator ] of FILTERS ){
-
-		const queryValue = ( query[ name ] || '' );
-		const values = ( Array.isArray( queryValue ) ? queryValue : queryValue.split( ',' ) );
-		const validValues = values.filter( validator );
-
-		if( validValues.length ){
-
-			filters[ name ] = validValues;
-		}
-	}
-
-	return filters;
-}
+const barrierFilters = require( '../lib/barrier-filters' );
 
 module.exports = {
 	list: async function( req, res, next ){
 
-		const filters = getFilters( req.query );
+	const filters = barrierFilters.getFromQueryString( req.query );
 
 		try {
 
@@ -62,7 +34,7 @@ module.exports = {
 
 	download: ( req, res, next ) => {
 
-		const filters = getFilters( req.query );
+		const filters = barrierFilters.getFromQueryString( req.query );
 		const download = backend.barriers.download( req, filters );
 
 		download.on( 'response', ( { statusCode } ) => {
