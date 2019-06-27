@@ -1,4 +1,4 @@
-{% from 'components/select/macro.njk' import govukSelect %}
+{% from 'components/input/macro.njk' import govukInput %}
 {% from 'app-components/heading.njk' import heading %}
 {% from 'app-components/checkbox-filter.njk' import checkboxFilter %}
 {% from 'app-components/typeahead.njk' import typeahead %}
@@ -24,20 +24,6 @@
 		<div class="govuk-grid-column-one-quarter">
 			<h2 class="filter-list-title">Filter barriers by:</h2>
 			<form action="{{ urls.findABarrier() }}" method="GET" class="filter-items">
-
-				{# govukSelect({
-					id: 'country',
-					name: 'country',
-					classes: 'govuk-!-width-full js-filter',
-					formGroup: {
-						classes: 'filter-items-group'
-					},
-					label: {
-						text: 'Barrier location',
-						classes: 'filter-items__label'
-					},
-					items: filters.country.items
-				}) #}
 
 				{{ typeahead({
 					id: 'country',
@@ -124,6 +110,19 @@
 					items: filters.priority.items
 				})	}}
 
+				{{ govukInput({
+					label: {
+						text: 'Search',
+						classes: 'filter-items__label'
+					},
+					formGroup: {
+						classes: 'filter-group'
+					},
+					id: 'search',
+					name: 'search',
+					value: filters.search.text
+				}) }}
+
 				{% if hasFilters %}
 				<a class="filter-items__clear" href="{{ urls.findABarrier() }}">Remove all filters</a>
 				{% endif %}
@@ -159,6 +158,7 @@
 						{{ activeFilter( 'Type', filters.type ) }}
 						{{ activeFilter( 'Priority', filters.priority ) }}
 						{{ activeFilter( 'Overseas region', filters.region ) }}
+						{{ activeFilter( 'Search', filters.search ) }}
 					</ul>
 
 					{%- if not editWatchList %}

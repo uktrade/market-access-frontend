@@ -117,6 +117,7 @@ function getFilterParams( filters ){
 		'status': 'status',
 		'priority': 'priority',
 		'region': LOCATION,
+		'search': 'text',
 	};
 
 	const params = [];
@@ -134,7 +135,7 @@ function getFilterParams( filters ){
 
 			} else {
 
-				params.push( `${ paramKey }=${ value }` );
+				params.push( `${ paramKey }=${ encodeURIComponent( value ) }` );
 			}
 		}
 	}

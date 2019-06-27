@@ -422,6 +422,50 @@ describe( 'Find a barrier controller', () => {
 			} );
 		} );
 
+		describe( 'With a search filter', () => {
+
+			let viewModelResponse;
+
+			beforeEach( () => {
+
+				viewModelResponse = { a: 1, b: 2 };
+
+				viewModel.and.callFake( () => viewModelResponse );
+
+				backend.barriers.getAll.and.callFake( () => ({
+					response: { isSuccess: true },
+					body: jasmine.helpers.getFakeData( '/backend/barriers/' )
+				}) );
+			} );
+
+			afterEach( () => {
+
+				expect( res.render ).toHaveBeenCalledWith( template, viewModelResponse );
+				expect( next ).not.toHaveBeenCalled();
+			} );
+
+			describe( 'With a search term', () => {
+				it( 'Should render the template with a filter', async () => {
+
+					const searchTerm = faker.lorem.words( 2 );
+					req.query.search = searchTerm;
+
+					await controller.list( req, res, next );
+
+					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { search: [ searchTerm ] } );
+				} );
+			} );
+
+			describe( 'Without a search term', () => {
+				it( 'Should render the template without filters', async () => {
+
+					await controller.list( req, res, next );
+
+					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, {} );
+				} );
+			} );
+	} );
+
 		describe( 'When the backend call is not a success', () => {
 			describe( 'When it is a 500', () => {
 				it( 'Should call next with an error', async () => {

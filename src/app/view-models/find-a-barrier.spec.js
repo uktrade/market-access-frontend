@@ -167,7 +167,7 @@ describe( 'Find a barrier view model', () => {
 		expect( metadata.getBarrierTypeList ).toHaveBeenCalledWith();
 		expect( metadata.getBarrierPrioritiesList ).toHaveBeenCalledWith( { suffix: false } );
 		expect( sortGovukItems.alphabetical ).toHaveBeenCalled();
-		expect( urls.findABarrier.calls.count() ).toEqual( 5 );
+		expect( urls.findABarrier.calls.count() ).toEqual( 6 );
 		expect( urls.findABarrier ).toHaveBeenCalledWith( {} );
 	} );
 
@@ -179,6 +179,7 @@ describe( 'Find a barrier view model', () => {
 			sector: overrides.sector || { items: sectorList, active: false, text: strings.sectors.response, removeUrl: findABarrierResponse },
 			type: overrides.type || { items: barrierTypeList, active: false, text: strings.types.response, removeUrl: findABarrierResponse },
 			priority: overrides.priority || { items: barrierPriorityList, active: false, text: strings.priorities.response, removeUrl: findABarrierResponse },
+			search: overrides.search || { active: false, text: undefined, removeUrl: findABarrierResponse },
 		};
 	}
 
@@ -353,4 +354,25 @@ describe( 'Find a barrier view model', () => {
 			expect( strings.priorities ).toHaveBeenCalledWith( filters.priority );
 		} );
 	} );
+
+	describe( 'With a search filter', () => {
+		it( 'Should return the correct data', () => {
+
+			const count = 5;
+			const filters = { search: faker.lorem.words( 3 ) };
+			const output = viewModel( {
+				count,
+				barriers,
+				filters
+			} );
+
+			expect( output.count ).toEqual( count );
+			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
+			expect( output.filters ).toEqual( getFilters( {
+				search: { active: true, text: filters.search, removeUrl: findABarrierResponse }
+			} ) );
+			expect( output.hasFilters ).toEqual( true );
+		} );
+	} );
+
 } );

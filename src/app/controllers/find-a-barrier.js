@@ -8,6 +8,7 @@ const FILTERS = Object.entries( {
 	type: validators.isBarrierType,
 	priority: validators.isBarrierPriority,
 	region: validators.isOverseasRegion,
+	search: ( str ) => !!str.length,
 } );
 
 function getFilters( query ){

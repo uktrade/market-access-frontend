@@ -314,7 +314,16 @@ describe( 'Backend Service', () => {
 
 					const status = '2,5';
 
-					testWithOrdering( { status }, `status=${ status }` );
+					testWithOrdering( { status }, `status=${ encodeURIComponent( status ) }` );
+				} );
+			} );
+
+			describe( 'With a search filter', () => {
+				it( 'Should call the correct path, urlencode the value, use default sort order', async () => {
+
+					const search = 'testing with %';
+
+					testWithOrdering( { search }, `text=${ encodeURIComponent( search ) }` );
 				} );
 			} );
 		} );
@@ -400,7 +409,16 @@ describe( 'Backend Service', () => {
 
 					const status = '2,5';
 
-					testWithOrdering( { status }, `status=${ status }` );
+					testWithOrdering( { status }, `status=${ encodeURIComponent( status ) }` );
+				} );
+			} );
+
+			describe( 'With a search filter', () => {
+				it( 'Should call the correct path, urlencode the value, use default sort order', async () => {
+
+					const search = 'testing with %';
+
+					testWithOrdering( { search }, `text=${ encodeURIComponent( search ) }` );
 				} );
 			} );
 		} );
