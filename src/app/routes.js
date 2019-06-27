@@ -38,7 +38,8 @@ module.exports = function( express, app ){
 	app.use( '/reports/', headerNav( { isReport: true } ), reportRoutes( express, express.Router() ) );
 	app.use( '/barriers/', barrierRoutes( express, express.Router() ) );
 	app.get( '/what-is-a-barrier/', whatIsABarrierController );
-	app.get( '/find-a-barrier/', headerNav( { isFind: true } ), findABarrierController );
+	app.get( '/find-a-barrier/', headerNav( { isFind: true } ), findABarrierController.list );
+	app.get( '/find-a-barrier/download/', findABarrierController.download );
 
 	app.get( '/watch-list/save/', csrfProtection, WatchListController.save);
 	app.post( '/watch-list/save/', parseBody, csrfProtection, WatchListController.save);
