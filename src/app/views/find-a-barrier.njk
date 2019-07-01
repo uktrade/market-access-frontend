@@ -149,7 +149,6 @@
 				<h2 class="filter-results-title">{{ count }}<span class="filter-results-title__caption"> barrier{{ 's' if count != 1 }}</span></h2>
 
 				{%- if hasFilters %}
-					<a class="filter-results-clear-link" href="{{ urls.findABarrier() }}">Remove all filters</a>
 
 					<h3 class="visually-hidden">Active filters:</h3>
 					<ul class="active-filters">
@@ -161,11 +160,12 @@
 						{{ activeFilter( 'Priority', filters.priority ) }}
 					</ul>
 
-					{%- if not editWatchList %}
-						<div class="filter-results-action-buttons">
+					<div class="filter-results-action-buttons{{ ' filter-results-action-buttons--save' if not editWatchList }}">
+						<a class="filter-results-clear-link" href="{{ urls.findABarrier() }}">Remove all filters</a>
+						{%- if not editWatchList %}
 							<a href="{{ urls.watchList.save( queryString ) }}" class="govuk-button govuk-button--watch-list"> Save watch list</a>
-						</div>
-					{% endif %}
+						{% endif %}
+					</div>
 				{% endif %}
 			</div>
 
