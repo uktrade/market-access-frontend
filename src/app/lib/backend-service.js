@@ -302,7 +302,7 @@ module.exports = {
 			eu_exit_related: values.euExitRelated,
 		}),
 		saveProblemStatus: ( req, barrierId, values ) => updateBarrier( getToken( req ), barrierId, {
-			problem_status: values.status
+			problem_status: values.problemStatus
 		} ),
 		saveStatus: ( req, barrierId, values ) => {
 			const status_details = { status_summary: values.statusSummary };

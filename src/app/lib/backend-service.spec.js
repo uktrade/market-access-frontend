@@ -887,14 +887,14 @@ describe( 'Backend Service', () => {
 		describe( 'saveProblemStatus', () => {
 			it( 'Should PUT to the correct path with the correct values', async () => {
 
-				const status = '1';
+				const problemStatus = '1';
 
 				await service.barriers.saveProblemStatus( req, barrierId, {
-					status
+					problemStatus
 				} );
 
 				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
-					problem_status: status
+					problem_status: problemStatus
 				} );
 			} );
 		} );
