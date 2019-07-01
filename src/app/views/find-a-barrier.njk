@@ -25,6 +25,19 @@
 			<h2 class="filter-list-title">Filter barriers by:</h2>
 			<form action="{{ urls.findABarrier() }}" method="GET" class="filter-items">
 
+				{{ govukInput({
+					label: {
+						text: 'Search',
+						classes: 'filter-items__label'
+					},
+					formGroup: {
+						classes: 'filter-items-group'
+					},
+					id: 'search',
+					name: 'search',
+					value: filters.search.text
+				}) }}
+
 				{{ typeahead({
 					id: 'country',
 					name: 'country',
@@ -110,19 +123,6 @@
 					items: filters.priority.items
 				})	}}
 
-				{{ govukInput({
-					label: {
-						text: 'Search',
-						classes: 'filter-items__label'
-					},
-					formGroup: {
-						classes: 'filter-group'
-					},
-					id: 'search',
-					name: 'search',
-					value: filters.search.text
-				}) }}
-
 				{% if hasFilters %}
 				<a class="filter-items__clear" href="{{ urls.findABarrier() }}">Remove all filters</a>
 				{% endif %}
@@ -153,12 +153,12 @@
 
 					<h3 class="visually-hidden">Active filters:</h3>
 					<ul class="active-filters">
+						{{ activeFilter( 'Search', filters.search ) }}
 						{{ activeFilter( 'Barrier location', filters.country ) }}
 						{{ activeFilter( 'Sector', filters.sector ) }}
 						{{ activeFilter( 'Type', filters.type ) }}
-						{{ activeFilter( 'Priority', filters.priority ) }}
 						{{ activeFilter( 'Overseas region', filters.region ) }}
-						{{ activeFilter( 'Search', filters.search ) }}
+						{{ activeFilter( 'Priority', filters.priority ) }}
 					</ul>
 
 					{%- if not editWatchList %}
