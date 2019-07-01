@@ -7,6 +7,8 @@ describe( 'validators', () => {
 	let validators;
 	let metadata;
 	let config;
+	let validCountry = uuid();
+	let validAdminArea = uuid();
 
 	beforeEach( () => {
 
@@ -15,11 +17,12 @@ describe( 'validators', () => {
 				'test-value-1': 'some value',
 				'test-value-2': 'another value'
 			},
-			countries: [ { id: 'abc-123' }, { id: 'def-456' } ],
+			countries: [ { id: validCountry }, { id: uuid() } ],
 			overseasRegions: [ { id: 'ghi-123' }, { id: 'jkl-456' } ],
 			barrierTypes: [ { id: 1 }, { id: 2}, { id: 4 } ],
 			sectors: [ { id: uuid() }, { id: uuid() } ],
 			barrierPriorities: [ { code: 'abc', name: 'test 1' }, { code: 'def', name: 'test 2' } ],
+			adminAreas: [ { id: validAdminArea } ],
 		};
 
 		config = {
@@ -116,7 +119,7 @@ describe( 'validators', () => {
 		describe( 'With a valid country', () => {
 			it( 'Should return true', () => {
 
-				expect( validators.isCountry( 'abc-123' ) ).toEqual( true );
+				expect( validators.isCountry( validCountry ) ).toEqual( true );
 			} );
 		} );
 
@@ -132,7 +135,7 @@ describe( 'validators', () => {
 		describe( 'With a valid admin area', () => {
 			it( 'Should return true', () => {
 
-				expect( validators.isCountryAdminArea( '8ad3f33a-ace8-40ec-bd2c-638fdc3024ea' ) ).toEqual( true );
+				expect( validators.isCountryAdminArea( validAdminArea ) ).toEqual( true );
 			} );
 		} );
 
@@ -143,6 +146,37 @@ describe( 'validators', () => {
 			});
 		});
 	});
+
+	describe( 'isCountryOrAdminArea', () => {
+		describe( 'With a valid country', () => {
+			it( 'Should return true', () => {
+
+				expect( validators.isCountryOrAdminArea( validCountry ) ).toEqual( true );
+			} );
+		} );
+
+		describe( 'With an invalid country', () => {
+			it( 'Should return false', () => {
+
+				expect( validators.isCountryOrAdminArea( 'xyz-123' ) ).toEqual( false );
+			} );
+		} );
+
+		describe( 'With a valid admin area', () => {
+			it( 'Should return true', () => {
+
+				expect( validators.isCountryOrAdminArea( validAdminArea ) ).toEqual( true );
+			} );
+		} );
+
+		describe( 'With an invalid admin area', () => {
+			it( 'Should return false', () => {
+
+				expect( validators.isCountryOrAdminArea( '1234' ) ).toEqual( false );
+			});
+		});
+	} );
+
 	describe( 'isOverseasRegion', () => {
 		describe( 'With a valid overseas region', () => {
 			it( 'Should return true', () => {

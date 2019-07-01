@@ -39,21 +39,43 @@
 
 	display: block;
 	width: 100%;
+	padding-bottom: govuk-em( 10, 16 );
 
 	@include mq( $from: tablet ){
-		display: inline-block;
 		position: absolute;
 		top: 0;
 		right: 0;
 		width: auto;
+		padding-top: govuk-em( 20, 16 );
 	}
 
 	& > * {
 		margin-bottom: 10px;
 	}
 
-	.govuk-button {
-		vertical-align: text-top;
+	.govuk-button--watch-list {
+
+		vertical-align: bottom;
+		margin-top: govuk-em( 10, 16 );
+
+		@include mq( $from: tablet ){
+
+			margin-bottom: 0;
+			margin-left: govuk-em( 15, 16 );
+		}
+	}
+}
+
+.filter-results-action-buttons--save {
+	padding-top: 0;
+}
+
+.filter-results-clear-link {
+	@include mq( $from: tablet ){
+		position: relative;
+		top: govuk-em( 6, 16 );
+		display: inline-block;
+		vertical-align: bottom;
 	}
 }
 

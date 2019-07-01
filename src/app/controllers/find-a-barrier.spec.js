@@ -1,6 +1,4 @@
 const proxyquire = require( 'proxyquire' );
-const uuid = require( 'uuid/v4' );
-const faker = require( 'faker' );
 const EventEmitter = require( 'events' );
 const modulePath = './find-a-barrier';
 
@@ -11,7 +9,8 @@ describe( 'Find a barrier controller', () => {
 	let res;
 	let next;
 	let backend;
-	let validators;
+	let getFromQueryString;
+	let getFromQueryStringResponse;
 	let viewModel;
 
 	const template = 'find-a-barrier';
@@ -32,399 +31,45 @@ describe( 'Find a barrier controller', () => {
 			}
 		};
 		viewModel = jasmine.createSpy( 'view-model' );
-		validators = {
-			isCountryOrAdminArea: jasmine.createSpy( 'validators.isCountryOrAdminArea' ),
-			isOverseasRegion: jasmine.createSpy( 'validators.isOverseasRegion' ),
-			isSector: jasmine.createSpy( 'validators.isSector' ),
-			isBarrierType: jasmine.createSpy( 'validators.isBarrierType' ),
-			isBarrierPriority: jasmine.createSpy( 'validators.isBarrierPriority' ),
-		};
+
+		getFromQueryStringResponse = { queryResponse: 'response text' };
+		getFromQueryString = jasmine.createSpy( 'barrierFilters.getFromQueryString' ).and.callFake( () => getFromQueryStringResponse );
 
 		controller = proxyquire( modulePath, {
 			'../lib/backend-service': backend,
 			'../view-models/find-a-barrier': viewModel,
-			'../lib/validators': validators
+			'../lib/barrier-filters': { getFromQueryString }
 		} );
 	} );
 
 	describe( 'list', () => {
 		describe( 'When the backend call is a success', () => {
-			describe( 'With no filters', () => {
-				it( 'Should render the template without filters', async () => {
+			it( 'Gets the filters from the querystring and renders the template', async () => {
 
-					const viewModelResponse = { a: 1, b: 2 };
-					const data = jasmine.helpers.getFakeData( '/backend/barriers/' );
+				const viewModelResponse = { a: 1, b: 2 };
+				const data = jasmine.helpers.getFakeData( '/backend/barriers/' );
 
-					viewModel.and.callFake( () => viewModelResponse );
+				viewModel.and.callFake( () => viewModelResponse );
 
-					backend.barriers.getAll.and.callFake( () => ({
-						response: { isSuccess: true },
-						body: data
-					}) );
+				backend.barriers.getAll.and.callFake( () => ({
+					response: { isSuccess: true },
+					body: data
+				}) );
 
-					await controller.list( req, res, next );
+				req.query = { filter1: 'true', filter2: 'true' };
 
-					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, {} );
-					expect( res.render ).toHaveBeenCalledWith( template, viewModelResponse );
-					expect( next ).not.toHaveBeenCalled();
-				} );
-			} );
+				await controller.list( req, res, next );
 
-			describe( 'With a country filter', () => {
-
-				let country;
-				let viewModelResponse;
-
-				beforeEach( () => {
-
-					country = uuid();
-					req.query.country = country;
-					viewModelResponse = { a: 1, b: 2 };
-
-					viewModel.and.callFake( () => viewModelResponse );
-
-					backend.barriers.getAll.and.callFake( () => ({
-						response: { isSuccess: true },
-						body: jasmine.helpers.getFakeData( '/backend/barriers/' )
-					}) );
-				} );
-
-				afterEach( () => {
-
-					expect( res.render ).toHaveBeenCalledWith( template, viewModelResponse );
-					expect( next ).not.toHaveBeenCalled();
-				} );
-
-				describe( 'When the country is valid', () => {
-					it( 'Should render the template with a filter', async () => {
-
-						validators.isCountryOrAdminArea.and.callFake( () => true );
-
-						await controller.list( req, res, next );
-
-						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { country: [ country ] } );
-					} );
-				} );
-
-				describe( 'When the country is NOT valid', () => {
-					it( 'Should render the template without filters', async () => {
-
-						validators.isCountryOrAdminArea.and.callFake( () => false );
-
-						await controller.list( req, res, next );
-
-						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, {} );
-					} );
-				} );
-			} );
-
-			describe( 'With an overseas region filter', () => {
-
-				let region;
-				let viewModelResponse;
-
-				beforeEach( () => {
-
-					region = uuid();
-					req.query.region = region;
-					viewModelResponse = { a: 1, b: 2 };
-
-					viewModel.and.callFake( () => viewModelResponse );
-
-					backend.barriers.getAll.and.callFake( () => ({
-						response: { isSuccess: true },
-						body: jasmine.helpers.getFakeData( '/backend/barriers/' )
-					}) );
-				} );
-
-				afterEach( () => {
-
-					expect( res.render ).toHaveBeenCalledWith( template, viewModelResponse );
-					expect( next ).not.toHaveBeenCalled();
-				} );
-
-				describe( 'When the region is valid', () => {
-					it( 'Should render the template with a filter', async () => {
-
-						validators.isOverseasRegion.and.callFake( () => true );
-
-						await controller.list( req, res, next );
-
-						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { region: [ region ] } );
-					} );
-				} );
-
-				describe( 'When the region is NOT valid', () => {
-					it( 'Should render the template without filters', async () => {
-
-						validators.isOverseasRegion.and.callFake( () => false );
-
-						await controller.list( req, res, next );
-
-						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, {} );
-					} );
-				} );
-			} );
-
-			describe( 'With a sector filter', () => {
-
-				let sector;
-				let viewModelResponse;
-
-				beforeEach( () => {
-
-					sector = uuid();
-					req.query.sector = sector;
-					viewModelResponse = { a: 1, b: 2 };
-
-					viewModel.and.callFake( () => viewModelResponse );
-
-					backend.barriers.getAll.and.callFake( () => ({
-						response: { isSuccess: true },
-						body: jasmine.helpers.getFakeData( '/backend/barriers/' )
-					}) );
-				} );
-
-				afterEach( () => {
-
-					expect( res.render ).toHaveBeenCalledWith( template, viewModelResponse );
-					expect( next ).not.toHaveBeenCalled();
-				} );
-
-				describe( 'When the sector is valid', () => {
-					it( 'Should render the template with a filter', async () => {
-
-						validators.isSector.and.callFake( () => true );
-
-						await controller.list( req, res, next );
-
-						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { sector: [ sector ] } );
-					} );
-				} );
-
-				describe( 'When the sector is NOT valid', () => {
-					it( 'Should render the template without filters', async () => {
-
-						validators.isSector.and.callFake( () => false );
-
-						await controller.list( req, res, next );
-
-						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, {} );
-					} );
-				} );
-			} );
-
-			describe( 'With a type filter', () => {
-
-				let type;
-				let viewModelResponse;
-
-				beforeEach( () => {
-
-					type = faker.lorem.word().toUpperCase();
-					req.query.type = type;
-					viewModelResponse = { a: 1, b: 2 };
-
-					viewModel.and.callFake( () => viewModelResponse );
-
-					backend.barriers.getAll.and.callFake( () => ({
-						response: { isSuccess: true },
-						body: jasmine.helpers.getFakeData( '/backend/barriers/' )
-					}) );
-				} );
-
-				afterEach( () => {
-
-					expect( res.render ).toHaveBeenCalledWith( template, viewModelResponse );
-					expect( next ).not.toHaveBeenCalled();
-				} );
-
-				describe( 'When the type is valid', () => {
-					it( 'Should render the template with a filter', async () => {
-
-						validators.isBarrierType.and.callFake( () => true );
-
-						await controller.list( req, res, next );
-
-						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { type: [ type ] } );
-					} );
-				} );
-
-				describe( 'When the type is NOT valid', () => {
-					it( 'Should render the template without filters', async () => {
-
-						validators.isBarrierType.and.callFake( () => false );
-
-						await controller.list( req, res, next );
-
-						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, {} );
-					} );
-				} );
-			} );
-
-			describe( 'With a priority filter', () => {
-
-				let priority;
-				let viewModelResponse;
-
-				beforeEach( () => {
-
-					viewModelResponse = { a: 1, b: 2 };
-
-					viewModel.and.callFake( () => viewModelResponse );
-
-					backend.barriers.getAll.and.callFake( () => ({
-						response: { isSuccess: true },
-						body: jasmine.helpers.getFakeData( '/backend/barriers/' )
-					}) );
-				} );
-
-				afterEach( () => {
-
-					expect( res.render ).toHaveBeenCalledWith( template, viewModelResponse );
-					expect( next ).not.toHaveBeenCalled();
-				} );
-
-				describe( 'A single value', () => {
-
-					beforeEach( () => {
-
-						priority = faker.lorem.word().toUpperCase();
-						req.query.priority = priority;
-					} );
-
-					describe( 'When the priority is valid', () => {
-						it( 'Should render the template with a filter', async () => {
-
-							validators.isBarrierPriority.and.callFake( () => true );
-
-							await controller.list( req, res, next );
-
-							expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { priority: [ priority ] } );
-						} );
-					} );
-
-					describe( 'When the priority is NOT valid', () => {
-						it( 'Should render the template without filters', async () => {
-
-							validators.isBarrierPriority.and.callFake( () => false );
-
-							await controller.list( req, res, next );
-
-							expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, {} );
-						} );
-					} );
-				} );
-
-				describe( 'Multiple values', () => {
-					describe( 'As an array', () => {
-
-						beforeEach( () => {
-							priority = [ 'ABC', 'DEF' ];
-							req.query.priority = priority;
-						} );
-
-						describe( 'When all priorities are valid', () => {
-							it( 'Should render the template with a filter', async () => {
-
-								validators.isBarrierPriority.and.callFake( () => true );
-
-								await controller.list( req, res, next );
-
-								expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { priority } );
-							} );
-						} );
-
-						describe( 'When all priorities are NOT valid', () => {
-							it( 'Should render the template without filters', async () => {
-
-								validators.isBarrierPriority.and.callFake( () => false );
-
-								await controller.list( req, res, next );
-
-								expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, {} );
-							} );
-						} );
-
-						describe( 'When one priority is valid and one is not', () => {
-							it( 'Should render the template with a filter', async () => {
-
-								const validPriorities = priority;
-								const invalidPriority = 'GHI';
-
-								req.query.priority = validPriorities.concat( [ invalidPriority ] );
-
-								validators.isBarrierPriority.and.callFake( ( value ) => {
-
-									if( validPriorities.includes( value ) ){ return true; }
-
-									return false;
-								} );
-
-								await controller.list( req, res, next );
-
-								expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { priority: validPriorities } );
-							} );
-						} );
-					} );
-
-					describe( 'As a csv', () => {
-
-						beforeEach( () => {
-							priority = [ 'ABC', 'DEF' ];
-							req.query.priority = priority.join( ',' );
-						} );
-
-						describe( 'When all priorities are valid', () => {
-							it( 'Should render the template with a filter', async () => {
-
-								validators.isBarrierPriority.and.callFake( () => true );
-
-								await controller.list( req, res, next );
-
-								expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { priority } );
-							} );
-						} );
-
-						describe( 'When all priorities are NOT valid', () => {
-							it( 'Should render the template without filters', async () => {
-
-								validators.isBarrierPriority.and.callFake( () => false );
-
-								await controller.list( req, res, next );
-
-								expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, {} );
-							} );
-						} );
-
-						describe( 'When one priority is valid and one is not', () => {
-							it( 'Should render the template with a filter', async () => {
-
-								const validPriorities = priority;
-								const invalidPriority = faker.lorem.word().toUpperCase();
-
-								req.query.priority = validPriorities.concat( [ invalidPriority ] ).join( ',' );
-
-								validators.isBarrierPriority.and.callFake( ( value ) => {
-
-									if( validPriorities.includes( value ) ){ return true; }
-
-									return false;
-								} );
-
-								await controller.list( req, res, next );
-
-								expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { priority: validPriorities } );
-							} );
-						} );
-					} );
-				} );
+				expect( getFromQueryString ).toHaveBeenCalledWith( req.query );
+				expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, getFromQueryStringResponse );
+				expect( res.render ).toHaveBeenCalledWith( template, viewModelResponse );
+				expect( next ).not.toHaveBeenCalled();
 			} );
 		} );
 
 		describe( 'When the backend call is not a success', () => {
 			describe( 'When it is a 500', () => {
-				it( 'Should call next with an error', async () => {
+				it( 'Calls next with an error', async () => {
 
 					const statusCode = 500;
 
