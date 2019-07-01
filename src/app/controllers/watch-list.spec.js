@@ -11,10 +11,13 @@ let getTemplateValuesResponse;
 let backend;
 let urls;
 let metadata;
-let validators;
+let getFromQueryString;
+let getFromQueryStringResponse;
 let Form;
 let form;
 let watchList;
+let strings;
+let filterList;
 
 describe( 'Watch list controller', () => {
 
@@ -38,16 +41,12 @@ describe( 'Watch list controller', () => {
 			getOverseasRegion: jasmine.createSpy( 'validators.getOverseasRegion' ),
 		};
 
-		validators = {
-			isCountryOrAdminArea: jasmine.createSpy( 'validators.isCountryOrAdminArea' ),
-			isOverseasRegion: jasmine.createSpy( 'validators.isOverseasRegion' ),
-			isSector: jasmine.createSpy( 'validators.isSector' ),
-			isBarrierType: jasmine.createSpy( 'validators.isBarrierType' ),
-			isBarrierPriority: jasmine.createSpy( 'validators.isBarrierPriority' ),
-		};
-
+		strings = jasmine.helpers.mocks.strings();
 		getValuesResponse = { name: 'Test name' };
 		getTemplateValuesResponse = { c: 3, d: 4 };
+		getFromQueryStringResponse = { country: [ 'a' ], sector: [ 'b' ] };
+		filterList = Object.entries( { country: 'locations', sector: 'sectors' } ).map( ( [ key, value ] ) => ({ key, value: strings[ value ].response }) ),
+
 		form = {
 			validate: jasmine.createSpy( 'form.validate' ),
 			getValues: jasmine.createSpy( 'form.getValues' ).and.callFake( () => getValuesResponse ),
@@ -55,13 +54,15 @@ describe( 'Watch list controller', () => {
 		};
 
 		Form = jasmine.createSpy( 'Form' ).and.callFake( () => form );
+		getFromQueryString = jasmine.createSpy().and.callFake( () => getFromQueryStringResponse );
 
 		controller = proxyquire( modulePath, {
 			'../lib/metadata': metadata,
-			'../lib/validators': validators,
+			'../lib/barrier-filters': { getFromQueryString },
 			'../lib/Form': Form,
 			'../lib/backend-service': backend,
 			'../lib/urls': urls,
+			'../lib/strings': strings,
 		} );
 	} );
 
@@ -93,10 +94,10 @@ describe( 'Watch list controller', () => {
 
 						expect( res.render ).toHaveBeenCalledWith( 'watch-list/save', {
 							...getTemplateValuesResponse,
-							filters: {},
+							filters: getFromQueryStringResponse,
 							isRename: true,
 							queryString: { rename: 'true' },
-							filterList: [],
+							filterList,
 							csrfToken,
 							showWarning: false,
 						} );
@@ -110,10 +111,10 @@ describe( 'Watch list controller', () => {
 
 						expect( res.render ).toHaveBeenCalledWith( 'watch-list/save', {
 							...getTemplateValuesResponse,
-							filters: {},
+							filters: getFromQueryStringResponse,
 							isRename: false,
 							queryString: {},
-							filterList: [],
+							filterList,
 							csrfToken,
 							showWarning: true,
 						} );
@@ -131,10 +132,10 @@ describe( 'Watch list controller', () => {
 
 						expect( res.render ).toHaveBeenCalledWith( 'watch-list/save', {
 							...getTemplateValuesResponse,
-							filters: {},
+							filters: getFromQueryStringResponse,
 							isRename: true,
 							queryString: { rename: 'true' },
-							filterList: [],
+							filterList,
 							csrfToken,
 							showWarning: false,
 						} );
@@ -148,10 +149,10 @@ describe( 'Watch list controller', () => {
 
 						expect( res.render ).toHaveBeenCalledWith( 'watch-list/save', {
 							...getTemplateValuesResponse,
-							filters: {},
+							filters: getFromQueryStringResponse,
 							isRename: false,
 							queryString: {},
-							filterList: [],
+							filterList,
 							csrfToken,
 							showWarning: false,
 						} );
@@ -175,10 +176,10 @@ describe( 'Watch list controller', () => {
 
 					expect( res.render ).toHaveBeenCalledWith( 'watch-list/save', {
 						...getTemplateValuesResponse,
-						filters: {},
+						filters: getFromQueryStringResponse,
 						isRename: false,
 						queryString: {},
-						filterList: [],
+						filterList,
 						csrfToken,
 						showWarning: false,
 					} );
@@ -208,7 +209,7 @@ describe( 'Watch list controller', () => {
 
 							expect( backend.watchList.save ).toHaveBeenCalledWith(
 									req,
-									{ watchList: { name: 'Test name', filters: {} } }
+									{ watchList: { name: 'Test name', filters: getFromQueryStringResponse } }
 							);
 							expect( req.session.user ).not.toBeDefined();
 							expect( res.redirect ).toHaveBeenCalledWith( indexResponse );

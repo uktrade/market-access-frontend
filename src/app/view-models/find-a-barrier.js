@@ -119,6 +119,11 @@ module.exports = function( { count, barriers, filters, queryString, editWatchLis
 				text: strings.priorities( filters.priority ),
 				removeUrl: getRemoveUrl( filters, 'priority' ),
 			},
+			search: {
+				active: !!filters.search,
+				text: filters.search,
+				removeUrl: getRemoveUrl( filters, 'search' ),
+			}
 		}
 	};
 };

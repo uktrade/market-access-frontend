@@ -1,4 +1,4 @@
-{% from 'components/select/macro.njk' import govukSelect %}
+{% from 'components/input/macro.njk' import govukInput %}
 {% from 'app-components/heading.njk' import heading %}
 {% from 'app-components/checkbox-filter.njk' import checkboxFilter %}
 {% from 'app-components/typeahead.njk' import typeahead %}
@@ -25,19 +25,18 @@
 			<h2 class="filter-list-title">Filter barriers by:</h2>
 			<form action="{{ urls.findABarrier() }}" method="GET" class="filter-items">
 
-				{# govukSelect({
-					id: 'country',
-					name: 'country',
-					classes: 'govuk-!-width-full js-filter',
+				{{ govukInput({
+					label: {
+						text: 'Search',
+						classes: 'filter-items__label'
+					},
 					formGroup: {
 						classes: 'filter-items-group'
 					},
-					label: {
-						text: 'Barrier location',
-						classes: 'filter-items__label'
-					},
-					items: filters.country.items
-				}) #}
+					id: 'search',
+					name: 'search',
+					value: filters.search.text
+				}) }}
 
 				{{ typeahead({
 					id: 'country',
@@ -150,22 +149,23 @@
 				<h2 class="filter-results-title">{{ count }}<span class="filter-results-title__caption"> barrier{{ 's' if count != 1 }}</span></h2>
 
 				{%- if hasFilters %}
-					<a class="filter-results-clear-link" href="{{ urls.findABarrier() }}">Remove all filters</a>
 
 					<h3 class="visually-hidden">Active filters:</h3>
 					<ul class="active-filters">
+						{{ activeFilter( 'Search', filters.search ) }}
 						{{ activeFilter( 'Barrier location', filters.country ) }}
 						{{ activeFilter( 'Sector', filters.sector ) }}
 						{{ activeFilter( 'Type', filters.type ) }}
-						{{ activeFilter( 'Priority', filters.priority ) }}
 						{{ activeFilter( 'Overseas region', filters.region ) }}
+						{{ activeFilter( 'Priority', filters.priority ) }}
 					</ul>
 
-					{%- if not editWatchList %}
-						<div class="filter-results-action-buttons">
+					<div class="filter-results-action-buttons{{ ' filter-results-action-buttons--save' if not editWatchList }}">
+						<a class="filter-results-clear-link" href="{{ urls.findABarrier() }}">Remove all filters</a>
+						{%- if not editWatchList %}
 							<a href="{{ urls.watchList.save( queryString ) }}" class="govuk-button govuk-button--watch-list"> Save watch list</a>
-						</div>
-					{% endif %}
+						{% endif %}
+					</div>
 				{% endif %}
 			</div>
 
