@@ -18,23 +18,9 @@ module.exports = async ( req, res, next ) => {
 					user.permitted_applications = [
 						{
 							'key': 'datahub-crm',
-							'url': '',
-							'name': ''
-						},
-						{
-							'key': 'datahub-mi',
-							'url': '',
-							'name': ''
 						},
 						{
 							'key': 'market-access',
-							'url': '',
-							'name': ''
-						},
-						{
-							'key': 'find-exporters',
-							'url': '',
-							'name': ''
 						}
 					];
 				}
