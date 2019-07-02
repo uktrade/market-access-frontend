@@ -9,7 +9,7 @@ let csrfToken;
 let backend;
 let ssoToken;
 let dashboardViewModel;
-let watchList;
+let barrierFilters;
 let urls;
 let metadata;
 
@@ -21,7 +21,7 @@ describe( 'Index controller', () => {
 	beforeEach( () => {
 
 		ssoToken = 'abc-123';
-		watchList = {
+		barrierFilters = {
 			transformFilterValue: jasmine.createSpy( 'watchList.transformFilterValue' )
 		};
 
@@ -61,7 +61,7 @@ describe( 'Index controller', () => {
 			'../lib/urls': urls,
 			'../view-models/dashboard': dashboardViewModel,
 			'../lib/metadata': metadata,
-			'./watch-list': watchList
+			'../lib/barrier-filters': barrierFilters,
 		} );
 	} );
 
@@ -85,6 +85,7 @@ describe( 'Index controller', () => {
 		describe( 'When there is a watch list', () => {
 
 			beforeEach(() => {
+
 				req.user.user_profile = {
 					watchList: {
 						name: 'hello1',
@@ -93,11 +94,13 @@ describe( 'Index controller', () => {
 						}
 					}
 				};
-				watchList.transformFilterValue.and.callFake( () => 'Country 1' );
+
+				barrierFilters.transformFilterValue.and.callFake( () => 'Country 1' );
 			});
 
 			describe( 'Without an error', () => {
 				describe( 'With a success response', () => {
+
 					let barriersResponse;
 					let dashboardViewModelResponse;
 
@@ -129,10 +132,10 @@ describe( 'Index controller', () => {
 							expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { country: '1234' }, 'modified_on', 'desc' );
 							expect( dashboardViewModel ).toHaveBeenCalledWith(
 								barriersResponse.body.results,
-								{ ...sortData, currentSort: defaultCurrentSort},
+								{ ...sortData, currentSort: defaultCurrentSort },
 								true,
-								[{key: 'country', value: 'Country 1' }],
-								{ country: '1234'},
+								[ { key: 'country', value: 'Country 1' } ],
+								{ country: '1234' },
 							);
 						} );
 					} );

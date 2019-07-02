@@ -1,4 +1,5 @@
 const proxyquire = require( 'proxyquire' );
+const uuid = require( 'uuid/v4' );
 const modulePath = './watch-list';
 
 let controller;
@@ -16,7 +17,8 @@ let getFromQueryStringResponse;
 let Form;
 let form;
 let watchList;
-let strings;
+let transformFilterValue;
+let transformFilterValueResponse;
 let filterList;
 
 describe( 'Watch list controller', () => {
@@ -41,11 +43,11 @@ describe( 'Watch list controller', () => {
 			getOverseasRegion: jasmine.createSpy( 'validators.getOverseasRegion' ),
 		};
 
-		strings = jasmine.helpers.mocks.strings();
 		getValuesResponse = { name: 'Test name' };
 		getTemplateValuesResponse = { c: 3, d: 4 };
 		getFromQueryStringResponse = { country: [ 'a' ], sector: [ 'b' ] };
-		filterList = Object.entries( { country: 'locations', sector: 'sectors' } ).map( ( [ key, value ] ) => ({ key, value: strings[ value ].response }) ),
+		transformFilterValueResponse = uuid();
+		filterList = Object.entries( { country: 'locations', sector: 'sectors' } ).map( ( [ key ] ) => ({ key, value: transformFilterValueResponse }) ),
 
 		form = {
 			validate: jasmine.createSpy( 'form.validate' ),
@@ -55,14 +57,14 @@ describe( 'Watch list controller', () => {
 
 		Form = jasmine.createSpy( 'Form' ).and.callFake( () => form );
 		getFromQueryString = jasmine.createSpy().and.callFake( () => getFromQueryStringResponse );
+		transformFilterValue = jasmine.createSpy( 'barrierFilters.transformFilterValue' ).and.callFake( () => transformFilterValueResponse );
 
 		controller = proxyquire( modulePath, {
 			'../lib/metadata': metadata,
-			'../lib/barrier-filters': { getFromQueryString },
+			'../lib/barrier-filters': { getFromQueryString, transformFilterValue },
 			'../lib/Form': Form,
 			'../lib/backend-service': backend,
 			'../lib/urls': urls,
-			'../lib/strings': strings,
 		} );
 	} );
 

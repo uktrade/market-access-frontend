@@ -1,7 +1,7 @@
 const urls = require( '../lib/urls' );
 const backend = require( '../lib/backend-service' );
 const dashboardViewModel = require( '../view-models/dashboard' );
-const transformFilterValue = require('./watch-list').transformFilterValue;
+const { transformFilterValue } = require( '../lib/barrier-filters' );
 
 const sortData = {
 	fields: [ 'priority', 'date', 'location', 'status', 'updated' ],
