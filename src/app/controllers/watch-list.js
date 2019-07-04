@@ -1,5 +1,4 @@
 const urls = require( '../lib/urls' );
-const backend = require( '../lib/backend-service' );
 const Form = require( '../lib/Form' );
 const barrierFilters = require( '../lib/barrier-filters' );
 
@@ -9,13 +8,14 @@ module.exports = {
 
 		const filters = barrierFilters.getFromQueryString( req.query );
 		const isRename = ( req.query.rename === 'true' );
-		const userProfile = req.user.user_profile || {};
+		const currentWatchListIndex = 0;
+		const currentWatchList = req.watchList.lists[ currentWatchListIndex ];
 		const filterList = Object.entries( filters ).map( ( [ key, value ] ) => ({ key, value: barrierFilters.transformFilterValue( key, value ) }) );
 
 		const form = new Form( req, {
 			name: {
 				required: 'Enter a name for your watch list',
-				values: [ userProfile.watchList ? userProfile.watchList.name : null ],
+				values: [ currentWatchList ? currentWatchList.name : null ],
 			}
 		} );
 
@@ -25,26 +25,18 @@ module.exports = {
 
 			if( !form.hasErrors() ){
 
-				const watchList = {
-					name: form.getValues().name,
-					filters
-				};
-
-				userProfile.watchList = watchList;
-
 				try {
 
-					const { response } = await backend.watchList.save( req, userProfile );
+					if( req.watchList.lists.length ){
 
-					if( response.isSuccess ){
-
-						delete req.session.user;
-						return res.redirect( urls.index() );
+						await req.watchList.update( currentWatchListIndex, form.getValues().name, filters );
 
 					} else {
 
-						next( new Error( `Unable to save watch list, got ${ response.statusCode } response code` ) );
+						await req.watchList.add( form.getValues().name, filters );
 					}
+					delete req.session.user;
+					return res.redirect( urls.index() );
 
 				} catch( e ){
 
@@ -60,29 +52,20 @@ module.exports = {
 				queryString: req.query,
 				filterList,
 				csrfToken: req.csrfToken(),
-				showWarning: ( isRename ? false : !!userProfile.watchList ),
+				showWarning: ( isRename ? false : !!currentWatchList ),
 			}
 		);
 	},
 
 	remove: async ( req, res, next ) => {
 
-		const userProfile = req.user.user_profile;
-		userProfile.watchList = null;
-
 		try {
 
-			const { response } = await backend.watchList.save( req, userProfile );
+			const currentWatchListIndex = 0;
+			await req.watchList.remove( currentWatchListIndex );
+			delete req.session.user;
 
-			if( response.isSuccess ){
-
-				delete req.session.user;
-				return res.redirect( urls.index() );
-
-			} else {
-
-				next( new Error( `Unable to get user info, got ${ response.statusCode } response code` ) );
-			}
+			return res.redirect( urls.index() );
 
 		} catch( e ){
 

@@ -2,14 +2,14 @@ const urls = require( '../lib/urls' );
 
 module.exports = ( req, res, next ) => {
 
-	const userProfile = req.user.user_profile || {};
+	const watchLists = req.watchList.lists;
 	const pathname = req.originalUrl.split( '?' ).shift();
 
 	let tabs = [];
 
 	tabs = [
 		{
-			text: userProfile.watchList ? userProfile.watchList.name : 'My watch list',
+			text: watchLists.length ? watchLists[ 0 ].name : 'My watch list',
 			href: urls.index(),
 			isCurrent: pathname === urls.index(),
 		},

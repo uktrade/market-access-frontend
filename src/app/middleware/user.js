@@ -1,5 +1,26 @@
-const config = require( '../config' );
 const backend = require( '../lib/backend-service' );
+const UserWatchList = require( '../lib/user-watch-list' );
+
+async function getUser( req ){
+
+	try {
+
+		const { response, body } = await backend.getUser( req );
+
+		if( response.isSuccess ){
+
+			req.session.user = body;
+
+		} else {
+
+			throw new Error( `Unable to get user info, got ${ response.statusCode } response code` );
+		}
+
+	} catch( e ){
+
+		throw e;
+	}
+}
 
 module.exports = async ( req, res, next ) => {
 
@@ -7,38 +28,30 @@ module.exports = async ( req, res, next ) => {
 
 		try {
 
-			const { response, body } = ( await backend.getUser( req ) );
+			await getUser( req, next );
 
-			if( response.isSuccess ){
-
-				const user = body;
-
-				if( config.sso.bypass ){
-
-					user.permitted_applications = [
-						{
-							'key': 'datahub-crm',
-						},
-						{
-							'key': 'market-access',
-						}
-					];
-				}
-
-				req.session.user = user;
-
-			} else {
-
-				next( new Error( `Unable to get user info, got ${ response.statusCode } response code` ) );
-			}
-
-		} catch( e ){
+		} catch( e ) {
 
 			return next( e );
 		}
 	}
 
+	try {
+
+		const updated = await UserWatchList.migrateAndSave( req );
+
+		if( updated ){
+
+			await getUser( req, next );
+		}
+
+	} catch( e ){
+
+		return next( e );
+	}
+
 	req.user = req.session.user;
+	req.watchList = new UserWatchList( req );
 	res.locals.user = req.session.user;
 	next();
 };

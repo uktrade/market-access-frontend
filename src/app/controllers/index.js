@@ -29,19 +29,20 @@ module.exports = {
 	index: async ( req, res, next ) => {
 
 		const currentSort = getCurrentSort( req.query );
-		const userProfile = req.user.user_profile || {};
 
-		if( !userProfile.watchList ){
+		if( !req.watchList.lists.length ){
 
 			res.render( 'index' );
 
 		} else {
 
-			const watchListFilters = Object.entries( userProfile.watchList.filters ).map( ( [ key, value ] ) => ({ key, value: transformFilterValue( key, value ) }) );
+			const watchListIndex = 0;
+			const currentWatchList = req.watchList.lists[ watchListIndex ];
+			const watchListFilters = Object.entries( currentWatchList.filters ).map( ( [ key, value ] ) => ({ key, value: transformFilterValue( key, value ) }) );
 
 			try {
 
-				const { response, body } = await backend.barriers.getAll( req, userProfile.watchList.filters, currentSort.serviceParam, currentSort.direction );
+				const { response, body } = await backend.barriers.getAll( req, currentWatchList.filters, currentSort.serviceParam, currentSort.direction );
 
 				if( response.isSuccess ){
 
@@ -50,7 +51,7 @@ module.exports = {
 						{ ...sortData, currentSort },
 						true,
 						watchListFilters,
-						userProfile.watchList.filters,
+						currentWatchList.filters,
 					));
 
 				} else {

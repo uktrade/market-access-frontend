@@ -33,6 +33,12 @@ if( typeof jasmine !== 'undefined' ){
 			session: {},
 			params: {},
 			user: {},
+			watchList: {
+				get: jasmine.createSpy( 'req.watchList.get' ),
+				add: jasmine.createSpy( 'req.watchList.add' ),
+				update: jasmine.createSpy( 'req.watchList.update' ),
+				remove: jasmine.createSpy( 'req.watchList.remove' ),
+			},
 			body: {},
 			error: jasmine.createSpy( 'req.error' ),
 			hasErrors: jasmine.createSpy( 'req.hasErrors' ),
