@@ -1,4 +1,5 @@
 const urls = require( '../lib/urls' );
+const config = require( '../config' );
 
 module.exports = ( req, res, next ) => {
 
@@ -20,7 +21,10 @@ module.exports = ( req, res, next ) => {
 		}
 	];
 
-	res.locals.dashboardTabs = tabs;
+	res.locals.dashboardData = {
+		tabs,
+		canAddWatchList: ( watchLists.length <= config.maxWatchLists ),
+	};
 
 	next();
 };
