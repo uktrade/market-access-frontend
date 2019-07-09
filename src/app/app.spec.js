@@ -134,7 +134,17 @@ describe( 'App', function(){
 		intercept.backend()
 			.persist()
 			.get( '/whoami' )
-			.reply( 200, {} );
+			.reply( 200, {
+				user_profile: {
+					watchList: {
+						version: 2,
+						lists: [{
+							name: 'test',
+							filters: { country: [ uuid() ] },
+						}]
+					}
+				}
+			} );
 	} );
 
 	afterEach( () => {
@@ -211,6 +221,39 @@ describe( 'App', function(){
 				app
 					.get( urls.findABarrier() )
 					.end( checkPage( 'Market Access - Find a barrier', done ) );
+			} );
+		} );
+
+		describe( 'Watch list page', function(){
+			describe( 'Save', () => {
+				it( 'Should render the page', function( done ){
+
+					app
+						.get( urls.watchList.save() )
+						.end( checkPage( 'Market Access - Save watch list', done ) );
+				} );
+			} );
+
+			describe( 'Rename', () => {
+				it( 'Should render the page', function( done ){
+
+					app
+						.get( urls.watchList.rename( 0 ) )
+						.end( checkPage( 'Market Access - Rename watch list', done ) );
+				} );
+			} );
+
+			describe( 'Remove', () => {
+				it( 'Should delete the wathch list and redirect', function( done ){
+
+					intercept.backend()
+						.patch( '/whoami' )
+						.reply( 200, {} );
+
+					app
+						.get( urls.watchList.remove( 0 ) )
+						.end( checkRedirect( urls.index(), done ) );
+				} );
 			} );
 		} );
 

@@ -1,0 +1,95 @@
+{% from 'components/input/macro.njk' import govukInput %}
+{% from 'components/radios/macro.njk' import govukRadios %}
+{% from "components/warning-text/macro.njk" import govukWarningText %}
+{% from 'app-components/heading.njk' import heading %}
+{% from 'app-components/details-list.njk' import detailsList %}
+{% from 'app-components/callout.njk' import callout %}
+
+{% extends 'layout.njk' %}
+
+{% set title %}{{ 'Rename' if isRename else ( 'Edit' if isEdit else 'Save' ) }} watch list{% endset%}
+
+{% block page_title %}{{ super() }} - {{ title }}{% endblock %}
+
+{% block body_script %}
+	<script>
+		ma.pages.watchList();
+	</script>
+{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: ( urls.index( watchListIndex ) if isRename else urls.findABarrier( filters ) ) },
+		text: title,
+		errors: errors
+	}) }}
+
+	<section class="restrict-width">
+
+		{{ detailsList( filterList ) }}
+
+		<form action="{{ urls.watchList.rename( watchListIndex ) if isRename else urls.watchList.save( queryString ) }}" method="POST">
+			<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+			{{ govukInput( {
+
+				label: {
+					text: 'Name your watch list',
+					classes: 'govuk-label--s'
+				},
+				id: 'name',
+				name: 'name',
+				value: name,
+				errorMessage: errors | errorForName( 'name' )
+			} ) }}
+
+			{% if canReplace %}
+
+				{% set replaceRadiosHtml %}
+					{{
+						govukRadios({
+							idPrefix: 'replace-index',
+							name: 'replaceIndex',
+							fieldset: {
+								legend: {
+									text: 'Which list would you like to replace?',
+									classes: 'govuk-fieldset__legend--s'
+								}
+							},
+							items: replaceIndex,
+							errorMessage: errors | errorForName( 'replace-index-1' )
+						})
+					}}
+				{% endset %}
+
+				{% if hasToReplace %}
+					{{ replaceRadiosHtml | safe }}
+				{% else %}
+					{{
+						govukRadios({
+							idPrefix: 'replace-or-new',
+							name: 'replaceOrNew',
+							classes: 'replace-or-new',
+							fieldset: {
+								legend: {
+									text: 'Replace current list or create new?',
+									classes: 'govuk-fieldset__legend--s'
+								}
+							},
+							items: replaceOrNew | addToRadio( {
+								'replace': { conditional: { html: replaceRadiosHtml } }
+							} ),
+							errorMessage: errors | errorForName( 'replace-or-new-1' )
+						})
+					}}
+				{% endif %}
+			{% endif %}
+
+			<input type="submit" value="Save" class="govuk-button">
+			<a href="{{ ( urls.index( watchListIndex ) if isRename else urls.findABarrier( filters ) ) }}" class="govuk-button button--secondary">Cancel</a>
+		</form>
+
+	</section>
+
+{% endblock %}

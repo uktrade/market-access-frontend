@@ -50,6 +50,20 @@ module.exports = {
 		}
 
 		return filters;
-	}
+	},
+
+	areEqual: ( list1, list2 ) => {
+
+		const values1 = [];
+		const values2 = [];
+
+		FILTERS.forEach( ( [ key ] ) => {
+
+			values1.push( list1[ key ] );
+			values2.push( list2[ key ] );
+		} );
+
+		return JSON.stringify( values1 ) === JSON.stringify( values2 );
+	},
 };
 

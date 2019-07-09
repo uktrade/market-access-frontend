@@ -36,7 +36,7 @@ function getRemoveUrl( filters, key ){
 //const isSelected = createMatcher( 'selected' );
 const isChecked = createMatcher( 'checked' );
 
-module.exports = function( { count, barriers, filters, queryString, editWatchList } ){
+module.exports = function( { count, barriers, filters, queryString, isEdit, editListIndex, filtersMatchEditList } ){
 
 	const barrierList = [];
 
@@ -80,13 +80,16 @@ module.exports = function( { count, barriers, filters, queryString, editWatchLis
 		}
 	} );
 
+	const hasFilters = !!Object.keys( filters ).length;
 
 	return {
 		count,
 		barriers: barrierList,
-		hasFilters: !!Object.keys( filters ).length,
+		hasFilters,
 		queryString,
-		editWatchList,
+		showSaveButton: ( isEdit ? !filtersMatchEditList : hasFilters ),
+		isEdit,
+		editListIndex,
 		filterParams: filters,
 		filters: {
 			country: {

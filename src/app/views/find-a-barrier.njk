@@ -25,6 +25,10 @@
 			<h2 class="filter-list-title">Filter barriers by:</h2>
 			<form action="{{ urls.findABarrier() }}" method="GET" class="filter-items">
 
+				{% if isEdit %}
+				<input type="hidden" name="editList" value="{{ editListIndex }}">
+				{% endif %}
+
 				{{ govukInput({
 					label: {
 						text: 'Search',
@@ -162,8 +166,8 @@
 
 					<div class="filter-results-action-buttons{{ ' filter-results-action-buttons--save' if not editWatchList }}">
 						<a class="filter-results-clear-link" href="{{ urls.findABarrier() }}">Remove all filters</a>
-						{%- if not editWatchList %}
-							<a href="{{ urls.watchList.save( queryString ) }}" class="govuk-button govuk-button--watch-list"> Save watch list</a>
+						{%- if showSaveButton %}
+							<a href="{{ urls.watchList.save( queryString ) }}" class="govuk-button govuk-button--watch-list">{{ 'Edit' if isEdit else 'Save' }} watch list</a>
 						{% endif %}
 					</div>
 				{% endif %}

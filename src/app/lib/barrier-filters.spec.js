@@ -239,4 +239,22 @@ describe( 'barrier-filters', () => {
 		} );
 	} );
 
+	describe( '#areEqual', () => {
+		describe( 'When valid keys have matching values', () => {
+			it( 'It should return true', () => {
+
+				expect( barrierFilters.areEqual( { a: 1, b: 2 }, { a: 3, b: 4 } ) ).toEqual( true );
+				expect( barrierFilters.areEqual( { a: 1, b: 2 }, { a: 1, b: 2 } ) ).toEqual( true );
+				expect( barrierFilters.areEqual( { country: 1, b: 2 }, { country: 1, b: 3 } ) ).toEqual( true );
+			} );
+		} );
+
+		describe( 'When valid keys have non matching values', () => {
+			it( 'It should return false', () => {
+
+				expect( barrierFilters.areEqual( { country: 1 }, { country: 2 } ) ).toEqual( false );
+				expect( barrierFilters.areEqual( { country: [ uuid() ] }, { country: [ uuid() ] } ) ).toEqual( false );
+			} );
+		} );
+	} );
 } );

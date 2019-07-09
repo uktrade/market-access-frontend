@@ -36,12 +36,18 @@ module.exports = {
 
 		} else {
 
-			const watchListIndex = 0;
+			const queryIndex = req.query.list;
+			const watchListIndex = ( queryIndex ? parseInt( queryIndex, 10 ) : 0 );
 			const currentWatchList = req.watchList.lists[ watchListIndex ];
-			const watchListFilters = Object.entries( currentWatchList.filters ).map( ( [ key, value ] ) => ({ key, value: transformFilterValue( key, value ) }) );
+
+			if( !currentWatchList ){
+
+				return next( new Error( 'No watchlist found' ) );
+			}
 
 			try {
 
+				const watchListFilters = Object.entries( currentWatchList.filters ).map( ( [ key, value ] ) => ({ key, value: transformFilterValue( key, value ) }) );
 				const { response, body } = await backend.barriers.getAll( req, currentWatchList.filters, currentSort.serviceParam, currentSort.direction );
 
 				if( response.isSuccess ){
@@ -49,9 +55,13 @@ module.exports = {
 					res.render('index', dashboardViewModel(
 						body.results,
 						{ ...sortData, currentSort },
-						true,
-						watchListFilters,
 						currentWatchList.filters,
+						watchListIndex,
+						{
+							isWatchList: true,
+							watchListFilters,
+							csrfToken: req.csrfToken(),
+						}
 					));
 
 				} else {

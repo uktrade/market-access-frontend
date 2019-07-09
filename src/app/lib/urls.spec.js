@@ -11,12 +11,23 @@ describe( 'URLs', () => {
 			} );
 		} );
 
-		describe( 'With params', () => {
+		describe( 'With a watchListIndex', () => {
 			it( 'Should return the correct path', () => {
 
-				expect( urls.index( {} ) ).toEqual( '/' );
-				expect( urls.index( { test1: '1' } ) ).toEqual( '/?test1=1' );
-				expect( urls.index( { test1: '1', test2: '2' } ) ).toEqual( '/?test1=1&test2=2' );
+				expect( urls.index( 0 ) ).toEqual( '/' );
+				expect( urls.index( 1 ) ).toEqual( '/?list=1' );
+				expect( urls.index( 2 ) ).toEqual( '/?list=2' );
+			} );
+		} );
+
+		describe( 'With a watchListIndex and params', () => {
+			it( 'Should return the correct path', () => {
+
+				expect( urls.index( 0, {} ) ).toEqual( '/' );
+				expect( urls.index( 0, { test1: '1' } ) ).toEqual( '/?test1=1' );
+				expect( urls.index( 0, { test1: '1', test2: '2' } ) ).toEqual( '/?test1=1&test2=2' );
+				expect( urls.index( 1, { test1: '1' } ) ).toEqual( '/?test1=1&list=1' );
+				expect( urls.index( 1, { test1: '1', test2: '2' } ) ).toEqual( '/?test1=1&test2=2&list=1' );
 			} );
 		} );
 	} );
@@ -56,6 +67,7 @@ describe( 'URLs', () => {
 				expect( urls.findABarrier( {} ) ).toEqual( '/find-a-barrier/' );
 				expect( urls.findABarrier( { country: '1' } ) ).toEqual( '/find-a-barrier/?country=1' );
 				expect( urls.findABarrier( { country: '1', sector: '2' } ) ).toEqual( '/find-a-barrier/?country=1&sector=2' );
+				expect( urls.findABarrier( { search: 'a space separated term' } ) ).toEqual( `/find-a-barrier/?search=${ encodeURIComponent( 'a space separated term' )}` );
 			} );
 		} );
 	} );
@@ -64,6 +76,7 @@ describe( 'URLs', () => {
 		describe( 'save', () => {
 			describe( 'Without any filters', () => {
 				it( 'Should return the correct path', () => {
+
 					expect( urls.watchList.save() ).toEqual( '/watch-list/save/' );
 				} );
 			} );
@@ -79,27 +92,18 @@ describe( 'URLs', () => {
 		});
 
 		describe( 'rename', () => {
-			describe( 'Without any filters', () => {
-				it( 'Should return the correct path', () => {
-					expect( urls.watchList.rename() ).toEqual( '/watch-list/save/?rename=true' );
-				} );
-			} );
+			it( 'Should return the correct path', () => {
 
-			describe( 'With filters', () => {
-				it( 'Should return the correct path', () => {
-
-					expect( urls.watchList.rename( {} ) ).toEqual( '/watch-list/save/?rename=true' );
-					expect( urls.watchList.rename( { country: '1' } ) ).toEqual( '/watch-list/save/?country=1&rename=true' );
-					expect( urls.watchList.rename( { country: '1', sector: '2' } ) ).toEqual( '/watch-list/save/?country=1&sector=2&rename=true' );
-				} );
+				expect( urls.watchList.rename( 0 ) ).toEqual( '/watch-list/rename/0/' );
+				expect( urls.watchList.rename( 1 ) ).toEqual( '/watch-list/rename/1/' );
 			} );
 		});
 
 		describe( 'remove', () => {
 			it( 'Should return the correct path', () => {
 
-				expect( urls.watchList.remove() ).toEqual( '/watch-list/remove/' );
-
+				expect( urls.watchList.remove( 0 ) ).toEqual( '/watch-list/remove/0/' );
+				expect( urls.watchList.remove( 1 ) ).toEqual( '/watch-list/remove/1/' );
 			} );
 		});
 	});
@@ -109,6 +113,7 @@ describe( 'URLs', () => {
 			it( 'Should return the correct path', () => {
 
 				const documentId = uuid();
+
 				expect( urls.documents.download( documentId ) ).toEqual( `/documents/${ documentId }/download/` );
 			} );
 		} );

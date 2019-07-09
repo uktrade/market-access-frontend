@@ -10,7 +10,7 @@ describe( 'Dashboard data', () => {
 	beforeEach( () => {
 
 		req = {
-			user: { user_profile: {} },
+			watchList: { lists: [] },
 			originalUrl: urls.index()
 		};
 		res = { locals: {} };
@@ -24,8 +24,15 @@ describe( 'Dashboard data', () => {
 	describe( 'When there is a watch list', () => {
 
 		beforeEach(() => {
-			req.user.user_profile.watchList = {
-				name: 'Hello1'
+			req.watchList = {
+				version: 2,
+				lists: [{
+					name: 'List 1',
+					filters: {}
+				},{
+					name: 'List 2',
+					filters: {}
+				}]
 			};
 		});
 
@@ -35,8 +42,9 @@ describe( 'Dashboard data', () => {
 
 					dashboardData( req, res, next );
 
-					expect( res.locals.dashboardTabs ).toEqual([
-						{ text: 'Hello1', href: '/', isCurrent: true },
+					expect( res.locals.dashboardData.tabs ).toEqual([
+						{ text: 'List 1', href: '/', isCurrent: true },
+						{ text: 'List 2', href: '/?list=1', isCurrent: false },
 						{ text: 'My draft barriers', href: '/reports/', isCurrent: false }
 					]);
 				});
@@ -45,12 +53,28 @@ describe( 'Dashboard data', () => {
 			describe( 'With a sorting query param', () => {
 				it( 'creates the tabs and injects them into the response', () => {
 
-					req.originalUrl = urls.index( { sortBy: 'date' } );
+					req.originalUrl = urls.index( 0, { sortBy: 'date' } );
 
 					dashboardData( req, res, next );
 
-					expect( res.locals.dashboardTabs ).toEqual([
-						{ text: 'Hello1', href: '/', isCurrent: true },
+					expect( res.locals.dashboardData.tabs ).toEqual([
+						{ text: 'List 1', href: '/', isCurrent: true },
+						{ text: 'List 2', href: '/?list=1', isCurrent: false },
+						{ text: 'My draft barriers', href: '/reports/', isCurrent: false }
+					]);
+				});
+			} );
+
+			describe( 'With a sorting query param and a list', () => {
+				it( 'creates the tabs and injects them into the response', () => {
+
+					req.originalUrl = urls.index( 1, { sortBy: 'date' } );
+
+					dashboardData( req, res, next );
+
+					expect( res.locals.dashboardData.tabs ).toEqual([
+						{ text: 'List 1', href: '/', isCurrent: false },
+						{ text: 'List 2', href: '/?list=1', isCurrent: true },
 						{ text: 'My draft barriers', href: '/reports/', isCurrent: false }
 					]);
 				});
@@ -64,8 +88,9 @@ describe( 'Dashboard data', () => {
 
 				dashboardData( req, res, next );
 
-				expect( res.locals.dashboardTabs ).toEqual([
-					{ text: 'Hello1', href: '/', isCurrent: false },
+				expect( res.locals.dashboardData.tabs ).toEqual([
+					{ text: 'List 1', href: '/', isCurrent: false },
+					{ text: 'List 2', href: '/?list=1', isCurrent: false },
 					{ text: 'My draft barriers', href: '/reports/', isCurrent: true }
 				]);
 			});
@@ -78,7 +103,7 @@ describe( 'Dashboard data', () => {
 
 				dashboardData( req, res, next );
 
-				expect( res.locals.dashboardTabs ).toEqual([
+				expect( res.locals.dashboardData.tabs ).toEqual([
 					{ text: 'My watch list', href: '/', isCurrent: true },
 					{ text: 'My draft barriers', href: '/reports/', isCurrent: false }
 				]);
@@ -92,7 +117,7 @@ describe( 'Dashboard data', () => {
 
 				dashboardData( req, res, next );
 
-				expect( res.locals.dashboardTabs).toEqual([
+				expect( res.locals.dashboardData.tabs).toEqual([
 					{ text: 'My watch list', href: '/', isCurrent: false },
 					{ text: 'My draft barriers', href: '/reports/', isCurrent: true }
 				]);
