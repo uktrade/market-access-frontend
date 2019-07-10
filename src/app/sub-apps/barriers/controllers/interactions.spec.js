@@ -195,10 +195,11 @@ describe( 'Barrier interactions controller', () => {
 					expect( res.status ).toHaveBeenCalledWith( 400 );
 					expect( res.json ).toHaveBeenCalledWith( { message: 'File size exceeds the 5 MB limit. Reduce file size and upload the document again.' } );
 					expect( reporter.message ).not.toHaveBeenCalled();
+					expect( reporter.captureException ).not.toHaveBeenCalled();
 				} );
 			} );
 
-			describe( 'When the error is about file size', () => {
+			describe( 'When the error is about something else', () => {
 				it( 'Should return a 400 with a message', async () => {
 
 					req.formError = new Error( 'The error is something else' );
@@ -207,7 +208,7 @@ describe( 'Barrier interactions controller', () => {
 
 					expect( res.status ).toHaveBeenCalledWith( 400 );
 					expect( res.json ).toHaveBeenCalledWith( { message: 'A system error has occured, so the file has not been uploaded. Try again.' } );
-					expect( reporter.message ).not.toHaveBeenCalled();
+					expect( reporter.captureException ).toHaveBeenCalledWith( req.formError );
 				} );
 			} );
 		} );

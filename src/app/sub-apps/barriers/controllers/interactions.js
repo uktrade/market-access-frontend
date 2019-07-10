@@ -256,8 +256,15 @@ function createUploadHandler( passedCb ){
 
 		if( req.formError ){
 
+			const isOverSize = isFileOverSize( req.formError );
+
 			res.status( 400 );
-			res.json( { message: ( isFileOverSize( req.formError ) ? OVERSIZE_FILE_MESSAGE : UPLOAD_ERROR_MESSAGE ) } );
+			res.json( { message: ( isOverSize ? OVERSIZE_FILE_MESSAGE : UPLOAD_ERROR_MESSAGE ) } );
+
+			if( !isOverSize ){
+
+				reporter.captureException( req.formError );
+			}
 
 		} else if( document && validators.isValidFile( document ) ){
 
