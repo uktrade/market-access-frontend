@@ -34,7 +34,7 @@ if( typeof jasmine !== 'undefined' ){
 			params: {},
 			user: {},
 			watchList: {
-				get: jasmine.createSpy( 'req.watchList.get' ),
+				lists: [],
 				add: jasmine.createSpy( 'req.watchList.add' ),
 				update: jasmine.createSpy( 'req.watchList.update' ),
 				remove: jasmine.createSpy( 'req.watchList.remove' ),

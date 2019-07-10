@@ -89,20 +89,23 @@ module.exports = {
 			if( !form.hasErrors() ){
 
 				const values = form.getValues();
+				let index;
 
 				try {
 
 					if( isEdit || hasToReplace || values.replaceOrNew === REPLACE ){
 
-						await req.watchList.update( ( isEdit ? editIndex : values.replaceIndex ), values.name, filters );
+						index = ( isEdit ? editIndex : values.replaceIndex );
+						await req.watchList.update( index, values.name, filters );
 
 					} else {
 
 						await req.watchList.add( values.name, filters );
+						index = ( req.watchList.lists.length - 1 );
 					}
 
 					delete req.session.user;
-					return res.redirect( urls.index( isEdit ? editIndex : null ) );
+					return res.redirect( urls.index( index ) );
 
 				} catch( e ){
 
@@ -131,7 +134,7 @@ module.exports = {
 
 		if( !currentWatchList ){
 
-			return next( new Error( 'Watchlist not found' ) );
+			return next( new Error( 'Watch list not found' ) );
 		}
 
 		const form = new Form( req, {
@@ -178,6 +181,12 @@ module.exports = {
 		try {
 
 			const watchListIndex = parseInt( req.params.index, 10 );
+
+			if( isNaN( watchListIndex ) ){
+
+				throw new Error( 'Invalid watch list index' );
+			}
+
 			await req.watchList.remove( watchListIndex );
 			delete req.session.user;
 
