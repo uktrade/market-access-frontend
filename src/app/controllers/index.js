@@ -42,7 +42,7 @@ module.exports = {
 
 			if( !currentWatchList ){
 
-				return next( new Error( 'No watchlist found' ) );
+				return next( new Error( 'No watchList found' ) );
 			}
 
 			try {
