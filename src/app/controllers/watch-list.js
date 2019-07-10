@@ -102,7 +102,7 @@ module.exports = {
 					}
 
 					delete req.session.user;
-					return res.redirect( urls.index() );
+					return res.redirect( urls.index( isEdit ? editIndex : null ) );
 
 				} catch( e ){
 

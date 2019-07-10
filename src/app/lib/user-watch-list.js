@@ -4,21 +4,22 @@ const VERSION = 2;
 async function saveWatchList( req, watchList ){
 
 	const user = req.session.user;
-	const profile = user.user_profile || {};
+	//clone the profile to avoid updating the session before a successful save
+	const newProfile = { ...user.user_profile, watchList };
 
-	profile.watchList = watchList;
+	const { response, body } = await backend.watchList.save( req, newProfile );
 
-	const { response, body } = await backend.watchList.save( req, profile );
+	if( response.isSuccess ){
 
-	if( !response.isSuccess ){
-
-		const err = new Error( `Unable to save watch list, got ${ response.statusCode } response code` );
-		err.responseBody = body;
-		throw( err );
+		//can now safely update the session value
+		user.user_profile = newProfile;
 
 	} else {
 
-		user.user_profile = profile;
+		const err = new Error( `Unable to save watch list, got ${ response.statusCode } response code` );
+		err.responseBody = body;
+
+		throw( err );
 	}
 }
 
@@ -47,12 +48,18 @@ class UserWatchList {
 
 	constructor( req ){
 
-		this.req = req;
-		this.watchList = getWatchList( req );
+		const watchList = getWatchList( req );
 
-		if( this.watchList.version !== VERSION ){
+		if( watchList.version !== VERSION ){
 			throw new Error( 'user watchList is not the correct version' );
 		}
+
+		this.req = req;
+		//clone the watchlist to avoid saving a modified version to the session
+		this.watchList = {
+			version: VERSION,
+			lists: [ ...watchList.lists ],
+		};
 	}
 
 	get lists(){
@@ -76,8 +83,7 @@ class UserWatchList {
 
 		if( list ){
 
-			list.name = name;
-			list.filters = filters;
+			this.lists.splice( index, 1, { name, filters } );
 
 			await this.save();
 		}

@@ -1,5 +1,8 @@
 const proxyquire = require( 'proxyquire' );
+const faker = require( 'faker' );
 const modulePath = './user-watch-list';
+
+const CURRENT_VERSION = 2;
 
 describe( 'User watch list', () => {
 
@@ -25,7 +28,7 @@ describe( 'User watch list', () => {
 				const watchList = new UserWatchList( req );
 
 				expect( watchList.req ).toEqual( req );
-				expect( watchList.watchList ).toEqual( { version: 2, lists: [] } );
+				expect( watchList.watchList ).toEqual( { version: CURRENT_VERSION, lists: [] } );
 			} );
 		} );
 
@@ -71,45 +74,59 @@ describe( 'User watch list', () => {
 	} );
 
 	describe( 'With an instance created', () => {
+		describe( 'With an existing profile and watchList', () => {
 
-		beforeEach( () => {
+			let currentProfile;
 
-			watchList = new UserWatchList( req );
-		} );
+			beforeEach( () => {
 
-		describe( '#add', () => {
-			describe( 'When the response is a success', () => {
+				currentProfile = {
+					fake: 1,
+					watchList: {
+						version: CURRENT_VERSION,
+						lists: [{
+							name: 'fake list one',
+							filters: { country: 'abc-123' },
+						}]
+					}
+				};
+
+				//clone the current profile so we can compare
+				req.session.user.user_profile = JSON.parse( JSON.stringify( currentProfile ) );
+
+				watchList = new UserWatchList( req );
+			} );
+
+			describe( '#add', () => {
+
+				let name;
+				let filters;
+				let newProfile;
 
 				beforeEach( () => {
-					backend.watchList.save.and.callFake( () => Promise.resolve( { response: { isSuccess: true  } } ) );
+
+					name = 'test 2';
+					filters = { c: 3 };
+
+					newProfile = {
+						fake: 1,
+						watchList: {
+							version: CURRENT_VERSION,
+							lists : [
+								...currentProfile.watchList.lists,
+								{ name, filters },
+							]
+						}
+					};
 				} );
 
-				describe( 'When there is a user profile', () => {
-					it( 'Saves the watchList and replaces it on the profile', async () => {
+				describe( 'When the response is a success', () => {
 
-						req.session.user.user_profile = {
-							test: 1,
-							watchList: {
-								version: '1',
-								filters: { b: 2 }
-							}
-						};
+					beforeEach( () => {
+						backend.watchList.save.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+					} );
 
-						const name = 'test 2';
-						const filters = { c: 3 };
-
-						const newProfile = {
-							test: 1,
-							watchList: {
-								version: 2,
-								lists : [
-									{
-										name,
-										filters,
-									}
-								]
-							}
-						};
+					it( 'Adds to the list', async () => {
 
 						await watchList.add( name, filters );
 
@@ -118,27 +135,331 @@ describe( 'User watch list', () => {
 					} );
 				} );
 
-				describe( 'When there is not a user profile', () => {
-					it( 'Saves the watchList and creates a profile', async () => {
+				describe( 'When the response is a 500', () => {
 
-						const name = '3';
-						const filters =  { c: 4 };
-						const newWatchList = {
-							version: 2,
-							lists: [
-								{
-									name,
-									filters,
-								}
+					beforeEach( () => {
+						backend.watchList.save.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode: 500 } } ) );
+					} );
+
+					it( 'Throws an error and does not add to the list', async () => {
+
+						try {
+
+							await watchList.add( name, filters );
+							fail();
+
+						} catch( e ){
+
+							expect( e ).toEqual( new Error( 'Unable to save watch list, got 500 response code' ) );
+							expect( req.session.user.user_profile ).toEqual( currentProfile );
+							expect( backend.watchList.save ).toHaveBeenCalledWith( req, newProfile );
+						}
+					} );
+				} );
+
+				describe( 'When there is an error', () => {
+
+					let err;
+
+					beforeEach( () => {
+						err = new Error( 'failed to save' );
+						backend.watchList.save.and.callFake( () => Promise.reject( err ) );
+					} );
+
+					it( 'Throws an error and does not add to the list', async () => {
+
+						try {
+
+							await watchList.add( name, filters );
+							fail();
+
+						} catch( e ){
+
+							expect( e ).toEqual( err );
+							expect( req.session.user.user_profile ).toEqual( currentProfile );
+							expect( backend.watchList.save ).toHaveBeenCalledWith( req, newProfile );
+						}
+					} );
+				} );
+			} );
+
+			describe( '#remove', () => {
+
+				let newProfile;
+
+				beforeEach( () => {
+
+					newProfile = {
+						fake: 1,
+						watchList: {
+							version: CURRENT_VERSION,
+							lists : []
+						}
+					};
+				} );
+
+				describe( 'When the response is a success', () => {
+
+					beforeEach( () => {
+						backend.watchList.save.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+					} );
+
+					describe( 'When the index is valid', () => {
+						it( 'Removes the item from the list', async () => {
+
+							await watchList.remove( 0 );
+
+							expect( req.session.user.user_profile ).toEqual( newProfile );
+							expect( backend.watchList.save ).toHaveBeenCalledWith( req, newProfile );
+						} );
+					} );
+
+					describe( 'When the index is NOT valid', () => {
+						it( 'Does nothing', async () => {
+
+							await watchList.remove( 10 );
+
+							expect( req.session.user.user_profile ).toEqual( currentProfile );
+							expect( backend.watchList.save ).not.toHaveBeenCalled();
+						} );
+					} );
+				} );
+
+				describe( 'When the response is a 500', () => {
+
+					beforeEach( () => {
+						backend.watchList.save.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode: 500 } } ) );
+					} );
+
+					it( 'Throws an error and does not remove the item from the list', async () => {
+
+						try {
+
+							await watchList.remove( 0 );
+							fail();
+
+						} catch( e ){
+
+							expect( e ).toEqual( new Error( 'Unable to save watch list, got 500 response code' ) );
+							expect( req.session.user.user_profile ).toEqual( currentProfile );
+							expect( backend.watchList.save ).toHaveBeenCalledWith( req, newProfile );
+						}
+					} );
+				} );
+
+				describe( 'When there is an error', () => {
+
+					let err;
+
+					beforeEach( () => {
+						err = new Error( 'failed to save' );
+						backend.watchList.save.and.callFake( () => Promise.reject( err ) );
+					} );
+
+					it( 'Throws an error and does not remove the item from the list', async () => {
+
+						try {
+
+							await watchList.remove( 0 );
+							fail();
+
+						} catch( e ){
+
+							expect( e ).toEqual( err );
+							expect( req.session.user.user_profile ).toEqual( currentProfile );
+							expect( backend.watchList.save ).toHaveBeenCalledWith( req, newProfile );
+						}
+					} );
+				} );
+			} );
+
+			describe( '#update', () => {
+
+				let name;
+				let filters;
+				let newProfile;
+
+				beforeEach( () => {
+
+					name = faker.lorem.words( 2 );
+					filters = { sector: faker.random.uuid() };
+
+					newProfile = {
+						fake: 1,
+						watchList: {
+							version: CURRENT_VERSION,
+							lists : [ { name, filters } ]
+						}
+					};
+				} );
+
+				describe( 'When the response is a success', () => {
+
+					beforeEach( () => {
+						backend.watchList.save.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+					} );
+
+					describe( 'When the index is valid', () => {
+						it( 'Updates the item from the list', async () => {
+
+							await watchList.update( 0, name, filters );
+
+							expect( req.session.user.user_profile ).toEqual( newProfile );
+							expect( backend.watchList.save ).toHaveBeenCalledWith( req, newProfile );
+						} );
+					} );
+
+					describe( 'When the index is NOT valid', () => {
+						it( 'Does nothing', async () => {
+
+							await watchList.update( 10, name, filters );
+
+							expect( req.session.user.user_profile ).toEqual( currentProfile );
+							expect( backend.watchList.save ).not.toHaveBeenCalled();
+						} );
+					} );
+				} );
+
+				describe( 'When the response is a 500', () => {
+
+					beforeEach( () => {
+						backend.watchList.save.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode: 500 } } ) );
+					} );
+
+					it( 'Throws an error and does not update the item in the list', async () => {
+
+						try {
+
+							await watchList.update( 0, name, filters );
+							fail();
+
+						} catch( e ){
+
+							expect( e ).toEqual( new Error( 'Unable to save watch list, got 500 response code' ) );
+							expect( req.session.user.user_profile ).toEqual( currentProfile );
+							expect( backend.watchList.save ).toHaveBeenCalledWith( req, newProfile );
+						}
+					} );
+				} );
+
+				describe( 'When there is an error', () => {
+
+					let err;
+
+					beforeEach( () => {
+						err = new Error( 'failed to save' );
+						backend.watchList.save.and.callFake( () => Promise.reject( err ) );
+					} );
+
+					it( 'Throws an error and does not update the item in the list', async () => {
+
+						try {
+
+							await watchList.update( 0, name, filters );
+							fail();
+
+						} catch( e ){
+
+							expect( e ).toEqual( err );
+							expect( req.session.user.user_profile ).toEqual( currentProfile );
+							expect( backend.watchList.save ).toHaveBeenCalledWith( req, newProfile );
+						}
+					} );
+				} );
+			} );
+		} );
+
+		describe( 'Without an existing profile and watchList', () => {
+
+			let currentProfile;
+
+			beforeEach( () => {
+
+				currentProfile = undefined;
+
+				watchList = new UserWatchList( req );
+			} );
+
+			describe( '#add', () => {
+
+				let name;
+				let filters;
+				let newProfile;
+
+				beforeEach( () => {
+
+					name = 'test 2';
+					filters = { c: 3 };
+
+					newProfile = {
+						watchList: {
+							version: CURRENT_VERSION,
+							lists : [
+								{ name, filters },
 							]
-						};
+						}
+					};
+				} );
 
-						const expectedProfile = { watchList: { ...newWatchList } };
+				describe( 'When the response is a success', () => {
+
+					beforeEach( () => {
+						backend.watchList.save.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+					} );
+
+					it( 'Adds to the list', async () => {
 
 						await watchList.add( name, filters );
 
-						expect( req.session.user.user_profile ).toEqual( expectedProfile );
-						expect( backend.watchList.save ).toHaveBeenCalledWith( req, expectedProfile );
+						expect( req.session.user.user_profile ).toEqual( newProfile );
+						expect( backend.watchList.save ).toHaveBeenCalledWith( req, newProfile );
+					} );
+				} );
+
+				describe( 'When the response is a 500', () => {
+
+					beforeEach( () => {
+						backend.watchList.save.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode: 500 } } ) );
+					} );
+
+					it( 'Throws an error and does not add to the list', async () => {
+
+						try {
+
+							await watchList.add( name, filters );
+							fail();
+
+						} catch( e ){
+
+							expect( e ).toEqual( new Error( 'Unable to save watch list, got 500 response code' ) );
+							expect( req.session.user.user_profile ).toEqual( currentProfile );
+							expect( backend.watchList.save ).toHaveBeenCalledWith( req, newProfile );
+						}
+					} );
+				} );
+
+				describe( 'When there is an error', () => {
+
+					let err;
+
+					beforeEach( () => {
+						err = new Error( 'failed to save' );
+						backend.watchList.save.and.callFake( () => Promise.reject( err ) );
+					} );
+
+					it( 'Throws an error and does not add to the list', async () => {
+
+						try {
+
+							await watchList.add( name, filters );
+							fail();
+
+						} catch( e ){
+
+							expect( e ).toEqual( err );
+							expect( req.session.user.user_profile ).toEqual( currentProfile );
+							expect( backend.watchList.save ).toHaveBeenCalledWith( req, newProfile );
+						}
 					} );
 				} );
 			} );
