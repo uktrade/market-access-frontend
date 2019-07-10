@@ -34,65 +34,19 @@ describe( 'user middleware', () => {
 
 	describe( 'When the user info is not in the session', () => {
 		describe( 'When the response is a success', () => {
-			describe( 'When SSO bypass is false', () => {
-				it( 'Should fetch the info and store it in the session', async () => {
+			it( 'Should fetch the info and store it in the session', async () => {
 
-					const userMock = { username: 'mock-user' };
+				const userMock = { username: 'mock-user' };
 
-					backend.getUser.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body: userMock } ) );
+				backend.getUser.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body: userMock } ) );
 
-					await middleware( req, res, next );
+				await middleware( req, res, next );
 
-					expect( backend.getUser ).toHaveBeenCalledWith( req );
-					expect( req.session.user ).toEqual( userMock );
-					expect( res.locals.user ).toEqual( userMock );
-					expect( req.user ).toEqual( userMock );
-					expect( next ).toHaveBeenCalled();
-				} );
-			} );
-
-			describe( 'When SSO bypass is true', () => {
-				it( 'Should fetch the info, add some peritted_applications and store it in the session', async () => {
-
-					config.sso.bypass = true;
-
-					const userMock = { username: 'mock-user' };
-					const userWithPermissions = {
-						...userMock,
-						permitted_applications: [
-							{
-								'key': 'datahub-crm',
-								'url': '',
-								'name': ''
-							},
-							{
-								'key': 'datahub-mi',
-								'url': '',
-								'name': ''
-							},
-							{
-								'key': 'market-access',
-								'url': '',
-								'name': ''
-							},
-							{
-								'key': 'find-exporters',
-								'url': '',
-								'name': ''
-							}
-						]
-					};
-
-					backend.getUser.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body: userMock } ) );
-
-					await middleware( req, res, next );
-
-					expect( backend.getUser ).toHaveBeenCalledWith( req );
-					expect( req.session.user ).toEqual( userWithPermissions );
-					expect( res.locals.user ).toEqual( userWithPermissions );
-					expect( req.user ).toEqual( userWithPermissions );
-					expect( next ).toHaveBeenCalled();
-				} );
+				expect( backend.getUser ).toHaveBeenCalledWith( req );
+				expect( req.session.user ).toEqual( userMock );
+				expect( res.locals.user ).toEqual( userMock );
+				expect( req.user ).toEqual( userMock );
+				expect( next ).toHaveBeenCalled();
 			} );
 		} );
 
