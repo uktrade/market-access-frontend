@@ -184,21 +184,90 @@ describe( 'Find a barrier view model', () => {
 	}
 
 	describe( 'Without any filters', () => {
+
+		let queryString;
+		let count;
+		let filters;
+
+		beforeEach( () => {
+
+			count = 20;
+			filters = {};
+			queryString = {};
+		} );
+
+		describe( 'When isEdit is true', () => {
+
+			let isEdit;
+			let editListIndex;
+
+			beforeEach( () => {
+
+				isEdit = true;
+				editListIndex = undefined;
+			} );
+
+			describe( 'When filtersMatchEditList is true', () => {
+				it( 'Should set showSaveButton to false', () => {
+
+					const filtersMatchEditList = true;
+					const output = viewModel( {
+						count,
+						barriers,
+						filters,
+						queryString,
+						isEdit,
+						editListIndex,
+						filtersMatchEditList
+					} );
+
+					expect( output.showSaveButton ).toEqual( false );
+				} );
+			} );
+
+			describe( 'When filtersMatchEditList is false', () => {
+				it( 'Should set showSaveButton to true', () => {
+
+					const filtersMatchEditList = false;
+					const output = viewModel( {
+						count,
+						barriers,
+						filters,
+						queryString,
+						isEdit,
+						editListIndex,
+						filtersMatchEditList
+					} );
+
+					expect( output.showSaveButton ).toEqual( true );
+				} );
+			} );
+		} );
+
 		it( 'Should return the correct data', () => {
 
-			const count = 20;
-			const filters = {};
+			const isEdit = false;
+			const editListIndex = undefined;
+			const filtersMatchEditList = false;
 
 			const output = viewModel( {
 				count,
 				barriers,
-				filters
+				filters,
+				queryString,
+				isEdit,
+				editListIndex,
+				filtersMatchEditList,
 			} );
 
 			expect( output.count ).toEqual( count );
 			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
 			expect( output.filters ).toEqual( getFilters() );
 			expect( output.hasFilters ).toEqual( false );
+			expect( output.queryString ).toEqual( queryString );
+			expect( output.isEdit ).toEqual( isEdit );
+			expect( output.editListIndex ).toEqual( editListIndex );
+			expect( output.showSaveButton ).toEqual( false );
 		} );
 	} );
 
