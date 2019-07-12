@@ -168,7 +168,6 @@ describe( 'Find a barrier view model', () => {
 		expect( metadata.getBarrierPrioritiesList ).toHaveBeenCalledWith( { suffix: false } );
 		expect( sortGovukItems.alphabetical ).toHaveBeenCalled();
 		expect( urls.findABarrier.calls.count() ).toEqual( 6 );
-		expect( urls.findABarrier ).toHaveBeenCalledWith( {} );
 	} );
 
 	function getFilters( overrides = {} ){
@@ -204,7 +203,12 @@ describe( 'Find a barrier view model', () => {
 			beforeEach( () => {
 
 				isEdit = true;
-				editListIndex = undefined;
+				editListIndex = String( faker.random.number( 10 ) );
+			} );
+
+			afterEach( () => {
+
+				expect( urls.findABarrier ).toHaveBeenCalledWith( { editList: editListIndex } );
 			} );
 
 			describe( 'When filtersMatchEditList is true', () => {
@@ -247,7 +251,6 @@ describe( 'Find a barrier view model', () => {
 		it( 'Should return the correct data', () => {
 
 			const isEdit = false;
-			const editListIndex = undefined;
 			const filtersMatchEditList = false;
 
 			const output = viewModel( {
@@ -256,7 +259,6 @@ describe( 'Find a barrier view model', () => {
 				filters,
 				queryString,
 				isEdit,
-				editListIndex,
 				filtersMatchEditList,
 			} );
 
@@ -266,182 +268,243 @@ describe( 'Find a barrier view model', () => {
 			expect( output.hasFilters ).toEqual( false );
 			expect( output.queryString ).toEqual( queryString );
 			expect( output.isEdit ).toEqual( isEdit );
-			expect( output.editListIndex ).toEqual( editListIndex );
+			expect( output.editListIndex ).not.toBeDefined();
 			expect( output.showSaveButton ).toEqual( false );
+			expect( urls.findABarrier ).toHaveBeenCalledWith( {} );
 		} );
 	} );
 
-	describe( 'With a country filter', () => {
-		it( 'Should return the correct data', () => {
+	describe( 'With filters', () => {
 
-			const count = 10;
-			const filters = { country: [ uuid() ] };
+		let count;
+		let filters;
+		let queryString;
+		let editListIndex;
 
-			countryList[ 2 ].value = filters.country[ 0 ];
+		beforeEach( () => {
 
-			const output = viewModel( {
-				count,
-				barriers,
-				filters
+			count = faker.random.number( 100 );
+			filters = {};
+			queryString = { param1: 'one', param2: 'two' };
+			editListIndex = String( faker.random.number( 10 ) );
+		} );
+
+		function checkFilter( setup, assert ){
+
+			function checkCommonOutput( output ){
+
+				expect( output.count ).toEqual( count );
+				expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
+				expect( output.hasFilters ).toEqual( true );
+				expect( output.queryString ).toEqual( queryString );
+				expect( output.editListIndex ).toEqual( editListIndex );
+				expect( output.filterParams ).toEqual( filters );
+			}
+
+			describe( 'When isEdit is false', () => {
+				it( 'Returns the correct data', () => {
+
+					setup();
+
+					const output = viewModel( {
+						count,
+						barriers,
+						filters,
+						queryString,
+						editListIndex,
+						isEdit: false,
+						filtersMatchEditList: false,
+					} );
+
+					checkCommonOutput( output );
+					expect( output.isEdit ).toEqual( false );
+					expect( output.showSaveButton ).toEqual( true );
+					expect( urls.findABarrier ).toHaveBeenCalledWith( filters );
+					assert( output );
+				} );
 			} );
 
-			expect( output.count ).toEqual( count );
-			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
-			expect( output.filters ).toEqual( getFilters( {
-				country: { items: countryList, active: true, text: strings.locations.response, removeUrl: findABarrierResponse },
-			} ) );
-			expect( countryList.find( ( country ) => country.value === filters.country[ 0 ] ).checked ).toEqual( true );
-			expect( output.hasFilters ).toEqual( true );
-			expect( strings.locations ).toHaveBeenCalledWith( filters.country );
-		} );
-	} );
+			describe( 'When isEdit is true', () => {
 
-	describe( 'With an overseas region filter', () => {
-		it( 'Should return the correct data', () => {
+				afterEach( () => {
 
-			const count = 10;
-			const filters = { region: [ uuid() ] };
+					expect( urls.findABarrier ).toHaveBeenCalledWith( { ...filters, editList: editListIndex } );
+				} );
 
-			overseasRegionList[ 2 ].value = filters.region[ 0 ];
+				describe( 'When filtersMatchEditList is true', () => {
+					it( 'Returns the correct data and sets showSaveButton to false', () => {
 
-			const output = viewModel( {
-				count,
-				barriers,
-				filters
+						setup();
+
+						const output = viewModel( {
+							count,
+							barriers,
+							filters,
+							queryString,
+							editListIndex,
+							isEdit: true,
+							filtersMatchEditList: true
+						} );
+
+						checkCommonOutput( output );
+						expect( output.isEdit ).toEqual( true );
+						expect( output.editListIndex ).toEqual( editListIndex );
+						expect( output.showSaveButton ).toEqual( false );
+						assert( output );
+					} );
+				} );
+
+				describe( 'When filtersMatchEditList is false', () => {
+					it( 'Returns the correct data and sets showSaveButton to true', () => {
+
+						setup();
+
+						const output = viewModel( {
+							count,
+							barriers,
+							filters,
+							queryString,
+							editListIndex,
+							isEdit: true,
+							filtersMatchEditList: false
+						} );
+
+						checkCommonOutput( output );
+						expect( output.isEdit ).toEqual( true );
+						expect( output.editListIndex ).toEqual( editListIndex );
+						expect( output.showSaveButton ).toEqual( true );
+						assert( output );
+					} );
+				} );
 			} );
+		}
 
-			expect( output.count ).toEqual( count );
-			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
-			expect( output.filters ).toEqual( getFilters( {
-				region: { items: overseasRegionList, active: true, text: strings.regions.response, removeUrl: findABarrierResponse }
-			} ) );
-			expect( overseasRegionList[ 2 ].checked ).toEqual( true );
-			expect( output.hasFilters ).toEqual( true );
-			expect( strings.regions ).toHaveBeenCalledWith( filters.region );
-		} );
-	} );
+		describe( 'Country filter', () => {
 
-	describe( 'With a sector filter', () => {
-		it( 'Should return the correct data', () => {
+			checkFilter( () => {
 
-			const count = 5;
-			const filters = { sector: [ uuid() ] };
+				filters.country = [ uuid() ];
+				countryList[ 2 ].value = filters.country[ 0 ];
 
-			sectorList[ 2 ].value = filters.sector[ 0 ];
+			}, ( output ) => {
 
-			const output = viewModel( {
-				count,
-				barriers,
-				filters
+				expect( output.filters ).toEqual( getFilters( {
+					country: { items: countryList, active: true, text: strings.locations.response, removeUrl: findABarrierResponse },
+				} ) );
+				expect( countryList.find( ( country ) => country.value === filters.country[ 0 ] ).checked ).toEqual( true );
+				expect( strings.locations ).toHaveBeenCalledWith( filters.country );
 			} );
-
-			expect( output.count ).toEqual( count );
-			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
-			expect( output.filters ).toEqual( getFilters( {
-				sector: { items: sectorList, active: true, text: strings.sectors.response, removeUrl: findABarrierResponse }
-			} ) );
-			expect( sectorList[ 2 ].checked ).toEqual( true );
-			expect( output.hasFilters ).toEqual( true );
-			expect( strings.sectors ).toHaveBeenCalledWith( filters.sector );
 		} );
-	} );
 
-	describe( 'With a barrier type filter', () => {
-		it( 'Should return the correct data', () => {
+		describe( 'Overseas region filter', () => {
 
-			const count = 5;
+			checkFilter( () => {
+
+				filters.region = [ uuid() ];
+				overseasRegionList[ 2 ].value = filters.region[ 0 ];
+
+			}, ( output ) => {
+
+				expect( output.filters ).toEqual( getFilters( {
+					region: { items: overseasRegionList, active: true, text: strings.regions.response, removeUrl: findABarrierResponse }
+				} ) );
+				expect( overseasRegionList[ 2 ].checked ).toEqual( true );
+				expect( strings.regions ).toHaveBeenCalledWith( filters.region );
+			} );
+		} );
+
+		describe( 'Sector filter', () => {
+
+			checkFilter( () => {
+
+				filters.sector = [ uuid() ];
+				sectorList[ 2 ].value = filters.sector[ 0 ];
+
+			}, ( output ) => {
+
+				expect( output.filters ).toEqual( getFilters( {
+					sector: { items: sectorList, active: true, text: strings.sectors.response, removeUrl: findABarrierResponse }
+				} ) );
+				expect( sectorList[ 2 ].checked ).toEqual( true );
+				expect( strings.sectors ).toHaveBeenCalledWith( filters.sector );
+			} );
+		} );
+
+		describe( 'Barrier type filter', () => {
+
 			const selectedType = 999;
-			const filters = { type: [ String( selectedType ) ] };
 
-			barrierTypeList[ 1 ].value = selectedType;
+			checkFilter( () => {
 
-			const output = viewModel( {
-				count,
-				barriers,
-				filters
+				filters.type = [ String( selectedType ) ];
+				barrierTypeList[ 1 ].value = selectedType;
+
+			}, ( output ) => {
+
+				expect( output.filters ).toEqual( getFilters({
+					type: {
+						items: barrierTypeList.map( ( { text, value } ) => {
+
+							const item = { text, value };
+
+							if( value == selectedType ){
+								item.checked = true;
+							}
+
+							return item;
+
+						} ).sort( ( a, b ) => a.text.localeCompare( b.text ) ),
+						active: true,
+						text: strings.types.response,
+						removeUrl: findABarrierResponse
+					},
+				}) );
+				expect( strings.types ).toHaveBeenCalledWith( filters.type );
 			} );
+		} );
 
-			expect( output.count ).toEqual( count );
-			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
-			expect( output.filters ).toEqual( getFilters({
-				type: {
-					items: barrierTypeList.map( ( { text, value } ) => {
+		describe( 'Barrier priority filter', () => {
 
-						const item = { text, value };
+			checkFilter( () => {
 
-						if( value == selectedType ){
-							item.checked = true;
-						}
+				filters.priority = [ faker.lorem.word().toUpperCase() ];
+				barrierPriorityList[ 2 ].value = filters.priority[ 0 ];
 
-						return item;
+			}, ( output ) => {
 
-					} ).sort( ( a, b ) => a.text.localeCompare( b.text ) ),
-					active: true,
-					text: strings.types.response,
-					removeUrl: findABarrierResponse
-				},
-			}) );
-			expect( output.hasFilters ).toEqual( true );
-			expect( strings.types ).toHaveBeenCalledWith( filters.type );
+				expect( output.filters ).toEqual( getFilters({
+					priority: {
+						items: barrierPriorityList.map( ( { text, value } ) => {
+
+							const item = { text, value };
+
+							if( value == filters.priority ){
+								item.checked = true;
+							}
+
+							return item;
+						} ),
+						active: true,
+						text: strings.priorities.response,
+						removeUrl: findABarrierResponse,
+					},
+				}) );
+				expect( strings.priorities ).toHaveBeenCalledWith( filters.priority );
+			} );
+		} );
+
+		describe( 'Search filter', () => {
+
+			checkFilter( () => {
+
+				filters.search = faker.lorem.words( 3 );
+
+			}, ( output ) => {
+
+				expect( output.filters ).toEqual( getFilters( {
+					search: { active: true, text: filters.search, removeUrl: findABarrierResponse }
+				} ) );
+			} );
 		} );
 	} );
-
-	describe( 'With a barrier priority filter', () => {
-		it( 'Should return the correct data', () => {
-
-			const count = 5;
-			const filters = { priority: [ faker.lorem.word().toUpperCase() ] };
-
-			barrierPriorityList[ 2 ].value = filters.priority[ 0 ];
-
-			const output = viewModel( {
-				count,
-				barriers,
-				filters
-			} );
-
-			expect( output.count ).toEqual( count );
-			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
-			expect( output.filters ).toEqual( getFilters({
-				priority: {
-					items: barrierPriorityList.map( ( { text, value } ) => {
-
-						const item = { text, value };
-
-						if( value == filters.priority ){
-							item.checked = true;
-						}
-
-						return item;
-					} ),
-					active: true,
-					text: strings.priorities.response,
-					removeUrl: findABarrierResponse,
-				},
-			}) );
-			expect( output.hasFilters ).toEqual( true );
-			expect( strings.priorities ).toHaveBeenCalledWith( filters.priority );
-		} );
-	} );
-
-	describe( 'With a search filter', () => {
-		it( 'Should return the correct data', () => {
-
-			const count = 5;
-			const filters = { search: faker.lorem.words( 3 ) };
-			const output = viewModel( {
-				count,
-				barriers,
-				filters
-			} );
-
-			expect( output.count ).toEqual( count );
-			expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
-			expect( output.filters ).toEqual( getFilters( {
-				search: { active: true, text: filters.search, removeUrl: findABarrierResponse }
-			} ) );
-			expect( output.hasFilters ).toEqual( true );
-		} );
-	} );
-
 } );

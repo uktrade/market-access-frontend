@@ -24,21 +24,27 @@ function createMatcher( key ){
 	};
 }
 
-function getRemoveUrl( filters, key ){
-
-	const clone = { ...filters };
-
-	delete clone[ key ];
-
-	return urls.findABarrier( clone );
-}
-
 //const isSelected = createMatcher( 'selected' );
 const isChecked = createMatcher( 'checked' );
 
 module.exports = function( { count, barriers, filters, queryString, isEdit, editListIndex, filtersMatchEditList } ){
 
 	const barrierList = [];
+	const hasFilters = !!Object.keys( filters ).length;
+
+	function getRemoveUrl( filters, key ){
+
+		const clone = { ...filters };
+
+		delete clone[ key ];
+
+		if( isEdit ){
+
+			clone.editList = editListIndex;
+		}
+
+		return urls.findABarrier( clone );
+	}
 
 	for( let barrier of barriers ){
 
@@ -79,8 +85,6 @@ module.exports = function( { count, barriers, filters, queryString, isEdit, edit
 			countries.push( ...adminList );
 		}
 	} );
-
-	const hasFilters = !!Object.keys( filters ).length;
 
 	return {
 		count,
