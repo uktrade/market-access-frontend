@@ -50,7 +50,7 @@ function addParams( path, map = [] ){
 
 	for( let [ key, value ] of Object.entries( map ) ){
 
-		params.push( key + '=' + value );
+		params.push( key + '=' + encodeURIComponent( value ) );
 	}
 
 	return path + ( params.length ? '?' + params.join( '&' ) : '' );
@@ -58,7 +58,15 @@ function addParams( path, map = [] ){
 
 module.exports = {
 
-	index: ( params ) => addParams( '/', params ),
+	index: ( watchListIndex, params = {} ) => {
+
+		if( watchListIndex > 0 ){
+
+			params.list = watchListIndex;
+		}
+
+		return addParams( '/', params );
+	},
 	login: () => '/login/',
 	me: () => '/me',
 	whatIsABarrier: () => '/what-is-a-barrier/',
@@ -71,8 +79,8 @@ module.exports = {
 
 	watchList: {
 		save: ( params ) => addParams( '/watch-list/save/', params ),
-		rename: ( params = {} ) => addParams( '/watch-list/save/', { ...params, rename: true } ),
-		remove:	() => '/watch-list/remove/',
+		rename: ( index ) => addParams( `/watch-list/rename/${ index }/` ),
+		remove:	( index ) => `/watch-list/remove/${ index }/`,
 	},
 
 	barriers: {

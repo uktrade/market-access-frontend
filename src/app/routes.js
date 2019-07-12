@@ -4,7 +4,7 @@ const ssoController = require( './controllers/sso' );
 const indexController = require( './controllers/index' );
 const whatIsABarrierController = require( './controllers/what-is-a-barrier' );
 const findABarrierController = require( './controllers/find-a-barrier' );
-const WatchListController = require( './controllers/watch-list' );
+const watchListController = require( './controllers/watch-list' );
 const reportRoutes = require( './sub-apps/reports/routes' );
 const barrierRoutes = require( './sub-apps/barriers/routes' );
 
@@ -34,14 +34,16 @@ module.exports = function( express, app ){
 
 	app.get( '/documents/:uuid/download/', indexController.documents.download ),
 
-	app.get( '/', headerNav( { isDashboard: true } ), dashboardData, indexController.index );
+	app.get( '/', headerNav( { isDashboard: true } ), csrfProtection, dashboardData, indexController.index );
 	app.use( '/reports/', headerNav( { isReport: true } ), reportRoutes( express, express.Router() ) );
 	app.use( '/barriers/', barrierRoutes( express, express.Router() ) );
 	app.get( '/what-is-a-barrier/', whatIsABarrierController );
 	app.get( '/find-a-barrier/', headerNav( { isFind: true } ), findABarrierController.list );
 	app.get( '/find-a-barrier/download/', findABarrierController.download );
 
-	app.get( '/watch-list/save/', csrfProtection, WatchListController.save);
-	app.post( '/watch-list/save/', parseBody, csrfProtection, WatchListController.save);
-	app.get( '/watch-list/remove/', csrfProtection, WatchListController.remove);
+	app.get( '/watch-list/save/', csrfProtection, watchListController.save );
+	app.post( '/watch-list/save/', parseBody, csrfProtection, watchListController.save );
+	app.get( '/watch-list/rename/:index/', csrfProtection, watchListController.rename );
+	app.post( '/watch-list/rename/:index/', parseBody, csrfProtection, watchListController.rename );
+	app.get( '/watch-list/remove/:index/', csrfProtection, watchListController.remove );
 };

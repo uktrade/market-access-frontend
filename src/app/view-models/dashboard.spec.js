@@ -6,6 +6,10 @@ describe( 'Dashboard view model', () => {
 
 	let viewModel;
 	let metadata;
+	let queryString;
+	let editQueryString;
+	let locals;
+	let watchListIndex;
 
 	function getSector(){
 		return { name: 'a sector' };
@@ -34,6 +38,11 @@ describe( 'Dashboard view model', () => {
 			}
 		};
 
+		queryString = { param1: '1', param2: '2' };
+		locals = { a: 'b', c: 'd' };
+		watchListIndex = 1;
+		editQueryString = { ...queryString, editList: watchListIndex };
+
 		viewModel = proxyquire( modulePath, {
 			'../lib/metadata': metadata
 		} );
@@ -43,7 +52,8 @@ describe( 'Dashboard view model', () => {
 		it( 'Should transform and not sort them', () => {
 
 			const barriers = jasmine.helpers.getFakeData( '/backend/barriers/index.dashboard' ).results;
-			const output = viewModel( JSON.parse( JSON.stringify( barriers ) ), { fields: [] }, true, { a: 'b'}, {c: 'd'}) ;
+
+			const output = viewModel( JSON.parse( JSON.stringify( barriers ) ), { fields: [] }, queryString, watchListIndex, locals );
 
 			function checkBarrier( id, index ){
 
@@ -79,35 +89,36 @@ describe( 'Dashboard view model', () => {
 					}
 				} );
 			}
-			expect(output.barrierCount).toEqual(4);
-			expect(output.isWatchList).toEqual(true);
-			expect(output.watchListFilters).toEqual({ a: 'b'});
-			expect(output.queryString).toEqual({c: 'd'});
+
+			expect( output.barrierCount ).toEqual( 4 );
+			expect( output.queryString ).toEqual( queryString );
+			expect( output.editQueryString ).toEqual( editQueryString );
+			expect( output.watchListIndex ) .toEqual( 1 );
 
 			[ '7de', '1ec', '648', '553' ].forEach( checkBarrier );
 		} );
 	} );
 
-	describe( 'When the list of barriers is empty and the country is undefined', () => {
-		it( 'Should return the barriers and country', () => {
+	describe( 'When the list of barriers is empty', () => {
+		it( 'Should return the barriers and other data', () => {
 
 			const input = [];
 			const sortData = {
 				fields: [],
 				currentSort: {},
 			};
-			const output = viewModel( input, sortData, true, { a: 'b'}, {c: 'd'} );
+
+			const output = viewModel( input, sortData, queryString, watchListIndex, locals );
 
 			expect( output ).toEqual({
+				...locals,
 				barriers: input,
 				sortableFields: {},
 				barrierCount: 0,
-				isWatchList: true,
-				watchListFilters: { a: 'b'},
-				queryString: {c: 'd'},
-				editQueryString: {c: 'd', editWatchList: true}
+				queryString,
+				editQueryString,
+				watchListIndex,
 			});
 		} );
 	} );
-
 } );

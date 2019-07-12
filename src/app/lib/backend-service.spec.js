@@ -12,6 +12,7 @@ describe( 'Backend Service', () => {
 	let service;
 	let req;
 	let metadata;
+	let ssoConfig;
 
 	beforeEach( () => {
 
@@ -30,11 +31,14 @@ describe( 'Backend Service', () => {
 		metadata = {
 			getCountry: jasmine.createSpy( 'metadata.country' )
 		};
+		ssoConfig = { bypass: false };
+
 
 		service = proxyquire( modulePath, {
 			'./backend-request': backend,
 			'./metadata': metadata,
 			'../config': {
+				sso: ssoConfig,
 				files: {
 					scan: {
 						statusCheckInterval: 10, //make the test run faster
@@ -47,18 +51,50 @@ describe( 'Backend Service', () => {
 
 	describe( 'getUser', () => {
 		describe( 'When the response is a success', () => {
-			it( 'Should call the correct path and transform the response', async () => {
 
-				const body = { location: 'test' };
-				const countryResponse = 'a country';
+			let body;
+			let countryResponse;
+
+			beforeEach( () => {
+
+				body = { location: 'test' };
+				countryResponse = 'a country';
 
 				backend.get.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body }) );
 				metadata.getCountry.and.callFake( () => countryResponse );
+			} );
 
-				await service.getUser( req );
+			afterEach( () => {
 
 				expect( backend.get ).toHaveBeenCalledWith( '/whoami', token );
 				expect( body.country ).toEqual( countryResponse );
+			} );
+
+			describe( 'When sso bypass is false', () => {
+				it( 'Should call the correct path and transform the response', async () => {
+
+					await service.getUser( req );
+
+					expect( body.permitted_applications ).not.toBeDefined();
+				} );
+			} );
+
+			describe( 'When sso bypass is true', () => {
+				it( 'Should call the correct path and transform the response', async () => {
+
+					ssoConfig.bypass = true;
+
+					await service.getUser( req );
+
+					expect( body.permitted_applications ).toEqual( [
+						{
+							'key': 'datahub-crm',
+						},
+						{
+							'key': 'market-access',
+						}
+					] );
+				} );
 			} );
 		} );
 

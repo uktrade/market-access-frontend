@@ -14,15 +14,15 @@
 
 {% block page_content %}
 
-	{{ dashboardHeading( dashboardTabs ) }}
+	{{ dashboardHeading( dashboardData ) }}
 
 	{% if barriers and barriers.length or isWatchList %}
 		<div class="dashboard-results-header">
 			<h2 class="dashboard-results-header__title">{{ barrierCount }}<span class="dashboard-results-header__title__caption"> barrier{{ 's' if barrierCount != 1 }}</span></h2>
 			<div class="dashboard-results-header__link-wrapper js-toggle-box-control">
 				<a class="dashboard-results-header__link js-list-link js-only" href="{{ urls.findABarrier( editQueryString ) }}"> Edit list filters </a>
-				<a class="dashboard-results-header__link js-list-link" href="{{ urls.watchList.rename( queryString ) }}"> Rename list </a>
-				<a class="dashboard-results-header__link js-list-link" href="{{ urls.watchList.remove() }}"> Delete list </a>
+				<a class="dashboard-results-header__link js-list-link" href="{{ urls.watchList.rename( watchListIndex ) }}"> Rename list </a>
+				<a class="dashboard-results-header__link js-list-link" href="{{ urls.watchList.remove( watchListIndex ) + '?_csrf=' + csrfToken }}"> Delete list </a>
 			</div>
 			<div class="toggle-box">
 				{% if watchListFilters %}

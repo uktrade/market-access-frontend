@@ -15,129 +15,6 @@ a {
 	@include govuk-visually-hidden;
 }
 
-.govuk-phase-banner--ma {
-	margin-bottom: govuk-em( 40, 16 );
-	padding: govuk-em(10, 16) govuk-em(15, 16);
-}
-
-.govuk-header--ma {
-
-	border-bottom: none;
-
-	.govuk-header__container {
-		border-bottom: none;
-		margin-bottom: 0;
-	}
-
-	.govuk-header__navigation-item--active a:link,
-	.govuk-header__navigation-item--active a:hover,
-	.govuk-header__navigation-item--active a:visited {
-		color: $govuk-fuchsia-50;
-	}
-}
-
-@include mq( $from: mobile ){
-
-	.govuk-header--ma {
-
-		border-bottom: none;
-
-		.govuk-header__container {
-			border-bottom: none;
-			margin-bottom: 0;
-		}
-	}
-
-	.js-enabled .header-wrapper__user {
-		display: none;
-	}
-}
-
-.header-wrapper {
-	background-color: $govuk-black;
-	color: $govuk-white;
-}
-
-.js-enabled .header-wrapper__user--open {
-	displaY: block;
-}
-
-.header-wrapper__user__content {
-	max-width: 960px;
-	border-top: 1px solid $govuk-grey-1;
-	margin: 0 govuk-em( 15, 16 );
-	padding: govuk-em( 10, 16 ) 0;
-}
-
-@include mq( $from: tablet ){
-	.header-wrapper__user__content {
-		margin: 0 govuk-em( 30, 16 );
-	}
-}
-
-@include mq( $from: desktop ){
-
-	.header-wrapper {
-		position: relative;
-	}
-
-	.header-wrapper__user {
-		position: absolute;
-		top: govuk-em( 10, 16 );
-		left: 0;
-		width: 100%;
-	}
-
-	.js-enabled .header-wrapper__user {
-		display: block;
-	}
-
-	.header-wrapper__user__content {
-		border-top: 0;
-		text-align: right;
-	}
-}
-
-// As soon as the viewport is greater than the width of the page plus the
-// gutters, just centre the content instead of adding gutters.
-@include govuk-media-query($and: "(min-width: #{($govuk-page-width + $govuk-gutter * 2)})") {
-
-	.header-wrapper__user__content {
-		margin: 0 auto;
-	}
-}
-
-.govuk-tag--ma {
-	padding-top: govuk-em( 4, 16 );
-	padding-bottom: govuk-em( 2, 16 );
-	background-color: $govuk-fuchsia;
-}
-
-.user-info {
-	color: white;
-	font-weight: bold;
-	// line-height: 1.7;
-	// margin-left: 2em;
-}
-
-.user-info a {
-
-	font-weight: normal;
-	color: white;
-	text-decoration: none;
-
-	@include mq( $from: tablet ){
-		margin-left: govuk-em( 10, 16 );
-	}
-
-	&:hover {
-		text-decoration: underline;
-	}
-
-	&:visited {
-		color: white;
-	}
-}
 
 .footer-bar {
 	@include govuk-font( $size: 14 );
@@ -171,27 +48,6 @@ a {
 	}
 }
 
-@include mq( $from: tablet ){
-	.govuk-header--ma {
-		.govuk-width-container {
-			max-width: 100%;
-			margin: 0 govuk-em( 15, 16 );
-		}
-		.govuk-header__logo {
-			width: auto;
-			margin-right: 8%;
-		}
-		.govuk-tag {
-			margin-left: govuk-em( 10, 16 );
-			background-color: #912b88;
-		}
-	}
-	.header-wrapper__user__content {
-		max-width: 100%;
-		margin: 0 govuk-em( 15, 16 );
-	}
-}
-
 .ma-masthead {
 
 	max-width: 100%;
@@ -204,26 +60,6 @@ a {
 		content: "";
 		clear: both;
 		display: table;
-	}
-}
-
-.barrier-summary:after {
-	content: "";
-	clear: both;
-	display: table;
-}
-
-.barrier-content {
-	max-width: 100%;
-	display: inline-block;
-	@include mq($from: 768px) {
-		width: calc(100% - 435px);
-	}
-	@include mq( $from: 1024px ){
-		width: calc(100% - 535px);
-	}
-	.section-heading {
-		border-bottom: none;
 	}
 }
 

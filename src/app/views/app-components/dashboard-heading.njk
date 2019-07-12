@@ -1,6 +1,6 @@
 {% from 'app-components/tabs.njk' import tabs %}
 
-{% macro dashboardHeading( tabList ) %}
+{% macro dashboardHeading( data ) %}
 
 	<h1 class="govuk-heading-l">
 		<span class="govuk-caption-m">Market access barriers</span> Dashboard
@@ -29,5 +29,10 @@
 		</p>
 	</div>
 
-	{{ tabs( tabList ) }}
+	<div class="page-tabs-container">
+		{{ tabs( data.tabs ) }}
+		{% if data.canAddWatchList %}
+		<a class="page-tabs-add-watch-list" href="{{ urls.findABarrier() }}"><span class="circle-icon">&#xFF0B</span> add watch list</a>
+		{% endif %}
+	</div>
 {% endmacro %}

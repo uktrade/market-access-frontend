@@ -1,7 +1,7 @@
 const urls = require( '../lib/urls' );
 const backend = require( '../lib/backend-service' );
 const dashboardViewModel = require( '../view-models/dashboard' );
-const transformFilterValue = require('./watch-list').transformFilterValue;
+const { transformFilterValue } = require( '../lib/barrier-filters' );
 
 const sortData = {
 	fields: [ 'priority', 'date', 'location', 'status', 'updated' ],
@@ -29,28 +29,39 @@ module.exports = {
 	index: async ( req, res, next ) => {
 
 		const currentSort = getCurrentSort( req.query );
-		const userProfile = req.user.user_profile || {};
 
-		if( !userProfile.watchList ){
+		if( !req.watchList.lists.length ){
 
 			res.render( 'index' );
 
 		} else {
 
-			const watchListFilters = Object.entries( userProfile.watchList.filters ).map( ( [ key, value ] ) => ({ key, value: transformFilterValue( key, value ) }) );
+			const queryIndex = req.query.list;
+			const watchListIndex = ( queryIndex ? parseInt( queryIndex, 10 ) : 0 );
+			const currentWatchList = req.watchList.lists[ watchListIndex ];
+
+			if( !currentWatchList ){
+
+				return next( new Error( 'No watchList found' ) );
+			}
 
 			try {
 
-				const { response, body } = await backend.barriers.getAll( req, userProfile.watchList.filters, currentSort.serviceParam, currentSort.direction );
+				const watchListFilters = Object.entries( currentWatchList.filters ).map( ( [ key, value ] ) => ({ key, value: transformFilterValue( key, value ) }) );
+				const { response, body } = await backend.barriers.getAll( req, currentWatchList.filters, currentSort.serviceParam, currentSort.direction );
 
 				if( response.isSuccess ){
 
 					res.render('index', dashboardViewModel(
 						body.results,
 						{ ...sortData, currentSort },
-						true,
-						watchListFilters,
-						userProfile.watchList.filters,
+						currentWatchList.filters,
+						watchListIndex,
+						{
+							isWatchList: true,
+							watchListFilters,
+							csrfToken: req.csrfToken(),
+						}
 					));
 
 				} else {

@@ -60,6 +60,7 @@ $govuk-images-path: '/govuk-public/images/';
 @import 'app-objects/attachments';
 @import 'app-objects/info-panel';
 @import 'app-objects/inline-definition-list';
+@import 'app-objects/circle-icon';
 
 @import 'app-components/dash-button';
 @import 'app-components/dash-card';
@@ -139,6 +140,22 @@ body:not(.js-enabled) {
 	}
 }
 
+.page-tabs-container {
+	position: relative;
+}
+
+.page-tabs-add-watch-list {
+
+	position: absolute;
+	bottom: govuk-em( 15, 16 );
+	right: 0;
+	text-decoration: none;
+
+	&:link {
+		text-decoration: none;
+	}
+}
+
 .restrict-width {
 	max-width: govuk-em( 680, 16 );
 }
@@ -167,12 +184,6 @@ body:not(.js-enabled) {
 .form-cancel {
 	line-height: 2.5;
 	margin-left: govuk-em( 10, 16 );
-}
-
-.interaction-panel {
-	background-color: $govuk-grey-3;
-	padding: govuk-em( 15, 16 );
-	margin-bottom: govuk-em( 30, 16 );
 }
 
 .barrier-section-intro {

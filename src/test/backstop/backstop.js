@@ -44,19 +44,19 @@ module.exports = {
 	id: 'dev-test',
 	viewports: [
 		{
-			"name": 'desktop',
-			"width": 1200,
-			"height": 800
+			name: 'desktop',
+			width: 1200,
+			height: 800
 		},
 		{
-			"name": 'tablet_h',
-			"width": 1024,
-			"height": 568
+			name: 'tablet_h',
+			width: 1024,
+			height: 568
 		},
 		{
-			"name": 'tablet_v',
-			"width": 568,
-			"height": 1024
+			name: 'tablet_v',
+			width: 568,
+			height: 1024
 		}
 	],
 	scenarios,
@@ -67,7 +67,7 @@ module.exports = {
 		html_report: 'src/test/backstop/data/html-report',
 		ci_report: 'src/test/backstop/data/ci-report'
 	},
-	engine: 'phantomjs',
+	engine: 'puppeteer',
 	report: [
 		'browser', 'CI'
 	],
