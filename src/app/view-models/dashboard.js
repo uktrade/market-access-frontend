@@ -43,7 +43,7 @@ function update( barrier ){
 	};
 }
 
-function getSortableFields( sortData ){
+function getSortableFields( watchListIndex, sortData ){
 
 	const sortableFields = {};
 	const currentSort = sortData.currentSort;
@@ -56,30 +56,30 @@ function getSortableFields( sortData ){
 			isActive,
 			key: field,
 			direction: ( isActive ? currentSort.direction : 'desc' ),
-			url: urls.index( { sortBy: field, sortDirection: ( isActive ? ( currentSort.direction === 'asc' ? 'desc' : 'asc' ) : 'desc' ) } ),
+			url: urls.index( watchListIndex, { sortBy: field, sortDirection: ( isActive ? ( currentSort.direction === 'asc' ? 'desc' : 'asc' ) : 'desc' ) } ),
 		};
 	} );
 
 	return sortableFields;
 }
 
-module.exports = ( barriers, sortData, isWatchList, watchListFilters, queryString ) => {
+module.exports = ( barriers, sortData, queryString, watchListIndex, locals ) => {
 
 	if( barriers && barriers.length ){
 
 		barriers = barriers.map( update );
 	}
 
-	const editQueryString = { ...queryString, editWatchList: true };
-	const sortableFields = getSortableFields( sortData );
+	const editQueryString = { ...queryString, editList: watchListIndex };
+	const sortableFields = getSortableFields( watchListIndex, sortData );
 
 	return {
+		...locals,
 		barriers,
 		sortableFields,
 		barrierCount: barriers.length,
-		isWatchList,
-		watchListFilters,
 		queryString,
-		editQueryString
+		editQueryString,
+		watchListIndex,
 	};
 };

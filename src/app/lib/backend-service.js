@@ -101,6 +101,18 @@ function transformUser( { response, body } ){
 	if( response.isSuccess ){
 
 		body.country = metadata.getCountry( body.location );
+
+		if( config.sso.bypass ){
+
+			body.permitted_applications = [
+				{
+					'key': 'datahub-crm',
+				},
+				{
+					'key': 'market-access',
+				}
+			];
+		}
 	}
 
 	body.country = body.country || {};

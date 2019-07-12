@@ -24,21 +24,27 @@ function createMatcher( key ){
 	};
 }
 
-function getRemoveUrl( filters, key ){
-
-	const clone = { ...filters };
-
-	delete clone[ key ];
-
-	return urls.findABarrier( clone );
-}
-
 //const isSelected = createMatcher( 'selected' );
 const isChecked = createMatcher( 'checked' );
 
-module.exports = function( { count, barriers, filters, queryString, editWatchList } ){
+module.exports = function( { count, barriers, filters, queryString, isEdit, editListIndex, filtersMatchEditList } ){
 
 	const barrierList = [];
+	const hasFilters = !!Object.keys( filters ).length;
+
+	function getRemoveUrl( filters, key ){
+
+		const clone = { ...filters };
+
+		delete clone[ key ];
+
+		if( isEdit ){
+
+			clone.editList = editListIndex;
+		}
+
+		return urls.findABarrier( clone );
+	}
 
 	for( let barrier of barriers ){
 
@@ -80,14 +86,16 @@ module.exports = function( { count, barriers, filters, queryString, editWatchLis
 		}
 	} );
 
-
 	return {
 		count,
 		barriers: barrierList,
-		hasFilters: !!Object.keys( filters ).length,
+		hasFilters,
 		queryString,
-		editWatchList,
+		showSaveButton: ( isEdit ? !filtersMatchEditList : hasFilters ),
+		isEdit,
+		editListIndex,
 		filterParams: filters,
+		removeAllUrl: urls.findABarrier( ( isEdit ? { editList: editListIndex } : {} ) ),
 		filters: {
 			country: {
 				items: countries.sort( sortGovukItems.alphabetical ).map( isChecked( filters.country ) ),

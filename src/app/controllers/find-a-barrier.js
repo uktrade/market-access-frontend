@@ -3,9 +3,10 @@ const viewModel = require( '../view-models/find-a-barrier' );
 const barrierFilters = require( '../lib/barrier-filters' );
 
 module.exports = {
+
 	list: async function( req, res, next ){
 
-	const filters = barrierFilters.getFromQueryString( req.query );
+		const filters = barrierFilters.getFromQueryString( req.query );
 
 		try {
 
@@ -13,12 +14,19 @@ module.exports = {
 
 			if( response.isSuccess ){
 
+				const editListParam = req.query.editList;
+				const isEdit = !!editListParam;
+				const editListIndex = ( !!isEdit && parseInt( editListParam, 10 ) );
+				const editList = ( isEdit && req.watchList.lists[ editListIndex ] );
+
 				res.render( 'find-a-barrier', viewModel( {
 					count: body.count,
 					barriers: body.results,
 					filters,
 					queryString: req.query,
-					editWatchList: req.query.editWatchList
+					isEdit,
+					editListIndex,
+					filtersMatchEditList: ( isEdit && editList && barrierFilters.areEqual( filters, editList.filters ) ),
 				} ) );
 
 			} else {

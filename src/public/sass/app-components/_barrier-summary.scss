@@ -3,6 +3,12 @@
 	padding-bottom: govuk-em( 30, 16 );
 }
 
+.barrier-summary:after {
+	content: "";
+	clear: both;
+	display: table;
+}
+
 .barrier-summary__heading {
 	@include govuk-font( $size: 14);
 	float: left;

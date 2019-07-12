@@ -19,21 +19,42 @@ const keyMap = {
 	region: 'isOverseasRegion',
 };
 
+const stringMap = {
+	country: 'locations',
+	sector: 'sectors',
+	type: 'types',
+	priority: 'priorities',
+	region: 'regions',
+};
+
 describe( 'barrier-filters', () => {
 
 	let validators;
+	let strings;
 	let barrierFilters;
 
 	beforeEach( () => {
 
 		validators = {};
+		strings = {};
 
 		validatorNames.forEach( ( name ) => {
 			validators[ name ] = jasmine.createSpy( `validators.${ name }` );
 		} );
 
+		Object.values( stringMap ).forEach( ( stringName ) => {
+
+			const spy = jasmine.createSpy( `strings.${ stringName }` );
+
+			spy.response = faker.lorem.words( 2 );
+			spy.and.callFake( () => spy.response );
+
+			strings[ stringName ] = spy;
+		} );
+
 		barrierFilters = proxyquire( modulePath, {
-			'./validators': validators
+			'./validators': validators,
+			'./strings': strings,
 		} );
 	} );
 
@@ -49,6 +70,33 @@ describe( 'barrier-filters', () => {
 			}
 
 			expect( typeof filtersObject.search ).toEqual( 'function' );
+		} );
+	} );
+
+	describe( '#transformFilterValue', () => {
+		describe( 'When there is a string fn to convert the value', () => {
+			it( 'Uses the string function', () => {
+
+				Object.entries( stringMap ).forEach( ( [ key, stringName ] ) => {
+
+					const id = uuid();
+					const value = barrierFilters.transformFilterValue( key, id );
+					const stringFn = strings[ stringName ];
+
+					expect( stringFn ).toHaveBeenCalledWith( id );
+					expect( value ).toEqual( stringFn.response );
+				} );
+			} );
+		} );
+
+		describe( 'When there is NOT a string fn to convert the value', () => {
+			it( 'Returns the value', () => {
+
+				const id = uuid();
+				const value = barrierFilters.transformFilterValue( 'a', id );
+
+				expect( value ).toEqual( id );
+			} );
 		} );
 	} );
 
@@ -187,6 +235,25 @@ describe( 'barrier-filters', () => {
 						expect( filters ).toEqual( { priority: validPriorities } );
 					} );
 				} );
+			} );
+		} );
+	} );
+
+	describe( '#areEqual', () => {
+		describe( 'When valid keys have matching values', () => {
+			it( 'It should return true', () => {
+
+				expect( barrierFilters.areEqual( { a: 1, b: 2 }, { a: 3, b: 4 } ) ).toEqual( true );
+				expect( barrierFilters.areEqual( { a: 1, b: 2 }, { a: 1, b: 2 } ) ).toEqual( true );
+				expect( barrierFilters.areEqual( { country: 1, b: 2 }, { country: 1, b: 3 } ) ).toEqual( true );
+			} );
+		} );
+
+		describe( 'When valid keys have non matching values', () => {
+			it( 'It should return false', () => {
+
+				expect( barrierFilters.areEqual( { country: 1 }, { country: 2 } ) ).toEqual( false );
+				expect( barrierFilters.areEqual( { country: [ uuid() ] }, { country: [ uuid() ] } ) ).toEqual( false );
 			} );
 		} );
 	} );

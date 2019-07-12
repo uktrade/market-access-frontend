@@ -77,6 +77,10 @@ let config = {
 	reports: {
 		summaryLimit: number( 'REPORT_SUMMARY_LIMIT', 300 ),
 	},
+	watchList: {
+		maxLists: number( 'MAX_WATCH_LISTS', 3 ),
+		maxNameLength: number( 'MAX_WATCH_LIST_NAME_LENGTH', 25 ),
+	},
 	files: {
 		maxSize: number( 'FILE_MAX_SIZE', ( 5 * 1024 * 1024 ) ),
 		types: env( 'FILE_TYPES', 'image/jpeg,text/csv' ).split( ',' ),
