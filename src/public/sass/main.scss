@@ -145,10 +145,10 @@ body:not(.js-enabled) {
 }
 
 .page-tabs-add-watch-list {
+
 	position: absolute;
-	bottom: 0;
+	bottom: govuk-em( 15, 16 );
 	right: 0;
-	padding-bottom: govuk-em( 15, 16 );
 	text-decoration: none;
 
 	&:link {
