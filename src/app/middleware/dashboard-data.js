@@ -1,5 +1,8 @@
-const urls = require( '../lib/urls' );
 const config = require( '../config' );
+const urls = require( '../lib/urls' );
+
+const indexUrl = urls.index();
+const reportsIndexUrl = urls.reports.index();
 
 module.exports = ( req, res, next ) => {
 
@@ -7,7 +10,6 @@ module.exports = ( req, res, next ) => {
 	const urlParts = req.originalUrl.split( '?' );
 	const pathname = urlParts.shift();
 	const tabs = [];
-	const indexUrl = urls.index();
 
 	if( watchLists.length ){
 
@@ -33,13 +35,13 @@ module.exports = ( req, res, next ) => {
 
 	tabs.push({
 		text: 'My draft barriers',
-		href: urls.reports.index(),
-		isCurrent: ( pathname === urls.reports.index() ),
+		href: reportsIndexUrl,
+		isCurrent: ( pathname === reportsIndexUrl ),
 	});
 
 	res.locals.dashboardData = {
 		tabs,
-		canAddWatchList: ( watchLists.length < config.maxWatchLists ),
+		canAddWatchList: ( watchLists.length < config.watchList.maxLists ),
 	};
 
 	next();

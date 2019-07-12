@@ -2,15 +2,33 @@ const config = require( '../config' );
 const urls = require( '../lib/urls' );
 const Form = require( '../lib/Form' );
 const barrierFilters = require( '../lib/barrier-filters' );
+const repoter = require( '../lib/reporter' );
 
 const REPLACE = 'replace';
 const NEW = 'new';
 const NAME_ERROR = 'Enter a name for your watch list';
+const MAX_CHARACTERS = config.watchList.maxNameLength;
 
 function createFilterList( filters ){
 
 	return Object.entries( filters ).map( ( [ key, value ] ) => ({ key, value: barrierFilters.transformFilterValue( key, value ) }) );
 }
+
+const watchListsNameValidator = {
+	fn: ( text ) => {
+
+		const length = text.length;
+		const valid = ( length < MAX_CHARACTERS );
+
+		if( !valid ){
+
+			repoter.message( 'info', 'Watch list name too long', { characters: length } );
+		}
+
+		return valid;
+	},
+	message: `Enter a name less than ${ MAX_CHARACTERS } characters`,
+};
 
 module.exports = {
 
@@ -22,12 +40,13 @@ module.exports = {
 		const watchLists = req.watchList.lists;
 		const watchListsLength = watchLists.length;
 		const canReplace = ( !editIndex && !!watchListsLength );
-		const hasToReplace = ( watchListsLength >= config.maxWatchLists );
+		const hasToReplace = ( watchListsLength >= config.watchList.maxLists );
 		let editWatchList;
 
 		const formConfig = {
 			name: {
 				required: NAME_ERROR,
+				validators: [ watchListsNameValidator ],
 			}
 		};
 
@@ -91,6 +110,11 @@ module.exports = {
 				const values = form.getValues();
 				let index;
 
+				if( hasToReplace ){
+
+					repoter.message( 'info', 'Max number of watch lists reached' );
+				}
+
 				try {
 
 					if( isEdit || hasToReplace || values.replaceOrNew === REPLACE ){
@@ -140,6 +164,7 @@ module.exports = {
 		const form = new Form( req, {
 			name: {
 				required: NAME_ERROR,
+				validators: [ watchListsNameValidator ],
 				values: [ currentWatchList.name ],
 			}
 		});

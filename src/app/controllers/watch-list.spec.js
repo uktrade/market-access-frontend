@@ -19,6 +19,7 @@ let form;
 let transformFilterValue;
 let transformFilterValueResponse;
 let config;
+let reporter;
 
 describe( 'Watch list controller', () => {
 
@@ -33,7 +34,10 @@ describe( 'Watch list controller', () => {
 		};
 
 		config = {
-			maxWatchLists: 3,
+			watchList: {
+				maxLists: 3,
+				maxNameLength: 5,
+			},
 		};
 
 		metadata = {
@@ -43,6 +47,8 @@ describe( 'Watch list controller', () => {
 			getBarrierPriority: jasmine.createSpy( 'validators.getBarrierPriority' ),
 			getOverseasRegion: jasmine.createSpy( 'validators.getOverseasRegion' ),
 		};
+
+		reporter = jasmine.helpers.mocks.reporter();
 
 		getValuesResponse = { name: 'Test name' };
 		getTemplateValuesResponse = { c: 3, d: 4 };
@@ -65,6 +71,7 @@ describe( 'Watch list controller', () => {
 			'../lib/Form': Form,
 			'../lib/urls': urls,
 			'../config': config,
+			'../lib/reporter': reporter,
 		} );
 	} );
 
@@ -89,10 +96,15 @@ describe( 'Watch list controller', () => {
 
 				await controller.save( req, res, next );
 
-				const config = Form.calls.argsFor( 0 )[1];
+				const formConfig = Form.calls.argsFor( 0 )[1];
+				const text = faker.lorem.words( config.watchList.maxNameLength );
 
-				expect( config.name ).toBeDefined();
-				expect( config.name.required ).toBeDefined();
+				expect( formConfig.name ).toBeDefined();
+				expect( formConfig.name.required ).toBeDefined();
+				expect( formConfig.name.validators.length ).toEqual( 1 );
+				expect( formConfig.name.validators[ 0 ].fn( text ) ).toEqual( false );
+				expect( reporter.message ).toHaveBeenCalledWith( 'info', 'Watch list name too long', { characters: text.length } );
+				expect( formConfig.name.validators[ 0 ].message ).toEqual( `Enter a name less than ${ config.watchList.maxNameLength } characters` );
 			});
 
 			it( 'Should render the template with showWarning as false', async () => {
@@ -219,6 +231,7 @@ describe( 'Watch list controller', () => {
 
 								expect( req.watchList.update ).toHaveBeenCalledWith( replaceIndex, getValuesResponse.name, getFromQueryStringResponse );
 								expect( urls.index ).toHaveBeenCalledWith( replaceIndex );
+								expect( reporter.message ).toHaveBeenCalledWith( 'info', 'Max number of watch lists reached' );
 							} );
 						} );
 					} );
@@ -293,6 +306,21 @@ describe( 'Watch list controller', () => {
 					csrfToken,
 				} );
 			}
+
+			it( 'Sets up the form correctly', async () => {
+
+				await controller.rename( req, res, next );
+
+				const formConfig = Form.calls.argsFor( 0 )[1];
+				const text = faker.lorem.words( config.watchList.maxNameLength );
+
+				expect( formConfig.name ).toBeDefined();
+				expect( formConfig.name.required ).toBeDefined();
+				expect( formConfig.name.validators.length ).toEqual( 1 );
+				expect( formConfig.name.validators[ 0 ].fn( text ) ).toEqual( false );
+				expect( reporter.message ).toHaveBeenCalledWith( 'info', 'Watch list name too long', { characters: text.length } );
+				expect( formConfig.name.validators[ 0 ].message ).toEqual( `Enter a name less than ${ config.watchList.maxNameLength } characters` );
+			});
 
 			describe( 'When it is a GET', () => {
 				it( 'Renders the template with the correct data', async () => {
