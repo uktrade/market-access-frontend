@@ -167,7 +167,7 @@ describe( 'Find a barrier view model', () => {
 		expect( metadata.getBarrierTypeList ).toHaveBeenCalledWith();
 		expect( metadata.getBarrierPrioritiesList ).toHaveBeenCalledWith( { suffix: false } );
 		expect( sortGovukItems.alphabetical ).toHaveBeenCalled();
-		expect( urls.findABarrier.calls.count() ).toEqual( 6 );
+		expect( urls.findABarrier.calls.count() ).toEqual( 7 );
 	} );
 
 	function getFilters( overrides = {} ){
@@ -270,7 +270,9 @@ describe( 'Find a barrier view model', () => {
 			expect( output.isEdit ).toEqual( isEdit );
 			expect( output.editListIndex ).not.toBeDefined();
 			expect( output.showSaveButton ).toEqual( false );
+			expect( output.removeAllUrl ).toEqual( findABarrierResponse );
 			expect( urls.findABarrier ).toHaveBeenCalledWith( {} );
+			expect( urls.findABarrier.calls.argsFor( 0 ) ).toEqual( [ {} ] );
 		} );
 	} );
 
@@ -299,6 +301,7 @@ describe( 'Find a barrier view model', () => {
 				expect( output.queryString ).toEqual( queryString );
 				expect( output.editListIndex ).toEqual( editListIndex );
 				expect( output.filterParams ).toEqual( filters );
+				expect( output.removeAllUrl ).toEqual( findABarrierResponse );
 			}
 
 			describe( 'When isEdit is false', () => {

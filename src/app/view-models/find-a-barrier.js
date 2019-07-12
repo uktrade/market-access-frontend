@@ -95,6 +95,7 @@ module.exports = function( { count, barriers, filters, queryString, isEdit, edit
 		isEdit,
 		editListIndex,
 		filterParams: filters,
+		removeAllUrl: urls.findABarrier( ( isEdit ? { editList: editListIndex } : {} ) ),
 		filters: {
 			country: {
 				items: countries.sort( sortGovukItems.alphabetical ).map( isChecked( filters.country ) ),
