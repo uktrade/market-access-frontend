@@ -506,7 +506,7 @@ describe( 'metadata', () => {
 				const item = fakeData.barrier_priorities[ 2 ];
 				const expected = {
 					...item,
-					modifyer: item.code.toLowerCase()
+					modifier: item.code.toLowerCase()
 				};
 
 				expect( metadata.getBarrierPriority( item.code ) ).toEqual( expected );
@@ -520,10 +520,10 @@ describe( 'metadata', () => {
 			beforeEach( () => {
 
 				const list = fakeData.barrier_priorities;
-				expectedOrder = [ list[ 2 ], list[ 3 ], list[ 0 ], list[ 1 ] ].map( ( item ) => ({ ...item, modifyer: item.code.toLowerCase() }) );
+				expectedOrder = [ list[ 2 ], list[ 3 ], list[ 0 ], list[ 1 ] ].map( ( item ) => ({ ...item, modifier: item.code.toLowerCase() }) );
 			} );
 
-			it( 'Should return the list in the correct order with a modifyer property added', () => {
+			it( 'Should return the list in the correct order with a modifier property added', () => {
 
 				expect( metadata.barrierPriorities ).toBeDefined();
 				expect( metadata.barrierPriorities ).toEqual( expectedOrder );
@@ -588,9 +588,9 @@ describe( 'metadata', () => {
 							HIBERNATED
 						},
 						typeInfo: {
-							[ OPEN ]: { name: 'Open', modifyer: 'assessment' },
-							[ RESOLVED ]: { name: 'Resolved', modifyer: 'resolved' },
-							[ HIBERNATED ]: { name: 'Paused', modifyer: 'hibernated' }
+							[ OPEN ]: { name: 'Open', modifier: 'assessment' },
+							[ RESOLVED ]: { name: 'Resolved', modifier: 'resolved' },
+							[ HIBERNATED ]: { name: 'Paused', modifier: 'hibernated' }
 						}
 					},
 					priority: {

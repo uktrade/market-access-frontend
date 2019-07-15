@@ -146,7 +146,7 @@ function barrierPriority( priority ){
 
 	return {
 		...priority,
-		modifyer: priority.code.toLowerCase()
+		modifier: priority.code.toLowerCase()
 	};
 }
 
@@ -266,9 +266,9 @@ module.exports.barrier = {
 			HIBERNATED
 		},
 		typeInfo: {
-			[ OPEN ]: { name: 'Open', modifyer: 'assessment' },
-			[ RESOLVED ]: { name: 'Resolved', modifyer: 'resolved' },
-			[ HIBERNATED ]: { name: 'Paused', modifyer: 'hibernated' }
+			[ OPEN ]: { name: 'Open', modifier: 'assessment' },
+			[ RESOLVED ]: { name: 'Resolved', modifier: 'resolved' },
+			[ HIBERNATED ]: { name: 'Paused', modifier: 'hibernated' }
 		}
 	},
 	priority: {
