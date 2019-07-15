@@ -85,7 +85,7 @@ describe( 'Dashboard view model', () => {
 					},
 					priority: {
 						...barrier.priority,
-						modifyer: barrier.priority.code.toLowerCase()
+						modifier: barrier.priority.code.toLowerCase()
 					}
 				} );
 			}

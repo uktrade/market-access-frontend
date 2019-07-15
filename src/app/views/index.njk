@@ -54,7 +54,7 @@
 			<tbody>
 				{%- for barrier in barriers %}
 				<tr class="standard-table__row">
-					<td class="standard-table__cell"><span class="priority-marker priority-marker--{{ barrier.priority.modifyer }}"></span>{{ barrier.priority.name }}</td>
+					<td class="standard-table__cell"><span class="priority-marker priority-marker--{{ barrier.priority.modifier }}"></span>{{ barrier.priority.name }}</td>
 					<td class="standard-table__cell">{{ barrier.date.modified | dateOnly }}</td>
 					<td class="standard-table__cell">
 						<a class="dashboard-table__barrier-title" href="{{ urls.barriers.detail( barrier.id ) }}">
@@ -66,7 +66,7 @@
 						{{ collapsible( barrier.sectors ) }}
 					</td>
 					<td class="standard-table__cell">{{ barrier.country.name }}</td>
-					<td class="standard-table__cell"><span class="barrier-status-table-badge barrier-status-table-badge--{{ barrier.status.modifyer }}">{{ barrier.status.name }}</span></td>
+					<td class="standard-table__cell"><span class="barrier-status-table-badge barrier-status-table-badge--{{ barrier.status.modifier }}">{{ barrier.status.name }}</span></td>
 					<td class="standard-table__cell">{{ barrier.date.reported | dateOnly }}</td>
 				</tr>
 				{%- endfor %}

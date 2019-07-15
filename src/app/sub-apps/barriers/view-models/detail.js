@@ -60,7 +60,7 @@ module.exports = ( barrier, addCompany = false ) => {
 			},
 			priority: {
 				...barrier.priority,
-				modifyer: barrier.priority.code.toLowerCase()
+				modifier: barrier.priority.code.toLowerCase()
 			},
 			modifiedOn: barrier.modified_on
 		},

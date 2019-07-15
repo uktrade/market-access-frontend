@@ -18,7 +18,7 @@ function update( barrier ){
 	const status = barrierStatusTypeInfo[ barrierStatusCode ] || {};
 	const priority = {
 		...barrier.priority,
-		modifyer: barrier.priority.code.toLowerCase(),
+		modifier: barrier.priority.code.toLowerCase(),
 	};
 
 	return {

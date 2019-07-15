@@ -99,7 +99,7 @@ describe( 'Barrier detail view model', () => {
 			] );
 			expect( outputBarrier.status ).toEqual( {
 				name: 'Open',
-				modifyer: 'assessment',
+				modifier: 'assessment',
 				date: inputBarrier.status_date,
 				description: inputBarrier.status_summary
 			} );
@@ -123,7 +123,7 @@ describe( 'Barrier detail view model', () => {
 				},
 				summary: inputBarrier.infringement_summary
 			} );
-			expect( outputBarrier.priority ).toEqual( { ...inputBarrier.priority, modifyer: inputBarrier.priority.code.toLowerCase() } );
+			expect( outputBarrier.priority ).toEqual( { ...inputBarrier.priority, modifier: inputBarrier.priority.code.toLowerCase() } );
 			expect( outputBarrier.euExitRelated ).toEqual( 'A' );
 
 			expect( output.sectorsList ).toEqual( barrierSectors.map( ( sector ) => ( { text: sector.name } ) ) );
@@ -213,7 +213,7 @@ describe( 'Barrier detail view model', () => {
 
 			expect( outputBarrier.status ).toEqual( {
 				name: 'Resolved',
-				modifyer: 'resolved',
+				modifier: 'resolved',
 				date: inputBarrier.status_date,
 				description: inputBarrier.status_summary
 			} );
@@ -257,7 +257,7 @@ describe( 'Barrier detail view model', () => {
 
 			expect( outputBarrier.status ).toEqual( {
 				name: 'Paused',
-				modifyer: 'hibernated',
+				modifier: 'hibernated',
 				date: inputBarrier.status_date,
 				description: inputBarrier.status_summary
 			} );
