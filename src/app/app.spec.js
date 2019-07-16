@@ -892,7 +892,7 @@ describe( 'App', function(){
 				it( 'Should render the page', ( done ) => {
 
 					const barrier = intercept.stub( '/backend/barriers/barrier' );
-					barrier.status = 2;
+					barrier.status.id = 2;
 
 					intercept.backend()
 						.get( `/barriers/${ barrierId }` )

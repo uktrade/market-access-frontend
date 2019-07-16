@@ -268,14 +268,14 @@ module.exports = {
 			} ),
 			delete: ( req, noteId ) => backend.delete( `/barriers/interactions/${ noteId }`, getToken( req ) ),
 		},
-		resolve: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/resolve`, getToken( req ), {
+		resolve: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/resolve-in-full`, getToken( req ), {
 			status_date: getDefaultedDate( values.resolvedDate ),
 			status_summary: values.resolvedSummary
 		} ),
 		hibernate: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/hibernate`, getToken( req ), {
 			status_summary: values.hibernationSummary
 		} ),
-		open: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/open`, getToken( req ), {
+		open: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/open-in-progress`, getToken( req ), {
 			status_summary: values.reopenSummary
 		} ),
 		saveTypes: ( req, barrierId, types ) => updateBarrier( getToken( req ), barrierId, {

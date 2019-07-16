@@ -15,7 +15,9 @@
          "export_country": "fafe9b8a-18d2-43b8-8e79-a9e220f07df8",
          "support_type": 2,
          "contributor_count": 13,
-         "status": 0,
+         "status": {
+				"id": 0
+			},
          "priority": {
             "code": "HIGH",
             "name": "deserunt",
@@ -37,7 +39,9 @@
          "export_country": "5c9b531c-d072-4426-846a-7902e0152b19",
          "support_type": 2,
          "contributor_count": 15,
-         "status": 0,
+         "status": {
+				"id": 0
+			},
          "priority": {
             "code": "LOW",
             "name": "accusamus",
@@ -59,7 +63,9 @@
          "export_country": "6e1e1043-8e89-43f1-a848-71eaea27cd88",
          "support_type": 2,
          "contributor_count": 17,
-         "status": 4,
+         "status": {
+				"id": 4
+			},
          "priority": {
             "code": "UNKNOWN",
             "name": "numquam",
@@ -81,7 +87,9 @@
          "export_country": "6cef6a0b-adf7-4714-b27a-1e1daaf3c935",
          "support_type": 1,
          "contributor_count": 8,
-         "status": 0,
+         "status": {
+				"id": 0
+			},
          "priority": {
             "code": "LOW",
             "name": "maiores",

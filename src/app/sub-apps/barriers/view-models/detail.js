@@ -6,7 +6,7 @@ const barrierStatusTypeInfo = metadata.barrier.status.typeInfo;
 
 module.exports = ( barrier, addCompany = false ) => {
 
-	const barrierStatusCode = barrier.status;
+	const barrierStatusCode = barrier.status.id;
 	const status = barrierStatusTypeInfo[ barrierStatusCode ] || {};
 	const sectors = ( barrier.sectors || [] ).map( metadata.getSector );
 	const sectorsList =  barrier.all_sectors ? [{ text: 'All sectors' }] : sectors.map( ( sector ) => ( sector && { text: sector.name } || { text: 'Unknown' } ) );
@@ -19,8 +19,8 @@ module.exports = ( barrier, addCompany = false ) => {
 		return ( code ? metadata.optionalBool[ code ] : 'Unknown' );
 	}
 
-	status.description = barrier.status_summary;
-	status.date = barrier.status_date;
+	status.description = barrier.status.summary;
+	status.date = barrier.status.date;
 
 	return {
 		addCompany,

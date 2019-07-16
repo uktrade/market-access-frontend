@@ -15,7 +15,9 @@
          "export_country": "50fef455-fdef-4500-8752-8261f86b1d0e",
          "support_type": 1,
          "contributor_count": 17,
-         "status": 1,
+         "status": {
+				"id": 1
+			},
          "priority": {
             "code": "ABC",
             "name": "id",
@@ -37,7 +39,9 @@
          "export_country": "42d1ee10-5abb-4981-b333-8d3bad342f4c",
          "support_type": 2,
          "contributor_count": 4,
-         "status": 4,
+         "status": {
+				"id": 4
+			},
          "priority": {
             "code": "DEF",
             "name": "at",
@@ -59,7 +63,9 @@
          "export_country": "767cb79b-41a0-48f7-ae2a-ebeaa1c31527",
          "support_type": 1,
          "contributor_count": 11,
-         "status": 1,
+         "status": {
+				"id": 1
+			},
          "priority": {
             "code": "ABC",
             "name": "maxime",
@@ -81,7 +87,9 @@
          "export_country": "9b80fd65-4475-4731-815e-4cd529f28b07",
          "support_type": 1,
          "contributor_count": 6,
-         "status": 1,
+         "status": {
+				"id": 1
+			},
          "priority": {
             "code": "ABC",
             "name": "molestiae",

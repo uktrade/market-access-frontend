@@ -491,35 +491,36 @@ describe( 'Edit barrier controller', () => {
 		} );
 	} );
 
-	describe('status', () => {
+	describe( 'status', () => {
 
 		const template = 'barriers/views/edit/status';
 		let barrier;
 
 		beforeEach( () => {
+
 			barrier = jasmine.helpers.getFakeData( '/backend/barriers/barrier' );
 			validators.isDateValue = jasmine.createSpy( 'validators.isDateValue' );
 			req.barrier = barrier;
-			barrier.status_summary = "hello";
+			barrier.status.summary = "hello";
 		} );
 
-		describe( 'If configuring the form for a resolved barrier', () => {
+		describe( 'Configuring the form for a resolved barrier', () => {
 			it( 'Should configure the Form correctly', async () => {
 
-				barrier.status = 4;
+				barrier.status.id = 4;
 
 				const monthResponse = { month: true };
 				const yearResponse = { year: true };
-	
+
 				validators.isDateValue.and.callFake( ( key ) => {
 					if( key === 'month' ){ return monthResponse; }
 					if( key === 'year' ){ return yearResponse; }
 				} );
-	
+
 				await controller.status( req, res, next );
-	
+
 				const config = Form.calls.argsFor( 0 )[ 1 ];
-	
+
 				expect( config.statusDate ).toBeDefined();
 				expect( config.statusDate.type ).toEqual( Form.GROUP );
 				expect( config.statusDate.validators.length ).toEqual( 5 );
@@ -536,25 +537,25 @@ describe( 'Edit barrier controller', () => {
 						values: [ '2019' ]
 					}
 				} );
-	
+
 				expect( config.statusSummary ).toBeDefined();
 				expect( config.statusSummary.required ).toBeDefined();
-				expect( config.statusSummary.values).toEqual(['hello']);
+				expect( config.statusSummary.values ).toEqual( [ 'hello' ] );
 			});
 		});
 
-		describe( 'If configuring the form for a paused barrier', () => {
+		describe( 'Configuring the form for a paused barrier', () => {
 			it( 'Should configure the Form correctly', async () => {
-	
+
 				await controller.status( req, res, next );
-	
+
 				const config = Form.calls.argsFor( 0 )[ 1 ];
-	
+
 				expect( config.statusDate ).toBeUndefined();
-	
+
 				expect( config.statusSummary ).toBeDefined();
 				expect( config.statusSummary.required ).toBeDefined();
-				expect( config.statusSummary.values).toEqual(['hello']);
+				expect( config.statusSummary.values ).toEqual( [ 'hello' ] );
 			});
 		});
 
@@ -574,7 +575,7 @@ describe( 'Edit barrier controller', () => {
 
 			config.render( templateValues );
 
-			expect( res.render ).toHaveBeenCalledWith( template, templateValues );
+			expect( res.render ).toHaveBeenCalledWith( template, { ...templateValues, isResolved: false } );
 
 			config.saveFormData( formValues );
 
@@ -587,6 +588,7 @@ describe( 'Edit barrier controller', () => {
 			expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
 			expect( urls.barriers.detail ).toHaveBeenCalledWith( barrier.id );
 		} );
+
 		describe( 'When the processor does not throw an error', () => {
 			it( 'Should not call next', async () => {
 

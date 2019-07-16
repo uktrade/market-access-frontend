@@ -3,18 +3,23 @@ const modulePath = './interactions';
 
 const getFakeData = jasmine.helpers.getFakeData;
 
-const OPEN = 'Open';
-const RESOLVED = 'Resolved';
-const PAUSED = 'Paused';
+const types = metadata.barrier.status.types;
 
 describe( 'Interactions view model', () => {
 
 	let viewModel;
+	let OPEN;
+	let RESOLVED;
+	let PAUSED;
 
 	beforeAll( async () => {
 
 		jasmine.helpers.intercept.backend().get( '/metadata' ).reply( 200, getFakeData( '/backend/metadata/' ) );
 		await metadata.fetch();
+
+		OPEN = metadata.barrier.status.typeInfo[ types.OPEN ].name;
+		RESOLVED = metadata.barrier.status.typeInfo[ types.RESOLVED ].name;
+		PAUSED = metadata.barrier.status.typeInfo[ types.HIBERNATED ].name;
 	} );
 
 	beforeEach( async () => {

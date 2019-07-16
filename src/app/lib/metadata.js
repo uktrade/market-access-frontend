@@ -166,7 +166,7 @@ module.exports.fetch = async () => {
 
 			overseasRegions = getOverseasRegions( availableCountries ).sort( sortOverseasRegions );
 			adminAreas = body.country_admin_areas.filter( notDisabled );
-			adminAreasByCountry = alterAdminAreasData(adminAreas);
+			adminAreasByCountry = alterAdminAreasData( adminAreas );
 			countries = availableCountries.map( cleanCountry );
 			sectors = body.sectors.filter( notDisabled );
 			level0Sectors = sectors.filter( ( sector ) => sector.level === 0 );
@@ -215,6 +215,16 @@ module.exports.fetch = async () => {
 				deletion_pending: 'Deletion pending',
 			};
 
+			//overwrite static type info names with the names from the metadata
+			for( let [ key, name ] of Object.entries( body.barrier_status ) ){
+
+				const item = module.exports.barrier.status.typeInfo[ key ];
+
+				if( item ){
+					item.name = name;
+				}
+			}
+
 		} else {
 
 			throw new Error( 'Unable to fetch metadata' );
@@ -249,7 +259,9 @@ module.exports.getBarrierPrioritiesList = ( opts = {} ) => barrierPriorities.map
 	html: `<span class="priority-marker priority-marker--${ code.toLowerCase() }"></span>` + ( opts.suffix === false ? name : `<strong>${ name }</strong> priority` )
 }) );
 
+const PENDING = 1;
 const OPEN = 2;
+const PART_RESOLVED = 3;
 const RESOLVED = 4;
 const HIBERNATED = 5;
 
@@ -261,12 +273,16 @@ module.exports.getAdminArea = (adminAreaId) => adminAreas.find( ( AdminArea ) =>
 module.exports.barrier = {
 	status: {
 		types: {
+			PENDING,
 			OPEN,
+			PART_RESOLVED,
 			RESOLVED,
 			HIBERNATED
 		},
 		typeInfo: {
+			[ PENDING ]: { name: 'Pending', modifier: 'assessment' },
 			[ OPEN ]: { name: 'Open', modifier: 'assessment' },
+			[ PART_RESOLVED ]: { name: 'Part resolved', modifier: 'resolved' },
 			[ RESOLVED ]: { name: 'Resolved', modifier: 'resolved' },
 			[ HIBERNATED ]: { name: 'Paused', modifier: 'hibernated' }
 		}

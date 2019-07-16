@@ -123,6 +123,7 @@ describe( 'Barrier status controller', () => {
 		let detailUrl;
 
 		function checkAndGetConfig(){
+
 			const args = Form.calls.argsFor( 0 );
 			const config = args[ 1 ];
 
@@ -131,7 +132,7 @@ describe( 'Barrier status controller', () => {
 
 			expect( config.status ).toBeDefined();
 			expect( config.status.type ).toEqual( RADIO );
-			expect( config.status.values ).toEqual( [ barrier.status ] );
+			expect( config.status.values ).toEqual( [ barrier.status.id ] );
 			expect( Array.isArray( config.status.items ) ).toEqual( true );
 			expect( typeof config.status.validators[ 0 ].fn ).toEqual( 'function' );
 
@@ -176,6 +177,7 @@ describe( 'Barrier status controller', () => {
 
 			barrier = {
 				id: uuid(),
+				status: {},
 			};
 			req.barrier = barrier;
 
@@ -198,7 +200,7 @@ describe( 'Barrier status controller', () => {
 
 			beforeEach( () => {
 
-				barrier.status = 2;
+				barrier.status.id = 2;
 			} );
 
 			it( 'Should setup the form correctly', () => {
@@ -299,7 +301,6 @@ describe( 'Barrier status controller', () => {
 
 								describe( 'When the fields match', () => {
 									it( 'Should call form.addErrors and render the page', async () => {
-
 
 										form.hasErrors = () => false;
 										form.addErrors.and.callFake( () => {
@@ -471,7 +472,7 @@ describe( 'Barrier status controller', () => {
 
 			beforeEach( () => {
 
-				barrier.status = 4;
+				barrier.status.id = 4;
 			} );
 
 			it( 'Should setup the form correctly', () => {
@@ -538,7 +539,7 @@ describe( 'Barrier status controller', () => {
 
 			beforeEach( () => {
 
-				barrier.status = 5;
+				barrier.status.id = 5;
 			} );
 
 			it( 'Should setup the form correctly', () => {

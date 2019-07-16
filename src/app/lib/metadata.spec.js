@@ -81,6 +81,7 @@ describe( 'metadata', () => {
 		beforeEach( async () => {
 
 			const body = getFakeData( '/backend/metadata/' );
+
 			uniqueBarrierTypes = [ ...body.barrier_types ];
 			body.barrier_types.push( fakeData.barrier_types[ 0 ], fakeData.barrier_types[ 1 ] );
 
@@ -562,6 +563,18 @@ describe( 'metadata', () => {
 				} );
 			} );
 		} );
+
+		describe( 'barrier', () => {
+			describe( 'status.types', () => {
+				it( 'Updates the name with the value from the metadata', () => {
+
+					for( let [ key, item ] of Object.entries( metadata.barrier.status.typeInfo ) ){
+
+						expect( item.name ).toEqual( fakeData.barrier_status[ key ] );
+					}
+				} );
+			} );
+		} );
 	} );
 
 	describe( 'static data', () => {
@@ -576,21 +589,27 @@ describe( 'metadata', () => {
 		describe( 'barrier', () => {
 			it( 'Should expose the required data', () => {
 
+				const PENDING = 1;
 				const OPEN = 2;
+				const PART_RESOLVED = 3;
 				const RESOLVED = 4;
 				const HIBERNATED = 5;
 
 				expect( metadata.barrier ).toEqual( {
 					status: {
 						types: {
+							PENDING,
 							OPEN,
+							PART_RESOLVED,
 							RESOLVED,
 							HIBERNATED
 						},
 						typeInfo: {
+							[ PENDING ]: { name: 'Pending', modifier: 'assessment' },
 							[ OPEN ]: { name: 'Open', modifier: 'assessment' },
+							[ PART_RESOLVED ]: { name: 'Part resolved', modifier: 'resolved' },
 							[ RESOLVED ]: { name: 'Resolved', modifier: 'resolved' },
-							[ HIBERNATED ]: { name: 'Paused', modifier: 'hibernated' }
+							[ HIBERNATED ]: { name: 'Paused', modifier: 'hibernated' },
 						}
 					},
 					priority: {

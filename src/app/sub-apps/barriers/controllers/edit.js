@@ -95,19 +95,20 @@ module.exports = {
 
 	status: async ( req, res, next ) => {
 
-		
 		const barrier = req.barrier;
-		const isResolved = barrier.status === metadata.barrier.status.types.RESOLVED;
+		const isResolved = barrier.status.id === metadata.barrier.status.types.RESOLVED;
 
 		const formFields = {
 			statusSummary: {
-				values: [ barrier.status_summary ],
+				values: [ barrier.status.summary ],
 				required: 'Enter a summary'
 			}
 		};
-		if (isResolved) { 
+
+		if( isResolved ){
+
 			const invalidDateMessage = 'Enter resolution date and include a month and year';
-			const resolvedDateValues = getDateParts(barrier.status_date );
+			const resolvedDateValues = getDateParts( barrier.status.date );
 
 			formFields.statusDate = {
 				type: Form.GROUP,
@@ -137,12 +138,12 @@ module.exports = {
 				}
 			};
 		}
-		
+
 		const form = new Form( req, formFields);
 
 		const processor = new FormProcessor( {
 			form,
-			render: ( templateValues ) => res.render( 'barriers/views/edit/status', Object.assign(templateValues, {isResolved}) ),
+			render: ( templateValues ) => res.render( 'barriers/views/edit/status', { ...templateValues, isResolved } ),
 			saveFormData: ( formValues ) => backend.barriers.saveStatus( req, barrier.id, formValues ),
 			saved: () => res.redirect( urls.barriers.detail( barrier.id ) )
 		} );

@@ -565,7 +565,7 @@ describe( 'Backend Service', () => {
 					resolvedSummary
 				} );
 
-				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/resolve`, token, {
+				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/resolve-in-full`, token, {
 					status_date: [ year, month, '01' ].join( '-' ),
 					status_summary: resolvedSummary
 				} );
@@ -596,7 +596,7 @@ describe( 'Backend Service', () => {
 					reopenSummary
 				} );
 
-				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/open`, token, {
+				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/open-in-progress`, token, {
 					status_summary: reopenSummary
 				} );
 			} );

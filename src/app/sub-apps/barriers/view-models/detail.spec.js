@@ -2,8 +2,9 @@ const proxyquire = require( 'proxyquire' );
 const faker = require( 'faker' );
 const modulePath = './detail';
 
+const { OPEN, RESOLVED, HIBERNATED } = require( '../../../lib/metadata' ).barrier.status.types;
+
 describe( 'Barrier detail view model', () => {
-	// Add in the admin areas
 
 	let viewModel;
 	let metadata;
@@ -57,7 +58,7 @@ describe( 'Barrier detail view model', () => {
 				{ title: 'A', description: 'a description' },
 				{ title: 'B', description: 'b description' },
 				{ title: 'C', description: 'c description' },
-			]
+			],
 		};
 
 		config = { addCompany: false };
@@ -78,7 +79,7 @@ describe( 'Barrier detail view model', () => {
 	describe( 'With all the data on an open barrier', () => {
 		it( 'Should create all the correct properties', () => {
 
-			inputBarrier.status = 2;
+			inputBarrier.status.id = 2;
 			inputBarrier.problem_status = '2';
 
 			const output = viewModel( inputBarrier );
@@ -98,10 +99,10 @@ describe( 'Barrier detail view model', () => {
 				{ text: metadata.barrierTypes[ 1 ].title },
 			] );
 			expect( outputBarrier.status ).toEqual( {
-				name: 'Open',
-				modifier: 'assessment',
-				date: inputBarrier.status_date,
-				description: inputBarrier.status_summary
+				name: metadata.barrier.status.typeInfo[ OPEN ].name,
+				modifier: metadata.barrier.status.typeInfo[ OPEN ].modifier,
+				date: inputBarrier.status.date,
+				description: inputBarrier.status.summary
 			} );
 			expect( outputBarrier.reportedOn ).toEqual( inputBarrier.reported_on );
 			expect( outputBarrier.addedBy ).toEqual( inputBarrier.reported_by );
@@ -148,7 +149,7 @@ describe( 'Barrier detail view model', () => {
 	describe( 'With sectors missing on an open barrier', () => {
 		it( 'Should create all the correct properties', () => {
 
-			inputBarrier.status = 2;
+			inputBarrier.status.id = 2;
 			inputBarrier.sectors = null;
 
 			const output = viewModel( inputBarrier );
@@ -168,7 +169,7 @@ describe( 'Barrier detail view model', () => {
 
 			metadata.getSector.and.callFake( () => null );
 
-			inputBarrier.status = 2;
+			inputBarrier.status.id = 2;
 			inputBarrier.sectors = [ null ];
 
 			const output = viewModel( inputBarrier );
@@ -206,16 +207,16 @@ describe( 'Barrier detail view model', () => {
 	describe( 'A resolved barrier', () => {
 		it( 'Should have the correct properties', () => {
 
-			inputBarrier.status = 4;
+			inputBarrier.status.id = 4;
 
 			const output = viewModel( inputBarrier );
 			const outputBarrier = output.barrier;
 
 			expect( outputBarrier.status ).toEqual( {
-				name: 'Resolved',
-				modifier: 'resolved',
-				date: inputBarrier.status_date,
-				description: inputBarrier.status_summary
+				name: metadata.barrier.status.typeInfo[ RESOLVED ].name,
+				modifier: metadata.barrier.status.typeInfo[ RESOLVED ].modifier,
+				date: inputBarrier.status.date,
+				description: inputBarrier.status.summary
 			} );
 
 			expect( outputBarrier.isOpen ).toEqual( false );
@@ -238,28 +239,29 @@ describe( 'Barrier detail view model', () => {
 
 	describe( 'When all sectors is selected', () => {
 		it( 'Should have the correct properties', () => {
+
 			inputBarrier.all_sectors = true;
 
 			const output = viewModel( inputBarrier );
 			const sectorsList = output.sectorsList;
 
-			expect(sectorsList).toEqual([{ text: 'All sectors' }]);
+			expect( sectorsList ).toEqual( [ { text: 'All sectors' } ] );
 		});
 	});
 
 	describe( 'A hibernated barrier', () => {
 		it( 'Should have the correct properties', () => {
 
-			inputBarrier.status = 5;
+			inputBarrier.status.id = 5;
 
 			const output = viewModel( inputBarrier );
 			const outputBarrier = output.barrier;
 
 			expect( outputBarrier.status ).toEqual( {
-				name: 'Paused',
-				modifier: 'hibernated',
-				date: inputBarrier.status_date,
-				description: inputBarrier.status_summary
+				name: metadata.barrier.status.typeInfo[ HIBERNATED ].name,
+				modifier: metadata.barrier.status.typeInfo[ HIBERNATED ].modifier,
+				date: inputBarrier.status.date,
+				description: inputBarrier.status.summary
 			} );
 
 			expect( outputBarrier.isOpen ).toEqual( false );
