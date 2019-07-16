@@ -9,6 +9,7 @@ const validatorNames = [
 	'isBarrierType',
 	'isBarrierPriority',
 	'isOverseasRegion',
+	'isBarrierStatus',
 ];
 
 const keyMap = {
@@ -17,6 +18,7 @@ const keyMap = {
 	type: 'isBarrierType',
 	priority: 'isBarrierPriority',
 	region: 'isOverseasRegion',
+	status: 'isBarrierStatus',
 };
 
 const stringMap = {
@@ -25,6 +27,7 @@ const stringMap = {
 	type: 'types',
 	priority: 'priorities',
 	region: 'regions',
+	status: 'statuses'
 };
 
 describe( 'barrier-filters', () => {
@@ -107,12 +110,13 @@ describe( 'barrier-filters', () => {
 		beforeEach( () => {
 
 			query = {
-				country: String( uuid() ),
-				sector: String( uuid() ),
+				country:  uuid(),
+				sector:  uuid(),
 				type: String( faker.random.number() ),
 				priority: String( faker.random.number( { min: 0, max: 5 } ) ),
-				region: String( uuid() ),
-				search: String( faker.lorem.words( 3 ) ),
+				region: uuid(),
+				search: faker.lorem.words( 3 ),
+				status: '2',
 			};
 
 			validatorNames.forEach( ( name ) => validators[ name ].and.callFake( () => true ) );

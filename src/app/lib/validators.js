@@ -52,4 +52,5 @@ module.exports = {
 	isValidFile: ( file ) => config.files.types.includes( file.type ),
 	isBarrierPriority: ( value ) => metadata.barrierPriorities.some( ( priority ) => priority.code === value ),
 	isCountryOrAdminArea: ( id ) => isCountry( id ) || isCountryAdminArea( id ),
+	isBarrierStatus: ( id ) => metadata.barrierStatuses.hasOwnProperty( id ),
 };

@@ -44,4 +44,5 @@ module.exports = {
 	},
 	types: ( ids = [] ) => ids.map( ( id ) => metadata.getBarrierType( id ).title ).join( DELIMITER ),
 	priorities: ( ids = [] ) => ids.map( ( id ) => metadata.getBarrierPriority( id ).name ).join( DELIMITER ),
+	statuses: ( ids = [] ) => ids.map( ( id ) => metadata.getBarrierStatus( id ) ).join( DELIMITER ),
 };

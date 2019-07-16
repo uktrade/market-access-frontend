@@ -127,6 +127,23 @@
 					items: filters.priority.items
 				})	}}
 
+				{{ checkboxFilter({
+					id: 'status',
+					name: 'status',
+					classes: 'govuk-!-width-full',
+					formGroup: {
+						classes: 'filter-group'
+					},
+					fieldset: {
+						classes: 'filter-group__inner',
+						legend: {
+							text: "Barrier status",
+							classes: "filter-items__label filter-group__label"
+						}
+					},
+					items: filters.status.items
+				})	}}
+
 				{% if hasFilters %}
 				<a class="filter-items__clear" href="{{ removeAllUrl }}">Remove all filters</a>
 				{% endif %}
@@ -162,6 +179,7 @@
 						{{ activeFilter( 'Type', filters.type ) }}
 						{{ activeFilter( 'Overseas region', filters.region ) }}
 						{{ activeFilter( 'Priority', filters.priority ) }}
+						{{ activeFilter( 'Status', filters.status ) }}
 					</ul>
 
 					<div class="filter-results-action-buttons{{ ' filter-results-action-buttons--save' if not editWatchList }}">

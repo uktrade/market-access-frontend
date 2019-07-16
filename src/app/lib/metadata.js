@@ -9,6 +9,7 @@ let level0Sectors;
 let barrierTypes;
 let uniqueBarrierTypes;
 let barrierPriorities;
+let barrierStatuses;
 
 function notDisabled( item ){
 
@@ -173,6 +174,7 @@ module.exports.fetch = async () => {
 			barrierTypes = body.barrier_types;
 			uniqueBarrierTypes = dedupeBarrierTypes( barrierTypes );
 			barrierPriorities = body.barrier_priorities.map( barrierPriority ).sort( sortPriority );
+			barrierStatuses = body.barrier_status;
 
 			module.exports.statusTypes = {
 				...body.status_types,
@@ -214,6 +216,7 @@ module.exports.fetch = async () => {
 				virus_scanned: 'Virus scanned',
 				deletion_pending: 'Deletion pending',
 			};
+			module.exports.barrierStatuses = barrierStatuses;
 
 			//overwrite static type info names with the names from the metadata
 			for( let [ key, name ] of Object.entries( body.barrier_status ) ){
@@ -269,6 +272,8 @@ module.exports.getCountryAdminAreasList = ( countryId, defaultText = 'Select an 
 module.exports.isCountryWithAdminArea = ( countryID ) => countryID in adminAreasByCountry;
 module.exports.getAdminArea = (adminAreaId) => adminAreas.find( ( AdminArea ) => AdminArea.id === adminAreaId );
 
+module.exports.getBarrierStatus = ( id ) => barrierStatuses[ id ];
+module.exports.getBarrierStatusList = () => Object.entries( barrierStatuses ).map( ( [ id, name ] ) => ({ value: id, text: name }) );
 
 module.exports.barrier = {
 	status: {

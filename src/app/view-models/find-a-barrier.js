@@ -131,7 +131,13 @@ module.exports = function( { count, barriers, filters, queryString, isEdit, edit
 				active: !!filters.search,
 				text: filters.search,
 				removeUrl: getRemoveUrl( filters, 'search' ),
-			}
+			},
+			status: {
+				items: metadata.getBarrierStatusList().map( isChecked( filters.status ) ),
+				active: !!filters.status,
+				text: strings.statuses( filters.status ),
+				removeUrl: getRemoveUrl( filters, 'status' ),
+			},
 		}
 	};
 };
