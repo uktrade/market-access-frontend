@@ -28,52 +28,60 @@ module.exports = async ( req, res, next ) => {
 
 		if( !form.hasErrors() ){
 
-			if (!metadata.isCountryWithAdminArea(form.getValues().country)){
+			const formValues = form.getValues();
+
+			if( !metadata.isCountryWithAdminArea( formValues.country ) ){
+
 				try {
+
 					const reportId = report.id;
 					const sessionStartForm = ( req.session.startFormValues || req.report && { status: req.report.problem_status } );
 					const sessionResolvedForm = ( req.session.isResolvedFormValues || req.report && { isResolved: req.report.is_resolved, resolvedDate: req.report.resolved_date } );
 					const isUpdate = !!reportId;
-			
+
 					let response;
 					let body;
-					let values = Object.assign( {}, sessionStartForm, sessionResolvedForm, form.getValues(), {adminAreas: []} );
-			
+					let values = Object.assign( {}, sessionStartForm, sessionResolvedForm, formValues, { adminAreas: [] } );
+
 					if( isUpdate ){
 						({ response, body } = await backend.reports.update( req, reportId, values ));
 					} else {
 						({ response, body } = await backend.reports.save( req, values ));
 					}
-			
+
 					if( response.isSuccess ){
-			
+
 						delete req.session.startFormValues;
 						delete req.session.isResolvedFormValues;
 						delete req.session.countryFormValues;
-			
+
 						if( !isUpdate && !body.id ){
-			
+
 							return next( new Error( 'No id created for report' ) );
-			
+
 						} else {
-			
+
 							return res.redirect( urls.reports.hasSectors( body.id ) );
 						}
-			
+
 					} else {
-			
+
 						return next( new Error( `Unable to ${ isUpdate ? 'update' : 'save' } report, got ${ response.statusCode } response code` ) );
 					}
-			
+
 				} catch( e ){
-			
+
 					return next( e );
 				}
+
 			} else {
-				if (form.getValues().country !== report.export_country) {
+
+				if( formValues.country !== report.export_country ){
+
 					delete req.session.adminAreas;
 				}
-				return res.redirect( urls.reports.hasAdminAreas( report.id, form.getValues().country ) );
+
+				return res.redirect( urls.reports.hasAdminAreas( report.id, formValues.country ) );
 			}
 		}
 	}

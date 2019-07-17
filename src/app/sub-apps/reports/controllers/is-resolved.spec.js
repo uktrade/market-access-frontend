@@ -59,6 +59,7 @@ describe( 'Report controllers', () => {
 	} );
 
 	describe( 'isResolved', () => {
+
 		const template = 'reports/views/is-resolved';
 
 		it( 'Should setup the form correctly', () => {
