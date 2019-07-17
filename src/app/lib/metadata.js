@@ -11,6 +11,14 @@ let uniqueBarrierTypes;
 let barrierPriorities;
 let barrierStatuses;
 
+const barrierStatusKeys = {
+	PENDING: 1,
+	OPEN: 2,
+	PART_RESOLVED: 3,
+	RESOLVED: 4,
+	HIBERNATED: 5,
+};
+
 function notDisabled( item ){
 
 	return  item.disabled_on === null;
@@ -174,7 +182,11 @@ module.exports.fetch = async () => {
 			barrierTypes = body.barrier_types;
 			uniqueBarrierTypes = dedupeBarrierTypes( barrierTypes );
 			barrierPriorities = body.barrier_priorities.map( barrierPriority ).sort( sortPriority );
-			barrierStatuses = body.barrier_status;
+			barrierStatuses = Object.values( barrierStatusKeys ).reduce( ( statuses, id ) => {
+
+				statuses[ id ] = body.barrier_status[ id ];
+				return statuses;
+			}, {} );
 
 			module.exports.statusTypes = {
 				...body.status_types,
@@ -262,12 +274,6 @@ module.exports.getBarrierPrioritiesList = ( opts = {} ) => barrierPriorities.map
 	html: `<span class="priority-marker priority-marker--${ code.toLowerCase() }"></span>` + ( opts.suffix === false ? name : `<strong>${ name }</strong> priority` )
 }) );
 
-const PENDING = 1;
-const OPEN = 2;
-const PART_RESOLVED = 3;
-const RESOLVED = 4;
-const HIBERNATED = 5;
-
 module.exports.getCountryAdminAreasList = ( countryId, defaultText = 'Select an admin area') => createAdminAreaList(countryId, adminAreasByCountry, defaultText);
 module.exports.isCountryWithAdminArea = ( countryID ) => countryID in adminAreasByCountry;
 module.exports.getAdminArea = (adminAreaId) => adminAreas.find( ( AdminArea ) => AdminArea.id === adminAreaId );
@@ -277,19 +283,13 @@ module.exports.getBarrierStatusList = () => Object.entries( barrierStatuses ).ma
 
 module.exports.barrier = {
 	status: {
-		types: {
-			PENDING,
-			OPEN,
-			PART_RESOLVED,
-			RESOLVED,
-			HIBERNATED
-		},
+		types: barrierStatusKeys,
 		typeInfo: {
-			[ PENDING ]: { name: 'Pending', modifier: 'assessment' },
-			[ OPEN ]: { name: 'Open', modifier: 'assessment' },
-			[ PART_RESOLVED ]: { name: 'Part resolved', modifier: 'resolved' },
-			[ RESOLVED ]: { name: 'Resolved', modifier: 'resolved' },
-			[ HIBERNATED ]: { name: 'Paused', modifier: 'hibernated' }
+			[ barrierStatusKeys.PENDING ]: { name: 'Pending', modifier: 'assessment' },
+			[ barrierStatusKeys.OPEN ]: { name: 'Open', modifier: 'assessment' },
+			[ barrierStatusKeys.PART_RESOLVED ]: { name: 'Part resolved', modifier: 'resolved' },
+			[ barrierStatusKeys.RESOLVED ]: { name: 'Resolved', modifier: 'resolved' },
+			[ barrierStatusKeys.HIBERNATED ]: { name: 'Paused', modifier: 'hibernated' }
 		}
 	},
 	priority: {

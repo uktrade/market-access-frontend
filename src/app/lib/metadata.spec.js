@@ -563,27 +563,37 @@ describe( 'metadata', () => {
 			} );
 		} );
 
-		describe( 'barrierStatuses', () => {
-			it( 'Should return the object', () => {
+		describe( 'Barier status', () => {
 
-				expect( metadata.barrierStatuses ).toBeDefined();
-				expect( metadata.barrierStatuses ).toEqual( fakeData.barrier_status );
+			let validList;
+
+			beforeEach( () => {
+				validList = { ...fakeData.barrier_status };
+				delete validList[ 6 ];
 			} );
-		} );
 
-		describe( 'getBarrierStatus', () => {
-			it( 'Should return the object', () => {
+			describe( 'barrierStatuses', () => {
+				it( 'Should return the object', () => {
 
-				expect( metadata.getBarrierStatus( '1' ) ).toEqual( fakeData.barrier_status[ '1' ] );
+					expect( metadata.barrierStatuses ).toBeDefined();
+					expect( metadata.barrierStatuses ).toEqual( validList );
+				} );
 			} );
-		} );
 
-		describe( 'getBarrierStatusList', () => {
-			it( 'Should return a list', () => {
+			describe( 'getBarrierStatus', () => {
+				it( 'Should return the object', () => {
 
-				const expected = Object.entries( fakeData.barrier_status ).map( ( [ id, name ] ) => ({ value: id, text: name }) );
+					expect( metadata.getBarrierStatus( '1' ) ).toEqual( validList[ '1' ] );
+				} );
+			} );
 
-				expect( metadata.getBarrierStatusList() ).toEqual( expected );
+			describe( 'getBarrierStatusList', () => {
+				it( 'Should return a list', () => {
+
+					const expected = Object.entries( validList ).map( ( [ id, name ] ) => ({ value: id, text: name }) );
+
+					expect( metadata.getBarrierStatusList() ).toEqual( expected );
+				} );
 			} );
 		} );
 
