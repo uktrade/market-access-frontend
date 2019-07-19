@@ -11,6 +11,7 @@ describe( 'Interactions view model', () => {
 	let OPEN;
 	let RESOLVED;
 	let PAUSED;
+	let UNKNOWN;
 
 	beforeAll( async () => {
 
@@ -20,6 +21,7 @@ describe( 'Interactions view model', () => {
 		OPEN = metadata.barrier.status.typeInfo[ types.OPEN ].name;
 		RESOLVED = metadata.barrier.status.typeInfo[ types.RESOLVED ].name;
 		PAUSED = metadata.barrier.status.typeInfo[ types.HIBERNATED ].name;
+		UNKNOWN = metadata.barrier.status.typeInfo[ types.UNKNOWN ].name;
 	} );
 
 	beforeEach( async () => {
@@ -44,7 +46,7 @@ describe( 'Interactions view model', () => {
 		};
 	}
 
-	function createStatus( item, from, to, isResolved, isOpen){
+	function createStatus( item, from, to, isResolved, isOpen ){
 		return {
 			isStatus: true,
 			modifier: 'status',
@@ -95,8 +97,8 @@ describe( 'Interactions view model', () => {
 			createStatus( historyResults[ 3 ], OPEN, RESOLVED, true, false ),
 			createPriority( historyResults[ 5 ] ),
 			createNote( interactionsResults[ 1 ] ),
-			createStatus( historyResults[ 1 ], 0, OPEN, false, true ),
-			createStatus( historyResults[ 0 ], null, 0, false, false ),
+			createStatus( historyResults[ 1 ], UNKNOWN, OPEN, false, true ),
+			createStatus( historyResults[ 0 ], null, UNKNOWN, false, false ),
 		] );
 	} );
 } );

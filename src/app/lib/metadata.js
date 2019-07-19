@@ -12,6 +12,7 @@ let barrierPriorities;
 let barrierStatuses;
 
 const barrierStatusKeys = {
+	UNKNOWN: 0,
 	PENDING: 1,
 	OPEN: 2,
 	PART_RESOLVED: 3,
@@ -275,8 +276,8 @@ module.exports.getBarrierPrioritiesList = ( opts = {} ) => barrierPriorities.map
 }) );
 
 module.exports.getCountryAdminAreasList = ( countryId, defaultText = 'Select an admin area') => createAdminAreaList(countryId, adminAreasByCountry, defaultText);
-module.exports.isCountryWithAdminArea = ( countryID ) => countryID in adminAreasByCountry;
-module.exports.getAdminArea = (adminAreaId) => adminAreas.find( ( AdminArea ) => AdminArea.id === adminAreaId );
+module.exports.isCountryWithAdminArea = ( countryId ) => countryId in adminAreasByCountry;
+module.exports.getAdminArea = ( adminAreaId ) => adminAreas.find( ( AdminArea ) => AdminArea.id === adminAreaId );
 
 module.exports.getBarrierStatus = ( id ) => barrierStatuses[ id ];
 module.exports.getBarrierStatusList = () => Object.entries( barrierStatuses ).map( ( [ id, name ] ) => ({ value: id, text: name }) );
@@ -285,11 +286,12 @@ module.exports.barrier = {
 	status: {
 		types: barrierStatusKeys,
 		typeInfo: {
-			[ barrierStatusKeys.PENDING ]: { name: 'Pending', modifier: 'assessment' },
-			[ barrierStatusKeys.OPEN ]: { name: 'Open', modifier: 'assessment' },
-			[ barrierStatusKeys.PART_RESOLVED ]: { name: 'Part resolved', modifier: 'resolved' },
-			[ barrierStatusKeys.RESOLVED ]: { name: 'Resolved', modifier: 'resolved' },
-			[ barrierStatusKeys.HIBERNATED ]: { name: 'Paused', modifier: 'hibernated' }
+			[ barrierStatusKeys.UNKNOWN ]: { name: 'Unknown', modifier: 'hibernated', hint: 'Barrier requires further work for the status to be known' },
+			[ barrierStatusKeys.PENDING ]: { name: 'Pending', modifier: 'assessment', hint: 'Barrier is awaiting action' },
+			[ barrierStatusKeys.OPEN ]: { name: 'Open', modifier: 'assessment', hint: 'Barrier is being worked on' },
+			[ barrierStatusKeys.PART_RESOLVED ]: { name: 'Part resolved', modifier: 'resolved', hint: 'Barrier has been resolved for specific UK companies but not all. Barrier impact has been significantly reduced but remains in part' },
+			[ barrierStatusKeys.RESOLVED ]: { name: 'Resolved', modifier: 'resolved', hint: 'Barrier has been resolved for all UK companies' },
+			[ barrierStatusKeys.HIBERNATED ]: { name: 'Paused', modifier: 'hibernated', hint: 'Barrier is present but not being persued' },
 		}
 	},
 	priority: {

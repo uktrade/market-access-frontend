@@ -622,6 +622,7 @@ describe( 'metadata', () => {
 		describe( 'barrier', () => {
 			it( 'Should expose the required data', () => {
 
+				const UNKNOWN = 0;
 				const PENDING = 1;
 				const OPEN = 2;
 				const PART_RESOLVED = 3;
@@ -631,6 +632,7 @@ describe( 'metadata', () => {
 				expect( metadata.barrier ).toEqual( {
 					status: {
 						types: {
+							UNKNOWN,
 							PENDING,
 							OPEN,
 							PART_RESOLVED,
@@ -638,11 +640,12 @@ describe( 'metadata', () => {
 							HIBERNATED
 						},
 						typeInfo: {
-							[ PENDING ]: { name: 'Pending', modifier: 'assessment' },
-							[ OPEN ]: { name: 'Open', modifier: 'assessment' },
-							[ PART_RESOLVED ]: { name: 'Part resolved', modifier: 'resolved' },
-							[ RESOLVED ]: { name: 'Resolved', modifier: 'resolved' },
-							[ HIBERNATED ]: { name: 'Paused', modifier: 'hibernated' },
+							[ UNKNOWN ]: { name: 'Unknown', modifier: 'hibernated', hint: 'Barrier requires further work for the status to be known' },
+							[ PENDING ]: { name: 'Pending', modifier: 'assessment', hint: 'Barrier is awaiting action' },
+							[ OPEN ]: { name: 'Open', modifier: 'assessment', hint: 'Barrier is being worked on' },
+							[ PART_RESOLVED ]: { name: 'Part resolved', modifier: 'resolved', hint: 'Barrier has been resolved for specific UK companies but not all. Barrier impact has been significantly reduced but remains in part' },
+							[ RESOLVED ]: { name: 'Resolved', modifier: 'resolved', hint: 'Barrier has been resolved for all UK companies' },
+							[ HIBERNATED ]: { name: 'Paused', modifier: 'hibernated', hint: 'Barrier is present but not being persued' },
 						}
 					},
 					priority: {

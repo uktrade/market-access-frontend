@@ -85,6 +85,7 @@ describe( 'Barrier detail view model', () => {
 			const output = viewModel( inputBarrier );
 			const outputBarrier = output.barrier;
 			const barrierSectors = inputBarrier.sectors.map( metadata.getSector );
+			const openMetadata = metadata.barrier.status.typeInfo[ OPEN ];
 
 			expect( outputBarrier.id ).toEqual( inputBarrier.id );
 			expect( outputBarrier.code ).toEqual( inputBarrier.code );
@@ -99,10 +100,11 @@ describe( 'Barrier detail view model', () => {
 				{ text: metadata.barrierTypes[ 1 ].title },
 			] );
 			expect( outputBarrier.status ).toEqual( {
-				name: metadata.barrier.status.typeInfo[ OPEN ].name,
-				modifier: metadata.barrier.status.typeInfo[ OPEN ].modifier,
+				name: openMetadata.name,
+				modifier: openMetadata.modifier,
 				date: inputBarrier.status.date,
-				description: inputBarrier.status.summary
+				description: inputBarrier.status.summary,
+				hint: openMetadata.hint,
 			} );
 			expect( outputBarrier.reportedOn ).toEqual( inputBarrier.reported_on );
 			expect( outputBarrier.addedBy ).toEqual( inputBarrier.reported_by );
@@ -211,12 +213,14 @@ describe( 'Barrier detail view model', () => {
 
 			const output = viewModel( inputBarrier );
 			const outputBarrier = output.barrier;
+			const resolvedMetadata = metadata.barrier.status.typeInfo[ RESOLVED ];
 
 			expect( outputBarrier.status ).toEqual( {
-				name: metadata.barrier.status.typeInfo[ RESOLVED ].name,
-				modifier: metadata.barrier.status.typeInfo[ RESOLVED ].modifier,
+				name: resolvedMetadata.name,
+				modifier: resolvedMetadata.modifier,
 				date: inputBarrier.status.date,
-				description: inputBarrier.status.summary
+				description: inputBarrier.status.summary,
+				hint: resolvedMetadata.hint,
 			} );
 
 			expect( outputBarrier.isOpen ).toEqual( false );
@@ -256,12 +260,14 @@ describe( 'Barrier detail view model', () => {
 
 			const output = viewModel( inputBarrier );
 			const outputBarrier = output.barrier;
+			const hibernatedMetadata = metadata.barrier.status.typeInfo[ HIBERNATED ];
 
 			expect( outputBarrier.status ).toEqual( {
-				name: metadata.barrier.status.typeInfo[ HIBERNATED ].name,
-				modifier: metadata.barrier.status.typeInfo[ HIBERNATED ].modifier,
+				name: hibernatedMetadata.name,
+				modifier: hibernatedMetadata.modifier,
 				date: inputBarrier.status.date,
-				description: inputBarrier.status.summary
+				description: inputBarrier.status.summary,
+				hint: hibernatedMetadata.hint,
 			} );
 
 			expect( outputBarrier.isOpen ).toEqual( false );
