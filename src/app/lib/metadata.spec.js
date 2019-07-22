@@ -569,6 +569,7 @@ describe( 'metadata', () => {
 
 			beforeEach( () => {
 				validList = { ...fakeData.barrier_status };
+				delete validList[ 0 ];
 				delete validList[ 6 ];
 			} );
 
@@ -622,7 +623,7 @@ describe( 'metadata', () => {
 		describe( 'barrier', () => {
 			it( 'Should expose the required data', () => {
 
-				const UNKNOWN = 0;
+				const UNKNOWN = 7;
 				const PENDING = 1;
 				const OPEN = 2;
 				const PART_RESOLVED = 3;

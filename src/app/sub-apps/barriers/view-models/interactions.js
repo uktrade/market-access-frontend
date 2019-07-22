@@ -67,8 +67,8 @@ function getStatus( item ){
 			from: getStatusType( item.old_value ),
 			to: getStatusType( item.new_value ),
 			date: item.field_info.status_date,
-			isResolved: ( item.new_value === metadata.barrier.status.types.RESOLVED ),
-			isOpen: ( item.new_value === metadata.barrier.status.types.OPEN )
+			isResolved: ( item.new_value == metadata.barrier.status.types.RESOLVED ),
+			isOpen: ( item.new_value == metadata.barrier.status.types.OPEN )
 		},
 		text: item.field_info.status_summary,
 		user: item.user,

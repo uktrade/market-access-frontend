@@ -9,7 +9,10 @@
 
 {% block body_script %}
 	<script>
-		ma.pages.barrier.status();
+		ma.pages.barrier.status( {
+			statusTypes: {{ statusTypes | dump | safe }},
+			validTypes: {{ validTypes | dump | safe }}
+		} );
 	</script>
 {% endblock %}
 
@@ -22,7 +25,94 @@
 		errors: errors
 	}) }}
 
+	{% set isUnknownHtml %}
+
+		{{ govukTextarea( {
+
+			label: {
+				text: 'Provide a summary of why this barrier is unknown',
+				classes: 'govuk-label--s'
+			},
+			id: 'unknown-summary',
+			name: 'unknownSummary',
+			value: unknownSummary,
+			errorMessage: errors | errorForName( 'unknown-summary' )
+		} ) }}
+	{% endset %}
+
+	{% set isPendingHtml %}
+
+		{{ govukTextarea( {
+
+			label: {
+				text: 'Provide a summary of why this barrier is pending action',
+				classes: 'govuk-label--s'
+			},
+			id: 'pending-summary',
+			name: 'pendingSummary',
+			value: pendingSummary,
+			errorMessage: errors | errorForName( 'pending-summary' )
+		} ) }}
+	{% endset %}
+
+	{% set isOpenHtml %}
+
+		{{ govukTextarea( {
+
+			label: {
+				text: 'Provide a summary of why this barrier is being reopened',
+				classes: 'govuk-label--s'
+			},
+			id: 'reopen-summary',
+			name: 'reopenSummary',
+			value: reopenSummary,
+			errorMessage: errors | errorForName( 'reopen-summary' )
+		} ) }}
+	{% endset %}
+
+	{% set isPartResolvedHtml %}
+
+		{{ govukDateInput( {
+
+			id: 'part-resolved-date',
+			fieldset: {
+				legend: {
+					text: 'Date the barrier was partially resolved',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			errorMessage: errors | errorForName( 'part-resolved-date' ),
+			items: [
+				{
+					name: 'partMonth',
+					label: 'Month',
+					value: partResolvedDate.partMonth,
+					classes: 'govuk-input--width-2'
+				},
+				{
+					name: 'partYear',
+					label: 'Year',
+					value: partResolvedDate.partYear,
+					classes: 'govuk-input--width-4'
+				}
+			]
+		} ) }}
+
+		{{ govukTextarea( {
+
+			label: {
+				text: 'Provide a summary of how this barrier was partially resolved',
+				classes: 'govuk-label--s'
+			},
+			id: 'part-resolved-summary',
+			name: 'partResolvedSummary',
+			value: partResolvedSummary,
+			errorMessage: errors | errorForName( 'part-resolved-summary' )
+		} ) }}
+	{% endset %}
+
 	{% set isResolvedHtml %}
+
 		{{ govukDateInput( {
 
 			id: 'resolved-date',
@@ -60,33 +150,18 @@
 		} ) }}
 	{% endset %}
 
-	{% set isHibernateHtml %}
+	{% set isHibernatedHtml %}
 
 		{{ govukTextarea( {
 
 			label: {
-				text: 'Provide a summary of why this barrier is being paused',
+				text: 'Provide a summary of why this barrier is dormant',
 				classes: 'govuk-label--s'
 			},
 			id: 'hibernation-summary',
 			name: 'hibernationSummary',
 			value: hibernationSummary,
 			errorMessage: errors | errorForName( 'hibernation-summary' )
-		} ) }}
-	{% endset %}
-
-	{% set isOpenHtml %}
-
-		{{ govukTextarea( {
-
-			label: {
-				text: 'Provide a summary of why this barrier is being reopened',
-				classes: 'govuk-label--s'
-			},
-			id: 'reopen-summary',
-			name: 'reopenSummary',
-			value: reopenSummary,
-			errorMessage: errors | errorForName( 'reopen-summary' )
 		} ) }}
 	{% endset %}
 
@@ -104,14 +179,16 @@
 					classes: 'govuk-fieldset__legend--s'
 				}
 			},
-			items: status | addToRadio( {
-				'resolve': { conditional: { html: isResolvedHtml } },
-				'hibernate': { conditional: { html: isHibernateHtml } },
-				'open': { conditional: { html: isOpenHtml } }
-			} ),
+			items: status | addToRadio(
+				[ statusTypes.UNKNOWN, { conditional: { html: isUnknownHtml } } ],
+				[ statusTypes.PENDING, { conditional: { html: isPendingHtml } } ],
+				[ statusTypes.OPEN, { conditional: { html: isOpenHtml } } ],
+				[ statusTypes.PART_RESOLVED, { conditional: { html: isPartResolvedHtml } } ],
+				[ statusTypes.RESOLVED, { conditional: { html: isResolvedHtml } } ],
+				[ statusTypes.HIBERNATED, { conditional: { html: isHibernatedHtml } } ]
+			),
 			errorMessage: errors | errorForName( 'status-1' )
-			} )
-		}}
+		} ) }}
 
 		<input type="submit" class="govuk-button" value="Change barrier status">
 		<a href="{{ urls.barriers.detail( barrier.id ) }}" class="govuk-button button--secondary">Cancel</a>

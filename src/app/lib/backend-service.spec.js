@@ -554,50 +554,101 @@ describe( 'Backend Service', () => {
 			} );
 		} );
 
-		describe( 'resolve', () => {
-			it( 'Should PUT to the correct path with the correct values', async () => {
+		describe( 'status', () => {
 
-				const [ month, year ] = [ '11', '2000' ];
-				const resolvedSummary = 'my summary text';
+			describe( 'unknown', () => {
+				it( 'Should PUT to the correct path with the correct values', async () => {
 
-				await service.barriers.resolve( req, barrierId, {
-					resolvedDate: { month, year },
-					resolvedSummary
-				} );
+					const unknownSummary = 'my summary text';
 
-				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/resolve-in-full`, token, {
-					status_date: [ year, month, '01' ].join( '-' ),
-					status_summary: resolvedSummary
-				} );
-			} );
-		} );
+					await service.barriers.setStatus.unknown( req, barrierId, {
+						unknownSummary
+					} );
 
-		describe( 'hibernate', () => {
-			it( 'Should PUT to the correct path with the correct values', async () => {
-
-				const hibernationSummary = 'my summary text';
-
-				await service.barriers.hibernate( req, barrierId, {
-					hibernationSummary
-				} );
-
-				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/hibernate`, token, {
-					status_summary: hibernationSummary
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/unknown`, token, {
+						status_summary: unknownSummary
+					} );
 				} );
 			} );
-		} );
 
-		describe( 'open', () => {
-			it( 'Should PUT to the correct path with the correct values', async () => {
+			describe( 'pending', () => {
+				it( 'Should PUT to the correct path with the correct values', async () => {
 
-				const reopenSummary = 'my summary text';
+					const pendingSummary = 'my summary text';
 
-				await service.barriers.open( req, barrierId, {
-					reopenSummary
+					await service.barriers.setStatus.pending( req, barrierId, {
+						pendingSummary
+					} );
+
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/open-pending-action`, token, {
+						status_summary: pendingSummary
+					} );
 				} );
+			} );
 
-				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/open-in-progress`, token, {
-					status_summary: reopenSummary
+			describe( 'open', () => {
+				it( 'Should PUT to the correct path with the correct values', async () => {
+
+					const reopenSummary = 'my summary text';
+
+					await service.barriers.setStatus.open( req, barrierId, {
+						reopenSummary
+					} );
+
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/open-in-progress`, token, {
+						status_summary: reopenSummary
+					} );
+				} );
+			} );
+
+			describe( 'partResolve', () => {
+				it( 'Should PUT to the correct path with the correct values', async () => {
+
+					const [ month, year ] = [ '11', '2000' ];
+					const partResolvedSummary = 'my summary text';
+
+					await service.barriers.setStatus.partResolved( req, barrierId, {
+						partResolvedDate: { month, year },
+						partResolvedSummary
+					} );
+
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/resolve-in-part`, token, {
+						status_date: [ year, month, '01' ].join( '-' ),
+						status_summary: partResolvedSummary
+					} );
+				} );
+			} );
+
+			describe( 'resolve', () => {
+				it( 'Should PUT to the correct path with the correct values', async () => {
+
+					const [ month, year ] = [ '11', '2000' ];
+					const resolvedSummary = 'my summary text';
+
+					await service.barriers.setStatus.resolved( req, barrierId, {
+						resolvedDate: { month, year },
+						resolvedSummary
+					} );
+
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/resolve-in-full`, token, {
+						status_date: [ year, month, '01' ].join( '-' ),
+						status_summary: resolvedSummary
+					} );
+				} );
+			} );
+
+			describe( 'hibernate', () => {
+				it( 'Should PUT to the correct path with the correct values', async () => {
+
+					const hibernationSummary = 'my summary text';
+
+					await service.barriers.setStatus.hibernated( req, barrierId, {
+						hibernationSummary
+					} );
+
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/hibernate`, token, {
+						status_summary: hibernationSummary
+					} );
 				} );
 			} );
 		} );

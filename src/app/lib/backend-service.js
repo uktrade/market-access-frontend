@@ -268,16 +268,28 @@ module.exports = {
 			} ),
 			delete: ( req, noteId ) => backend.delete( `/barriers/interactions/${ noteId }`, getToken( req ) ),
 		},
-		resolve: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/resolve-in-full`, getToken( req ), {
-			status_date: getDefaultedDate( values.resolvedDate ),
-			status_summary: values.resolvedSummary
-		} ),
-		hibernate: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/hibernate`, getToken( req ), {
-			status_summary: values.hibernationSummary
-		} ),
-		open: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/open-in-progress`, getToken( req ), {
-			status_summary: values.reopenSummary
-		} ),
+		setStatus: {
+			unknown: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/unknown`, getToken( req ), {
+				status_summary: values.unknownSummary
+			} ),
+			pending: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/open-pending-action`, getToken( req ), {
+				status_summary: values.pendingSummary
+			} ),
+			open: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/open-in-progress`, getToken( req ), {
+				status_summary: values.reopenSummary
+			} ),
+			partResolved: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/resolve-in-part`, getToken( req ), {
+				status_date: getDefaultedDate( values.partResolvedDate ),
+				status_summary: values.partResolvedSummary
+			} ),
+			resolved: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/resolve-in-full`, getToken( req ), {
+				status_date: getDefaultedDate( values.resolvedDate ),
+				status_summary: values.resolvedSummary
+			} ),
+			hibernated: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/hibernate`, getToken( req ), {
+				status_summary: values.hibernationSummary
+			} ),
+		},
 		saveTypes: ( req, barrierId, types ) => updateBarrier( getToken( req ), barrierId, {
 			barrier_types: getValue( types )
 		} ),
@@ -317,11 +329,14 @@ module.exports = {
 			problem_status: values.problemStatus
 		} ),
 		saveStatus: ( req, barrierId, values ) => {
+
 			const status_details = { status_summary: values.statusSummary };
-			if (values.statusDate) {
+
+			if( values.statusDate ){
 				status_details.status_date = getDefaultedDate( values.statusDate );
 			}
-			return updateBarrier( getToken( req ), barrierId, status_details);
+
+			return updateBarrier( getToken( req ), barrierId, status_details );
 		}
 	},
 

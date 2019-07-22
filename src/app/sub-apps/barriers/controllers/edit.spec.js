@@ -64,7 +64,6 @@ describe( 'Edit barrier controller', () => {
 				savePriority: jasmine.createSpy( 'backend.barriers.savePriority' ),
 				saveEuExitRelated: jasmine.createSpy( 'backend.barriers.saveEuExitRelated' ),
 				saveProblemStatus: jasmine.createSpy( 'backend.barriers.saveProblemStatus' ),
-				saveStatus: jasmine.createSpy( 'backend.barriers.saveStatus' ),
 			}
 		};
 

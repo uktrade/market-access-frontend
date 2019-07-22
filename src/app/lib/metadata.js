@@ -12,7 +12,7 @@ let barrierPriorities;
 let barrierStatuses;
 
 const barrierStatusKeys = {
-	UNKNOWN: 0,
+	UNKNOWN: 7,
 	PENDING: 1,
 	OPEN: 2,
 	PART_RESOLVED: 3,
