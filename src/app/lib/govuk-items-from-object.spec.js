@@ -12,17 +12,16 @@ describe( 'govukItemsFromObject', () => {
 		const output = govukItemsFromObj( input );
 
 		expect( output ).toEqual( [
-
-		{
-			value: '1',
-			text: 'test1'
-		},{
-			value: '2',
-			text: 'test2'
-		},{
-			value: '3',
-			text: 'test3'
-		},
+			{
+				value: '1',
+				text: 'test1'
+			},{
+				value: '2',
+				text: 'test2'
+			},{
+				value: '3',
+				text: 'test3'
+			},
 		] );
 	} );
 } );

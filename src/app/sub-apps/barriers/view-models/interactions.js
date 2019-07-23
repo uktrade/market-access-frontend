@@ -99,11 +99,11 @@ function getHistory( items ){
 
 			case 'status':
 				history.push( getStatus( item ) );
-			break;
+				break;
 
 			case 'priority':
 				history.push( getPriority( item ) );
-			break;
+				break;
 		}
 	}
 

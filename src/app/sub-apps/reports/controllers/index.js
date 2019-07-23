@@ -80,11 +80,8 @@ module.exports = {
 
 			if( req.xhr ){
 
-				//setTimeout( () => {
-					const { reports } = reportsViewModel( [ req.report ] );
-					res.render( 'reports/views/partials/delete-report-modal', { report: reports[ 0 ], csrfToken: req.csrfToken() } );
-				//}, 3000 );
-
+				const { reports } = reportsViewModel( [ req.report ] );
+				res.render( 'reports/views/partials/delete-report-modal', { report: reports[ 0 ], csrfToken: req.csrfToken() } );
 
 			} else {
 

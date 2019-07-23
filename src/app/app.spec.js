@@ -543,7 +543,7 @@ describe( 'App', function(){
 
 					describe( 'Searching for a company', () => {
 						describe( 'a GET', () => {
-								it( 'Should render the page', ( done ) => {
+							it( 'Should render the page', ( done ) => {
 
 								app
 									.get( urls.barriers.companies.search( barrierId ) )
@@ -586,7 +586,7 @@ describe( 'App', function(){
 										.post( '/v4/public/search/company' )
 										.reply( 200, intercept.stub( '/datahub/search/company' ) );
 
-										doPost( 200, checkPage( 'Market Access - Barrier - Add an affected company', done ) );
+									doPost( 200, checkPage( 'Market Access - Barrier - Add an affected company', done ) );
 								} );
 							} );
 
@@ -628,7 +628,7 @@ describe( 'App', function(){
 						} );
 
 						describe( 'a GET', () => {
-								it( 'Should render the page', ( done ) => {
+							it( 'Should render the page', ( done ) => {
 
 								interceptCompany( datahubUrl );
 
@@ -910,8 +910,8 @@ describe( 'App', function(){
 				it( 'Should render a list of reports', ( done ) => {
 
 					intercept.backend()
-					.get( /^\/reports(\?.+)?$/ )
-					.reply( 200, intercept.stub( '/backend/reports/' ) );
+						.get( /^\/reports(\?.+)?$/ )
+						.reply( 200, intercept.stub( '/backend/reports/' ) );
 
 					app
 						.get( urls.reports.index() )

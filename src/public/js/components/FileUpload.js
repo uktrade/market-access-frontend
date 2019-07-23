@@ -1,7 +1,7 @@
 ma.components.FileUpload = (function( doc, jessie ){
 
 	if( !jessie.hasFeatures(
-			'attachListener', 'bind', 'queryOne', 'addClass', 'removeClass', 'cancelDefault', 'getElementData'
+		'attachListener', 'bind', 'queryOne', 'addClass', 'removeClass', 'cancelDefault', 'getElementData'
 	) ){ return; }
 
 	var attachListener = jessie.attachListener;

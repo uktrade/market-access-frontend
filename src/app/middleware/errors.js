@@ -23,27 +23,27 @@ module.exports = {
 
 			switch( err.code ){
 
-			case 'TOO_MANY_BYTES':
+				case 'TOO_MANY_BYTES':
 
-				res.sendStatus( 413 );
+					res.sendStatus( 413 );
+					break;
 
-			break;
-			case 'EBADCSRFTOKEN':
+				case 'EBADCSRFTOKEN':
 
-				res.status( 400 );
-				res.render( 'error/invalid-csrf-token' );
+					res.status( 400 );
+					res.render( 'error/invalid-csrf-token' );
+					break;
 
-			break;
-			case 'DOWNLOAD_FAIL':
+				case 'DOWNLOAD_FAIL':
 
-				res.status( 500 );
-				res.render( 'error/unable-to-download' );
+					res.status( 500 );
+					res.render( 'error/unable-to-download' );
+					break;
 
-			break;
-			default:
+				default:
 
-				res.status( 500 );
-				res.render( 'error/default', { error: err, showErrors: config.showErrors } );
+					res.status( 500 );
+					res.render( 'error/default', { error: err, showErrors: config.showErrors } );
 			}
 		}
 	}

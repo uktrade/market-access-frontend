@@ -79,12 +79,12 @@ describe( 'addToRadio', () => {
 		describe( 'when the data is many arguments', () => {
 			it( 'Should add an id and any other properties', () => {
 
-					output = addToRadio(
-						input,
-						[ '1', { conditional: { html: radio1Html } } ],
-						[ '2', { id: 'my-item-2', conditional: { html: radio2Html } } ],
-						[ '3', { conditional: { html: radio3Html }, hint } ],
-						[ 0, { conditional: { html: radio4Html } } ],
+				output = addToRadio(
+					input,
+					[ '1', { conditional: { html: radio1Html } } ],
+					[ '2', { id: 'my-item-2', conditional: { html: radio2Html } } ],
+					[ '3', { conditional: { html: radio3Html }, hint } ],
+					[ 0, { conditional: { html: radio4Html } } ],
 				);
 			} );
 		} );

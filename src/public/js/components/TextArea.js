@@ -1,7 +1,7 @@
 ma.components.TextArea = (function( doc, jessie ){
 
 	if( !jessie.hasFeatures(
-			'attachListener', 'bind', 'queryOne', 'addClass', 'removeClass', 'hasClass', 'cancelDefault', 'getElementData'
+		'attachListener', 'bind', 'queryOne', 'addClass', 'removeClass', 'hasClass', 'cancelDefault', 'getElementData'
 	) ){ return; }
 
 	var queryOne = jessie.queryOne;

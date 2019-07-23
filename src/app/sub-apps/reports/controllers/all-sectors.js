@@ -9,10 +9,10 @@ const govukItemsFromObj = require( '../../../lib/govuk-items-from-object' );
 module.exports = async ( req, res, next ) => {
 
 	const boolItems = govukItemsFromObj( metadata.bool );
-	const items = boolItems.map( 
-        ( item ) => item.value === 'true' ? 
-        { value: item.value, text: 'All sectors' } : 
-        { value: item.value, text: 'Just some sectors' } );
+	const items = boolItems.map(
+		( item ) => item.value === 'true' ?
+			{ value: item.value, text: 'All sectors' } :
+			{ value: item.value, text: 'Just some sectors' } );
 	const report = req.report;
 	const form = new Form( req, {
 
@@ -39,7 +39,7 @@ module.exports = async ( req, res, next ) => {
 
 	const processor = new FormProcessor( {
 		form,
-        render: ( templateValues ) => res.render( 'reports/views/all-sectors', templateValues ),
+		render: ( templateValues ) => res.render( 'reports/views/all-sectors', templateValues ),
 		saveFormData: ( formValues ) => backend.reports.saveAllSectors( req, report.id, formValues ),
 		saved: () => res.redirect( form.isExit ? urls.reports.detail( report.id ) : getRedirectUrl() )
 	} );
