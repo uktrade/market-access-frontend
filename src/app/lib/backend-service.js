@@ -272,8 +272,10 @@ module.exports = {
 			unknown: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/unknown`, getToken( req ), {
 				status_summary: values.unknownSummary
 			} ),
-			pending: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/open-pending-action`, getToken( req ), {
-				status_summary: values.pendingSummary
+			pending: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/open-action_required`, getToken( req ), {
+				status_summary: values.pendingSummary,
+				sub_status: values.pendingType,
+				sub_status_other: getValue( values.pendingTypeOther ),
 			} ),
 			open: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/open-in-progress`, getToken( req ), {
 				status_summary: values.reopenSummary

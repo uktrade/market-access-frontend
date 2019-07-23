@@ -344,5 +344,11 @@
          "name": "et",
          "order": 1
       }
-   ]
+	],
+	"barrier_pending": {
+      "ONE": "ut",
+      "TWO": "incidunt rem accusantium",
+      "THREE": "ut quo ea",
+      "OTHER": "enim"
+   }
 }

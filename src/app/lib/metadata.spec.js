@@ -596,6 +596,12 @@ describe( 'metadata', () => {
 					expect( metadata.getBarrierStatusList() ).toEqual( expected );
 				} );
 			} );
+
+			describe( 'barrierPendingOptions', () => {
+				it( 'Should return the options', () => {
+					expect( metadata.barrierPendingOptions ).toEqual( fakeData.barrier_pending );
+				} );
+			} );
 		} );
 
 		describe( 'barrier', () => {
@@ -647,13 +653,16 @@ describe( 'metadata', () => {
 							[ PART_RESOLVED ]: { name: 'Part resolved', modifier: 'resolved', hint: 'Barrier has been resolved for specific UK companies but not all. Barrier impact has been significantly reduced but remains in part' },
 							[ RESOLVED ]: { name: 'Resolved', modifier: 'resolved', hint: 'Barrier has been resolved for all UK companies' },
 							[ HIBERNATED ]: { name: 'Paused', modifier: 'hibernated', hint: 'Barrier is present but not being persued' },
-						}
+						},
+						pending: {
+							OTHER: 'OTHER'
+						},
 					},
 					priority: {
 						codes: {
 							UNKNOWN: 'UNKNOWN'
 						}
-					}
+					},
 				} );
 			} );
 		} );

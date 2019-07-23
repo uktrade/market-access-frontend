@@ -241,6 +241,8 @@ module.exports.fetch = async () => {
 				}
 			}
 
+			module.exports.barrierPendingOptions = body.barrier_pending;
+
 		} else {
 
 			throw new Error( 'Unable to fetch metadata' );
@@ -292,11 +294,14 @@ module.exports.barrier = {
 			[ barrierStatusKeys.PART_RESOLVED ]: { name: 'Part resolved', modifier: 'resolved', hint: 'Barrier has been resolved for specific UK companies but not all. Barrier impact has been significantly reduced but remains in part' },
 			[ barrierStatusKeys.RESOLVED ]: { name: 'Resolved', modifier: 'resolved', hint: 'Barrier has been resolved for all UK companies' },
 			[ barrierStatusKeys.HIBERNATED ]: { name: 'Paused', modifier: 'hibernated', hint: 'Barrier is present but not being persued' },
+		},
+		pending: {
+			OTHER: 'OTHER',
 		}
 	},
 	priority: {
 		codes: {
-			UNKNOWN: 'UNKNOWN'
+			UNKNOWN: 'UNKNOWN',
 		}
 	}
 };

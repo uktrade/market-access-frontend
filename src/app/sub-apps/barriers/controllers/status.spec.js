@@ -24,6 +24,8 @@ describe( 'Barrier status controller', () => {
 	let getTemplateValuesResponse;
 	let validators;
 	let validTypes;
+	let govukItemsFromObj;
+	let govukItemsFromObjResponse;
 
 	beforeEach( () => {
 
@@ -49,6 +51,11 @@ describe( 'Barrier status controller', () => {
 			}
 		};
 
+		metadata.barrierPendingOptions = { a: 1, b: 2, };
+
+		govukItemsFromObjResponse = [ { value: 1, text: 'beep' }, { value: 2, text: 'boop' } ];
+		govukItemsFromObj = jasmine.createSpy( 'govukItemsfromObj' ).and.callFake( () => govukItemsFromObjResponse );
+
 		getValuesResponse = { a: 1, b: 2 };
 		getTemplateValuesResponse = { c: 3, d: 4 };
 		form = {
@@ -56,6 +63,7 @@ describe( 'Barrier status controller', () => {
 			getValues: jasmine.createSpy( 'form.getValues' ).and.callFake( () => getValuesResponse ),
 			getTemplateValues: jasmine.createSpy( 'form.getTemplateValues' ).and.callFake( () => getTemplateValuesResponse )
 		};
+
 		Form = jasmine.createSpy( 'Form' ).and.callFake( () => form );
 		Form.GROUP = GROUP;
 		Form.RADIO = RADIO;
@@ -74,6 +82,8 @@ describe( 'Barrier status controller', () => {
 			'../../../lib/urls': urls,
 			'../../../lib/Form': Form,
 			'../../../lib/validators': validators,
+			'../../../lib/metadata': metadata,
+			'../../../lib/govuk-items-from-object': govukItemsFromObj,
 		} );
 	} );
 
@@ -192,6 +202,17 @@ describe( 'Barrier status controller', () => {
 
 			if( validTypes.includes( PENDING ) ){
 
+				expect( config.pendingType ).toBeDefined();
+				expect( config.pendingType.conditional ).toEqual( { name: 'status', value: PENDING } );
+				expect( config.pendingType.required ).toBeDefined();
+				expect( config.pendingType.type ).toEqual( RADIO );
+				expect( config.pendingType.items ).toEqual( govukItemsFromObjResponse );
+				expect( govukItemsFromObj ).toHaveBeenCalledWith( metadata.barrierPendingOptions );
+
+				expect( config.pendingTypeOther ).toBeDefined();
+				expect( config.pendingTypeOther.conditional ).toEqual( { name: 'pendingType', value: metadata.barrier.status.pending.OTHER } );
+				expect( config.pendingTypeOther.required ).toBeDefined();
+
 				checkSummary( config.pendingSummary, PENDING );
 
 			} else {
@@ -254,6 +275,7 @@ describe( 'Barrier status controller', () => {
 					...getTemplateValuesResponse,
 					statusTypes,
 					validTypes,
+					pendingOther: metadata.barrier.status.pending.OTHER,
 				};
 			} );
 

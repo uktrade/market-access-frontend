@@ -4,6 +4,7 @@ const FormProcessor = require( '../../../lib/FormProcessor' );
 const urls = require( '../../../lib/urls' );
 const validators = require( '../../../lib/validators' );
 const metadata = require( '../../../lib/metadata' );
+const govukItemsFromObj = require( '../../../lib/govuk-items-from-object' );
 
 const statusMetadata = metadata.barrier.status;
 const { UNKNOWN, PENDING, OPEN, PART_RESOLVED, RESOLVED, HIBERNATED } = statusMetadata.types;
@@ -67,6 +68,16 @@ module.exports = {
 				serviceMethod: 'pending',
 				fields: {
 					pendingSummary: createSummary( PENDING ),
+					pendingType: {
+						type: Form.RADIO,
+						conditional: { name: 'status', value: PENDING },
+						required: 'Select a pending action',
+						items: govukItemsFromObj( metadata.barrierPendingOptions ),
+					},
+					pendingTypeOther: {
+						conditional: { name: 'pendingType', value: metadata.barrier.status.pending.OTHER },
+						required: 'Enter a description for the pending action'
+					}
 				}
 			},
 			[ OPEN ]: {
@@ -151,6 +162,7 @@ module.exports = {
 				...templateValues,
 				statusTypes: statusMetadata.types,
 				validTypes,
+				pendingOther: metadata.barrier.status.pending.OTHER,
 			} ),
 			saveFormData: ( formValues ) => {
 

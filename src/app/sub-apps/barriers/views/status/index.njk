@@ -1,6 +1,7 @@
 {% from 'components/radios/macro.njk' import govukRadios %}
 {% from 'components/date-input/macro.njk' import govukDateInput %}
 {% from 'components/textarea/macro.njk' import govukTextarea %}
+{% from 'components/input/macro.njk' import govukInput %}
 {% from 'app-components/heading.njk' import heading %}
 
 {% extends 'layout.njk' %}
@@ -11,7 +12,8 @@
 	<script>
 		ma.pages.barrier.status( {
 			statusTypes: {{ statusTypes | dump | safe }},
-			validTypes: {{ validTypes | dump | safe }}
+			validTypes: {{ validTypes | dump | safe }},
+			pendingOther: {{ pendingOther | dump | safe }}
 		} );
 	</script>
 {% endblock %}
@@ -40,7 +42,39 @@
 		} ) }}
 	{% endset %}
 
+	{% set pendingOtherText %}
+
+		{{ govukInput( {
+
+			label: {
+				text: 'Please specify',
+				classes: 'govuk-label--s'
+			},
+			id: 'pending-type-other',
+			name: 'pendingTypeOther',
+			value: pendingTypeOther,
+			errorMessage: errors | errorForName( 'pending-type-other' )
+		} ) }}
+	{% endset %}
+
 	{% set isPendingHtml %}
+		{% if validTypes.includes( statusTypes.PENDING ) %}
+		{{ govukRadios( {
+
+			idPrefix: 'pending-type',
+			name: 'pendingType',
+			classes: 'js-pending-type',
+			fieldset: {
+				legend: {
+					text: 'What is the pending action?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: pendingType | addToRadio(
+				[ pendingOther, { conditional: { html: pendingOtherText } } ]
+			),
+			errorMessage: errors | errorForName( 'pending-type-1' )
+		} ) }}
 
 		{{ govukTextarea( {
 
@@ -53,6 +87,7 @@
 			value: pendingSummary,
 			errorMessage: errors | errorForName( 'pending-summary' )
 		} ) }}
+		{% endif %}
 	{% endset %}
 
 	{% set isOpenHtml %}

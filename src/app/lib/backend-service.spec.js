@@ -572,16 +572,43 @@ describe( 'Backend Service', () => {
 			} );
 
 			describe( 'pending', () => {
-				it( 'Should PUT to the correct path with the correct values', async () => {
+				describe( 'With OTHER', () => {
+					it( 'Should PUT to the correct path with the correct values', async () => {
 
-					const pendingSummary = 'my summary text';
+						const pendingSummary = 'my summary text';
+						const pendingType = 'OTHER';
+						const pendingTypeOther = faker.lorem.words( 4 );
 
-					await service.barriers.setStatus.pending( req, barrierId, {
-						pendingSummary
+						await service.barriers.setStatus.pending( req, barrierId, {
+							pendingSummary,
+							pendingType,
+							pendingTypeOther,
+						} );
+
+						expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/open-action_required`, token, {
+							status_summary: pendingSummary,
+							sub_status: pendingType,
+							sub_status_other: pendingTypeOther,
+						} );
 					} );
+				} );
 
-					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/open-pending-action`, token, {
-						status_summary: pendingSummary
+				describe( 'Without OTHER', () => {
+					it( 'Should PUT to the correct path with the correct values', async () => {
+
+						const pendingSummary = 'my summary text';
+						const pendingType = 'OTHER';
+
+						await service.barriers.setStatus.pending( req, barrierId, {
+							pendingSummary,
+							pendingType,
+						} );
+
+						expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/open-action_required`, token, {
+							status_summary: pendingSummary,
+							sub_status: pendingType,
+							sub_status_other: null,
+						} );
 					} );
 				} );
 			} );

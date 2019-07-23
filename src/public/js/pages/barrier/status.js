@@ -13,9 +13,19 @@ ma.pages.barrier.status = function( data ){
 			new ma.components.ConditionalRadioContent({
 				inputContainer: '.status',
 				inputName: 'status',
-				conditionalElem: '#conditional-' + type,
+				conditionalElem: ( '#conditional-' + type ),
 				shouldShow: function( value ){ return ( value == type ); }
 			});
+
+			if( type === data.statusTypes.PENDING ){
+
+				new ma.components.ConditionalRadioContent({
+					inputContainer: '.js-pending-type',
+					inputName: 'pendingType',
+					conditionalElem: ( '#conditional-' + data.pendingOther ),
+					shouldShow: function( value ){ return ( value == data.pendingOther ); }
+				});
+			}
 
 		})( validTypes[ i ] );
 	}
