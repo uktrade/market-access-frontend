@@ -350,13 +350,13 @@ module.exports = {
 		} ),
 		saveStatus: ( req, barrierId, values ) => {
 
-			const status_details = { status_summary: values.statusSummary };
+			const details = { status_summary: values.statusSummary };
 
 			if( values.statusDate ){
-				status_details.status_date = getDefaultedDate( values.statusDate );
+				details.status_date = getDefaultedDate( values.statusDate );
 			}
 
-			return updateBarrier( getToken( req ), barrierId, status_details );
+			return updateBarrier( getToken( req ), barrierId, details );
 		}
 	},
 
