@@ -1,7 +1,7 @@
 const metadata = require( '../../../lib/metadata' );
 const strings = require( '../../../lib/strings' );
 
-const { OPEN, RESOLVED, HIBERNATED } = metadata.barrier.status.types;
+const { OPEN, RESOLVED, PART_RESOLVED, HIBERNATED } = metadata.barrier.status.types;
 const barrierStatusTypeInfo = metadata.barrier.status.typeInfo;
 
 module.exports = ( barrier, addCompany = false ) => {
@@ -28,7 +28,8 @@ module.exports = ( barrier, addCompany = false ) => {
 			id: barrier.id,
 			code: barrier.code,
 			isOpen: ( barrierStatusCode === OPEN ),
-			isResolved: ( barrierStatusCode === RESOLVED ),
+			isResolved: ( barrierStatusCode === RESOLVED || barrierStatusCode == PART_RESOLVED ),
+			isPartiallyResolved: ( barrierStatusCode == PART_RESOLVED ),
 			isHibernated: ( barrierStatusCode === HIBERNATED ),
 			title: barrier.barrier_title,
 			product: barrier.product,

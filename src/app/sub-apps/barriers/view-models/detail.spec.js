@@ -2,7 +2,7 @@ const proxyquire = require( 'proxyquire' );
 const faker = require( 'faker' );
 const modulePath = './detail';
 
-const { OPEN, RESOLVED, HIBERNATED } = require( '../../../lib/metadata' ).barrier.status.types;
+const { OPEN, RESOLVED, PART_RESOLVED, HIBERNATED } = require( '../../../lib/metadata' ).barrier.status.types;
 
 describe( 'Barrier detail view model', () => {
 
@@ -79,7 +79,7 @@ describe( 'Barrier detail view model', () => {
 	describe( 'With all the data on an open barrier', () => {
 		it( 'Should create all the correct properties', () => {
 
-			inputBarrier.status.id = 2;
+			inputBarrier.status.id = OPEN;
 			inputBarrier.problem_status = '2';
 
 			const output = viewModel( inputBarrier );
@@ -151,7 +151,7 @@ describe( 'Barrier detail view model', () => {
 	describe( 'With sectors missing on an open barrier', () => {
 		it( 'Should create all the correct properties', () => {
 
-			inputBarrier.status.id = 2;
+			inputBarrier.status.id = OPEN;
 			inputBarrier.sectors = null;
 
 			const output = viewModel( inputBarrier );
@@ -171,7 +171,7 @@ describe( 'Barrier detail view model', () => {
 
 			metadata.getSector.and.callFake( () => null );
 
-			inputBarrier.status.id = 2;
+			inputBarrier.status.id = OPEN;
 			inputBarrier.sectors = [ null ];
 
 			const output = viewModel( inputBarrier );
@@ -206,10 +206,10 @@ describe( 'Barrier detail view model', () => {
 		} );
 	} );
 
-	describe( 'A resolved barrier', () => {
+	describe( 'A fully resolved barrier', () => {
 		it( 'Should have the correct properties', () => {
 
-			inputBarrier.status.id = 4;
+			inputBarrier.status.id = RESOLVED;
 
 			const output = viewModel( inputBarrier );
 			const outputBarrier = output.barrier;
@@ -225,6 +225,31 @@ describe( 'Barrier detail view model', () => {
 
 			expect( outputBarrier.isOpen ).toEqual( false );
 			expect( outputBarrier.isResolved ).toEqual( true );
+			expect( outputBarrier.isPartiallyResolved ).toEqual( false );
+			expect( outputBarrier.isHibernated ).toEqual( false );
+		} );
+	} );
+
+	describe( 'A partially resolved barrier', () => {
+		it( 'Should have the correct properties', () => {
+
+			inputBarrier.status.id = PART_RESOLVED;
+
+			const output = viewModel( inputBarrier );
+			const outputBarrier = output.barrier;
+			const partResolvedMetadata = metadata.barrier.status.typeInfo[ PART_RESOLVED ];
+
+			expect( outputBarrier.status ).toEqual( {
+				name: partResolvedMetadata.name,
+				modifier: partResolvedMetadata.modifier,
+				date: inputBarrier.status.date,
+				description: inputBarrier.status.summary,
+				hint: partResolvedMetadata.hint,
+			} );
+
+			expect( outputBarrier.isOpen ).toEqual( false );
+			expect( outputBarrier.isResolved ).toEqual( true );
+			expect( outputBarrier.isPartiallyResolved ).toEqual( true );
 			expect( outputBarrier.isHibernated ).toEqual( false );
 		} );
 	} );
@@ -272,6 +297,7 @@ describe( 'Barrier detail view model', () => {
 
 			expect( outputBarrier.isOpen ).toEqual( false );
 			expect( outputBarrier.isResolved ).toEqual( false );
+			expect( outputBarrier.isPartiallyResolved ).toEqual( false );
 			expect( outputBarrier.isHibernated ).toEqual( true );
 		} );
 	} );
