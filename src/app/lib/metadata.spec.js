@@ -650,7 +650,7 @@ describe( 'metadata', () => {
 							[ UNKNOWN ]: { name: 'Unknown', modifier: 'hibernated', hint: 'Barrier requires further work for the status to be known' },
 							[ PENDING ]: { name: 'Pending', modifier: 'assessment', hint: 'Barrier is awaiting action' },
 							[ OPEN ]: { name: 'Open', modifier: 'assessment', hint: 'Barrier is being worked on' },
-							[ PART_RESOLVED ]: { name: 'Part resolved', modifier: 'resolved', hint: 'Barrier has been resolved for specific UK companies but not all. Barrier impact has been significantly reduced but remains in part' },
+							[ PART_RESOLVED ]: { name: 'Part resolved', modifier: 'resolved', hint: 'Barrier impact has been significantly reduced but remains in part' },
 							[ RESOLVED ]: { name: 'Resolved', modifier: 'resolved', hint: 'Barrier has been resolved for all UK companies' },
 							[ HIBERNATED ]: { name: 'Paused', modifier: 'hibernated', hint: 'Barrier is present but not being persued' },
 						},

@@ -26,6 +26,7 @@ describe( 'Barrier status controller', () => {
 	let validTypes;
 	let govukItemsFromObj;
 	let govukItemsFromObjResponse;
+	let barrierFields;
 
 	beforeEach( () => {
 
@@ -69,12 +70,11 @@ describe( 'Barrier status controller', () => {
 		Form.RADIO = RADIO;
 
 		validators = {
-			isDateValue: jasmine.createSpy( 'validators.isDateValue' ),
-			isDateValid: jasmine.createSpy( 'validators.isDateValid' ),
-			isDateInPast: jasmine.createSpy( 'validators.isDateInPast' ),
-			isMetadata: jasmine.createSpy( 'validators.isMetadata' ),
-			isDateNumeric: jasmine.createSpy( 'validators.isDateNumeric' ),
 			isBarrierStatus: jasmine.createSpy( 'validators.isBarrierStatus' ),
+		};
+
+		barrierFields = {
+			createStatusDate: jasmine.createSpy( 'barrierFields.createStatusDate' ),
 		};
 
 		controller = proxyquire( modulePath, {
@@ -84,6 +84,7 @@ describe( 'Barrier status controller', () => {
 			'../../../lib/validators': validators,
 			'../../../lib/metadata': metadata,
 			'../../../lib/govuk-items-from-object': govukItemsFromObj,
+			'../../../lib/barrier-fields': barrierFields,
 		} );
 	} );
 
@@ -92,10 +93,8 @@ describe( 'Barrier status controller', () => {
 		const TEMPLATE = 'barriers/views/status/index';
 
 		let barrier;
-		let dayValidator;
-		let monthValidator;
-		let yearValidator;
 		let detailUrl;
+		let statusDateField;
 
 		function checkSummary( field, value ){
 
@@ -105,25 +104,20 @@ describe( 'Barrier status controller', () => {
 			expect( field.errorField ).toEqual( 'summary' );
 		}
 
-		function checkDateValidators( fieldValidators, monthName = 'month', yearName = 'year' ){
+		function checkDateField( field, value, index, monthName, yearName ){
 
-			const month = '03';
-			const year = '2019';
+			expect( field ).toEqual( {
+				...statusDateField,
+				conditional: { name: 'status', value },
+				errorField: 'status_date',
+			} );
 
-			const parts = {
-				[ monthName ]: month,
-				[ yearName ]: year,
-			};
+			const expectedArgs = [ {} ];
 
-			fieldValidators[ 2 ].fn( parts );
-			fieldValidators[ 3 ].fn( parts );
-			fieldValidators[ 4 ].fn( parts );
+			if( monthName ){ expectedArgs.push( monthName ); }
+			if( yearName ){ expectedArgs.push( yearName ); }
 
-			expect( fieldValidators[ 0 ].fn ).toEqual( monthValidator );
-			expect( fieldValidators[ 1 ].fn ).toEqual( yearValidator );
-			expect( validators.isDateNumeric ).toHaveBeenCalledWith( { month, year } );
-			expect( validators.isDateValid ).toHaveBeenCalledWith( { month, year } );
-			expect( validators.isDateInPast ).toHaveBeenCalledWith( { month, year } );
+			expect( barrierFields.createStatusDate.calls.argsFor( index ) ).toEqual( expectedArgs );
 		}
 
 		function checkFormConfig( validTypes ){
@@ -142,12 +136,7 @@ describe( 'Barrier status controller', () => {
 
 			if( validTypes.includes( RESOLVED ) ){
 
-				expect( config.resolvedDate ).toBeDefined();
-				expect( config.resolvedDate.type ).toEqual( GROUP );
-				expect( config.resolvedDate.conditional ).toEqual( { name: 'status', value: RESOLVED } );
-				expect( config.resolvedDate.items ).toEqual( { month: {}, year: {} } );
-
-				checkDateValidators( config.resolvedDate.validators );
+				checkDateField( config.resolvedDate, RESOLVED, 1 );
 				checkSummary( config.resolvedSummary, RESOLVED );
 
 			} else {
@@ -158,13 +147,7 @@ describe( 'Barrier status controller', () => {
 
 			if( validTypes.includes( PART_RESOLVED ) ){
 
-				expect( config.partResolvedDate ).toBeDefined();
-				expect( config.partResolvedDate.type ).toEqual( GROUP );
-				expect( config.partResolvedDate.conditional ).toEqual( { name: 'status', value: PART_RESOLVED } );
-				expect( config.partResolvedDate.items ).toEqual( { partMonth: {}, partYear: {} } );
-				expect( config.partResolvedDate.validators.length ).toEqual( 5 );
-
-				checkDateValidators( config.partResolvedDate.validators, 'partMonth', 'partYear' );
+				checkDateField( config.partResolvedDate, PART_RESOLVED, 0, 'partMonth', 'partYear' );
 				checkSummary( config.partResolvedSummary, PART_RESOLVED );
 
 			} else {
@@ -247,16 +230,8 @@ describe( 'Barrier status controller', () => {
 			};
 			req.barrier = barrier;
 
-			dayValidator = jasmine.createSpy( 'isDateValue -> day' );
-			monthValidator = jasmine.createSpy( 'isDateValue -> month' );
-			yearValidator = jasmine.createSpy( 'isDateValue -> year' );
-
-			validators.isDateValue.and.callFake( ( name ) => {
-
-				if( name === 'day' ){ return dayValidator; }
-				if( name === 'month' || name === 'partMonth' ){ return monthValidator; }
-				if( name === 'year' || name === 'partYear' ){ return yearValidator; }
-			} );
+			statusDateField = { a: uuid(), b: uuid() };
+			barrierFields.createStatusDate.and.callFake( () => ({ ...statusDateField }) );
 
 			detailUrl = '/barrier-detail/';
 			urls.barriers.detail.and.callFake( () => detailUrl );

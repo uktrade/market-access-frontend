@@ -242,6 +242,7 @@ module.exports.fetch = async () => {
 			}
 
 			module.exports.barrierPendingOptions = body.barrier_pending;
+			module.exports.barrierResolvedStatus = body.resolved_status;
 
 		} else {
 
@@ -291,13 +292,13 @@ module.exports.barrier = {
 			[ barrierStatusKeys.UNKNOWN ]: { name: 'Unknown', modifier: 'hibernated', hint: 'Barrier requires further work for the status to be known' },
 			[ barrierStatusKeys.PENDING ]: { name: 'Pending', modifier: 'assessment', hint: 'Barrier is awaiting action' },
 			[ barrierStatusKeys.OPEN ]: { name: 'Open', modifier: 'assessment', hint: 'Barrier is being worked on' },
-			[ barrierStatusKeys.PART_RESOLVED ]: { name: 'Part resolved', modifier: 'resolved', hint: 'Barrier has been resolved for specific UK companies but not all. Barrier impact has been significantly reduced but remains in part' },
+			[ barrierStatusKeys.PART_RESOLVED ]: { name: 'Part resolved', modifier: 'resolved', hint: 'Barrier impact has been significantly reduced but remains in part' },
 			[ barrierStatusKeys.RESOLVED ]: { name: 'Resolved', modifier: 'resolved', hint: 'Barrier has been resolved for all UK companies' },
 			[ barrierStatusKeys.HIBERNATED ]: { name: 'Paused', modifier: 'hibernated', hint: 'Barrier is present but not being persued' },
 		},
 		pending: {
 			OTHER: 'OTHER',
-		}
+		},
 	},
 	priority: {
 		codes: {

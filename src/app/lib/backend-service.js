@@ -5,6 +5,7 @@ const config = require( '../config' );
 const SCAN_CHECK_INTERVAL = config.files.scan.statusCheckInterval;
 const SCAN_MAX_ATTEMPTS = Math.round( config.files.scan.maxWaitTime / SCAN_CHECK_INTERVAL );
 const LOCATION = 'location';
+const { RESOLVED, PART_RESOLVED } = metadata.barrier.status.types;
 
 function getToken( req ){
 
@@ -167,6 +168,23 @@ function getBarrierParams( filters = {}, orderBy = 'reported_on', orderDirection
 	params.push( `ordering=${ orderDirection === 'asc' ? '' :  '-' }${ orderBy }` );
 
 	return params;
+}
+
+function getInitialReportValues( formValues ){
+
+	const isFullyResolved = ( formValues.isResolved == RESOLVED );
+	const isPartResolved = ( formValues.isResolved == PART_RESOLVED );
+	const isResolved = ( isFullyResolved || isPartResolved );
+	const date = ( isFullyResolved ? formValues.resolvedDate : ( isPartResolved ? formValues.partResolvedDate : null ) );
+
+	return {
+		problem_status: getValue( formValues.status ),
+		is_resolved: isResolved,
+		resolved_status: ( isResolved ? formValues.isResolved : null ),
+		resolved_date: getValue( getDefaultedDate( date ) ),
+		export_country: getValue( formValues.country ),
+		country_admin_areas: getValue( formValues.adminAreas ),
+	};
 }
 
 const reports = {
@@ -348,20 +366,8 @@ module.exports = {
 		getForCountry: ( req, countryId ) => backend.get( `/reports?export_country=${ countryId }&ordering=-created_on`, getToken( req ) ).then( transformReportList ),
 		get: ( req, reportId ) => backend.get( `/reports/${ reportId }`, getToken( req ) ).then( transformSingleReport ),
 		delete: ( req, reportId ) => backend.delete( `/reports/${ reportId }`, getToken( req ) ),
-		save: ( req, values ) => backend.post( '/reports', getToken( req ), {
-			problem_status: getValue( values.status ),
-			is_resolved: getValue( values.isResolved ),
-			resolved_date: getValue( getDefaultedDate( values.resolvedDate ) ),
-			export_country: getValue( values.country ),
-			country_admin_areas: getValue( values.adminAreas )
-		} ),
-		update: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
-			problem_status: getValue( values.status ),
-			is_resolved: getValue( values.isResolved ),
-			resolved_date: getValue( getDefaultedDate( values.resolvedDate ) ),
-			export_country: getValue( values.country ),
-			country_admin_areas: getValue( values.adminAreas )
-		} ),
+		save: ( req, values ) => backend.post( '/reports', getToken( req ), getInitialReportValues( values ) ),
+		update: ( req, reportId, values ) => updateReport( getToken( req ), reportId, getInitialReportValues( values ) ),
 		saveHasSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 			sectors_affected: getValue( values.hasSectors ),
 			all_sectors: null,

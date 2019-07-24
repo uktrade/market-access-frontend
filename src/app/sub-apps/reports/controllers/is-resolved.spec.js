@@ -1,5 +1,7 @@
 const proxyquire = require( 'proxyquire' );
+const metadata = require( '../../../lib/metadata' );
 
+const { RESOLVED, PART_RESOLVED } = metadata.barrier.status.types;
 const modulePath = './is-resolved';
 
 describe( 'Report controllers', () => {
@@ -10,10 +12,6 @@ describe( 'Report controllers', () => {
 	let Form;
 	let form;
 	let urls;
-	let metadata;
-	let validators;
-	let govukItemsFromObj;
-	let govukItemsFromObjResponse;
 	let getValuesResponse;
 	let getTemplateValuesResponse;
 
@@ -21,7 +19,6 @@ describe( 'Report controllers', () => {
 
 		( { req, res } = jasmine.helpers.mocks.middleware() );
 
-		govukItemsFromObjResponse = [ { items: 1 } ];
 		getValuesResponse = { a: 1, b: 2 };
 		getTemplateValuesResponse = { c: 3, d: 4 };
 		form = {
@@ -31,15 +28,6 @@ describe( 'Report controllers', () => {
 			getTemplateValues: jasmine.createSpy( 'form.getTemplateValues' ).and.callFake( () => getTemplateValuesResponse )
 		};
 
-		validators = {
-			isMetadata: jasmine.createSpy( 'validators.isMetaData' ),
-			isDateValue: jasmine.createSpy( 'validators.isDateValue' ),
-		};
-
-		metadata = {
-			statusTypes: { a: 1, b: 2 },
-		};
-
 		urls = {
 			reports: {
 				country: jasmine.createSpy( 'urls.reports.country' ),
@@ -47,81 +35,132 @@ describe( 'Report controllers', () => {
 		};
 
 		Form = jasmine.createSpy( 'Form' ).and.callFake( () => form );
-		govukItemsFromObj = jasmine.createSpy( 'govukItemsFromObj' ).and.callFake( () => govukItemsFromObjResponse );
 
 		controller = proxyquire( modulePath, {
-			'../../../lib/metadata': metadata,
 			'../../../lib/Form': Form,
 			'../../../lib/urls': urls,
-			'../../../lib/validators': validators,
-			'../../../lib/govuk-items-from-object': govukItemsFromObj
 		} );
 	} );
 
 	describe( 'isResolved', () => {
 
 		const template = 'reports/views/is-resolved';
+		let templateData;
 
-		it( 'Should setup the form correctly', () => {
+		beforeEach( () => {
 
-			const monthResponse = { month: true };
-			const yearResponse = { year: true };
-			const boolResponse = { bool: true };
-			const sessionValues = {
-				isResolved: 'isResolved'
-			};
-			const report = {
-				is_resolved: 'is_resolved',
-				resolved_date: '2018-02-01'
-			};
-
-			req.report = report;
-			req.session.isResolvedFormValues = sessionValues;
-
-			validators.isMetadata.and.callFake( ( key ) => {
-
-				if( key === 'bool' ){ return boolResponse; }
-			} );
-
-			validators.isDateValue.and.callFake( ( key ) => {
-
-				if( key === 'month' ){ return monthResponse; }
-				if( key === 'year' ){ return yearResponse; }
-			} );
-
-			controller( req, res );
-
-			const args = Form.calls.argsFor( 0 );
-			const config = args[ 1 ];
-
-			expect( Form ).toHaveBeenCalled();
-			expect( args[ 0 ] ).toEqual( req );
-
-			expect( config.isResolved ).toBeDefined();
-			expect( config.isResolved.type ).toEqual( Form.RADIO );
-			expect( config.isResolved.values ).toEqual( [ sessionValues.isResolved, report.is_resolved ] );
-			expect( config.isResolved.items ).toEqual( govukItemsFromObjResponse );
-			expect( govukItemsFromObj ).toHaveBeenCalledWith( metadata.bool );
-			expect( config.isResolved.validators.length ).toEqual( 1 );
-			expect( config.isResolved.validators[ 0 ].fn ).toEqual( boolResponse );
-
-			expect( config.resolvedDate ).toBeDefined();
-			expect( config.resolvedDate.type ).toEqual( Form.GROUP );
-			expect( config.resolvedDate.conditional ).toEqual( { name: 'isResolved', value: 'true' } );
-			expect( config.resolvedDate.errorField ).toEqual( 'resolved_date' );
-			expect( config.resolvedDate.validators.length ).toEqual( 5 );
-			expect( config.resolvedDate.validators[ 0 ].fn ).toEqual( monthResponse );
-			expect( config.resolvedDate.validators[ 1 ].fn ).toEqual( yearResponse );
-			expect( config.resolvedDate.validators[ 2 ].fn ).toEqual( validators.isDateNumeric );
-			expect( config.resolvedDate.validators[ 3 ].fn ).toEqual( validators.isDateValid );
-			expect( config.resolvedDate.validators[ 4 ].fn ).toEqual( validators.isDateInPast );
-			expect( config.resolvedDate.items ).toEqual( {
-				month: {
-					values: [ '02' ]
-				},
-				year: {
-					values: [ '2018' ]
+			templateData = {
+				...getTemplateValuesResponse,
+				types: {
+					RESOLVED,
+					PART_RESOLVED,
 				}
+			};
+		} );
+
+		describe( 'When the status is fully resolved', () => {
+			it( 'Should setup the form correctly', () => {
+
+				const report = {
+					is_resolved: true,
+					resolved_status: RESOLVED,
+					resolved_date: '2018-02-01'
+				};
+
+				req.report = report;
+
+				controller( req, res );
+
+				const args = Form.calls.argsFor( 0 );
+				const config = args[ 1 ];
+
+				expect( Form ).toHaveBeenCalled();
+				expect( args[ 0 ] ).toEqual( req );
+
+				expect( config.isResolved ).toBeDefined();
+				expect( config.isResolved.type ).toEqual( Form.RADIO );
+				expect( config.isResolved.values ).toEqual( [ report.resolved_status ] );
+				expect( config.isResolved.validators.length ).toEqual( 1 );
+
+				expect( config.resolvedDate ).toBeDefined();
+				expect( config.resolvedDate.type ).toEqual( Form.GROUP );
+				expect( config.resolvedDate.conditional ).toEqual( { name: 'isResolved', value: RESOLVED } );
+				expect( config.resolvedDate.errorField ).toEqual( 'resolved_date' );
+				expect( config.resolvedDate.validators.length ).toEqual( 5 );
+				expect( config.resolvedDate.items ).toEqual( {
+					month: {
+						values: [ '02' ]
+					},
+					year: {
+						values: [ '2018' ]
+					}
+				} );
+			} );
+		} );
+
+		describe( 'When the status is partially resolved', () => {
+			it( 'Should setup the form correctly', () => {
+
+				const report = {
+					is_resolved: true,
+					resolved_status: PART_RESOLVED,
+					resolved_date: '2018-02-01'
+				};
+
+				req.report = report;
+
+				controller( req, res );
+
+				const args = Form.calls.argsFor( 0 );
+				const config = args[ 1 ];
+
+				expect( Form ).toHaveBeenCalled();
+				expect( args[ 0 ] ).toEqual( req );
+
+				expect( config.isResolved ).toBeDefined();
+				expect( config.isResolved.type ).toEqual( Form.RADIO );
+				expect( config.isResolved.values ).toEqual( [ report.resolved_status ] );
+				expect( config.isResolved.validators.length ).toEqual( 1 );
+
+				expect( config.partResolvedDate ).toBeDefined();
+				expect( config.partResolvedDate.type ).toEqual( Form.GROUP );
+				expect( config.partResolvedDate.conditional ).toEqual( { name: 'isResolved', value: PART_RESOLVED } );
+				expect( config.partResolvedDate.errorField ).toEqual( 'resolved_date' );
+				expect( config.partResolvedDate.validators.length ).toEqual( 5 );
+				expect( config.partResolvedDate.items ).toEqual( {
+					partMonth: {
+						values: [ '02' ]
+					},
+					partYear: {
+						values: [ '2018' ]
+					}
+				} );
+			} );
+		} );
+
+		describe( 'When the status is partially resolved', () => {
+			it( 'Should setup the form correctly', () => {
+
+				const report = {
+					is_resolved: false,
+					resolved_status: null,
+					resolved_date: null
+				};
+
+				req.report = report;
+
+				controller( req, res );
+
+				const args = Form.calls.argsFor( 0 );
+				const config = args[ 1 ];
+
+				expect( Form ).toHaveBeenCalled();
+				expect( args[ 0 ] ).toEqual( req );
+
+				expect( config.isResolved ).toBeDefined();
+				expect( config.isResolved.type ).toEqual( Form.RADIO );
+				expect( config.isResolved.values ).toEqual( [ false ] );
+				expect( config.isResolved.validators.length ).toEqual( 1 );
 			} );
 		} );
 
@@ -130,7 +169,7 @@ describe( 'Report controllers', () => {
 
 				controller( req, res );
 
-				expect( res.render ).toHaveBeenCalledWith( template, getTemplateValuesResponse );
+				expect( res.render ).toHaveBeenCalledWith( template, templateData );
 				expect( form.hasErrors ).not.toHaveBeenCalled();
 			} );
 		} );
@@ -170,7 +209,7 @@ describe( 'Report controllers', () => {
 					expect( form.hasErrors ).toHaveBeenCalledWith();
 					expect( typeof req.session.isResolvedFormValues ).toEqual( 'undefined' );
 					expect( res.redirect ).not.toHaveBeenCalled();
-					expect( res.render ).toHaveBeenCalledWith( template, getTemplateValuesResponse );
+					expect( res.render ).toHaveBeenCalledWith( template, templateData );
 				} );
 			} );
 		} );

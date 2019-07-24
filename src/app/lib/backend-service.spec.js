@@ -1,9 +1,11 @@
 const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
 const faker = require( 'faker' );
-const modulePath = './backend-service';
+const metadata = require( './metadata' );
 
+const modulePath = './backend-service';
 const getFakeData = jasmine.helpers.getFakeData;
+const { RESOLVED, PART_RESOLVED } = metadata.barrier.status.types;
 
 describe( 'Backend Service', () => {
 
@@ -1122,7 +1124,8 @@ describe( 'Backend Service', () => {
 
 					expect( backend.post ).toHaveBeenCalledWith( '/reports', token, {
 						problem_status: null,
-						is_resolved: null,
+						is_resolved: false,
+						resolved_status: null,
 						resolved_date: null,
 						export_country: null,
 						country_admin_areas: []
@@ -1133,7 +1136,6 @@ describe( 'Backend Service', () => {
 			describe( 'When the values are not empty', () => {
 
 				let status;
-				let isResolved;
 				let resolvedDate;
 				let country;
 				let adminAreas;
@@ -1141,18 +1143,17 @@ describe( 'Backend Service', () => {
 				beforeEach( () => {
 
 					status = 1;
-					isResolved = true;
 					resolvedDate = { year: '2018', month:'02' };
 					country = uuid();
 					adminAreas = [uuid()];
 				} );
 
-				describe( 'When isResolved is true', () => {
+				describe( 'When isResolved is RESOLVED', () => {
 					it( 'Should POST to the correct path with the values and sector as null', () => {
 
 						service.reports.save( req, {
 							status,
-							isResolved,
+							isResolved: RESOLVED,
 							resolvedDate,
 							country,
 							adminAreas
@@ -1160,7 +1161,30 @@ describe( 'Backend Service', () => {
 
 						expect( backend.post ).toHaveBeenCalledWith( '/reports', token, {
 							problem_status: status,
-							is_resolved: isResolved,
+							is_resolved: true,
+							resolved_status: RESOLVED,
+							resolved_date: '2018-02-01',
+							export_country: country,
+							country_admin_areas: adminAreas
+						} );
+					} );
+				} );
+
+				describe( 'When isResolved is PART_RESOLVED', () => {
+					it( 'Should POST to the correct path with the values and sector as null', () => {
+
+						service.reports.save( req, {
+							status,
+							isResolved: PART_RESOLVED,
+							partResolvedDate:	resolvedDate,
+							country,
+							adminAreas
+						} );
+
+						expect( backend.post ).toHaveBeenCalledWith( '/reports', token, {
+							problem_status: status,
+							is_resolved: true,
+							resolved_status: PART_RESOLVED,
 							resolved_date: '2018-02-01',
 							export_country: country,
 							country_admin_areas: adminAreas
@@ -1173,7 +1197,7 @@ describe( 'Backend Service', () => {
 
 						service.reports.save( req, {
 							status,
-							isResolved: false,
+							isResolved: 'false',
 							resolvedDate,
 							country,
 							adminAreas
@@ -1182,7 +1206,8 @@ describe( 'Backend Service', () => {
 						expect( backend.post ).toHaveBeenCalledWith( '/reports', token, {
 							problem_status: status,
 							is_resolved: false,
-							resolved_date: '2018-02-01',
+							resolved_status: null,
+							resolved_date: null,
 							export_country: country,
 							country_admin_areas: adminAreas
 						} );
@@ -1215,7 +1240,7 @@ describe( 'Backend Service', () => {
 						}
 
 						for( let key of Object.keys( backendData ) ){
-							nullBackendData[ key ] = null;
+							nullBackendData[ key ] = ( key === 'is_resolved' ? false : null );
 						}
 
 						service.reports[ methodName ]( req, reportId, emptyServiceData );
@@ -1237,7 +1262,7 @@ describe( 'Backend Service', () => {
 			describe( 'update', () => {
 
 				const status = 1;
-				const isResolved = true;
+				const isResolved = RESOLVED;
 				const resolvedDate = { year: '2018', month:'02' };
 				const country = uuid();
 				const adminAreas = [uuid()];
@@ -1252,7 +1277,8 @@ describe( 'Backend Service', () => {
 						adminAreas
 					}, {
 						problem_status: status,
-						is_resolved: isResolved,
+						is_resolved: true,
+						resolved_status: RESOLVED,
 						resolved_date: '2018-02-01',
 						export_country: country,
 						country_admin_areas: adminAreas
@@ -1269,7 +1295,8 @@ describe( 'Backend Service', () => {
 						adminAreas
 					}, {
 						problem_status: status,
-						is_resolved: isResolved,
+						is_resolved: true,
+						resolved_status: RESOLVED,
 						resolved_date: null,
 						export_country: country,
 						country_admin_areas: adminAreas

@@ -5,42 +5,19 @@ const urls = require( '../../../lib/urls' );
 const validators = require( '../../../lib/validators' );
 const metadata = require( '../../../lib/metadata' );
 const govukItemsFromObj = require( '../../../lib/govuk-items-from-object' );
+const barrierFields = require( '../../../lib/barrier-fields' );
 
 const statusMetadata = metadata.barrier.status;
 const { UNKNOWN, PENDING, OPEN, PART_RESOLVED, RESOLVED, HIBERNATED } = statusMetadata.types;
-const invalidDateMessage = 'Enter resolution date and include a month and year';
 
-function createDate( value, monthName = 'month', yearName = 'year' ){
+function createDate( value, ...args ){
 
-	function createDateObj( values ){
-		return { month: values[ monthName ], year: values[ yearName ] };
-	}
+	const field = barrierFields.createStatusDate( {}, ...args );
 
-	return {
-		type: Form.GROUP,
-		conditional: { name: 'status', value },
-		errorField: 'status_date',
-		validators: [ {
-			fn: validators.isDateValue( monthName ),
-			message: invalidDateMessage
-		},{
-			fn: validators.isDateValue( yearName ),
-			message: invalidDateMessage
-		},{
-			fn: ( parts ) => validators.isDateNumeric( createDateObj( parts ) ),
-			message: 'Resolution date must only include numbers'
-		},{
-			fn: ( parts ) => validators.isDateValid( createDateObj( parts ) ),
-			message: invalidDateMessage
-		},{
-			fn: ( parts ) => validators.isDateInPast( createDateObj( parts ) ),
-			message: 'Resolution date must be this month or in the past'
-		} ],
-		items: {
-			[ monthName ]: {},
-			[ yearName ]: {}
-		}
-	};
+	field.conditional = { name: 'status', value };
+	field.errorField = 'status_date';
+
+	return field;
 }
 
 function createSummary( value ){
