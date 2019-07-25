@@ -16,6 +16,7 @@ describe( 'Find a barrier view model', () => {
 	let mockRegion;
 	let mockType;
 	let mockPriority;
+	let mockStatus;
 	let barriers;
 	let countryList;
 	let overseasRegionList;
@@ -26,6 +27,7 @@ describe( 'Find a barrier view model', () => {
 	let urls;
 	let findABarrierResponse;
 	let strings;
+	let barrierStatusList;
 
 	function getExpectedBarrierOutput( barriers ){
 
@@ -34,7 +36,7 @@ describe( 'Find a barrier view model', () => {
 		for( let barrier of barriers ){
 
 			const sectors = ( barrier.sectors ? barrier.sectors.map( () => mockSector ) : [] );
-			const barrierStatusCode = barrier.status;
+			const barrierStatusCode = barrier.status.id;
 			const status = metadata.barrier.status.typeInfo[ barrierStatusCode ] || {};
 
 			expected.push({
@@ -50,7 +52,7 @@ describe( 'Find a barrier view model', () => {
 				status,
 				date: {
 					reported: barrier.reported_on,
-					status: barrier.status_date,
+					status: barrier.status.date,
 					created: barrier.created_on,
 				},
 				priority: barrier.priority
@@ -88,6 +90,8 @@ describe( 'Find a barrier view model', () => {
 			getBarrierTypeList: jasmine.createSpy( 'metadata.getBarrierTypeList' ),
 			getBarrierPriority: jasmine.createSpy( 'metadata.getBarrierPriority' ),
 			getBarrierPrioritiesList: jasmine.createSpy( 'metadata.getBarrierPrioritiesList' ),
+			getBarrierStatus: jasmine.createSpy( 'metadata.getBarrierStatus' ),
+			getBarrierStatusList: jasmine.createSpy( 'metadata.getBarrierStatusList' ),
 		};
 
 		mockSector = { id: uuid(), name: faker.lorem.words() };
@@ -95,6 +99,7 @@ describe( 'Find a barrier view model', () => {
 		mockRegion = { id: uuid(), name: faker.lorem.words() };
 		mockType = { id: uuid(), title: faker.lorem.words() };
 		mockPriority = { code: faker.lorem.word().toUpperCase(), name: faker.lorem.words() };
+		mockStatus = faker.lorem.words( 2 );
 		barriers = jasmine.helpers.getFakeData( '/backend/barriers/find-a-barrier' );
 
 		countryList = [
@@ -128,6 +133,12 @@ describe( 'Find a barrier view model', () => {
 			{ value: faker.lorem.word().toUpperCase(), text: faker.lorem.words() },
 		];
 
+		barrierStatusList = [
+			{ value: '1', text: faker.lorem.words() },
+			{ value: '2', text: faker.lorem.words() },
+			{ value: '3', text: faker.lorem.words() },
+		];
+
 		sortGovukItems = {
 			alphabetical: jasmine.createSpy( 'sortGovukItems.alphabetical' ).and.callFake( ( a, b ) => a.text > b.text ),
 		};
@@ -142,6 +153,8 @@ describe( 'Find a barrier view model', () => {
 		metadata.getBarrierTypeList.and.callFake( () => barrierTypeList );
 		metadata.getBarrierPriority.and.callFake( () => mockPriority );
 		metadata.getBarrierPrioritiesList.and.callFake( () => barrierPriorityList );
+		metadata.getBarrierStatus.and.callFake( () => mockStatus );
+		metadata.getBarrierStatusList.and.callFake( () => barrierStatusList );
 
 		findABarrierResponse = '/a/b/c';
 
@@ -166,8 +179,9 @@ describe( 'Find a barrier view model', () => {
 		expect( metadata.getSectorList ).toHaveBeenCalledWith( 'All sectors' );
 		expect( metadata.getBarrierTypeList ).toHaveBeenCalledWith();
 		expect( metadata.getBarrierPrioritiesList ).toHaveBeenCalledWith( { suffix: false } );
+		expect( metadata.getBarrierStatusList ).toHaveBeenCalledWith();
 		expect( sortGovukItems.alphabetical ).toHaveBeenCalled();
-		expect( urls.findABarrier.calls.count() ).toEqual( 7 );
+		expect( urls.findABarrier.calls.count() ).toEqual( 8 );
 	} );
 
 	function getFilters( overrides = {} ){
@@ -179,6 +193,7 @@ describe( 'Find a barrier view model', () => {
 			type: overrides.type || { items: barrierTypeList, active: false, text: strings.types.response, removeUrl: findABarrierResponse },
 			priority: overrides.priority || { items: barrierPriorityList, active: false, text: strings.priorities.response, removeUrl: findABarrierResponse },
 			search: overrides.search || { active: false, text: undefined, removeUrl: findABarrierResponse },
+			status: overrides.status || { items: barrierStatusList, active: false, text: strings.statuses.response, removeUrl: findABarrierResponse },
 		};
 	}
 
@@ -507,6 +522,38 @@ describe( 'Find a barrier view model', () => {
 				expect( output.filters ).toEqual( getFilters( {
 					search: { active: true, text: filters.search, removeUrl: findABarrierResponse }
 				} ) );
+			} );
+		} );
+
+		describe( 'Barrier status filter', () => {
+
+			const selectedType = 999;
+
+			checkFilter( () => {
+
+				filters.status = [ String( selectedType ) ];
+				barrierStatusList[ 1 ].value = selectedType;
+
+			}, ( output ) => {
+
+				expect( output.filters ).toEqual( getFilters({
+					status: {
+						items: barrierStatusList.map( ( { text, value } ) => {
+
+							const item = { text, value };
+
+							if( value == selectedType ){
+								item.checked = true;
+							}
+
+							return item;
+						} ),
+						active: true,
+						text: strings.statuses.response,
+						removeUrl: findABarrierResponse
+					},
+				}) );
+				expect( strings.statuses ).toHaveBeenCalledWith( filters.status );
 			} );
 		} );
 	} );

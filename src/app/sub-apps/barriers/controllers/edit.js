@@ -6,6 +6,9 @@ const govukItemsFromObj = require( '../../../lib/govuk-items-from-object' );
 const getDateParts = require( '../../../lib/get-date-parts' );
 const backend = require( '../../../lib/backend-service' );
 const urls = require( '../../../lib/urls' );
+const barrierFileds = require( '../../../lib/barrier-fields' );
+
+const { RESOLVED, PART_RESOLVED } = metadata.barrier.status.types;
 
 module.exports = {
 
@@ -95,54 +98,27 @@ module.exports = {
 
 	status: async ( req, res, next ) => {
 
-		
 		const barrier = req.barrier;
-		const isResolved = barrier.status === metadata.barrier.status.types.RESOLVED;
+		const isResolved = ( barrier.status.id === RESOLVED || barrier.status.id === PART_RESOLVED );
 
-		const formFields = {
-			statusSummary: {
-				values: [ barrier.status_summary ],
-				required: 'Enter a summary'
-			}
-		};
-		if (isResolved) { 
-			const invalidDateMessage = 'Enter resolution date and include a month and year';
-			const resolvedDateValues = getDateParts(barrier.status_date );
+		const formFields = {};
 
-			formFields.statusDate = {
-				type: Form.GROUP,
-				validators: [ {
-					fn: validators.isDateValue( 'month' ),
-					message: invalidDateMessage
-				},{
-					fn: validators.isDateValue( 'year' ),
-					message: invalidDateMessage
-				},{
-					fn: validators.isDateNumeric,
-					message: 'Resolution date must only include numbers'
-				},{
-					fn: validators.isDateValid,
-					message: invalidDateMessage
-				},{
-					fn: validators.isDateInPast,
-					message: 'Resolution date must be this month or in the past'
-				} ],
-				items: {
-					month: {
-						values: [ resolvedDateValues.month ]
-					},
-					year: {
-						values: [ resolvedDateValues.year ]
-					}
-				}
-			};
+		if( isResolved ){
+
+			const resolvedDateValues = getDateParts( barrier.status.date );
+
+			formFields.statusDate = barrierFileds.createStatusDate( resolvedDateValues );
 		}
-		
-		const form = new Form( req, formFields);
 
+		formFields.statusSummary = {
+			values: [ barrier.status.summary ],
+			required: 'Enter a summary'
+		};
+
+		const form = new Form( req, formFields );
 		const processor = new FormProcessor( {
 			form,
-			render: ( templateValues ) => res.render( 'barriers/views/edit/status', Object.assign(templateValues, {isResolved}) ),
+			render: ( templateValues ) => res.render( 'barriers/views/edit/status', { ...templateValues, isResolved } ),
 			saveFormData: ( formValues ) => backend.barriers.saveStatus( req, barrier.id, formValues ),
 			saved: () => res.redirect( urls.barriers.detail( barrier.id ) )
 		} );

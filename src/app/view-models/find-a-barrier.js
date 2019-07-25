@@ -49,7 +49,7 @@ module.exports = function( { count, barriers, filters, queryString, isEdit, edit
 	for( let barrier of barriers ){
 
 		const sectors = ( barrier.sectors && barrier.sectors.map( metadata.getSector ) || [] );
-		const barrierStatusCode = barrier.status;
+		const barrierStatusCode = barrier.status.id;
 		const status = barrierStatusTypeInfo[ barrierStatusCode ] || {};
 
 		barrierList.push( {
@@ -66,7 +66,7 @@ module.exports = function( { count, barriers, filters, queryString, isEdit, edit
 			priority: barrier.priority,
 			date: {
 				reported: barrier.reported_on,
-				status: barrier.status_date,
+				status: barrier.status.date,
 				created: barrier.created_on,
 			}
 		} );
@@ -131,7 +131,13 @@ module.exports = function( { count, barriers, filters, queryString, isEdit, edit
 				active: !!filters.search,
 				text: filters.search,
 				removeUrl: getRemoveUrl( filters, 'search' ),
-			}
+			},
+			status: {
+				items: metadata.getBarrierStatusList().map( isChecked( filters.status ) ),
+				active: !!filters.status,
+				text: strings.statuses( filters.status ),
+				removeUrl: getRemoveUrl( filters, 'status' ),
+			},
 		}
 	};
 };

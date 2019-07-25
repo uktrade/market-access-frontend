@@ -139,16 +139,15 @@ module.exports = {
 		}
 
 		res.render( 'watch-list', {
-				...form.getTemplateValues(),
-				filters,
-				canReplace,
-				hasToReplace,
-				isEdit: !!editIndex,
-				queryString: req.query,
-				filterList: createFilterList( filters ),
-				csrfToken: req.csrfToken(),
-			}
-		);
+			...form.getTemplateValues(),
+			filters,
+			canReplace,
+			hasToReplace,
+			isEdit: !!editIndex,
+			queryString: req.query,
+			filterList: createFilterList( filters ),
+			csrfToken: req.csrfToken(),
+		} );
 	},
 
 	rename: async ( req, res, next ) => {

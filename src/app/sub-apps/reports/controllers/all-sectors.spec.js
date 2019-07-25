@@ -45,8 +45,8 @@ describe( 'Report controllers', () => {
 		urls = {
 			reports: {
 				detail: jasmine.createSpy( 'urls.reports.detail' ),
-                addSector:  jasmine.createSpy( 'urls.reports.addSector' ),
-                sectors:  jasmine.createSpy( 'urls.reports.sectors' ),
+				addSector:  jasmine.createSpy( 'urls.reports.addSector' ),
+				sectors:  jasmine.createSpy( 'urls.reports.sectors' ),
 				aboutProblem: jasmine.createSpy( 'urls.reports.aboutProblem' ),
 			},
 		};

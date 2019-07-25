@@ -10,20 +10,19 @@
 }
 
 .barrier-summary__heading {
+
 	@include govuk-font( $size: 14);
 	float: left;
 	width: 100%;
 	margin-bottom: govuk-em( 15, 14 );
 
 	@include mq( $from: tablet ){
-
-		width: 60%;
+		width: 55%;
 		margin-bottom: 0;
 	}
 
 	@include mq( $from: 850px ){
-
-		width: 70%;
+		width: 65%;
 	}
 }
 
@@ -44,13 +43,15 @@
 }
 
 .barrier-summary__status {
+
 	width: 100%;
+	box-sizing: border-box;
+
 	@include mq( $from: tablet ){
 		float: right;
 		text-align: right;
-		width: govuk-em( 180, 16 );
+		width: govuk-em( 240, 16 );
 	}
-	box-sizing: border-box;
 }
 
 .barrier-summary__status__badge {
@@ -78,11 +79,11 @@
 }
 
 .barrier-summary__info {
+
 	clear: left;
 	overflow: hidden;
 
 	@include mq( $from: tablet ){
-
 		padding-top: govuk-em( 30, 16 );
 	}
 }

@@ -1,9 +1,11 @@
 const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
 const faker = require( 'faker' );
-const modulePath = './backend-service';
+const metadata = require( './metadata' );
 
+const modulePath = './backend-service';
 const getFakeData = jasmine.helpers.getFakeData;
+const { RESOLVED, PART_RESOLVED } = metadata.barrier.status.types;
 
 describe( 'Backend Service', () => {
 
@@ -554,50 +556,128 @@ describe( 'Backend Service', () => {
 			} );
 		} );
 
-		describe( 'resolve', () => {
-			it( 'Should PUT to the correct path with the correct values', async () => {
+		describe( 'status', () => {
 
-				const [ month, year ] = [ '11', '2000' ];
-				const resolvedSummary = 'my summary text';
+			describe( 'unknown', () => {
+				it( 'Should PUT to the correct path with the correct values', async () => {
 
-				await service.barriers.resolve( req, barrierId, {
-					resolvedDate: { month, year },
-					resolvedSummary
-				} );
+					const unknownSummary = 'my summary text';
 
-				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/resolve`, token, {
-					status_date: [ year, month, '01' ].join( '-' ),
-					status_summary: resolvedSummary
-				} );
-			} );
-		} );
+					await service.barriers.setStatus.unknown( req, barrierId, {
+						unknownSummary
+					} );
 
-		describe( 'hibernate', () => {
-			it( 'Should PUT to the correct path with the correct values', async () => {
-
-				const hibernationSummary = 'my summary text';
-
-				await service.barriers.hibernate( req, barrierId, {
-					hibernationSummary
-				} );
-
-				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/hibernate`, token, {
-					status_summary: hibernationSummary
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/unknown`, token, {
+						status_summary: unknownSummary
+					} );
 				} );
 			} );
-		} );
 
-		describe( 'open', () => {
-			it( 'Should PUT to the correct path with the correct values', async () => {
+			describe( 'pending', () => {
+				describe( 'With OTHER', () => {
+					it( 'Should PUT to the correct path with the correct values', async () => {
 
-				const reopenSummary = 'my summary text';
+						const pendingSummary = 'my summary text';
+						const pendingType = 'OTHER';
+						const pendingTypeOther = faker.lorem.words( 4 );
 
-				await service.barriers.open( req, barrierId, {
-					reopenSummary
+						await service.barriers.setStatus.pending( req, barrierId, {
+							pendingSummary,
+							pendingType,
+							pendingTypeOther,
+						} );
+
+						expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/open-action_required`, token, {
+							status_summary: pendingSummary,
+							sub_status: pendingType,
+							sub_status_other: pendingTypeOther,
+						} );
+					} );
 				} );
 
-				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/open`, token, {
-					status_summary: reopenSummary
+				describe( 'Without OTHER', () => {
+					it( 'Should PUT to the correct path with the correct values', async () => {
+
+						const pendingSummary = 'my summary text';
+						const pendingType = 'OTHER';
+
+						await service.barriers.setStatus.pending( req, barrierId, {
+							pendingSummary,
+							pendingType,
+						} );
+
+						expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/open-action_required`, token, {
+							status_summary: pendingSummary,
+							sub_status: pendingType,
+							sub_status_other: null,
+						} );
+					} );
+				} );
+			} );
+
+			describe( 'open', () => {
+				it( 'Should PUT to the correct path with the correct values', async () => {
+
+					const reopenSummary = 'my summary text';
+
+					await service.barriers.setStatus.open( req, barrierId, {
+						reopenSummary
+					} );
+
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/open-in-progress`, token, {
+						status_summary: reopenSummary
+					} );
+				} );
+			} );
+
+			describe( 'partResolve', () => {
+				it( 'Should PUT to the correct path with the correct values', async () => {
+
+					const [ month, year ] = [ '11', '2000' ];
+					const partResolvedSummary = 'my summary text';
+
+					await service.barriers.setStatus.partResolved( req, barrierId, {
+						partResolvedDate: { month, year },
+						partResolvedSummary
+					} );
+
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/resolve-in-part`, token, {
+						status_date: [ year, month, '01' ].join( '-' ),
+						status_summary: partResolvedSummary
+					} );
+				} );
+			} );
+
+			describe( 'resolve', () => {
+				it( 'Should PUT to the correct path with the correct values', async () => {
+
+					const [ month, year ] = [ '11', '2000' ];
+					const resolvedSummary = 'my summary text';
+
+					await service.barriers.setStatus.resolved( req, barrierId, {
+						resolvedDate: { month, year },
+						resolvedSummary
+					} );
+
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/resolve-in-full`, token, {
+						status_date: [ year, month, '01' ].join( '-' ),
+						status_summary: resolvedSummary
+					} );
+				} );
+			} );
+
+			describe( 'hibernate', () => {
+				it( 'Should PUT to the correct path with the correct values', async () => {
+
+					const hibernationSummary = 'my summary text';
+
+					await service.barriers.setStatus.hibernated( req, barrierId, {
+						hibernationSummary
+					} );
+
+					expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }/hibernate`, token, {
+						status_summary: hibernationSummary
+					} );
 				} );
 			} );
 		} );
@@ -1044,7 +1124,8 @@ describe( 'Backend Service', () => {
 
 					expect( backend.post ).toHaveBeenCalledWith( '/reports', token, {
 						problem_status: null,
-						is_resolved: null,
+						is_resolved: false,
+						resolved_status: null,
 						resolved_date: null,
 						export_country: null,
 						country_admin_areas: []
@@ -1055,7 +1136,6 @@ describe( 'Backend Service', () => {
 			describe( 'When the values are not empty', () => {
 
 				let status;
-				let isResolved;
 				let resolvedDate;
 				let country;
 				let adminAreas;
@@ -1063,18 +1143,17 @@ describe( 'Backend Service', () => {
 				beforeEach( () => {
 
 					status = 1;
-					isResolved = true;
 					resolvedDate = { year: '2018', month:'02' };
 					country = uuid();
 					adminAreas = [uuid()];
 				} );
 
-				describe( 'When isResolved is true', () => {
+				describe( 'When isResolved is RESOLVED', () => {
 					it( 'Should POST to the correct path with the values and sector as null', () => {
 
 						service.reports.save( req, {
 							status,
-							isResolved,
+							isResolved: RESOLVED,
 							resolvedDate,
 							country,
 							adminAreas
@@ -1082,7 +1161,30 @@ describe( 'Backend Service', () => {
 
 						expect( backend.post ).toHaveBeenCalledWith( '/reports', token, {
 							problem_status: status,
-							is_resolved: isResolved,
+							is_resolved: true,
+							resolved_status: RESOLVED,
+							resolved_date: '2018-02-01',
+							export_country: country,
+							country_admin_areas: adminAreas
+						} );
+					} );
+				} );
+
+				describe( 'When isResolved is PART_RESOLVED', () => {
+					it( 'Should POST to the correct path with the values and sector as null', () => {
+
+						service.reports.save( req, {
+							status,
+							isResolved: PART_RESOLVED,
+							partResolvedDate:	{ partMonth: resolvedDate.month, partYear: resolvedDate.year },
+							country,
+							adminAreas
+						} );
+
+						expect( backend.post ).toHaveBeenCalledWith( '/reports', token, {
+							problem_status: status,
+							is_resolved: true,
+							resolved_status: PART_RESOLVED,
 							resolved_date: '2018-02-01',
 							export_country: country,
 							country_admin_areas: adminAreas
@@ -1095,7 +1197,7 @@ describe( 'Backend Service', () => {
 
 						service.reports.save( req, {
 							status,
-							isResolved: false,
+							isResolved: 'false',
 							resolvedDate,
 							country,
 							adminAreas
@@ -1104,7 +1206,8 @@ describe( 'Backend Service', () => {
 						expect( backend.post ).toHaveBeenCalledWith( '/reports', token, {
 							problem_status: status,
 							is_resolved: false,
-							resolved_date: '2018-02-01',
+							resolved_status: null,
+							resolved_date: null,
 							export_country: country,
 							country_admin_areas: adminAreas
 						} );
@@ -1137,7 +1240,7 @@ describe( 'Backend Service', () => {
 						}
 
 						for( let key of Object.keys( backendData ) ){
-							nullBackendData[ key ] = null;
+							nullBackendData[ key ] = ( key === 'is_resolved' ? false : null );
 						}
 
 						service.reports[ methodName ]( req, reportId, emptyServiceData );
@@ -1159,7 +1262,7 @@ describe( 'Backend Service', () => {
 			describe( 'update', () => {
 
 				const status = 1;
-				const isResolved = true;
+				const isResolved = RESOLVED;
 				const resolvedDate = { year: '2018', month:'02' };
 				const country = uuid();
 				const adminAreas = [uuid()];
@@ -1174,7 +1277,8 @@ describe( 'Backend Service', () => {
 						adminAreas
 					}, {
 						problem_status: status,
-						is_resolved: isResolved,
+						is_resolved: true,
+						resolved_status: RESOLVED,
 						resolved_date: '2018-02-01',
 						export_country: country,
 						country_admin_areas: adminAreas
@@ -1191,7 +1295,8 @@ describe( 'Backend Service', () => {
 						adminAreas
 					}, {
 						problem_status: status,
-						is_resolved: isResolved,
+						is_resolved: true,
+						resolved_status: RESOLVED,
 						resolved_date: null,
 						export_country: country,
 						country_admin_areas: adminAreas

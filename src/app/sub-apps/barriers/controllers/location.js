@@ -6,7 +6,7 @@ const backend = require( '../../../lib/backend-service' );
 
 module.exports = {
 
-   list: async (req, res, next) => {
+	list: async (req, res, next) => {
 
 		const barrier = req.barrier;
 		const isPost = req.method === 'POST';

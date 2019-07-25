@@ -221,7 +221,7 @@
 
 					{% endif %}
 				</span>
-				<h2 class="barrier-status-details__heading">Barrier {{ 'resolved' if barrier.isResolved else 'paused' }} <span class="barrier-status-details__heading__caption">in {{ barrier.status.date | dateOnly( day=false ) }}</span></2>
+				<h2 class="barrier-status-details__heading">Barrier {{ 'partially resolved' if barrier.isPartiallyResolved else ( 'resolved' if barrier.isResolved else 'dormant' ) }} <span class="barrier-status-details__heading__caption">in {{ barrier.status.date | dateOnly( day=false ) }}</span></2>
 				<h3 class="barrier-status-details__sub-heading">Summary {{ ' of resolution' if barrier.isResolved }}</h3>
 				<p class="barrier-status-details__text">{{ barrier.status.description | escape | nl2br }}</p>
 				<a href="{{ urls.barriers.edit.status(barrier.id)}}"> Edit</a>
@@ -338,7 +338,7 @@
 					{%- endif %}
 					</p>
 
-					{% if item.event === 'BARRIER_STATUS_CHANGE' and item.state.isOpen -%}
+					{% if item.event === 'BARRIER_STATUS_CHANGE' and item.state.showSummary -%}
 						<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
 					{% endif -%}
 

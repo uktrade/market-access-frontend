@@ -304,12 +304,14 @@
       }
    ],
    "barrier_status": {
+		"0": "placeat sapiente",
       "1": "necessitatibus doloribus et",
       "2": "deleniti accusamus facilis",
       "3": "sit omnis aperiam",
       "4": "non id qui",
       "5": "culpa et placeat",
-      "6": "non sapiente quam"
+		"6": "non sapiente quam",
+		"7": "accusamus culpa"
    },
    "barrier_type_categories": {
       "GOODS": "rerum dolores sapiente",
@@ -342,5 +344,11 @@
          "name": "et",
          "order": 1
       }
-   ]
+	],
+	"barrier_pending": {
+      "ONE": "ut",
+      "TWO": "incidunt rem accusantium",
+      "THREE": "ut quo ea",
+      "OTHER": "enim"
+   }
 }

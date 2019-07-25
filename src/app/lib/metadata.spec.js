@@ -81,6 +81,7 @@ describe( 'metadata', () => {
 		beforeEach( async () => {
 
 			const body = getFakeData( '/backend/metadata/' );
+
 			uniqueBarrierTypes = [ ...body.barrier_types ];
 			body.barrier_types.push( fakeData.barrier_types[ 0 ], fakeData.barrier_types[ 1 ] );
 
@@ -363,14 +364,15 @@ describe( 'metadata', () => {
 				it('Should return an object containing all countries with their corresponding admin areas', () => {
 					adminAreasByCountry = metadata.adminAreasByCountry;
 
-					expect(Object.keys(adminAreasByCountry).length).toEqual(2);
-					expect(Object.keys(adminAreasByCountry)).toEqual(
+					expect( Object.keys( adminAreasByCountry ).length ).toEqual( 2 );
+					expect( Object.keys( adminAreasByCountry ) ).toEqual(
 						[ '81756b9a-5d95-e211-a939-e4115bead28a', '5daf72a6-5d95-e211-a939-e4115bead28a' ]
 					);
 				});
 			});
 
 			describe( 'getCountryAdminAreasList', () => {
+
 				beforeEach( () => {
 					countryId = '81756b9a-5d95-e211-a939-e4115bead28a';
 					adminAreasByCountry = metadata.adminAreasByCountry;
@@ -383,7 +385,7 @@ describe( 'metadata', () => {
 
 						affectedAdminAreasList.unshift( { value: '', text: 'Select an admin area' } );
 
-						expect( metadata.getCountryAdminAreasList(countryId) ).toEqual( affectedAdminAreasList );
+						expect( metadata.getCountryAdminAreasList( countryId ) ).toEqual( affectedAdminAreasList );
 					} );
 				} );
 
@@ -391,29 +393,27 @@ describe( 'metadata', () => {
 					it( 'Should return all admin areas that are not disabled for the selected country', () => {
 
 						const text = 'All admin areas';
-						const affectedAdminAreasList = adminAreasByCountry[countryId].map( ( adminArea ) => ({ value: adminArea.id, text: adminArea.name } ) );
+						const affectedAdminAreasList = adminAreasByCountry[ countryId ].map( ( adminArea ) => ({ value: adminArea.id, text: adminArea.name } ) );
 
 						affectedAdminAreasList.unshift( { value: '', text } );
 
-						expect( metadata.getCountryAdminAreasList(countryId, text) ).toEqual( affectedAdminAreasList );
-
+						expect( metadata.getCountryAdminAreasList( countryId, text ) ).toEqual( affectedAdminAreasList );
 					} );
 				} );
 			} );
 
-			describe('isCountryWithAdminArea', () => {
-				describe('with a valid country', () => {
-					it('Should return true', () => {
-						expect (metadata.isCountryWithAdminArea('81756b9a-5d95-e211-a939-e4115bead28a')).toEqual(true);
+			describe( 'isCountryWithAdminArea', () => {
+				describe( 'with a valid country', () => {
+					it( 'Should return true', () => {
+						expect( metadata.isCountryWithAdminArea( '81756b9a-5d95-e211-a939-e4115bead28a' ) ).toEqual( true );
 					});
 				});
-				describe('without a valid country', () => {
-					it('Should return false', () => {
-						expect (metadata.isCountryWithAdminArea('81756b9a-5d95-e211-a939-e4115bxyd78a')).toEqual(false);
+				describe( 'without a valid country', () => {
+					it( 'Should return false', () => {
+						expect( metadata.isCountryWithAdminArea( '81756b9a-5d95-e211-a939-e4115bxyd78a' ) ).toEqual( false );
 					});
 				});
 			});
-
 		});
 
 		describe( 'sectors', () => {
@@ -475,7 +475,7 @@ describe( 'metadata', () => {
 		} );
 
 		describe( 'getBarrierType', () => {
-			it( 'Should return the list', () => {
+			it( 'Should return the item', () => {
 
 				expect( metadata.getBarrierType( fakeData.barrier_types[ 3 ].id ) ).toEqual( fakeData.barrier_types[ 3 ] );
 			} );
@@ -562,6 +562,59 @@ describe( 'metadata', () => {
 				} );
 			} );
 		} );
+
+		describe( 'Barier status', () => {
+
+			let validList;
+
+			beforeEach( () => {
+				validList = { ...fakeData.barrier_status };
+				delete validList[ 0 ];
+				delete validList[ 6 ];
+			} );
+
+			describe( 'barrierStatuses', () => {
+				it( 'Should return the object', () => {
+
+					expect( metadata.barrierStatuses ).toBeDefined();
+					expect( metadata.barrierStatuses ).toEqual( validList );
+				} );
+			} );
+
+			describe( 'getBarrierStatus', () => {
+				it( 'Should return the object', () => {
+
+					expect( metadata.getBarrierStatus( '1' ) ).toEqual( validList[ '1' ] );
+				} );
+			} );
+
+			describe( 'getBarrierStatusList', () => {
+				it( 'Should return a list', () => {
+
+					const expected = Object.entries( validList ).map( ( [ id, name ] ) => ({ value: id, text: name }) );
+
+					expect( metadata.getBarrierStatusList() ).toEqual( expected );
+				} );
+			} );
+
+			describe( 'barrierPendingOptions', () => {
+				it( 'Should return the options', () => {
+					expect( metadata.barrierPendingOptions ).toEqual( fakeData.barrier_pending );
+				} );
+			} );
+		} );
+
+		describe( 'barrier', () => {
+			describe( 'status.types', () => {
+				it( 'Updates the name with the value from the metadata', () => {
+
+					for( let [ key, item ] of Object.entries( metadata.barrier.status.typeInfo ) ){
+
+						expect( item.name ).toEqual( fakeData.barrier_status[ key ] );
+					}
+				} );
+			} );
+		} );
 	} );
 
 	describe( 'static data', () => {
@@ -576,28 +629,40 @@ describe( 'metadata', () => {
 		describe( 'barrier', () => {
 			it( 'Should expose the required data', () => {
 
+				const UNKNOWN = 7;
+				const PENDING = 1;
 				const OPEN = 2;
+				const PART_RESOLVED = 3;
 				const RESOLVED = 4;
 				const HIBERNATED = 5;
 
 				expect( metadata.barrier ).toEqual( {
 					status: {
 						types: {
+							UNKNOWN,
+							PENDING,
 							OPEN,
+							PART_RESOLVED,
 							RESOLVED,
 							HIBERNATED
 						},
 						typeInfo: {
-							[ OPEN ]: { name: 'Open', modifier: 'assessment' },
-							[ RESOLVED ]: { name: 'Resolved', modifier: 'resolved' },
-							[ HIBERNATED ]: { name: 'Paused', modifier: 'hibernated' }
-						}
+							[ UNKNOWN ]: { name: 'Unknown', modifier: 'hibernated', hint: 'Barrier requires further work for the status to be known' },
+							[ PENDING ]: { name: 'Pending', modifier: 'assessment', hint: 'Barrier is awaiting action' },
+							[ OPEN ]: { name: 'Open', modifier: 'assessment', hint: 'Barrier is being worked on' },
+							[ PART_RESOLVED ]: { name: 'Part resolved', modifier: 'resolved', hint: 'Barrier impact has been significantly reduced but remains in part' },
+							[ RESOLVED ]: { name: 'Resolved', modifier: 'resolved', hint: 'Barrier has been resolved for all UK companies' },
+							[ HIBERNATED ]: { name: 'Paused', modifier: 'hibernated', hint: 'Barrier is present but not being persued' },
+						},
+						pending: {
+							OTHER: 'OTHER'
+						},
 					},
 					priority: {
 						codes: {
 							UNKNOWN: 'UNKNOWN'
 						}
-					}
+					},
 				} );
 			} );
 		} );

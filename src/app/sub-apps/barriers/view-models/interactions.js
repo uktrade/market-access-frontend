@@ -1,13 +1,26 @@
 const metadata = require( '../../../lib/metadata' );
 const fileSize = require( '../../../lib/file-size' );
 
-function getStatusType( id ){
+const { OPEN, RESOLVED, PART_RESOLVED, PENDING, UNKNOWN } = metadata.barrier.status.types;
+const typeInfo = metadata.barrier.status.typeInfo;
+const { OTHER } = metadata.barrier.status.pending;
 
-	const typeInfo = metadata.barrier.status.typeInfo;
+function getSubStatusText( fieldInfo ){
+
+	const isOther = ( fieldInfo.sub_status === OTHER );
+	const subStatus = metadata.barrierPendingOptions[ fieldInfo.sub_status ];
+
+	return ` (${ isOther ? fieldInfo.sub_status_other : subStatus })`;
+}
+
+function getStatusType( id, fieldInfo ){
 
 	if( id !== null && typeInfo.hasOwnProperty( id ) ){
 
-		return typeInfo[ id ].name;
+		const name = typeInfo[ id ].name;
+		const subStatus = ( fieldInfo && id == PENDING ? getSubStatusText( fieldInfo ) : '' );
+
+		return ( name + subStatus );
 	}
 
 	return  id;
@@ -58,6 +71,8 @@ function getNotes( items, editId ){
 
 function getStatus( item ){
 
+	const statusId = item.new_value;
+
 	return {
 		isStatus: true,
 		modifier: 'status',
@@ -65,10 +80,10 @@ function getStatus( item ){
 		event: item.field_info.event,
 		state: {
 			from: getStatusType( item.old_value ),
-			to: getStatusType( item.new_value ),
+			to: getStatusType( statusId, item.field_info ),
 			date: item.field_info.status_date,
-			isResolved: ( item.new_value === metadata.barrier.status.types.RESOLVED ),
-			isOpen: ( item.new_value === metadata.barrier.status.types.OPEN )
+			isResolved: ( statusId == RESOLVED || statusId == PART_RESOLVED ),
+			showSummary: ( statusId == OPEN || statusId == UNKNOWN || statusId == PENDING )
 		},
 		text: item.field_info.status_summary,
 		user: item.user,
@@ -99,11 +114,11 @@ function getHistory( items ){
 
 			case 'status':
 				history.push( getStatus( item ) );
-			break;
+				break;
 
 			case 'priority':
 				history.push( getPriority( item ) );
-			break;
+				break;
 		}
 	}
 

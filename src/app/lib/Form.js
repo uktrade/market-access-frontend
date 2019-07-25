@@ -224,10 +224,10 @@ Form.prototype.getTemplateValues = function( errorsName ){
 			switch( field.type ){
 				case RADIO:
 					templateValue = field.items.map( isChecked( value ) );
-				break;
+					break;
 				case SELECT:
 					templateValue = field.items.map( isSelected( value ) );
-				break;
+					break;
 				default:
 					templateValue = value;
 			}

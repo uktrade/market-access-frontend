@@ -8,6 +8,7 @@ const FILTERS = Object.entries( {
 	priority: validators.isBarrierPriority,
 	region: validators.isOverseasRegion,
 	search: ( str ) => !!str.length,
+	status: validators.isBarrierStatus,
 } );
 
 const filterStringMap = {
@@ -15,7 +16,8 @@ const filterStringMap = {
 	sector: strings.sectors,
 	type: strings.types,
 	priority: strings.priorities,
-	region: strings.regions
+	region: strings.regions,
+	status: strings.statuses,
 };
 
 module.exports = {

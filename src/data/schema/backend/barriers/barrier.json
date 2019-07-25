@@ -97,13 +97,21 @@
 		"priority": { "$ref": "$refs/common.json#/priority" },
 
 		"status": {
-			"type": "number",
-			"enum": [ 0, 1, 2, 3, 4, 5, 6 ]
+			"type": "object",
+			"required": [ "id", "date", "summary", "sub_status", "sub_status_text" ],
+			"properties": {
+
+				"id": {
+					"type": "number",
+					"enum": [ 0, 1, 2, 3, 4, 5, 6 ]
+				},
+
+				"summary": { "$ref": "$refs/common.json#/paragraph" },
+				"date": { "$ref": "$refs/common.json#/past-date" },
+				"sub_status": { "$ref": "$refs/common.json#/word" },
+				"sub_status_text": { "$ref": "$refs/common.json#/words" }
+			}
 		},
-
-		"status_summary": { "$ref": "$refs/common.json#/paragraph" },
-
-		"status_date": { "$ref": "$refs/common.json#/past-date" },
 
 		"reported_on": { "$ref": "$refs/common.json#/past-date" },
 		"reported_by": {

@@ -9,6 +9,16 @@ let level0Sectors;
 let barrierTypes;
 let uniqueBarrierTypes;
 let barrierPriorities;
+let barrierStatuses;
+
+const barrierStatusKeys = {
+	UNKNOWN: 7,
+	PENDING: 1,
+	OPEN: 2,
+	PART_RESOLVED: 3,
+	RESOLVED: 4,
+	HIBERNATED: 5,
+};
 
 function notDisabled( item ){
 
@@ -166,13 +176,18 @@ module.exports.fetch = async () => {
 
 			overseasRegions = getOverseasRegions( availableCountries ).sort( sortOverseasRegions );
 			adminAreas = body.country_admin_areas.filter( notDisabled );
-			adminAreasByCountry = alterAdminAreasData(adminAreas);
+			adminAreasByCountry = alterAdminAreasData( adminAreas );
 			countries = availableCountries.map( cleanCountry );
 			sectors = body.sectors.filter( notDisabled );
 			level0Sectors = sectors.filter( ( sector ) => sector.level === 0 );
 			barrierTypes = body.barrier_types;
 			uniqueBarrierTypes = dedupeBarrierTypes( barrierTypes );
 			barrierPriorities = body.barrier_priorities.map( barrierPriority ).sort( sortPriority );
+			barrierStatuses = Object.values( barrierStatusKeys ).reduce( ( statuses, id ) => {
+
+				statuses[ id ] = body.barrier_status[ id ];
+				return statuses;
+			}, {} );
 
 			module.exports.statusTypes = {
 				...body.status_types,
@@ -214,6 +229,19 @@ module.exports.fetch = async () => {
 				virus_scanned: 'Virus scanned',
 				deletion_pending: 'Deletion pending',
 			};
+			module.exports.barrierStatuses = barrierStatuses;
+
+			//overwrite static type info names with the names from the metadata
+			for( let [ key, name ] of Object.entries( body.barrier_status ) ){
+
+				const item = module.exports.barrier.status.typeInfo[ key ];
+
+				if( item ){
+					item.name = name;
+				}
+			}
+
+			module.exports.barrierPendingOptions = body.barrier_pending;
 
 		} else {
 
@@ -249,31 +277,31 @@ module.exports.getBarrierPrioritiesList = ( opts = {} ) => barrierPriorities.map
 	html: `<span class="priority-marker priority-marker--${ code.toLowerCase() }"></span>` + ( opts.suffix === false ? name : `<strong>${ name }</strong> priority` )
 }) );
 
-const OPEN = 2;
-const RESOLVED = 4;
-const HIBERNATED = 5;
-
 module.exports.getCountryAdminAreasList = ( countryId, defaultText = 'Select an admin area') => createAdminAreaList(countryId, adminAreasByCountry, defaultText);
-module.exports.isCountryWithAdminArea = ( countryID ) => countryID in adminAreasByCountry;
-module.exports.getAdminArea = (adminAreaId) => adminAreas.find( ( AdminArea ) => AdminArea.id === adminAreaId );
+module.exports.isCountryWithAdminArea = ( countryId ) => countryId in adminAreasByCountry;
+module.exports.getAdminArea = ( adminAreaId ) => adminAreas.find( ( AdminArea ) => AdminArea.id === adminAreaId );
 
+module.exports.getBarrierStatus = ( id ) => barrierStatuses[ id ];
+module.exports.getBarrierStatusList = () => Object.entries( barrierStatuses ).map( ( [ id, name ] ) => ({ value: id, text: name }) );
 
 module.exports.barrier = {
 	status: {
-		types: {
-			OPEN,
-			RESOLVED,
-			HIBERNATED
-		},
+		types: barrierStatusKeys,
 		typeInfo: {
-			[ OPEN ]: { name: 'Open', modifier: 'assessment' },
-			[ RESOLVED ]: { name: 'Resolved', modifier: 'resolved' },
-			[ HIBERNATED ]: { name: 'Paused', modifier: 'hibernated' }
-		}
+			[ barrierStatusKeys.UNKNOWN ]: { name: 'Unknown', modifier: 'hibernated', hint: 'Barrier requires further work for the status to be known' },
+			[ barrierStatusKeys.PENDING ]: { name: 'Pending', modifier: 'assessment', hint: 'Barrier is awaiting action' },
+			[ barrierStatusKeys.OPEN ]: { name: 'Open', modifier: 'assessment', hint: 'Barrier is being worked on' },
+			[ barrierStatusKeys.PART_RESOLVED ]: { name: 'Part resolved', modifier: 'resolved', hint: 'Barrier impact has been significantly reduced but remains in part' },
+			[ barrierStatusKeys.RESOLVED ]: { name: 'Resolved', modifier: 'resolved', hint: 'Barrier has been resolved for all UK companies' },
+			[ barrierStatusKeys.HIBERNATED ]: { name: 'Paused', modifier: 'hibernated', hint: 'Barrier is present but not being persued' },
+		},
+		pending: {
+			OTHER: 'OTHER',
+		},
 	},
 	priority: {
 		codes: {
-			UNKNOWN: 'UNKNOWN'
+			UNKNOWN: 'UNKNOWN',
 		}
 	}
 };

@@ -73,11 +73,11 @@ describe( 'Dashboard view model', () => {
 						id: barrier.export_country,
 						name: ( country && country.name )
 					},
-					status: metadata.barrier.status.typeInfo[ barrier.status ],
+					status: metadata.barrier.status.typeInfo[ barrier.status.id ],
 					supportNeeded: barrier.support_type === 1,
 					hasContributors: barrier.contributor_count > 0,
 					problemStatus: metadata.statusTypes[ barrier.problem_status ],
-					sectors: ( barrier.all_sectors ? [ 'All sectors'] : barrier.sectors && barrier.sectors.map( getSector ) || [ 'Unknown' ] ),
+					sectors: ( barrier.all_sectors ? [ 'All sectors'] : barrier.sectors && barrier.sectors.map( () => getSector().name ) || [ 'Unknown' ] ),
 					date: {
 						reported: barrier.reported_on,
 						created: barrier.created_on,

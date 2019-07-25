@@ -33,50 +33,52 @@ module.exports = async ( req, res, next ) => {
 		form.validate();
 
 		if( !form.hasErrors() ){
-			if (form.getValues().hasAdminAreas === 'true') {
 
-					try {
+			if( form.getValues().hasAdminAreas === 'true' ){
 
-						const reportId = report.id;
-						const sessionStartForm = ( req.session.startFormValues || req.report && { status: req.report.problem_status } );
-						const sessionResolvedForm = ( req.session.isResolvedFormValues || req.report && { isResolved: req.report.is_resolved, resolvedDate: req.report.resolved_date } );
+				try {
 
-						const isUpdate = !!reportId;
+					const reportId = report.id;
+					const sessionStartForm = ( req.session.startFormValues || req.report && { status: req.report.problem_status } );
+					const sessionResolvedForm = ( req.session.isResolvedFormValues || req.report && { isResolved: req.report.is_resolved, resolvedDate: req.report.resolved_date } );
 
-						let response;
-						let body;
-						let values = Object.assign( {}, sessionStartForm, sessionResolvedForm, {country: countryId}, {adminAreas: []}  );
+					const isUpdate = !!reportId;
 
-						if( isUpdate ){
-							({ response, body } = await backend.reports.update( req, reportId, values ));
-						} else {
-							({ response, body } = await backend.reports.save( req, values ));
-						}
+					let response;
+					let body;
+					let values = Object.assign( {}, sessionStartForm, sessionResolvedForm, {country: countryId}, {adminAreas: []}  );
 
-						if( response.isSuccess ){
-
-							delete req.session.startFormValues;
-							delete req.session.isResolvedFormValues;
-							delete req.session.adminAreas;
-
-							if( !isUpdate && !body.id ){
-
-								return next( new Error( 'No id created for report' ) );
-
-							} else {
-
-								return res.redirect( urls.reports.hasSectors( body.id ) );
-							}
-
-						} else {
-
-							return next( new Error( `Unable to ${ isUpdate ? 'update' : 'save' } report, got ${ response.statusCode } response code` ) );
-						}
-
-					} catch( e ){
-
-						return next( e );
+					if( isUpdate ){
+						({ response, body } = await backend.reports.update( req, reportId, values ));
+					} else {
+						({ response, body } = await backend.reports.save( req, values ));
 					}
+
+					if( response.isSuccess ){
+
+						delete req.session.startFormValues;
+						delete req.session.isResolvedFormValues;
+						delete req.session.adminAreas;
+
+						if( !isUpdate && !body.id ){
+
+							return next( new Error( 'No id created for report' ) );
+
+						} else {
+
+							return res.redirect( urls.reports.hasSectors( body.id ) );
+						}
+
+					} else {
+
+						return next( new Error( `Unable to ${ isUpdate ? 'update' : 'save' } report, got ${ response.statusCode } response code` ) );
+					}
+
+				} catch( e ){
+
+					return next( e );
+				}
+
 			} else {
 
 				delete req.session.adminAreas;

@@ -5,6 +5,7 @@ const config = require( '../config' );
 const SCAN_CHECK_INTERVAL = config.files.scan.statusCheckInterval;
 const SCAN_MAX_ATTEMPTS = Math.round( config.files.scan.maxWaitTime / SCAN_CHECK_INTERVAL );
 const LOCATION = 'location';
+const { RESOLVED, PART_RESOLVED } = metadata.barrier.status.types;
 
 function getToken( req ){
 
@@ -169,6 +170,35 @@ function getBarrierParams( filters = {}, orderBy = 'reported_on', orderDirection
 	return params;
 }
 
+function getInitialReportValues( formValues ){
+
+	const isFullyResolved = ( formValues.isResolved == RESOLVED );
+	const isPartResolved = ( formValues.isResolved == PART_RESOLVED );
+	const isResolved = ( isFullyResolved || isPartResolved );
+	let date = null;
+
+	if( isFullyResolved ){
+
+		date = formValues.resolvedDate;
+
+	} else if( isPartResolved ){
+
+		date = {
+			month: formValues.partResolvedDate.partMonth,
+			year: formValues.partResolvedDate.partYear
+		};
+	}
+
+	return {
+		problem_status: getValue( formValues.status ),
+		is_resolved: isResolved,
+		resolved_status: ( isResolved ? formValues.isResolved : null ),
+		resolved_date: getValue( getDefaultedDate( date ) ),
+		export_country: getValue( formValues.country ),
+		country_admin_areas: getValue( formValues.adminAreas ),
+	};
+}
+
 const reports = {
 	saveSummary: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 		problem_description: getValue( values.description ),
@@ -268,16 +298,30 @@ module.exports = {
 			} ),
 			delete: ( req, noteId ) => backend.delete( `/barriers/interactions/${ noteId }`, getToken( req ) ),
 		},
-		resolve: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/resolve`, getToken( req ), {
-			status_date: getDefaultedDate( values.resolvedDate ),
-			status_summary: values.resolvedSummary
-		} ),
-		hibernate: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/hibernate`, getToken( req ), {
-			status_summary: values.hibernationSummary
-		} ),
-		open: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/open`, getToken( req ), {
-			status_summary: values.reopenSummary
-		} ),
+		setStatus: {
+			unknown: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/unknown`, getToken( req ), {
+				status_summary: values.unknownSummary
+			} ),
+			pending: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/open-action_required`, getToken( req ), {
+				status_summary: values.pendingSummary,
+				sub_status: values.pendingType,
+				sub_status_other: getValue( values.pendingTypeOther ),
+			} ),
+			open: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/open-in-progress`, getToken( req ), {
+				status_summary: values.reopenSummary
+			} ),
+			partResolved: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/resolve-in-part`, getToken( req ), {
+				status_date: getDefaultedDate( values.partResolvedDate ),
+				status_summary: values.partResolvedSummary
+			} ),
+			resolved: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/resolve-in-full`, getToken( req ), {
+				status_date: getDefaultedDate( values.resolvedDate ),
+				status_summary: values.resolvedSummary
+			} ),
+			hibernated: ( req, barrierId, values ) => backend.put( `/barriers/${ barrierId }/hibernate`, getToken( req ), {
+				status_summary: values.hibernationSummary
+			} ),
+		},
 		saveTypes: ( req, barrierId, types ) => updateBarrier( getToken( req ), barrierId, {
 			barrier_types: getValue( types )
 		} ),
@@ -317,11 +361,14 @@ module.exports = {
 			problem_status: values.problemStatus
 		} ),
 		saveStatus: ( req, barrierId, values ) => {
-			const status_details = { status_summary: values.statusSummary };
-			if (values.statusDate) {
-				status_details.status_date = getDefaultedDate( values.statusDate );
+
+			const details = { status_summary: values.statusSummary };
+
+			if( values.statusDate ){
+				details.status_date = getDefaultedDate( values.statusDate );
 			}
-			return updateBarrier( getToken( req ), barrierId, status_details);
+
+			return updateBarrier( getToken( req ), barrierId, details );
 		}
 	},
 
@@ -331,20 +378,8 @@ module.exports = {
 		getForCountry: ( req, countryId ) => backend.get( `/reports?export_country=${ countryId }&ordering=-created_on`, getToken( req ) ).then( transformReportList ),
 		get: ( req, reportId ) => backend.get( `/reports/${ reportId }`, getToken( req ) ).then( transformSingleReport ),
 		delete: ( req, reportId ) => backend.delete( `/reports/${ reportId }`, getToken( req ) ),
-		save: ( req, values ) => backend.post( '/reports', getToken( req ), {
-			problem_status: getValue( values.status ),
-			is_resolved: getValue( values.isResolved ),
-			resolved_date: getValue( getDefaultedDate( values.resolvedDate ) ),
-			export_country: getValue( values.country ),
-			country_admin_areas: getValue(values.adminAreas)
-		} ),
-		update: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
-			problem_status: getValue( values.status ),
-			is_resolved: getValue( values.isResolved ),
-			resolved_date: getValue( getDefaultedDate( values.resolvedDate ) ),
-			export_country: getValue( values.country ),
-			country_admin_areas: getValue( values.adminAreas )
-		} ),
+		save: ( req, values ) => backend.post( '/reports', getToken( req ), getInitialReportValues( values ) ),
+		update: ( req, reportId, values ) => updateReport( getToken( req ), reportId, getInitialReportValues( values ) ),
 		saveHasSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 			sectors_affected: getValue( values.hasSectors ),
 			all_sectors: null,

@@ -33,11 +33,11 @@ module.exports = {
 		const staticMaxAge = ( isDev ? 0 : '2y' );
 
 		const nunjucksEnv = nunjucks.configure( [
-				`${__dirname}/views`,
-				`${__dirname}/sub-apps`,
-				`${ pathToNodeModules }/govuk-frontend`,
-				`${ pathToNodeModules }/@uktrade`,
-			], {
+			`${__dirname}/views`,
+			`${__dirname}/sub-apps`,
+			`${ pathToNodeModules }/govuk-frontend`,
+			`${ pathToNodeModules }/@uktrade`,
+		], {
 			trimBlocks: true,
 			lstripBlocks: true,
 			autoescape: true,

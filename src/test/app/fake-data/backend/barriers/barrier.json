@@ -36,9 +36,13 @@
    ],
    "barrier_title": "nemo nobis ut",
    "problem_description": "Accusamus saepe sed non in molestiae minima voluptas. Quis atque ipsa est laborum voluptatem sed fugit autem quos. Et sit omnis praesentium debitis odit sint officiis.",
-   "status": 1,
-   "status_date":  "2019-03-01T00:00:00Z",
-   "status_summary": "Cheese",
+	"status": {
+      "id": 1,
+      "date": "2019-03-01",
+      "summary": "Possimus sequi reprehenderit assumenda. Enim est in sapiente ex totam earum esse perspiciatis. Praesentium facere aliquam aut non dicta et consequatur eligendi. Voluptas consequatur aut pariatur corporis molestiae. Tenetur qui odio minima nesciunt sint quo voluptatem minima omnis.",
+      "sub_status": "consequuntur",
+      "sub_status_text": "eos aspernatur consequatur"
+   },
    "reported_on": "Fri Mar 30 2018 01:46:38 GMT+0100 (BST)",
    "reported_by": "Stanton Walsh IV",
    "export_country": "81756b9a-5d95-e211-a939-e4115bead28a",
