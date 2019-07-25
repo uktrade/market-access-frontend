@@ -1,6 +1,8 @@
 const proxyquire = require( 'proxyquire' );
 const modulePath = './reports';
 
+const { RESOLVED, PART_RESOLVED } = require( '../../../lib/metadata' ).barrier.status.types;
+
 describe( 'Reports view model', () => {
 
 	let viewModel;
@@ -37,21 +39,25 @@ describe( 'Reports view model', () => {
 					id: 1,
 					problem_status: '1',
 					is_resolved: true,
+					resolved_status: RESOLVED,
 					export_country: 'a'
 				},{
 					id: 2,
 					problem_status: '2',
 					is_resolved: true,
+					resolved_status: PART_RESOLVED,
 					export_country: 'b'
 				},{
 					id: 3,
 					problem_status: '3',
 					is_resolved: false,
+					resolved_status: null,
 					export_country: 'c'
 				},{
 					id: 4,
 					problem_status: '3',
 					is_resolved: false,
+					resolved_status: null,
 					export_country: 'd'
 				}
 			];
@@ -84,11 +90,10 @@ describe( 'Reports view model', () => {
 					export_country: report.export_country,
 					country: getCountry(),
 					is_resolved: report.is_resolved,
-					isResolved: report.is_resolved,
-					problem_status: {
-						id: report.problem_status,
-						name: metadata.statusTypes[ report.problem_status ]
-					},
+					resolvedText: ( report.is_resolved ? ( report.resolved_status === RESOLVED ? 'In full' : 'In part' ) : 'No' ),
+					resolved_status: report.resolved_status,
+					problem_status: report.problem_status,
+					problemStatusText: metadata.statusTypes[ report.problem_status ],
 					date: {
 						created: report.created_on
 					}
@@ -123,8 +128,8 @@ describe( 'Reports view model', () => {
 
 				const output = viewModel( getReports(), currentReportId );
 
-				expect( output.currentReport).toBeDefined();
-				expect( output.currentReport.id).toEqual(1);
+				expect( output.currentReport ).toBeDefined();
+				expect( output.currentReport.id ).toEqual( 1 );
 			});
 		});
 	} );

@@ -1,15 +1,11 @@
 const metadata = require( '../../../lib/metadata' );
+const { RESOLVED } = metadata.barrier.status.types;
 
 function update( item ){
 
-	const id = item.problem_status;
-
-	item.isResolved = item.is_resolved;
+	item.resolvedText = ( item.is_resolved ? ( item.resolved_status == RESOLVED ? 'In full' : 'In part' ) : 'No' );
 	item.country = metadata.getCountry( item.export_country );
-	item.problem_status = {
-		id,
-		name: metadata.statusTypes[ id ],
-	};
+	item.problemStatusText = metadata.statusTypes[ item.problem_status ];
 	item.date = {
 		created: item.created_on
 	};
@@ -28,8 +24,11 @@ module.exports = ( reports, currentReportId ) => {
 		if( currentReportId ){
 
 			reports.some( ( report ) => {
+
 				if( report.id === currentReportId ){
-					return currentReport = report;
+
+					currentReport = report;
+					return true;
 				}
 			});
 		}

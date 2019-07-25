@@ -52,10 +52,10 @@
 						{{ report.country.name or '---' }}
 					</td>
 					<td class="standard-table__cell">
-						{{ 'Yes' if report.isResolved else 'No' }}
+						{{ report.resolvedText }}
 					</td>
 					<td class="standard-table__cell">
-						{{ report.problem_status.name or '---' }}
+						{{ report.problemStatusText or '---' }}
 					</td>
 					<td class="standard-table__cell">
 						{{ report.created_by.name or '---' }}

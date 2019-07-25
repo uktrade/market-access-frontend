@@ -12,10 +12,8 @@ async function renderDashboard( req, res, next, isDelete = false, currentReportI
 
 		if( response.isSuccess ){
 
-			const { reports, currentReport } = reportsViewModel( body.results, currentReportId );
 			res.render( 'reports/views/index', {
-				currentReport,
-				reports,
+				...reportsViewModel( body.results, currentReportId ),
 				csrfToken: req.csrfToken(),
 				isDelete
 			} );
