@@ -1176,7 +1176,7 @@ describe( 'Backend Service', () => {
 						service.reports.save( req, {
 							status,
 							isResolved: PART_RESOLVED,
-							partResolvedDate:	resolvedDate,
+							partResolvedDate:	{ partMonth: resolvedDate.month, partYear: resolvedDate.year },
 							country,
 							adminAreas
 						} );

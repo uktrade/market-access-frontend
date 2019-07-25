@@ -175,7 +175,19 @@ function getInitialReportValues( formValues ){
 	const isFullyResolved = ( formValues.isResolved == RESOLVED );
 	const isPartResolved = ( formValues.isResolved == PART_RESOLVED );
 	const isResolved = ( isFullyResolved || isPartResolved );
-	const date = ( isFullyResolved ? formValues.resolvedDate : ( isPartResolved ? formValues.partResolvedDate : null ) );
+	let date = null;
+
+	if( isFullyResolved ){
+
+		date = formValues.resolvedDate;
+
+	} else if( isPartResolved ){
+
+		date = {
+			month: formValues.partResolvedDate.partMonth,
+			year: formValues.partResolvedDate.partYear
+		};
+	}
 
 	return {
 		problem_status: getValue( formValues.status ),

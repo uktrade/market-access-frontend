@@ -3,6 +3,44 @@ const Form = require( '../../../lib/Form' );
 const urls = require( '../../../lib/urls' );
 const validators = require( '../../../lib/validators' );
 const backend = require( '../../../lib/backend-service' );
+const getDateParts = require( '../../../lib/get-date-parts' );
+
+const { PART_RESOLVED } = metadata.barrier.status.types;
+
+function getResolvedFormValuesFromReport( report ){
+
+	if( report ){
+
+		const values = {};
+		let isResolved;
+
+		if( report.is_resolved ){
+
+			const { month, year } = getDateParts( report.resolved_date );
+			const isPartResolved = ( report.resolved_status == PART_RESOLVED );
+
+			if( isPartResolved ){
+
+				values.partResolvedDate = { partMonth: month, partYear: year };
+
+			} else {
+
+				values.resolvedDate = { month, year };
+			}
+
+			isResolved = report.resolved_status;
+
+		} else {
+
+			isResolved = 'false';
+		}
+
+		return {
+			...values,
+			isResolved,
+		};
+	}
+}
 
 module.exports = async ( req, res, next ) => {
 
@@ -35,8 +73,8 @@ module.exports = async ( req, res, next ) => {
 				try {
 
 					const reportId = report.id;
-					const sessionStartForm = ( req.session.startFormValues || req.report && { status: req.report.problem_status } );
-					const sessionResolvedForm = ( req.session.isResolvedFormValues || req.report && { isResolved: req.report.is_resolved, resolvedDate: req.report.resolved_date } );
+					const sessionStartForm = ( req.session.startFormValues || report && { status: report.problem_status } );
+					const sessionResolvedForm = ( req.session.isResolvedFormValues || getResolvedFormValuesFromReport( report ) );
 					const isUpdate = !!reportId;
 
 					let response;
