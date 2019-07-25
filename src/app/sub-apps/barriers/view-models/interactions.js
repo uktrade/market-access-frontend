@@ -1,7 +1,7 @@
 const metadata = require( '../../../lib/metadata' );
 const fileSize = require( '../../../lib/file-size' );
 
-const { OPEN, RESOLVED, PENDING } = metadata.barrier.status.types;
+const { OPEN, RESOLVED, PART_RESOLVED, PENDING, UNKNOWN } = metadata.barrier.status.types;
 const typeInfo = metadata.barrier.status.typeInfo;
 const { OTHER } = metadata.barrier.status.pending;
 
@@ -71,6 +71,8 @@ function getNotes( items, editId ){
 
 function getStatus( item ){
 
+	const statusId = item.new_value;
+
 	return {
 		isStatus: true,
 		modifier: 'status',
@@ -78,10 +80,10 @@ function getStatus( item ){
 		event: item.field_info.event,
 		state: {
 			from: getStatusType( item.old_value ),
-			to: getStatusType( item.new_value, item.field_info ),
+			to: getStatusType( statusId, item.field_info ),
 			date: item.field_info.status_date,
-			isResolved: ( item.new_value == RESOLVED ),
-			isOpen: ( item.new_value == OPEN )
+			isResolved: ( statusId == RESOLVED || statusId == PART_RESOLVED ),
+			showSummary: ( statusId == OPEN || statusId == UNKNOWN || statusId == PENDING )
 		},
 		text: item.field_info.status_summary,
 		user: item.user,

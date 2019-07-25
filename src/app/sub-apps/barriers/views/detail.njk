@@ -338,7 +338,7 @@
 					{%- endif %}
 					</p>
 
-					{% if item.event === 'BARRIER_STATUS_CHANGE' and item.state.isOpen -%}
+					{% if item.event === 'BARRIER_STATUS_CHANGE' and item.state.showSummary -%}
 						<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
 					{% endif -%}
 

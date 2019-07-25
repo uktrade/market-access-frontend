@@ -14,6 +14,7 @@ describe( 'Interactions view model', () => {
 	let PAUSED;
 	let UNKNOWN;
 	let PENDING;
+	let PART_RESOLVED;
 
 	beforeAll( async () => {
 
@@ -26,6 +27,7 @@ describe( 'Interactions view model', () => {
 		RESOLVED = typeInfo[ types.RESOLVED ].name;
 		PAUSED = typeInfo[ types.HIBERNATED ].name;
 		UNKNOWN = typeInfo[ types.UNKNOWN ].name;
+		PART_RESOLVED = typeInfo[ types.PART_RESOLVED ].name;
 	} );
 
 	beforeEach( async () => {
@@ -50,7 +52,7 @@ describe( 'Interactions view model', () => {
 		};
 	}
 
-	function createStatus( item, from, to, isResolved, isOpen ){
+	function createStatus( item, from, to, isResolved, showSummary ){
 		return {
 			isStatus: true,
 			modifier: 'status',
@@ -61,7 +63,7 @@ describe( 'Interactions view model', () => {
 				to,
 				date: item.field_info.status_date,
 				isResolved,
-				isOpen
+				showSummary
 			},
 			text: item.field_info.status_summary,
 			user: item.user,
@@ -102,9 +104,10 @@ describe( 'Interactions view model', () => {
 			createPriority( historyResults[ 5 ] ),
 			createNote( interactionsResults[ 1 ] ),
 			createStatus( historyResults[ 1 ], UNKNOWN, OPEN, false, true ),
-			createStatus( historyResults[ 0 ], null, UNKNOWN, false, false ),
-			createStatus( historyResults[ 7 ], OPEN, `${ PENDING } (${ fakeMetadata.barrier_pending.TWO })`, false, false ),
-			createStatus( historyResults[ 8 ], OPEN, `${ PENDING } (${ historyResults[ 8 ].field_info.sub_status_other })`, false, false ),
+			createStatus( historyResults[ 0 ], null, UNKNOWN, false, true ),
+			createStatus( historyResults[ 7 ], OPEN, `${ PENDING } (${ fakeMetadata.barrier_pending.TWO })`, false, true ),
+			createStatus( historyResults[ 8 ], OPEN, `${ PENDING } (${ historyResults[ 8 ].field_info.sub_status_other })`, false, true ),
+			createStatus( historyResults[ 9 ], OPEN, PART_RESOLVED, true, false ),
 		] );
 	} );
 } );

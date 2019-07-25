@@ -136,6 +136,22 @@
             "id": 19,
             "name": "aspernatur"
          }
+      },{
+         "date": "Wed Sep 03 2016 09:40:54 GMT+0100 (BST)",
+         "old_value": 2,
+         "new_value": 3,
+         "field": "status",
+         "field_info": {
+            "status_date": "Mon Jun 16 2016 15:19:15 GMT+0100 (BST)",
+            "status_summary": "consectetur deserunt velit",
+            "sub_status": null,
+            "sub_status_other": null,
+            "event": "BARRIER_STATUS_CHANGE"
+         },
+         "user": {
+            "id": 19,
+            "name": "aspernatur"
+         }
       }
    ]
 }
