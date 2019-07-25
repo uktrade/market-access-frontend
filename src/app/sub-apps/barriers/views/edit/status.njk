@@ -17,6 +17,7 @@
 
 	<form action="{{ urls.barriers.edit.status( barrier.id ) }}" method="POST" class="restrict-width">
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
 		{% if isResolved %}
 			{{ govukDateInput( {
 
@@ -46,7 +47,7 @@
 		{{ govukTextarea( {
 
 			label: {
-				text: 'Provide a summary of how this barrier was resolved' if isResolved else 'Provide a summary of why this barrier is being paused',
+				text: 'Provide a summary of how this barrier was resolved' if isResolved else 'Provide a summary of why this barrier is dormant',
 				classes: 'govuk-label--s'
 			},
 			id: 'status-summary',

@@ -6,6 +6,9 @@ const govukItemsFromObj = require( '../../../lib/govuk-items-from-object' );
 const getDateParts = require( '../../../lib/get-date-parts' );
 const backend = require( '../../../lib/backend-service' );
 const urls = require( '../../../lib/urls' );
+const barrierFileds = require( '../../../lib/barrier-fields' );
+
+const { RESOLVED, PART_RESOLVED } = metadata.barrier.status.types;
 
 module.exports = {
 
@@ -96,7 +99,7 @@ module.exports = {
 	status: async ( req, res, next ) => {
 
 		const barrier = req.barrier;
-		const isResolved = barrier.status.id === metadata.barrier.status.types.RESOLVED;
+		const isResolved = ( barrier.status.id === RESOLVED || barrier.status.id === PART_RESOLVED );
 
 		const formFields = {
 			statusSummary: {
@@ -107,40 +110,12 @@ module.exports = {
 
 		if( isResolved ){
 
-			const invalidDateMessage = 'Enter resolution date and include a month and year';
 			const resolvedDateValues = getDateParts( barrier.status.date );
 
-			formFields.statusDate = {
-				type: Form.GROUP,
-				validators: [ {
-					fn: validators.isDateValue( 'month' ),
-					message: invalidDateMessage
-				},{
-					fn: validators.isDateValue( 'year' ),
-					message: invalidDateMessage
-				},{
-					fn: validators.isDateNumeric,
-					message: 'Resolution date must only include numbers'
-				},{
-					fn: validators.isDateValid,
-					message: invalidDateMessage
-				},{
-					fn: validators.isDateInPast,
-					message: 'Resolution date must be this month or in the past'
-				} ],
-				items: {
-					month: {
-						values: [ resolvedDateValues.month ]
-					},
-					year: {
-						values: [ resolvedDateValues.year ]
-					}
-				}
-			};
+			formFields.statusDate = barrierFileds.createStatusDate( resolvedDateValues );
 		}
 
-		const form = new Form( req, formFields);
-
+		const form = new Form( req, formFields );
 		const processor = new FormProcessor( {
 			form,
 			render: ( templateValues ) => res.render( 'barriers/views/edit/status', { ...templateValues, isResolved } ),

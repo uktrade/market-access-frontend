@@ -1,4 +1,5 @@
 const proxyquire = require( 'proxyquire' );
+const { RESOLVED, PART_RESOLVED, PAUSED } = require( '../../../lib/metadata' ).barrier.status.types;
 
 const modulePath = './edit';
 const SELECT = 'select-value';
@@ -21,8 +22,11 @@ describe( 'Edit barrier controller', () => {
 	let processor;
 	let backend;
 	let urls;
+	let barrierFields;
 
 	beforeEach( () => {
+
+		( { req, res, next } = jasmine.helpers.mocks.middleware() );
 
 		metadata = {
 			statusTypes: {
@@ -75,19 +79,11 @@ describe( 'Edit barrier controller', () => {
 		};
 
 		barrier = jasmine.helpers.getFakeData( '/backend/barriers/barrier' );
+		req.barrier = barrier;
 
-		req = {
-			barrier,
-			session: {},
-			params: {},
-			query: {}
+		barrierFields = {
+			createStatusDate: jasmine.createSpy( 'barrierFields.createStatusDate' ),
 		};
-
-		res = {
-			render: jasmine.createSpy( 'res.render' ),
-			redirect: jasmine.createSpy( 'res.redirect' )
-		};
-		next = jasmine.createSpy( 'next' );
 
 		controller = proxyquire( modulePath, {
 			'../../../lib/metadata': metadata,
@@ -97,6 +93,7 @@ describe( 'Edit barrier controller', () => {
 			'../../../lib/FormProcessor': FormProcessor,
 			'../../../lib/backend-service': backend,
 			'../../../lib/urls': urls,
+			'../../../lib/barrier-fields': barrierFields,
 		} );
 	} );
 
@@ -501,51 +498,54 @@ describe( 'Edit barrier controller', () => {
 			barrier = jasmine.helpers.getFakeData( '/backend/barriers/barrier' );
 			validators.isDateValue = jasmine.createSpy( 'validators.isDateValue' );
 			req.barrier = barrier;
-			barrier.status.summary = "hello";
+			barrier.status.summary = 'hello';
 		} );
 
 		describe( 'Configuring the form for a resolved barrier', () => {
-			it( 'Should configure the Form correctly', async () => {
 
-				barrier.status.id = 4;
+			let mockDateField;
 
-				const monthResponse = { month: true };
-				const yearResponse = { year: true };
+			beforeEach( () => {
 
-				validators.isDateValue.and.callFake( ( key ) => {
-					if( key === 'month' ){ return monthResponse; }
-					if( key === 'year' ){ return yearResponse; }
-				} );
+				mockDateField = { a: 1, b: 2 };
+				barrierFields.createStatusDate.and.callFake( () => mockDateField );
+			} );
 
-				await controller.status( req, res, next );
+			afterEach( () => {
 
 				const config = Form.calls.argsFor( 0 )[ 1 ];
 
-				expect( config.statusDate ).toBeDefined();
-				expect( config.statusDate.type ).toEqual( Form.GROUP );
-				expect( config.statusDate.validators.length ).toEqual( 5 );
-				expect( config.statusDate.validators[ 0 ].fn ).toEqual( monthResponse );
-				expect( config.statusDate.validators[ 1 ].fn ).toEqual( yearResponse );
-				expect( config.statusDate.validators[ 2 ].fn ).toEqual( validators.isDateNumeric );
-				expect( config.statusDate.validators[ 3 ].fn ).toEqual( validators.isDateValid );
-				expect( config.statusDate.validators[ 4 ].fn ).toEqual( validators.isDateInPast );
-				expect( config.statusDate.items ).toEqual( {
-					month: {
-						values: [ '03' ]
-					},
-					year: {
-						values: [ '2019' ]
-					}
-				} );
+				expect( config.statusDate ).toEqual( mockDateField );
+				expect( barrierFields.createStatusDate ) .toHaveBeenCalledWith( { year: '2019', month: '03', day: '01' } );
 
 				expect( config.statusSummary ).toBeDefined();
 				expect( config.statusSummary.required ).toBeDefined();
 				expect( config.statusSummary.values ).toEqual( [ 'hello' ] );
-			});
+			} );
+
+			describe( 'When it is fully resolved', () => {
+				it( 'Should configure the Form correctly', async () => {
+
+					barrier.status.id = RESOLVED;
+
+					await controller.status( req, res, next );
+				});
+			} );
+
+			describe( 'When it is partially resolved', () => {
+				it( 'Should configure the Form correctly', async () => {
+
+					barrier.status.id = PART_RESOLVED;
+
+					await controller.status( req, res, next );
+				});
+			} );
 		});
 
 		describe( 'Configuring the form for a paused barrier', () => {
 			it( 'Should configure the Form correctly', async () => {
+
+				barrier.status.id = PAUSED;
 
 				await controller.status( req, res, next );
 
