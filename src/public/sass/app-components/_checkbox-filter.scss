@@ -59,7 +59,7 @@ $default-spacing-unit: 5px;
 		&::after {
 			border: ceil($font-size / 2) solid black;
 			left: floor($font-size * 1.4);
-			top: floor($font-size * 1.9);
+			top: floor($font-size * 1.7);
 		}
 	}
 }
@@ -80,7 +80,7 @@ $default-spacing-unit: 5px;
 		padding-bottom: 8px;
 	}
 
-	&[type="checkbox"] + .checkbox-filter__label::after {
+	&[ type="checkbox" ] + .checkbox-filter__label::after {
 		transform: rotate(-45deg);
 		-ms-transform: rotate(-45deg);
 	}
