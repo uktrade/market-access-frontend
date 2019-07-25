@@ -11,6 +11,11 @@ module.exports = async ( req, res, next ) => {
 	const report = req.report;
 	const formConfig = {
 
+		barrierTitle: {
+			values: [ report.barrier_title ],
+			required: 'Enter a title for this barrier'
+		},
+
 		item: {
 			values: [ report.product ],
 			required: 'Enter a product or service'
@@ -32,11 +37,6 @@ module.exports = async ( req, res, next ) => {
 			values: [ report.other_source ],
 			conditional: { name: 'barrierSource', value: 'OTHER' },
 			required: 'Enter how you became aware of the barrier'
-		},
-
-		barrierTitle: {
-			values: [ report.barrier_title ],
-			required: 'Enter a title for this barrier'
 		},
 
 		euExitRelated: {

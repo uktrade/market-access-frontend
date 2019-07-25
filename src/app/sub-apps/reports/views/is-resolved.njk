@@ -27,7 +27,7 @@
 		{% set isResolvedHtml %}
 			{{ govukDateInput( {
 
-				id: 'resolved-date',
+				id: 'resolved-date-group',
 				fieldset: {
 					legend: {
 						text: 'When was the barrier resolved?',
@@ -37,6 +37,7 @@
 				errorMessage: errors | errorForName( 'resolved-date' ),
 				items: [
 					{
+						id: 'resolved-date',
 						name: 'month',
 						value: resolvedDate.month,
 						classes: 'govuk-input--width-2'
@@ -53,7 +54,7 @@
 		{% set isPartResolvedHtml %}
 			{{ govukDateInput( {
 
-				id: 'part-resolved-date',
+				id: 'part-resolved-date-group',
 				fieldset: {
 					legend: {
 						text: 'When was the barrier partially resolved?',
@@ -63,6 +64,7 @@
 				errorMessage: errors | errorForName( 'part-resolved-date' ),
 				items: [
 					{
+						id: 'part-resolved-date',
 						name: 'partMonth',
 						label: 'Month',
 						value: partResolvedDate.partMonth,

@@ -101,12 +101,7 @@ module.exports = {
 		const barrier = req.barrier;
 		const isResolved = ( barrier.status.id === RESOLVED || barrier.status.id === PART_RESOLVED );
 
-		const formFields = {
-			statusSummary: {
-				values: [ barrier.status.summary ],
-				required: 'Enter a summary'
-			}
-		};
+		const formFields = {};
 
 		if( isResolved ){
 
@@ -114,6 +109,11 @@ module.exports = {
 
 			formFields.statusDate = barrierFileds.createStatusDate( resolvedDateValues );
 		}
+
+		formFields.statusSummary = {
+			values: [ barrier.status.summary ],
+			required: 'Enter a summary'
+		};
 
 		const form = new Form( req, formFields );
 		const processor = new FormProcessor( {

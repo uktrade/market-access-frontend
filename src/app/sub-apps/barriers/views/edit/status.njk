@@ -21,7 +21,7 @@
 		{% if isResolved %}
 			{{ govukDateInput( {
 
-				id: 'status-date',
+				id: 'status-date-group',
 				fieldset: {
 					legend: {
 						text: 'Date the barrier was resolved',
@@ -31,6 +31,7 @@
 				errorMessage: errors | errorForName( 'status-date' ),
 				items: [
 					{
+						id: 'status-date',
 						name: 'month',
 						value: statusDate.month,
 						classes: 'govuk-input--width-2'
