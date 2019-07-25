@@ -3,25 +3,29 @@ const modulePath = './interactions';
 
 const getFakeData = jasmine.helpers.getFakeData;
 
-const types = metadata.barrier.status.types;
+const { types, typeInfo } = metadata.barrier.status;
 
 describe( 'Interactions view model', () => {
 
 	let viewModel;
+	let fakeMetadata;
 	let OPEN;
 	let RESOLVED;
 	let PAUSED;
 	let UNKNOWN;
+	let PENDING;
 
 	beforeAll( async () => {
 
-		jasmine.helpers.intercept.backend().get( '/metadata' ).reply( 200, getFakeData( '/backend/metadata/' ) );
+		fakeMetadata = getFakeData( '/backend/metadata/' );
+		jasmine.helpers.intercept.backend().get( '/metadata' ).reply( 200, fakeMetadata );
 		await metadata.fetch();
 
-		OPEN = metadata.barrier.status.typeInfo[ types.OPEN ].name;
-		RESOLVED = metadata.barrier.status.typeInfo[ types.RESOLVED ].name;
-		PAUSED = metadata.barrier.status.typeInfo[ types.HIBERNATED ].name;
-		UNKNOWN = metadata.barrier.status.typeInfo[ types.UNKNOWN ].name;
+		OPEN = typeInfo[ types.OPEN ].name;
+		PENDING = typeInfo[ types.PENDING ].name;
+		RESOLVED = typeInfo[ types.RESOLVED ].name;
+		PAUSED = typeInfo[ types.HIBERNATED ].name;
+		UNKNOWN = typeInfo[ types.UNKNOWN ].name;
 	} );
 
 	beforeEach( async () => {
@@ -99,6 +103,8 @@ describe( 'Interactions view model', () => {
 			createNote( interactionsResults[ 1 ] ),
 			createStatus( historyResults[ 1 ], UNKNOWN, OPEN, false, true ),
 			createStatus( historyResults[ 0 ], null, UNKNOWN, false, false ),
+			createStatus( historyResults[ 7 ], OPEN, `${ PENDING } (${ fakeMetadata.barrier_pending.TWO })`, false, false ),
+			createStatus( historyResults[ 8 ], OPEN, `${ PENDING } (${ historyResults[ 8 ].field_info.sub_status_other })`, false, false ),
 		] );
 	} );
 } );

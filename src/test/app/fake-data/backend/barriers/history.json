@@ -104,6 +104,38 @@
             "id": 16,
             "name": "incidunt"
          }
+      },{
+         "date": "Wed Sep 05 2016 09:40:54 GMT+0100 (BST)",
+         "old_value": 2,
+         "new_value": 1,
+         "field": "status",
+         "field_info": {
+            "status_date": "Mon Jun 18 2016 15:19:15 GMT+0100 (BST)",
+            "status_summary": "consectetur deserunt velit",
+            "sub_status": "TWO",
+            "sub_status_other": null,
+            "event": "BARRIER_STATUS_CHANGE"
+         },
+         "user": {
+            "id": 19,
+            "name": "aspernatur"
+         }
+      },{
+         "date": "Wed Sep 04 2016 09:40:54 GMT+0100 (BST)",
+         "old_value": 2,
+         "new_value": 1,
+         "field": "status",
+         "field_info": {
+            "status_date": "Mon Jun 17 2016 15:19:15 GMT+0100 (BST)",
+            "status_summary": "consectetur deserunt velit",
+            "sub_status": "OTHER",
+            "sub_status_other": "saepe velit",
+            "event": "BARRIER_STATUS_CHANGE"
+         },
+         "user": {
+            "id": 19,
+            "name": "aspernatur"
+         }
       }
    ]
 }
