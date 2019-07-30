@@ -364,6 +364,15 @@ describe( 'Backend Service', () => {
 					testWithOrdering( { search }, `text=${ encodeURIComponent( search ) }` );
 				} );
 			} );
+
+			describe( 'With a user filter', () => {
+				it( 'Should call the correct path, urlencode the value, use default sort order', async () => {
+
+					const createdBy = '123';
+
+					testWithOrdering( { createdBy }, `user=1` );
+				} );
+			} );
 		} );
 
 		describe( 'download', () => {

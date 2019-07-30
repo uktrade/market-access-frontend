@@ -131,6 +131,7 @@ function getFilterParams( filters ){
 		'priority': 'priority',
 		'region': LOCATION,
 		'search': 'text',
+		'createdBy': 'user',
 	};
 
 	const params = [];
@@ -142,13 +143,21 @@ function getFilterParams( filters ){
 
 		if( value ){
 
-			if( paramKey === LOCATION ){
+			switch( paramKey ){
 
-				locations.push( value );
+				case LOCATION:
 
-			} else {
+					locations.push( value );
+					break;
 
-				params.push( `${ paramKey }=${ encodeURIComponent( value ) }` );
+				case 'user':
+
+					params.push( `${ paramKey }=1` );
+					break;
+
+				default:
+
+					params.push( `${ paramKey }=${ encodeURIComponent( value ) }` );
 			}
 		}
 	}

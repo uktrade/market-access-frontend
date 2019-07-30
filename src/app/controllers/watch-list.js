@@ -9,11 +9,6 @@ const NEW = 'new';
 const NAME_ERROR = 'Enter a name for your watch list';
 const MAX_CHARACTERS = config.watchList.maxNameLength;
 
-function createFilterList( filters ){
-
-	return Object.entries( filters ).map( ( [ key, value ] ) => ({ key, value: barrierFilters.transformFilterValue( key, value ) }) );
-}
-
 const watchListsNameValidator = {
 	fn: ( text ) => {
 
@@ -145,7 +140,7 @@ module.exports = {
 			hasToReplace,
 			isEdit: !!editIndex,
 			queryString: req.query,
-			filterList: createFilterList( filters ),
+			filterList: barrierFilters.createList( filters ),
 			csrfToken: req.csrfToken(),
 		} );
 	},
@@ -195,7 +190,7 @@ module.exports = {
 			isRename: true,
 			watchListIndex,
 			queryString: req.query,
-			filterList: createFilterList( currentWatchList.filters ),
+			filterList: barrierFilters.createList( currentWatchList.filters ),
 			csrfToken: req.csrfToken(),
 		});
 	},

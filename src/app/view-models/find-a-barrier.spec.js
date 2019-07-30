@@ -28,6 +28,7 @@ describe( 'Find a barrier view model', () => {
 	let findABarrierResponse;
 	let strings;
 	let barrierStatusList;
+	let barrierFilters;
 
 	function getExpectedBarrierOutput( barriers ){
 
@@ -164,11 +165,14 @@ describe( 'Find a barrier view model', () => {
 
 		strings = jasmine.helpers.mocks.strings();
 
+		barrierFilters = jasmine.helpers.mocks.barrierFilters();
+
 		viewModel = proxyquire( modulePath, {
 			'../lib/metadata': metadata,
 			'../lib/sort-govuk-items': sortGovukItems,
 			'../lib/urls': urls,
 			'../lib/strings': strings,
+			'../lib/barrier-filters': barrierFilters,
 		} );
 	} );
 
@@ -181,19 +185,24 @@ describe( 'Find a barrier view model', () => {
 		expect( metadata.getBarrierPrioritiesList ).toHaveBeenCalledWith( { suffix: false } );
 		expect( metadata.getBarrierStatusList ).toHaveBeenCalledWith();
 		expect( sortGovukItems.alphabetical ).toHaveBeenCalled();
-		expect( urls.findABarrier.calls.count() ).toEqual( 8 );
+		expect( urls.findABarrier.calls.count() ).toEqual( 9 );
 	} );
 
 	function getFilters( overrides = {} ){
 
+		const { responses } = barrierFilters.getDisplayInfo;
+		const removeUrl = findABarrierResponse;
+		const active = false;
+
 		return {
-			country: overrides.country || { items: countryList, active: false, text: strings.locations.response, removeUrl: findABarrierResponse },
-			region: overrides.region || { items: overseasRegionList, active: false, text: strings.regions.response, removeUrl: findABarrierResponse },
-			sector: overrides.sector || { items: sectorList, active: false, text: strings.sectors.response, removeUrl: findABarrierResponse },
-			type: overrides.type || { items: barrierTypeList, active: false, text: strings.types.response, removeUrl: findABarrierResponse },
-			priority: overrides.priority || { items: barrierPriorityList, active: false, text: strings.priorities.response, removeUrl: findABarrierResponse },
-			search: overrides.search || { active: false, text: undefined, removeUrl: findABarrierResponse },
-			status: overrides.status || { items: barrierStatusList, active: false, text: strings.statuses.response, removeUrl: findABarrierResponse },
+			country: { ...responses.country, items: countryList, active, removeUrl, ...overrides.country },
+			region: { ...responses.region, items: overseasRegionList, active, removeUrl, ...overrides.region },
+			sector: { ...responses.sector, items: sectorList, active, removeUrl, ...overrides.sector },
+			type: { ...responses.type, items: barrierTypeList, active, removeUrl, ...overrides.type },
+			priority: { ...responses.priority, items: barrierPriorityList, active, removeUrl, ...overrides.priority },
+			search: { ...responses.search, active, removeUrl, ...overrides.search },
+			status: { ...responses.status, items: barrierStatusList, active, removeUrl, ...overrides.status },
+			createdBy: { ...responses.createdBy, items: [ { text: responses.createdBy.text, value: 1 } ], active, removeUrl, ...overrides.createdBy },
 		};
 	}
 
@@ -407,10 +416,10 @@ describe( 'Find a barrier view model', () => {
 			}, ( output ) => {
 
 				expect( output.filters ).toEqual( getFilters( {
-					country: { items: countryList, active: true, text: strings.locations.response, removeUrl: findABarrierResponse },
+					country: { items: countryList, active: true },
 				} ) );
 				expect( countryList.find( ( country ) => country.value === filters.country[ 0 ] ).checked ).toEqual( true );
-				expect( strings.locations ).toHaveBeenCalledWith( filters.country );
+				expect( barrierFilters.getDisplayInfo ).toHaveBeenCalledWith( 'country', filters.country );
 			} );
 		} );
 
@@ -424,10 +433,10 @@ describe( 'Find a barrier view model', () => {
 			}, ( output ) => {
 
 				expect( output.filters ).toEqual( getFilters( {
-					region: { items: overseasRegionList, active: true, text: strings.regions.response, removeUrl: findABarrierResponse }
+					region: { items: overseasRegionList, active: true }
 				} ) );
 				expect( overseasRegionList[ 2 ].checked ).toEqual( true );
-				expect( strings.regions ).toHaveBeenCalledWith( filters.region );
+				expect( barrierFilters.getDisplayInfo ).toHaveBeenCalledWith( 'region', filters.region );
 			} );
 		} );
 
@@ -441,10 +450,10 @@ describe( 'Find a barrier view model', () => {
 			}, ( output ) => {
 
 				expect( output.filters ).toEqual( getFilters( {
-					sector: { items: sectorList, active: true, text: strings.sectors.response, removeUrl: findABarrierResponse }
+					sector: { items: sectorList, active: true }
 				} ) );
 				expect( sectorList[ 2 ].checked ).toEqual( true );
-				expect( strings.sectors ).toHaveBeenCalledWith( filters.sector );
+				expect( barrierFilters.getDisplayInfo ).toHaveBeenCalledWith( 'sector', filters.sector );
 			} );
 		} );
 
@@ -473,11 +482,9 @@ describe( 'Find a barrier view model', () => {
 
 						} ).sort( ( a, b ) => a.text.localeCompare( b.text ) ),
 						active: true,
-						text: strings.types.response,
-						removeUrl: findABarrierResponse
 					},
 				}) );
-				expect( strings.types ).toHaveBeenCalledWith( filters.type );
+				expect( barrierFilters.getDisplayInfo ).toHaveBeenCalledWith( 'type', filters.type );
 			} );
 		} );
 
@@ -503,11 +510,9 @@ describe( 'Find a barrier view model', () => {
 							return item;
 						} ),
 						active: true,
-						text: strings.priorities.response,
-						removeUrl: findABarrierResponse,
 					},
 				}) );
-				expect( strings.priorities ).toHaveBeenCalledWith( filters.priority );
+				expect( barrierFilters.getDisplayInfo ).toHaveBeenCalledWith( 'priority', filters.priority );
 			} );
 		} );
 
@@ -520,8 +525,9 @@ describe( 'Find a barrier view model', () => {
 			}, ( output ) => {
 
 				expect( output.filters ).toEqual( getFilters( {
-					search: { active: true, text: filters.search, removeUrl: findABarrierResponse }
+					search: { active: true }
 				} ) );
+				expect( barrierFilters.getDisplayInfo ).toHaveBeenCalledWith( 'search', filters.search );
 			} );
 		} );
 
@@ -549,11 +555,24 @@ describe( 'Find a barrier view model', () => {
 							return item;
 						} ),
 						active: true,
-						text: strings.statuses.response,
-						removeUrl: findABarrierResponse
 					},
 				}) );
-				expect( strings.statuses ).toHaveBeenCalledWith( filters.status );
+				expect( barrierFilters.getDisplayInfo ).toHaveBeenCalledWith( 'status', filters.status );
+			} );
+		} );
+
+		describe( 'Created by filter', () => {
+
+			checkFilter( () => {
+
+				filters.createdBy = [ 123 ];
+
+			}, ( output ) => {
+
+				expect( output.filters ).toEqual( getFilters( {
+					createdBy: { active: true }
+				} ) );
+				expect( barrierFilters.getDisplayInfo ).toHaveBeenCalledWith( 'createdBy', filters.createdBy );
 			} );
 		} );
 	} );
