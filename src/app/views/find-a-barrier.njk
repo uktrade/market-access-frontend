@@ -144,6 +144,23 @@
 					items: filters.status.items
 				})	}}
 
+				{{ checkboxFilter({
+					id: 'user-filter',
+					name: 'createdBy',
+					classes: 'govuk-!-width-full',
+					formGroup: {
+						classes: 'filter-group'
+					},
+					fieldset: {
+						classes: 'filter-group__inner',
+						legend: {
+							text: filters.createdBy.label,
+							classes: "filter-items__label filter-group__label"
+						}
+					},
+					items: filters.createdBy.items
+				})	}}
+
 				{% if hasFilters %}
 				<a class="filter-items__clear" href="{{ removeAllUrl }}">Remove all filters</a>
 				{% endif %}
@@ -153,11 +170,11 @@
 		</div>
 		<div class="govuk-grid-column-three-quarters">
 
-			{%- macro activeFilter( name, filter ) -%}
+			{%- macro activeFilter( filter ) -%}
 				{% if filter.active %}
 				<li class="active-filters__item">
-					<a href="{{ filter.removeUrl }}" class="active-filters__item__link" title="Remove {{ name }} filter">
-						<h4 class="active-filter__heading">{{ name }}:</h4>
+					<a href="{{ filter.removeUrl }}" class="active-filters__item__link" title="Remove {{ filter.label }} filter">
+						<h4 class="active-filter__heading">{{ filter.label }}:</h4>
 						<p class="active-filter__text">
 							{{ filter.text }}
 						</p>
@@ -173,13 +190,14 @@
 
 					<h3 class="visually-hidden">Active filters:</h3>
 					<ul class="active-filters">
-						{{ activeFilter( 'Search', filters.search ) }}
-						{{ activeFilter( 'Barrier location', filters.country ) }}
-						{{ activeFilter( 'Sector', filters.sector ) }}
-						{{ activeFilter( 'Type', filters.type ) }}
-						{{ activeFilter( 'Overseas region', filters.region ) }}
-						{{ activeFilter( 'Priority', filters.priority ) }}
-						{{ activeFilter( 'Status', filters.status ) }}
+						{{ activeFilter( filters.search ) }}
+						{{ activeFilter( filters.country ) }}
+						{{ activeFilter( filters.sector ) }}
+						{{ activeFilter( filters.type ) }}
+						{{ activeFilter( filters.region ) }}
+						{{ activeFilter( filters.priority ) }}
+						{{ activeFilter( filters.status ) }}
+						{{ activeFilter( filters.createdBy ) }}
 					</ul>
 
 					<div class="filter-results-action-buttons{{ ' filter-results-action-buttons--save' if not editWatchList }}">

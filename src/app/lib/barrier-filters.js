@@ -10,6 +10,7 @@ const FILTERS = Object.entries( {
 	region: [ 'Overseas region', validators.isOverseasRegion, strings.regions ],
 	search: [ 'Search', ( str ) => !!str.length, ( str ) => str ],
 	status: [ 'Barrier status', validators.isBarrierStatus, strings.statuses ],
+	createdBy: [ 'Show only', ( v ) => v == '1', () => 'My barriers' ],
 } );
 
 const displayMap = FILTERS.reduce( ( obj, [ key, [ label, , getValue ] ] ) => { obj[ key ] = { label, getValue }; return obj; }, {} );

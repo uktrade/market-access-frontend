@@ -100,6 +100,16 @@ describe( 'barrier-filters', () => {
 				expect( reporter.captureException ).toHaveBeenCalled();
 			} );
 		} );
+
+		describe( 'When it is createBy', () => {
+			it( 'Returns a static value', () => {
+
+				const inputValue = '123';
+				const value = barrierFilters.getDisplayInfo( 'createdBy', inputValue );
+
+				expect( value ).toEqual( { label: 'Show only', text: 'My barriers' } );
+			} );
+		} );
 	} );
 
 	describe( '#getFromQueryString', () => {

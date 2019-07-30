@@ -185,7 +185,7 @@ describe( 'Find a barrier view model', () => {
 		expect( metadata.getBarrierPrioritiesList ).toHaveBeenCalledWith( { suffix: false } );
 		expect( metadata.getBarrierStatusList ).toHaveBeenCalledWith();
 		expect( sortGovukItems.alphabetical ).toHaveBeenCalled();
-		expect( urls.findABarrier.calls.count() ).toEqual( 8 );
+		expect( urls.findABarrier.calls.count() ).toEqual( 9 );
 	} );
 
 	function getFilters( overrides = {} ){
@@ -202,6 +202,7 @@ describe( 'Find a barrier view model', () => {
 			priority: { ...responses.priority, items: barrierPriorityList, active, removeUrl, ...overrides.priority },
 			search: { ...responses.search, active, removeUrl, ...overrides.search },
 			status: { ...responses.status, items: barrierStatusList, active, removeUrl, ...overrides.status },
+			createdBy: { ...responses.createdBy, items: [ { text: responses.createdBy.text, value: 1 } ], active, removeUrl, ...overrides.createdBy },
 		};
 	}
 
@@ -557,6 +558,21 @@ describe( 'Find a barrier view model', () => {
 					},
 				}) );
 				expect( barrierFilters.getDisplayInfo ).toHaveBeenCalledWith( 'status', filters.status );
+			} );
+		} );
+
+		describe( 'Created by filter', () => {
+
+			checkFilter( () => {
+
+				filters.createdBy = [ 123 ];
+
+			}, ( output ) => {
+
+				expect( output.filters ).toEqual( getFilters( {
+					createdBy: { active: true }
+				} ) );
+				expect( barrierFilters.getDisplayInfo ).toHaveBeenCalledWith( 'createdBy', filters.createdBy );
 			} );
 		} );
 	} );
