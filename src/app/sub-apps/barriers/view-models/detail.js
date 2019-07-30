@@ -1,12 +1,12 @@
 const metadata = require( '../../../lib/metadata' );
 const strings = require( '../../../lib/strings' );
 
-const { OPEN, RESOLVED, HIBERNATED } = metadata.barrier.status.types;
+const { OPEN, RESOLVED, PART_RESOLVED, HIBERNATED } = metadata.barrier.status.types;
 const barrierStatusTypeInfo = metadata.barrier.status.typeInfo;
 
 module.exports = ( barrier, addCompany = false ) => {
 
-	const barrierStatusCode = barrier.status;
+	const barrierStatusCode = barrier.status.id;
 	const status = barrierStatusTypeInfo[ barrierStatusCode ] || {};
 	const sectors = ( barrier.sectors || [] ).map( metadata.getSector );
 	const sectorsList =  barrier.all_sectors ? [{ text: 'All sectors' }] : sectors.map( ( sector ) => ( sector && { text: sector.name } || { text: 'Unknown' } ) );
@@ -19,8 +19,8 @@ module.exports = ( barrier, addCompany = false ) => {
 		return ( code ? metadata.optionalBool[ code ] : 'Unknown' );
 	}
 
-	status.description = barrier.status_summary;
-	status.date = barrier.status_date;
+	status.description = barrier.status.summary;
+	status.date = barrier.status.date;
 
 	return {
 		addCompany,
@@ -28,7 +28,8 @@ module.exports = ( barrier, addCompany = false ) => {
 			id: barrier.id,
 			code: barrier.code,
 			isOpen: ( barrierStatusCode === OPEN ),
-			isResolved: ( barrierStatusCode === RESOLVED ),
+			isResolved: ( barrierStatusCode === RESOLVED || barrierStatusCode == PART_RESOLVED ),
+			isPartiallyResolved: ( barrierStatusCode == PART_RESOLVED ),
 			isHibernated: ( barrierStatusCode === HIBERNATED ),
 			title: barrier.barrier_title,
 			product: barrier.product,
@@ -60,7 +61,7 @@ module.exports = ( barrier, addCompany = false ) => {
 			},
 			priority: {
 				...barrier.priority,
-				modifyer: barrier.priority.code.toLowerCase()
+				modifier: barrier.priority.code.toLowerCase()
 			},
 			modifiedOn: barrier.modified_on
 		},

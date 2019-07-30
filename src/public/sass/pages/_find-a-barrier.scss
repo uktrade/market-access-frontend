@@ -1,3 +1,9 @@
+.barrier-priority-filter {
+	.checkbox-filter__label {
+		padding-top: 6px;
+	}
+}
+
 .filter-list-title {
 	@include govuk-font( $size: 19, $line-height: 1 );
 	color: $govuk-grey-1;

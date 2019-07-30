@@ -8,7 +8,7 @@
 
 {% block body_script %}
 	<script>
-		ma.pages.report.isResolved();
+		ma.pages.report.isResolved( {{ types | dump | safe }} );
 	</script>
 {% endblock %}
 
@@ -27,7 +27,7 @@
 		{% set isResolvedHtml %}
 			{{ govukDateInput( {
 
-				id: 'resolved-date',
+				id: 'resolved-date-group',
 				fieldset: {
 					legend: {
 						text: 'When was the barrier resolved?',
@@ -37,6 +37,7 @@
 				errorMessage: errors | errorForName( 'resolved-date' ),
 				items: [
 					{
+						id: 'resolved-date',
 						name: 'month',
 						value: resolvedDate.month,
 						classes: 'govuk-input--width-2'
@@ -44,6 +45,35 @@
 					{
 						name: 'year',
 						value: resolvedDate.year,
+						classes: 'govuk-input--width-4'
+					}
+				]
+			} ) }}
+		{% endset %}
+
+		{% set isPartResolvedHtml %}
+			{{ govukDateInput( {
+
+				id: 'part-resolved-date-group',
+				fieldset: {
+					legend: {
+						text: 'When was the barrier partially resolved?',
+						classes: 'govuk-fieldset__legend--s'
+					}
+				},
+				errorMessage: errors | errorForName( 'part-resolved-date' ),
+				items: [
+					{
+						id: 'part-resolved-date',
+						name: 'partMonth',
+						label: 'Month',
+						value: partResolvedDate.partMonth,
+						classes: 'govuk-input--width-2'
+					},
+					{
+						name: 'partYear',
+						label: 'Year',
+						value: partResolvedDate.partYear,
 						classes: 'govuk-input--width-4'
 					}
 				]
@@ -61,12 +91,16 @@
 					classes: 'govuk-fieldset__legend--s'
 				}
 			},
-			items: isResolved | addToRadio( {
-				'true': {
+			items: isResolved | addToRadio(
+				[ types.RESOLVED, {
 					conditional: { html: isResolvedHtml },
-					hint: { text: 'Please continue to give us information, even if the barrier is resolved.' }
-				}
-			} ),
+					hint: { text: 'Please continue to enter information, even if the barrier is resolved.' }
+				} ],
+				[ types.PART_RESOLVED, {
+					conditional: { html: isPartResolvedHtml },
+					hint: { text: 'Please continue to enter information, even if the barrier is partially resolved.' }
+				} ]
+			),
 			errorMessage: errors | errorForName( 'is-resolved-1' )
 			} )
 		}}

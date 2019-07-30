@@ -17,10 +17,11 @@
 
 	<form action="{{ urls.barriers.edit.status( barrier.id ) }}" method="POST" class="restrict-width">
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
 		{% if isResolved %}
 			{{ govukDateInput( {
 
-				id: 'status-date',
+				id: 'status-date-group',
 				fieldset: {
 					legend: {
 						text: 'Date the barrier was resolved',
@@ -30,6 +31,7 @@
 				errorMessage: errors | errorForName( 'status-date' ),
 				items: [
 					{
+						id: 'status-date',
 						name: 'month',
 						value: statusDate.month,
 						classes: 'govuk-input--width-2'
@@ -46,7 +48,7 @@
 		{{ govukTextarea( {
 
 			label: {
-				text: 'Provide a summary of how this barrier was resolved' if isResolved else 'Provide a summary of why this barrier is being paused',
+				text: 'Provide a summary of how this barrier was resolved' if isResolved else 'Provide a summary of why this barrier is dormant',
 				classes: 'govuk-label--s'
 			},
 			id: 'status-summary',

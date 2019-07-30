@@ -74,7 +74,7 @@ if( typeof jasmine !== 'undefined' ){
 
 		strings: () => {
 
-			const methods = [ 'location', 'locations', 'types', 'sectors', 'regions', 'priorities' ];
+			const methods = [ 'location', 'locations', 'types', 'sectors', 'regions', 'priorities', 'statuses' ];
 			const spies =  {};
 
 			methods.forEach( ( name ) => {
@@ -89,6 +89,29 @@ if( typeof jasmine !== 'undefined' ){
 			} );
 
 			return spies;
+		},
+
+		barrierFilters: () => {
+
+			const getDisplayInfoSpy = jasmine.createSpy( 'barrierFilters.getDisplayInfo' );
+			getDisplayInfoSpy.responses = {};
+			getDisplayInfoSpy.and.callFake( ( key ) => {
+
+				getDisplayInfoSpy.responses[ key ] = { label: faker.lorem.word(), text: faker.lorem.word() };
+
+				return getDisplayInfoSpy.responses[ key ];
+			} );
+
+			const createListSpy = jasmine.createSpy( 'barrierFilters.createList' );
+			createListSpy.response = [ { key: faker.lorem.word(), value: faker.lorem.word() } ];
+			createListSpy.and.callFake( () => createListSpy.response );
+
+			return {
+				getDisplayInfo: getDisplayInfoSpy,
+				createList: createListSpy,
+				getFromQueryString: jasmine.createSpy( 'barrierFilters.getFromQueryString' ),
+				areEqual: jasmine.createSpy( 'barrierFilters.areEqual' ),
+			};
 		},
 
 		barrierSession: () => ({

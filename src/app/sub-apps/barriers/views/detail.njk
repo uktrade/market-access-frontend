@@ -206,7 +206,7 @@
 		{%- if barrier.isResolved or barrier.isHibernated -%}
 
 			<div class="barrier-status-details">
-				<span class="barrier-status-details__icon barrier-status-details__icon--{{ barrier.status.modifyer }}">
+				<span class="barrier-status-details__icon barrier-status-details__icon--{{ barrier.status.modifier }}">
 					{% if barrier.isResolved %}
 
 						<svg width="26" height="20" viewBox="0 0 26 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -221,7 +221,7 @@
 
 					{% endif %}
 				</span>
-				<h2 class="barrier-status-details__heading">Barrier {{ 'resolved' if barrier.isResolved else 'paused' }} <span class="barrier-status-details__heading__caption">in {{ barrier.status.date | dateOnly( day=false ) }}</span></2>
+				<h2 class="barrier-status-details__heading">Barrier {{ 'partially resolved' if barrier.isPartiallyResolved else ( 'resolved' if barrier.isResolved else 'dormant' ) }} <span class="barrier-status-details__heading__caption">in {{ barrier.status.date | dateOnly( day=false ) }}</span></2>
 				<h3 class="barrier-status-details__sub-heading">Summary {{ ' of resolution' if barrier.isResolved }}</h3>
 				<p class="barrier-status-details__text">{{ barrier.status.description | escape | nl2br }}</p>
 				<a href="{{ urls.barriers.edit.status(barrier.id)}}"> Edit</a>
@@ -338,7 +338,7 @@
 					{%- endif %}
 					</p>
 
-					{% if item.event === 'BARRIER_STATUS_CHANGE' and item.state.isOpen -%}
+					{% if item.event === 'BARRIER_STATUS_CHANGE' and item.state.showSummary -%}
 						<p class="event-list__item__text">{{ item.text | escape | nl2br  }}</p>
 					{% endif -%}
 
@@ -347,7 +347,7 @@
 					<h4 class="event-list__item__heading">{{ item.date | dateOnly }}<span class="event-list__item__heading__recede"> at {{ item.date | time }} (GMT)</span></h4>
 
 					<p class="event-list__item__text">
-						<span class="priority-marker priority-marker--{{ item.priority.modifyer }}"></span> Barrier priority set to <strong>{{ item.priority.name }}</strong>{{ ' by ' + item.user.name if item.user.name }}.
+						<span class="priority-marker priority-marker--{{ item.priority.modifier }}"></span> Barrier priority set to <strong>{{ item.priority.name }}</strong>{{ ' by ' + item.user.name if item.user.name }}.
 					</p>
 
 					{%- if item.text %}

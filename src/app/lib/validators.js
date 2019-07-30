@@ -40,16 +40,17 @@ module.exports = {
 		return false;
 	},
 	isBarrierType: ( id ) => metadata.barrierTypes.some( ( barrier ) => barrier.id == id ),
-	isDateValue: ( key ) => ( values ) => !!values[ key ],
-	isDateValid: ( values ) => !!Date.parse( [ values.year, values.month, values.day ].join( '-' ) ),
-	isDateInPast: ( values ) => ( Date.parse( [ values.year, values.month, values.day ].join( '-' ) ) < Date.now() ),
-	isDateNumeric: ( values ) => {
+	isDateValue: ( key ) => ( parts ) => !!parts[ key ],
+	isDateValid: ( parts ) => !!Date.parse( [ parts.year, parts.month, parts.day ].join( '-' ) ),
+	isDateInPast: ( parts ) => ( Date.parse( [ parts.year, parts.month, parts.day ].join( '-' ) ) < Date.now() ),
+	isDateNumeric: ( parts ) => {
 
-		const allValues = Object.values( values ).reduce( ( str, value ) => ( str + value ), '' );
+		const allValues = Object.values( parts ).reduce( ( str, value ) => ( str + value ), '' );
 
 		return isNumeric.test( allValues );
 	},
 	isValidFile: ( file ) => config.files.types.includes( file.type ),
 	isBarrierPriority: ( value ) => metadata.barrierPriorities.some( ( priority ) => priority.code === value ),
 	isCountryOrAdminArea: ( id ) => isCountry( id ) || isCountryAdminArea( id ),
+	isBarrierStatus: ( id ) => metadata.barrierStatuses.hasOwnProperty( id ),
 };

@@ -5,6 +5,7 @@ const urls = require( '../../../lib/urls' );
 const validators = require( '../../../lib/validators' );
 
 module.exports = {
+
 	list: async ( req, res, next ) => {
 
 		const isPost = req.method === 'POST';
@@ -68,53 +69,55 @@ module.exports = {
 		}
 
 		res.render( 'reports/views/admin-areas', { countryId, adminAreas: adminAreas.map( metadata.getAdminArea ), csrfToken: req.csrfToken() } );
-    },
-    remove: ( req, res ) => {
+	},
 
-			const report  = ( req.report || {} );
-			const countryId = req.params.countryId;
-			const adminAreaToRemove = req.body.adminArea;
+	remove: ( req, res ) => {
 
-			req.session.adminAreas = req.session.adminAreas.filter( ( adminArea ) => adminArea !== adminAreaToRemove );
+		const report  = ( req.report || {} );
+		const countryId = req.params.countryId;
+		const adminAreaToRemove = req.body.adminArea;
 
-			res.redirect( urls.reports.adminAreas.list( report.id, countryId ) );
-    },
-    add: ( req, res ) => {
+		req.session.adminAreas = req.session.adminAreas.filter( ( adminArea ) => adminArea !== adminAreaToRemove );
 
-			const countryId = req.params.countryId;
-			const report  = ( req.report || {} );
+		res.redirect( urls.reports.adminAreas.list( report.id, countryId ) );
+	},
 
-			if( !req.session.adminAreas ){
-				req.session.adminAreas = [];
+	add: ( req, res ) => {
+
+		const countryId = req.params.countryId;
+		const report  = ( req.report || {} );
+
+		if( !req.session.adminAreas ){
+			req.session.adminAreas = [];
+		}
+
+		const adminAreas = req.session.adminAreas;
+		const form = new Form( req, {
+
+			adminAreas: {
+				type: Form.SELECT,
+				items: metadata.getCountryAdminAreasList(countryId).filter( ( adminArea ) => !adminAreas.includes( adminArea.value ) ),
+				validators: [ {
+					fn: validators.isCountryAdminArea,
+					message: 'Select an admin area affected by the barrier'
+				},{
+					fn: ( value ) => !adminAreas.includes( value ),
+					message: 'Admin area already added, choose another'
+				} ]
 			}
+		} );
 
-			const adminAreas = req.session.adminAreas;
-			const form = new Form( req, {
+		if( form.isPost ){
 
-				adminAreas: {
-					type: Form.SELECT,
-					items: metadata.getCountryAdminAreasList(countryId).filter( ( adminArea ) => !adminAreas.includes( adminArea.value ) ),
-					validators: [ {
-						fn: validators.isCountryAdminArea,
-						message: 'Select an admin area affected by the barrier'
-					},{
-						fn: ( value ) => !adminAreas.includes( value ),
-						message: 'Admin area already added, choose another'
-					} ]
-				}
-			} );
+			form.validate();
 
-			if( form.isPost ){
+			if( !form.hasErrors() ){
 
-				form.validate();
-
-				if( !form.hasErrors() ){
-
-					req.session.adminAreas.push( form.getValues().adminAreas );
-					return res.redirect( urls.reports.adminAreas.list( report.id, countryId ) );
-				}
+				req.session.adminAreas.push( form.getValues().adminAreas );
+				return res.redirect( urls.reports.adminAreas.list( report.id, countryId ) );
 			}
+		}
 
-			res.render( 'reports/views/add-admin-area', {countryId, ...form.getTemplateValues(), currentAdminAreas: adminAreas.map( metadata.getAdminArea ) } );
-		},
+		res.render( 'reports/views/add-admin-area', {countryId, ...form.getTemplateValues(), currentAdminAreas: adminAreas.map( metadata.getAdminArea ) } );
+	},
 };

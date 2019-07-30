@@ -17,7 +17,8 @@
 		"sectors",
 		"barrier_status",
 		"barrier_source",
-		"barrier_priorities"
+		"barrier_priorities",
+		"barrier_pending"
 	],
 	"properties": {
 
@@ -178,6 +179,18 @@
 			"maxItems": 4,
 			"items": {
 				"$ref": "$refs/common.json#/priority"
+			}
+		},
+
+		"barrier_pending": {
+			"type": "object",
+			"required": [ "ONE", "TWO", "THREE", "OTHER" ],
+			"properties": {
+
+				"ONE": { "$ref": "$refs/common.json#/word" },
+				"TWO": { "$ref": "$refs/common.json#/words" },
+				"THREE": { "$ref": "$refs/common.json#/words" },
+				"OTHER": { "$ref": "$refs/common.json#/word" }
 			}
 		}
 	}

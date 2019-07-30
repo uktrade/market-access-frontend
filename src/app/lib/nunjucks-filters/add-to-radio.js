@@ -1,4 +1,18 @@
-module.exports = ( radioItems, data ) => {
+module.exports = ( radioItems, ...dataToAdd ) => {
+
+	let data = {};
+
+	if( Array.isArray( dataToAdd[ 0 ] ) ){
+
+		for( let [ key, opts ] of dataToAdd ){
+
+			data[ key ] = opts;
+		}
+
+	} else {
+
+		data = dataToAdd[ 0 ];
+	}
 
 	for( let radio of radioItems ){
 

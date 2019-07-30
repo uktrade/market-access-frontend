@@ -30,16 +30,16 @@
 
 					{%- if item.complete %}
 						{% set text='Completed' %}
-						{% set modifyer='complete' %}
+						{% set modifier='complete' %}
 					{% elif item.inProgress %}
 						{% set text='In Progress' %}
-						{% set modifyer='in-progress' %}
+						{% set modifier='in-progress' %}
 					{% elif item.notStarted %}
 						{% set text='Not Started' %}
-						{% set modifyer='not-started' %}
+						{% set modifier='not-started' %}
 					{% endif -%}
 
-				<strong class="task-list__item__banner task-list__item__banner--{{ modifyer }}" id="{{ id }}">{{ text }}</strong>
+				<strong class="task-list__item__banner task-list__item__banner--{{ modifier }}" id="{{ id }}">{{ text }}</strong>
 				{%- endif %}
 			</li>
 			{%- endfor %}

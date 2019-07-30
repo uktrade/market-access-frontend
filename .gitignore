@@ -45,6 +45,9 @@ node_modules/
 .envrc
 .bin
 
+# vscode plugins
+.history
+
 dist
 src/test/ci/output
 *.map

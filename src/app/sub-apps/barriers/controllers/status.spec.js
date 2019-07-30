@@ -1,10 +1,14 @@
 const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
+const metadata = require( '../../../lib/metadata' );
 
 const modulePath = './status';
 
 const GROUP = 'group';
 const RADIO = 'select';
+
+const statusTypes = metadata.barrier.status.types;
+const { UNKNOWN, PENDING, OPEN, PART_RESOLVED, RESOLVED, HIBERNATED } = statusTypes;
 
 describe( 'Barrier status controller', () => {
 
@@ -14,43 +18,30 @@ describe( 'Barrier status controller', () => {
 	let next;
 	let backend;
 	let urls;
-	let csrfToken;
 	let Form;
 	let form;
 	let getValuesResponse;
 	let getTemplateValuesResponse;
 	let validators;
-	let barrierId;
-	let metadata;
+	let validTypes;
+	let govukItemsFromObj;
+	let govukItemsFromObjResponse;
+	let barrierFields;
 
 	beforeEach( () => {
 
-		csrfToken = uuid();
-		barrierId = uuid();
+		({ req, res, next } = jasmine.helpers.mocks.middleware());
 
-		req = {
-			barrier: {
-				id: barrierId
-			},
-			csrfToken: () => csrfToken,
-			session: {},
-			params: {}
-		};
-		res = {
-			render: jasmine.createSpy( 'res.render' ),
-			redirect: jasmine.createSpy( 'res.redirect' )
-		};
-		next = jasmine.createSpy( 'next' );
 		backend = {
 			barriers: {
-				get: jasmine.createSpy( 'backend.barriers.get' ),
-				getInteractions: jasmine.createSpy( 'backend.barriers.getInteractions' ),
-				saveNote: jasmine.createSpy( 'backend.barriers.saveNote' ),
-				resolve: jasmine.createSpy( 'backend.barriers.resolve' ),
-				hibernate: jasmine.createSpy( 'backend.barriers.hibernate' ),
-				open: jasmine.createSpy( 'backend.barriers.open' ),
-				saveType: jasmine.createSpy( 'backend.barriers.saveType' ),
-				saveSectors: jasmine.createSpy( 'backend.barriers.saveSectors' )
+				setStatus:{
+					unknown: jasmine.createSpy( 'backend.barriers.unknown' ),
+					pending: jasmine.createSpy( 'backend.barriers.pending' ),
+					open: jasmine.createSpy( 'backend.barriers.setStatus.open' ),
+					partResolved: jasmine.createSpy( 'backend.barriers.partResolved' ),
+					resolved: jasmine.createSpy( 'backend.barriers.setStatus.resolvedd' ),
+					hibernated: jasmine.createSpy( 'backend.barriers.setStatus.hibernatedd' ),
+				}
 			}
 		};
 
@@ -58,28 +49,13 @@ describe( 'Barrier status controller', () => {
 			index: jasmine.createSpy( 'urls.index' ),
 			barriers: {
 				detail: jasmine.createSpy( 'urls.barriers.detail' ),
-				interactions: jasmine.createSpy( 'urls.barriers.interactions' ),
-				statusResolved: jasmine.createSpy( 'urls.barriers.statusResolved' ),
-				statusHibernated: jasmine.createSpy( 'urls.barriers.statusHibernated' ),
-				type: {
-					list: jasmine.createSpy( 'urls.barriers.type.list' )
-				},
-				sectors: {
-					list: jasmine.createSpy( 'urls.barriers.sectors.list' )
-				}
 			}
 		};
 
-		metadata = {
-			barrierTypes: [
-				{ id: 1, title: 'barrier 1', category: 'GOODS', description: 'some text' },
-				{ id: 2, title: 'barrier 2', category: 'SERVICES', description: 'a bit more text' }
-			],
-			barrierTypeCategories: {
-				'GOODS': 'title 1',
-				'SERVICES': 'title 2'
-			},
-		};
+		metadata.barrierPendingOptions = { a: 1, b: 2, };
+
+		govukItemsFromObjResponse = [ { value: 1, text: 'beep' }, { value: 2, text: 'boop' } ];
+		govukItemsFromObj = jasmine.createSpy( 'govukItemsfromObj' ).and.callFake( () => govukItemsFromObjResponse );
 
 		getValuesResponse = { a: 1, b: 2 };
 		getTemplateValuesResponse = { c: 3, d: 4 };
@@ -88,16 +64,17 @@ describe( 'Barrier status controller', () => {
 			getValues: jasmine.createSpy( 'form.getValues' ).and.callFake( () => getValuesResponse ),
 			getTemplateValues: jasmine.createSpy( 'form.getTemplateValues' ).and.callFake( () => getTemplateValuesResponse )
 		};
+
 		Form = jasmine.createSpy( 'Form' ).and.callFake( () => form );
 		Form.GROUP = GROUP;
 		Form.RADIO = RADIO;
 
 		validators = {
-			isDateValue: jasmine.createSpy( 'validators.isDateValue' ),
-			isDateValid: ( name ) => jasmine.createSpy( 'validators.isDateValid: ' + name ),
-			isDateInPast: jasmine.createSpy( 'validators.isDateInPast' ),
-			isMetadata: jasmine.createSpy( 'validators.isMetadata' ),
-			isDateNumeric: jasmine.createSpy( 'validators.isDateNumeric' )
+			isBarrierStatus: jasmine.createSpy( 'validators.isBarrierStatus' ),
+		};
+
+		barrierFields = {
+			createStatusDate: jasmine.createSpy( 'barrierFields.createStatusDate' ),
 		};
 
 		controller = proxyquire( modulePath, {
@@ -105,24 +82,46 @@ describe( 'Barrier status controller', () => {
 			'../../../lib/urls': urls,
 			'../../../lib/Form': Form,
 			'../../../lib/validators': validators,
-			'../../../lib/metadata': metadata
+			'../../../lib/metadata': metadata,
+			'../../../lib/govuk-items-from-object': govukItemsFromObj,
+			'../../../lib/barrier-fields': barrierFields,
 		} );
 	} );
 
 	describe( 'status.index', () => {
 
-		const RESOLVE = 'resolve';
-		const HIBERNATE = 'hibernate';
-		const OPEN = 'open';
 		const TEMPLATE = 'barriers/views/status/index';
 
 		let barrier;
-		let dayValidator;
-		let monthValidator;
-		let yearValidator;
 		let detailUrl;
+		let statusDateField;
 
-		function checkAndGetConfig(){
+		function checkSummary( field, value ){
+
+			expect( field ).toBeDefined();
+			expect( field.conditional ).toEqual( { name: 'status', value } );
+			expect( field.required ).toBeDefined();
+			expect( field.errorField ).toEqual( 'summary' );
+		}
+
+		function checkDateField( field, value, index, monthName, yearName ){
+
+			expect( field ).toEqual( {
+				...statusDateField,
+				conditional: { name: 'status', value },
+				errorField: 'status_date',
+			} );
+
+			const expectedArgs = [ {} ];
+
+			if( monthName ){ expectedArgs.push( monthName ); }
+			if( yearName ){ expectedArgs.push( yearName ); }
+
+			expect( barrierFields.createStatusDate.calls.argsFor( index ) ).toEqual( expectedArgs );
+		}
+
+		function checkFormConfig( validTypes ){
+
 			const args = Form.calls.argsFor( 0 );
 			const config = args[ 1 ];
 
@@ -131,64 +130,108 @@ describe( 'Barrier status controller', () => {
 
 			expect( config.status ).toBeDefined();
 			expect( config.status.type ).toEqual( RADIO );
-			expect( config.status.values ).toEqual( [ barrier.status ] );
+			expect( config.status.values ).toEqual( [ barrier.status.id ] );
 			expect( Array.isArray( config.status.items ) ).toEqual( true );
 			expect( typeof config.status.validators[ 0 ].fn ).toEqual( 'function' );
+
+			if( validTypes.includes( RESOLVED ) ){
+
+				checkDateField( config.resolvedDate, RESOLVED, 1 );
+				checkSummary( config.resolvedSummary, RESOLVED );
+
+			} else {
+
+				expect( config.resolvedDate ).not.toBeDefined();
+				expect( config.resolvedSummary ).not.toBeDefined();
+			}
+
+			if( validTypes.includes( PART_RESOLVED ) ){
+
+				checkDateField( config.partResolvedDate, PART_RESOLVED, 0, 'partMonth', 'partYear' );
+				checkSummary( config.partResolvedSummary, PART_RESOLVED );
+
+			} else {
+
+				expect( config.partResolvedDate ).not.toBeDefined();
+				expect( config.partResolvedSummary ).not.toBeDefined();
+			}
+
+			if( validTypes.includes( HIBERNATED ) ){
+
+				checkSummary( config.hibernationSummary, HIBERNATED );
+
+			} else {
+
+				expect( config.hibernationSummary ).not.toBeDefined();
+			}
+
+			if( validTypes.includes( OPEN ) )	{
+
+				checkSummary( config.reopenSummary, OPEN );
+
+			} else {
+
+				expect( config.reopenSummary ).not.toBeDefined();
+			}
+
+			if( validTypes.includes( UNKNOWN ) ){
+
+				checkSummary( config.unknownSummary, UNKNOWN );
+
+			} else {
+
+				expect( config.unknownSummary ).not.toBeDefined();
+			}
+
+			if( validTypes.includes( PENDING ) ){
+
+				expect( config.pendingType ).toBeDefined();
+				expect( config.pendingType.conditional ).toEqual( { name: 'status', value: PENDING } );
+				expect( config.pendingType.required ).toBeDefined();
+				expect( config.pendingType.type ).toEqual( RADIO );
+				expect( config.pendingType.items ).toEqual( govukItemsFromObjResponse );
+				expect( govukItemsFromObj ).toHaveBeenCalledWith( metadata.barrierPendingOptions );
+
+				expect( config.pendingTypeOther ).toBeDefined();
+				expect( config.pendingTypeOther.conditional ).toEqual( { name: 'pendingType', value: metadata.barrier.status.pending.OTHER } );
+				expect( config.pendingTypeOther.required ).toBeDefined();
+
+				checkSummary( config.pendingSummary, PENDING );
+
+			} else {
+
+				expect( config.pendingSummary ).not.toBeDefined();
+			}
 
 			return config;
 		}
 
-		function hasResolveConfig( config ){
+		function createValidTypes( keyToRemove ){
 
-			expect( config.resolvedDate ).toBeDefined();
-			expect( config.resolvedDate.type ).toEqual( GROUP );
-			expect( config.resolvedDate.conditional ).toEqual( { name: 'status', value: RESOLVE } );
-			expect( config.resolvedDate.items ).toEqual( { month: {}, year: {} } );
-			expect( config.resolvedDate.validators[ 0 ].fn ).toEqual( monthValidator );
-			expect( config.resolvedDate.validators[ 1 ].fn ).toEqual( yearValidator );
-			expect( config.resolvedDate.validators[ 2 ].fn ).toEqual( validators.isDateNumeric );
-			expect( config.resolvedDate.validators[ 3 ].fn ).toEqual( validators.isDateValid );
-			expect( config.resolvedDate.validators[ 4 ].fn ).toEqual( validators.isDateInPast );
+			const types = { ...statusTypes };
 
-			expect( config.resolvedSummary ).toBeDefined();
-			expect( config.resolvedSummary.conditional ).toEqual( { name: 'status', value: RESOLVE } );
-			expect( config.resolvedSummary.required ).toBeDefined();
-			expect( config.resolvedSummary.errorField ).toEqual( 'summary' );
-		}
+			for( let [ key, value ] of Object.entries( types ) ){
 
-		function hasHibernateConfig( config ){
+				if( value === keyToRemove ){
 
-			expect( config.hibernationSummary ).toBeDefined();
-			expect( config.hibernationSummary.conditional ).toEqual( { name: 'status', value: HIBERNATE } );
-			expect( config.hibernationSummary.required ).toBeDefined();
-			expect( config.hibernationSummary.errorField ).toEqual( 'summary' );
-		}
+					delete types[ key ];
+					break;
+				}
+			}
 
-		function hasOpenConfig( config ){
-
-			expect( config.reopenSummary ).toBeDefined();
-			expect( config.reopenSummary.conditional ).toEqual( { name: 'status', value: OPEN } );
-			expect( config.reopenSummary.required ).toBeDefined();
-			expect( config.reopenSummary.errorField ).toEqual( 'summary' );
+			return Object.values( types );
 		}
 
 		beforeEach( () => {
 
 			barrier = {
 				id: uuid(),
+				status: {},
 			};
 			req.barrier = barrier;
 
-			dayValidator = { day: 1 };
-			monthValidator = { month: 1 };
-			yearValidator = { year: 1 };
-
-			validators.isDateValue.and.callFake( ( name ) => {
-
-				if( name === 'day' ){ return dayValidator; }
-				if( name === 'month' ){ return monthValidator; }
-				if( name === 'year' ){ return yearValidator; }
-			} );
+			statusDateField = { a: uuid(), b: uuid() };
+			barrierFields.createStatusDate.and.callFake( () => ({ ...statusDateField }) );
 
 			detailUrl = '/barrier-detail/';
 			urls.barriers.detail.and.callFake( () => detailUrl );
@@ -196,18 +239,36 @@ describe( 'Barrier status controller', () => {
 
 		describe( 'When the current status is OPEN', () => {
 
+			let templateData;
+
 			beforeEach( () => {
 
-				barrier.status = 2;
+				barrier.status.id = Number( OPEN );
+				validTypes = createValidTypes( OPEN );
+
+				templateData = {
+					...getTemplateValuesResponse,
+					statusTypes,
+					validTypes,
+					pendingOther: metadata.barrier.status.pending.OTHER,
+				};
 			} );
 
 			it( 'Should setup the form correctly', () => {
 
 				controller.index( req, res );
 
-				const config = checkAndGetConfig();
-				hasResolveConfig( config );
-				hasHibernateConfig( config );
+				const config = checkFormConfig( validTypes );
+				const isValidType = config.status.validators[ 0 ].fn;
+
+				validators.isBarrierStatus.and.callFake( () => true );
+				expect( isValidType( OPEN ) ).toEqual( false );
+				expect( isValidType( RESOLVED ) ).toEqual( true );
+
+				validators.isBarrierStatus.and.callFake( () => false );
+				expect( isValidType( OPEN ) ).toEqual( false );
+				expect( isValidType( RESOLVED ) ).toEqual( false );
+
 			} );
 
 			describe( 'When it is a GET', () => {
@@ -217,7 +278,7 @@ describe( 'Barrier status controller', () => {
 
 					expect( form.validate ).not.toHaveBeenCalled();
 					expect( form.getTemplateValues ).toHaveBeenCalledWith();
-					expect( res.render ).toHaveBeenCalledWith( TEMPLATE, getTemplateValuesResponse );
+					expect( res.render ).toHaveBeenCalledWith( TEMPLATE, templateData );
 				} );
 			} );
 
@@ -225,7 +286,6 @@ describe( 'Barrier status controller', () => {
 
 				beforeEach( () => {
 
-					req.body = {};
 					form.isPost = true;
 				} );
 
@@ -241,30 +301,30 @@ describe( 'Barrier status controller', () => {
 
 						await controller.index( req, res, next );
 
-						expect( res.render ).toHaveBeenCalledWith( TEMPLATE, getTemplateValuesResponse );
+						expect( res.render ).toHaveBeenCalledWith( TEMPLATE, templateData );
 					} );
 				} );
 
 				describe( 'When the required values are filled', () => {
-					describe( 'When it is RESOLVE', () => {
+					describe( 'When it is RESOLVED', () => {
 
 						beforeEach( () => {
 
-							getValuesResponse.status = RESOLVE;
+							getValuesResponse.status = RESOLVED;
 						} );
 
 						describe( 'When the response is a success', () => {
 
 							beforeEach( () => {
 
-								backend.barriers.resolve.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+								backend.barriers.setStatus.resolved.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
 								form.hasErrors = () => false;
 							} );
 
 							afterEach( () => {
 
 								expect( next ).not.toHaveBeenCalled();
-								expect( backend.barriers.resolve ).toHaveBeenCalledWith( req, req.barrier.id, getValuesResponse );
+								expect( backend.barriers.setStatus.resolved ).toHaveBeenCalledWith( req, req.barrier.id, getValuesResponse );
 							} );
 
 							describe( 'When the form is saved', () => {
@@ -289,7 +349,7 @@ describe( 'Barrier status controller', () => {
 									statusCode = 400;
 									fields = { a: 1, b: 2 };
 
-									backend.barriers.resolve.and.callFake( () => Promise.resolve( {
+									backend.barriers.setStatus.resolved.and.callFake( () => Promise.resolve( {
 										response: { isSuccess: false, statusCode },
 										body: { fields }
 									} ) );
@@ -300,7 +360,6 @@ describe( 'Barrier status controller', () => {
 								describe( 'When the fields match', () => {
 									it( 'Should call form.addErrors and render the page', async () => {
 
-
 										form.hasErrors = () => false;
 										form.addErrors.and.callFake( () => {
 											form.hasErrors = () => true;
@@ -309,7 +368,7 @@ describe( 'Barrier status controller', () => {
 										await controller.index( req, res, next );
 
 										expect( form.addErrors ).toHaveBeenCalledWith( fields );
-										expect( res.render ).toHaveBeenCalledWith( TEMPLATE, getTemplateValuesResponse );
+										expect( res.render ).toHaveBeenCalledWith( TEMPLATE, templateData );
 									} );
 								} );
 
@@ -330,7 +389,7 @@ describe( 'Barrier status controller', () => {
 
 									const statusCode = 500;
 									form.hasErrors = () => false;
-									backend.barriers.resolve.and.callFake( () => Promise.resolve( {
+									backend.barriers.setStatus.resolved.and.callFake( () => Promise.resolve( {
 										response: { isSuccess: false, statusCode }
 									} ) );
 
@@ -346,7 +405,7 @@ describe( 'Barrier status controller', () => {
 
 								const err = new Error( 'my test' );
 								form.hasErrors = () => false;
-								backend.barriers.resolve.and.callFake( () => Promise.reject( err ) );
+								backend.barriers.setStatus.resolved.and.callFake( () => Promise.reject( err ) );
 
 								await controller.index( req, res, next );
 
@@ -355,25 +414,25 @@ describe( 'Barrier status controller', () => {
 						} );
 					} );
 
-					describe( 'When it is HIBERNATE', () => {
+					describe( 'When it is HIBERNATED', () => {
 
 						beforeEach( () => {
 
-							getValuesResponse.status = HIBERNATE;
+							getValuesResponse.status = HIBERNATED;
 						} );
 
 						describe( 'When the response is a success', () => {
 
 							beforeEach( () => {
 
-								backend.barriers.hibernate.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+								backend.barriers.setStatus.hibernated.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
 								form.hasErrors = () => false;
 							} );
 
 							afterEach( () => {
 
 								expect( next ).not.toHaveBeenCalled();
-								expect( backend.barriers.hibernate ).toHaveBeenCalledWith( req, req.barrier.id, getValuesResponse );
+								expect( backend.barriers.setStatus.hibernated ).toHaveBeenCalledWith( req, req.barrier.id, getValuesResponse );
 							} );
 
 							describe( 'When the form is saved', () => {
@@ -398,7 +457,7 @@ describe( 'Barrier status controller', () => {
 									statusCode = 400;
 									fields = { a: 1, b: 2 };
 
-									backend.barriers.hibernate.and.callFake( () => Promise.resolve( {
+									backend.barriers.setStatus.hibernated.and.callFake( () => Promise.resolve( {
 										response: { isSuccess: false, statusCode },
 										body: { fields }
 									} ) );
@@ -418,7 +477,7 @@ describe( 'Barrier status controller', () => {
 										await controller.index( req, res, next );
 
 										expect( form.addErrors ).toHaveBeenCalledWith( fields );
-										expect( res.render ).toHaveBeenCalledWith( TEMPLATE, getTemplateValuesResponse );
+										expect( res.render ).toHaveBeenCalledWith( TEMPLATE, templateData );
 									} );
 								} );
 
@@ -439,7 +498,7 @@ describe( 'Barrier status controller', () => {
 
 									const statusCode = 500;
 									form.hasErrors = () => false;
-									backend.barriers.hibernate.and.callFake( () => Promise.resolve( {
+									backend.barriers.setStatus.hibernated.and.callFake( () => Promise.resolve( {
 										response: { isSuccess: false, statusCode }
 									} ) );
 
@@ -455,11 +514,123 @@ describe( 'Barrier status controller', () => {
 
 								const err = new Error( 'my test' );
 								form.hasErrors = () => false;
-								backend.barriers.hibernate.and.callFake( () => Promise.reject( err ) );
+								backend.barriers.setStatus.hibernated.and.callFake( () => Promise.reject( err ) );
 
 								await controller.index( req, res, next );
 
 								expect( next ).toHaveBeenCalledWith( err );
+							} );
+						} );
+					} );
+
+					describe( 'When it is PART_RESOLVED', () => {
+
+						let month;
+						let year;
+
+						beforeEach( () => {
+
+							month = '03';
+							year = '2019';
+
+							getValuesResponse.status = PART_RESOLVED;
+							getValuesResponse.partResolvedDate = {
+								partMonth: month,
+								partYear: year,
+							};
+						} );
+
+						describe( 'When the response is a success', () => {
+
+							beforeEach( () => {
+
+								backend.barriers.setStatus.partResolved.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+								form.hasErrors = () => false;
+							} );
+
+							afterEach( () => {
+
+								expect( next ).not.toHaveBeenCalled();
+								expect( backend.barriers.setStatus.partResolved ).toHaveBeenCalledWith( req, req.barrier.id, {
+									...getValuesResponse,
+									partResolvedDate: { month, year },
+								} );
+							} );
+
+							describe( 'When the form is saved', () => {
+								it( 'Should redirect', async () => {
+
+									await controller.index( req, res, next );
+
+									expect( urls.barriers.detail ).toHaveBeenCalledWith( req.barrier.id );
+									expect( res.redirect ).toHaveBeenCalledWith( detailUrl );
+								} );
+							} );
+						} );
+					} );
+
+					describe( 'When it is UNKNOWN', () => {
+
+						beforeEach( () => {
+
+							getValuesResponse.status = UNKNOWN;
+						} );
+
+						describe( 'When the response is a success', () => {
+
+							beforeEach( () => {
+
+								backend.barriers.setStatus.unknown.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+								form.hasErrors = () => false;
+							} );
+
+							afterEach( () => {
+
+								expect( next ).not.toHaveBeenCalled();
+								expect( backend.barriers.setStatus.unknown ).toHaveBeenCalledWith( req, req.barrier.id, getValuesResponse );
+							} );
+
+							describe( 'When the form is saved', () => {
+								it( 'Should redirect', async () => {
+
+									await controller.index( req, res, next );
+
+									expect( urls.barriers.detail ).toHaveBeenCalledWith( req.barrier.id );
+									expect( res.redirect ).toHaveBeenCalledWith( detailUrl );
+								} );
+							} );
+						} );
+					} );
+
+					describe( 'When it is PENDING', () => {
+
+						beforeEach( () => {
+
+							getValuesResponse.status = PENDING;
+						} );
+
+						describe( 'When the response is a success', () => {
+
+							beforeEach( () => {
+
+								backend.barriers.setStatus.pending.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+								form.hasErrors = () => false;
+							} );
+
+							afterEach( () => {
+
+								expect( next ).not.toHaveBeenCalled();
+								expect( backend.barriers.setStatus.pending ).toHaveBeenCalledWith( req, req.barrier.id, getValuesResponse );
+							} );
+
+							describe( 'When the form is saved', () => {
+								it( 'Should redirect', async () => {
+
+									await controller.index( req, res, next );
+
+									expect( urls.barriers.detail ).toHaveBeenCalledWith( req.barrier.id );
+									expect( res.redirect ).toHaveBeenCalledWith( detailUrl );
+								} );
 							} );
 						} );
 					} );
@@ -467,21 +638,19 @@ describe( 'Barrier status controller', () => {
 			} );
 		} );
 
-		describe( 'When the current status is RESOLVE', () => {
+		describe( 'When the current status is RESOLVED', () => {
 
 			beforeEach( () => {
 
-				barrier.status = 4;
+				barrier.status.id = Number( RESOLVED );
+				validTypes = createValidTypes( RESOLVED );
 			} );
 
 			it( 'Should setup the form correctly', () => {
 
 				controller.index( req, res );
 
-				const config = checkAndGetConfig();
-
-				hasOpenConfig( config );
-				hasHibernateConfig( config );
+				checkFormConfig( validTypes );
 			} );
 
 			describe( 'When it is a POST', () => {
@@ -509,14 +678,14 @@ describe( 'Barrier status controller', () => {
 
 							beforeEach( () => {
 
-								backend.barriers.open.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
+								backend.barriers.setStatus.open.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
 								form.hasErrors = () => false;
 							} );
 
 							afterEach( () => {
 
 								expect( next ).not.toHaveBeenCalled();
-								expect( backend.barriers.open ).toHaveBeenCalledWith( req, req.barrier.id, getValuesResponse );
+								expect( backend.barriers.setStatus.open ).toHaveBeenCalledWith( req, req.barrier.id, getValuesResponse );
 							} );
 
 							describe( 'When the form is saved', () => {
@@ -534,21 +703,67 @@ describe( 'Barrier status controller', () => {
 			} );
 		} );
 
-		describe( 'When the current status is HIBERNATE', () => {
+		describe( 'When the current status is HIBERNATED', () => {
 
 			beforeEach( () => {
 
-				barrier.status = 5;
+				barrier.status.id = Number( HIBERNATED );
+				validTypes = createValidTypes( HIBERNATED );
 			} );
 
 			it( 'Should setup the form correctly', () => {
 
 				controller.index( req, res );
 
-				const config = checkAndGetConfig();
+				checkFormConfig( validTypes );
+			} );
+		} );
 
-				hasOpenConfig( config );
-				hasResolveConfig( config );
+		describe( 'When the current status is UNKNOWN', () => {
+
+			beforeEach( () => {
+
+				barrier.status.id = Number( UNKNOWN );
+				validTypes = createValidTypes( UNKNOWN );
+			} );
+
+			it( 'Should setup the form correctly', () => {
+
+				controller.index( req, res );
+
+				checkFormConfig( validTypes );
+			} );
+		} );
+
+		describe( 'When the current status is PART_RESOLVED', () => {
+
+			beforeEach( () => {
+
+				barrier.status.id = Number( PART_RESOLVED );
+				validTypes = createValidTypes( PART_RESOLVED );
+			} );
+
+			it( 'Should setup the form correctly', () => {
+
+				controller.index( req, res );
+
+				checkFormConfig( validTypes );
+			} );
+		} );
+
+		describe( 'When the current status is PENDING', () => {
+
+			beforeEach( () => {
+
+				barrier.status.id = Number( PENDING );
+				validTypes = createValidTypes( PENDING );
+			} );
+
+			it( 'Should setup the form correctly', () => {
+
+				controller.index( req, res );
+
+				checkFormConfig( validTypes );
 			} );
 		} );
 	} );

@@ -3,18 +3,31 @@ const modulePath = './interactions';
 
 const getFakeData = jasmine.helpers.getFakeData;
 
-const OPEN = 'Open';
-const RESOLVED = 'Resolved';
-const PAUSED = 'Paused';
+const { types, typeInfo } = metadata.barrier.status;
 
 describe( 'Interactions view model', () => {
 
 	let viewModel;
+	let fakeMetadata;
+	let OPEN;
+	let RESOLVED;
+	let PAUSED;
+	let UNKNOWN;
+	let PENDING;
+	let PART_RESOLVED;
 
 	beforeAll( async () => {
 
-		jasmine.helpers.intercept.backend().get( '/metadata' ).reply( 200, getFakeData( '/backend/metadata/' ) );
+		fakeMetadata = getFakeData( '/backend/metadata/' );
+		jasmine.helpers.intercept.backend().get( '/metadata' ).reply( 200, fakeMetadata );
 		await metadata.fetch();
+
+		OPEN = typeInfo[ types.OPEN ].name;
+		PENDING = typeInfo[ types.PENDING ].name;
+		RESOLVED = typeInfo[ types.RESOLVED ].name;
+		PAUSED = typeInfo[ types.HIBERNATED ].name;
+		UNKNOWN = typeInfo[ types.UNKNOWN ].name;
+		PART_RESOLVED = typeInfo[ types.PART_RESOLVED ].name;
 	} );
 
 	beforeEach( async () => {
@@ -39,7 +52,7 @@ describe( 'Interactions view model', () => {
 		};
 	}
 
-	function createStatus( item, from, to, isResolved, isOpen){
+	function createStatus( item, from, to, isResolved, showSummary ){
 		return {
 			isStatus: true,
 			modifier: 'status',
@@ -50,7 +63,7 @@ describe( 'Interactions view model', () => {
 				to,
 				date: item.field_info.status_date,
 				isResolved,
-				isOpen
+				showSummary
 			},
 			text: item.field_info.status_summary,
 			user: item.user,
@@ -90,8 +103,11 @@ describe( 'Interactions view model', () => {
 			createStatus( historyResults[ 3 ], OPEN, RESOLVED, true, false ),
 			createPriority( historyResults[ 5 ] ),
 			createNote( interactionsResults[ 1 ] ),
-			createStatus( historyResults[ 1 ], 0, OPEN, false, true ),
-			createStatus( historyResults[ 0 ], null, 0, false, false ),
+			createStatus( historyResults[ 1 ], UNKNOWN, OPEN, false, true ),
+			createStatus( historyResults[ 0 ], null, UNKNOWN, false, true ),
+			createStatus( historyResults[ 7 ], OPEN, `${ PENDING } (${ fakeMetadata.barrier_pending.TWO })`, false, true ),
+			createStatus( historyResults[ 8 ], OPEN, `${ PENDING } (${ historyResults[ 8 ].field_info.sub_status_other })`, false, true ),
+			createStatus( historyResults[ 9 ], OPEN, PART_RESOLVED, true, false ),
 		] );
 	} );
 } );

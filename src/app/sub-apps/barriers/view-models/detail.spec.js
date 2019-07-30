@@ -2,8 +2,9 @@ const proxyquire = require( 'proxyquire' );
 const faker = require( 'faker' );
 const modulePath = './detail';
 
+const { OPEN, RESOLVED, PART_RESOLVED, HIBERNATED } = require( '../../../lib/metadata' ).barrier.status.types;
+
 describe( 'Barrier detail view model', () => {
-	// Add in the admin areas
 
 	let viewModel;
 	let metadata;
@@ -57,7 +58,7 @@ describe( 'Barrier detail view model', () => {
 				{ title: 'A', description: 'a description' },
 				{ title: 'B', description: 'b description' },
 				{ title: 'C', description: 'c description' },
-			]
+			],
 		};
 
 		config = { addCompany: false };
@@ -78,12 +79,13 @@ describe( 'Barrier detail view model', () => {
 	describe( 'With all the data on an open barrier', () => {
 		it( 'Should create all the correct properties', () => {
 
-			inputBarrier.status = 2;
+			inputBarrier.status.id = OPEN;
 			inputBarrier.problem_status = '2';
 
 			const output = viewModel( inputBarrier );
 			const outputBarrier = output.barrier;
 			const barrierSectors = inputBarrier.sectors.map( metadata.getSector );
+			const openMetadata = metadata.barrier.status.typeInfo[ OPEN ];
 
 			expect( outputBarrier.id ).toEqual( inputBarrier.id );
 			expect( outputBarrier.code ).toEqual( inputBarrier.code );
@@ -98,10 +100,11 @@ describe( 'Barrier detail view model', () => {
 				{ text: metadata.barrierTypes[ 1 ].title },
 			] );
 			expect( outputBarrier.status ).toEqual( {
-				name: 'Open',
-				modifyer: 'assessment',
-				date: inputBarrier.status_date,
-				description: inputBarrier.status_summary
+				name: openMetadata.name,
+				modifier: openMetadata.modifier,
+				date: inputBarrier.status.date,
+				description: inputBarrier.status.summary,
+				hint: openMetadata.hint,
 			} );
 			expect( outputBarrier.reportedOn ).toEqual( inputBarrier.reported_on );
 			expect( outputBarrier.addedBy ).toEqual( inputBarrier.reported_by );
@@ -123,7 +126,7 @@ describe( 'Barrier detail view model', () => {
 				},
 				summary: inputBarrier.infringement_summary
 			} );
-			expect( outputBarrier.priority ).toEqual( { ...inputBarrier.priority, modifyer: inputBarrier.priority.code.toLowerCase() } );
+			expect( outputBarrier.priority ).toEqual( { ...inputBarrier.priority, modifier: inputBarrier.priority.code.toLowerCase() } );
 			expect( outputBarrier.euExitRelated ).toEqual( 'A' );
 
 			expect( output.sectorsList ).toEqual( barrierSectors.map( ( sector ) => ( { text: sector.name } ) ) );
@@ -148,7 +151,7 @@ describe( 'Barrier detail view model', () => {
 	describe( 'With sectors missing on an open barrier', () => {
 		it( 'Should create all the correct properties', () => {
 
-			inputBarrier.status = 2;
+			inputBarrier.status.id = OPEN;
 			inputBarrier.sectors = null;
 
 			const output = viewModel( inputBarrier );
@@ -168,7 +171,7 @@ describe( 'Barrier detail view model', () => {
 
 			metadata.getSector.and.callFake( () => null );
 
-			inputBarrier.status = 2;
+			inputBarrier.status.id = OPEN;
 			inputBarrier.sectors = [ null ];
 
 			const output = viewModel( inputBarrier );
@@ -203,23 +206,50 @@ describe( 'Barrier detail view model', () => {
 		} );
 	} );
 
-	describe( 'A resolved barrier', () => {
+	describe( 'A fully resolved barrier', () => {
 		it( 'Should have the correct properties', () => {
 
-			inputBarrier.status = 4;
+			inputBarrier.status.id = RESOLVED;
 
 			const output = viewModel( inputBarrier );
 			const outputBarrier = output.barrier;
+			const resolvedMetadata = metadata.barrier.status.typeInfo[ RESOLVED ];
 
 			expect( outputBarrier.status ).toEqual( {
-				name: 'Resolved',
-				modifyer: 'resolved',
-				date: inputBarrier.status_date,
-				description: inputBarrier.status_summary
+				name: resolvedMetadata.name,
+				modifier: resolvedMetadata.modifier,
+				date: inputBarrier.status.date,
+				description: inputBarrier.status.summary,
+				hint: resolvedMetadata.hint,
 			} );
 
 			expect( outputBarrier.isOpen ).toEqual( false );
 			expect( outputBarrier.isResolved ).toEqual( true );
+			expect( outputBarrier.isPartiallyResolved ).toEqual( false );
+			expect( outputBarrier.isHibernated ).toEqual( false );
+		} );
+	} );
+
+	describe( 'A partially resolved barrier', () => {
+		it( 'Should have the correct properties', () => {
+
+			inputBarrier.status.id = PART_RESOLVED;
+
+			const output = viewModel( inputBarrier );
+			const outputBarrier = output.barrier;
+			const partResolvedMetadata = metadata.barrier.status.typeInfo[ PART_RESOLVED ];
+
+			expect( outputBarrier.status ).toEqual( {
+				name: partResolvedMetadata.name,
+				modifier: partResolvedMetadata.modifier,
+				date: inputBarrier.status.date,
+				description: inputBarrier.status.summary,
+				hint: partResolvedMetadata.hint,
+			} );
+
+			expect( outputBarrier.isOpen ).toEqual( false );
+			expect( outputBarrier.isResolved ).toEqual( true );
+			expect( outputBarrier.isPartiallyResolved ).toEqual( true );
 			expect( outputBarrier.isHibernated ).toEqual( false );
 		} );
 	} );
@@ -238,32 +268,36 @@ describe( 'Barrier detail view model', () => {
 
 	describe( 'When all sectors is selected', () => {
 		it( 'Should have the correct properties', () => {
+
 			inputBarrier.all_sectors = true;
 
 			const output = viewModel( inputBarrier );
 			const sectorsList = output.sectorsList;
 
-			expect(sectorsList).toEqual([{ text: 'All sectors' }]);
+			expect( sectorsList ).toEqual( [ { text: 'All sectors' } ] );
 		});
 	});
 
 	describe( 'A hibernated barrier', () => {
 		it( 'Should have the correct properties', () => {
 
-			inputBarrier.status = 5;
+			inputBarrier.status.id = 5;
 
 			const output = viewModel( inputBarrier );
 			const outputBarrier = output.barrier;
+			const hibernatedMetadata = metadata.barrier.status.typeInfo[ HIBERNATED ];
 
 			expect( outputBarrier.status ).toEqual( {
-				name: 'Paused',
-				modifyer: 'hibernated',
-				date: inputBarrier.status_date,
-				description: inputBarrier.status_summary
+				name: hibernatedMetadata.name,
+				modifier: hibernatedMetadata.modifier,
+				date: inputBarrier.status.date,
+				description: inputBarrier.status.summary,
+				hint: hibernatedMetadata.hint,
 			} );
 
 			expect( outputBarrier.isOpen ).toEqual( false );
 			expect( outputBarrier.isResolved ).toEqual( false );
+			expect( outputBarrier.isPartiallyResolved ).toEqual( false );
 			expect( outputBarrier.isHibernated ).toEqual( true );
 		} );
 	} );

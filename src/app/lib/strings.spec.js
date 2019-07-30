@@ -39,6 +39,11 @@ describe( 'strings', () => {
 			{ id: 's-id-2', name: 'sector 2' },
 		];
 
+		const statuses = {
+			'st-id-1': 'status type 1',
+			'st-id-2': 'status type 2',
+		};
+
 		metadata = {
 			getCountry: jasmine.createSpy( 'metadata.getCountry' ).and.callFake( ( id ) => countries.find( ( country ) => country.id === id ) ),
 			getAdminArea: jasmine.createSpy( 'metadata.getAdminArea' ).and.callFake( ( id ) => adminAreas.find( ( area ) => area.id === id ) ),
@@ -46,6 +51,7 @@ describe( 'strings', () => {
 			getSector: jasmine.createSpy( 'metadata.getSector' ).and.callFake( ( id ) => sectors.find( ( sector ) => sector.id === id ) ),
 			getBarrierType: jasmine.createSpy( 'metadata.getBarrierType' ).and.callFake( ( id ) => types.find( ( type ) => type.id === id ) ),
 			getBarrierPriority: jasmine.createSpy( 'metadata.getBarrierPriority' ).and.callFake( ( id ) => priorities.find( ( priority ) => priority.id === id ) ),
+			getBarrierStatus: jasmine.createSpy( 'metadata.getBarrierStatus' ).and.callFake( ( id ) => statuses[ id ] ),
 		};
 
 		strings = proxyquire( modulePath, {
@@ -169,5 +175,20 @@ describe( 'strings', () => {
 				expect( strings.sectors( [], true ) ).toEqual( 'All sectors' );
 			});
 		});
+	} );
+
+	describe( 'status types', () => {
+		describe( 'Without any ids', () => {
+			it( 'Should not error', () => {
+				expect( () => strings.statuses() ).not.toThrow();
+			} );
+		} );
+
+		describe( 'With ids', () => {
+			it( 'Should return the correct string', () => {
+				expect( strings.statuses( [ 'st-id-1' ] ) ).toEqual( 'status type 1' );
+				expect( strings.statuses( [ 'st-id-1', 'st-id-2' ] ) ).toEqual( 'status type 1, status type 2' );
+			} );
+		} );
 	} );
 } );

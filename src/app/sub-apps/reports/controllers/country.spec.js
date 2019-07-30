@@ -1,5 +1,6 @@
 const proxyquire = require( 'proxyquire' );
 
+const { RESOLVED, PART_RESOLVED } = require( '../../../lib/metadata' ).barrier.status.types;
 const modulePath = './country';
 
 describe( 'Report controllers', () => {
@@ -41,6 +42,11 @@ describe( 'Report controllers', () => {
 				{ id: 2, name: 'country 2' }
 			],
 			isCountryWithAdminArea: jasmine.createSpy( 'metadata.isCountryWithAdminArea' ),
+			barrier: {
+				status: {
+					types: { RESOLVED, PART_RESOLVED }
+				}
+			}
 		};
 
 		urls = {
@@ -145,78 +151,148 @@ describe( 'Report controllers', () => {
 						let report;
 						let saveValues;
 
-						beforeEach( () => {
+						describe( 'When the report is not resolved', () => {
 
-							report = {
-								id: 1,
-								problem_status: { a: 1 },
-								is_resolved: false,
-								resolved_date: { c: 3 }
-							};
+							beforeEach( () => {
 
-							saveValues = Object.assign( {}, {
-								status: report.problem_status,
-								isResolved: false,
-								resolvedDate: report.resolved_date,
-								adminAreas: []
-							}, getValuesResponse );
+								report = {
+									id: 1,
+									problem_status: { a: 1 },
+									is_resolved: false,
+									resolved_date: { c: 3 }
+								};
 
-							req.report = report;
-						} );
+								saveValues = Object.assign( {}, {
+									status: report.problem_status,
+									isResolved: 'false',
+									adminAreas: []
+								}, getValuesResponse );
 
-						it( 'Should update the report with the report data', async () => {
+								req.report = report;
+							} );
 
-							await controller( req, res, next );
-
-							const args = backend.reports.update.calls.argsFor( 0 );
-
-							expect( args[ 0 ] ).toEqual( req );
-							expect( args[ 1 ] ).toEqual( report.id );
-							expect( args[ 2 ] ).toEqual( saveValues );
-						} );
-
-						describe( 'When the update throws an error', () => {
-							it( 'Should call next with the error', async () => {
-
-								const err = new Error( 'an update error' );
-
-								backend.reports.update.and.callFake( () => Promise.reject( err ) );
+							it( 'Should update the report with the report data', async () => {
 
 								await controller( req, res, next );
 
-								expect( next ).toHaveBeenCalledWith( err );
-								expect( res.redirect ).not.toHaveBeenCalled();
+								const args = backend.reports.update.calls.argsFor( 0 );
+
+								expect( args[ 0 ] ).toEqual( req );
+								expect( args[ 1 ] ).toEqual( report.id );
+								expect( args[ 2 ] ).toEqual( saveValues );
+							} );
+
+							describe( 'When the update throws an error', () => {
+								it( 'Should call next with the error', async () => {
+
+									const err = new Error( 'an update error' );
+
+									backend.reports.update.and.callFake( () => Promise.reject( err ) );
+
+									await controller( req, res, next );
+
+									expect( next ).toHaveBeenCalledWith( err );
+									expect( res.redirect ).not.toHaveBeenCalled();
+								} );
+							} );
+
+							describe( 'When the update does not throw an error', () => {
+								describe( 'When the response is a success', () => {
+									it( 'Should redirect to the correct url', async () => {
+
+										const hasSectorsResponse = '/a/sector/url';
+										const body = { id: 2 };
+
+										backend.reports.update.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body } ) );
+										urls.reports.hasSectors.and.callFake( () => hasSectorsResponse );
+
+										await controller( req, res, next );
+
+										expect( res.redirect ).toHaveBeenCalledWith( hasSectorsResponse );
+										expect( urls.reports.hasSectors ).toHaveBeenCalledWith( body.id );
+										expect( next ).not.toHaveBeenCalled();
+									} );
+								} );
+
+								describe( 'When the response is NOT a success', () => {
+									it( 'Should redirect to the correct url', async () => {
+
+										backend.reports.update.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode: 404 } } ) );
+
+										await controller( req, res, next );
+
+										expect( res.redirect ).not.toHaveBeenCalled();
+										expect( next ).toHaveBeenCalledWith( new Error( 'Unable to update report, got 404 response code' ) );
+									} );
+								} );
 							} );
 						} );
 
-						describe( 'When the update does not throw an error', () => {
-							describe( 'When the response is a success', () => {
-								it( 'Should redirect to the correct url', async () => {
+						describe( 'When the report is RESOLVED', () => {
 
-									const hasSectorsResponse = '/a/sector/url';
-									const body = { id: 2 };
+							beforeEach( () => {
 
-									backend.reports.update.and.callFake( () => Promise.resolve( { response: { isSuccess: true }, body } ) );
-									urls.reports.hasSectors.and.callFake( () => hasSectorsResponse );
+								report = {
+									id: 1,
+									problem_status: { a: 1 },
+									is_resolved: true,
+									resolved_status: RESOLVED,
+									resolved_date: '2020-10-05'
+								};
 
-									await controller( req, res, next );
+								saveValues = Object.assign( {}, {
+									status: report.problem_status,
+									isResolved: RESOLVED,
+									resolvedDate: { month: '10', year: '2020' },
+									adminAreas: []
+								}, getValuesResponse );
 
-									expect( res.redirect ).toHaveBeenCalledWith( hasSectorsResponse );
-									expect( urls.reports.hasSectors ).toHaveBeenCalledWith( body.id );
-									expect( next ).not.toHaveBeenCalled();
-								} );
+								req.report = report;
 							} );
 
-							describe( 'When the response is NOT a success', () => {
-								it( 'Should redirect to the correct url', async () => {
+							it( 'Should update the report with the report data', async () => {
 
-									backend.reports.update.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode: 404 } } ) );
+								await controller( req, res, next );
 
-									await controller( req, res, next );
+								const args = backend.reports.update.calls.argsFor( 0 );
 
-									expect( res.redirect ).not.toHaveBeenCalled();
-									expect( next ).toHaveBeenCalledWith( new Error( 'Unable to update report, got 404 response code' ) );
-								} );
+								expect( args[ 0 ] ).toEqual( req );
+								expect( args[ 1 ] ).toEqual( report.id );
+								expect( args[ 2 ] ).toEqual( saveValues );
+							} );
+						} );
+
+						describe( 'When the report is PART_RESOLVED', () => {
+
+							beforeEach( () => {
+
+								report = {
+									id: 1,
+									problem_status: { a: 1 },
+									is_resolved: true,
+									resolved_status: PART_RESOLVED,
+									resolved_date: '2020-10-05'
+								};
+
+								saveValues = Object.assign( {}, {
+									status: report.problem_status,
+									isResolved: PART_RESOLVED,
+									partResolvedDate: { partMonth: '10', partYear: '2020' },
+									adminAreas: []
+								}, getValuesResponse );
+
+								req.report = report;
+							} );
+
+							it( 'Should update the report with the report data', async () => {
+
+								await controller( req, res, next );
+
+								const args = backend.reports.update.calls.argsFor( 0 );
+
+								expect( args[ 0 ] ).toEqual( req );
+								expect( args[ 1 ] ).toEqual( report.id );
+								expect( args[ 2 ] ).toEqual( saveValues );
 							} );
 						} );
 					} );
@@ -285,6 +361,7 @@ describe( 'Report controllers', () => {
 						} );
 					});
 				} );
+
 				describe( 'When the chosen country does have admin areas', () => {
 					beforeEach( () => {
 
@@ -318,20 +395,20 @@ describe( 'Report controllers', () => {
 
 					describe( 'When the form is valid', () => {
 						it( 'Should save the values to the session and redirect to the correct url', () => {
-		
+
 							const hasAdminAreaUrlResponse = '/a/country/url';
-		
+
 							urls.reports.hasAdminAreas.and.callFake( () => hasAdminAreaUrlResponse );
-		
+
 							controller( req, res, next );
-		
+
 							expect( form.validate ).toHaveBeenCalledWith();
 							expect( form.hasErrors ).toHaveBeenCalledWith();
 							expect( res.redirect ).toHaveBeenCalledWith( hasAdminAreaUrlResponse );
 							expect( res.render ).not.toHaveBeenCalled();
 						} );
 					} );
-				});	
+				});
 			} );
 		} );
 	} );

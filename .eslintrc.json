@@ -19,13 +19,14 @@
 		"strict": [ 2, "never" ],
 		"no-console": 2,
 		"semi": [ 2, "always" ],
-		"quotes": [ 2, "single", "avoid-escape" ]
+		"quotes": [ 2, "single", "avoid-escape" ],
+		"indent": [ "error", "tab", { "SwitchCase": 1 } ]
 	},
-	"overrides": {
+	"overrides": [{
 		"files": "**/*.spec.js",
 		"rules": {
 			"no-console": 0,
 			"quotes": 0
 		}
-	}
+	}]
 }

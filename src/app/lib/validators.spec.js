@@ -1,5 +1,6 @@
 const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
+const faker = require( 'faker' );
 const modulePath = './validators';
 
 describe( 'validators', () => {
@@ -23,6 +24,10 @@ describe( 'validators', () => {
 			sectors: [ { id: uuid() }, { id: uuid() } ],
 			barrierPriorities: [ { code: 'abc', name: 'test 1' }, { code: 'def', name: 'test 2' } ],
 			adminAreas: [ { id: validAdminArea } ],
+			barrierStatuses: {
+				'1': faker.lorem.words( 2 ),
+				'2': faker.lorem.words( 2 )
+			}
 		};
 
 		config = {
@@ -234,7 +239,7 @@ describe( 'validators', () => {
 	} );
 
 	describe( 'isBarrierType', () => {
-		describe( 'With a valid country', () => {
+		describe( 'With a valid id', () => {
 			describe( 'With the id as a string', () => {
 				it( 'Should return true', () => {
 
@@ -250,8 +255,8 @@ describe( 'validators', () => {
 			} );
 		} );
 
-		describe( 'With a valid country', () => {
-			it( 'Should return true', () => {
+		describe( 'With an invalid id', () => {
+			it( 'Should return false', () => {
 
 				expect( validators.isBarrierType( 'xyz' ) ).toEqual( false );
 			} );
@@ -439,6 +444,31 @@ describe( 'validators', () => {
 			it( 'Should return false', () => {
 
 				expect( validators.isBarrierPriority( 'xyz' ) ).toEqual( false );
+			} );
+		} );
+	} );
+
+	describe( 'isBarrierStatus', () => {
+		describe( 'With a valid id', () => {
+			describe( 'With the id as a string', () => {
+				it( 'Should return true', () => {
+
+					expect( validators.isBarrierStatus( '2' ) ).toEqual( true );
+				} );
+			} );
+
+			describe( 'With the id as a number', () => {
+				it( 'Should return true', () => {
+
+					expect( validators.isBarrierStatus( 2 ) ).toEqual( true );
+				} );
+			} );
+		} );
+
+		describe( 'With an invalid id', () => {
+			it( 'Should return false', () => {
+
+				expect( validators.isBarrierStatus( 'xyz' ) ).toEqual( false );
 			} );
 		} );
 	} );

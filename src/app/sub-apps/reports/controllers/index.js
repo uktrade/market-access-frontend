@@ -12,10 +12,8 @@ async function renderDashboard( req, res, next, isDelete = false, currentReportI
 
 		if( response.isSuccess ){
 
-			const { reports, currentReport } = reportsViewModel( body.results, currentReportId );
 			res.render( 'reports/views/index', {
-				currentReport,
-				reports,
+				...reportsViewModel( body.results, currentReportId ),
 				csrfToken: req.csrfToken(),
 				isDelete
 			} );
@@ -80,11 +78,8 @@ module.exports = {
 
 			if( req.xhr ){
 
-				//setTimeout( () => {
-					const { reports } = reportsViewModel( [ req.report ] );
-					res.render( 'reports/views/partials/delete-report-modal', { report: reports[ 0 ], csrfToken: req.csrfToken() } );
-				//}, 3000 );
-
+				const { reports } = reportsViewModel( [ req.report ] );
+				res.render( 'reports/views/partials/delete-report-modal', { report: reports[ 0 ], csrfToken: req.csrfToken() } );
 
 			} else {
 

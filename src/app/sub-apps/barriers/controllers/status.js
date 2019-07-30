@@ -3,107 +3,120 @@ const Form = require( '../../../lib/Form' );
 const FormProcessor = require( '../../../lib/FormProcessor' );
 const urls = require( '../../../lib/urls' );
 const validators = require( '../../../lib/validators' );
+const metadata = require( '../../../lib/metadata' );
+const govukItemsFromObj = require( '../../../lib/govuk-items-from-object' );
+const barrierFields = require( '../../../lib/barrier-fields' );
+
+const statusMetadata = metadata.barrier.status;
+const { UNKNOWN, PENDING, OPEN, PART_RESOLVED, RESOLVED, HIBERNATED } = statusMetadata.types;
+
+function createDate( value, ...args ){
+
+	const field = barrierFields.createStatusDate( {}, ...args );
+
+	field.conditional = { name: 'status', value };
+	field.errorField = 'status_date';
+
+	return field;
+}
+
+function createSummary( value ){
+	return {
+		conditional: { name: 'status', value },
+		errorField: 'summary',
+		required: 'Enter a summary'
+	};
+}
 
 module.exports = {
 
 	index: async ( req, res, next ) => {
 
-		const RESOLVE = 'resolve';
-		const HIBERNATE = 'hibernate';
-		const OPEN = 'open';
-
 		const barrier = req.barrier;
-		const currentStatus = barrier.status;
-		const invalidDateMessage = 'Enter resolution date and include a month and year';
+		const currentStatus = barrier.status.id;
 		const configItems = {
-			[ RESOLVE ]: {
-				serviceMethod: 'resolve',
-				label: 'Mark as <strong>resolved</strong>',
+			[ UNKNOWN ]: {
+				serviceMethod: 'unknown',
 				fields: {
-					resolvedDate: {
-						type: Form.GROUP,
-						conditional: { name: 'status', value: RESOLVE },
-						errorField: 'status_date',
-						validators: [ {
-							fn: validators.isDateValue( 'month' ),
-							message: invalidDateMessage
-						},{
-							fn: validators.isDateValue( 'year' ),
-							message: invalidDateMessage
-						},{
-							fn: validators.isDateNumeric,
-							message: 'Resolution date must only include numbers'
-						},{
-							fn: validators.isDateValid,
-							message: invalidDateMessage
-						},{
-							fn: validators.isDateInPast,
-							message: 'Resolution date must be this month or in the past'
-						} ],
-						items: {
-							month: {},
-							year: {}
-						}
-					},
-
-					resolvedSummary: {
-						conditional: { name: 'status', value: RESOLVE },
-						errorField: 'summary',
-						required: 'Enter a summary'
-					}
+					unknownSummary: createSummary( UNKNOWN ),
 				}
 			},
-			[ HIBERNATE ]: {
-				serviceMethod: 'hibernate',
-				label: 'Mark as <strong>paused</strong>',
+			[ PENDING ]: {
+				serviceMethod: 'pending',
 				fields: {
-					hibernationSummary: {
-						conditional: { name: 'status', value: HIBERNATE },
-						errorField: 'summary',
-						required: 'Enter a summary'
+					pendingSummary: createSummary( PENDING ),
+					pendingType: {
+						type: Form.RADIO,
+						conditional: { name: 'status', value: PENDING },
+						required: 'Select a pending action',
+						items: govukItemsFromObj( metadata.barrierPendingOptions ),
 					},
+					pendingTypeOther: {
+						conditional: { name: 'pendingType', value: metadata.barrier.status.pending.OTHER },
+						required: 'Enter a description for the pending action'
+					}
 				}
 			},
 			[ OPEN ]: {
 				serviceMethod: 'open',
-				label: 'Mark as <strong>open</strong>',
 				fields: {
-					reopenSummary: {
-						conditional: { name: 'status', value: OPEN },
-						errorField: 'summary',
-						required: 'Enter a summary'
-					}
+					reopenSummary: createSummary( OPEN ),
 				}
-			}
+			},
+			[ PART_RESOLVED ]: {
+				serviceMethod: 'partResolved',
+				transformValues: ( values ) => {
+
+					const { partMonth: month, partYear: year } = values.partResolvedDate;
+
+					values.partResolvedDate = { month, year };
+
+					return values;
+				},
+				fields: {
+					partResolvedDate: createDate( PART_RESOLVED, 'partMonth', 'partYear' ),
+					partResolvedSummary: createSummary( PART_RESOLVED ),
+				}
+			},
+			[ RESOLVED ]: {
+				serviceMethod: 'resolved',
+				fields: {
+					resolvedDate: createDate( RESOLVED ),
+					resolvedSummary: createSummary( RESOLVED ),
+				}
+			},
+			[ HIBERNATED ]: {
+				serviceMethod: 'hibernated',
+				fields: {
+					hibernationSummary: createSummary( HIBERNATED ),
+				}
+			},
 		};
 
-		let formOptions;
 		const items = [];
 		const formFields = {};
+		const validTypes = [];
 
-		switch( currentStatus ){
-			case 2: //Open
-				formOptions = [ RESOLVE, HIBERNATE ];
-			break;
-			case 4: //Resolved
-				formOptions = [ OPEN, HIBERNATE ];
-			break;
-			case 5: //Hibernated
-				formOptions = [ OPEN, RESOLVE ];
-			break;
-		}
+		for( let typeId of Object.values( statusMetadata.types ) ){
 
-		for( let option of formOptions ){
+			if( typeId == currentStatus ){
+				continue;
+			}
 
-			const configItem = configItems[ option ];
+			const configItem = configItems[ typeId ];
+			const typeInfo = statusMetadata.typeInfo[ typeId ];
 
+			validTypes.push( typeId );
 			items.push( {
-				value: option,
-				html: configItem.label
+				value: typeId,
+				text: typeInfo.name,
+				hint: {
+					text: typeInfo.hint,
+				}
 			} );
 
-			for( let [ key, value ] of Object.entries( configItem.fields ) ){
-				formFields[ key ] = value;
+			for( let [ fieldName, value ] of Object.entries( configItem.fields ) ){
+				formFields[ fieldName ] = value;
 			}
 		}
 
@@ -113,21 +126,30 @@ module.exports = {
 			items,
 			validators: [
 				{
-					fn: ( value ) => formOptions.includes( value ),
+					fn: ( value ) => ( validators.isBarrierStatus( value ) && currentStatus !== value ),
 					message: 'Choose a status'
 				}
 			]
 		};
 
-		let configItem;
 		const form = new Form( req, formFields );
 		const processor = new FormProcessor( {
 			form,
-			render: ( templateValues ) => res.render( 'barriers/views/status/index', templateValues ),
+			render: ( templateValues ) => res.render( 'barriers/views/status/index', {
+				...templateValues,
+				statusTypes: statusMetadata.types,
+				validTypes,
+				pendingOther: metadata.barrier.status.pending.OTHER,
+			} ),
 			saveFormData: ( formValues ) => {
 
-				configItem = configItems[ formValues.status ];
-				return backend.barriers[ configItem.serviceMethod ]( req, req.barrier.id, formValues );
+				const { serviceMethod, transformValues } = configItems[ formValues.status ];
+
+				if( transformValues ){
+					formValues = transformValues( formValues );
+				}
+
+				return backend.barriers.setStatus[ serviceMethod ]( req, req.barrier.id, formValues );
 			},
 			saved: () => res.redirect( urls.barriers.detail( req.barrier.id ) )
 		} );

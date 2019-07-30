@@ -9,6 +9,7 @@ const validatorNames = [
 	'isBarrierType',
 	'isBarrierPriority',
 	'isOverseasRegion',
+	'isBarrierStatus',
 ];
 
 const keyMap = {
@@ -17,6 +18,7 @@ const keyMap = {
 	type: 'isBarrierType',
 	priority: 'isBarrierPriority',
 	region: 'isOverseasRegion',
+	status: 'isBarrierStatus',
 };
 
 const stringMap = {
@@ -25,6 +27,17 @@ const stringMap = {
 	type: 'types',
 	priority: 'priorities',
 	region: 'regions',
+	status: 'statuses'
+};
+
+const labelMap = {
+	country: 'Barrier location',
+	sector: 'Sector',
+	type: 'Barrier type',
+	priority: 'Barrier priority',
+	region: 'Overseas region',
+	status: 'Barrier status',
+	search: 'Search',
 };
 
 describe( 'barrier-filters', () => {
@@ -32,11 +45,13 @@ describe( 'barrier-filters', () => {
 	let validators;
 	let strings;
 	let barrierFilters;
+	let reporter;
 
 	beforeEach( () => {
 
 		validators = {};
 		strings = {};
+		reporter = jasmine.helpers.mocks.reporter();
 
 		validatorNames.forEach( ( name ) => {
 			validators[ name ] = jasmine.createSpy( `validators.${ name }` );
@@ -55,36 +70,22 @@ describe( 'barrier-filters', () => {
 		barrierFilters = proxyquire( modulePath, {
 			'./validators': validators,
 			'./strings': strings,
+			'./reporter': reporter,
 		} );
 	} );
 
-	describe( '#FILTERS', () => {
-		it( 'Exports a list of valid filters with validators', () => {
-
-			//convert array back to object for easy testing
-			const filtersObject = barrierFilters.FILTERS.reduce( ( obj, { 0: key, 1: value } ) => ({ ...obj, ...{ [ key ]: value } }), {} );
-
-			for( let [ filterKey, validatorKey ] of Object.entries( keyMap ) ){
-
-				expect( filtersObject[ filterKey ] ).toEqual( validators[ validatorKey ] );
-			}
-
-			expect( typeof filtersObject.search ).toEqual( 'function' );
-		} );
-	} );
-
-	describe( '#transformFilterValue', () => {
+	describe( '#getDisplayInfo', () => {
 		describe( 'When there is a string fn to convert the value', () => {
 			it( 'Uses the string function', () => {
 
 				Object.entries( stringMap ).forEach( ( [ key, stringName ] ) => {
 
 					const id = uuid();
-					const value = barrierFilters.transformFilterValue( key, id );
+					const value = barrierFilters.getDisplayInfo( key, id );
 					const stringFn = strings[ stringName ];
 
 					expect( stringFn ).toHaveBeenCalledWith( id );
-					expect( value ).toEqual( stringFn.response );
+					expect( value ).toEqual( { label: labelMap[ key ], text: stringFn.response } );
 				} );
 			} );
 		} );
@@ -93,9 +94,20 @@ describe( 'barrier-filters', () => {
 			it( 'Returns the value', () => {
 
 				const id = uuid();
-				const value = barrierFilters.transformFilterValue( 'a', id );
+				const value = barrierFilters.getDisplayInfo( 'a', id );
 
-				expect( value ).toEqual( id );
+				expect( value ).toEqual( undefined );
+				expect( reporter.captureException ).toHaveBeenCalled();
+			} );
+		} );
+
+		describe( 'When it is createBy', () => {
+			it( 'Returns a static value', () => {
+
+				const inputValue = '123';
+				const value = barrierFilters.getDisplayInfo( 'createdBy', inputValue );
+
+				expect( value ).toEqual( { label: 'Show only', text: 'My barriers' } );
 			} );
 		} );
 	} );
@@ -107,12 +119,13 @@ describe( 'barrier-filters', () => {
 		beforeEach( () => {
 
 			query = {
-				country: String( uuid() ),
-				sector: String( uuid() ),
+				country:  uuid(),
+				sector:  uuid(),
 				type: String( faker.random.number() ),
 				priority: String( faker.random.number( { min: 0, max: 5 } ) ),
-				region: String( uuid() ),
-				search: String( faker.lorem.words( 3 ) ),
+				region: uuid(),
+				search: faker.lorem.words( 3 ),
+				status: '2',
 			};
 
 			validatorNames.forEach( ( name ) => validators[ name ].and.callFake( () => true ) );

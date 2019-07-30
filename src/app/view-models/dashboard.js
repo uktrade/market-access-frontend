@@ -14,11 +14,11 @@ function update( barrier ){
 
 	const countryId = barrier.export_country;
 	const country = metadata.countries.find( ( country ) => country.id === countryId );
-	const barrierStatusCode = barrier.status;
+	const barrierStatusCode = barrier.status.id;
 	const status = barrierStatusTypeInfo[ barrierStatusCode ] || {};
 	const priority = {
 		...barrier.priority,
-		modifyer: barrier.priority.code.toLowerCase(),
+		modifier: barrier.priority.code.toLowerCase(),
 	};
 
 	return {

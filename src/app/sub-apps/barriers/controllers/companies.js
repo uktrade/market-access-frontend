@@ -36,7 +36,7 @@ async function search( req, res, next ){
 
 						case 404:
 							error = 'No company found';
-						break;
+							break;
 						default:
 							error = 'There was an error finding the company';
 					}
