@@ -21,9 +21,7 @@ describe( 'Index controller', () => {
 	beforeEach( () => {
 
 		ssoToken = 'abc-123';
-		barrierFilters = {
-			transformFilterValue: jasmine.createSpy( 'watchList.transformFilterValue' )
-		};
+		barrierFilters = jasmine.helpers.mocks.barrierFilters();
 
 		backend = {
 			barriers: {
@@ -92,8 +90,6 @@ describe( 'Index controller', () => {
 						country: '1234'
 					}
 				} );
-
-				barrierFilters.transformFilterValue.and.callFake( () => 'Country 1' );
 			});
 
 			describe( 'When the watchList index cannot be found', () => {
@@ -148,7 +144,7 @@ describe( 'Index controller', () => {
 								0,
 								{
 									isWatchList: true,
-									watchListFilters: [ { key: 'country', value: 'Country 1' } ],
+									watchListFilters: barrierFilters.createList.response,
 									csrfToken,
 								},
 							);
@@ -177,7 +173,7 @@ describe( 'Index controller', () => {
 										0,
 										{
 											isWatchList: true,
-											watchListFilters: [ { key: 'country', value: 'Country 1' } ],
+											watchListFilters: barrierFilters.createList.response,
 											csrfToken,
 										},
 									);
@@ -199,7 +195,7 @@ describe( 'Index controller', () => {
 										0,
 										{
 											isWatchList: true,
-											watchListFilters: [ { key: 'country', value: 'Country 1' } ],
+											watchListFilters: barrierFilters.createList.response,
 											csrfToken,
 										},
 									);
@@ -221,7 +217,7 @@ describe( 'Index controller', () => {
 										0,
 										{
 											isWatchList: true,
-											watchListFilters: [ { key: 'country', value: 'Country 1' } ],
+											watchListFilters: barrierFilters.createList.response,
 											csrfToken,
 										},
 									);
@@ -243,7 +239,7 @@ describe( 'Index controller', () => {
 										0,
 										{
 											isWatchList: true,
-											watchListFilters: [ { key: 'country', value: 'Country 1' } ],
+											watchListFilters: barrierFilters.createList.response,
 											csrfToken,
 										},
 									);

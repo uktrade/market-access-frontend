@@ -2,6 +2,7 @@ const metadata = require( '../lib/metadata' );
 const sortGovukItems = require( '../lib/sort-govuk-items' );
 const urls = require( '../lib/urls' );
 const strings = require( '../lib/strings' );
+const barrierFilters = require( '../lib/barrier-filters' );
 
 const { OPEN, RESOLVED, HIBERNATED } = metadata.barrier.status.types;
 const barrierStatusTypeInfo = metadata.barrier.status.typeInfo;
@@ -98,44 +99,44 @@ module.exports = function( { count, barriers, filters, queryString, isEdit, edit
 		removeAllUrl: urls.findABarrier( ( isEdit ? { editList: editListIndex } : {} ) ),
 		filters: {
 			country: {
+				...barrierFilters.getDisplayInfo( 'country', filters.country ),
 				items: countries.sort( sortGovukItems.alphabetical ).map( isChecked( filters.country ) ),
 				active: !!filters.country,
-				text: strings.locations( filters.country ),
 				removeUrl: getRemoveUrl( filters, 'country' ),
 			},
 			region: {
+				...barrierFilters.getDisplayInfo( 'region', filters.region ),
 				items: metadata.getOverseasRegionList( 'All regions' ).map( isChecked( filters.region ) ),
 				active: !!filters.region,
-				text: strings.regions( filters.region ),
 				removeUrl: getRemoveUrl( filters, 'region' ),
 			},
 			sector: {
+				...barrierFilters.getDisplayInfo( 'sector', filters.sector ),
 				items: metadata.getSectorList( 'All sectors' ).map( isChecked( filters.sector ) ),
 				active: !!filters.sector,
-				text: strings.sectors( filters.sector ),
 				removeUrl: getRemoveUrl( filters, 'sector' ),
 			},
 			type: {
+				...barrierFilters.getDisplayInfo( 'type', filters.type ),
 				items: metadata.getBarrierTypeList().sort( sortGovukItems.alphabetical ).map( isChecked( filters.type ) ),
 				active: !!filters.type,
-				text: strings.types( filters.type ),
 				removeUrl: getRemoveUrl( filters, 'type' ),
 			},
 			priority: {
+				...barrierFilters.getDisplayInfo( 'priority', filters.priority ),
 				items: metadata.getBarrierPrioritiesList( { suffix: false } ).map( isChecked( filters.priority ) ),
 				active: !!filters.priority,
-				text: strings.priorities( filters.priority ),
 				removeUrl: getRemoveUrl( filters, 'priority' ),
 			},
 			search: {
+				...barrierFilters.getDisplayInfo( 'search', filters.search ),
 				active: !!filters.search,
-				text: filters.search,
 				removeUrl: getRemoveUrl( filters, 'search' ),
 			},
 			status: {
+				...barrierFilters.getDisplayInfo( 'status', filters.status ),
 				items: metadata.getBarrierStatusList().map( isChecked( filters.status ) ),
 				active: !!filters.status,
-				text: strings.statuses( filters.status ),
 				removeUrl: getRemoveUrl( filters, 'status' ),
 			},
 		}

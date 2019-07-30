@@ -16,8 +16,8 @@ let getFromQueryString;
 let getFromQueryStringResponse;
 let Form;
 let form;
-let transformFilterValue;
-let transformFilterValueResponse;
+let createList;
+let createListResponse;
 let config;
 let reporter;
 
@@ -53,7 +53,7 @@ describe( 'Watch list controller', () => {
 		getValuesResponse = { name: 'Test name' };
 		getTemplateValuesResponse = { c: 3, d: 4 };
 		getFromQueryStringResponse = { country: [ 'a' ], sector: [ 'b' ] };
-		transformFilterValueResponse = uuid();
+		createListResponse = uuid();
 
 		form = {
 			validate: jasmine.createSpy( 'form.validate' ),
@@ -62,12 +62,12 @@ describe( 'Watch list controller', () => {
 		};
 
 		Form = jasmine.createSpy( 'Form' ).and.callFake( () => form );
-		getFromQueryString = jasmine.createSpy().and.callFake( () => getFromQueryStringResponse );
-		transformFilterValue = jasmine.createSpy( 'barrierFilters.transformFilterValue' ).and.callFake( () => transformFilterValueResponse );
+		getFromQueryString = jasmine.createSpy( 'barrierFilters.getFromQueryString' ).and.callFake( () => getFromQueryStringResponse );
+		createList = jasmine.createSpy( 'barrierFilters.createList' ).and.callFake( () => createListResponse );
 
 		controller = proxyquire( modulePath, {
 			'../lib/metadata': metadata,
-			'../lib/barrier-filters': { getFromQueryString, transformFilterValue },
+			'../lib/barrier-filters': { getFromQueryString, createList },
 			'../lib/Form': Form,
 			'../lib/urls': urls,
 			'../config': config,
@@ -86,7 +86,7 @@ describe( 'Watch list controller', () => {
 				hasToReplace: false,
 				isEdit: false,
 				queryString: req.query,
-				filterList: Object.keys( getFromQueryStringResponse ).map( ( key ) => ({ key, value: transformFilterValueResponse }) ),
+				filterList: createListResponse,
 				csrfToken,
 			} );
 		}
@@ -302,7 +302,7 @@ describe( 'Watch list controller', () => {
 					isRename: true,
 					watchListIndex: 0,
 					queryString: req.query,
-					filterList: [ { key: 'type', value: transformFilterValueResponse } ],
+					filterList: createListResponse,
 					csrfToken,
 				} );
 			}

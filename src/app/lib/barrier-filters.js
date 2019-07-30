@@ -1,41 +1,49 @@
 const validators = require( './validators' );
 const strings = require( './strings' );
+const reporter = require( './reporter' );
 
 const FILTERS = Object.entries( {
-	country: validators.isCountryOrAdminArea,
-	sector: validators.isSector,
-	type: validators.isBarrierType,
-	priority: validators.isBarrierPriority,
-	region: validators.isOverseasRegion,
-	search: ( str ) => !!str.length,
-	status: validators.isBarrierStatus,
+	country: [ 'Barrier location', validators.isCountryOrAdminArea, strings.locations ],
+	sector: [ 'Sector', validators.isSector, strings.sectors ],
+	type: [ 'Barrier type', validators.isBarrierType, strings.types ],
+	priority: [ 'Barrier priority', validators.isBarrierPriority, strings.priorities ],
+	region: [ 'Overseas region', validators.isOverseasRegion, strings.regions ],
+	search: [ 'Search', ( str ) => !!str.length, ( str ) => str ],
+	status: [ 'Barrier status', validators.isBarrierStatus, strings.statuses ],
 } );
 
-const filterStringMap = {
-	country: strings.locations,
-	sector: strings.sectors,
-	type: strings.types,
-	priority: strings.priorities,
-	region: strings.regions,
-	status: strings.statuses,
-};
+const displayMap = FILTERS.reduce( ( obj, [ key, [ label, , getValue ] ] ) => { obj[ key ] = { label, getValue }; return obj; }, {} );
+
+function getDisplayInfo ( key, queryValue ){
+
+	try {
+
+		const { label, getValue } = displayMap[ key ];
+
+		return { label, text: getValue( queryValue ) };
+
+	} catch( e ){
+
+		reporter.captureException( e );
+	}
+}
 
 module.exports = {
 
-	FILTERS,
+	getDisplayInfo,
 
-	transformFilterValue: function( key, value ) {
+	createList: ( filters /* response from getFromQueryString */ ) => Object.entries( filters ).map( ( [ key, queryValue ] ) => {
 
-		const stringFn = filterStringMap[ key ];
+		const { label, text } = getDisplayInfo( key, queryValue );
 
-		return ( stringFn ? stringFn( value ) : value );
-	},
+		return { key: label, value: text };
+	} ),
 
 	getFromQueryString: function( query ){
 
 		const filters = {};
 
-		for( let [ name, validator ] of FILTERS ){
+		for( let [ name, [ , validator ] ] of FILTERS ){
 
 			const queryValue = ( query[ name ] );
 

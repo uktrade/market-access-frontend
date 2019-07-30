@@ -1,7 +1,7 @@
 const urls = require( '../lib/urls' );
 const backend = require( '../lib/backend-service' );
 const dashboardViewModel = require( '../view-models/dashboard' );
-const { transformFilterValue } = require( '../lib/barrier-filters' );
+const { createList } = require( '../lib/barrier-filters' );
 
 const sortData = {
 	fields: [ 'priority', 'date', 'location', 'status', 'updated' ],
@@ -47,7 +47,6 @@ module.exports = {
 
 			try {
 
-				const watchListFilters = Object.entries( currentWatchList.filters ).map( ( [ key, value ] ) => ({ key, value: transformFilterValue( key, value ) }) );
 				const { response, body } = await backend.barriers.getAll( req, currentWatchList.filters, currentSort.serviceParam, currentSort.direction );
 
 				if( response.isSuccess ){
@@ -59,7 +58,7 @@ module.exports = {
 						watchListIndex,
 						{
 							isWatchList: true,
-							watchListFilters,
+							watchListFilters: createList( currentWatchList.filters ),
 							csrfToken: req.csrfToken(),
 						}
 					));
