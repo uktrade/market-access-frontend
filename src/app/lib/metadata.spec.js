@@ -652,7 +652,7 @@ describe( 'metadata', () => {
 							[ OPEN ]: { name: 'Open', modifier: 'assessment', hint: 'Barrier is being worked on' },
 							[ PART_RESOLVED ]: { name: 'Part resolved', modifier: 'resolved', hint: 'Barrier impact has been significantly reduced but remains in part' },
 							[ RESOLVED ]: { name: 'Resolved', modifier: 'resolved', hint: 'Barrier has been resolved for all UK companies' },
-							[ HIBERNATED ]: { name: 'Paused', modifier: 'hibernated', hint: 'Barrier is present but not being persued' },
+							[ HIBERNATED ]: { name: 'Paused', modifier: 'hibernated', hint: 'Barrier is present but not being pursued' },
 						},
 						pending: {
 							OTHER: 'OTHER'
