@@ -293,7 +293,7 @@ module.exports.barrier = {
 			[ barrierStatusKeys.OPEN ]: { name: 'Open', modifier: 'assessment', hint: 'Barrier is being worked on' },
 			[ barrierStatusKeys.PART_RESOLVED ]: { name: 'Part resolved', modifier: 'resolved', hint: 'Barrier impact has been significantly reduced but remains in part' },
 			[ barrierStatusKeys.RESOLVED ]: { name: 'Resolved', modifier: 'resolved', hint: 'Barrier has been resolved for all UK companies' },
-			[ barrierStatusKeys.HIBERNATED ]: { name: 'Paused', modifier: 'hibernated', hint: 'Barrier is present but not being persued' },
+			[ barrierStatusKeys.HIBERNATED ]: { name: 'Paused', modifier: 'hibernated', hint: 'Barrier is present but not being pursued' },
 		},
 		pending: {
 			OTHER: 'OTHER',
