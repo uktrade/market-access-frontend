@@ -1,0 +1,56 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "List of barrier members",
+
+	"type": "object",
+	"required": [ "count", "results" ],
+	"properties": {
+
+		"count": { "$ref": "$refs/common.json#/int" },
+
+		"results": {
+			"type": "array",
+			"minItems": 2,
+			"maxItems": 5,
+			"items": {
+				"$ref": "#/refs/member"
+			}
+		}
+	},
+
+	"refs": {
+		"member": {
+			"type": "object",
+			"required": [ "id", "user", "role" ],
+			"properties": {
+				"id": { "$ref": "$refs/common.json#/small-int" },
+				"user": {
+					"type": "object",
+					"required": [ "profile", "email", "first_name", "last_name" ],
+					"properties": {
+						"profile": {
+							"type": "object",
+							"required": [ "sso_user_id" ],
+							"properties": {
+								"sso_user_id": { "$ref": "$refs/common.json#/uuid" }
+							}
+						},
+						"first_name": {
+							"type": "string",
+							"faker": "name.firstName"
+						},
+						"last_name": {
+							"type": "string",
+							"faker": "name.lastName"
+						},
+						"email": {
+							"type": "string",
+							"faker": "internet.email"
+						}
+					}
+				},
+				"role": { "$ref": "$refs/common.json#/words" }
+			}
+		}
+	}
+}

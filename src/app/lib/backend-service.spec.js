@@ -135,6 +135,16 @@ describe( 'Backend Service', () => {
 		} );
 	} );
 
+	describe( 'getSsoUser', () => {
+		it( 'Should call the correct path', async () => {
+
+			const userId = uuid();
+			await service.getSsoUser( req, userId );
+
+			expect( backend.get ).toHaveBeenCalledWith( `/users/${ userId }`, token );
+		} );
+	} );
+
 	describe( 'Documents', () => {
 		describe( 'create', () => {
 			it( 'Should call the correct API', async () => {
@@ -1020,6 +1030,45 @@ describe( 'Backend Service', () => {
 
 				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
 					problem_status: problemStatus
+				} );
+			} );
+		} );
+
+		describe( 'team', () => {
+			describe( 'get', () => {
+				it( 'Should GET the correct path', async () => {
+
+					await service.barriers.team.get( req, barrierId );
+
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers/${ barrierId }/members`, token );
+				} );
+			} );
+
+			describe( 'add', () => {
+				it( 'Should POST to the correct path with the correct values', async () => {
+
+					const values = {
+						memberId: uuid(),
+						role: 'A role here',
+					};
+
+					await service.barriers.team.add( req, barrierId, values );
+
+					expect( backend.post ).toHaveBeenCalledWith( `/barriers/${ barrierId }/members`, token, {
+						user: { profile: { sso_user_id: values.memberId } },
+						role: values.role,
+					} );
+				} );
+			} );
+
+			describe( 'remove', () => {
+				it( 'Should DELETE to the correct path', async () => {
+
+					const userId = uuid();
+
+					await service.barriers.team.remove( req, barrierId, userId );
+
+					expect( backend.delete ).toHaveBeenCalledWith( `/barriers/${ barrierId }/members/${ userId }`, token );
 				} );
 			} );
 		} );

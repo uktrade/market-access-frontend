@@ -5,7 +5,7 @@ const modulePath = './make-request';
 const GET = 'GET';
 const POST = 'POST';
 
-fdescribe( 'makeRequest', () => {
+describe( 'makeRequest', () => {
 
 	let domain;
 	let request;

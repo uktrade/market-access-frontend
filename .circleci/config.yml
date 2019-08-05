@@ -52,6 +52,7 @@ aliases:
       SSO_REDIRECT_URI: 'http://localhost:8080/login/callback/'
       SSO_BYPASS: true
       SSO_MOCK_CODE: abc-def-ghi
+      SSO_API_TOKEN: jkl-mno-pqr
       DATAHUB_URL: 'http://localhost.datahub'
       DATAHUB_HAWK_ID: abc
       DATAHUB_HAWK_KEY: def

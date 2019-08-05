@@ -1,0 +1,41 @@
+{
+   "count": 94003,
+   "results": [
+      {
+         "id": 6,
+         "user": {
+            "profile": {
+               "sso_user_id": "89902532-a455-463c-85fc-f5dbba757c1a"
+            },
+            "email": "Lennie_Jakubowski@yahoo.com",
+            "first_name": "Hailey",
+            "last_name": "Keebler"
+         },
+         "role": "itaque quod veniam"
+      },
+      {
+         "id": 4,
+         "user": {
+            "profile": {
+               "sso_user_id": "3937bb57-ccdc-411f-8fd3-5b969e3fcc70"
+            },
+            "email": "Nolan.Zemlak38@yahoo.com",
+            "first_name": "Fabian",
+            "last_name": "Greenholt"
+         },
+         "role": "ipsum ut dolorem"
+      },
+      {
+         "id": 2,
+         "user": {
+            "profile": {
+               "sso_user_id": "aa575997-5c07-496b-9e42-5a413ed4b060"
+            },
+            "email": "Paige.Schaden69@hotmail.com",
+            "first_name": "Kurtis",
+            "last_name": "Welch"
+         },
+         "role": "repellendus voluptatem voluptates"
+      }
+   ]
+}

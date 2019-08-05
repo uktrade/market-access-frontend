@@ -1,0 +1,15 @@
+{% from 'app-components/tabs.njk' import tabs %}
+
+{% macro barrierTabs( barrierId, active = 'detail' ) %}
+	{{ tabs([
+		{
+			href: urls.barriers.detail( barrierId ),
+			text: 'Barrier information',
+			isCurrent: ( active == 'detail' )
+		},{
+			href: urls.barriers.team.list( barrierId ),
+			text: 'Barrier team',
+			isCurrent: ( active == 'team' )
+		}
+	]) }}
+{% endmacro %}

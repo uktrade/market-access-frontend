@@ -92,6 +92,7 @@ $govuk-images-path: '/govuk-public/images/';
 @import 'pages/report/sectors';
 @import 'pages/barrier/detail';
 @import 'pages/barrier/type';
+@import 'pages/barrier/team';
 @import 'pages/find-a-barrier';
 
 body:not(.js-enabled) {

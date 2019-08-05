@@ -222,6 +222,7 @@ module.exports = {
 	getUser: ( req ) => backend.get( '/whoami', getToken( req ) ).then( transformUser ),
 	ping: () => backend.get( '/ping.xml' ),
 	getCounts: ( req ) => backend.get( '/counts', getToken( req ) ),
+	getSsoUser: ( req, userId ) => backend.get( `/users/${ userId }`, getToken( req ) ),
 
 	documents: {
 		create: ( req, fileName, fileSize ) => backend.post( '/documents', getToken( req ), {
@@ -378,6 +379,14 @@ module.exports = {
 			}
 
 			return updateBarrier( getToken( req ), barrierId, details );
+		},
+		team: {
+			get: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }/members`, getToken( req ) ),
+			add: ( req, barrierId, values ) => backend.post( `/barriers/${ barrierId }/members`, getToken( req ), {
+				user: { profile: { sso_user_id: values.memberId } },
+				role: values.role,
+			} ),
+			remove: ( req, barrierId, userId ) => backend.delete( `/barriers/${ barrierId }/members/${ userId }`, getToken( req ) ),
 		}
 	},
 
