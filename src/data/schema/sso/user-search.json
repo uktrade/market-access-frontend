@@ -1,0 +1,11 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Details of a contact",
+
+	"type": "array",
+	"minItems": 400,
+	"maxItems": 450,
+	"items": {
+		"$ref": "$refs/sso.json#/user"
+	}
+}
