@@ -8,7 +8,7 @@ const isAlpha = /^[a-zA-Z0-9-]+$/;
 
 const ssoUrls = [ 'auth', 'token' ].reduce( ( params, param ) => {
 
-	params[ param ] = `${ config.sso.protocol }://${ config.sso.domain}:${ config.sso.port }${ config.sso.path[ param ] }`;
+	params[ param ] = `${ config.sso.protocol }://${ config.sso.domain }:${ config.sso.port }${ config.sso.path[ param ] }`;
 
 	return params;
 }, {} );

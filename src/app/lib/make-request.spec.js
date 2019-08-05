@@ -5,7 +5,7 @@ const modulePath = './make-request';
 const GET = 'GET';
 const POST = 'POST';
 
-describe( 'makeRequest', () => {
+fdescribe( 'makeRequest', () => {
 
 	let domain;
 	let request;
@@ -174,7 +174,7 @@ describe( 'makeRequest', () => {
 								} );
 							} );
 
-							describe( 'An application/json response type', () => {
+							describe( 'A simple application/json response type', () => {
 
 								beforeEach( () => {
 
@@ -211,6 +211,20 @@ describe( 'makeRequest', () => {
 										expect( body ).toEqual( invalidBody );
 										expect( reporter.captureException ).toHaveBeenCalledWith( new SyntaxError( 'Unexpected token : in JSON at position 9' ), { uri: ( domain + path ) });
 									} );
+								} );
+							} );
+
+							describe( 'With a complex application/json content type', () => {
+								it( 'Should return the response', async () => {
+
+									mockResponse.headers[ 'content-type' ] = 'application/json; charset=utf-8';
+									requestCallback( null, mockResponse, '{ "a": 1, "b": 2 }' );
+
+									const { response, body } = await sendRequest( GET, path, { token } );
+
+									expect( response.isSuccess ).toEqual( true );
+									expect( response ).toEqual( mockResponse );
+									expect( body ).toEqual( { a: 1, b: 2 } );
 								} );
 							} );
 						} );
