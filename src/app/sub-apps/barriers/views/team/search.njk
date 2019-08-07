@@ -47,13 +47,12 @@
 			<ul class="company-card-list">
 			{% for user in users %}
 				<li class="company-card">
-					<a href="{{ urls.barriers.team.add( barrier.id, user.id ) }}" class="company-card__link">
+					<a href="{{ urls.barriers.team.add( barrier.id, user.id ) }}#role" class="company-card__link">
 
 						<h3 class="company-card__heading">{{ user.name | highlight( query ) | safe }}</h3>
 						<dl class="company-card__values">
 							<dt class="company-card__values__key">Email</dt>
 							<dd class="company-card__values__value">{{ user.email }}</dd>
-
 						</dl>
 
 					</a>

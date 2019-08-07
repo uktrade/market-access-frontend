@@ -1,6 +1,7 @@
 {% from 'components/select/macro.njk' import govukSelect %}
 {% from 'components/input/macro.njk' import govukInput %}
 {% from 'components/error-summary/macro.njk' import govukErrorSummary %}
+{% from "components/fieldset/macro.njk" import govukFieldset %}
 
 {% from 'app-components/barrier-summary.njk' import barrierSummary %}
 {% from 'app-components/barrier-tabs.njk' import barrierTabs %}
@@ -49,36 +50,48 @@
 		<form action="{{ urls.barriers.team.add( barrier.id, member.id ) }}" method="POST">
 			<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
-			{% if member %}
+			{% call govukFieldset({
+				legend: {
+					text: 'Team member',
+					classes: "govuk-fieldset__legend--l"
+				}
+			}) %}
 
-				<div>
-					Name: {{ member.name }}
-				</div>
-				<input type="hidden" name="memberId" value="{{ member.id }}">
+				{% if member %}
 
-			{% else %}
+					<div class="static-form-group">
+						<span class="static-form-group__label">Name</span>
+						<span class="static-form-group__value">{{ member.name }}</span>
+					</div>
+					<input type="hidden" name="memberId" value="{{ member.id }}">
 
-				{{ govukSelect({
-					id: 'user',
-					name: 'memberId',
+				{% else %}
+
+					{{ govukSelect({
+						id: 'user',
+						name: 'memberId',
+						label: {
+							text: 'Find a user',
+							classes: 'govuk-label--s'
+						},
+						items: user,
+						error: errors | errorForName( 'memberId' )
+					}) }}
+
+				{% endif %}
+
+				{{ govukInput({
+					id: 'role',
+					name: 'role',
 					label: {
-						text: 'Find a user'
+						text: 'Role',
+						classes: 'govuk-label--s'
 					},
-					items: user,
-					error: errors | errorForName( 'memberId' )
+					value: role,
+					error: errors | errorForName( 'role' )
 				}) }}
 
-			{% endif %}
-
-			{{ govukInput({
-				id: 'role',
-				name: 'role',
-				label: {
-					text: 'Role'
-				},
-				value: role,
-				error: errors | errorForName( 'role' )
-			}) }}
+			{% endcall %}
 
 			<input type="submit" value="Save" class="govuk-button">
 			<a href="{{ urls.barriers.team.list( barrier.id ) }}" class="govuk-button button--secondary">Cancel</a>
