@@ -98,7 +98,7 @@ module.exports = {
 
 		try {
 
-			await processor.process({ checkResponseErrors: true });
+			await processor.process();
 
 		} catch( e ){
 

@@ -1,3 +1,4 @@
+{% from 'components/warning-text/macro.njk' import govukWarningText %}
 {% from 'app-components/currency-input.njk' import currencyInput %}
 {% from 'app-components/heading.njk' import heading %}
 
@@ -14,14 +15,22 @@
 		errors: errors
 	}) }}
 
+	{{ govukWarningText({
+		text: 'To be completed by the Market Access Analysts',
+		iconFallbackText: 'Warning'
+	}) }}
+
 	<form action="{{ urls.barriers.assessment.exportValue( barrier.id ) }}" method="POST" class="restrict-width">
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
 		{{ currencyInput( {
 
 			label: {
-				text: 'What is the value of currently affected UK exports to the partner country per year?',
+				text: 'What is the value of currently affected UK exports?',
 				classes: 'govuk-label--s'
+			},
+			hint: {
+				text: 'The value of UK exports to the partner country that are affected by this barrier in GBP per year.'
 			},
 			id: 'value',
 			name: 'value',

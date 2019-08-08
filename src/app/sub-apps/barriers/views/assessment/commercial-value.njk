@@ -3,14 +3,14 @@
 
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Barrier Assessment - Commercial Value{% endblock %}
+{% block page_title %}{{ super() }} - Barrier Assessment - Commercial value{% endblock %}
 
 {% block page_content %}
 
 	{{ heading({
 		back: { href: urls.barriers.assessment.detail( barrier.id ) },
 		caption: barrier.barrier_title,
-		text: 'Commercial Value',
+		text: 'Commercial value',
 		errors: errors
 	}) }}
 
@@ -20,8 +20,11 @@
 		{{ currencyInput( {
 
 			label: {
-				text: 'What is the value of the barrier to the affected business(es) per year?',
+				text: 'What is the value of the barrier to the affected business(es)?',
 				classes: 'govuk-label--s'
+			},
+			hint: {
+				text: 'The value of the barrier to the affected business(es) in GBP per year.'
 			},
 			id: 'value',
 			name: 'value',

@@ -1,3 +1,4 @@
+{% from 'components/warning-text/macro.njk' import govukWarningText %}
 {% from 'app-components/currency-input.njk' import currencyInput %}
 {% from 'app-components/heading.njk' import heading %}
 
@@ -14,14 +15,22 @@
 		errors: errors
 	}) }}
 
+	{{ govukWarningText({
+		text: 'To be completed by the Market Access Analysts',
+		iconFallbackText: 'Warning'
+	}) }}
+
 	<form action="{{ urls.barriers.assessment.marketSize( barrier.id ) }}" method="POST" class="restrict-width">
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
 		{{ currencyInput( {
 
 			label: {
-				text: 'What is the size of the import market this barrier is limiting access to per year?',
+				text: 'What is the size of the import market?',
 				classes: 'govuk-label--s'
+			},
+			hint: {
+				text: 'The size of the import market that this barrier is limiting UK access to in GBP per year.'
 			},
 			id: 'value',
 			name: 'value',

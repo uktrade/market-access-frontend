@@ -80,6 +80,26 @@ function checkModal( done ){
 	};
 }
 
+function checkFormAction( url, done ){
+
+	return ( err, res ) => {
+
+		if( err ){ done.fail( err ); }
+
+		const matches = /<form.*action="(.+?)"/gm.exec( res.text );
+
+		if( matches ){
+
+			expect( matches[ 1 ] ).toEqual( url );
+			done();
+
+		} else {
+
+			done.fail();
+		}
+	};
+}
+
 function checkRedirect( location, done, responseCode = 302 ){
 
 	return ( err, res ) => {
@@ -1016,6 +1036,7 @@ describe( 'App', function(){
 							.get( `/barriers/${ barrierId }/assessment` )
 							.reply( 200, intercept.stub( '/backend/barriers/assessment') );
 					} );
+
 					describe( 'Detail', () => {
 						it( 'Should render the page', ( done ) => {
 
@@ -1031,6 +1052,82 @@ describe( 'App', function(){
 							app
 								.get( urls.barriers.assessment.economic( barrierId ) )
 								.end( checkPage( 'Market Access - Barrier Assessment - Economic assessment', done ) );
+						} );
+
+						it( 'Should have the correct form action', ( done ) => {
+
+							const url = urls.barriers.assessment.economic( barrierId );
+							app
+								.get( url )
+								.end( checkFormAction( url, done ) );
+						} );
+					} );
+
+					describe( 'economyValue', () => {
+						it( 'Should render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.assessment.economyValue( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier Assessment - UK economy value', done ) );
+						} );
+
+						it( 'Should have the correct form action', ( done ) => {
+
+							const url = urls.barriers.assessment.economyValue( barrierId );
+							app
+								.get( url )
+								.end( checkFormAction( url, done ) );
+						} );
+					} );
+
+					describe( 'marketSize', () => {
+						it( 'Should render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.assessment.marketSize( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier Assessment - Import market size', done ) );
+						} );
+
+						it( 'Should have the correct form action', ( done ) => {
+
+							const url = urls.barriers.assessment.marketSize( barrierId );
+							app
+								.get( url )
+								.end( checkFormAction( url, done ) );
+						} );
+					} );
+
+					describe( 'exportValue', () => {
+						it( 'Should render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.assessment.exportValue( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier Assessment - Affected UK exports', done ) );
+						} );
+
+						it( 'Should have the correct form action', ( done ) => {
+
+							const url = urls.barriers.assessment.exportValue( barrierId );
+							app
+								.get( url )
+								.end( checkFormAction( url, done ) );
+						} );
+					} );
+
+					describe( 'commercialValue', () => {
+						it( 'Should render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.assessment.commercialValue( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier Assessment - Commercial value', done ) );
+						} );
+
+						it( 'Should have the correct form action', ( done ) => {
+
+							const url = urls.barriers.assessment.commercialValue( barrierId );
+							app
+								.get( url )
+								.end( checkFormAction( url, done ) );
 						} );
 					} );
 				} );

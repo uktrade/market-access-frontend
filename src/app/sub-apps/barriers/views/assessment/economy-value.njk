@@ -1,3 +1,4 @@
+{% from 'components/warning-text/macro.njk' import govukWarningText %}
 {% from 'app-components/currency-input.njk' import currencyInput %}
 {% from 'app-components/heading.njk' import heading %}
 
@@ -14,14 +15,22 @@
 		errors: errors
 	}) }}
 
+	{{ govukWarningText({
+		text: 'To be completed by the Market Access Analysts',
+		iconFallbackText: 'Warning'
+	}) }}
+
 	<form action="{{ urls.barriers.assessment.economyValue( barrier.id ) }}" method="POST" class="restrict-width">
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
 		{{ currencyInput( {
 
 			label: {
-				text: 'What is the total value of the barrier to the UK economy per year?',
+				text: 'What is the total value of the barrier to the UK economy?',
 				classes: 'govuk-label--s'
+			},
+			hint: {
+				text: 'The estimated value of resolving the barrier to the UK economy in GBP per year.'
 			},
 			id: 'value',
 			name: 'value',
