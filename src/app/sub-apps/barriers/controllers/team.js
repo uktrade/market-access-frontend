@@ -117,7 +117,7 @@ module.exports = {
 
 					if( response.isSuccess ){
 
-						users = body.map( createMemberForTemplate );
+						users = body.results.map( createMemberForTemplate );
 
 					} else {
 

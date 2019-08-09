@@ -1,11 +1,20 @@
 {
 	"$schema": "http://json-schema.org/draft-04/schema#",
-	"title": "Details of a contact",
+	"title": "User search results from SSO",
 
-	"type": "array",
-	"minItems": 400,
-	"maxItems": 450,
-	"items": {
-		"$ref": "$refs/sso.json#/user"
+	"type": "object",
+	"required": [ "count", "results" ],
+	"properties": {
+
+		"count": { "$ref": "$refs/common.json#/int" },
+
+		"results": {
+			"type": "array",
+			"minItems": 2,
+			"maxItems": 5,
+			"items": {
+				"$ref": "$refs/sso.json#/user"
+			}
+		}
 	}
 }
