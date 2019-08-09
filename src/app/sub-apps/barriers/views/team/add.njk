@@ -33,7 +33,7 @@
 
 	{{ barrierTabs( barrier.id, 'team' ) }}
 
-	{{ barrierTeamList( members ) }}
+	{{ barrierTeamList( members, barrier ) }}
 
 	{%- if errors and errors.length %}
 			{{- govukErrorSummary( {

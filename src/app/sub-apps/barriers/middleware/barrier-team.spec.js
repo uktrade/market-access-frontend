@@ -66,23 +66,27 @@ describe( 'Barrier Team middleware', () => {
 	} );
 
 	describe( 'When the backend resolves with success', () => {
-		it( 'Calls next with an error', async () => {
+		it( 'Adds the members to the req and locals', async () => {
 
 			const body = jasmine.helpers.getFakeData( '/backend/barriers/members' );
 			const responseData = {
 				response: { isSuccess: true },
 				body
 			};
+			const members = body.results.map( ( member ) => ({
+				id: member.id,
+				name: `${ member.user.first_name } ${ member.user.last_name }`,
+				email: member.user.email,
+				role: member.role
+			}) );
 			get.and.callFake( () => Promise.resolve( responseData ) );
 
 			await middleware( req, res, next );
 
+
 			expect( next ).toHaveBeenCalledWith();
-			expect( res.locals.members ).toEqual( body.results.map( ( member ) => ({
-				name: `${ member.user.first_name } ${ member.user.last_name }`,
-				email: member.user.email,
-				role: member.role
-			}) ) );
+			expect( req.members ).toEqual( members );
+			expect( res.locals.members ).toEqual( members );
 		} );
 	} );
 } );

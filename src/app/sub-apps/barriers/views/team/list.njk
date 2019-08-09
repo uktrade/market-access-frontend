@@ -4,10 +4,11 @@
 {% from 'app-components/barrier-summary.njk' import barrierSummary %}
 {% from 'app-components/barrier-tabs.njk' import barrierTabs %}
 {% from 'app-components/barrier-team-list.njk' import barrierTeamList %}
+{% from 'barriers/views/macros/delete-team-member.njk' import deleteTeamMember %}
 
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Barrier team - List of members{% endblock %}
+{% block page_title %}{{ super() }} - Barrier team - {{ 'Delete member' if isDelete else 'List of members' }}{% endblock %}
 
 {% block body_script %}
 	{{ super() }}
@@ -27,11 +28,17 @@
 	</div>
 {% endblock %}
 
+{% block outsideContent %}
+	{% if isDelete %}
+		{{ deleteTeamMember( barrier.id, deleteMember, csrfToken ) }}
+	{% endif %}
+{% endblock %}
+
 {% block page_content %}
 
 	{{ barrierTabs( barrier.id, 'team' ) }}
 
-	{{ barrierTeamList( members ) }}
+	{{ barrierTeamList( members, barrier ) }}
 
 	<a href="{{ urls.barriers.team.search( barrier.id ) }}" class="govuk-button button--secondary">Add team member</a>
 

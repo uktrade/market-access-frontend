@@ -121,6 +121,19 @@ function transformUser( { response, body } ){
 	return { response, body };
 }
 
+function transformSsoUser( { response, body } ){
+
+	if( response.isSuccess ){
+
+		body = {
+			...body,
+			user_id: body.profile.sso_user_id,
+		};
+	}
+
+	return { response, body };
+}
+
 function getFilterParams( filters ){
 
 	const filterMap = {
@@ -222,7 +235,7 @@ module.exports = {
 	getUser: ( req ) => backend.get( '/whoami', getToken( req ) ).then( transformUser ),
 	ping: () => backend.get( '/ping.xml' ),
 	getCounts: ( req ) => backend.get( '/counts', getToken( req ) ),
-	getSsoUser: ( req, userId ) => backend.get( `/users/${ userId }`, getToken( req ) ),
+	getSsoUser: ( req, userId ) => backend.get( `/users/${ userId }`, getToken( req ) ).then( transformSsoUser ),
 
 	documents: {
 		create: ( req, fileName, fileSize ) => backend.post( '/documents', getToken( req ), {
@@ -386,7 +399,7 @@ module.exports = {
 				user: { profile: { sso_user_id: values.memberId } },
 				role: values.role,
 			} ),
-			remove: ( req, barrierId, userId ) => backend.delete( `/barriers/${ barrierId }/members/${ userId }`, getToken( req ) ),
+			delete: ( req, barrierMemberId ) => backend.delete( `/barriers/members/${ barrierMemberId }`, getToken( req ) ),
 		}
 	},
 

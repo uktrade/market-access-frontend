@@ -38,10 +38,7 @@ module.exports = {
 
 				if( response.isSuccess ){
 
-					member = createMemberForTemplate( {
-						...body,
-						user_id: body.profile.sso_user_id,
-					} );
+					member = createMemberForTemplate( body );
 
 				} else {
 
@@ -139,5 +136,59 @@ module.exports = {
 			users,
 			error,
 		} );
+	},
+
+	delete: async ( req, res, next ) => {
+
+		const barrierId = req.barrier.id;
+		const memberId = parseInt( req.params.memberId, 10 );
+		const isPost = ( req.method === 'POST' );
+		const member = req.members.find( ( member ) => member.id === memberId );
+
+		if( !member ){
+
+			return next( new Error( 'No matching team member found' ) );
+		}
+
+		if( isPost ){
+
+			try {
+
+				const { response, body } = await backend.barriers.team.delete( req, memberId );
+
+				if( response.isSuccess ){
+
+					res.redirect( urls.barriers.team.list( barrierId ) );
+
+				} else {
+
+					throw new HttpResponseError( 'Unable to delete user', response, body );
+				}
+
+			} catch( e ){
+
+				next( e );
+			}
+
+		} else {
+
+			if( req.xhr ){
+
+				res.render( 'barriers/views/partials/delete-team-member-modal', {
+					barrierId,
+					member,
+					csrfToken: req.csrfToken()
+				} );
+
+			} else {
+
+				res.render( 'barriers/views/team/list', {
+					...detailViewModel( req.barrier ),
+					isDelete: true,
+					csrfToken: req.csrfToken(),
+					deleteMember: member,
+				});
+			}
+		}
 	},
 };

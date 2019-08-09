@@ -109,8 +109,9 @@ module.exports = ( express, app ) => {
 	app.post( '/:barrierId/team/add/', barrierTeam, controller.team.add );
 	app.get( '/:barrierId/team/add/search/', controller.team.search );
 	app.post( '/:barrierId/team/add/search/', controller.team.search );
-	//app.get( '/:barrierId/team/edit/:userId', controller.team.edit );
-	//app.post( '/:barrierId/team/remove/', controller.team.remove );
+	//app.get( '/:barrierId/team/edit/:memberId', controller.team.edit );
+	app.get( '/:barrierId/team/delete/:memberId', barrierTeam, controller.team.delete );
+	app.post( '/:barrierId/team/delete/:memberId', barrierTeam, controller.team.delete );
 
 	return app;
 };

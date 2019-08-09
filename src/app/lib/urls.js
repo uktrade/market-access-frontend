@@ -159,7 +159,7 @@ module.exports = {
 			},
 			search: ( barrierId ) => `/barriers/${ barrierId }/team/add/search/`,
 			//edit: ( barrierId, memberId ) => `/barriers/${ barrierId }/team/edit/${ memberId }`,
-			//remove: ( barrierId ) => `/barriers/${ barrierId }/team/remove/`
+			delete: ( barrierId, memberId ) => `/barriers/${ barrierId }/team/delete/${ memberId }`,
 		},
 	},
 

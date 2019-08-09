@@ -1,0 +1,25 @@
+{% from 'app-components/modal.njk' import modal %}
+{% from 'app-components/details-list.njk' import detailsList %}
+
+{% macro deleteTeamMember( barrierId, member, csrfToken ) %}
+	{% call modal(
+			{
+				title: 'Delete team member',
+				action: { url: urls.barriers.team.delete( barrierId, member.id ), text: 'Yes, delete' },
+				cancel: { url: urls.barriers.team.list( barrierId ), text: 'No, cancel' },
+				csrfToken: csrfToken
+			}
+		)
+	%}
+		{{ detailsList([
+			{
+				key: 'Name',
+				value: member.name
+			},{
+				key: 'Role',
+				value: member.role
+			}
+		])}}
+		<p>Are you sure you want to delete this team member?</p>
+	{% endcall %}
+{% endmacro %}

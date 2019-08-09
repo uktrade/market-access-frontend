@@ -136,12 +136,55 @@ describe( 'Backend Service', () => {
 	} );
 
 	describe( 'getSsoUser', () => {
-		it( 'Should call the correct path', async () => {
+		describe( 'When the response is not a success', () => {
+			it( 'Should call the correct path and return the response with body', async () => {
 
-			const userId = uuid();
-			await service.getSsoUser( req, userId );
+				const userId = uuid();
 
-			expect( backend.get ).toHaveBeenCalledWith( `/users/${ userId }`, token );
+				backend.get.and.callFake( () => Promise.reject( {
+					response: { isSuccess: false }
+				} ));
+
+				try {
+
+					await service.getSsoUser( req, userId );
+					fail();
+
+				} catch( e ){
+
+					expect( backend.get ).toHaveBeenCalledWith( `/users/${ userId }`, token );
+				}
+			} );
+		} );
+
+		describe( 'When the response is a success', () => {
+			it( 'Should call the correct path', async () => {
+
+				const userId = uuid();
+				const mockBody = {
+					id: 123,
+					first_name: 'abc',
+					last_name: 'def',
+					profile: {
+						sso_user_id: uuid(),
+					}
+				};
+				const expectedBody = {
+					...JSON.parse( JSON.stringify( mockBody, null, 2 ) ),
+					user_id: mockBody.profile.sso_user_id,
+				};
+
+				backend.get.and.callFake( () => Promise.resolve( {
+					response: { isSuccess: true },
+					body: mockBody,
+				} ));
+
+				const { response, body } = await service.getSsoUser( req, userId );
+
+				expect( backend.get ).toHaveBeenCalledWith( `/users/${ userId }`, token );
+				expect( response.isSuccess ).toEqual( true );
+				expect( body ).toEqual( expectedBody );
+			} );
 		} );
 	} );
 
@@ -1061,14 +1104,14 @@ describe( 'Backend Service', () => {
 				} );
 			} );
 
-			describe( 'remove', () => {
+			describe( 'delete', () => {
 				it( 'Should DELETE to the correct path', async () => {
 
-					const userId = uuid();
+					const memberId = uuid();
 
-					await service.barriers.team.remove( req, barrierId, userId );
+					await service.barriers.team.delete( req, memberId );
 
-					expect( backend.delete ).toHaveBeenCalledWith( `/barriers/${ barrierId }/members/${ userId }`, token );
+					expect( backend.delete ).toHaveBeenCalledWith( `/barriers/members/${ memberId }`, token );
 				} );
 			} );
 		} );

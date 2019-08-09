@@ -9,11 +9,13 @@ module.exports = async ( req, res, next ) => {
 
 		if( response.isSuccess ){
 
-			res.locals.members = body.results.map( ( member ) => ({
+			req.members = body.results.map( ( member ) => ({
+				id: member.id,
 				name: `${ member.user.first_name } ${ member.user.last_name }`,
 				email: member.user.email,
 				role: member.role
 			}) );
+			res.locals.members = req.members;
 			next();
 
 		} else {

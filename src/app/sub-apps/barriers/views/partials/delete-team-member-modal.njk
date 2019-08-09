@@ -1,0 +1,3 @@
+{% from 'barriers/views/macros/delete-team-member.njk' import deleteTeamMember %}
+
+{{ deleteTeamMember( barrier.id, member, csrfToken ) }}
