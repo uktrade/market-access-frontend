@@ -68,7 +68,7 @@ module.exports = {
 
 				try {
 
-					const { response } = await backend.barriers.team.add( req, barrierId, form.getValues() );
+					const { response, body } = await backend.barriers.team.add( req, barrierId, form.getValues() );
 
 					if( response.isSuccess ){
 
@@ -77,7 +77,7 @@ module.exports = {
 					} else {
 
 						error = 'There was an error adding the user, try again';
-						reporter.message( 'error', 'Unable to add user to team', { member, barrierId, response } );
+						reporter.message( 'error', 'Unable to add user to team', { member, barrierId, response, body } );
 					}
 
 				} catch ( e ){
@@ -111,6 +111,7 @@ module.exports = {
 			if( !form.hasErrors() ){
 
 				const { query } = form.getValues();
+
 				try {
 
 					const { response, body } = await sso.users.search( query );
