@@ -101,6 +101,7 @@ aliases:
       REDIS_BASE_URL: redis://localhost
       SLACK_WEBHOOK: ''
       RESOURCE_SERVER_USER_INFO_URL: 'http://localhost:5000/api/v1/user/me/'
+      RESOURCE_SERVER_USER_INTROSPECT_URL: 'http://localhost:5000/api/v1/user/introspect/'
     command: ./start-wait-for-db.sh
 
 jobs:
