@@ -113,7 +113,7 @@ describe( 'Team controller', () => {
 			} );
 
 			describe( 'When getSsoUser is not a success', () => {
-				it( 'Adds the member to locals', async () => {
+				it( 'Calls next with an error', async () => {
 
 					backend.getSsoUser.and.callFake( () => Promise.resolve( {
 						response: { isSuccess: false },
@@ -231,19 +231,51 @@ describe( 'Team controller', () => {
 					} );
 
 					describe( 'When the response is not a success', () => {
-						it( 'Sets the error and reports it', async () => {
+						describe( 'When it is a 400 status code', () => {
+							it( 'Sets the error and reports it', async () => {
 
-							const response = { isSuccess: false, a: 1 };
-							const body = 'Some error here';
-							backend.barriers.team.add.and.callFake( () => Promise.resolve({ response, body } ) );
+								const response = { isSuccess: false, a: 1, statusCode: 400 };
+								const body = 'Some error here';
 
-							await controller.add( req, res, next );
+								const error = 'The user is already a member of the team';
+								let member;
 
-							expect( reporter.message ).toHaveBeenCalledWith( 'error', 'Unable to add user to team', {
-								member: undefined,
-								barrierId: req.barrier.id,
-								response,
-								body,
+								backend.barriers.team.add.and.callFake( () => Promise.resolve( { response, body } ) );
+
+								await controller.add( req, res, next );
+
+								expect( reporter.message ).toHaveBeenCalledWith( 'error', 'User is already a member of the team', {
+									member,
+									barrierId: req.barrier.id,
+									response,
+									body,
+								} );
+
+								checkRender( member, error );
+							} );
+						} );
+
+						describe( 'When it is a 500 status code', () => {
+							it( 'Sets the error and reports it', async () => {
+
+								const response = { isSuccess: false, a: 1, statusCode: 500 };
+								const body = 'Some error here';
+
+								const error = 'There was an error adding the user, try again';
+								let member;
+
+								backend.barriers.team.add.and.callFake( () => Promise.resolve( { response, body } ) );
+
+								await controller.add( req, res, next );
+
+								expect( reporter.message ).toHaveBeenCalledWith( 'error', 'Unable to add user to team', {
+									member,
+									barrierId: req.barrier.id,
+									response,
+									body,
+								} );
+
+								checkRender( member, error );
 							} );
 						} );
 					} );

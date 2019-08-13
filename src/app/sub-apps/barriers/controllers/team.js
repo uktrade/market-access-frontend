@@ -76,8 +76,11 @@ module.exports = {
 
 					} else {
 
-						error = 'There was an error adding the user, try again';
-						reporter.message( 'error', 'Unable to add user to team', { member, barrierId, response, body } );
+						const is400 = ( response.statusCode === 400 );
+						const reporterError = ( is400 ? 'User is already a member of the team' : 'Unable to add user to team' );
+
+						error = ( is400 ? 'The user is already a member of the team' : 'There was an error adding the user, try again' );
+						reporter.message( 'error', reporterError, { member, barrierId, response, body } );
 					}
 
 				} catch ( e ){
