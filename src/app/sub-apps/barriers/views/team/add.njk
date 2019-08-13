@@ -1,0 +1,101 @@
+{% from 'components/select/macro.njk' import govukSelect %}
+{% from 'components/input/macro.njk' import govukInput %}
+{% from 'components/error-summary/macro.njk' import govukErrorSummary %}
+{% from "components/fieldset/macro.njk" import govukFieldset %}
+
+{% from 'app-components/barrier-summary.njk' import barrierSummary %}
+{% from 'app-components/barrier-tabs.njk' import barrierTabs %}
+{% from 'app-components/barrier-team-list.njk' import barrierTeamList %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ 'Error: ' if errors.length or error }}{{ super() }} - Barrier team - Add a member{% endblock %}
+
+{% block body_script %}
+	{{ super() }}
+	<script>
+		ma.pages.barrier.team( {
+			toggleLinks: {
+				text: 'Update the barrier',
+				linkClass: 'js-barrier-summary-link'
+			}
+		} );
+	</script>
+{% endblock %}
+
+{% block masthead %}
+	<div class="ma-masthead">
+		{{ barrierSummary( barrier ) }}
+	</div>
+{% endblock %}
+
+{% block page_content %}
+
+	{{ barrierTabs( barrier.id, 'team' ) }}
+
+	{{ barrierTeamList( members, barrier ) }}
+
+	{%- if errors and errors.length %}
+			{{- govukErrorSummary( {
+				titleText: 'There is a problem',
+				errorList: errors,
+				classes: 'restrict-width'
+			} ) -}}
+		{% endif %}
+
+		{% if error %}
+			<p class="error-message">{{ error }}</p>
+		{% endif %}
+
+		<form action="{{ urls.barriers.team.add( barrier.id, member.id ) }}" method="POST">
+			<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+			{% call govukFieldset({
+				legend: {
+					text: 'Team member',
+					classes: "govuk-fieldset__legend--l"
+				}
+			}) %}
+
+				{% if member %}
+
+					<div class="static-form-group">
+						<span class="static-form-group__label">Name</span>
+						<span class="static-form-group__value">{{ member.name }}</span>
+					</div>
+					<input type="hidden" name="memberId" value="{{ member.id }}">
+
+				{% else %}
+
+					{{ govukSelect({
+						id: 'user',
+						name: 'memberId',
+						label: {
+							text: 'Find a user',
+							classes: 'govuk-label--s'
+						},
+						items: user,
+						error: errors | errorForName( 'memberId' )
+					}) }}
+
+				{% endif %}
+
+				{{ govukInput({
+					id: 'role',
+					name: 'role',
+					label: {
+						text: 'Role',
+						classes: 'govuk-label--s'
+					},
+					value: role,
+					error: errors | errorForName( 'role' )
+				}) }}
+
+			{% endcall %}
+
+			<input type="submit" value="Save" class="govuk-button">
+			<a href="{{ urls.barriers.team.list( barrier.id ) }}" class="govuk-button button--secondary">Cancel</a>
+		</form>
+
+{% endblock %}
+

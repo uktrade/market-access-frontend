@@ -9,6 +9,7 @@ const documentIdParam = require( './middleware/params/document-id' );
 const barrierTypeCategoryParam = require( './middleware/params/barrier-type-category' );
 const companyIdParam = require( './middleware/params/company-id' );
 const uuidParam = require( '../../middleware/params/uuid' );
+const barrierTeam = require( './middleware/barrier-team' );
 
 const csrfProtection = csurf();
 
@@ -102,6 +103,15 @@ module.exports = ( express, app ) => {
 	app.post( '/:barrierId/companies/search/', controller.companies.search );
 	app.get( '/:barrierId/companies/:companyId/', controller.companies.details );
 	app.post( '/:barrierId/companies/:companyId/', controller.companies.details );
+
+	app.get( '/:barrierId/team/', barrierTeam, controller.team.list );
+	app.get( '/:barrierId/team/add/', barrierTeam, controller.team.add );
+	app.post( '/:barrierId/team/add/', barrierTeam, controller.team.add );
+	app.get( '/:barrierId/team/add/search/', controller.team.search );
+	app.post( '/:barrierId/team/add/search/', controller.team.search );
+	//app.get( '/:barrierId/team/edit/:memberId', controller.team.edit );
+	app.get( '/:barrierId/team/delete/:memberId', barrierTeam, controller.team.delete );
+	app.post( '/:barrierId/team/delete/:memberId', barrierTeam, controller.team.delete );
 
 	return app;
 };

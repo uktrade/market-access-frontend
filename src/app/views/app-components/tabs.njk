@@ -10,8 +10,8 @@
 	{%- endif -%}
 {% endmacro %}
 
-{% macro tabs( items ) %}
-	<ul class="page-tabs">
+{% macro tabs( items, params ) %}
+	<ul class="page-tabs{{ ( ' ' + params.classes ) if params.classes }}">
 		{%- for item in items %}
 			{{- tab( item ) -}}
 		{%- endfor %}

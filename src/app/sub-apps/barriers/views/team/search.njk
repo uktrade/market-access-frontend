@@ -1,0 +1,68 @@
+{% from 'app-components/search-form.njk' import searchForm %}
+{% from 'app-components/heading.njk' import heading %}
+{% from 'app-components/selection-list.njk' import companiesList %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Barrier team - Find user{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.barriers.team.list( barrier.id ) },
+		caption: barrier.barrier_title,
+		text: 'Name of user',
+		errors: errors
+	}) }}
+
+	<div class="restrict-width">
+
+		{{ searchForm( {
+				action: urls.barriers.team.search( barrier.id ),
+				label: {
+					text: 'Find a user'
+				},
+				csrfToken: csrfToken,
+				input: {
+					id: 'user',
+					name: 'query',
+					value: query,
+					placeholder: 'Search for user',
+					error: errors | errorForName( 'query' )
+				}
+			} )
+		}}
+
+		{% if error %}
+			<p class="error-message">{{ error }}</p>
+		{% endif %}
+
+		{% if users %}
+
+			<h2 class="results-count">
+				<span class="results-count__number">{{ users.length }}</span>
+				users match <span class="highlight">{{ query }}</span>
+			</h2>
+
+			<ul class="company-card-list">
+			{% for user in users %}
+				<li class="company-card">
+					<a href="{{ urls.barriers.team.add( barrier.id, user.id ) }}#role" class="company-card__link">
+
+						<h3 class="company-card__heading">{{ user.name | highlight( query ) | safe }}</h3>
+						<dl class="company-card__values">
+							<dt class="company-card__values__key">Email</dt>
+							<dd class="company-card__values__value">{{ user.email }}</dd>
+						</dl>
+
+					</a>
+				</li>
+			{% endfor %}
+			</ul>
+
+		{% endif %}
+
+		<a href="{{ urls.barriers.team.list( barrier.id ) }}" class="govuk-button button--secondary">Cancel</a>
+
+{% endblock %}
+

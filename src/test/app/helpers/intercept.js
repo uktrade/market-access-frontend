@@ -10,6 +10,7 @@ if( typeof jasmine !== 'undefined' ){
 
 		backend: () => nock( config.backend.url ),
 		datahub: () => nock( config.datahub.url ),
+		sso: () => nock( `${ config.sso.protocol }://${ config.sso.domain }:${ config.sso.port }` ),
 		stub: ( file ) => getFakeData( file )
 	};
 }

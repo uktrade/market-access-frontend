@@ -262,6 +262,40 @@ describe( 'URLs', () => {
 				expect( urls.barriers.companies.details( barrierId, companyId ) ).toEqual( `/barriers/${ barrierId }/companies/${ companyId }/` );
 			} );
 		} );
+
+		describe( 'team', () => {
+			describe( 'list', () => {
+				it( 'Should return the correct paths', () => {
+
+					expect( urls.barriers.team.list( barrierId ) ).toEqual( `/barriers/${ barrierId }/team/` );
+				});
+			} );
+
+			describe( 'add', () => {
+				describe( 'Without a memberId', () => {
+					it( 'Should return the correct paths', () => {
+
+						expect( urls.barriers.team.add( barrierId ) ).toEqual( `/barriers/${ barrierId }/team/add/` );
+					});
+				} );
+
+				describe( 'With a memberId', () => {
+					it( 'Should return the correct paths', () => {
+
+						const memberId = uuid();
+
+						expect( urls.barriers.team.add( barrierId, memberId ) ).toEqual( `/barriers/${ barrierId }/team/add/?user=${ memberId }` );
+					});
+				} );
+			} );
+
+			describe( 'search', () => {
+				it( 'Should return the correct paths', () => {
+
+					expect( urls.barriers.team.search( barrierId ) ).toEqual( `/barriers/${ barrierId }/team/add/search/` );
+				});
+			} );
+		} );
 	} );
 
 	describe( 'Report urls', () => {

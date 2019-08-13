@@ -44,7 +44,7 @@ const reportUrl = {
 	delete: ( reportId ) => `/reports/${ reportId }/delete/`,
 };
 
-function addParams( path, map = [] ){
+function addParams( path, map = {} ){
 
 	const params = [];
 
@@ -143,6 +143,23 @@ module.exports = {
 			details: ( barrierId, companyId ) => `/barriers/${ barrierId }/companies/${ companyId }/`,
 			search: ( barrierId ) => `/barriers/${ barrierId }/companies/search/`,
 			remove: ( barrierId ) => `/barriers/${ barrierId }/companies/remove/`
+		},
+		team: {
+			list: ( barrierId ) => `/barriers/${ barrierId }/team/`,
+			add: ( barrierId, memberId ) => {
+
+				const path = `/barriers/${ barrierId }/team/add/`;
+
+				if( typeof memberId !== 'undefined' ){
+
+					return addParams( path, { user: memberId } );
+				}
+
+				return path;
+			},
+			search: ( barrierId ) => `/barriers/${ barrierId }/team/add/search/`,
+			//edit: ( barrierId, memberId ) => `/barriers/${ barrierId }/team/edit/${ memberId }`,
+			delete: ( barrierId, memberId ) => `/barriers/${ barrierId }/team/delete/${ memberId }`,
 		},
 	},
 

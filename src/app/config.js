@@ -137,6 +137,9 @@ let config = {
 		client: requiredEnv( 'SSO_CLIENT' ),
 		secret: requiredEnv( 'SSO_SECRET' ),
 		mockCode: env( 'SSO_MOCK_CODE' ),
+		api: {
+			token: requiredEnv( 'SSO_API_TOKEN' ),
+		},
 		path: {
 			auth: requiredEnv( 'SSO_PATH_AUTH' ),
 			token: requiredEnv( 'SSO_PATH_TOKEN' ),

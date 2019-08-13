@@ -1,0 +1,29 @@
+{% from 'macros/standard-table-heading.njk' import tableHeading %}
+
+{% macro barrierTeamList( team, barrier ) %}
+	{% if team.length %}
+		<table class="standard-table standard-table--barrier-team">
+			<caption class="visually-hidden">List of team members for this barrier</caption>
+			<thead>
+				<tr class="standard-table__heading-row">
+					{{ tableHeading( 'Name' ) }}
+					{# {{ tableHeading( 'Contact details' ) }} #}
+					{{ tableHeading( 'Role' ) }}
+					{{ tableHeading( 'Action') }}
+				</tr>
+			</thead>
+			<tbody class="js-delete-modal-container">
+				{% for user in team %}
+					<tr class="standard-table__row">
+						<td class="standard-table__cell">{{ user.name }}</td>
+						{# <td class="standard-table__cell">{{ user.email | default( 'unknown' ) }}</td> #}
+						<td class="standard-table__cell">{{ user.role }}</td>
+						<td class="standard-table__cell">
+							{% if loop.index !== 1 %}<a class="js-delete-modal" href="{{ urls.barriers.team.delete( barrier.id, user.id ) }}">Delete</a>{% endif %}
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	{% endif %}
+{% endmacro %}
