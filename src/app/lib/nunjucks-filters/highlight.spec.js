@@ -24,12 +24,26 @@ describe( 'Highlight filter', () => {
 					expect( highlight( 'this is a Matching string', 'match' ) ).toEqual( 'this is a <span class="highlight">Match</span>ing string' );
 				} );
 			} );
+
+			describe( 'When the match is a number', () => {
+				it( 'Should wrap the match', () => {
+
+					expect( highlight( 'my string 1', 1 ) ).toEqual( 'my string <span class="highlight">1</span>' );
+				} );
+			} );
 		} );
 
 		describe( 'When there is a double match', () => {
 			it( 'Should wrap both matches', () => {
 
 				expect( highlight( 'this is a matching string with two matching examples', 'matching' ) ).toEqual( 'this is a <span class="highlight">matching</span> string with two <span class="highlight">matching</span> examples' );
+			} );
+		} );
+
+		describe( 'When the string is empty', () => {
+			it( 'Should return the string', () => {
+
+				expect( highlight( 'a string with no matches', '' ) ).toEqual( 'a string with no matches' );
 			} );
 		} );
 	} );
