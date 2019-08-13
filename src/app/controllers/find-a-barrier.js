@@ -16,8 +16,14 @@ module.exports = {
 
 				const editListParam = req.query.editList;
 				const isEdit = !!editListParam;
-				const editListIndex = ( !!isEdit && parseInt( editListParam, 10 ) );
-				const editList = ( isEdit && req.watchList.lists[ editListIndex ] );
+				let editListIndex;
+				let editList;
+
+				if( isEdit ){
+
+					editListIndex = parseInt( editListParam, 10 );
+					editList = req.watchList.lists[ editListIndex ];
+				}
 
 				res.render( 'find-a-barrier', viewModel( {
 					count: body.count,
