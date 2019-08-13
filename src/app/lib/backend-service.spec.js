@@ -136,13 +136,28 @@ describe( 'Backend Service', () => {
 	} );
 
 	describe( 'getSsoUser', () => {
-		describe( 'When the response is not a success', () => {
+
+		let mockBody;
+		let userId;
+
+		beforeEach( () => {
+
+			userId = uuid();
+			mockBody = {
+				id: 123,
+				first_name: 'abc',
+				last_name: 'def',
+				profile: {
+					sso_user_id: uuid(),
+				}
+			};
+		} );
+
+		describe( 'When the response errors', () => {
 			it( 'Should call the correct path and return the response with body', async () => {
 
-				const userId = uuid();
-
 				backend.get.and.callFake( () => Promise.reject( {
-					response: { isSuccess: false }
+					response: { isSuccess: false },
 				} ));
 
 				try {
@@ -157,18 +172,25 @@ describe( 'Backend Service', () => {
 			} );
 		} );
 
+		describe( 'When the response is not a success', () => {
+			it( 'Should return the response', async () => {
+
+				backend.get.and.returnValue( Promise.resolve( {
+					response: { isSuccess: false },
+					body: mockBody
+				} ) );
+
+				const { response, body } = await service.getSsoUser( req, userId );
+
+				expect( backend.get ).toHaveBeenCalledWith( `/users/${ userId }`, token );
+				expect( response.isSuccess ).toEqual( false );
+				expect( body ).toEqual( mockBody );
+			} );
+		} );
+
 		describe( 'When the response is a success', () => {
 			it( 'Should call the correct path', async () => {
 
-				const userId = uuid();
-				const mockBody = {
-					id: 123,
-					first_name: 'abc',
-					last_name: 'def',
-					profile: {
-						sso_user_id: uuid(),
-					}
-				};
 				const expectedBody = {
 					...JSON.parse( JSON.stringify( mockBody, null, 2 ) ),
 					user_id: mockBody.profile.sso_user_id,
