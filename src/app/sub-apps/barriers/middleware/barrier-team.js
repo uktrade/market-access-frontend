@@ -1,6 +1,18 @@
 const backend = require( '../../../lib/backend-service' );
 const HttpResponseError = require( '../../../lib/HttpResponseError' );
 
+function getName( { email, first_name: fname, last_name: lname } ){
+
+	if( fname || lname ){
+
+		return `${ fname } ${ lname }`;
+
+	} else {
+
+		return email.split( '@' )[ 0 ];
+	}
+}
+
 module.exports = async ( req, res, next ) => {
 
 	try {
@@ -11,10 +23,11 @@ module.exports = async ( req, res, next ) => {
 
 			req.members = body.results.map( ( member ) => ({
 				id: member.id,
-				name: `${ member.user.first_name } ${ member.user.last_name }`,
+				name: getName( member.user ),
 				email: member.user.email,
-				role: member.role
-			}) );
+				role: member.role,
+				isCreator: member.default,
+			} ) );
 			res.locals.members = req.members;
 			next();
 

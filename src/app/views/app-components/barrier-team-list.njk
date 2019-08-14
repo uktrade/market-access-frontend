@@ -19,7 +19,7 @@
 						{# <td class="standard-table__cell">{{ user.email | default( 'unknown' ) }}</td> #}
 						<td class="standard-table__cell">{{ user.role }}</td>
 						<td class="standard-table__cell">
-							{% if loop.index !== 1 %}<a class="js-delete-modal" href="{{ urls.barriers.team.delete( barrier.id, user.id ) }}">Delete</a>{% endif %}
+							{% if not user.isCreator %}<a class="js-delete-modal" href="{{ urls.barriers.team.delete( barrier.id, user.id ) }}">Delete</a>{% endif %}
 						</td>
 					</tr>
 				{% endfor %}

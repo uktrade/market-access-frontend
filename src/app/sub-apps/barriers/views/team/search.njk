@@ -44,16 +44,16 @@
 				users match <span class="highlight">{{ query }}</span>
 			</h2>
 
-			<ul class="company-card-list">
+			<ul class="search-card-list">
 			{% for user in users %}
-				<li class="company-card">
-					<a href="{{ urls.barriers.team.add( barrier.id, user.id ) }}#role" class="company-card__link">
+				<li class="search-card">
+					<a href="{{ urls.barriers.team.add( barrier.id, user.id ) }}#role" class="search-card__link">
 
-						<h3 class="company-card__heading">{{ user.name | highlight( query ) | safe }}</h3>
-						<dl class="company-card__values">
-							<dt class="company-card__values__key">Email</dt>
-							<dd class="company-card__values__value">{{ user.email }}</dd>
-						</dl>
+						<h3 class="search-card__heading">{{ user.name | highlight( query ) | safe }}</h3>
+						{# <dl class="search-card__values">
+							<dt class="search-card__values__key">Email</dt>
+							<dd class="search-card__values__value">{{ user.email }}</dd>
+						</dl> #}
 
 					</a>
 				</li>
