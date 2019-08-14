@@ -53,4 +53,5 @@ module.exports = {
 	isBarrierPriority: ( value ) => metadata.barrierPriorities.some( ( priority ) => priority.code === value ),
 	isCountryOrAdminArea: ( id ) => isCountry( id ) || isCountryAdminArea( id ),
 	isBarrierStatus: ( id ) => metadata.barrierStatuses.hasOwnProperty( id ),
+	isCreatedBy: ( id ) => metadata.barrier.createdBy.items.hasOwnProperty( id ),
 };

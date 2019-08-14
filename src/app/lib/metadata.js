@@ -1,4 +1,5 @@
 const backend = require( './backend-request' );
+const govukItemsFromObject = require( './govuk-items-from-object' );
 
 let countries;
 let adminAreasByCountry;
@@ -119,14 +120,15 @@ function createList( items, text ){
 	return list;
 }
 
-function createAdminAreaList (country, adminAreas, text) {
+function createAdminAreaList( country, adminAreas, text ){
 
-	const adminAreaList = adminAreas[country].map( ( adminArea ) => ( {
+	const adminAreaList = adminAreas[ country ].map( ( adminArea ) => ( {
 		value: adminArea.id,
 		text: adminArea.name
 	} ) );
 
 	adminAreaList.unshift( { value: '', text } );
+
 	return adminAreaList;
 }
 
@@ -277,12 +279,12 @@ module.exports.getBarrierPrioritiesList = ( opts = {} ) => barrierPriorities.map
 	html: `<span class="priority-marker priority-marker--${ code.toLowerCase() }"></span>` + ( opts.suffix === false ? name : `<strong>${ name }</strong> priority` )
 }) );
 
-module.exports.getCountryAdminAreasList = ( countryId, defaultText = 'Select an admin area') => createAdminAreaList(countryId, adminAreasByCountry, defaultText);
+module.exports.getCountryAdminAreasList = ( countryId, defaultText = 'Select an admin area' ) => createAdminAreaList( countryId, adminAreasByCountry, defaultText );
 module.exports.isCountryWithAdminArea = ( countryId ) => countryId in adminAreasByCountry;
 module.exports.getAdminArea = ( adminAreaId ) => adminAreas.find( ( AdminArea ) => AdminArea.id === adminAreaId );
 
 module.exports.getBarrierStatus = ( id ) => barrierStatuses[ id ];
-module.exports.getBarrierStatusList = () => Object.entries( barrierStatuses ).map( ( [ id, name ] ) => ({ value: id, text: name }) );
+module.exports.getBarrierStatusList = () => govukItemsFromObject( barrierStatuses );
 
 module.exports.barrier = {
 	status: {
@@ -303,8 +305,17 @@ module.exports.barrier = {
 		codes: {
 			UNKNOWN: 'UNKNOWN',
 		}
-	}
+	},
+	createdBy: {
+		items: {
+			'1': 'My barriers',
+			'2': 'My team barriers',
+		}
+	},
 };
+
+module.exports.getBarrierCreatedBy = ( id ) => module.exports.barrier.createdBy.items[ id ];
+module.exports.getBarrierCreatedByList = () => govukItemsFromObject( module.exports.barrier.createdBy.items );
 
 module.exports.mimeTypes = {
 	'image/gif': '.gif',
