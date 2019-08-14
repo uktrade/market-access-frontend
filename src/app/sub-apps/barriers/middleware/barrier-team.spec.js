@@ -91,6 +91,7 @@ describe( 'Barrier Team middleware', () => {
 					name,
 					email,
 					role: member.role,
+					isCreator: member.default,
 				};
 			} );
 

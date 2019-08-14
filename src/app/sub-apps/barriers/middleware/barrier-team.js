@@ -26,6 +26,7 @@ module.exports = async ( req, res, next ) => {
 				name: getName( member.user ),
 				email: member.user.email,
 				role: member.role,
+				isCreator: member.default,
 			} ) );
 			res.locals.members = req.members;
 			next();
