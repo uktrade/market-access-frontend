@@ -73,16 +73,30 @@ describe( 'Barrier Team middleware', () => {
 				response: { isSuccess: true },
 				body
 			};
-			const members = body.results.map( ( member ) => ({
-				id: member.id,
-				name: `${ member.user.first_name } ${ member.user.last_name }`,
-				email: member.user.email,
-				role: member.role
-			}) );
+			const members = body.results.map( ( member ) => {
+
+				const { email, first_name: fname, last_name: lname } = member.user;
+				let name;
+
+				if( fname || lname ){
+
+					name = ( `${ fname } ${ lname }` );
+
+				} else {
+					name = email.split( '@' )[ 0 ];
+				}
+
+				return {
+					id: member.id,
+					name,
+					email,
+					role: member.role,
+				};
+			} );
+
 			get.and.callFake( () => Promise.resolve( responseData ) );
 
 			await middleware( req, res, next );
-
 
 			expect( next ).toHaveBeenCalledWith();
 			expect( req.members ).toEqual( members );
