@@ -464,7 +464,7 @@ describe( 'Backend Service', () => {
 
 						const createdBy = '1,2';
 
-						testWithOrdering( { createdBy }, `user=1&team=1` );
+						testWithOrdering( { createdBy }, `team=1` );
 					} );
 				} );
 			} );

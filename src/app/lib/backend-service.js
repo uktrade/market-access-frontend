@@ -165,8 +165,14 @@ function getFilterParams( filters ){
 
 				case 'createdBy':
 
-					if( value.includes( '1' ) ){ params.push( 'user=1' ); }
-					if( value.includes( '2' ) ){ params.push( 'team=1' ); }
+					if( value.includes( '2' ) ){
+
+						params.push( 'team=1' );
+
+					} else if( value.includes( '1' ) ){
+
+						params.push( 'user=1' );
+					}
 					break;
 
 				default:
