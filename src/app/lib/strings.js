@@ -8,7 +8,7 @@ module.exports = {
 
 		const countryName = ( metadata.getCountry( country ) || {} ).name;
 		const adminAreasString = adminAreas ? adminAreas.map(
-			(adminAreaId) => ( metadata.getAdminArea( adminAreaId ) || {} ).name
+			( adminAreaId ) => ( metadata.getAdminArea( adminAreaId ) || {} ).name
 		).join( DELIMITER ) : '';
 
 		return adminAreasString ? `${ adminAreasString } (${ countryName })` : countryName;
@@ -44,5 +44,6 @@ module.exports = {
 	},
 	types: ( ids = [] ) => ids.map( ( id ) => metadata.getBarrierType( id ).title ).join( DELIMITER ),
 	priorities: ( ids = [] ) => ids.map( ( id ) => metadata.getBarrierPriority( id ).name ).join( DELIMITER ),
-	statuses: ( ids = [] ) => ids.map( ( id ) => metadata.getBarrierStatus( id ) ).join( DELIMITER ),
+	statuses: ( ids = [] ) => ids.map( metadata.getBarrierStatus ).join( DELIMITER ),
+	createdBy: ( ids = [] ) => ids.map( metadata.getBarrierCreatedBy ).join( DELIMITER ),
 };

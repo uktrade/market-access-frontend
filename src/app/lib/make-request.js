@@ -56,7 +56,8 @@ function createPromiseRequest( requestOptions, hawkParams, clientHeader ){
 			} else {
 
 				const statusCode = response.statusCode;
-				const isJson = ( response.headers[ 'content-type' ] === 'application/json' );
+				const contentTypeHeader = response.headers[ 'content-type' ];
+				const isJson = ( contentTypeHeader && contentTypeHeader.includes( 'application/json' ) );
 
 				logger.verbose( `Response code: ${ response.statusCode } for ${ uri }` );
 
@@ -96,7 +97,7 @@ function createPromiseRequest( requestOptions, hawkParams, clientHeader ){
 
 				const body = parseBody( uri, isJson, responseBody );
 
-				response.isSuccess = ( statusCode >= 200 && statusCode <= 300 );
+				response.isSuccess = ( statusCode >= 200 && statusCode < 300 );
 
 				if( response.isSuccess || statusCode === 404 || statusCode === 400 ){
 

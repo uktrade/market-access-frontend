@@ -1,0 +1,21 @@
+{
+	"user":{
+		"type": "object",
+		"required": [ "user_id", "first_name", "last_name", "email" ],
+		"properties": {
+			"user_id": { "$ref": "./common.json#/uuid" },
+			"first_name": {
+				"type": "string",
+				"faker": "name.firstName"
+			},
+			"last_name": {
+				"type": "string",
+				"faker": "name.lastName"
+			},
+			"email": {
+				"type": "string",
+				"faker": "internet.email"
+			}
+		}
+	}
+}

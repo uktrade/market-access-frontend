@@ -1,8 +1,8 @@
 const supertest = require( 'supertest' );
 const proxyquire = require( 'proxyquire' );
-//const winston = require( 'winston' );
 const nock = require( 'nock' );
 const uuid = require( 'uuid' );
+const faker = require( 'faker' );
 
 const urls = require( './lib/urls' );
 const logger = require( './lib/logger' );
@@ -566,6 +566,11 @@ describe( 'App', function(){
 									.get( url )
 									.end( ( err, res ) => {
 
+										if( err ){
+
+											done.fail( err );
+										}
+
 										token = getCsrfToken( res, done.fail );
 										done();
 									} );
@@ -870,6 +875,135 @@ describe( 'App', function(){
 													.end( checkRedirect( urls.barriers.location.list( barrierId ), done ) );
 											} );
 									} );
+							} );
+						} );
+					} );
+				} );
+
+				describe( 'Barrier Team', () => {
+
+					beforeEach( () => {
+
+						intercept.backend()
+							.get( `/barriers/${ barrierId }/members` )
+							.reply( 200, intercept.stub( '/backend/barriers/members' ) );
+					} );
+
+					describe( 'List', () => {
+						it( 'Should render the list', ( done ) => {
+
+							app.get( urls.barriers.team.list( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier team - List of members', done ) );
+						} );
+					} );
+
+					describe( 'Add', () => {
+						describe( 'A GET', () => {
+							it( 'Should render the page', ( done ) => {
+
+								app.get( urls.barriers.team.add( barrierId ) )
+									.end( checkPage( 'Market Access - Barrier team - Add a member', done ) );
+							} );
+						} );
+					} );
+
+					describe( 'Search', () => {
+						describe( 'A GET', () => {
+							it( 'Should render the page', ( done ) => {
+
+								app.get( urls.barriers.team.search( barrierId ) )
+									.end( checkPage( 'Market Access - Barrier team - Find user', done ) );
+							} );
+						} );
+
+						describe( 'a POST', () => {
+
+							let agent;
+							let token;
+							let url;
+							let text;
+
+							beforeEach( ( done ) => {
+
+								agent = supertest.agent( appInstance );
+								url = urls.barriers.team.search( barrierId );
+								text = faker.lorem.words( 2 );
+
+								agent
+									.get( url )
+									.end( ( err, res ) => {
+
+										if( err ){
+
+											done.fail( err );
+										}
+
+										token = getCsrfToken( res, done.fail );
+										done();
+									} );
+							} );
+
+							function doPost( code, cb ){
+								agent
+									.post( url )
+									.send( `_csrf=${ token }&query=${ text }` )
+									.expect( code )
+									.end( cb );
+							}
+
+							describe( 'With a success from sso', () => {
+								it( 'Should render the page', ( done ) => {
+
+									intercept.sso()
+										.get( `/api/v1/user/search/?autocomplete=${ encodeURIComponent( text ) }` )
+										.reply( 200, intercept.stub( '/sso/user/users' ) );
+
+									doPost( 200, checkPage( 'Market Access - Barrier team - Find user', done ) );
+								} );
+							} );
+
+							describe( 'With a 500 error from sso', () => {
+								it( 'Should render an error page', ( done ) => {
+
+									intercept.sso()
+										.get( `/api/v1/user/search/?autocomplete=${ encodeURIComponent( text ) }` )
+										.reply( 500, {} );
+
+									doPost( 500, checkPage( 'Market Access - Error', done, 500 ) );
+								} );
+							} );
+
+							describe( 'With a 403 error from sso', () => {
+								it( 'Should render an error page', ( done ) => {
+
+									intercept.sso()
+										.get( `/api/v1/user/search/?autocomplete=${ encodeURIComponent( text ) }` )
+										.reply( 403, {} );
+
+									doPost( 500, checkPage( 'Market Access - Error', done, 500 ) );
+								} );
+							} );
+						} );
+					} );
+
+					describe( 'Delete', () => {
+						describe( 'A GET', () => {
+							describe( 'When the id matches a team member', () => {
+								it( 'Should render the page', ( done ) => {
+
+									const users = intercept.stub( '/backend/barriers/members' ).results;
+
+									app.get( urls.barriers.team.delete( barrierId, users[ 1 ].id ) )
+										.end( checkPage( 'Market Access - Barrier team - Delete member', done ) );
+								} );
+							} );
+							describe( 'When the id does not match a member', () => {
+
+								it( 'Should render the page', ( done ) => {
+
+									app.get( urls.barriers.team.delete( barrierId, '12' ) )
+										.end( checkPage( 'Market Access - Error', done, 500 ) );
+								} );
 							} );
 						} );
 					} );

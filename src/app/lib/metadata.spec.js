@@ -604,6 +604,28 @@ describe( 'metadata', () => {
 			} );
 		} );
 
+		describe( 'getBarrierCreatedBy', () => {
+			it( 'Gets the item by key', () => {
+
+				expect( metadata.getBarrierCreatedBy( '1' ) ).toEqual( 'My barriers' );
+			} );
+		} );
+
+		describe( 'getBarrierCreatedByList', () => {
+			it( 'Gets the item by key', () => {
+
+				expect( metadata.getBarrierCreatedByList() ).toEqual( [
+					{
+						value: '1',
+						text: 'My barriers',
+					},{
+						value: '2',
+						text: 'My team barriers',
+					}
+				] );
+			} );
+		} );
+
 		describe( 'barrier', () => {
 			describe( 'status.types', () => {
 				it( 'Updates the name with the value from the metadata', () => {
@@ -661,6 +683,12 @@ describe( 'metadata', () => {
 					priority: {
 						codes: {
 							UNKNOWN: 'UNKNOWN'
+						}
+					},
+					createdBy: {
+						items: {
+							'1': 'My barriers',
+							'2': 'My team barriers',
 						}
 					},
 				} );

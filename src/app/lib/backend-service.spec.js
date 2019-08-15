@@ -135,6 +135,81 @@ describe( 'Backend Service', () => {
 		} );
 	} );
 
+	describe( 'getSsoUser', () => {
+
+		let mockBody;
+		let userId;
+
+		beforeEach( () => {
+
+			userId = uuid();
+			mockBody = {
+				id: 123,
+				first_name: 'abc',
+				last_name: 'def',
+				profile: {
+					sso_user_id: uuid(),
+				}
+			};
+		} );
+
+		describe( 'When the response errors', () => {
+			it( 'Should call the correct path and return the response with body', async () => {
+
+				backend.get.and.callFake( () => Promise.reject( {
+					response: { isSuccess: false },
+				} ));
+
+				try {
+
+					await service.getSsoUser( req, userId );
+					fail();
+
+				} catch( e ){
+
+					expect( backend.get ).toHaveBeenCalledWith( `/users/${ userId }`, token );
+				}
+			} );
+		} );
+
+		describe( 'When the response is not a success', () => {
+			it( 'Should return the response', async () => {
+
+				backend.get.and.returnValue( Promise.resolve( {
+					response: { isSuccess: false },
+					body: mockBody
+				} ) );
+
+				const { response, body } = await service.getSsoUser( req, userId );
+
+				expect( backend.get ).toHaveBeenCalledWith( `/users/${ userId }`, token );
+				expect( response.isSuccess ).toEqual( false );
+				expect( body ).toEqual( mockBody );
+			} );
+		} );
+
+		describe( 'When the response is a success', () => {
+			it( 'Should call the correct path', async () => {
+
+				const expectedBody = {
+					...JSON.parse( JSON.stringify( mockBody, null, 2 ) ),
+					user_id: mockBody.profile.sso_user_id,
+				};
+
+				backend.get.and.callFake( () => Promise.resolve( {
+					response: { isSuccess: true },
+					body: mockBody,
+				} ));
+
+				const { response, body } = await service.getSsoUser( req, userId );
+
+				expect( backend.get ).toHaveBeenCalledWith( `/users/${ userId }`, token );
+				expect( response.isSuccess ).toEqual( true );
+				expect( body ).toEqual( expectedBody );
+			} );
+		} );
+	} );
+
 	describe( 'Documents', () => {
 		describe( 'create', () => {
 			it( 'Should call the correct API', async () => {
@@ -365,12 +440,32 @@ describe( 'Backend Service', () => {
 				} );
 			} );
 
-			describe( 'With a user filter', () => {
-				it( 'Should call the correct path, urlencode the value, use default sort order', async () => {
+			describe( 'With a createdBy filter', () => {
+				describe( 'When the value is 1', () => {
+					it( 'Should call the correct path, urlencode the value, use default sort order', async () => {
 
-					const createdBy = '123';
+						const createdBy = '1';
 
-					testWithOrdering( { createdBy }, `user=1` );
+						testWithOrdering( { createdBy }, `user=1` );
+					} );
+				} );
+
+				describe( 'When the value is 2', () => {
+					it( 'Should call the correct path, urlencode the value, use default sort order', async () => {
+
+						const createdBy = '2';
+
+						testWithOrdering( { createdBy }, `team=1` );
+					} );
+				} );
+
+				describe( 'When the value is 1,2', () => {
+					it( 'Should call the correct path, urlencode the value, use default sort order', async () => {
+
+						const createdBy = '1,2';
+
+						testWithOrdering( { createdBy }, `team=1` );
+					} );
 				} );
 			} );
 		} );
@@ -1020,6 +1115,45 @@ describe( 'Backend Service', () => {
 
 				expect( backend.put ).toHaveBeenCalledWith( `/barriers/${ barrierId }`, token, {
 					problem_status: problemStatus
+				} );
+			} );
+		} );
+
+		describe( 'team', () => {
+			describe( 'get', () => {
+				it( 'Should GET the correct path', async () => {
+
+					await service.barriers.team.get( req, barrierId );
+
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers/${ barrierId }/members`, token );
+				} );
+			} );
+
+			describe( 'add', () => {
+				it( 'Should POST to the correct path with the correct values', async () => {
+
+					const values = {
+						memberId: uuid(),
+						role: 'A role here',
+					};
+
+					await service.barriers.team.add( req, barrierId, values );
+
+					expect( backend.post ).toHaveBeenCalledWith( `/barriers/${ barrierId }/members`, token, {
+						user: { profile: { sso_user_id: values.memberId } },
+						role: values.role,
+					} );
+				} );
+			} );
+
+			describe( 'delete', () => {
+				it( 'Should DELETE to the correct path', async () => {
+
+					const memberId = uuid();
+
+					await service.barriers.team.delete( req, memberId );
+
+					expect( backend.delete ).toHaveBeenCalledWith( `/barriers/members/${ memberId }`, token );
 				} );
 			} );
 		} );

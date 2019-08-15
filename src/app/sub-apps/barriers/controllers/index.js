@@ -6,4 +6,5 @@ module.exports = {
 	location: require('./location'),
 	sectors: require( './sectors' ),
 	companies: require( './companies' ),
+	team: require( './team' ),
 };

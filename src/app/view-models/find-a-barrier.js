@@ -87,8 +87,6 @@ module.exports = function( { count, barriers, filters, queryString, isEdit, edit
 		}
 	} );
 
-	const createdByInfo = barrierFilters.getDisplayInfo( 'createdBy', filters.createdBy );
-
 	return {
 		count,
 		barriers: barrierList,
@@ -142,8 +140,8 @@ module.exports = function( { count, barriers, filters, queryString, isEdit, edit
 				removeUrl: getRemoveUrl( filters, 'status' ),
 			},
 			createdBy: {
-				...createdByInfo,
-				items: [ { text: createdByInfo.text, value: 1 } ].map( isChecked( filters.createdBy ) ),
+				...barrierFilters.getDisplayInfo( 'createdBy', filters.createdBy ),
+				items: metadata.getBarrierCreatedByList().map( isChecked( filters.createdBy ) ),
 				active: !!filters.createdBy,
 				removeUrl: getRemoveUrl( filters, 'createdBy' ),
 			},

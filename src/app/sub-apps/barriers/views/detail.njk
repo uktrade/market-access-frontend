@@ -1,8 +1,9 @@
-{% from 'app-components/barrier-summary.njk' import barrierSummary %}
-{% from 'app-components/summary-group.njk' import summaryGroup %}
 {% from "components/textarea/macro.njk" import govukTextarea %}
 {% from "components/file-upload/macro.njk" import govukFileUpload %}
+{% from 'app-components/barrier-summary.njk' import barrierSummary %}
+{% from 'app-components/summary-group.njk' import summaryGroup %}
 {% from 'app-components/toast.njk' import toastAlert %}
+{% from 'app-components/barrier-tabs.njk' import barrierTabs %}
 {% from 'barriers/views/macros/delete-note.njk' import deleteNote %}
 
 {% extends 'layout.njk' %}
@@ -112,6 +113,10 @@
 	{% if toast and toast.heading %}
 		{{ toastAlert( toast ) }}
 	{% endif %}
+
+	{{
+		barrierTabs( barrier.id, 'detail' )
+	}}
 
 	{{ summaryGroup( {
 		heading: {

@@ -74,7 +74,7 @@ if( typeof jasmine !== 'undefined' ){
 
 		strings: () => {
 
-			const methods = [ 'location', 'locations', 'types', 'sectors', 'regions', 'priorities', 'statuses' ];
+			const methods = [ 'location', 'locations', 'types', 'sectors', 'regions', 'priorities', 'statuses', 'createdBy' ];
 			const spies =  {};
 
 			methods.forEach( ( name ) => {
@@ -121,6 +121,25 @@ if( typeof jasmine !== 'undefined' ){
 				list: createBarrierSessionSpies( 'list' ),
 				all: createBarrierSessionSpies( 'all' ),
 			}
-		})
+		}),
+
+		form: () => {
+
+			const getValuesResponse = { value1: faker.lorem.word(), value2: faker.lorem.word() };
+			const getTemplateValuesResponse = { template1: faker.lorem.word(), template2: faker.lorem.word() };
+			const form = {
+				getTemplateValues: jasmine.createSpy( 'form.getTemplateValues' ).and.returnValue( getTemplateValuesResponse ),
+				getValues: jasmine.createSpy( 'form.getValues' ).and.returnValue( getValuesResponse ),
+				validate: jasmine.createSpy( 'form.validate' ),
+				hasErrors: jasmine.createSpy( 'form.hasErrors' ),
+			};
+
+			return {
+				getValuesResponse,
+				getTemplateValuesResponse,
+				form,
+				Form: jasmine.createSpy( 'Form' ).and.returnValue( form )
+			};
+		},
 	};
 }

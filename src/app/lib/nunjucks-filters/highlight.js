@@ -1,6 +1,6 @@
 module.exports = ( input, match ) => {
 
-	if( typeof input === 'string' ){
+	if( match && typeof input === 'string' ){
 
 		const regex = new RegExp( '(' + match + ')', 'gi' );
 

@@ -13,6 +13,7 @@ const jsonFiles = {
 	'barriers/barrier': generateSchema( '/backend/barriers/barrier' ),
 	'barriers/interactions': generateSchema( '/backend/barriers/interactions' ),
 	'barriers/history': generateSchema( '/backend/barriers/history' ),
+	'barriers/members': generateSchema( '/backend/barriers/members' ),
 };
 
 writeJsonFiles( OUTPUT_PATH, jsonFiles );

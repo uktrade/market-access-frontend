@@ -52,6 +52,7 @@ aliases:
       SSO_REDIRECT_URI: 'http://localhost:8080/login/callback/'
       SSO_BYPASS: true
       SSO_MOCK_CODE: abc-def-ghi
+      SSO_API_TOKEN: jkl-mno-pqr
       DATAHUB_URL: 'http://localhost.datahub'
       DATAHUB_HAWK_ID: abc
       DATAHUB_HAWK_KEY: def
@@ -100,6 +101,7 @@ aliases:
       REDIS_BASE_URL: redis://localhost
       SLACK_WEBHOOK: ''
       RESOURCE_SERVER_USER_INFO_URL: 'http://localhost:5000/api/v1/user/me/'
+      RESOURCE_SERVER_USER_INTROSPECT_URL: 'http://localhost:5000/api/v1/user/introspect/'
     command: ./start-wait-for-db.sh
 
 jobs:

@@ -1,28 +1,28 @@
-.company-card-list {
+.search-card-list {
 	padding: 0;
 }
 
-.company-card {
+.search-card {
 	list-style: none;
 	margin-bottom: govuk-em( 15, 16 );
 }
 
-.company-card__heading {
+.search-card__heading {
 	@include govuk-font( $weight: bold, $size: 19 );
 }
 
-.company-card__values {
+.search-card__values {
 	color: $govuk-black;
 	@include govuk-font( $size: 14 );
 }
 
-.company-card__values__key {
+.search-card__values__key {
 	color: $govuk-grey-1;
 	display: inline-block;
 	padding: govuk-em( 5, 14 ) 0 govuk-em( 5, 14 ) 0;
 }
 
-.company-card__values__value {
+.search-card__values__value {
 
 	margin: 0 0 govuk-em( 10, 14 ) 0;
 	display: inline;
@@ -33,7 +33,7 @@
 	}
 }
 
-.company-card__link {
+.search-card__link {
 
 	text-decoration: none;
 	display: inline-block;

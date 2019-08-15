@@ -4,6 +4,10 @@
 	margin-top: govuk-em( 25, 16 );
 }
 
+.page-tabs--no-margin {
+	margin-top: 0;
+}
+
 .page-tabs__tab {
 	display: inline-block;
 	position: relative;

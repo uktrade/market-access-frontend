@@ -1,0 +1,20 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "User search results from SSO",
+
+	"type": "object",
+	"required": [ "count", "results" ],
+	"properties": {
+
+		"count": { "$ref": "$refs/common.json#/int" },
+
+		"results": {
+			"type": "array",
+			"minItems": 2,
+			"maxItems": 5,
+			"items": {
+				"$ref": "$refs/sso.json#/user"
+			}
+		}
+	}
+}

@@ -61,6 +61,7 @@ $govuk-images-path: '/govuk-public/images/';
 @import 'app-objects/info-panel';
 @import 'app-objects/inline-definition-list';
 @import 'app-objects/circle-icon';
+@import 'app-objects/static-form-group';
 
 @import 'app-components/dash-button';
 @import 'app-components/dash-card';
@@ -77,7 +78,7 @@ $govuk-images-path: '/govuk-public/images/';
 @import 'app-components/event-list';
 @import 'app-components/checkmark';
 @import 'app-components/selection-list';
-@import 'app-components/company-card';
+@import 'app-components/search-card';
 @import 'app-components/toast';
 @import 'app-components/checkbox-filter';
 @import 'app-components/typeahead';
@@ -92,6 +93,7 @@ $govuk-images-path: '/govuk-public/images/';
 @import 'pages/report/sectors';
 @import 'pages/barrier/detail';
 @import 'pages/barrier/type';
+@import 'pages/barrier/team';
 @import 'pages/find-a-barrier';
 
 body:not(.js-enabled) {

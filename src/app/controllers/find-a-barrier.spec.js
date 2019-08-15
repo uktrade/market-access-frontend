@@ -2,6 +2,8 @@ const proxyquire = require( 'proxyquire' );
 const EventEmitter = require( 'events' );
 const modulePath = './find-a-barrier';
 
+const { mocks } = jasmine.helpers;
+
 describe( 'Find a barrier controller', () => {
 
 	let controller;
@@ -17,13 +19,8 @@ describe( 'Find a barrier controller', () => {
 
 	beforeEach( () => {
 
-		req = {
-			query: {}
-		};
-		res = {
-			render: jasmine.createSpy( 'res.render' )
-		};
-		next = jasmine.createSpy( 'next' );
+		( { req, res, next } = mocks.middleware() );
+
 		backend = {
 			barriers: {
 				getAll: jasmine.createSpy( 'backend.barriers.getAll' ),
@@ -44,26 +41,65 @@ describe( 'Find a barrier controller', () => {
 
 	describe( 'list', () => {
 		describe( 'When the backend call is a success', () => {
-			it( 'Gets the filters from the querystring and renders the template', async () => {
+			describe( 'Without a watchlist edit param', () => {
+				it( 'Gets the filters from the querystring and renders the template', async () => {
 
-				const viewModelResponse = { a: 1, b: 2 };
-				const data = jasmine.helpers.getFakeData( '/backend/barriers/' );
+					const viewModelResponse = { a: 1, b: 2 };
+					const data = jasmine.helpers.getFakeData( '/backend/barriers/' );
 
-				viewModel.and.callFake( () => viewModelResponse );
+					viewModel.and.callFake( () => viewModelResponse );
 
-				backend.barriers.getAll.and.callFake( () => ({
-					response: { isSuccess: true },
-					body: data
-				}) );
+					backend.barriers.getAll.and.callFake( () => ({
+						response: { isSuccess: true },
+						body: data
+					}) );
 
-				req.query = { filter1: 'true', filter2: 'true' };
+					req.query = { filter1: 'true', filter2: 'true' };
 
-				await controller.list( req, res, next );
+					await controller.list( req, res, next );
 
-				expect( getFromQueryString ).toHaveBeenCalledWith( req.query );
-				expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, getFromQueryStringResponse );
-				expect( res.render ).toHaveBeenCalledWith( template, viewModelResponse );
-				expect( next ).not.toHaveBeenCalled();
+					const viewModelArgs = viewModel.calls.argsFor( 0 )[ 0 ];
+
+					expect( getFromQueryString ).toHaveBeenCalledWith( req.query );
+					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, getFromQueryStringResponse );
+					expect( res.render ).toHaveBeenCalledWith( template, viewModelResponse );
+					expect( next ).not.toHaveBeenCalled();
+					expect( viewModelArgs.isEdit ).toEqual( false );
+					expect( viewModelArgs.editListIndex ).toBeUndefined();
+				} );
+			} );
+
+			describe( 'With a watchlist and edit param', () => {
+				it( 'Gets the filters from the querystring and renders the template', async () => {
+
+					const viewModelResponse = { a: 1, b: 2 };
+					const data = jasmine.helpers.getFakeData( '/backend/barriers/' );
+
+					req.watchList.lists = [ { name: 'list one', filters: { a: 1, b: 2 } } ];
+					viewModel.and.callFake( () => viewModelResponse );
+
+					backend.barriers.getAll.and.callFake( () => ({
+						response: { isSuccess: true },
+						body: data
+					}) );
+
+					req.query = {
+						filter1: 'true',
+						filter2: 'true',
+						editList: '0',
+					};
+
+					await controller.list( req, res, next );
+
+					const viewModelArgs = viewModel.calls.argsFor( 0 )[ 0 ];
+
+					expect( getFromQueryString ).toHaveBeenCalledWith( req.query );
+					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, getFromQueryStringResponse );
+					expect( res.render ).toHaveBeenCalledWith( template, viewModelResponse );
+					expect( next ).not.toHaveBeenCalled();
+					expect( viewModelArgs.isEdit ).toEqual( true );
+					expect( viewModelArgs.editListIndex ).toEqual( 0 );
+				} );
 			} );
 		} );
 
