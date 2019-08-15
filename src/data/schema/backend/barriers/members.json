@@ -26,7 +26,7 @@
 				"id": { "$ref": "$refs/common.json#/small-int" },
 				"user": {
 					"type": "object",
-					"required": [ "profile", "email", "first_name", "last_name" ],
+					"required": [ "profile", "email", "first_name", "last_name", "full_name" ],
 					"properties": {
 						"profile": {
 							"type": "object",
@@ -42,6 +42,10 @@
 						"last_name": {
 							"type": "string",
 							"faker": "name.lastName"
+						},
+						"full_name": {
+							"type": "string",
+							"faker": "name.findName"
 						},
 						"email": {
 							"type": "string",

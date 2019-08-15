@@ -74,7 +74,7 @@ if( typeof jasmine !== 'undefined' ){
 
 		strings: () => {
 
-			const methods = [ 'location', 'locations', 'types', 'sectors', 'regions', 'priorities', 'statuses' ];
+			const methods = [ 'location', 'locations', 'types', 'sectors', 'regions', 'priorities', 'statuses', 'createdBy' ];
 			const spies =  {};
 
 			methods.forEach( ( name ) => {

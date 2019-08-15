@@ -3,6 +3,8 @@ const faker = require( 'faker' );
 const uuid = require( 'uuid/v4' );
 const modulePath = './barrier-filters';
 
+const { mocks } = jasmine.helpers;
+
 const validatorNames = [
 	'isCountryOrAdminArea',
 	'isSector',
@@ -10,6 +12,7 @@ const validatorNames = [
 	'isBarrierPriority',
 	'isOverseasRegion',
 	'isBarrierStatus',
+	'isCreatedBy',
 ];
 
 const keyMap = {
@@ -19,6 +22,7 @@ const keyMap = {
 	priority: 'isBarrierPriority',
 	region: 'isOverseasRegion',
 	status: 'isBarrierStatus',
+	createdBy: 'isCreatedBy',
 };
 
 const stringMap = {
@@ -27,7 +31,8 @@ const stringMap = {
 	type: 'types',
 	priority: 'priorities',
 	region: 'regions',
-	status: 'statuses'
+	status: 'statuses',
+	createdBy: 'createdBy',
 };
 
 const labelMap = {
@@ -38,6 +43,7 @@ const labelMap = {
 	region: 'Overseas region',
 	status: 'Barrier status',
 	search: 'Search',
+	createdBy: 'Show only',
 };
 
 describe( 'barrier-filters', () => {
@@ -50,21 +56,11 @@ describe( 'barrier-filters', () => {
 	beforeEach( () => {
 
 		validators = {};
-		strings = {};
-		reporter = jasmine.helpers.mocks.reporter();
+		strings = mocks.strings();
+		reporter = mocks.reporter();
 
 		validatorNames.forEach( ( name ) => {
 			validators[ name ] = jasmine.createSpy( `validators.${ name }` );
-		} );
-
-		Object.values( stringMap ).forEach( ( stringName ) => {
-
-			const spy = jasmine.createSpy( `strings.${ stringName }` );
-
-			spy.response = faker.lorem.words( 2 );
-			spy.and.callFake( () => spy.response );
-
-			strings[ stringName ] = spy;
 		} );
 
 		barrierFilters = proxyquire( modulePath, {
@@ -100,16 +96,6 @@ describe( 'barrier-filters', () => {
 				expect( reporter.captureException ).toHaveBeenCalled();
 			} );
 		} );
-
-		describe( 'When it is createBy', () => {
-			it( 'Returns a static value', () => {
-
-				const inputValue = '123';
-				const value = barrierFilters.getDisplayInfo( 'createdBy', inputValue );
-
-				expect( value ).toEqual( { label: 'Show only', text: 'My barriers' } );
-			} );
-		} );
 	} );
 
 	describe( '#getFromQueryString', () => {
@@ -126,6 +112,7 @@ describe( 'barrier-filters', () => {
 				region: uuid(),
 				search: faker.lorem.words( 3 ),
 				status: '2',
+				createdBy: '1'
 			};
 
 			validatorNames.forEach( ( name ) => validators[ name ].and.callFake( () => true ) );

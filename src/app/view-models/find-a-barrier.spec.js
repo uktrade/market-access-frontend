@@ -29,6 +29,7 @@ describe( 'Find a barrier view model', () => {
 	let strings;
 	let barrierStatusList;
 	let barrierFilters;
+	let createdByList;
 
 	function getExpectedBarrierOutput( barriers ){
 
@@ -78,7 +79,7 @@ describe( 'Find a barrier view model', () => {
 						4: {},
 						5: {}
 					}
-				}
+				},
 			},
 			adminAreasByCountry: {},
 			getSector: jasmine.createSpy( 'metadata.getSector' ),
@@ -93,6 +94,7 @@ describe( 'Find a barrier view model', () => {
 			getBarrierPrioritiesList: jasmine.createSpy( 'metadata.getBarrierPrioritiesList' ),
 			getBarrierStatus: jasmine.createSpy( 'metadata.getBarrierStatus' ),
 			getBarrierStatusList: jasmine.createSpy( 'metadata.getBarrierStatusList' ),
+			getBarrierCreatedByList: jasmine.createSpy( 'metadata.getBarrierCreatedByList' ),
 		};
 
 		mockSector = { id: uuid(), name: faker.lorem.words() };
@@ -140,22 +142,28 @@ describe( 'Find a barrier view model', () => {
 			{ value: '3', text: faker.lorem.words() },
 		];
 
+		createdByList = [
+			{ value: '1', text: faker.lorem.words() },
+			{ value: '2', text: faker.lorem.words() },
+		];
+
 		sortGovukItems = {
 			alphabetical: jasmine.createSpy( 'sortGovukItems.alphabetical' ).and.callFake( ( a, b ) => a.text > b.text ),
 		};
 
-		metadata.getCountryList.and.callFake( () => countryList );
-		metadata.getOverseasRegionList.and.callFake( () => overseasRegionList );
-		metadata.getSectorList.and.callFake( () => sectorList );
-		metadata.getSector.and.callFake( () => mockSector );
-		metadata.getCountry.and.callFake( () => mockCountry );
-		metadata.getOverseasRegion.and.callFake( () => mockRegion );
-		metadata.getBarrierType.and.callFake( () => mockType );
-		metadata.getBarrierTypeList.and.callFake( () => barrierTypeList );
-		metadata.getBarrierPriority.and.callFake( () => mockPriority );
-		metadata.getBarrierPrioritiesList.and.callFake( () => barrierPriorityList );
-		metadata.getBarrierStatus.and.callFake( () => mockStatus );
-		metadata.getBarrierStatusList.and.callFake( () => barrierStatusList );
+		metadata.getCountryList.and.returnValue( countryList );
+		metadata.getOverseasRegionList.and.returnValue( overseasRegionList );
+		metadata.getSectorList.and.returnValue( sectorList );
+		metadata.getSector.and.returnValue( mockSector );
+		metadata.getCountry.and.returnValue( mockCountry );
+		metadata.getOverseasRegion.and.returnValue( mockRegion );
+		metadata.getBarrierType.and.returnValue( mockType );
+		metadata.getBarrierTypeList.and.returnValue( barrierTypeList );
+		metadata.getBarrierPriority.and.returnValue( mockPriority );
+		metadata.getBarrierPrioritiesList.and.returnValue( barrierPriorityList );
+		metadata.getBarrierStatus.and.returnValue( mockStatus );
+		metadata.getBarrierStatusList.and.returnValue( barrierStatusList );
+		metadata.getBarrierCreatedByList.and.returnValue( createdByList );
 
 		findABarrierResponse = '/a/b/c';
 
@@ -184,6 +192,7 @@ describe( 'Find a barrier view model', () => {
 		expect( metadata.getBarrierTypeList ).toHaveBeenCalledWith();
 		expect( metadata.getBarrierPrioritiesList ).toHaveBeenCalledWith( { suffix: false } );
 		expect( metadata.getBarrierStatusList ).toHaveBeenCalledWith();
+		expect( metadata.getBarrierCreatedByList ).toHaveBeenCalledWith();
 		expect( sortGovukItems.alphabetical ).toHaveBeenCalled();
 		expect( urls.findABarrier.calls.count() ).toEqual( 9 );
 	} );
@@ -202,7 +211,7 @@ describe( 'Find a barrier view model', () => {
 			priority: { ...responses.priority, items: barrierPriorityList, active, removeUrl, ...overrides.priority },
 			search: { ...responses.search, active, removeUrl, ...overrides.search },
 			status: { ...responses.status, items: barrierStatusList, active, removeUrl, ...overrides.status },
-			createdBy: { ...responses.createdBy, items: [ { text: responses.createdBy.text, value: 1 } ], active, removeUrl, ...overrides.createdBy },
+			createdBy: { ...responses.createdBy, items: createdByList, active, removeUrl, ...overrides.createdBy },
 		};
 	}
 

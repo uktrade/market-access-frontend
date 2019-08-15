@@ -440,12 +440,32 @@ describe( 'Backend Service', () => {
 				} );
 			} );
 
-			describe( 'With a user filter', () => {
-				it( 'Should call the correct path, urlencode the value, use default sort order', async () => {
+			describe( 'With a createdBy filter', () => {
+				describe( 'When the value is 1', () => {
+					it( 'Should call the correct path, urlencode the value, use default sort order', async () => {
 
-					const createdBy = '123';
+						const createdBy = '1';
 
-					testWithOrdering( { createdBy }, `user=1` );
+						testWithOrdering( { createdBy }, `user=1` );
+					} );
+				} );
+
+				describe( 'When the value is 2', () => {
+					it( 'Should call the correct path, urlencode the value, use default sort order', async () => {
+
+						const createdBy = '2';
+
+						testWithOrdering( { createdBy }, `team=1` );
+					} );
+				} );
+
+				describe( 'When the value is 1,2', () => {
+					it( 'Should call the correct path, urlencode the value, use default sort order', async () => {
+
+						const createdBy = '1,2';
+
+						testWithOrdering( { createdBy }, `team=1` );
+					} );
 				} );
 			} );
 		} );
