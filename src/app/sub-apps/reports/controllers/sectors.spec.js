@@ -324,6 +324,7 @@ describe( 'Report controllers', () => {
 							expect( config.sectors.type ).toEqual( Form.SELECT );
 							expect( config.sectors.items ).toEqual( metadata.getSectorList().filter( ( sector ) => sector.value != 2 ) );
 							expect( config.sectors.validators[ 0 ].fn ).toEqual( validators.isSector );
+							expect( config.sectors.validators[ 1 ].fn( 2 ) ).toEqual( false );
 						} );
 					} );
 				} );
