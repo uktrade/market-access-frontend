@@ -113,5 +113,16 @@ module.exports = ( express, app ) => {
 	app.get( '/:barrierId/team/delete/:memberId', barrierTeam, controller.team.delete );
 	app.post( '/:barrierId/team/delete/:memberId', barrierTeam, controller.team.delete );
 
+	app.get( '/:barrierId/assessment/', controller.assessment.list );
+	app.get( '/:barrierId/assessment/economic/', controller.assessment.economic );
+	app.post( '/:barrierId/assessment/economic/', controller.assessment.economic );
+	app.get( '/:barrierId/assessment/economy-value/', controller.assessment.economyValue );
+	app.post( '/:barrierId/assessment/economy-value/', controller.assessment.economyValue );
+	app.get( '/:barrierId/assessment/market-size/', controller.assessment.marketSize );
+	app.post( '/:barrierId/assessment/market-size/', controller.assessment.marketSize );
+	app.get( '/:barrierId/assessment/export-value/', controller.assessment.exportValue );
+	app.post( '/:barrierId/assessment/export-value/', controller.assessment.exportValue );
+	app.get( '/:barrierId/assessment/commercial-value/', controller.assessment.commercialValue );
+	app.post( '/:barrierId/assessment/commercial-value/', controller.assessment.commercialValue );
 	return app;
 };

@@ -1,0 +1,48 @@
+{% from 'components/radios/macro.njk' import govukRadios %}
+{% from 'components/textarea/macro.njk' import govukTextarea %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Barrier Assessment - Economic assessment{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.barriers.assessment.detail( barrier.id ) },
+		caption: barrier.barrier_title,
+		text: 'Economic assessment',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.barriers.assessment.economic( barrier.id ) }}" method="POST" class="restrict-width">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{{ govukRadios({
+
+			name: 'impact',
+			fieldset: {
+				legend: {
+					text: 'What is the economic impact of the barrier?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: impact,
+			errorMessage: errors | errorForName( 'impact-1' )
+		}) }}
+
+		{{ govukTextarea( {
+
+			label: {
+				text: 'Explain the assessment',
+				classes: 'govuk-label--s'
+			},
+			id: 'description',
+			name: 'description',
+			value: description,
+			errorMessage: errors | errorForName( 'description' )
+		} ) }}
+
+		<input type="submit" value="Save and exit to barrier" class="govuk-button">
+	</form>
+{% endblock %}

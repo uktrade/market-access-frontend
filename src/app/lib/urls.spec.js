@@ -296,6 +296,17 @@ describe( 'URLs', () => {
 				});
 			} );
 		} );
+
+		describe( 'assessment', () => {
+			it( 'Should return the correct paths', () => {
+				expect( urls.barriers.assessment.detail( barrierId ) ).toEqual( `/barriers/${ barrierId }/assessment/` );
+				expect( urls.barriers.assessment.economic( barrierId ) ).toEqual( `/barriers/${ barrierId }/assessment/economic/` );
+				expect( urls.barriers.assessment.economyValue( barrierId ) ).toEqual( `/barriers/${ barrierId }/assessment/economy-value/` );
+				expect( urls.barriers.assessment.marketSize( barrierId ) ).toEqual( `/barriers/${ barrierId }/assessment/market-size/` );
+				expect( urls.barriers.assessment.exportValue( barrierId ) ).toEqual( `/barriers/${ barrierId }/assessment/export-value/` );
+				expect( urls.barriers.assessment.commercialValue( barrierId ) ).toEqual( `/barriers/${ barrierId }/assessment/commercial-value/` );
+			} );
+		} );
 	} );
 
 	describe( 'Report urls', () => {

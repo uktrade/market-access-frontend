@@ -1,0 +1,144 @@
+{% from "components/inset-text/macro.njk" import govukInsetText %}
+{% from 'app-components/barrier-summary.njk' import barrierSummary %}
+{% from 'app-components/barrier-tabs.njk' import barrierTabs %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Barrier Assessment{% endblock %}
+
+{% block masthead %}
+	<div class="ma-masthead">
+		{{ barrierSummary( barrier ) }}
+	</div>
+{% endblock %}
+
+{% block body_script %}
+	{{ super() }}
+	<script>
+		if( ma.components.ToggleLinks ){
+			new ma.components.ToggleLinks( {
+				text: 'Update the barrier',
+				linkClass: 'js-barrier-summary-link'
+			} );
+		}
+	</script>
+{% endblock %}
+
+{% block page_content %}
+
+	{{ barrierTabs( barrier.id, 'assessment' ) }}
+
+	{% macro assessmentItem( params ) %}
+
+		<div class="assessment-item">
+
+			<h2 class="assessment-item__heading">{{ params.heading }}</h2>
+
+				{% if params.value %}
+
+					<p class="assessment-item__value">
+						&pound; {{ params.value }}
+					</p>
+					<a class="assessment-item__edit" href="{{ params.link.href }}">Edit</a>
+
+				{% else %}
+
+					<div class="assessment-item-content">
+						<a class="assessment-item-content__link" href="{{ params.link.href }}">{{ params.link.text }}</a>
+						<p class="assessment-item-content__hint">{{ params.hint }}</p>
+
+						{% if params.analyst %}
+							{{ govukInsetText({
+								text: 'To be completed by the Market Access Analysts',
+								classes: 'assessment-item-content__restriction'
+							}) }}
+						{% endif %}
+					</div>
+
+				{% endif %}
+		</div>
+
+	{% endmacro %}
+
+	{% if assessment %}
+
+		<div class="assessment-item">
+			<h2 class="assessment-item__heading">Economic assessment</h2>
+
+			<h3 class="assessment-item__sub-heading">Impact</h3>
+			<ol class="barrier-impact-scale">
+				{% for item in impactScale %}
+					<li class="barrier-impact-scale__item {{- ' barrier-impact-scale__item--active' if item.isActive }}">
+						{{ item.text }}
+					</li>
+				{% endfor %}
+			</ol>
+
+			<h3 class="assessment-item__sub-heading">Assessment explanation</h3>
+			<p class="assessment-item__value">{{ assessment.explanation | nl2br | safe }}</p>
+
+			<h3 class="assessment-item__sub-heading">Inital assessment made by</h3>
+			<p class="assessment-item__value">{{ assessment.created_by.name }}</p>
+
+			<a class="assessment-item__edit" href="{{ urls.barriers.assessment.economic( barrier.id ) }}">Edit</a>
+		</div>
+
+	{% else %}
+
+		{{ assessmentItem({
+			heading: 'Economic assessment',
+			link: {
+				text: 'Add economic assessment',
+				href: urls.barriers.assessment.economic( barrier.id )
+			},
+			hint: 'The assessed economic importance of resolving this barrier relative to others in the same country.',
+			analyst: true
+		}) }}
+
+	{% endif %}
+
+	{{ assessmentItem({
+		heading: 'Value to UK Economy',
+		link: {
+			text: 'Add value to UK economy',
+			href: urls.barriers.assessment.economyValue( barrier.id )
+		},
+		hint: 'The estimated value of resolving the barrier to the UK economy in GBP per year.',
+		analyst: true,
+		value: assessment.value_to_economy
+	}) }}
+
+	{{ assessmentItem({
+		heading: 'Import Market Size',
+		link: {
+			text: 'Add import market size',
+			href: urls.barriers.assessment.marketSize( barrier.id )
+		},
+		hint: 'The size of the import market that this barrier is limiting UK access to in GBP per year.',
+		analyst: true,
+		value: assessment.import_market_size
+	}) }}
+
+	{{ assessmentItem({
+		heading: 'Value of currently affected UK exports',
+		link: {
+			text: 'Add UK export value',
+			href: urls.barriers.assessment.exportValue( barrier.id )
+		},
+		hint: 'The value of UK exports to the partner country that are affected by this barrier in GBP per year.',
+		analyst: true,
+		value: assessment.export_value
+	}) }}
+
+	{{ assessmentItem({
+		heading: 'Commercial Value',
+		link: {
+			text: 'Add commercial value',
+			href: urls.barriers.assessment.commercialValue( barrier.id )
+		},
+		hint: 'The value of the barrier to the affected business(es) in GBP per year.',
+		value: assessment.commercial_value
+	}) }}
+
+{% endblock %}
+

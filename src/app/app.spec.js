@@ -1006,6 +1006,32 @@ describe( 'App', function(){
 								} );
 							} );
 						} );
+					} ) ;
+				} );
+
+				describe( 'Barrier assessment', () => {
+
+					beforeEach( () => {
+						intercept.backend()
+							.get( `/barriers/${ barrierId }/assessment` )
+							.reply( 200, intercept.stub( '/backend/barriers/assessment') );
+					} );
+					describe( 'Detail', () => {
+						it( 'Should render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.assessment.detail( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier Assessment', done ) );
+						} );
+					} );
+
+					describe( 'economic', () => {
+						it( 'Should render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.assessment.economic( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier Assessment - Economic assessment', done ) );
+						} );
 					} );
 				} );
 			} );

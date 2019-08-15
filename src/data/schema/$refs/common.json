@@ -155,5 +155,14 @@
 				"pattern": "COMPLETED|IN PROGRESS"
 			}
 		}
+	},
+
+	"user": {
+		"type": "object",
+		"required": [ "id", "name" ],
+		"properties": {
+			"id": { "$ref": "#/small-int" },
+			"name": { "$ref": "#/word" }
+		}
 	}
 }

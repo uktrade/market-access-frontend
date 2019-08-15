@@ -1,0 +1,35 @@
+{% from 'app-components/currency-input.njk' import currencyInput %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Barrier Assessment - Commercial Value{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.barriers.assessment.detail( barrier.id ) },
+		caption: barrier.barrier_title,
+		text: 'Commercial Value',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.barriers.assessment.commercialValue( barrier.id ) }}" method="POST" class="restrict-width">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{{ currencyInput( {
+
+			label: {
+				text: 'What is the value of the barrier to the affected business(es) per year?',
+				classes: 'govuk-label--s'
+			},
+			id: 'value',
+			name: 'value',
+			classes: 'govuk-input--currency',
+			value: value,
+			errorMessage: errors | errorForName( 'value' )
+		} ) }}
+
+		<input type="submit" value="Save and exit to barrier" class="govuk-button">
+	</form>
+{% endblock %}

@@ -244,6 +244,7 @@ module.exports.fetch = async () => {
 			}
 
 			module.exports.barrierPendingOptions = body.barrier_pending;
+			module.exports.barrierAssessmentImpactOptions = body.assessment_impact;
 
 		} else {
 

@@ -1157,6 +1157,51 @@ describe( 'Backend Service', () => {
 				} );
 			} );
 		} );
+
+		describe( 'assessment', () => {
+			describe( 'get', () => {
+				it( 'Should GET the correct path', async () => {
+
+					await service.barriers.assessment.get( req, barrierId );
+
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers/${ barrierId }/assessment`, token );
+				} );
+			} );
+
+			describe( 'create', () => {
+				it( 'Should POST to the correct path with the correct values', async () => {
+
+					const values = {
+						impact: faker.lorem.word().toUpperCase(),
+						description: faker.lorem.paragraph( 2 ),
+					};
+
+					await service.barriers.assessment.create( req, barrierId, values );
+
+					expect( backend.post ).toHaveBeenCalledWith( `/barriers/${ barrierId }/assessment`, token, {
+						impact: values.impact,
+						explanation: values.description,
+					} );
+				} );
+			} );
+
+			describe( 'update', () => {
+				it( 'Should POST to the correct path with the correct values', async () => {
+
+					const values = {
+						impact: faker.lorem.word().toUpperCase(),
+						description: faker.lorem.paragraph( 2 ),
+					};
+
+					await service.barriers.assessment.update( req, barrierId, values );
+
+					expect( backend.patch ).toHaveBeenCalledWith( `/barriers/${ barrierId }/assessment`, token, {
+						impact: values.impact,
+						explanation: values.description,
+					} );
+				} );
+			} );
+		} );
 	} );
 
 	describe( 'Reports', () => {

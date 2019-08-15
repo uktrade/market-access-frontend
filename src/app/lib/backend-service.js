@@ -407,6 +407,31 @@ module.exports = {
 				role: values.role,
 			} ),
 			delete: ( req, barrierMemberId ) => backend.delete( `/barriers/members/${ barrierMemberId }`, getToken( req ) ),
+		},
+		assessment: {
+			get: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }/assessment`, getToken( req ) ),
+			create: ( req, barrierId, values ) => backend.post( `/barriers/${ barrierId }/assessment`, getToken( req ), {
+				impact: values.impact,
+				explanation: values.description,
+				//documents: []
+			} ),
+			update: ( req, barrierId, values ) => backend.patch( `/barriers/${ barrierId }/assessment`, getToken( req ), {
+				impact: values.impact,
+				explanation: values.description,
+				//documents: []
+			} ),
+			saveEconomyValue: ( req, barrierId, value ) => backend.patch( `/barriers/${ barrierId }/assessment`, getToken( req ), {
+				value_to_economy: value,
+			} ),
+			saveMarketSize: ( req, barrierId, value ) => backend.patch( `/barriers/${ barrierId }/assessment`, getToken( req ), {
+				import_market_size: value,
+			} ),
+			saveExportValue: ( req, barrierId, value ) => backend.patch( `/barriers/${ barrierId }/assessment`, getToken( req ), {
+				export_value: value,
+			} ),
+			saveCommercialValue: ( req, barrierId, value ) => backend.patch( `/barriers/${ barrierId }/assessment`, getToken( req ), {
+				commercial_value: value,
+			} ),
 		}
 	},
 

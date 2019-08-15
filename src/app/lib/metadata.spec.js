@@ -602,6 +602,12 @@ describe( 'metadata', () => {
 					expect( metadata.barrierPendingOptions ).toEqual( fakeData.barrier_pending );
 				} );
 			} );
+
+			describe( 'barrierAssessmentImpactOptions', () => {
+				it( 'Should return the options', () => {
+					expect( metadata.barrierAssessmentImpactOptions ).toEqual( fakeData.assessment_impact );
+				} );
+			} );
 		} );
 
 		describe( 'getBarrierCreatedBy', () => {

@@ -33,7 +33,7 @@ $govuk-images-path: '/govuk-public/images/';
 @import 'components/checkboxes/checkboxes';
 @import 'components/input/input';
 @import 'components/select/select';
-@import 'components/warning-text/warning-text';
+@import 'components/inset-text/inset-text';
 @import 'components/textarea/textarea';
 @import 'components/back-link/back-link';
 @import 'components/error-summary/error-summary';
@@ -94,6 +94,7 @@ $govuk-images-path: '/govuk-public/images/';
 @import 'pages/barrier/detail';
 @import 'pages/barrier/type';
 @import 'pages/barrier/team';
+@import 'pages/barrier/assessment';
 @import 'pages/find-a-barrier';
 
 body:not(.js-enabled) {
