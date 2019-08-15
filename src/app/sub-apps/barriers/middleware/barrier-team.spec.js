@@ -75,16 +75,7 @@ describe( 'Barrier Team middleware', () => {
 			};
 			const members = body.results.map( ( member ) => {
 
-				const { email, first_name: fname, last_name: lname } = member.user;
-				let name;
-
-				if( fname || lname ){
-
-					name = ( `${ fname } ${ lname }` );
-
-				} else {
-					name = email.split( '@' )[ 0 ];
-				}
+				const { email, full_name: name } = member.user;
 
 				return {
 					id: member.id,
