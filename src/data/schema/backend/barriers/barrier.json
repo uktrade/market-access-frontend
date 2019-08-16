@@ -19,19 +19,17 @@
 		"barrier_title",
 		"problem_description",
 		"status",
-		"status_date",
-		"status_summary",
 		"reported_on",
 		"reported_by",
 		"created_on",
 		"export_country",
-		"has_legal_infringement",
-		"wto_infringement",
-		"fta_infringement",
-		"other_infringement",
-		"infringement_summary",
+		"country_admin_areas",
 		"priority",
-		"modified_on"
+		"priority_summary",
+		"modified_on",
+		"all_sectors",
+		"eu_exit_related",
+		"has_assessment"
 	],
 	"properties": {
 
@@ -91,10 +89,14 @@
 			"faker": "lorem.words"
 		},
 
-		"eu_exit_related": { "$ref": "$refs/common.json#/boolean" },
+		"eu_exit_related": {
+			"type": "number",
+			"enum": [ 0, 1, 2 ]
+		},
 
 		"problem_description": { "$ref": "$refs/common.json#/paragraph" },
 		"priority": { "$ref": "$refs/common.json#/priority" },
+		"priority_summary": { "$ref": "$refs/common.json#/paragraph" },
 
 		"status": {
 			"type": "object",
@@ -121,15 +123,10 @@
 		"created_on": { "$ref": "$refs/common.json#/past-date" },
 		"modified_on": { "$ref": "$refs/common.json#/past-date" },
 		"export_country": { "$ref": "$refs/common.json#/uuid" },
-
-		"has_legal_infringement": {
-			"type": "string",
-			"enum": [ "1", "2", "3" ]
+		"country_admin_areas": { "$ref": "$refs/common.json#/nullable-uuid-array" },
+		"all_sectors": {
+			"enum": [ null, false, true ]
 		},
-
-		"wto_infringement": { "$ref": "$refs/common.json#/boolean" },
-		"fta_infringement": { "$ref": "$refs/common.json#/boolean" },
-		"other_infringement": { "$ref": "$refs/common.json#/boolean" },
-		"infringement_summary":  { "$ref": "$refs/common.json#/paragraph" }
+		"has_assessment": { "$ref": "$refs/common.json#/boolean" }
 	}
 }

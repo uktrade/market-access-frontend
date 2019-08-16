@@ -408,31 +408,37 @@ module.exports = {
 			} ),
 			delete: ( req, barrierMemberId ) => backend.delete( `/barriers/members/${ barrierMemberId }`, getToken( req ) ),
 		},
-		assessment: {
-			get: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }/assessment`, getToken( req ) ),
-			create: ( req, barrierId, values ) => backend.post( `/barriers/${ barrierId }/assessment`, getToken( req ), {
-				impact: values.impact,
-				explanation: values.description,
-				//documents: []
-			} ),
-			update: ( req, barrierId, values ) => backend.patch( `/barriers/${ barrierId }/assessment`, getToken( req ), {
-				impact: values.impact,
-				explanation: values.description,
-				//documents: []
-			} ),
-			saveEconomyValue: ( req, barrierId, value ) => backend.patch( `/barriers/${ barrierId }/assessment`, getToken( req ), {
-				value_to_economy: value,
-			} ),
-			saveMarketSize: ( req, barrierId, value ) => backend.patch( `/barriers/${ barrierId }/assessment`, getToken( req ), {
-				import_market_size: value,
-			} ),
-			saveExportValue: ( req, barrierId, value ) => backend.patch( `/barriers/${ barrierId }/assessment`, getToken( req ), {
-				export_value: value,
-			} ),
-			saveCommercialValue: ( req, barrierId, value ) => backend.patch( `/barriers/${ barrierId }/assessment`, getToken( req ), {
-				commercial_value: value,
-			} ),
-		}
+		assessment: (() => {
+
+			function saveAssessmentValues( req, barrier, values ){
+
+				const isPatch = barrier.has_assessment;
+				const url = `/barriers/${ barrier.id }/assessment`;
+
+				return backend[ ( isPatch ? 'patch' : 'post' ) ]( url, getToken( req ), values );
+			}
+
+			return {
+				get: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }/assessment`, getToken( req ) ),
+				saveEconomic: ( req, barrier, values ) => saveAssessmentValues( req, barrier, {
+					impact: values.impact,
+					explanation: values.description,
+					//documents: []
+				} ),
+				saveEconomyValue: ( req, barrier, value ) => saveAssessmentValues( req, barrier,  {
+					value_to_economy: value,
+				} ),
+				saveMarketSize: ( req, barrier, value ) => saveAssessmentValues( req, barrier,  {
+					import_market_size: value,
+				} ),
+				saveExportValue: ( req, barrier, value ) => saveAssessmentValues( req, barrier,  {
+					export_value: value,
+				} ),
+				saveCommercialValue: ( req, barrier, value ) => saveAssessmentValues( req, barrier,  {
+					commercial_value: value,
+				} ),
+			};
+		})(),
 	},
 
 	reports: {

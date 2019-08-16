@@ -25,7 +25,7 @@ function createValueController( opts ){
 		const processor = new FormProcessor( {
 			form,
 			render: ( templateValues ) => res.render( `barriers/views/assessment/${ opts.template }`, templateValues ),
-			saveFormData: ( formValues ) => backend.barriers.assessment[ opts.serviceMethod ]( req, req.barrier.id, formValues.value ),
+			saveFormData: ( formValues ) => backend.barriers.assessment[ opts.serviceMethod ]( req, req.barrier, formValues.value ),
 			saved: () => res.redirect( urls.barriers.assessment.detail( req.barrier.id ) )
 		} );
 
@@ -92,7 +92,7 @@ module.exports = {
 		const processor = new FormProcessor( {
 			form,
 			render: ( templateValues ) => res.render( 'barriers/views/assessment/economic', templateValues ),
-			saveFormData: ( formValues ) => backend.barriers.assessment.create( req, req.barrier.id, formValues ),
+			saveFormData: ( formValues ) => backend.barriers.assessment.saveEconomic( req, req.barrier, formValues ),
 			saved: () => res.redirect( urls.barriers.assessment.detail( req.barrier.id ) )
 		} );
 
