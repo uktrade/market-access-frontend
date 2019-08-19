@@ -168,6 +168,11 @@ module.exports = {
 			marketSize: ( barrierId ) => `/barriers/${ barrierId }/assessment/market-size/`,
 			exportValue: ( barrierId ) => `/barriers/${ barrierId }/assessment/export-value/`,
 			commercialValue: ( barrierId ) => `/barriers/${ barrierId }/assessment/commercial-value/`,
+			documents: {
+				add: ( barrierId ) => `/barriers/${ barrierId }/assessment/documents/add/`,
+				cancel: ( barrierId ) => `/barriers/${ barrierId }/assessment/documents/cancel/`,
+				delete: ( barrierId, documentId ) => `/barriers/${ barrierId }/assessment/documents/${ documentId }/delete/`,
+			},
 		}
 	},
 

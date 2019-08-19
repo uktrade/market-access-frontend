@@ -66,16 +66,29 @@
 			<h2 class="assessment-item__heading">Economic assessment</h2>
 
 			<h3 class="assessment-item__sub-heading">Impact</h3>
-			<ol class="barrier-impact-scale">
-				{% for item in impactScale %}
-					<li class="barrier-impact-scale__item {{- ' barrier-impact-scale__item--active' if item.isActive }}">
-						{{ item.text }}
-					</li>
-				{% endfor %}
-			</ol>
+			<span class="barrier-impact-value">
+				{{ impact.text }}
+			</span>
 
 			<h3 class="assessment-item__sub-heading">Assessment explanation</h3>
 			<p class="assessment-item__value">{{ assessment.explanation | nl2br | safe }}</p>
+
+			{% if documents and documents.length %}
+
+				<h3 class="assessment-item__sub-heading">Supporting documents</h3>
+				<ul class="document-list document-list--assessment">
+					{% for document in documents %}
+						<li class="document-list__item">
+						{% if document.canDownload %}
+							<a href="{{ urls.documents.download( document.id ) }}">{{ document.name }}</a>
+						{% else %}
+							{{ document.name }}
+						{% endif %}
+						- {{ document.size }}
+						</li>
+					{% endfor %}
+				</ul>
+			{% endif %}
 
 			<h3 class="assessment-item__sub-heading">Inital assessment made by</h3>
 			<p class="assessment-item__value">{{ assessment.created_by.name }}</p>

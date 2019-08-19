@@ -113,9 +113,9 @@ module.exports = ( express, app ) => {
 	app.get( '/:barrierId/team/delete/:memberId', barrierTeam, controller.team.delete );
 	app.post( '/:barrierId/team/delete/:memberId', barrierTeam, controller.team.delete );
 
-	app.get( '/:barrierId/assessment/', controller.assessment.list );
-	app.get( '/:barrierId/assessment/economic/', controller.assessment.economic );
-	app.post( '/:barrierId/assessment/economic/', controller.assessment.economic );
+	app.get( '/:barrierId/assessment/', controller.assessment.detail );
+	app.get( '/:barrierId/assessment/economic/', barrierSession, controller.assessment.economic );
+	app.post( '/:barrierId/assessment/economic/', barrierSession, fileUpload, controller.assessment.economic );
 	app.get( '/:barrierId/assessment/economy-value/', controller.assessment.economyValue );
 	app.post( '/:barrierId/assessment/economy-value/', controller.assessment.economyValue );
 	app.get( '/:barrierId/assessment/market-size/', controller.assessment.marketSize );
@@ -124,5 +124,9 @@ module.exports = ( express, app ) => {
 	app.post( '/:barrierId/assessment/export-value/', controller.assessment.exportValue );
 	app.get( '/:barrierId/assessment/commercial-value/', controller.assessment.commercialValue );
 	app.post( '/:barrierId/assessment/commercial-value/', controller.assessment.commercialValue );
+
+	app.post( '/:uuid/assessment/documents/add/', barrierSession, fileUpload, controller.assessment.documents.add );
+	app.get( '/:uuid/assessment/documents/cancel/', barrierSession, controller.assessment.documents.cancel );
+	app.post( '/:uuid/assessment/documents/:id/delete/', barrierSession, controller.assessment.documents.delete );
 	return app;
 };

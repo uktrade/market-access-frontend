@@ -1059,7 +1059,12 @@ describe( 'App', function(){
 							const url = urls.barriers.assessment.economic( barrierId );
 							app
 								.get( url )
-								.end( checkFormAction( url, done ) );
+								.end( ( err, res ) => {
+
+									const csrfToken = getCsrfTokenFromQueryParam( res, done.fail );
+
+									checkFormAction( `${ url }?_csrf=${ csrfToken }`, done )( err, res );
+								} );
 						} );
 					} );
 

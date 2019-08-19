@@ -177,5 +177,19 @@
 			"id": { "$ref": "#/small-int" },
 			"name": { "$ref": "#/word" }
 		}
+	},
+
+	"document": {
+		"type": "object",
+		"required": [ "id", "name", "size", "status" ],
+		"properties": {
+			"id": { "$ref": "#/uuid" },
+			"name": { "$ref": "#/word" },
+			"size": { "$ref": "#/small-int" },
+			"status": {
+				"type": "string",
+				"enum": [ "virus_scanned" ]
+			}
+		}
 	}
 }

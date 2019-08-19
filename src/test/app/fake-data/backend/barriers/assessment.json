@@ -6,7 +6,20 @@
    "import_market_size": 16816,
    "commercial_value": 51888,
    "export_value": 50309,
-   "documents": [],
+   "documents": [
+		{
+         "id": "4a922639-514e-4389-8967-1fde85acaf6c",
+         "name": "consequatur",
+         "size": 13,
+         "status": "virus_scanned"
+      },
+      {
+         "id": "a3edf3fc-2933-4773-9a26-4571acdfa391",
+         "name": "eos",
+         "size": 11,
+         "status": "virus_scanned"
+      }
+	],
    "created_on": "Mon Jan 21 2019 09:09:38 GMT+0000 (Greenwich Mean Time)",
    "created_by": {
       "id": 19,

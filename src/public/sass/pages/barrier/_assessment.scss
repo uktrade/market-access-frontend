@@ -9,7 +9,7 @@
 
 .assessment-item__sub-heading {
 	@include govuk-font( 19, $weight: bold );
-	margin: govuk-em( 10, 19 ) 0 0 0;
+	margin: govuk-em( 15, 19 ) 0 govuk-em( 5, 19 ) 0;
 }
 
 .assessment-item__value {
@@ -17,13 +17,15 @@
 }
 
 .assessment-item__edit {
-
+	display: inline-block;
+	margin-top: govuk-em( 5, 16 );
 }
 
 .assessment-item-content {
 	border: 2px dashed $govuk-grey-3;
 	padding: govuk-em( 15, 16 );
 	max-width: 600px;
+	box-sizing: border-box;
 }
 
 /* .assessment-item-content__link {
@@ -42,50 +44,16 @@
 	@include govuk-font( 16 );
 }
 
-.barrier-impact-scale {
-	list-style: none;
-	margin: 0;
-	padding: 0;
-	text-align: center;
-}
 
-.barrier-impact-scale__item {
-
+.barrier-impact-value {
 	display: inline-block;
 	min-width: 200px;
 	padding: govuk-em( 5, 16 ) 0;
 	margin: 0 govuk-em( 20, 16 ) 0 0;
 	text-align: center;
-	background-color: $govuk-grey-2;
-	color: white;
-	position: relative;
-	z-index: 10;
-	font-weight: bold;
-
-	&:after {
-		content: '';
-		display: block;
-		width: govuk-em( 25, 16 );
-		border-top: 5px solid $govuk-grey-2;
-		position: absolute;
-		top: 50%;
-		left: 100%;
-		z-index: -1;
-	}
-
-	&:last-of-type {
-		&:after {
-			display: none;
-		}
-	}
-}
-
-.barrier-impact-scale__item--active {
 	background-color: $govuk-black;
-}
-
-.currency-input {
-
+	color: white;
+	font-weight: bold;
 }
 
 .currency-input__prefix {

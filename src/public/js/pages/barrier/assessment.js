@@ -1,4 +1,4 @@
-ma.pages.barrier.detail = (function( doc, jessie ){
+ma.pages.barrier.assessment = (function(){
 
 	function setupAttachments(){
 
@@ -22,12 +22,10 @@ ma.pages.barrier.detail = (function( doc, jessie ){
 		var submitButton = jessie.queryOne( '.js-submit-button' );
 		var form = fileUpload.form;
 
-		if( !submitButton ){ return; }
-		if( !form ){ return; }
+		if( !submitButton ){ throw new Error( 'Submit button not found' ); }
+		if( !form ){ throw new Error( 'No form found' ); }
 
 		var deleteUrl = jessie.getElementData( form, 'xhr-delete' );
-
-		if( !deleteUrl ){ return; }
 
 		try {
 
@@ -39,46 +37,12 @@ ma.pages.barrier.detail = (function( doc, jessie ){
 		return form;
 	}
 
-	function setupForm( form, noteErrorText ){
+	return function(){
 
-		if( !ma.components.TextArea ){ return; }
-
-		var note;
-
-		try {
-
-			note = new ma.components.TextArea( {
-				group: '.js-note-group',
-				input: '.js-note-text'
-			} );
-
-		} catch( e ){ return; }
-
-		function handleFormSubmit( e ){
-
-			if( !note.hasValue() ){
-
-				jessie.cancelDefault( e );
-				note.setError( noteErrorText );
-				note.focus();
-			}
-		}
-
-		jessie.attachListener( form, 'submit', handleFormSubmit );
-	}
-
-	return function( opts ){
-
-		var form = setupAttachments();
-		if( form ){ setupForm( form, opts.noteErrorText ); }
-
-		if( ma.components.ToggleLinks ){
-			new ma.components.ToggleLinks( opts.toggleLinks );
-		}
+		setupAttachments();
 
 		if( ma.components.DeleteModal ){
 			new ma.components.DeleteModal();
 		}
 	};
-
-}( document, jessie ));
+})();

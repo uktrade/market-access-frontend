@@ -1192,16 +1192,36 @@ describe( 'Backend Service', () => {
 			} );
 
 			describe( 'saveEconomic', () => {
-				it( 'Should POST to the correct path with the correct values', async () => {
+				describe( 'Without any documentIds', () => {
+					it( 'Should POST to the correct path with the correct values', async () => {
 
-					const values = {
-						impact: faker.lorem.word().toUpperCase(),
-						description: faker.lorem.paragraph( 2 ),
-					};
+						const values = {
+							impact: faker.lorem.word().toUpperCase(),
+							description: faker.lorem.paragraph( 2 ),
+						};
 
-					await checkPostAndPatch( service.barriers.assessment.saveEconomic, values, {
-						impact: values.impact,
-						explanation: values.description,
+						await checkPostAndPatch( service.barriers.assessment.saveEconomic, values, {
+							impact: values.impact,
+							explanation: values.description,
+							documents: null,
+						} );
+					} );
+				} );
+
+				describe( 'With documentIds', () => {
+					it( 'Should POST to the correct path with the correct values', async () => {
+
+						const values = {
+							impact: faker.lorem.word().toUpperCase(),
+							description: faker.lorem.paragraph( 2 ),
+							documentIds: [ uuid(), uuid() ],
+						};
+
+						await checkPostAndPatch( service.barriers.assessment.saveEconomic, values, {
+							impact: values.impact,
+							explanation: values.description,
+							documents: values.documentIds,
+						} );
 					} );
 				} );
 			} );

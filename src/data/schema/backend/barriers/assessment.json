@@ -27,7 +27,12 @@
 		"import_market_size": { "$ref": "$refs/common.json#/int" },
 		"commercial_value": { "$ref": "$refs/common.json#/int" },
 		"export_value": { "$ref": "$refs/common.json#/int" },
-		"documents": { "type": "array" },
+		"documents": {
+			"type": "array",
+			"minItems": 0,
+			"maxItems": 5,
+			"items": { "$ref": "$refs/common.json#/document" }
+		},
 		"created_on": { "$ref": "$refs/common.json#/past-date" },
 		"created_by": { "$ref": "$refs/common.json#/user" }
 	}

@@ -423,7 +423,7 @@ module.exports = {
 				saveEconomic: ( req, barrier, values ) => saveAssessmentValues( req, barrier, {
 					impact: values.impact,
 					explanation: values.description,
-					//documents: []
+					documents: ( values.documentIds ? values.documentIds : null ),
 				} ),
 				saveEconomyValue: ( req, barrier, value ) => saveAssessmentValues( req, barrier,  {
 					value_to_economy: value,
