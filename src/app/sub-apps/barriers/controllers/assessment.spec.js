@@ -1,7 +1,6 @@
 const proxyquire = require( 'proxyquire' );
 const faker = require( 'faker' );
 const fileSize = require( '../../../lib/file-size' );
-const HttpResponseError = require( '../../../lib/HttpResponseError' );
 const modulePath = './assessment';
 const { mocks, getFakeData } = jasmine.helpers;
 
@@ -63,6 +62,7 @@ describe( 'Assessment controller', () => {
 			barriers: {
 				assessment: {
 					detail: jasmine.createSpy( 'urls.barriers.assessment.detail' ),
+					economic: jasmine.createSpy( 'urls.barriers.assessment.economic' ),
 				}
 			}
 		};
@@ -92,55 +92,30 @@ describe( 'Assessment controller', () => {
 
 		const template = 'barriers/views/assessment/detail';
 
-		describe( 'When the backend call rejects', () => {
-			it( 'Calls next with an error', async () => {
-
-				const err = new Error( 'A backend assessment issue' );
-
-				backend.barriers.assessment.get.and.returnValue( Promise.reject( err ) );
-				await controller.detail( req, res, next );
-
-				expect( next ).toHaveBeenCalledWith( err );
-			} );
-		} );
-
-		describe( 'When the backend resolves with a 500', () => {
-			it( 'Calls next with an error', async () => {
-
-				backend.barriers.assessment.get.and.returnValue( mocks.request( 500 ) );
-
-				await controller.detail( req, res, next );
-
-				expect( next ).toHaveBeenCalled();
-				expect( next.calls.argsFor( 0 )[ 0 ] instanceof HttpResponseError ).toEqual( true );
-			} );
-		} );
-
-		describe( 'When the backend resolves with a 404', () => {
-			it( 'Renders the assessment detail', async () => {
+		describe( 'When the assessment is not on the req (404)', () => {
+			it( 'Renders the assessment detail', () => {
 
 				const barrierDetailViewModelResponse = { d: 1, e: 2 };
 
-				backend.barriers.assessment.get.and.returnValue( mocks.request( 404 ) );
 				barrierDetailViewModel.and.returnValue( barrierDetailViewModelResponse );
 
-				await controller.detail( req, res, next );
+				controller.detail( req, res, );
 
 				expect( res.render ).toHaveBeenCalledWith( template, barrierDetailViewModelResponse );
 				expect( barrierDetailViewModel ).toHaveBeenCalledWith( barrier );
 			} );
 		} );
 
-		describe( 'When the backend resolves with a 200', () => {
-			it( 'Renders the assessment detail with the assessment data', async () => {
+		describe( 'When the assessment is on the req', () => {
+			it( 'Renders the assessment detail with the assessment data', () => {
 
 				const barrierDetailViewModelResponse = { e: 1, f: 2 };
 				const assessment = getFakeData( '/backend/barriers/assessment' );
 
-				backend.barriers.assessment.get.and.returnValue( mocks.request( 200, assessment ) );
+				req.assessment = assessment;
 				barrierDetailViewModel.and.returnValue( barrierDetailViewModelResponse );
 
-				await controller.detail( req, res, next );
+				controller.detail( req, res );
 
 				expect( res.render ).toHaveBeenCalledWith( template, {
 					...barrierDetailViewModelResponse,
@@ -158,7 +133,6 @@ describe( 'Assessment controller', () => {
 					}) ),
 				} );
 				expect( barrierDetailViewModel ).toHaveBeenCalledWith( barrier );
-				expect( next ).not.toHaveBeenCalled();
 			} );
 		} );
 	} );
@@ -205,11 +179,19 @@ describe( 'Assessment controller', () => {
 		describe( 'delete', () => {
 			it( 'Uses the documentControllers', () => {
 
-				expect( controller.documents.delete ).toEqual( documentControllers.xhr.delete.cb );
-				const args = documentControllers.xhr.delete.calls.argsFor( 0 );
+				const economicUrlResponse = 'a/b/c/';
+				urls.barriers.assessment.economic.and.returnValue( economicUrlResponse );
+				expect( controller.documents.delete ).toEqual( documentControllers.delete.cb );
+				const args = documentControllers.delete.calls.argsFor( 0 );
+
 				expect( typeof args[ 0 ] ).toEqual( 'function' );
 				expect( typeof args[ 1 ] ).toEqual( 'function' );
+				expect( typeof args[ 2 ] ).toEqual( 'function' );
+
 				expect( args[ 0 ]( req ) ).toEqual( documentId );
+				expect( args[ 1 ]( req ) ).toEqual( economicUrlResponse );
+				expect( urls.barriers.assessment.economic ).toHaveBeenCalledWith( barrierId, documentId );
+
 			} );
 
 			describe( 'When there are barrier documents in the session', () => {
@@ -223,7 +205,7 @@ describe( 'Assessment controller', () => {
 					];
 
 					barrierSession.documents.assessment.get.and.returnValue( mockDocuments );
-					documentControllers.xhr.delete.calls.argsFor( 0 )[ 1 ]( req, documentId );
+					documentControllers.delete.calls.argsFor( 0 )[ 2 ]( req, documentId );
 
 					expect( barrierSession.documents.assessment.set ).toHaveBeenCalledWith( [ nonMatchingDoc1 ] );
 				} );
@@ -232,7 +214,7 @@ describe( 'Assessment controller', () => {
 			describe( 'When there are no documents in the session', () => {
 				it( 'Should not error and have no documents in the session', () => {
 
-					documentControllers.xhr.delete.calls.argsFor( 0 )[ 1 ]( req, documentId );
+					documentControllers.delete.calls.argsFor( 0 )[ 2 ]( req, documentId );
 
 					expect( barrierSession.documents.assessment.set ).not.toHaveBeenCalled();
 				} );

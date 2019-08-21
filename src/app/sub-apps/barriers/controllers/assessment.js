@@ -5,31 +5,38 @@ const Form = require( '../../../lib/Form' );
 const FormProcessor = require( '../../../lib/FormProcessor' );
 const validators = require( '../../../lib/validators' );
 const govukItemsFromObject = require( '../../../lib/govuk-items-from-object' );
-const HttpResponseError = require( '../../../lib/HttpResponseError' );
 const barrierDetailViewModel = require( '../view-models/detail' );
 const documentControllers = require( '../../../lib/document-controllers' );
 const economicViewModel = require( '../view-models/assessment/economic' );
 const fileSize = require( '../../../lib/file-size' );
 const uploadDocument = require( '../../../lib/upload-document' );
 
-function createValueController( opts ){
+function createValueController( { template, serviceMethod, valueProp } ){
 
 	return async ( req, res, next ) => {
 
-		const form = new Form( req, {
+		const assessment = req.assessment;
+		const formConfig = {
 			value: {
 				required: 'Enter a value',
 				validators: [{
 					fn: validators.isNumeric,
 					message: 'Value is not a number'
-				}]
+				}],
+				values: [ ]
 			}
-		} );
+		};
+
+		if( assessment ){
+			formConfig.value.values = [ assessment[ valueProp ] ];
+		}
+
+		const form = new Form( req, formConfig );
 
 		const processor = new FormProcessor( {
 			form,
-			render: ( templateValues ) => res.render( `barriers/views/assessment/${ opts.template }`, templateValues ),
-			saveFormData: ( formValues ) => backend.barriers.assessment[ opts.serviceMethod ]( req, req.barrier, formValues.value ),
+			render: ( templateValues ) => res.render( `barriers/views/assessment/${ template }`, templateValues ),
+			saveFormData: ( formValues ) => backend.barriers.assessment[ serviceMethod ]( req, req.barrier, formValues.value ),
 			saved: () => res.redirect( urls.barriers.assessment.detail( req.barrier.id ) )
 		} );
 
@@ -57,44 +64,35 @@ function getDocument( doc ){
 
 module.exports = {
 
-	detail: async( req, res, next ) => {
+	detail: ( req, res ) => {
 
-		try {
+		const assessment = req.assessment;
 
-			const { response, body } = await backend.barriers.assessment.get( req, req.barrier.id );
+		if( assessment ){
 
-			if( response.isSuccess ){
+			res.render( 'barriers/views/assessment/detail', {
+				...barrierDetailViewModel( req.barrier ),
+				assessment,
+				impact: {
+					text: metadata.barrierAssessmentImpactOptions[ assessment.impact ],
+					id: assessment.impact,
+				},
+				documents: ( assessment.documents && req.assessment.documents.map( getDocument ) ),
+			} );
 
-				res.render( 'barriers/views/assessment/detail', {
-					...barrierDetailViewModel( req.barrier ),
-					assessment: body,
-					impact: {
-						text: metadata.barrierAssessmentImpactOptions[ body.impact ],
-						id: body.impact,
-					},
-					documents: ( body.documents && body.documents.map( getDocument ) ),
-				} );
+		} else {
 
-			} else if( response.statusCode === 404 ){
-
-				res.render( 'barriers/views/assessment/detail', barrierDetailViewModel( req.barrier ) );
-
-			} else {
-
-				throw new HttpResponseError( 'Unable to get barrier assessment', response, body );
-			}
-
-		} catch( e ){
-
-			next( e );
+			res.render( 'barriers/views/assessment/detail', barrierDetailViewModel( req.barrier ) );
 		}
 	},
 
 	economic: async ( req, res, next ) => {
 
 		const barrierId = req.barrier.id;
+		const assessment = req.assessment;
 		const session  = req.barrierSession.documents.assessment;
-		const form = new Form( req, {
+
+		const formConfig = {
 			impact: {
 				type: Form.RADIO,
 				required: 'Select an economic impact',
@@ -122,7 +120,19 @@ module.exports = {
 					}
 				]
 			}
-		} );
+		};
+
+		if( assessment ){
+
+			formConfig.impact.values = [ assessment.impact ];
+			formConfig.description.values = [ assessment.explanation ];
+
+			if( assessment.documents ){
+				session.setIfNotAlready( assessment.documents );
+			}
+		}
+
+		const form = new Form( req, formConfig );
 
 		if( req.formError && validators.isFileOverSize( req.formError ) ){
 
@@ -133,7 +143,10 @@ module.exports = {
 			form,
 			render: ( templateValues ) => res.render(
 				'barriers/views/assessment/economic',
-				economicViewModel( barrierId, session.get(), templateValues )
+				{
+					documents: assessment.documents,
+					...economicViewModel( barrierId, session.get(), templateValues )
+				}
 			),
 			saveFormData: async ( formValues ) => {
 
@@ -173,7 +186,11 @@ module.exports = {
 
 				return backend.barriers.assessment.saveEconomic( req, req.barrier, values );
 			},
-			saved: () => res.redirect( urls.barriers.assessment.detail( barrierId ) )
+			saved: () => {
+
+				session.delete();
+				res.redirect( urls.barriers.assessment.detail( barrierId ) );
+			}
 		} );
 
 		try {
@@ -195,16 +212,20 @@ module.exports = {
 			session.get().push( document );
 		} ),
 
-		delete: documentControllers.xhr.delete( ( req ) => req.params.id, ( req, documentId ) => {
+		delete: documentControllers.delete(
+			( req ) => req.params.id,
+			( req ) => urls.barriers.assessment.economic( req.uuid, req.params.id ),
+			( req, documentId ) => {
 
-			const session = req.barrierSession.documents.assessment;
-			const documents = session.get();
+				const session = req.barrierSession.documents.assessment;
+				const documents = session.get();
 
-			if( documents && documents.length ){
+				if( documents && documents.length ){
 
-				session.set( documents.filter( ( document ) => document.id !== documentId ) );
+					session.set( documents.filter( ( document ) => document.id !== documentId ) );
+				}
 			}
-		} ),
+		),
 
 		cancel: ( req, res ) => {
 
@@ -218,20 +239,24 @@ module.exports = {
 	economyValue: createValueController({
 		template: 'economy-value',
 		serviceMethod: 'saveEconomyValue',
+		valueProp: 'value_to_economy'
 	}),
 
 	marketSize: createValueController({
 		template: 'market-size',
 		serviceMethod: 'saveMarketSize',
+		valueProp: 'import_market_size',
 	}),
 
 	exportValue: createValueController({
 		template: 'export-value',
 		serviceMethod: 'saveExportValue',
+		valueProp: 'export_value',
 	}),
 
 	commercialValue: createValueController({
 		template: 'commercial-value',
 		serviceMethod: 'saveCommercialValue',
+		valueProp: 'commercial_value',
 	}),
 };

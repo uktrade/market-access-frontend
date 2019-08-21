@@ -10,6 +10,7 @@ const barrierTypeCategoryParam = require( './middleware/params/barrier-type-cate
 const companyIdParam = require( './middleware/params/company-id' );
 const uuidParam = require( '../../middleware/params/uuid' );
 const barrierTeam = require( './middleware/barrier-team' );
+const barrierAssessment = require( './middleware/barrier-assessment' );
 
 const csrfProtection = csurf();
 
@@ -113,20 +114,21 @@ module.exports = ( express, app ) => {
 	app.get( '/:barrierId/team/delete/:memberId', barrierTeam, controller.team.delete );
 	app.post( '/:barrierId/team/delete/:memberId', barrierTeam, controller.team.delete );
 
-	app.get( '/:barrierId/assessment/', controller.assessment.detail );
-	app.get( '/:barrierId/assessment/economic/', barrierSession, controller.assessment.economic );
+	app.get( '/:barrierId/assessment/', barrierAssessment, controller.assessment.detail );
+	app.get( '/:barrierId/assessment/economic/', barrierSession, barrierAssessment, controller.assessment.economic );
 	app.post( '/:barrierId/assessment/economic/', barrierSession, fileUpload, controller.assessment.economic );
-	app.get( '/:barrierId/assessment/economy-value/', controller.assessment.economyValue );
+	app.get( '/:barrierId/assessment/economy-value/', barrierAssessment, controller.assessment.economyValue );
 	app.post( '/:barrierId/assessment/economy-value/', controller.assessment.economyValue );
-	app.get( '/:barrierId/assessment/market-size/', controller.assessment.marketSize );
+	app.get( '/:barrierId/assessment/market-size/', barrierAssessment, controller.assessment.marketSize );
 	app.post( '/:barrierId/assessment/market-size/', controller.assessment.marketSize );
-	app.get( '/:barrierId/assessment/export-value/', controller.assessment.exportValue );
+	app.get( '/:barrierId/assessment/export-value/', barrierAssessment, controller.assessment.exportValue );
 	app.post( '/:barrierId/assessment/export-value/', controller.assessment.exportValue );
-	app.get( '/:barrierId/assessment/commercial-value/', controller.assessment.commercialValue );
+	app.get( '/:barrierId/assessment/commercial-value/', barrierAssessment, controller.assessment.commercialValue );
 	app.post( '/:barrierId/assessment/commercial-value/', controller.assessment.commercialValue );
 
 	app.post( '/:uuid/assessment/documents/add/', barrierSession, fileUpload, controller.assessment.documents.add );
 	app.get( '/:uuid/assessment/documents/cancel/', barrierSession, controller.assessment.documents.cancel );
+	app.get( '/:uuid/assessment/documents/:id/delete/', barrierSession, controller.assessment.documents.delete );
 	app.post( '/:uuid/assessment/documents/:id/delete/', barrierSession, controller.assessment.documents.delete );
 	return app;
 };
