@@ -15,11 +15,6 @@
 		errors: errors
 	}) }}
 
-	{{ govukWarningText({
-		text: 'To be completed by the Market Access Analysts',
-		iconFallbackText: 'Warning'
-	}) }}
-
 	<form action="{{ urls.barriers.assessment.exportValue( barrier.id ) }}" method="POST" class="restrict-width">
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
@@ -38,6 +33,11 @@
 			value: value,
 			errorMessage: errors | errorForName( 'value' )
 		} ) }}
+
+		{{ govukWarningText({
+			text: 'To be completed by the Market Access Analysts',
+			iconFallbackText: 'Warning'
+		}) }}
 
 		<input type="submit" value="Save and exit to barrier" class="govuk-button">
 	</form>

@@ -1,6 +1,7 @@
 {% from 'components/radios/macro.njk' import govukRadios %}
 {% from 'components/textarea/macro.njk' import govukTextarea %}
 {% from "components/file-upload/macro.njk" import govukFileUpload %}
+{% from 'components/warning-text/macro.njk' import govukWarningText %}
 {% from 'app-components/heading.njk' import heading %}
 {% from 'app-components/attached-documents.njk' import attachedDocuments %}
 
@@ -72,6 +73,11 @@
 				html: '(file size limit <strong>' + maxFileSize + '</strong>)'
 			},
 			errorMessage: errors | errorForName( 'document' )
+		}) }}
+
+		{{ govukWarningText({
+			text: 'To be completed by the Market Access Analysts',
+			iconFallbackText: 'Warning'
 		}) }}
 
 		<input type="submit" value="Save and exit to barrier" class="govuk-button js-submit-button">
