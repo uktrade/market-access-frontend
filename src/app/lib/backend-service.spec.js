@@ -1191,6 +1191,15 @@ describe( 'Backend Service', () => {
 				} );
 			} );
 
+			describe( 'getHistory', () => {
+				it( 'Should GET the correct path', async () => {
+
+					await service.barriers.assessment.getHistory( req, barrierId );
+
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers/${ barrierId }/assessment_history`, token );
+				} );
+			} );
+
 			describe( 'saveEconomic', () => {
 				describe( 'Without any documentIds', () => {
 					it( 'Should POST to the correct path with the correct values', async () => {

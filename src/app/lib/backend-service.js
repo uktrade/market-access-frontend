@@ -420,6 +420,7 @@ module.exports = {
 
 			return {
 				get: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }/assessment`, getToken( req ) ),
+				getHistory: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }/assessment_history`, getToken( req ) ),
 				saveEconomic: ( req, barrier, values ) => saveAssessmentValues( req, barrier, {
 					impact: values.impact,
 					explanation: values.description,
