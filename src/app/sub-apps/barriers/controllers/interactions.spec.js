@@ -54,7 +54,10 @@ describe( 'Barrier interactions controller', () => {
 					save: jasmine.createSpy( 'backend.barriers.notes.save' ),
 					update: jasmine.createSpy( 'backend.barriers.notes.update' ),
 					delete: jasmine.createSpy( 'backend.barriers.notes.delete' ),
-				}
+				},
+				assessment: {
+					getHistory: jasmine.createSpy( 'backend.barriers.assessment.getHistory' ),
+				},
 			}
 		};
 
@@ -137,11 +140,16 @@ describe( 'Barrier interactions controller', () => {
 			response: { isSuccess: true },
 			body: getFakeData( '/backend/barriers/history' )
 		};
+		const assessmentHistoryResponse = {
+			response: { isSuccess: true },
+			body: getFakeData( '/backend/barriers/assessment_history' ),
+		};
 
-		backend.barriers.getInteractions.and.callFake( () => Promise.resolve( interactionsResponse ) );
-		backend.barriers.getHistory.and.callFake( () => Promise.resolve( historyResponse ) );
+		backend.barriers.getInteractions.and.returnValue( Promise.resolve( interactionsResponse ) );
+		backend.barriers.getHistory.and.returnValue( Promise.resolve( historyResponse ) );
+		backend.barriers.assessment.getHistory.and.returnValue( Promise.resolve( assessmentHistoryResponse ) );
 
-		return { interactionsResponse, historyResponse };
+		return { interactionsResponse, historyResponse, assessmentHistoryResponse };
 	}
 
 	function returnViewModels(){
@@ -157,8 +165,10 @@ describe( 'Barrier interactions controller', () => {
 
 	async function check( controller, addCompany, data = {} ){
 
-		const { interactionsResponse, historyResponse } = returnSuccessResponses();
+		const { interactionsResponse, historyResponse, assessmentHistoryResponse } = returnSuccessResponses();
 		const { barrierDetailViewModelResponse, interactionsViewModelResponse } = returnViewModels();
+
+		req.barrier.has_assessment = true;
 
 		await controller( req, res, next );
 
@@ -168,7 +178,8 @@ describe( 'Barrier interactions controller', () => {
 		expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier, addCompany );
 		expect( interactionsViewModel ).toHaveBeenCalledWith( {
 			interactions: interactionsResponse.body,
-			history: historyResponse.body
+			history: historyResponse.body,
+			assessmentHistory: assessmentHistoryResponse,
 		}, undefined );
 
 		expect( res.render ).toHaveBeenCalledWith( 'barriers/views/detail',  {
@@ -446,7 +457,8 @@ describe( 'Barrier interactions controller', () => {
 						expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier, false );
 						expect( interactionsViewModel ).toHaveBeenCalledWith( {
 							interactions: interactionsResponse.body,
-							history: historyResponse.body
+							history: historyResponse.body,
+							assessmentHistory: undefined,
 						}, undefined );
 
 						config.saveFormData( formValues );
@@ -678,7 +690,8 @@ describe( 'Barrier interactions controller', () => {
 					expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier, req.query.addCompany);
 					expect( interactionsViewModel ).toHaveBeenCalledWith( {
 						interactions: interactionsResponse.body,
-						history: historyResponse.body
+						history: historyResponse.body,
+						assessmentHistory: undefined,
 					}, editId );
 
 					config.saveFormData( formValues );

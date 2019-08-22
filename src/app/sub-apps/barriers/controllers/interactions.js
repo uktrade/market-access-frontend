@@ -17,18 +17,22 @@ function getTimelineData( req, barrierId ){
 
 	return new Promise( async ( resolve, reject ) => {
 
+		const hasAssessment = req.barrier.has_assessment;
+
 		try {
 
-			const [ interactions, history ] = await Promise.all( [
+			const [ interactions, history, assessmentHistory ] = await Promise.all( [
 				backend.barriers.getInteractions( req, barrierId ),
-				backend.barriers.getHistory( req, barrierId )
+				backend.barriers.getHistory( req, barrierId ),
+				( hasAssessment ? backend.barriers.assessment.getHistory( req, barrierId ) : Promise.resolve() ),
 			]);
 
 			if( interactions.response.isSuccess && history.response.isSuccess ){
 
 				resolve( {
 					interactions: interactions.body,
-					history: history.body
+					history: history.body,
+					assessmentHistory,
 				} );
 
 			} else {

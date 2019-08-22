@@ -24,7 +24,7 @@
       {
          "date": "Fri Aug 24 2018 19:26:57 GMT+0100 (British Summer Time)",
          "field": "value_to_economy",
-         "old_value": 15,
+         "old_value": null,
          "new_value": 1,
          "user": {
             "id": 8,
