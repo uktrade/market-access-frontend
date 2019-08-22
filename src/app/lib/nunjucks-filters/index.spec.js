@@ -17,6 +17,7 @@ describe( 'Nunjucks filters', function(){
 		[ './add-to-radio', 'addToRadio' ],
 		[ './time', 'time' ],
 		[ './linkify', 'linkify' ],
+		[ './format-number', 'formatNumber' ],
 	];
 
 	beforeEach( function(){

@@ -21,9 +21,9 @@ function createValueController( { template, serviceMethod, valueProp } ){
 				required: 'Enter a value',
 				validators: [{
 					fn: validators.isNumeric,
-					message: 'Value is not a number'
+					message: 'Enter a whole number'
 				}],
-				values: [ ]
+				sanitize: ( value ) => value.replace( /,/g, '' ),
 			}
 		};
 

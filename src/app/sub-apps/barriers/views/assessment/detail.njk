@@ -37,7 +37,7 @@
 				{% if params.value %}
 
 					<p class="assessment-item__value">
-						&pound; {{ params.value }}
+						&pound; {{ params.value | formatNumber }}
 					</p>
 					<a class="assessment-item__edit" href="{{ params.link.href }}">Edit</a>
 

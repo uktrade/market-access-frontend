@@ -30,7 +30,7 @@
 			id: 'value',
 			name: 'value',
 			classes: 'govuk-input--currency',
-			value: value,
+			value: value | formatNumber,
 			errorMessage: errors | errorForName( 'value' )
 		} ) }}
 
