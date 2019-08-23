@@ -1135,6 +1135,117 @@ describe( 'App', function(){
 								.end( checkFormAction( url, done ) );
 						} );
 					} );
+
+					describe( 'Barrier Documents', () => {
+
+						let documentId;
+
+						beforeEach( () => {
+
+							documentId = uuid();
+						} );
+
+						describe( 'Delete', () => {
+
+							let token;
+							let agent;
+							let url;
+
+							beforeEach( ( done ) => {
+
+								intercept.backend()
+									.get( `/barriers/${ barrier.id }/assessment` )
+									.reply( 200, intercept.stub( '/backend/barriers/assessment' ) );
+
+								agent = supertest.agent( appInstance );
+
+								agent
+									.get( urls.barriers.assessment.economic( barrierId ) )
+									.end( ( err, res ) => {
+
+										token = getCsrfTokenFromQueryParam( res, done.fail );
+										url = urls.barriers.assessment.documents.delete( barrierId, documentId ) + `?_csrf=${ token }`;
+										done();
+									} );
+							} );
+
+							describe( 'When the API returns a 200', () => {
+
+								beforeEach( () => {
+
+									intercept.backend()
+										.delete( `/documents/${ documentId }` )
+										.reply( 200, '{}' );
+								} );
+
+								describe( 'With a normal request', () => {
+									it( 'Should return a 302', ( done ) => {
+
+										agent.post( url )
+											.send( '' )
+											.end( checkRedirect( urls.barriers.assessment.economic( barrierId ), done ) );
+									} );
+								} );
+
+								describe( 'With an XHR request', () => {
+									it( 'Should return a 200', ( done ) => {
+
+										agent.post( url )
+											.set( 'X-Requested-With', 'XMLHttpRequest' )
+											.send( '' )
+											.end( ( err, res ) => {
+
+												expect( res.statusCode ).toEqual( 200 );
+												expect( res.text ).toEqual( '{}' );
+												done();
+											} );
+									} );
+								} );
+							} );
+
+							describe( 'When the API returns a 400', () => {
+
+								beforeEach( () => {
+
+									intercept.backend()
+										.delete( `/documents/${ documentId }` )
+										.reply( 400, '{}' );
+								} );
+								describe( 'A normal request', () => {
+									it( 'Should return a 302', ( done ) => {
+
+										agent.post( url )
+											.send( '' )
+											.end( checkRedirect( urls.barriers.assessment.economic( barrierId ), done ) );
+									} );
+								} );
+
+								describe( 'An XHR request', () => {
+									it( 'Should return a 200', ( done ) => {
+
+										agent.post( url )
+											.set( 'X-Requested-With', 'XMLHttpRequest' )
+											.send( '' )
+											.end( ( err, res ) => {
+
+												expect( res.statusCode ).toEqual( 200 );
+												expect( res.text ).toEqual( '{}' );
+												done();
+											} );
+									} );
+								} );
+							} );
+						} );
+
+						describe( 'Cancel', () => {
+							it( 'Redirects to the assessment detail', ( done ) => {
+
+								app
+									.get( urls.barriers.assessment.documents.cancel( barrierId ) )
+									.end( checkRedirect( urls.barriers.assessment.detail( barrierId ), done ) );
+							} );
+						} );
+					} );
 				} );
 			} );
 

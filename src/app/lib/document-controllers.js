@@ -146,6 +146,11 @@ module.exports = {
 
 			if( response.isSuccess || response.statusCode === 400 ){
 
+				// A 400 in this case means that the document is attached to something, therefore we treat this as a success
+				// This means that we can call the successCb (which whould remove the document from the session)
+				// Then when the form with the document is actually saved (e.g. a note) we pass the correct list of documents from the session
+				// The backend will then delete any documents and/or add new ones
+
 				successCb( req, documentId );
 
 				if( req.xhr ){
