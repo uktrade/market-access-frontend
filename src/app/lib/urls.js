@@ -163,7 +163,10 @@ module.exports = {
 		},
 		assessment: {
 			detail: ( barrierId ) => `/barriers/${ barrierId }/assessment/`,
-			economic: ( barrierId ) => `/barriers/${ barrierId }/assessment/economic/`,
+			economic: {
+				list: ( barrierId ) => `/barriers/${ barrierId }/assessment/economic/`,
+				new: ( barrierId ) => `/barriers/${ barrierId }/assessment/economic/new/`,
+			} ,
 			economyValue: ( barrierId ) => `/barriers/${ barrierId }/assessment/economy-value/`,
 			marketSize: ( barrierId ) => `/barriers/${ barrierId }/assessment/market-size/`,
 			exportValue: ( barrierId ) => `/barriers/${ barrierId }/assessment/export-value/`,

@@ -86,117 +86,125 @@ module.exports = {
 		}
 	},
 
-	economic: async ( req, res, next ) => {
+	economic: {
+		list: async ( req, res, next ) => {
 
-		const barrierId = req.barrier.id;
-		const assessment = req.assessment;
-		const session  = req.barrierSession.documents.assessment;
+			const barrierId = req.barrier.id;
+			const assessment = req.assessment;
+			const session  = req.barrierSession.documents.assessment;
 
-		const formConfig = {
-			impact: {
-				type: Form.RADIO,
-				required: 'Select an economic impact',
-				items: govukItemsFromObject( metadata.barrierAssessmentImpactOptions ),
-			},
-			description: {
-				required: 'Explain the assessment'
-			},
-			document: {
-				type: Form.FILE,
-				validators: [
-					{
-						fn: ( file ) => {
+			const formConfig = {
+				impact: {
+					type: Form.RADIO,
+					required: 'Select an economic impact',
+					items: govukItemsFromObject( metadata.barrierAssessmentImpactOptions ),
+				},
+				description: {
+					required: 'Explain the assessment'
+				},
+				document: {
+					type: Form.FILE,
+					validators: [
+						{
+							fn: ( file ) => {
 
-							const isValid = validators.isValidFile( file );
+								const isValid = validators.isValidFile( file );
 
-							if( !isValid ){
+								if( !isValid ){
 
-								documentControllers.reportInvalidFile( file );
+									documentControllers.reportInvalidFile( file );
+								}
+
+								return isValid;
+							},
+							message: documentControllers.INVALID_FILE_TYPE_MESSAGE
+						}
+					]
+				}
+			};
+
+			if( assessment ){
+
+				formConfig.impact.values = [ assessment.impact ];
+				formConfig.description.values = [ assessment.explanation ];
+
+				if( assessment.documents ){
+					session.setIfNotAlready( assessment.documents );
+				}
+			}
+
+			const form = new Form( req, formConfig );
+
+			if( req.formError && validators.isFileOverSize( req.formError ) ){
+
+				form.addErrors( { document: documentControllers.OVERSIZE_FILE_MESSAGE } );
+			}
+
+			const processor = new FormProcessor( {
+				form,
+				render: ( templateValues ) => res.render(
+					'barriers/views/assessment/economic',
+					economicViewModel( barrierId, session.get(), templateValues )
+				),
+				saveFormData: async ( formValues ) => {
+
+					const documents = session.get();
+					const values = {
+						impact: formValues.impact,
+						description: formValues.description,
+						documentIds: [],
+					};
+
+					if( documents ){
+
+						values.documentIds = documents.map( ( document ) => document.id );
+					}
+
+					if( formValues.document && formValues.document.size > 0 ){
+
+						try {
+
+							const id = await uploadDocument( req, formValues.document );
+							const { passed } = await backend.documents.getScanStatus( req, id );
+
+							if( passed ){
+
+								values.documentIds.push( id );
+
+							} else {
+
+								throw new Error( documentControllers.FILE_INFECTED_MESSAGE );
 							}
 
-							return isValid;
-						},
-						message: documentControllers.INVALID_FILE_TYPE_MESSAGE
-					}
-				]
-			}
-		};
+						} catch ( e ){
 
-		if( assessment ){
-
-			formConfig.impact.values = [ assessment.impact ];
-			formConfig.description.values = [ assessment.explanation ];
-
-			if( assessment.documents ){
-				session.setIfNotAlready( assessment.documents );
-			}
-		}
-
-		const form = new Form( req, formConfig );
-
-		if( req.formError && validators.isFileOverSize( req.formError ) ){
-
-			form.addErrors( { document: documentControllers.OVERSIZE_FILE_MESSAGE } );
-		}
-
-		const processor = new FormProcessor( {
-			form,
-			render: ( templateValues ) => res.render(
-				'barriers/views/assessment/economic',
-				economicViewModel( barrierId, session.get(), templateValues )
-			),
-			saveFormData: async ( formValues ) => {
-
-				const documents = session.get();
-				const values = {
-					impact: formValues.impact,
-					description: formValues.description,
-					documentIds: [],
-				};
-
-				if( documents ){
-
-					values.documentIds = documents.map( ( document ) => document.id );
-				}
-
-				if( formValues.document && formValues.document.size > 0 ){
-
-					try {
-
-						const id = await uploadDocument( req, formValues.document );
-						const { passed } = await backend.documents.getScanStatus( req, id );
-
-						if( passed ){
-
-							values.documentIds.push( id );
-
-						} else {
-
-							throw new Error( documentControllers.FILE_INFECTED_MESSAGE );
+							return next( e );
 						}
-
-					} catch ( e ){
-
-						return next( e );
 					}
+
+					return backend.barriers.assessment.saveEconomic( req, req.barrier, values );
+				},
+				saved: () => {
+
+					session.delete();
+					res.redirect( urls.barriers.assessment.detail( barrierId ) );
 				}
+			} );
 
-				return backend.barriers.assessment.saveEconomic( req, req.barrier, values );
-			},
-			saved: () => {
+			try {
 
-				session.delete();
-				res.redirect( urls.barriers.assessment.detail( barrierId ) );
+				await processor.process();
+
+			} catch( e ){
+
+				next( e );
 			}
-		} );
+		},
 
-		try {
+		new: ( req, res ) => {
 
-			await processor.process();
-
-		} catch( e ){
-
-			next( e );
+			req.barrierSession.documents.assessment.delete();
+			res.redirect( urls.barriers.assessment.economic.list( req.barrier.id ) );
 		}
 	},
 
@@ -211,7 +219,7 @@ module.exports = {
 
 		delete: documentControllers.delete(
 			( req ) => req.params.id,
-			( req ) => urls.barriers.assessment.economic( req.uuid, req.params.id ),
+			( req ) => urls.barriers.assessment.economic.list( req.uuid, req.params.id ),
 			( req, documentId ) => {
 
 				const session = req.barrierSession.documents.assessment;

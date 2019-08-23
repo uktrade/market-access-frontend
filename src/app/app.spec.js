@@ -1047,24 +1047,35 @@ describe( 'App', function(){
 					} );
 
 					describe( 'economic', () => {
-						it( 'Should render the page', ( done ) => {
+						describe( 'listing', () => {
+							it( 'Should render the page', ( done ) => {
 
-							app
-								.get( urls.barriers.assessment.economic( barrierId ) )
-								.end( checkPage( 'Market Access - Barrier Assessment - Economic assessment', done ) );
+								app
+									.get( urls.barriers.assessment.economic.list( barrierId ) )
+									.end( checkPage( 'Market Access - Barrier Assessment - Economic assessment', done ) );
+							} );
+
+							it( 'Should have the correct form action', ( done ) => {
+
+								const url = urls.barriers.assessment.economic.list( barrierId );
+								app
+									.get( url )
+									.end( ( err, res ) => {
+
+										const csrfToken = getCsrfTokenFromQueryParam( res, done.fail );
+
+										checkFormAction( `${ url }?_csrf=${ csrfToken }`, done )( err, res );
+									} );
+							} );
 						} );
 
-						it( 'Should have the correct form action', ( done ) => {
+						describe( 'new', () => {
+							it( 'Should redirect to the list page', ( done ) => {
 
-							const url = urls.barriers.assessment.economic( barrierId );
-							app
-								.get( url )
-								.end( ( err, res ) => {
-
-									const csrfToken = getCsrfTokenFromQueryParam( res, done.fail );
-
-									checkFormAction( `${ url }?_csrf=${ csrfToken }`, done )( err, res );
-								} );
+								app
+									.get( urls.barriers.assessment.economic.new( barrierId ) )
+									.end( checkRedirect( urls.barriers.assessment.economic.list( barrierId ), done ) );
+							} );
 						} );
 					} );
 
@@ -1136,7 +1147,7 @@ describe( 'App', function(){
 						} );
 					} );
 
-					describe( 'Barrier Documents', () => {
+					describe( 'Assessment Documents', () => {
 
 						let documentId;
 
@@ -1160,7 +1171,7 @@ describe( 'App', function(){
 								agent = supertest.agent( appInstance );
 
 								agent
-									.get( urls.barriers.assessment.economic( barrierId ) )
+									.get( urls.barriers.assessment.economic.list( barrierId ) )
 									.end( ( err, res ) => {
 
 										token = getCsrfTokenFromQueryParam( res, done.fail );
@@ -1183,7 +1194,7 @@ describe( 'App', function(){
 
 										agent.post( url )
 											.send( '' )
-											.end( checkRedirect( urls.barriers.assessment.economic( barrierId ), done ) );
+											.end( checkRedirect( urls.barriers.assessment.economic.list( barrierId ), done ) );
 									} );
 								} );
 
@@ -1216,7 +1227,7 @@ describe( 'App', function(){
 
 										agent.post( url )
 											.send( '' )
-											.end( checkRedirect( urls.barriers.assessment.economic( barrierId ), done ) );
+											.end( checkRedirect( urls.barriers.assessment.economic.list( barrierId ), done ) );
 									} );
 								} );
 

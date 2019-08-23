@@ -25,7 +25,7 @@
 		errors: errors
 	}) }}
 
-	<form action="{{ urls.barriers.assessment.economic( barrier.id ) }}?_csrf={{ csrfToken }}" method="POST" enctype="multipart/form-data" class="restrict-width"  data-xhr-upload="{{ xhr.upload }}?_csrf={{ csrfToken }}" data-xhr-delete="{{ xhr.delete }}?_csrf={{ csrfToken }}">
+	<form action="{{ urls.barriers.assessment.economic.list( barrier.id ) }}?_csrf={{ csrfToken }}" method="POST" enctype="multipart/form-data" class="restrict-width"  data-xhr-upload="{{ xhr.upload }}?_csrf={{ csrfToken }}" data-xhr-delete="{{ xhr.delete }}?_csrf={{ csrfToken }}">
 
 		{{ govukRadios({
 

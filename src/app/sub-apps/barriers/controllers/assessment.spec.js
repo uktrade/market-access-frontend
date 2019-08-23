@@ -62,9 +62,11 @@ describe( 'Assessment controller', () => {
 			barriers: {
 				assessment: {
 					detail: jasmine.createSpy( 'urls.barriers.assessment.detail' ),
-					economic: jasmine.createSpy( 'urls.barriers.assessment.economic' ),
-				}
-			}
+					economic: {
+						list: jasmine.createSpy( 'urls.barriers.assessment.economic.list' ),
+					},
+				},
+			},
 		};
 
 		barrierDetailViewModel = jasmine.createSpy( 'barrierDetailViewModel' );
@@ -180,7 +182,7 @@ describe( 'Assessment controller', () => {
 			it( 'Uses the documentControllers', () => {
 
 				const economicUrlResponse = 'a/b/c/';
-				urls.barriers.assessment.economic.and.returnValue( economicUrlResponse );
+				urls.barriers.assessment.economic.list.and.returnValue( economicUrlResponse );
 				expect( controller.documents.delete ).toEqual( documentControllers.delete.cb );
 				const args = documentControllers.delete.calls.argsFor( 0 );
 
@@ -190,7 +192,7 @@ describe( 'Assessment controller', () => {
 
 				expect( args[ 0 ]( req ) ).toEqual( documentId );
 				expect( args[ 1 ]( req ) ).toEqual( economicUrlResponse );
-				expect( urls.barriers.assessment.economic ).toHaveBeenCalledWith( barrierId, documentId );
+				expect( urls.barriers.assessment.economic.list ).toHaveBeenCalledWith( barrierId, documentId );
 
 			} );
 

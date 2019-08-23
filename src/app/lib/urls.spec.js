@@ -299,12 +299,20 @@ describe( 'URLs', () => {
 
 		describe( 'assessment', () => {
 			it( 'Should return the correct paths', () => {
+
 				expect( urls.barriers.assessment.detail( barrierId ) ).toEqual( `/barriers/${ barrierId }/assessment/` );
-				expect( urls.barriers.assessment.economic( barrierId ) ).toEqual( `/barriers/${ barrierId }/assessment/economic/` );
+				expect( urls.barriers.assessment.economic.list( barrierId ) ).toEqual( `/barriers/${ barrierId }/assessment/economic/` );
+				expect( urls.barriers.assessment.economic.new( barrierId ) ).toEqual( `/barriers/${ barrierId }/assessment/economic/new/` );
 				expect( urls.barriers.assessment.economyValue( barrierId ) ).toEqual( `/barriers/${ barrierId }/assessment/economy-value/` );
 				expect( urls.barriers.assessment.marketSize( barrierId ) ).toEqual( `/barriers/${ barrierId }/assessment/market-size/` );
 				expect( urls.barriers.assessment.exportValue( barrierId ) ).toEqual( `/barriers/${ barrierId }/assessment/export-value/` );
 				expect( urls.barriers.assessment.commercialValue( barrierId ) ).toEqual( `/barriers/${ barrierId }/assessment/commercial-value/` );
+
+				const documentId = uuid();
+
+				expect( urls.barriers.assessment.documents.add( barrierId ) ).toEqual( `/barriers/${ barrierId }/assessment/documents/add/` );
+				expect( urls.barriers.assessment.documents.cancel( barrierId ) ).toEqual( `/barriers/${ barrierId }/assessment/documents/cancel/` );
+				expect( urls.barriers.assessment.documents.delete( barrierId, documentId ) ).toEqual( `/barriers/${ barrierId }/assessment/documents/${ documentId }/delete/` );
 			} );
 		} );
 	} );

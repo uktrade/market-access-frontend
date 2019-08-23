@@ -93,7 +93,7 @@
 			<h3 class="assessment-item__sub-heading">Inital assessment made by</h3>
 			<p class="assessment-item__value">{{ assessment.created_by.name }}</p>
 
-			<a class="assessment-item__edit" href="{{ urls.barriers.assessment.economic( barrier.id ) }}">Edit</a>
+			<a class="assessment-item__edit" href="{{ urls.barriers.assessment.economic.list( barrier.id ) }}">Edit</a>
 		</div>
 
 	{% else %}
@@ -102,7 +102,7 @@
 			heading: 'Economic assessment',
 			link: {
 				text: 'Add economic assessment',
-				href: urls.barriers.assessment.economic( barrier.id )
+				href: urls.barriers.assessment.economic.new( barrier.id )
 			},
 			hint: 'The assessed economic importance of resolving this barrier relative to others in the same country.',
 			analyst: true

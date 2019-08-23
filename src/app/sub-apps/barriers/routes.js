@@ -115,8 +115,9 @@ module.exports = ( express, app ) => {
 	app.post( '/:barrierId/team/delete/:memberId', barrierTeam, controller.team.delete );
 
 	app.get( '/:barrierId/assessment/', barrierAssessment, controller.assessment.detail );
-	app.get( '/:barrierId/assessment/economic/', barrierSession, barrierAssessment, controller.assessment.economic );
-	app.post( '/:barrierId/assessment/economic/', barrierSession, fileUpload, controller.assessment.economic );
+	app.get( '/:barrierId/assessment/economic/', barrierSession, barrierAssessment, controller.assessment.economic.list );
+	app.post( '/:barrierId/assessment/economic/', barrierSession, fileUpload, controller.assessment.economic.list );
+	app.get( '/:barrierId/assessment/economic/new/', barrierSession, controller.assessment.economic.new );
 	app.get( '/:barrierId/assessment/economy-value/', barrierAssessment, controller.assessment.economyValue );
 	app.post( '/:barrierId/assessment/economy-value/', controller.assessment.economyValue );
 	app.get( '/:barrierId/assessment/market-size/', barrierAssessment, controller.assessment.marketSize );
