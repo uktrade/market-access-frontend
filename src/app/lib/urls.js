@@ -161,6 +161,22 @@ module.exports = {
 			//edit: ( barrierId, memberId ) => `/barriers/${ barrierId }/team/edit/${ memberId }`,
 			delete: ( barrierId, memberId ) => `/barriers/${ barrierId }/team/delete/${ memberId }`,
 		},
+		assessment: {
+			detail: ( barrierId ) => `/barriers/${ barrierId }/assessment/`,
+			economic: {
+				list: ( barrierId ) => `/barriers/${ barrierId }/assessment/economic/`,
+				new: ( barrierId ) => `/barriers/${ barrierId }/assessment/economic/new/`,
+			} ,
+			economyValue: ( barrierId ) => `/barriers/${ barrierId }/assessment/economy-value/`,
+			marketSize: ( barrierId ) => `/barriers/${ barrierId }/assessment/market-size/`,
+			exportValue: ( barrierId ) => `/barriers/${ barrierId }/assessment/export-value/`,
+			commercialValue: ( barrierId ) => `/barriers/${ barrierId }/assessment/commercial-value/`,
+			documents: {
+				add: ( barrierId ) => `/barriers/${ barrierId }/assessment/documents/add/`,
+				cancel: ( barrierId ) => `/barriers/${ barrierId }/assessment/documents/cancel/`,
+				delete: ( barrierId, documentId ) => `/barriers/${ barrierId }/assessment/documents/${ documentId }/delete/`,
+			},
+		}
 	},
 
 	reports: reportUrl,

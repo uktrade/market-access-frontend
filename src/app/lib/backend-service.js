@@ -407,7 +407,39 @@ module.exports = {
 				role: values.role,
 			} ),
 			delete: ( req, barrierMemberId ) => backend.delete( `/barriers/members/${ barrierMemberId }`, getToken( req ) ),
-		}
+		},
+		assessment: (() => {
+
+			function saveAssessmentValues( req, barrier, values ){
+
+				const isPatch = barrier.has_assessment;
+				const url = `/barriers/${ barrier.id }/assessment`;
+
+				return backend[ ( isPatch ? 'patch' : 'post' ) ]( url, getToken( req ), values );
+			}
+
+			return {
+				get: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }/assessment`, getToken( req ) ),
+				getHistory: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }/assessment_history`, getToken( req ) ),
+				saveEconomic: ( req, barrier, values ) => saveAssessmentValues( req, barrier, {
+					impact: values.impact,
+					explanation: values.description,
+					documents: ( values.documentIds ? values.documentIds : null ),
+				} ),
+				saveEconomyValue: ( req, barrier, value ) => saveAssessmentValues( req, barrier,  {
+					value_to_economy: value,
+				} ),
+				saveMarketSize: ( req, barrier, value ) => saveAssessmentValues( req, barrier,  {
+					import_market_size: value,
+				} ),
+				saveExportValue: ( req, barrier, value ) => saveAssessmentValues( req, barrier,  {
+					export_value: value,
+				} ),
+				saveCommercialValue: ( req, barrier, value ) => saveAssessmentValues( req, barrier,  {
+					commercial_value: value,
+				} ),
+			};
+		})(),
 	},
 
 	reports: {

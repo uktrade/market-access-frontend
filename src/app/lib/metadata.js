@@ -244,6 +244,7 @@ module.exports.fetch = async () => {
 			}
 
 			module.exports.barrierPendingOptions = body.barrier_pending;
+			module.exports.barrierAssessmentImpactOptions = body.assessment_impact;
 
 		} else {
 
@@ -312,6 +313,15 @@ module.exports.barrier = {
 			'2': 'My team barriers',
 		}
 	},
+	assessment: {
+		fieldNames: {
+			impact: 'Economic assessment',
+			value_to_economy: 'Value to UK Economy',
+			import_market_size: 'Import Market Size',
+			export_value: 'Value of currently affected UK exports',
+			commercial_value: 'Commercial Value'
+		}
+	}
 };
 
 module.exports.getBarrierCreatedBy = ( id ) => module.exports.barrier.createdBy.items[ id ];

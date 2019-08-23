@@ -1,0 +1,44 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "History of an assessment",
+
+	"type": "object",
+	"required": [ "barrier_id", "history" ],
+	"properties": {
+
+		"barrier_id": { "$ref": "$refs/common.json#/uuid" },
+
+		"history": {
+			"type": "array",
+			"minItems": 2,
+			"maxItems": 5,
+			"items": {
+				"$ref": "#/refs/history-item"
+			}
+		}
+	},
+
+	"refs": {
+		"history-item": {
+			"type": "object",
+			"required": [
+				"date",
+				"field",
+				"old_value",
+				"new_value",
+				"user"
+			],
+			"properties": {
+
+				"date": { "$ref": "$refs/common.json#/past-date" },
+				"field": {
+					"type": "string",
+					"enum": [ "impact", "value_to_economy" ]
+				},
+				"old_value": { "$ref": "$refs/common.json#/small-int" },
+				"new_value": { "$ref": "$refs/common.json#/small-int" },
+				"user": { "$ref": "$refs/common.json#/user" }
+			}
+		}
+	}
+}

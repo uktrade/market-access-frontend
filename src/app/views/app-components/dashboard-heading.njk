@@ -30,7 +30,7 @@
 	</div>
 
 	<div class="page-tabs-container">
-		{{ tabs( data.tabs ) }}
+		{{ tabs( { items: data.tabs } ) }}
 		{% if data.canAddWatchList %}
 		<a class="page-tabs-add-watch-list" href="{{ urls.findABarrier() }}"><span class="circle-icon">&#xFF0B</span> add watch list</a>
 		{% endif %}

@@ -24,15 +24,6 @@
 
 	"refs": {
 
-		"user": {
-			"type": "object",
-			"required": [ "id", "name" ],
-			"properties": {
-				"id": { "$ref": "$refs/common.json#/small-int" },
-				"name": { "$ref": "$refs/common.json#/word" }
-			}
-		},
-
 		"status-item": {
 			"type": "object",
 			"required": [
@@ -56,9 +47,7 @@
 						"event": { "$ref": "$refs/common.json#/barrier-event" }
 					}
 				},
-				"user": {
-					"$ref": "#/refs/user"
-				}
+				"user": { "$ref": "$refs/common.json#/user" }
 			}
 		},
 
@@ -84,9 +73,7 @@
 						"priority_summary": { "$ref": "$refs/common.json#/words" }
 					}
 				},
-				"user": {
-					"$ref": "#/refs/user"
-				}
+				"user": { "$ref": "$refs/common.json#/user" }
 			}
 		}
 	}

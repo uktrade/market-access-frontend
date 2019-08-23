@@ -1,0 +1,39 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Detail of an assessment",
+
+	"type": "object",
+	"required": [
+		"id",
+		"impact",
+		"explantion",
+		"value_to_economy",
+		"import_market_size",
+		"commercial_value",
+		"export_value",
+		"documents",
+		"created_on",
+		"created_by"
+	],
+	"properties": {
+
+		"id": { "$ref": "$refs/common.json#/small-int" },
+		"impact": {
+			"type": "string",
+			"enum": [ "ONE", "TWO", "THREE", "FOUR" ]
+		},
+		"explantion": { "$ref": "$refs/common.json#/words" },
+		"value_to_economy": { "$ref": "$refs/common.json#/int" },
+		"import_market_size": { "$ref": "$refs/common.json#/int" },
+		"commercial_value": { "$ref": "$refs/common.json#/int" },
+		"export_value": { "$ref": "$refs/common.json#/int" },
+		"documents": {
+			"type": "array",
+			"minItems": 0,
+			"maxItems": 5,
+			"items": { "$ref": "$refs/common.json#/document" }
+		},
+		"created_on": { "$ref": "$refs/common.json#/past-date" },
+		"created_by": { "$ref": "$refs/common.json#/user" }
+	}
+}

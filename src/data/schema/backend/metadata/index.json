@@ -18,7 +18,8 @@
 		"barrier_status",
 		"barrier_source",
 		"barrier_priorities",
-		"barrier_pending"
+		"barrier_pending",
+		"assessment_impact"
 	],
 	"properties": {
 
@@ -191,6 +192,18 @@
 				"TWO": { "$ref": "$refs/common.json#/words" },
 				"THREE": { "$ref": "$refs/common.json#/words" },
 				"OTHER": { "$ref": "$refs/common.json#/word" }
+			}
+		},
+
+		"assessment_impact": {
+			"type": "object",
+			"required": [ "I_ONE", "I_TWO", "I_THREE", "I_FOUR" ],
+			"properties": {
+
+				"I_ONE": { "$ref": "$refs/common.json#/word" },
+				"I_TWO": { "$ref": "$refs/common.json#/words" },
+				"I_THREE": { "$ref": "$refs/common.json#/words" },
+				"I_FOUR": { "$ref": "$refs/common.json#/word" }
 			}
 		}
 	}

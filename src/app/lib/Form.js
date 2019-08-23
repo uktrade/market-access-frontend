@@ -61,6 +61,17 @@ function Form( req, fields ){
 	this.values = {};
 	this.errors = [];
 
+	function getValue( field, name ){
+
+		const value = req.body[ name ];
+
+		if( field.sanitize ){
+			return field.sanitize( value );
+		}
+
+		return value;
+	}
+
 	for( let [ name, field ] of Object.entries( fields ) ){
 
 		this.addField( name, field );
@@ -79,7 +90,7 @@ function Form( req, fields ){
 
 			} else {
 
-				this.values[ name ] = req.body[ name ];
+				this.values[ name ] = getValue( field, name );
 			}
 		}
 	}

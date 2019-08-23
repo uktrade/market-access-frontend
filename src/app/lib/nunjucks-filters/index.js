@@ -9,4 +9,5 @@ module.exports = function( env ){
 	env.addFilter( 'addToRadio', require( './add-to-radio' ) );
 	env.addFilter( 'time', require( './time' ) );
 	env.addFilter( 'linkify', require( './linkify' ) );
+	env.addFilter( 'formatNumber', require( './format-number' ) );
 };

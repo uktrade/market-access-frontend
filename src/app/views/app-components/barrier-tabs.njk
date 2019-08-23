@@ -1,8 +1,8 @@
 {% from 'app-components/tabs.njk' import tabs %}
 
 {% macro barrierTabs( barrierId, active = 'detail' ) %}
-	{{ tabs([
-		{
+	{{ tabs({
+		items: [{
 			href: urls.barriers.detail( barrierId ),
 			text: 'Barrier information',
 			isCurrent: ( active == 'detail' )
@@ -10,8 +10,11 @@
 			href: urls.barriers.team.list( barrierId ),
 			text: 'Barrier team',
 			isCurrent: ( active == 'team' )
-		}
-	], {
+		},{
+			href: urls.barriers.assessment.detail( barrierId ),
+			text: 'Assessment',
+			isCurrent: ( active == 'assessment' )
+		}],
 		classes: 'page-tabs--no-margin'
 	}) }}
 {% endmacro %}

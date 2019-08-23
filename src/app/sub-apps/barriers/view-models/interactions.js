@@ -125,10 +125,34 @@ function getHistory( items ){
 	return history;
 }
 
-module.exports = function ( responses, editId ){
+function getAssessmentHistory( items ){
+
+	const history = [];
+
+	for( const item of items ){
+
+		history.push( {
+			isAssessment: true,
+			isEdit: ( item.old_value !== null ),
+			name: metadata.barrier.assessment.fieldNames[ item.field ],
+			date: item.date,
+			user: item.user,
+		} );
+	}
+
+	return history;
+}
+
+module.exports = function( responses, editId ){
 
 	const notes = getNotes( responses.interactions.results, editId );
 	const history = getHistory( responses.history.history );
+	let items = notes.concat( history );
 
-	return notes.concat( history ).sort( sortByDateDescending );
+	if( responses.assessmentHistory ){
+
+		items = items.concat( getAssessmentHistory( responses.assessmentHistory.body.history ) );
+	}
+
+	return items.sort( sortByDateDescending );
 };
