@@ -1,7 +1,7 @@
 const { documents: documentUrls } = require( '../../../../lib/urls' ).barriers.assessment;
 
 
-module.exports = function( barrierId, documents, templateValues ){
+module.exports = function( barrierId, sessionDocuments, templateValues ){
 
 	const values = {
 		...templateValues,
@@ -11,9 +11,9 @@ module.exports = function( barrierId, documents, templateValues ){
 		},
 	};
 
-	if( documents ){
+	if( sessionDocuments ){
 
-		values.documents = documents.map( ( document ) => ({
+		values.documents = sessionDocuments.map( ( document ) => ({
 			...document,
 			deleteUrl: documentUrls.delete( barrierId, document.id )
 		}) );

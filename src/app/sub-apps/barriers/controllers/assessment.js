@@ -143,10 +143,7 @@ module.exports = {
 			form,
 			render: ( templateValues ) => res.render(
 				'barriers/views/assessment/economic',
-				{
-					documents: assessment.documents,
-					...economicViewModel( barrierId, session.get(), templateValues )
-				}
+				economicViewModel( barrierId, session.get(), templateValues )
 			),
 			saveFormData: async ( formValues ) => {
 
