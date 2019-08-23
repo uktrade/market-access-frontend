@@ -1,5 +1,6 @@
 const proxyquire = require( 'proxyquire' );
 const faker = require( 'faker' );
+const fileSize = require( '../../../../lib/file-size' );
 const modulePath = './economic';
 
 function createDoc(){
@@ -48,6 +49,7 @@ describe( 'Economic assessemnt view model', () => {
 			},
 			documents: documents.map( ( doc ) => ({
 				...doc,
+				size: fileSize( doc.size ),
 				deleteUrl: documentDeleteUrl,
 			}) ),
 		} );
