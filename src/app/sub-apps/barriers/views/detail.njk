@@ -133,20 +133,20 @@
 				text: barrier.reportedOn | dateOnly,
 				halfWidth: true
 			},{
-				title: 'Summary of the problem',
+				title: 'Barrier summary',
 				html: barrier.problem.description | escape | nl2br,
 				edit: {
 					href: urls.barriers.edit.description( barrier.id )
 				}
 			},{
-				title: 'Barrier scope',
+				title: 'Barrier type',
 				text: barrier.problem.status,
 				edit: {
 					href: urls.barriers.edit.problemStatus( barrier.id )
 				},
 				halfWidth: true
 			},{
-				title: 'Related to EU Exit',
+				title: 'Related to Brexit',
 				text: barrier.euExitRelated,
 				halfWidth: true,
 				edit: {
@@ -175,26 +175,26 @@
 				}
 			},
 			{
-				title: 'Market access barrier type',
+				title: 'Barrier ' + ( 'categories' if barrier.types.length > 1 else 'category' ),
 				heading: {
 					text: ( barrier.types.category.name + ':' ) if barrier.type.category.name
 				},
 				items: barrier.types,
 				add: {
-					text: 'Add type of Market Access Barrier',
+					text: 'Add barrier category',
 					href: urls.barriers.types.new( barrier.id )
 				},
 				edit: {
 					href: urls.barriers.types.edit( barrier.id )
 				}
 			},{
-				title: 'Product or service being exported or invested',
+				title: 'Product, service or investment affected',
 				text: barrier.product,
 				edit: {
 					href: urls.barriers.edit.product( barrier.id )
 				}
 			},{
-				title: 'Awareness of the problem',
+				title: 'Information source',
 				html: barrier.source.name + ( ( '<br>' + barrier.source.description ) if barrier.source.description ),
 				edit: {
 					href: urls.barriers.edit.source( barrier.id )
@@ -388,7 +388,7 @@
 
 					<h4 class="event-list__item__heading">You have not stated any next steps or progress</h4>
 					<p class="event-list__item__text">
-						A note can be next steps to resolve the barrier or any progress made on the barrier thus far. You can also attach any useful documents associated to the barrier.
+						Record agreed team actions and any progress made on resolving it. You can also upload documents, for example relevant emails or meeting readouts.
 					</p>
 
 				{%- endif -%}

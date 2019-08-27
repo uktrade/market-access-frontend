@@ -1,6 +1,6 @@
-.leade {
+/* .leade {
 	@include govuk-font( 19 );
-}
+} */
 
 .paragraph-list {
 	padding-left: govuk-em( 20, 16 );
@@ -34,7 +34,7 @@
 	}
 }
 
-.barrier-type-section-list {
+/* .barrier-type-section-list {
 	list-style: none;
 	padding: 0;
 }
@@ -42,17 +42,13 @@
 .barrier-type-section-sub-heading {
 	@include govuk-font( 19, $weight: bold );
 	margin-top: govuk-em( 45, 19 );
-}
+} */
 
 .barrier-type-group {
 
 	h4 {
 		@include govuk-font( 16, $weight: bold );
 		margin: govuk-em( 30, 16 ) 0 0 0;
-
-		&:first-of-type {
-			//margin-top: 0;
-		}
 	}
 
 	p {

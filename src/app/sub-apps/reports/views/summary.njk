@@ -4,7 +4,7 @@
 
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Add - Summarise the problem{% endblock %}
+{% block page_title %}{{ super() }} - Add - Barrier summary{% endblock %}
 
 {% block body_script %}
 	<script>
@@ -19,7 +19,7 @@
 	{{ heading({
 		back: { href: backHref },
 		caption: 'Add a barrier',
-		text: ( 'Summarise the problem' ),
+		text: ( 'Barrier summary' ),
 		errors: errors
 	}) }}
 
@@ -30,8 +30,11 @@
 		{{ govukCharacterCount( {
 
 			label: {
-				text: 'Provide a brief summary of the problem',
+				text: 'Describe the barrier',
 				classes: 'govuk-label--s'
+			},
+			hint: {
+				text: 'Include how the barrier is affecting the export or investment and why the barrier exists. For example, because of specific laws or measures, which government body imposed them and any political context; the HS code; and when the problem started.'
 			},
 			id: 'description',
 			name: 'description',
@@ -59,14 +62,14 @@
 			{{ govukTextarea( {
 
 				label: {
-					text: 'What are the next steps to resolve this barrier?',
+					text: 'What steps will be taken to resolve the barrier?',
 					classes: 'govuk-label--s'
 				},
 				id: 'next-steps',
 				name: 'nextSteps',
 				value: nextSteps,
 				hint: {
-					text: 'This could be steps determined by yourself or your team. Highlighting that next steps have not been discussed is also useful to note.'
+					text: 'Include all your agreed team actions.'
 				},
 				errorMessage: errors | errorForName( 'next-steps' )
 			} ) }}

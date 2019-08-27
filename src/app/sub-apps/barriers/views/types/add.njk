@@ -3,7 +3,7 @@
 
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Barrier - Add Type{% endblock %}
+{% block page_title %}{{ super() }} - Barrier - Add category{% endblock %}
 
 {% block body_script %}
 	<script>
@@ -16,7 +16,7 @@
 	{{ heading({
 		back: { href: urls.barriers.detail( barrier.id ) },
 		caption: barrier.barrier_title,
-		text: 'Define type of market access barrier',
+		text: 'Define barrier category',
 		errors: errors
 	}) }}
 
