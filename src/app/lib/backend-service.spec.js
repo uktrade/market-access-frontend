@@ -1157,6 +1157,128 @@ describe( 'Backend Service', () => {
 				} );
 			} );
 		} );
+
+		describe( 'assessment', () => {
+
+			beforeEach( () => {
+				req.barrier = {
+					id: barrierId,
+					has_assessment: false,
+				};
+			} );
+
+			async function checkPostAndPatch( method, inputValues, outputValues ){
+
+				const url = `/barriers/${ barrierId }/assessment`;
+
+				await method( req, req.barrier, inputValues );
+
+				expect( backend.post ).toHaveBeenCalledWith( url, token, outputValues );
+
+				req.barrier.has_assessment = true;
+
+				await method( req, req.barrier, inputValues );
+
+				expect( backend.patch ).toHaveBeenCalledWith( url, token, outputValues );
+			}
+
+			describe( 'get', () => {
+				it( 'Should GET the correct path', async () => {
+
+					await service.barriers.assessment.get( req, barrierId );
+
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers/${ barrierId }/assessment`, token );
+				} );
+			} );
+
+			describe( 'getHistory', () => {
+				it( 'Should GET the correct path', async () => {
+
+					await service.barriers.assessment.getHistory( req, barrierId );
+
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers/${ barrierId }/assessment_history`, token );
+				} );
+			} );
+
+			describe( 'saveEconomic', () => {
+				describe( 'Without any documentIds', () => {
+					it( 'Should POST to the correct path with the correct values', async () => {
+
+						const values = {
+							impact: faker.lorem.word().toUpperCase(),
+							description: faker.lorem.paragraph( 2 ),
+						};
+
+						await checkPostAndPatch( service.barriers.assessment.saveEconomic, values, {
+							impact: values.impact,
+							explanation: values.description,
+							documents: null,
+						} );
+					} );
+				} );
+
+				describe( 'With documentIds', () => {
+					it( 'Should POST to the correct path with the correct values', async () => {
+
+						const values = {
+							impact: faker.lorem.word().toUpperCase(),
+							description: faker.lorem.paragraph( 2 ),
+							documentIds: [ uuid(), uuid() ],
+						};
+
+						await checkPostAndPatch( service.barriers.assessment.saveEconomic, values, {
+							impact: values.impact,
+							explanation: values.description,
+							documents: values.documentIds,
+						} );
+					} );
+				} );
+			} );
+
+			describe( 'saveEconomyValue', () => {
+				it( 'Should POST to the correct path with the correct values', async () => {
+
+					const value = faker.random.number();
+
+					await checkPostAndPatch( service.barriers.assessment.saveEconomyValue, value, {
+						value_to_economy: value,
+					} );
+				} );
+			} );
+
+			describe( 'saveMarketSize', () => {
+				it( 'Should POST to the correct path with the correct values', async () => {
+
+					const value = faker.random.number();
+
+					await checkPostAndPatch( service.barriers.assessment.saveMarketSize, value, {
+						import_market_size: value,
+					} );
+				} );
+			} );
+
+			describe( 'saveExportValue', () => {
+				it( 'Should POST to the correct path with the correct values', async () => {
+
+					const value = faker.random.number();
+
+					await checkPostAndPatch( service.barriers.assessment.saveExportValue, value, {
+						export_value: value,
+					} );
+				} );
+			} );
+
+			describe( 'saveCommercialValue', () => {
+				it( 'Should POST to the correct path with the correct values', async () => {
+
+					const value = faker.random.number();
+
+					await checkPostAndPatch( service.barriers.assessment.saveCommercialValue, value, {
+						commercial_value: value,
+					} );
+				} );
+			} );
+		} );
 	} );
 
 	describe( 'Reports', () => {

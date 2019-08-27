@@ -61,7 +61,7 @@
 			<div class="attachments">
 				<h3 class="attachments__heading">Attached documents</h3>
 				<ul class="attachments__list js-documents-list">
-				{%-for document in params.documents %}
+				{%- for document in params.documents %}
 					{% if document %}{# ignore existing uploads in session which won't have a document - can be removed in next release #}
 
 					{%- set deleteUrl %}
@@ -360,7 +360,16 @@
 							 {{ item.text }}
 						</p>
 						{%- endif %}
+
+				{%- elif item.isAssessment -%}
+
+					<h4 class="event-list__item__heading">{{ item.date | dateOnly }}<span class="event-list__item__heading__recede"> at {{ item.date | time }} (GMT)</span></h4>
+
+					<p class="event-list__item__text">
+						<a href="{{ urls.barriers.assessment.detail( barrier.id ) }}">{{ item.name }}</a> {{ 'edited' if item.isEdit else 'added'}} {{ ' by ' + item.user.name if item.user.name }}.
+					</p>
 				{%- endif %}
+
 			</li>
 			{% endfor %}
 

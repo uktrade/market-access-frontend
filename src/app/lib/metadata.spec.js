@@ -602,6 +602,12 @@ describe( 'metadata', () => {
 					expect( metadata.barrierPendingOptions ).toEqual( fakeData.barrier_pending );
 				} );
 			} );
+
+			describe( 'barrierAssessmentImpactOptions', () => {
+				it( 'Should return the options', () => {
+					expect( metadata.barrierAssessmentImpactOptions ).toEqual( fakeData.assessment_impact );
+				} );
+			} );
 		} );
 
 		describe( 'getBarrierCreatedBy', () => {
@@ -691,6 +697,15 @@ describe( 'metadata', () => {
 							'2': 'My team barriers',
 						}
 					},
+					assessment: {
+						fieldNames: {
+							impact: 'Economic assessment',
+							value_to_economy: 'Value to UK Economy',
+							import_market_size: 'Import Market Size',
+							export_value: 'Value of currently affected UK exports',
+							commercial_value: 'Commercial Value'
+						}
+					}
 				} );
 			} );
 		} );

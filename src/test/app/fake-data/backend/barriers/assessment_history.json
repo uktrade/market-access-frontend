@@ -1,0 +1,35 @@
+{
+   "barrier_id": "66794c15-ddfb-4e00-b73c-b34e5c221387",
+   "history": [
+      {
+         "date": "Thu May 16 2019 10:58:33 GMT+0100 (British Summer Time)",
+         "field": "value_to_economy",
+         "old_value": 8,
+         "new_value": 14,
+         "user": {
+            "id": 14,
+            "name": "possimus"
+         }
+      },
+      {
+         "date": "Wed May 29 2019 13:17:50 GMT+0100 (British Summer Time)",
+         "field": "impact",
+         "old_value": 5,
+         "new_value": 15,
+         "user": {
+            "id": 17,
+            "name": "nesciunt"
+         }
+      },
+      {
+         "date": "Fri Aug 24 2018 19:26:57 GMT+0100 (British Summer Time)",
+         "field": "value_to_economy",
+         "old_value": null,
+         "new_value": 1,
+         "user": {
+            "id": 8,
+            "name": "voluptatem"
+         }
+      }
+   ]
+}

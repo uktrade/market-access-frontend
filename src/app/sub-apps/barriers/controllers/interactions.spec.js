@@ -27,6 +27,7 @@ describe( 'Barrier interactions controller', () => {
 	let barrierId;
 	let uploadDocument;
 	let reporter;
+	let documentControllers;
 
 	beforeEach( () => {
 
@@ -53,7 +54,10 @@ describe( 'Barrier interactions controller', () => {
 					save: jasmine.createSpy( 'backend.barriers.notes.save' ),
 					update: jasmine.createSpy( 'backend.barriers.notes.update' ),
 					delete: jasmine.createSpy( 'backend.barriers.notes.delete' ),
-				}
+				},
+				assessment: {
+					getHistory: jasmine.createSpy( 'backend.barriers.assessment.getHistory' ),
+				},
 			}
 		};
 
@@ -106,6 +110,7 @@ describe( 'Barrier interactions controller', () => {
 		};
 
 		reporter = mocks.reporter();
+		documentControllers = mocks.documentControllers();
 
 		controller = proxyquire( modulePath, {
 			'../../../config': config,
@@ -118,6 +123,7 @@ describe( 'Barrier interactions controller', () => {
 			'../view-models/interactions': interactionsViewModel,
 			'../../../lib/upload-document': uploadDocument,
 			'../../../lib/reporter': reporter,
+			'../../../lib/document-controllers': documentControllers,
 		} );
 	} );
 
@@ -134,11 +140,16 @@ describe( 'Barrier interactions controller', () => {
 			response: { isSuccess: true },
 			body: getFakeData( '/backend/barriers/history' )
 		};
+		const assessmentHistoryResponse = {
+			response: { isSuccess: true },
+			body: getFakeData( '/backend/barriers/assessment_history' ),
+		};
 
-		backend.barriers.getInteractions.and.callFake( () => Promise.resolve( interactionsResponse ) );
-		backend.barriers.getHistory.and.callFake( () => Promise.resolve( historyResponse ) );
+		backend.barriers.getInteractions.and.returnValue( Promise.resolve( interactionsResponse ) );
+		backend.barriers.getHistory.and.returnValue( Promise.resolve( historyResponse ) );
+		backend.barriers.assessment.getHistory.and.returnValue( Promise.resolve( assessmentHistoryResponse ) );
 
-		return { interactionsResponse, historyResponse };
+		return { interactionsResponse, historyResponse, assessmentHistoryResponse };
 	}
 
 	function returnViewModels(){
@@ -154,8 +165,10 @@ describe( 'Barrier interactions controller', () => {
 
 	async function check( controller, addCompany, data = {} ){
 
-		const { interactionsResponse, historyResponse } = returnSuccessResponses();
+		const { interactionsResponse, historyResponse, assessmentHistoryResponse } = returnSuccessResponses();
 		const { barrierDetailViewModelResponse, interactionsViewModelResponse } = returnViewModels();
+
+		req.barrier.has_assessment = true;
 
 		await controller( req, res, next );
 
@@ -165,7 +178,8 @@ describe( 'Barrier interactions controller', () => {
 		expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier, addCompany );
 		expect( interactionsViewModel ).toHaveBeenCalledWith( {
 			interactions: interactionsResponse.body,
-			history: historyResponse.body
+			history: historyResponse.body,
+			assessmentHistory: assessmentHistoryResponse,
 		}, undefined );
 
 		expect( res.render ).toHaveBeenCalledWith( 'barriers/views/detail',  {
@@ -174,166 +188,6 @@ describe( 'Barrier interactions controller', () => {
 			...data
 		} );
 	}
-
-	function checkAddDocument( getMethod, passedCb ){
-
-		let method;
-
-		beforeEach( () => {
-
-			method = getMethod();
-		} );
-
-		describe( 'When there is a formError on the req', () => {
-			describe( 'When the error is about file size', () => {
-				it( 'Should return a 400 with a message', async () => {
-
-					req.formError = new Error( 'The error is maxFileSize exceeded' );
-
-					await method( req, res );
-
-					expect( res.status ).toHaveBeenCalledWith( 400 );
-					expect( res.json ).toHaveBeenCalledWith( { message: 'File size exceeds the 5 MB limit. Reduce file size and upload the document again.' } );
-					expect( reporter.message ).not.toHaveBeenCalled();
-					expect( reporter.captureException ).not.toHaveBeenCalled();
-				} );
-			} );
-
-			describe( 'When the error is about something else', () => {
-				it( 'Should return a 400 with a message', async () => {
-
-					req.formError = new Error( 'The error is something else' );
-
-					await method( req, res );
-
-					expect( res.status ).toHaveBeenCalledWith( 400 );
-					expect( res.json ).toHaveBeenCalledWith( { message: 'A system error has occured, so the file has not been uploaded. Try again.' } );
-					expect( reporter.captureException ).toHaveBeenCalledWith( req.formError );
-				} );
-			} );
-		} );
-
-		describe( 'When there is not a formError', () => {
-			describe( 'When there is not a document', () => {
-				it( 'Should return a 400 with an error message', async () => {
-
-					await method( req, res );
-
-					expect( res.status ).toHaveBeenCalledWith( 400 );
-					expect( res.json ).toHaveBeenCalledWith( { message: 'Unsupported file format. The following file formats are accepted .jpg, .csv' } );
-					expect( reporter.message ).toHaveBeenCalledWith( 'info', 'Invalid document type: undefined', { size: undefined, name: undefined } );
-				} );
-			} );
-
-			describe( 'When there is a document', () => {
-
-				let doc;
-
-				beforeEach( () => {
-
-					doc = { type: 'text/plain', size: 10, name: 'test-1.txt' };
-					req.body.document = doc;
-				} );
-
-				describe( 'When the document is invalid', () => {
-					it( 'Should return 400 with an error message', async () => {
-
-						validators.isValidFile.and.callFake( () => false );
-
-						await method( req, res );
-
-						expect( res.status ).toHaveBeenCalledWith( 400 );
-						expect( res.json ).toHaveBeenCalledWith( { message: 'Unsupported file format. The following file formats are accepted .jpg, .csv' } );
-						expect( reporter.message ).toHaveBeenCalledWith( 'info', `Invalid document type: ${ doc.type }`, { size: doc.size, name: doc.name } );
-					} );
-				} );
-
-				describe( 'When the document is valid', () => {
-
-					beforeEach( () => {
-
-						validators.isValidFile.and.callFake( () => true );
-					} );
-
-					describe( 'When uploadDocument returns an error', () => {
-						it( 'Should return a 500', async () => {
-
-							const err = new Error( 'uploadDocument error' );
-
-							uploadDocument.and.callFake( () => Promise.reject( err ) );
-
-							await method( req, res );
-
-							expect( res.status ).toHaveBeenCalledWith( 500 );
-							expect( res.json ).toHaveBeenCalledWith( { message: 'A system error has occured, so the file has not been uploaded. Try again.' } );
-							expect( reporter.captureException ).toHaveBeenCalledWith( err );
-						} );
-					} );
-
-					describe( 'When uploadDocument returns a documentId', () => {
-
-						let documentId;
-
-						beforeEach( () => {
-
-							documentId = uuid();
-							uploadDocument.and.callFake( () => documentId );
-						} );
-
-						describe( 'When the document does not pass virus scanning', () => {
-							it( 'Should return a 401', async () => {
-
-								backend.documents.getScanStatus.and.callFake( () => Promise.resolve( { passed: false } ) );
-
-								await method( req, res );
-
-								expect( res.status ).toHaveBeenCalledWith( 401 );
-								expect( res.json ).toHaveBeenCalledWith( { message: 'This file may be infected with a virus and will not be accepted.' } );
-							} );
-						} );
-
-						describe( 'When the document passes virus scanning', () => {
-							it( 'Should return the document details and add the document to the session', async () => {
-
-								backend.documents.getScanStatus.and.callFake( () => Promise.resolve( { passed: true } ) );
-
-								await method( req, res );
-
-								expect( res.json ).toHaveBeenCalledWith( {
-									documentId,
-									file: { name: doc.name, size: '10 Bytes' }
-								} );
-
-								passedCb( documentId, doc );
-							} );
-						} );
-					} );
-				} );
-			} );
-		} );
-	}
-
-	describe( 'With a missing mime type map', () => {
-		it( 'Should report the error', () => {
-
-			config.files.types.push( 'fake/mime' );
-
-			controller = proxyquire( modulePath, {
-				'../../../config': config,
-				'../../../lib/backend-service': backend,
-				'../../../lib/urls': urls,
-				'../../../lib/Form': Form,
-				'../../../lib/FormProcessor': FormProcessor,
-				'../../../lib/validators': validators,
-				'../view-models/detail': barrierDetailViewModel,
-				'../view-models/interactions': interactionsViewModel,
-				'../../../lib/upload-document': uploadDocument,
-				'../../../lib/reporter': reporter,
-			} );
-
-			expect( reporter.message ).toHaveBeenCalledWith( 'info', 'No file extension mapping found for valid type: fake/mime'  );
-		} );
-	} );
 
 	describe( 'list', () => {
 
@@ -523,7 +377,7 @@ describe( 'Barrier interactions controller', () => {
 
 						expect( validator( file ) ).toEqual( true );
 						expect( validators.isValidFile ).toHaveBeenCalledWith( file );
-						expect( reporter.message ).not.toHaveBeenCalled();
+						expect( documentControllers.reportInvalidFile ).not.toHaveBeenCalled();
 					} );
 				} );
 
@@ -534,7 +388,7 @@ describe( 'Barrier interactions controller', () => {
 
 						expect( validator( file ) ).toEqual( false );
 						expect( validators.isValidFile ).toHaveBeenCalledWith( file );
-						expect( reporter.message ).toHaveBeenCalledWith( 'info', 'Invalid document type: ' + file.type, { size: file.size, name: file.name } );
+						expect( documentControllers.reportInvalidFile ).toHaveBeenCalledWith( file );
 					} );
 				} );
 			} );
@@ -603,7 +457,8 @@ describe( 'Barrier interactions controller', () => {
 						expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier, false );
 						expect( interactionsViewModel ).toHaveBeenCalledWith( {
 							interactions: interactionsResponse.body,
-							history: historyResponse.body
+							history: historyResponse.body,
+							assessmentHistory: undefined,
 						}, undefined );
 
 						config.saveFormData( formValues );
@@ -745,7 +600,7 @@ describe( 'Barrier interactions controller', () => {
 
 								await config.saveFormData( formValues );
 
-								expect( next ).toHaveBeenCalledWith( new Error( 'This file may be infected with a virus and will not be accepted.' ) );
+								expect( next ).toHaveBeenCalledWith( new Error( documentControllers.FILE_INFECTED_MESSAGE ) );
 							} );
 						} );
 					} );
@@ -835,7 +690,8 @@ describe( 'Barrier interactions controller', () => {
 					expect( barrierDetailViewModel ).toHaveBeenCalledWith( req.barrier, req.query.addCompany);
 					expect( interactionsViewModel ).toHaveBeenCalledWith( {
 						interactions: interactionsResponse.body,
-						history: historyResponse.body
+						history: historyResponse.body,
+						assessmentHistory: undefined,
 					}, editId );
 
 					config.saveFormData( formValues );
@@ -1056,170 +912,66 @@ describe( 'Barrier interactions controller', () => {
 				req.params.id = documentId;
 			} );
 
-			describe( 'delete', () => {
+			describe( 'add', () => {
+				it( 'Uses the documentControllers and adds the document to the session', async () => {
 
-				afterEach( () => {
+					const document = { type: 'text/plain', size: 10, name: 'test-1.txt' };
 
-					expect( backend.documents.delete ).toHaveBeenCalledWith( req, documentId );
-				} );
+					req.body.document = document;
 
-				describe( 'When the backend returns an error', () => {
+					expect( controller.notes.documents.add ).toEqual( documentControllers.xhr.add.cb );
 
-					let err;
+					documentControllers.xhr.add.calls.argsFor( 1 )[ 0 ]( req, { ...document, id: documentId } );
 
-					beforeEach( () => {
-
-						err = new Error( 'A backend error' );
-						backend.documents.delete.and.callFake( () => Promise.reject( err ) );
-					} );
-
-					describe( 'When it is a POST', () => {
-						it( 'Should return a JSON error with status 500', async () => {
-
-							req.method = 'POST';
-
-							await controller.notes.documents.delete( req, res, next );
-
-							expect( res.status ).toHaveBeenCalledWith( 500 );
-							expect( res.json ).toHaveBeenCalledWith( { message: 'Error deleting file' } );
-							expect( reporter.captureException ).toHaveBeenCalledWith( err );
-						} );
-					} );
-
-					describe( 'When it is a GET', () => {
-						it( 'Should call next with the error', async () => {
-
-							await controller.notes.documents.delete( req, res, next );
-
-							expect( next ).toHaveBeenCalledWith( err );
-							expect( reporter.captureException ).not.toHaveBeenCalled();
-						} );
-					} );
-				} );
-
-				describe( 'When the backend returns a 200', () => {
-
-					beforeEach( () => {
-
-						backend.documents.delete.and.callFake( () => Promise.resolve( {
-							response: { isSuccess: true }
-						} ) );
-					} );
-
-					describe( 'When it is a POST', () => {
-
-						beforeEach( () => {
-
-							req.method = 'POST';
-						} );
-
-						describe( 'When there are not any documents in the session', () => {
-							it( 'Should return the response in JSON', async () => {
-
-								await controller.notes.documents.delete( req, res, next );
-
-								expect( res.json ).toHaveBeenCalledWith( {} );
-							} );
-						} );
-
-						describe( 'When there are documents in the session', () => {
-							it( 'Should remove the matching document and return a 200', async () => {
-
-								const nonMatchingDoc1 = { document: { id: uuid(), name: 'test1.txt'} };
-								const matchingDoc = { document: { id: documentId, name: 'match1.txt' } };
-
-								req.session.noteDocuments = { [noteId]: [ nonMatchingDoc1, matchingDoc ] };
-
-								await controller.notes.documents.delete( req, res, next );
-
-								expect( res.json ).toHaveBeenCalledWith( {} );
-								expect( req.session.noteDocuments[ noteId ] ).toEqual( [ nonMatchingDoc1 ] );
-							} );
-						} );
-					} );
-
-					describe( 'When it is a GET', () => {
-						it( 'Should retun a 302 to the edit note page', async () => {
-
-							const editResponse = '/edit-a-note';
-
-							urls.barriers.notes.edit.and.callFake( () => editResponse );
-
-							await controller.notes.documents.delete( req, res, next );
-
-							expect( res.redirect ).toHaveBeenCalledWith( editResponse );
-							expect( urls.barriers.notes.edit ).toHaveBeenCalledWith( barrierId, noteId );
-						} );
-					} );
-				} );
-
-				describe( 'When the backend returns a 500', () => {
-
-					beforeEach( () => {
-
-						backend.documents.delete.and.callFake( () => Promise.resolve( {
-							response: { isSuccess: false, statusCode: 500 }
-						} ) );
-					} );
-
-					describe( 'When it is a POST', () => {
-
-						beforeEach( () => {
-
-							req.method = 'POST';
-						} );
-
-						afterEach( () => {
-
-							expect( res.status ).toHaveBeenCalledWith( 500 );
-							expect( res.json ).toHaveBeenCalledWith( { message: 'Error deleting file' } );
-							expect( reporter.captureException ).toHaveBeenCalledWith( new Error( `Unable to delete document ${ documentId }, got 500 from backend` ) );
-						} );
-
-						describe( 'When there are not any documents in the session', () => {
-							it( 'Should return a 500 and report the error in JSON', async () => {
-
-								await controller.notes.documents.delete( req, res, next );
-							} );
-						} );
-
-						describe( 'When there are documents in the session', () => {
-							it( 'Should leave the matching document and return a 500', async () => {
-
-								const nonMatchingDoc1 = { noteId, document: { id: uuid(), name: 'test1.txt'} };
-								const matchingDoc = { noteId, document: { id: documentId, name: 'match1.txt' } };
-
-								req.session.noteDocuments = [ nonMatchingDoc1, matchingDoc ];
-
-								await controller.notes.documents.delete( req, res, next );
-
-								expect( req.session.noteDocuments ).toEqual( [ nonMatchingDoc1, matchingDoc ] );
-							} );
-						} );
-					} );
-
-					describe( 'When it is a GET', () => {
-						it( 'Should call next with the error', async () => {
-
-							await controller.notes.documents.delete( req, res, next );
-
-							expect( next ).toHaveBeenCalledWith( new Error( `Unable to delete document ${ documentId }, got 500 from backend` ) );
-						} );
-					} );
+					expect( req.session.noteDocuments ).toBeDefined();
+					expect( req.session.noteDocuments[ noteId ] ).toEqual( [{ document: {
+						...document,
+						id: documentId,
+					} }] );
 				} );
 			} );
 
-			describe( 'add', () => {
+			describe( 'delete', () => {
 
-				checkAddDocument( () => controller.notes.documents.add, ( documentId, doc ) => {
+				it( 'Uses the documentControllers', () => {
 
-					expect( req.session.noteDocuments[ noteId ] ).toEqual( [{
-						document: {
-							id: documentId,
-							size: '10 Bytes',
-							name: doc.name,
-						}
-					}] );
+					const editNoteUrlResponse = 'a/b/c';
+					urls.barriers.notes.edit.and.returnValue( editNoteUrlResponse );
+
+					expect( controller.notes.documents.delete ).toEqual( documentControllers.delete.cb );
+
+					const args = documentControllers.delete.calls.argsFor( 0 );
+
+					expect( typeof args[ 0 ] ).toEqual( 'function' );
+					expect( typeof args[ 1 ] ).toEqual( 'function' );
+					expect( typeof args[ 2 ] ).toEqual( 'function' );
+
+					expect( args[ 0 ]( req ) ).toEqual( documentId );
+					expect( args[ 1 ]( req ) ).toEqual( editNoteUrlResponse );
+					expect( urls.barriers.notes.edit ).toHaveBeenCalledWith( barrierId, noteId );
+				} );
+
+				describe( 'When there are not any documents in the session', () => {
+					it( 'Should return the response in JSON', async () => {
+
+						documentControllers.delete.calls.argsFor( 0 )[ 2 ]( req, documentId );
+
+						expect( req.session.noteDocuments ).not.toBeDefined();
+					} );
+				} );
+
+				describe( 'When there are documents in the session', () => {
+					it( 'Should remove the matching document', async () => {
+
+						const nonMatchingDoc1 = { document: { id: uuid(), name: 'test1.txt'} };
+						const matchingDoc = { document: { id: documentId, name: 'match1.txt' } };
+
+						req.session.noteDocuments = { [ noteId ]: [ nonMatchingDoc1, matchingDoc ] };
+
+						documentControllers.delete.calls.argsFor( 0 )[ 2 ]( req, documentId );
+
+						expect( req.session.noteDocuments[ noteId ] ).toEqual( [ nonMatchingDoc1 ] );
+					} );
 				} );
 			} );
 
@@ -1264,137 +1016,103 @@ describe( 'Barrier interactions controller', () => {
 	} );
 
 	describe( 'documents (AJAX)', () => {
+
+		let barrierId;
+		let documentId;
+
+		beforeEach( () => {
+
+			barrierId = uuid();
+			documentId = uuid();
+
+			req.uuid = barrierId;
+			req.params.id = documentId;
+		} );
+
 		describe( 'add', () => {
 
-			checkAddDocument( () => controller.documents.add, ( documentId, doc ) => {
+			describe( 'When there are not any documents in the session', () => {
+				it( 'Uses the documentControllers and adds the document to the session', async () => {
 
-				expect( req.session.barrierDocuments ).toEqual( [{
-					barrierId: req.uuid,
-					document: {
-						id: documentId,
-						size: '10 Bytes',
-						name: doc.name,
-					}
-				}] );
+					const existingItem = { barrierId: uuid(), document: { id: uuid() } };
+					const document = { type: 'text/plain', size: 10, name: 'test-1.txt' };
+
+					req.body.document = document;
+					req.session.barrierDocuments = [ existingItem ];
+
+					expect( controller.documents.add ).toEqual( documentControllers.xhr.add.cb );
+
+					documentControllers.xhr.add.calls.argsFor( 0 )[ 0 ]( req, { ...document, id: documentId } );
+
+					expect( req.session.barrierDocuments ).toEqual( [
+						existingItem,
+						{
+							barrierId,
+							document: {
+								...document,
+								id: documentId,
+							}
+						}
+					] );
+				} );
+			} );
+
+			describe( 'When there are documents in the session', () => {
+				it( 'Uses the documentControllers and adds the document to the session', async () => {
+
+					const document = { type: 'text/plain', size: 10, name: 'test-1.txt' };
+
+					req.body.document = document;
+
+					expect( controller.documents.add ).toEqual( documentControllers.xhr.add.cb );
+
+					documentControllers.xhr.add.calls.argsFor( 0 )[ 0 ]( req, { ...document, id: documentId } );
+
+					expect( req.session.barrierDocuments ).toEqual( [{
+						barrierId,
+						document: {
+							...document,
+							id: documentId,
+						}
+					}] );
+				} );
 			} );
 		} );
 
 		describe( 'delete', () => {
 
-			let barrierId;
-			let documentId;
+			it( 'Uses the documentControllers', () => {
 
-			beforeEach( () => {
-
-				barrierId = uuid();
-				documentId = uuid();
-
-				req.uuid = barrierId;
-				req.params.id = documentId;
+				expect( controller.documents.delete ).toEqual( documentControllers.xhr.delete.cb );
+				const args = documentControllers.xhr.delete.calls.argsFor( 0 );
+				expect( typeof args[ 0 ] ).toEqual( 'function' );
+				expect( typeof args[ 1 ] ).toEqual( 'function' );
+				expect( args[ 0 ]( req ) ).toEqual( documentId );
 			} );
 
-			describe( 'When the document id is invalid', () => {
-				it( 'Should return a 500 and report the error', async () => {
+			describe( 'When there are barrier documents in the session', () => {
+				it( 'Should remove the document from the session', () => {
 
-					validators.isUuid.and.callFake( () => false );
+					const nonMatchingDoc1 = { id: uuid(), name: 'test1.jpg' };
+					const matchingDoc = { id: documentId, name: 'match.txt' };
 
-					await controller.documents.delete( req, res );
+					req.session.barrierDocuments = [
+						{ barrierId, document: nonMatchingDoc1 },
+						{ barrierId, document: matchingDoc }
+					];
 
-					expect( res.status ).toHaveBeenCalledWith( 500 );
-					expect( res.json ).toHaveBeenCalledWith( {} );
-					expect( reporter.captureException ).toHaveBeenCalledWith( new Error( 'Invalid documentId' ) );
+					documentControllers.xhr.delete.calls.argsFor( 0 )[ 1 ]( req, documentId );
+
+					expect( req.session.barrierDocuments ).toEqual( [ { barrierId, document: nonMatchingDoc1 } ] );
 				} );
 			} );
 
-			describe( 'When the document id is valid', () => {
+			describe( 'When there are no documents in the session', () => {
+				it( 'Should not error and have no documents in the session', () => {
 
-				beforeEach( () => {
-					validators.isUuid.and.callFake( () => true );
-				} );
+					documentControllers.xhr.delete.calls.argsFor( 0 )[ 1 ]( req, documentId );
 
-				describe( 'When the backend delete rejects', () => {
-					it( 'Should return a 500 with the correct message', async () => {
-
-						const err = new Error( 'A backend fail' );
-
-						backend.documents.delete.and.callFake( () => Promise.reject( err ) );
-
-						await controller.documents.delete( req, res );
-
-						expect( res.status ).toHaveBeenCalledWith( 500 );
-						expect( res.json ).toHaveBeenCalledWith( {} );
-						expect( reporter.captureException ).toHaveBeenCalledWith( err );
-					} );
-				} );
-
-				describe( 'When the backend resolves', () => {
-					describe( 'When it is a 500', () => {
-						it( 'Should report the error', async() => {
-
-							backend.documents.delete.and.callFake( () => Promise.resolve( { response: { statusCode: 500 } } ) );
-
-							await controller.documents.delete( req, res );
-
-							expect( res.status ).toHaveBeenCalledWith( 500 );
-							expect( res.json ).toHaveBeenCalledWith( { message: 'A system error has occured, so the file has not been deleted. Try again.' } );
-							expect( reporter.captureException ).toHaveBeenCalledWith( new Error( `Unable to delete document ${ documentId }, got 500 from backend` ) );
-						} );
-					} );
-
-					function checkSuccess(){
-
-						afterEach( () => {
-
-							expect( res.status ).toHaveBeenCalledWith( 200 );
-							expect( res.json ).toHaveBeenCalledWith( {} );
-						} );
-
-						describe( 'When there are barrier documents in the session', () => {
-							it( 'Should remove the document from the session and return a 200', async() => {
-
-								const nonMatchingDoc1 = { id: uuid(), name: 'test1.jpg' };
-								const matchingDoc = { id: documentId, name: 'match.txt' };
-
-								req.session.barrierDocuments = [
-									{ barrierId, document: nonMatchingDoc1 },
-									{ barrierId, document: matchingDoc }
-								];
-
-								await controller.documents.delete( req, res );
-
-								expect( req.session.barrierDocuments ).toEqual( [ { barrierId, document: nonMatchingDoc1 } ] );
-							} );
-						} );
-
-						describe( 'When there are not documents in the session', () => {
-							it( 'Should not error and have no documents in the session', async () => {
-
-								await controller.documents.delete( req, res );
-
-								expect( req.session.barrierDocuments ).not.toBeDefined();
-							} );
-						} );
-					}
-
-					describe( 'When it is a 200', () => {
-
-						beforeEach( () => {
-
-							backend.documents.delete.and.callFake( () => Promise.resolve( { response: { isSuccess: true } } ) );
-						} );
-
-						checkSuccess();
-					} );
-
-					describe( 'When it is a 404', () => {
-
-						beforeEach( () => {
-
-							backend.documents.delete.and.callFake( () => Promise.resolve( { response: { statusCode: 404 } } ) );
-						} );
-
-						checkSuccess();
-					} );
+					expect( req.session.barrierDocuments ).not.toBeDefined();
 				} );
 			} );
 		} );

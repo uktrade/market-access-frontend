@@ -47,8 +47,12 @@ module.exports = ( req, res, next ) => {
 			...methods,
 			types: createMethods( 'types' ),
 			sectors: {
-				all: createMethods( 'all'),
-				list: createMethods('list')
+				all: createMethods( 'all' ),
+				list: createMethods( 'list' )
+			},
+			documents: {
+				//barrier: createMethods( 'barrier-documents' ),
+				assessment: createMethods( 'assessment-documents' ),
 			},
 		};
 

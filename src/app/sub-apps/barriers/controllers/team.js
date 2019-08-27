@@ -114,7 +114,6 @@ module.exports = {
 			if( !form.hasErrors() ){
 
 				const { query } = form.getValues();
-
 				try {
 
 					const { response, body } = await sso.users.search( query );

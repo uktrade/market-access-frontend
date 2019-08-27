@@ -1,0 +1,44 @@
+{% from 'components/warning-text/macro.njk' import govukWarningText %}
+{% from 'app-components/currency-input.njk' import currencyInput %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Barrier Assessment - Affected UK exports{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.barriers.assessment.detail( barrier.id ) },
+		caption: barrier.barrier_title,
+		text: 'Value of currently affected UK exports',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.barriers.assessment.exportValue( barrier.id ) }}" method="POST" class="restrict-width">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{{ currencyInput( {
+
+			label: {
+				text: 'What is the value of currently affected UK exports?',
+				classes: 'govuk-label--s'
+			},
+			hint: {
+				text: 'The value of UK exports to the partner country that are affected by this barrier in GBP per year.'
+			},
+			id: 'value',
+			name: 'value',
+			classes: 'govuk-input--currency',
+			value: value | formatNumber,
+			errorMessage: errors | errorForName( 'value' )
+		} ) }}
+
+		{{ govukWarningText({
+			text: 'To be completed by the Market Access Analysts',
+			iconFallbackText: 'Warning'
+		}) }}
+
+		<input type="submit" value="Save and exit to barrier" class="govuk-button">
+	</form>
+{% endblock %}

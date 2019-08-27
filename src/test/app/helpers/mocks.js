@@ -120,7 +120,10 @@ if( typeof jasmine !== 'undefined' ){
 			sectors: {
 				list: createBarrierSessionSpies( 'list' ),
 				all: createBarrierSessionSpies( 'all' ),
-			}
+			},
+			documents: {
+				assessment: createBarrierSessionSpies( 'assessment-douments' ),
+			},
 		}),
 
 		form: () => {
@@ -141,5 +144,52 @@ if( typeof jasmine !== 'undefined' ){
 				Form: jasmine.createSpy( 'Form' ).and.returnValue( form )
 			};
 		},
+
+		formProcessor: () => {
+
+			const process = jasmine.createSpy( 'processor.process' );
+			const processor = { process };
+			const FormProcesor = jasmine.createSpy( 'FormProcessor' ).and.returnValue( processor );
+
+			FormProcesor.processor = processor;
+
+			return FormProcesor;
+		},
+
+		documentControllers: () => {
+
+			const xhrAddCb = jasmine.createSpy( 'documentControllers.xhr.add.cb' );
+			const xhrDeleteCb = jasmine.createSpy( 'documentControllers.xhr.delete.cb' );
+			const deleteCb = jasmine.createSpy( 'documentControllers.delete.cb' );
+
+			const xhr = {
+				add: jasmine.createSpy( 'documentControllers.xhr.add' ).and.returnValue( xhrAddCb ),
+				delete: jasmine.createSpy( 'documentControllers.xhr.delete' ).and.returnValue( xhrDeleteCb ),
+			};
+			const deleteMock = jasmine.createSpy( 'documentControllers.delete' ).and.returnValue( deleteCb );
+
+			xhr.add.cb = xhrAddCb;
+			xhr.delete.cb = xhrDeleteCb;
+			deleteMock.cb = deleteCb;
+
+			return {
+
+				MAX_FILE_SIZE: faker.lorem.words(),
+				OVERSIZE_FILE_MESSAGE: faker.lorem.words(),
+				INVALID_FILE_TYPE_MESSAGE: faker.lorem.words(),
+				UPLOAD_ERROR_MESSAGE: faker.lorem.words(),
+				FILE_INFECTED_MESSAGE: faker.lorem.words(),
+
+				reportInvalidFile: jasmine.createSpy( 'documentControllers.reportInvalidFile'),
+
+				xhr,
+				delete: deleteMock,
+			};
+		},
+
+		request: ( statusCode, body = {} ) => Promise.resolve({
+			response: { isSuccess: ( statusCode === 200 ), statusCode },
+			body,
+		}),
 	};
 }

@@ -80,6 +80,26 @@ function checkModal( done ){
 	};
 }
 
+function checkFormAction( url, done ){
+
+	return ( err, res ) => {
+
+		if( err ){ done.fail( err ); }
+
+		const matches = /<form.*action="(.+?)"/gm.exec( res.text );
+
+		if( matches ){
+
+			expect( matches[ 1 ] ).toEqual( url );
+			done();
+
+		} else {
+
+			done.fail();
+		}
+	};
+}
+
 function checkRedirect( location, done, responseCode = 302 ){
 
 	return ( err, res ) => {
@@ -1004,6 +1024,236 @@ describe( 'App', function(){
 									app.get( urls.barriers.team.delete( barrierId, '12' ) )
 										.end( checkPage( 'Market Access - Error', done, 500 ) );
 								} );
+							} );
+						} );
+					} ) ;
+				} );
+
+				describe( 'Barrier assessment', () => {
+
+					beforeEach( () => {
+						intercept.backend()
+							.get( `/barriers/${ barrierId }/assessment` )
+							.reply( 200, intercept.stub( '/backend/barriers/assessment') );
+					} );
+
+					describe( 'Detail', () => {
+						it( 'Should render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.assessment.detail( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier Assessment', done ) );
+						} );
+					} );
+
+					describe( 'economic', () => {
+						describe( 'listing', () => {
+							it( 'Should render the page', ( done ) => {
+
+								app
+									.get( urls.barriers.assessment.economic.list( barrierId ) )
+									.end( checkPage( 'Market Access - Barrier Assessment - Economic assessment', done ) );
+							} );
+
+							it( 'Should have the correct form action', ( done ) => {
+
+								const url = urls.barriers.assessment.economic.list( barrierId );
+								app
+									.get( url )
+									.end( ( err, res ) => {
+
+										const csrfToken = getCsrfTokenFromQueryParam( res, done.fail );
+
+										checkFormAction( `${ url }?_csrf=${ csrfToken }`, done )( err, res );
+									} );
+							} );
+						} );
+
+						describe( 'new', () => {
+							it( 'Should redirect to the list page', ( done ) => {
+
+								app
+									.get( urls.barriers.assessment.economic.new( barrierId ) )
+									.end( checkRedirect( urls.barriers.assessment.economic.list( barrierId ), done ) );
+							} );
+						} );
+					} );
+
+					describe( 'economyValue', () => {
+						it( 'Should render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.assessment.economyValue( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier Assessment - UK economy value', done ) );
+						} );
+
+						it( 'Should have the correct form action', ( done ) => {
+
+							const url = urls.barriers.assessment.economyValue( barrierId );
+							app
+								.get( url )
+								.end( checkFormAction( url, done ) );
+						} );
+					} );
+
+					describe( 'marketSize', () => {
+						it( 'Should render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.assessment.marketSize( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier Assessment - Import market size', done ) );
+						} );
+
+						it( 'Should have the correct form action', ( done ) => {
+
+							const url = urls.barriers.assessment.marketSize( barrierId );
+							app
+								.get( url )
+								.end( checkFormAction( url, done ) );
+						} );
+					} );
+
+					describe( 'exportValue', () => {
+						it( 'Should render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.assessment.exportValue( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier Assessment - Affected UK exports', done ) );
+						} );
+
+						it( 'Should have the correct form action', ( done ) => {
+
+							const url = urls.barriers.assessment.exportValue( barrierId );
+							app
+								.get( url )
+								.end( checkFormAction( url, done ) );
+						} );
+					} );
+
+					describe( 'commercialValue', () => {
+						it( 'Should render the page', ( done ) => {
+
+							app
+								.get( urls.barriers.assessment.commercialValue( barrierId ) )
+								.end( checkPage( 'Market Access - Barrier Assessment - Commercial value', done ) );
+						} );
+
+						it( 'Should have the correct form action', ( done ) => {
+
+							const url = urls.barriers.assessment.commercialValue( barrierId );
+							app
+								.get( url )
+								.end( checkFormAction( url, done ) );
+						} );
+					} );
+
+					describe( 'Assessment Documents', () => {
+
+						let documentId;
+
+						beforeEach( () => {
+
+							documentId = uuid();
+						} );
+
+						describe( 'Delete', () => {
+
+							let token;
+							let agent;
+							let url;
+
+							beforeEach( ( done ) => {
+
+								intercept.backend()
+									.get( `/barriers/${ barrier.id }/assessment` )
+									.reply( 200, intercept.stub( '/backend/barriers/assessment' ) );
+
+								agent = supertest.agent( appInstance );
+
+								agent
+									.get( urls.barriers.assessment.economic.list( barrierId ) )
+									.end( ( err, res ) => {
+
+										token = getCsrfTokenFromQueryParam( res, done.fail );
+										url = urls.barriers.assessment.documents.delete( barrierId, documentId ) + `?_csrf=${ token }`;
+										done();
+									} );
+							} );
+
+							describe( 'When the API returns a 200', () => {
+
+								beforeEach( () => {
+
+									intercept.backend()
+										.delete( `/documents/${ documentId }` )
+										.reply( 200, '{}' );
+								} );
+
+								describe( 'With a normal request', () => {
+									it( 'Should return a 302', ( done ) => {
+
+										agent.post( url )
+											.send( '' )
+											.end( checkRedirect( urls.barriers.assessment.economic.list( barrierId ), done ) );
+									} );
+								} );
+
+								describe( 'With an XHR request', () => {
+									it( 'Should return a 200', ( done ) => {
+
+										agent.post( url )
+											.set( 'X-Requested-With', 'XMLHttpRequest' )
+											.send( '' )
+											.end( ( err, res ) => {
+
+												expect( res.statusCode ).toEqual( 200 );
+												expect( res.text ).toEqual( '{}' );
+												done();
+											} );
+									} );
+								} );
+							} );
+
+							describe( 'When the API returns a 400', () => {
+
+								beforeEach( () => {
+
+									intercept.backend()
+										.delete( `/documents/${ documentId }` )
+										.reply( 400, '{}' );
+								} );
+								describe( 'A normal request', () => {
+									it( 'Should return a 302', ( done ) => {
+
+										agent.post( url )
+											.send( '' )
+											.end( checkRedirect( urls.barriers.assessment.economic.list( barrierId ), done ) );
+									} );
+								} );
+
+								describe( 'An XHR request', () => {
+									it( 'Should return a 200', ( done ) => {
+
+										agent.post( url )
+											.set( 'X-Requested-With', 'XMLHttpRequest' )
+											.send( '' )
+											.end( ( err, res ) => {
+
+												expect( res.statusCode ).toEqual( 200 );
+												expect( res.text ).toEqual( '{}' );
+												done();
+											} );
+									} );
+								} );
+							} );
+						} );
+
+						describe( 'Cancel', () => {
+							it( 'Redirects to the assessment detail', ( done ) => {
+
+								app
+									.get( urls.barriers.assessment.documents.cancel( barrierId ) )
+									.end( checkRedirect( urls.barriers.assessment.detail( barrierId ), done ) );
 							} );
 						} );
 					} );
