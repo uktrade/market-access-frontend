@@ -1,16 +1,15 @@
 const csurf = require( 'csurf' );
 
-const headerNav = require( '../../middleware/header-nav' );
-
 const controller = require( './controllers' );
 
-const uuidParam = require( '../../middleware/params/uuid' );
+const headerNav = require( '../../middleware/header-nav' );
 const dashboardData = require( '../../middleware/dashboard-data' );
-const reportId = require( './middleware/params/report-id' );
-const countryId = require( './middleware/params/country-id' );
-
 const hasStartFormValues = require( './middleware/has-start-form-values' );
 const hasResolvedFormValues = require( './middleware/has-resolved-form-values' );
+
+const uuidParam = require( '../../middleware/params/uuid' );
+const reportId = require( './middleware/params/report-id' );
+const countryId = require( './middleware/params/country-id' );
 
 const csrfProtection = csurf();
 
@@ -49,12 +48,13 @@ module.exports = ( express, app ) => {
 	app.get( '/:reportId/has-sectors/', controller.hasSectors );
 	app.post( '/:reportId/has-sectors/', controller.hasSectors );
 
-	app.get( '/:reportId/all-sectors/', controller.allSectors );
-	app.post( '/:reportId/all-sectors/', controller.allSectors );
+	app.get( '/:reportId/all-sectors/', controller.sectors.allSectors );
 
 	app.get( '/:reportId/sectors/', controller.sectors.list );
 	app.post( '/:reportId/sectors/', controller.sectors.list );
 
+	app.get( '/:reportId/sectors/add/all/', controller.sectors.all.add );
+	app.post( '/:reportId/sectors/remove/all/', controller.sectors.all.remove );
 	app.get( '/:reportId/sectors/add/', controller.sectors.add );
 	app.post( '/:reportId/sectors/add/', controller.sectors.add );
 	app.post( '/:reportId/sectors/remove/', controller.sectors.remove );

@@ -16,15 +16,26 @@
 
 	<h3 class="report-sectors-heading">Save or add another sector</h3>
 
-	{{ sectorsList( sectors, {
-			csrfToken: csrfToken,
-			add: urls.reports.addSector( report.id ),
-			inputName: 'sector',
-			remove: urls.reports.removeSector( report.id )
-		}
-	) }}
+	{% if allSectors %}
+		{{ sectorsList( [ { name: 'All sectors' } ], {
+				csrfToken: csrfToken,
+				inputName: 'sector',
+				add: urls.reports.sectors.add( report.id ),
+				remove: urls.reports.sectors.all.remove( report.id )
+			}
+		) }}
+	{% else %}
+		{{ sectorsList( sectors, {
+				csrfToken: csrfToken,
+				inputName: 'sector',
+				add: urls.reports.sectors.add( report.id ),
+				remove: urls.reports.sectors.remove( report.id ),
+				all: urls.reports.sectors.all.add( report.id )
+			}
+		) }}
+	{% endif %}
 
-	<form action="{{ urls.reports.sectors( report.id ) }}" method="POST">
+	<form action="{{ urls.reports.sectors.list( report.id ) }}" method="POST">
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 		<input type="submit" value="Save and continue" class="govuk-button">
 		<button type="submit" class="govuk-button button--secondary" name="action" value="exit">Save and exit</button>

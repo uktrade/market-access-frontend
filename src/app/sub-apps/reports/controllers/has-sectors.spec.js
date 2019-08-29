@@ -45,8 +45,10 @@ describe( 'Report controllers', () => {
 		urls = {
 			reports: {
 				detail: jasmine.createSpy( 'urls.reports.detail' ),
-				allSectors: jasmine.createSpy( 'urls.reports.allSectors' ),
 				aboutProblem: jasmine.createSpy( 'urls.reports.aboutProblem' ),
+				sectors: {
+					list: jasmine.createSpy( 'urls.reports.sectors.list' ),
+				},
 			},
 		};
 
@@ -213,15 +215,15 @@ describe( 'Report controllers', () => {
 
 					it( 'Should redirect to the correct URL', () => {
 
-						const allSectorsResponse = '/all-sectors';
+						const listResponse = '/list-sectors';
 
-						urls.reports.allSectors.and.callFake( () => allSectorsResponse );
+						urls.reports.sectors.list.and.callFake( () => listResponse );
 						getValuesResponse = { hasSectors: 'true' };
 
 						args.saved();
 
-						expect( urls.reports.allSectors ).toHaveBeenCalledWith( report.id );
-						expect( res.redirect ).toHaveBeenCalledWith( allSectorsResponse );
+						expect( urls.reports.sectors.list ).toHaveBeenCalledWith( report.id );
+						expect( res.redirect ).toHaveBeenCalledWith( listResponse );
 					} );
 				} );
 

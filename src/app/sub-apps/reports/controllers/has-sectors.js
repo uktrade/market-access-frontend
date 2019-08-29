@@ -27,9 +27,9 @@ module.exports = async ( req, res, next ) => {
 	function getRedirectUrl(){
 
 		const { hasSectors } = form.getValues();
-		const urlMethod = ( hasSectors === 'true' ? 'allSectors' : 'aboutProblem' );
+		const urlMethod = ( hasSectors === 'true' ? urls.reports.sectors.list : urls.reports.aboutProblem );
 
-		return urls.reports[ urlMethod ]( report.id );
+		return urlMethod( report.id );
 	}
 
 	const processor = new FormProcessor( {

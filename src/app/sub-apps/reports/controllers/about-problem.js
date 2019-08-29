@@ -57,9 +57,9 @@ module.exports = async ( req, res, next ) => {
 		render: ( templateValues ) => {
 
 			const hasSectors = ( report.sectors_affected === true );
-			const urlMethod = ( hasSectors ? ( report.all_sectors === true ? 'allSectors' : 'sectors' ) : 'hasSectors' );
+			const urlMethod = ( hasSectors ? urls.reports.sectors.list : urls.reports.hasSectors );
 
-			templateValues.backHref =  urls.reports[ urlMethod ]( report.id );
+			templateValues.backHref =  urlMethod( report.id );
 
 			res.render( 'reports/views/about-problem', templateValues );
 		},
