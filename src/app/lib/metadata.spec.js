@@ -98,8 +98,8 @@ describe( 'metadata', () => {
 
 				expect( metadata.statusTypes ).toBeDefined();
 				expect( metadata.statusTypes ).toEqual( {
-					'1': 'A procedural/short-term barrier',
-					'2': 'A long term strategic barrier'
+					'1': 'A procedural, short-term barrier',
+					'2': 'A long-term strategic barrier'
 				} );
 			} );
 		} );

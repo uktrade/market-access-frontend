@@ -17,7 +17,7 @@
 	{{ heading({
 		back: { href: urls.reports.start( report.id ) },
 		caption: 'Add a barrier',
-		text: 'Status of the barrier',
+		text: 'Barrier status',
 		errors: errors
 	}) }}
 
@@ -94,11 +94,11 @@
 			items: isResolved | addToRadio(
 				[ types.RESOLVED, {
 					conditional: { html: isResolvedHtml },
-					hint: { text: 'Please continue to enter information, even if the barrier is resolved.' }
+					hint: { text: 'It\'s still important to log resolved barriers' }
 				} ],
 				[ types.PART_RESOLVED, {
 					conditional: { html: isPartResolvedHtml },
-					hint: { text: 'Please continue to enter information, even if the barrier is partially resolved.' }
+					hint: { text: 'It\'s still important to log partially resolved barriers' }
 				} ]
 			),
 			errorMessage: errors | errorForName( 'is-resolved-1' )
