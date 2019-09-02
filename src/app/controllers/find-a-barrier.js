@@ -7,10 +7,11 @@ module.exports = {
 	list: async function( req, res, next ){
 
 		const filters = barrierFilters.getFromQueryString( req.query );
+		const page = ( parseInt( req.query.page, 10 ) || 1 );
 
 		try {
 
-			const { response, body } = await backend.barriers.getAll( req, filters );
+			const { response, body } = await backend.barriers.getAll( req, filters, page );
 
 			if( response.isSuccess ){
 

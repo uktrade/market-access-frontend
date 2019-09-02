@@ -101,7 +101,8 @@ let config = {
 			enabled: bool( 'BACKEND_HAWK_ENABLED', true ),
 			id: requiredEnv( 'BACKEND_HAWK_ID' ),
 			key: requiredEnv( 'BACKEND_HAWK_KEY' ),
-		}
+		},
+		resultsLimit: number( 'BACKEND_RESULTS_LIMIT', 100 ),
 	},
 	datahub: {
 		url: requiredEnv( 'DATAHUB_URL' ),

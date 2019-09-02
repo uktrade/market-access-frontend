@@ -6,6 +6,7 @@ const metadata = require( './metadata' );
 const modulePath = './backend-service';
 const getFakeData = jasmine.helpers.getFakeData;
 const { RESOLVED, PART_RESOLVED } = metadata.barrier.status.types;
+const RESULTS_LIMIT = 100;
 
 describe( 'Backend Service', () => {
 
@@ -46,7 +47,10 @@ describe( 'Backend Service', () => {
 						statusCheckInterval: 10, //make the test run faster
 						maxWaitTime: 2000,
 					}
-				}
+				},
+				backend: {
+					resultsLimit: RESULTS_LIMIT,
+				},
 			}
 		} );
 	} );
@@ -348,25 +352,30 @@ describe( 'Backend Service', () => {
 
 		describe( 'getAll', () => {
 
-			async function testWithOrdering( filters, expectedParams ){
+			async function testWithOrdering( filters, expectedParams, page = 1 ){
 
 				const path = ( '/barriers?' + ( expectedParams ? expectedParams + '&' : '' ) );
 
-				await service.barriers.getAll( req, filters );
+				function getPath( params ){
 
-				expect( backend.get ).toHaveBeenCalledWith( `${ path }ordering=-reported_on`, token );
+					return `${ path }${ params }&limit=${ RESULTS_LIMIT }&offset=${ RESULTS_LIMIT * ( page - 1 ) }`;
+				}
 
-				await service.barriers.getAll( req, filters, 'reported_on' );
+				await service.barriers.getAll( req, filters, page );
 
-				expect( backend.get ).toHaveBeenCalledWith( `${ path }ordering=-reported_on`, token );
+				expect( backend.get ).toHaveBeenCalledWith( getPath( 'ordering=-reported_on' ), token );
 
-				await service.barriers.getAll( req, filters, 'reported_on', 'desc' );
+				await service.barriers.getAll( req, filters, page, 'reported_on' );
 
-				expect( backend.get ).toHaveBeenCalledWith( `${ path }ordering=-reported_on`, token );
+				expect( backend.get ).toHaveBeenCalledWith( getPath( 'ordering=-reported_on' ), token );
 
-				await service.barriers.getAll( req, filters, 'reported_on', 'asc' );
+				await service.barriers.getAll( req, filters, page, 'reported_on', 'desc' );
 
-				expect( backend.get ).toHaveBeenCalledWith( `${ path }ordering=reported_on`, token );
+				expect( backend.get ).toHaveBeenCalledWith( getPath( 'ordering=-reported_on' ), token );
+
+				await service.barriers.getAll( req, filters, page, 'reported_on', 'asc' );
+
+				expect( backend.get ).toHaveBeenCalledWith( getPath( 'ordering=reported_on' ), token );
 			}
 
 			describe( 'With no filters', () => {
@@ -382,6 +391,15 @@ describe( 'Backend Service', () => {
 					const country = uuid();
 
 					testWithOrdering( { country }, `location=${ country }` );
+				} );
+
+				describe( 'With a different page', () => {
+					it( 'Passes the correct params', () => {
+
+						const country = uuid();
+
+						testWithOrdering( { country }, `location=${ country }`, 2 );
+					} );
 				} );
 			} );
 

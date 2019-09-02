@@ -40,48 +40,123 @@ describe( 'Find a barrier controller', () => {
 	} );
 
 	describe( 'list', () => {
+
+		function checkBackendCall( page = 1 ){
+
+			expect( getFromQueryString ).toHaveBeenCalledWith( req.query );
+			expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, getFromQueryStringResponse, page );
+		}
+
 		describe( 'When the backend call is a success', () => {
+
+			let viewModelResponse;
+
+			beforeEach( () => {
+
+				const data = jasmine.helpers.getFakeData( '/backend/barriers/' );
+
+				viewModelResponse = { a: 1, b: 2 };
+				viewModel.and.returnValue( viewModelResponse );
+
+				backend.barriers.getAll.and.callFake( () => ({
+					response: { isSuccess: true },
+					body: data
+				}) );
+			} );
+
+			afterEach( () => {
+
+				expect( res.render ).toHaveBeenCalledWith( template, viewModelResponse );
+				expect( next ).not.toHaveBeenCalled();
+			} );
+
 			describe( 'Without a watchlist edit param', () => {
-				it( 'Gets the filters from the querystring and renders the template', async () => {
+				describe( 'With no page param', () => {
+					it( 'Gets the filters from the querystring and renders the template', async () => {
 
-					const viewModelResponse = { a: 1, b: 2 };
-					const data = jasmine.helpers.getFakeData( '/backend/barriers/' );
+						req.query = { filter1: 'true', filter2: 'true' };
 
-					viewModel.and.callFake( () => viewModelResponse );
+						await controller.list( req, res, next );
 
-					backend.barriers.getAll.and.callFake( () => ({
-						response: { isSuccess: true },
-						body: data
-					}) );
+						const viewModelArgs = viewModel.calls.argsFor( 0 )[ 0 ];
 
-					req.query = { filter1: 'true', filter2: 'true' };
+						expect( viewModelArgs.isEdit ).toEqual( false );
+						expect( viewModelArgs.editListIndex ).toBeUndefined();
+						checkBackendCall();
+					} );
+				} );
 
-					await controller.list( req, res, next );
+				describe( 'With a page param set', () => {
 
-					const viewModelArgs = viewModel.calls.argsFor( 0 )[ 0 ];
+					beforeEach( () => {
 
-					expect( getFromQueryString ).toHaveBeenCalledWith( req.query );
-					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, getFromQueryStringResponse );
-					expect( res.render ).toHaveBeenCalledWith( template, viewModelResponse );
-					expect( next ).not.toHaveBeenCalled();
-					expect( viewModelArgs.isEdit ).toEqual( false );
-					expect( viewModelArgs.editListIndex ).toBeUndefined();
+						req.query = { filter1: 'true', filter2: 'true' };
+					} );
+
+					afterEach( () => {
+
+						const viewModelArgs = viewModel.calls.argsFor( 0 )[ 0 ];
+
+						expect( viewModelArgs.isEdit ).toEqual( false );
+						expect( viewModelArgs.editListIndex ).toBeUndefined();
+					} );
+
+					describe( 'When the param is a valid number as a string', () => {
+						it( 'adds the correct page', async () => {
+
+							req.query.page = '2';
+
+							await controller.list( req, res, next );
+							checkBackendCall( 2 );
+						} );
+					} );
+
+					describe( 'When the param is a valid number as a string', () => {
+						it( 'adds the correct page', async () => {
+
+							req.query.page = '3';
+
+							await controller.list( req, res, next );
+							checkBackendCall( 3 );
+						} );
+					} );
+
+					describe( 'When the param has a valid number at the start of the string', () => {
+						it( 'adds the correct page', async () => {
+
+							req.query.page = '2x3yz';
+
+							await controller.list( req, res, next );
+							checkBackendCall( 2 );
+						} );
+					} );
+
+					describe( 'When the param is an invalid string', () => {
+						it( 'adds the correct page', async () => {
+
+							req.query.page = 'xyz';
+
+							await controller.list( req, res, next );
+							checkBackendCall();
+						} );
+					} );
+
+					describe( 'When the param is an invalid string', () => {
+						it( 'adds the correct page', async () => {
+
+							req.query.page = 'x2yz';
+
+							await controller.list( req, res, next );
+							checkBackendCall();
+						} );
+					} );
 				} );
 			} );
 
 			describe( 'With a watchlist and edit param', () => {
 				it( 'Gets the filters from the querystring and renders the template', async () => {
 
-					const viewModelResponse = { a: 1, b: 2 };
-					const data = jasmine.helpers.getFakeData( '/backend/barriers/' );
-
 					req.watchList.lists = [ { name: 'list one', filters: { a: 1, b: 2 } } ];
-					viewModel.and.callFake( () => viewModelResponse );
-
-					backend.barriers.getAll.and.callFake( () => ({
-						response: { isSuccess: true },
-						body: data
-					}) );
 
 					req.query = {
 						filter1: 'true',
@@ -93,12 +168,9 @@ describe( 'Find a barrier controller', () => {
 
 					const viewModelArgs = viewModel.calls.argsFor( 0 )[ 0 ];
 
-					expect( getFromQueryString ).toHaveBeenCalledWith( req.query );
-					expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, getFromQueryStringResponse );
-					expect( res.render ).toHaveBeenCalledWith( template, viewModelResponse );
-					expect( next ).not.toHaveBeenCalled();
 					expect( viewModelArgs.isEdit ).toEqual( true );
 					expect( viewModelArgs.editListIndex ).toEqual( 0 );
+					checkBackendCall();
 				} );
 			} );
 		} );
@@ -117,6 +189,7 @@ describe( 'Find a barrier controller', () => {
 
 					expect( next ).toHaveBeenCalledWith( new Error( `Got ${ statusCode } response from backend` ) );
 					expect( res.render ).not.toHaveBeenCalled();
+					checkBackendCall();
 				} );
 			} );
 		} );
@@ -131,6 +204,7 @@ describe( 'Find a barrier controller', () => {
 
 				expect( next ).toHaveBeenCalledWith( err );
 				expect( res.render ).not.toHaveBeenCalled();
+				checkBackendCall();
 			} );
 		} );
 	} );
