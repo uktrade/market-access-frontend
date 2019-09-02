@@ -2,6 +2,7 @@
 {% from 'app-components/heading.njk' import heading %}
 {% from 'app-components/checkbox-filter.njk' import checkboxFilter %}
 {% from 'app-components/typeahead.njk' import typeahead %}
+{% from 'app-components/pagination.njk' import pagination %}
 
 {% extends 'layout.njk' %}
 
@@ -209,6 +210,10 @@
 				{% endif %}
 			</div>
 
+			<p class="filter-results-pagination-summary">
+				Page {{ paginationData.currentPage }} of {{ paginationData.totalPages}}
+			</p>
+
 			<p class="filter-results-download">
 				{% if count > 0 %}
 					<span class="filter-results-download__text">
@@ -262,6 +267,9 @@
 					</li>
 				{% endfor %}
 			</ol>
+
+			{{ pagination( paginationData ) }}
+
 		</div>
 	</section>
 

@@ -28,6 +28,7 @@ module.exports = {
 
 				res.render( 'find-a-barrier', viewModel( {
 					count: body.count,
+					page,
 					barriers: body.results,
 					filters,
 					queryString: req.query,

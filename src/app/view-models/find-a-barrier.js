@@ -1,9 +1,12 @@
+const config = require( '../config' );
 const metadata = require( '../lib/metadata' );
 const sortGovukItems = require( '../lib/sort-govuk-items' );
 const urls = require( '../lib/urls' );
 const strings = require( '../lib/strings' );
 const barrierFilters = require( '../lib/barrier-filters' );
+const pagination = require( '../lib/pagination' );
 
+const RESULTS_LIMIT = config.backend.resultsLimit;
 const { OPEN, RESOLVED, HIBERNATED } = metadata.barrier.status.types;
 const barrierStatusTypeInfo = metadata.barrier.status.typeInfo;
 
@@ -28,7 +31,7 @@ function createMatcher( key ){
 //const isSelected = createMatcher( 'selected' );
 const isChecked = createMatcher( 'checked' );
 
-module.exports = function( { count, barriers, filters, queryString, isEdit, editListIndex, filtersMatchEditList } ){
+module.exports = function( { count, page, barriers, filters, queryString, isEdit, editListIndex, filtersMatchEditList } ){
 
 	const barrierList = [];
 	const hasFilters = !!Object.keys( filters ).length;
@@ -89,6 +92,7 @@ module.exports = function( { count, barriers, filters, queryString, isEdit, edit
 
 	return {
 		count,
+		paginationData: pagination.create( filters, RESULTS_LIMIT, count, page ),
 		barriers: barrierList,
 		hasFilters,
 		queryString,
