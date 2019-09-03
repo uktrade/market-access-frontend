@@ -27,7 +27,15 @@ describe( 'validators', () => {
 			barrierStatuses: {
 				'1': faker.lorem.words( 2 ),
 				'2': faker.lorem.words( 2 )
-			}
+			},
+			barrier: {
+				createdBy: {
+					items: {
+						'1': 'My barriers',
+						'2': 'My team barriers',
+					}
+				},
+			},
 		};
 
 		config = {
@@ -469,6 +477,42 @@ describe( 'validators', () => {
 			it( 'Should return false', () => {
 
 				expect( validators.isBarrierStatus( 'xyz' ) ).toEqual( false );
+			} );
+		} );
+	} );
+
+	describe( 'isCreatedBy', () => {
+		describe( 'With a valid item', () => {
+			it( 'Return true', () => {
+
+				expect( validators.isCreatedBy( '1' ) ).toEqual( true );
+				expect( validators.isCreatedBy( '2' ) ).toEqual( true );
+			} );
+		} );
+
+		describe( 'With an invalid item', () => {
+			it( 'Return false', () => {
+
+				expect( validators.isCreatedBy( '3' ) ).toEqual( false );
+				expect( validators.isCreatedBy( '4' ) ).toEqual( false );
+			} );
+		} );
+	} );
+
+	describe( 'isFileOverSize', () => {
+		describe( 'When the error message contains the magic string', () => {
+			it( 'Returns true', () => {
+
+				const err = new Error( 'a message with maxFileSize exceeded as part of it' );
+				expect( validators.isFileOverSize( err ) ).toEqual( true );
+			} );
+		} );
+
+		describe( 'When the error message does not contain the magic string', () => {
+			it( 'Returns false', () => {
+
+				const err = new Error( 'a normal error' );
+				expect( validators.isFileOverSize( err ) ).toEqual( false );
 			} );
 		} );
 	} );

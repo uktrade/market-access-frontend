@@ -1,6 +1,6 @@
 const TRUNCATION_SYMBOL = '…';
 
-function getPageLink( page, query = {} ){
+function getPageLink( page, query ){
 
 	const newQuery = {
 		...query,

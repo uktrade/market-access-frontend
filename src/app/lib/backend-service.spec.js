@@ -265,20 +265,77 @@ describe( 'Backend Service', () => {
 
 		describe( 'getScanStatus', () => {
 			describe( 'When the API returns success', () => {
-				it( 'Should call the correct API and resolve', async () => {
+				describe( 'When the scan passes', () => {
+					describe( 'When it passes on the first call', () => {
+						it( 'Should call the correct API and resolve', async () => {
 
-					const documentId = uuid();
+							const documentId = uuid();
 
-					backend.post.and.callFake( () => Promise.resolve( {
-						response: { isSuccess: true },
-						body: { status: 'virus_scanned' },
-					} ) );
+							backend.post.and.callFake( () => Promise.resolve( {
+								response: { isSuccess: true },
+								body: { status: 'virus_scanned' },
+							} ) );
 
-					const { status, passed } = await service.documents.getScanStatus( req, documentId );
+							const { status, passed } = await service.documents.getScanStatus( req, documentId );
 
-					expect( backend.post ).toHaveBeenCalledWith( `/documents/${ documentId }/upload-callback`, token );
-					expect( status ).toEqual( 'virus_scanned' );
-					expect( passed ).toEqual( true );
+							expect( backend.post ).toHaveBeenCalledWith( `/documents/${ documentId }/upload-callback`, token );
+							expect( status ).toEqual( 'virus_scanned' );
+							expect( passed ).toEqual( true );
+						} );
+					} );
+
+					describe( 'When it passes on the second call', () => {
+						it( 'Should call the correct API and resolve', async () => {
+
+							const documentId = uuid();
+							let calls = 0;
+
+							backend.post.and.callFake( () => {
+
+								calls++;
+
+								if( calls === 1 ){
+
+									return Promise.resolve( {
+										response: { isSuccess: true },
+										body: { status: 'virus_scanning_in_progress' },
+									} );
+								}
+
+								if( calls === 2 ){
+
+									return Promise.resolve( {
+										response: { isSuccess: true },
+										body: { status: 'virus_scanned' },
+									} );
+								}
+							} );
+
+							const { status, passed } = await service.documents.getScanStatus( req, documentId );
+
+							expect( backend.post ).toHaveBeenCalledWith( `/documents/${ documentId }/upload-callback`, token );
+							expect( status ).toEqual( 'virus_scanned' );
+							expect( passed ).toEqual( true );
+						} );
+					} );
+				} );
+
+				describe( 'When the scan fails', () => {
+					it( 'Should call the correct API and resolve', async () => {
+
+						const documentId = uuid();
+
+						backend.post.and.callFake( () => Promise.resolve( {
+							response: { isSuccess: true },
+							body: { status: 'virus_scanning_failed' },
+						} ) );
+
+						const { status, passed } = await service.documents.getScanStatus( req, documentId );
+
+						expect( backend.post ).toHaveBeenCalledWith( `/documents/${ documentId }/upload-callback`, token );
+						expect( status ).toEqual( 'virus_scanning_failed' );
+						expect( passed ).toEqual( false );
+					} );
 				} );
 			} );
 
@@ -352,13 +409,13 @@ describe( 'Backend Service', () => {
 
 		describe( 'getAll', () => {
 
-			async function testWithOrdering( filters, expectedParams, page = 1 ){
+			async function testWithOrdering( filters, expectedParams, page ){
 
 				const path = ( '/barriers?' + ( expectedParams ? expectedParams + '&' : '' ) );
 
 				function getPath( params ){
 
-					return `${ path }${ params }&limit=${ RESULTS_LIMIT }&offset=${ RESULTS_LIMIT * ( page - 1 ) }`;
+					return `${ path }${ params }&limit=${ RESULTS_LIMIT }&offset=${ RESULTS_LIMIT * ( ( page || 1 ) - 1 ) }`;
 				}
 
 				await service.barriers.getAll( req, filters, page );
@@ -483,6 +540,15 @@ describe( 'Backend Service', () => {
 						const createdBy = '1,2';
 
 						testWithOrdering( { createdBy }, `team=1` );
+					} );
+				} );
+
+				describe( 'When the value is neither 1 or 2', () => {
+					it( 'Should call the correct path, urlencode the value, use default sort order', async () => {
+
+						const createdBy = '3';
+
+						testWithOrdering( { createdBy } );
 					} );
 				} );
 			} );
