@@ -15,7 +15,7 @@
 		errors: errors
 	}) }}
 
-	<form action="{{ urls.reports.addSector( report.id ) }}" method="POST" class="restrict-width">
+	<form action="{{ urls.reports.sectors.add( report.id ) }}" method="POST" class="restrict-width">
 		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
 		{{ govukSelect( {
@@ -36,6 +36,6 @@
 		{% endif %}
 
 		<input type="submit" value="Add sector" class="govuk-button">
-		<a class="form-cancel" href="{{ urls.reports.sectors( report.id ) }}">cancel</a>
+		<a class="form-cancel" href="{{ urls.reports.sectors.list( report.id ) }}">cancel</a>
 	</form>
 {% endblock %}

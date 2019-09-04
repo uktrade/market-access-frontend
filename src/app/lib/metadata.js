@@ -193,8 +193,8 @@ module.exports.fetch = async () => {
 
 			module.exports.statusTypes = {
 				...body.status_types,
-				'1': 'A procedural/short-term barrier',
-				'2': 'A long term strategic barrier'
+				'1': 'A procedural, short-term barrier',
+				'2': 'A long-term strategic barrier'
 			};
 			module.exports.lossScale = body.loss_range;
 			module.exports.optionalBool = body.adv_boolean;

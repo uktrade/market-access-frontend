@@ -1582,18 +1582,6 @@ describe( 'Backend Service', () => {
 				} );
 			} );
 
-			describe( 'saveAllSectors', () => {
-
-				const allSectors = 'true';
-
-				checkWithAndWithoutValues( 'saveAllSectors', {
-					allSectors,
-				}, {
-					all_sectors: allSectors,
-					sectors: null
-				} );
-			} );
-
 			describe( 'saveSectors', () => {
 
 				const sectors = [
@@ -1601,10 +1589,26 @@ describe( 'Backend Service', () => {
 					uuid()
 				];
 
-				checkWithAndWithoutValues( 'saveSectors', {
-					sectors
-				}, {
-					sectors
+				describe( 'With allSectors false', () => {
+
+					checkWithAndWithoutValues( 'saveSectors', {
+						sectors,
+						allSectors: false,
+					}, {
+						sectors,
+						all_sectors: false,
+					} );
+				} );
+
+				describe( 'With allSectors true', () => {
+
+					checkWithAndWithoutValues( 'saveSectors', {
+						sectors,
+						allSectors: true,
+					}, {
+						sectors,
+						all_sectors: true,
+					} );
 				} );
 			} );
 

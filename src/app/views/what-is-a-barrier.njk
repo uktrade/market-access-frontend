@@ -8,73 +8,79 @@
 
 	{{ heading({
 		caption: 'Market access barriers',
-		text: 'What are market access barriers?'
+		text: 'About the Digital Market Access Service'
 	}) }}
 
 	<div class="restrict-width">
-		<p class="leade">
-			Market access barriers are things that slow down or stop a UK company from doing business overseas. Market access barriers, also known as non-tariff barriers, are any obstacle to international trade that is not an import or export duty.
-		</p>
 
 		<p>
-			Non-tariff barriers cost the UK economy billions of pounds in trade opportunities worldwide. At DIT, it is one of our four core responsibilities to break down barriers to trade and investment. By sharing information about non-tariff barriers we can help more businesses to succeed.
+			Read about different types of barriers and why it's important to report them.
+
+			<ol class="paragraph-list">
+				<li class="paragraph-list__item"><a href="#help-work">How using this digital service helps your work</a></li>
+				<li class="paragraph-list__item"><a href="#help-business">How market access work helps UK businesses</a></li>
+				<li class="paragraph-list__item"><a href="#what">What are market access barriers</a></li>
+				<li class="paragraph-list__item"><a href="#goods-barriers">Categories of goods barriers</a></li>
+				<li class="paragraph-list__item"><a href="#service-barriers">Categories of service barriers</a></li>
+			</ol>
 		</p>
 
-		<p>
-			There are two types of non-tariff barriers:
-
-			<ul class="paragraph-list">
-				<li class="paragraph-list__item"><strong>Procedural or short-term issues</strong> - for example, goods stuck at the border or documentation issue</li>
-				<li class="paragraph-list__item"><strong>Strategic or long-term issues</strong> - for example, a change of regulation</li>
-			</ul>
-		</p>
-
-		<h2 class="barrier-type-section-heading">
-			Non-tariff barriers
+		<h2 class="barrier-type-section-heading" id="help-work">
+			How using this digital service helps your work
 		</h2>
+
+		<p>When you enter details of market access barriers, you're enabling colleagues across government in the UK and overseas to work together more effectively to resolve them. You're also helping to create a worldwide knowledge base.</p>
+		<p>You can view barriers created by other colleagues across government. You can see all barriers in all regions, or filter for the regions or barrier types you’re interested in and can create watch lists so you’re automatically shown barriers you're interested in.</p>
+		<p>The information you enter can only be seen by government colleagues. You should enter as much detail as you can.</p>
+		<p>When contributing to a barrier that you did not create, add yourself to the barrier team so colleagues know your role and can contact you if needed.</p>
+		<p>Questions on this system should be directed to the Bilateral Trade Relations Team in DIT, who coordinate this work centrally.</p>
+
+
+		<h2 class="barrier-type-section-heading" id="help-business">
+			How market access work helps UK businesses
+		</h2>
+
+		<p>
+			Market access barriers are a significant impediment to global trade and investment and this work has the potential to value of billions of pounds to the UK economy. Removing market access barriers can enable greater exports and investment overseas as new opportunities are created. Opening markets should provide dividends for UK businesses – otherwise we are targeting the wrong barriers.
+		</p>
+
+		<h2 class="barrier-type-section-heading" id="what">
+			What are market access barriers
+		</h2>
+		<p>
+			Market access barriers are problems that delay or obstruct UK businesses trading and investing overseas.
+			Barriers can take the form of tariffs or non-tariff barriers and ODI restrictions, such as having to train and use local workers. They can affect goods, services or investments.
+			There are 2 types of market access barriers – short term and long term.
+		</p>
 
 		<div class="barrier-type-card">
 			<h3 class="barrier-type-card__heading">
-				Procedural or short-term issues
+				Short-term barriers
 			</h3>
 
 			<p class='barrier-type-card__text'>
-				These are issues that can be resolved relatively quickly and may be day-to-day tasks. This could be a shipment that is stuck in customs due to incorrect customs documentation or a company needing assistance to fill out government forms.
+				Also called procedural barriers, these short-term problems are often relatively easy to resolve. For example, goods stuck in customs because of incorrect documents.
 			</p>
 			<p class='barrier-type-card__text'>
-				Some of these issues might not be a big deal in their own right. However they may point to a bigger underlying problem, and are therefore important to record.
+				Even though these barriers are short term, they could point to a bigger underlying problem, which is why it’s still important to log them in this system.
 			</p>
 		</div>
 
 		<div class="barrier-type-card">
 			<h3 class="barrier-type-card__heading">
-				Strategic or long-term issues
+				Long-term barriers
 			</h3>
 
 			<p class='barrier-type-card__text'>
-				A strategic or long term issue could be, for example, a change of regulation. These issues usually cannot be fixed quickly without a change of regulation or broader change to the business environment. A possible example is a ban on British products due to food safety regulations.
+				Also called strategic barriers, these problems usually cannot be fixed without a change of regulation or broader change to the business environment. For example, a ban on British products due to food safety regulations.
 			</p>
 			<p class='barrier-type-card__text'>
-				Strategic or long term issues may require engagement with local, national or UK government. These may violate World Trade Organisation (WTO) rules or other agreements, and can be resolved through the appropriate channels available under each respective agreement.
+				Resolving these types of barriers might mean engagement with local, national or UK government. If a barrier breaks World Trade Organisation (WTO) rules or other agreements, resolution can be sought through the appropriate channels available under each agreement.
 			</p>
+			{#<p class='barrier-type-card__text'>
+				<a href="#">See more examples of different types of barriers</a>.
+			</p>#}
 		</div>
-
-		<h2 class="barrier-type-section-heading">
-			Why non-tariff barriers are important
-		</h2>
-
-		<p>
-			Non-tariff barriers (NTBs) cost the UK economy billions of pounds in trade opportunities worldwide and HMT estimates that on average non-tariff barriers can add 2 to 3 times as much to the cost of traded goods as tariffs. NTBs are a priority for HMG; one of the four core responsibilities for Department for International Trade is to "bring together policy, promotion and financial expertise to break down barriers to trade and investment, and help businesses succeed"
-		</p>
-
-		<h2 class="barrier-type-section-heading">
-			Categories of Market Access Barriers
-		</h2>
-
-		<ul class="barrier-type-section-list">
-			<li class="barrier-type-section-list__item">- <a href="#goods-barriers">Barriers that affect Goods</a></li>
-			<li class="barrier-type-section-list__item">- <a href="#services-barriers">Barriers that affect Services</a></li>
-		</ul>
 
 		{% macro barrierList( items ) %}
 			<div class="barrier-type-group">
@@ -87,17 +93,21 @@
 			</div>
 		{% endmacro %}
 
-		<h3 class="barrier-type-section-sub-heading" id="goods-barriers">
-			Barriers that affect Goods
+		<h2 class="visually-hidden">Barrier categories</h2>
+
+		<h3 class="barrier-type-section-heading" id="goods-barriers">
+			Categories of goods barriers
 		</h3>
 
 		{{ barrierList( barrierTypes.goods ) }}
 
-		<h3 class="barrier-type-section-sub-heading" id="services-barriers">
-			Barriers that affect Services
+
+		<h3 class="barrier-type-section-heading" id="service-barriers">
+			Categories of service barriers
 		</h3>
 
 		{{ barrierList( barrierTypes.services ) }}
+
 
 		<a class="barrier-type-section-link" href="{{ urls.index() }}">View your dashboard</a>
 	</div>

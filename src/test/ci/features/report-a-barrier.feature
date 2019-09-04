@@ -15,7 +15,7 @@ Feature: Report a barrier
 		When I navigate to the start page
 		Then the title should be Market Access - Add - Status of the barrier
 		And the page should not have any accessibility violations
-		And the main heading should be Add a barrier Status of the barrier
+		And the main heading should be Add a barrier Barrier status
 
 	Scenario: Start a report
 		Given I'm on the first step of adding a new barrier

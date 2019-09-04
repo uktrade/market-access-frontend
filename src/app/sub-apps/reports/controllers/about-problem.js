@@ -13,12 +13,12 @@ module.exports = async ( req, res, next ) => {
 
 		barrierTitle: {
 			values: [ report.barrier_title ],
-			required: 'Enter a title for this barrier'
+			required: 'Enter a name for this barrier'
 		},
 
 		item: {
 			values: [ report.product ],
-			required: 'Enter a product or service'
+			required: 'Enter a product, service or investment'
 		},
 
 		barrierSource: {
@@ -44,7 +44,7 @@ module.exports = async ( req, res, next ) => {
 			values: [ report.eu_exit_related ],
 			validators: [ {
 				fn: validators.isMetadata( 'optionalBool' ),
-				message: 'Select whether this is EU exit related or not'
+				message: 'Select whether this is Brexit related or not'
 			} ],
 			items: govukItemsFromObj( metadata.optionalBool )
 		},
@@ -57,9 +57,9 @@ module.exports = async ( req, res, next ) => {
 		render: ( templateValues ) => {
 
 			const hasSectors = ( report.sectors_affected === true );
-			const urlMethod = ( hasSectors ? ( report.all_sectors === true ? 'allSectors' : 'sectors' ) : 'hasSectors' );
+			const urlMethod = ( hasSectors ? urls.reports.sectors.list : urls.reports.hasSectors );
 
-			templateValues.backHref =  urls.reports[ urlMethod ]( report.id );
+			templateValues.backHref =  urlMethod( report.id );
 
 			res.render( 'reports/views/about-problem', templateValues );
 		},

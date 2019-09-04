@@ -455,12 +455,9 @@ module.exports = {
 			all_sectors: null,
 			sectors: null
 		} ),
-		saveAllSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
-			all_sectors: getValue( values.allSectors ),
-			sectors: null
-		} ),
 		saveSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
-			sectors: getValue( values.sectors )
+			sectors: getValue( values.sectors ),
+			all_sectors: getValue( values.allSectors ),
 		} ),
 		saveProblem: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 			product: getValue( values.item ),
