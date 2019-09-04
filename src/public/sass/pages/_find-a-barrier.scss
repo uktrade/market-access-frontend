@@ -112,6 +112,10 @@
 	font-weight: bold;
 }
 
+.filter-results-pagination-summary {
+	color: $govuk-grey-1;
+}
+
 .filter-results-download {
 	overflow: hidden;
 	margin: govuk-em( 10, 16 ) 0 govuk-em( 5, 16 ) 0;

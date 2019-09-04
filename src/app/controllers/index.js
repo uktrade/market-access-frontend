@@ -47,15 +47,18 @@ module.exports = {
 
 			try {
 
-				const { response, body } = await backend.barriers.getAll( req, currentWatchList.filters, currentSort.serviceParam, currentSort.direction );
+				const page = ( parseInt( req.query.page, 10 ) || 1 );
+				const { response, body } = await backend.barriers.getAll( req, currentWatchList.filters, page, currentSort.serviceParam, currentSort.direction );
 
 				if( response.isSuccess ){
 
 					res.render('index', dashboardViewModel(
-						body.results,
+						body,
+						page,
 						{ ...sortData, currentSort },
 						currentWatchList.filters,
 						watchListIndex,
+						req.query,
 						{
 							isWatchList: true,
 							watchListFilters: createList( currentWatchList.filters ),

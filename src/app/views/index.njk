@@ -1,5 +1,6 @@
 {% from 'app-components/dashboard-heading.njk' import dashboardHeading %}
 {% from 'app-components/collapsible.njk' import collapsible %}
+{% from 'app-components/pagination.njk' import pagination %}
 {% from 'macros/standard-table-heading.njk' import tableHeading %}
 
 {% extends 'layout.njk' %}
@@ -38,6 +39,13 @@
 	{% endif %}
 
 	{%- if barriers and barriers.length -%}
+
+		{% if paginationData.totalPages > 1 %}
+		<p class="dashboard-page-summary">
+			Page {{ paginationData.currentPage }} of {{ paginationData.totalPages }}
+		</p>
+		{% endif %}
+
 		<div class="overflow-wrapper">
 		<table class="standard-table standard-table--barriers">
 			<thead>
@@ -73,6 +81,8 @@
 			</tbody>
 		</table>
 		</div>
+
+		{{ pagination( paginationData ) }}
 
 	{%- elseif isWatchList -%}
 		<div class="no-results-box">
