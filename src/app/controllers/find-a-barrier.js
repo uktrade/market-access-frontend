@@ -7,10 +7,11 @@ module.exports = {
 	list: async function( req, res, next ){
 
 		const filters = barrierFilters.getFromQueryString( req.query );
+		const page = ( parseInt( req.query.page, 10 ) || 1 );
 
 		try {
 
-			const { response, body } = await backend.barriers.getAll( req, filters );
+			const { response, body } = await backend.barriers.getAll( req, filters, page );
 
 			if( response.isSuccess ){
 
@@ -27,9 +28,9 @@ module.exports = {
 
 				res.render( 'find-a-barrier', viewModel( {
 					count: body.count,
+					page,
 					barriers: body.results,
 					filters,
-					queryString: req.query,
 					isEdit,
 					editListIndex,
 					filtersMatchEditList: ( isEdit && editList && barrierFilters.areEqual( filters, editList.filters ) ),

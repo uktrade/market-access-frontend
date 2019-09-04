@@ -21,7 +21,7 @@
 				csrfToken: csrfToken,
 				inputName: 'sector',
 				add: urls.barriers.sectors.add( barrier.id ),
-				remove: urls.barriers.sectors.removeAllSectors( barrier.id )
+				remove: urls.barriers.sectors.all.remove( barrier.id )
 			}
 		) }}
 	{% else %}
@@ -30,7 +30,7 @@
 				inputName: 'sector',
 				add: urls.barriers.sectors.add( barrier.id ),
 				remove: urls.barriers.sectors.remove( barrier.id ),
-				all: urls.barriers.sectors.addAllSectors( barrier.id )
+				all: urls.barriers.sectors.all.add( barrier.id )
 			}
 		) }}
 	{% endif %}

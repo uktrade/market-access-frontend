@@ -5,6 +5,7 @@ const urls = require( '../../../lib/urls' );
 const validators = require( '../../../lib/validators' );
 
 module.exports = {
+
 	list: async ( req, res, next ) => {
 
 		const report = req.report;
@@ -13,19 +14,22 @@ module.exports = {
 
 		if( !req.session.sectors ){
 			req.session.sectors = ( report.sectors || [] );
+			req.session.allSectors = report.all_sectors;
 		}
 
 		const sectors = req.session.sectors;
+		const allSectors = !!req.session.allSectors;
 
 		if( isPost ){
 
-			if( sectors && sectors.length ){
+			if( allSectors || sectors && sectors.length ){
 
 				try {
 
 					delete req.session.sectors;
+					delete req.session.allSectors;
 
-					const { response } = await backend.reports.saveSectors( req, reportId, { sectors } );
+					const { response } = await backend.reports.saveSectors( req, reportId, { sectors, allSectors } );
 
 					if( response.isSuccess ){
 
@@ -48,7 +52,11 @@ module.exports = {
 			}
 		}
 
-		res.render( 'reports/views/sectors', { sectors: sectors.map( metadata.getSector ), csrfToken: req.csrfToken() } );
+		res.render( 'reports/views/sectors', {
+			sectors: sectors.map( metadata.getSector ),
+			csrfToken: req.csrfToken(),
+			allSectors,
+		} );
 	},
 
 	remove: ( req, res ) => {
@@ -57,7 +65,7 @@ module.exports = {
 
 		req.session.sectors = req.session.sectors.filter( ( sector ) => sector !== sectorToRemove );
 
-		res.redirect( urls.reports.sectors( req.report.id ) );
+		res.redirect( urls.reports.sectors.list( req.report.id ) );
 	},
 
 	add: ( req, res ) => {
@@ -68,6 +76,8 @@ module.exports = {
 
 			req.session.sectors = ( report.sectors || [] );
 		}
+
+		req.session.allSectors = false;
 
 		const sectors = req.session.sectors;
 		const form = new Form( req, {
@@ -94,10 +104,30 @@ module.exports = {
 				sectors.push( form.getValues().sectors );
 				req.session.sectors = sectors;
 
-				return res.redirect( urls.reports.sectors( report.id ) );
+				return res.redirect( urls.reports.sectors.list( report.id ) );
 			}
 		}
 
 		res.render( 'reports/views/add-sector', Object.assign( form.getTemplateValues(), { currentSectors: sectors.map( metadata.getSector ) } ) );
 	},
+
+	allSectors: ( req, res ) => res.redirect( urls.reports.sectors.list( req.report.id ), 301 ),
+
+	all: {
+		add: ( req, res ) => {
+
+			req.session.allSectors = true;
+			req.session.sectors = [];
+
+			res.redirect( urls.reports.sectors.list( req.report.id ) );
+		},
+
+		remove: ( req, res ) => {
+
+			req.session.allSectors = false;
+			req.session.sectors = [];
+
+			res.redirect( urls.reports.sectors.list( req.report.id ) );
+		},
+	}
 };

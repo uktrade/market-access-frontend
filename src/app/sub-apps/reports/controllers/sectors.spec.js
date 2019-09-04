@@ -58,12 +58,18 @@ describe( 'Report controllers', () => {
 			}
 		};
 
+		req.report = {
+			id: uuid(),
+		};
+
 		urls = {
 			reports: {
 				isResolved: jasmine.createSpy( 'urls.reports.isResolved' ),
 				detail: jasmine.createSpy( 'urls.reports.detail' ),
 				aboutProblem: jasmine.createSpy( 'urls.reports.aboutProblem' ),
-				sectors: jasmine.createSpy( 'urls.reports.sectors' ),
+				sectors: {
+					list: jasmine.createSpy( 'urls.reports.sectors' ),
+				},
 			},
 		};
 
@@ -83,27 +89,47 @@ describe( 'Report controllers', () => {
 
 			const template = 'reports/views/sectors';
 
-			beforeEach( () => {
+			function checkRender( sectors, allSectors = false ){
 
-				req.report = {};
-			} );
-
-			function checkRender( sectors ){
-
-				expect( res.render ).toHaveBeenCalledWith( template, { sectors: sectors.map( metadata.getSector ), csrfToken } );
+				expect( res.render ).toHaveBeenCalledWith( template, {
+					sectors: sectors.map( metadata.getSector ),
+					csrfToken,
+					allSectors,
+				} );
 			}
 
 			describe( 'a GET', () => {
 				describe( 'With sectors in the session', () => {
-					it( 'Should render the page with the sectors', async () => {
 
-						const sectors = [ uuid(), uuid(), uuid() ];
+					let sectors;
+
+					beforeEach( () => {
+
+						sectors = [ uuid(), uuid(), uuid() ];
 
 						req.session.sectors = sectors;
+					} );
 
-						await controller.list( req, res, next );
+					describe( 'With all_sectors on the report as true', () => {
+						it( 'Should render the page with the sectors', async () => {
 
-						checkRender( sectors );
+							req.report.all_sectors = true;
+
+							await controller.list( req, res, next );
+
+							checkRender( sectors );
+						} );
+					} );
+
+					describe( 'With all_sectors on the report as false', () => {
+						it( 'Should render the page with the sectors', async () => {
+
+							req.report.all_sectors = false;
+
+							await controller.list( req, res, next );
+
+							checkRender( sectors );
+						} );
 					} );
 				} );
 
@@ -121,11 +147,26 @@ describe( 'Report controllers', () => {
 				} );
 
 				describe( 'With no sectors', () => {
-					it( 'Should render the page with and empty list', async () => {
+					describe( 'With all_sectors on the report set to true', () => {
+						it( 'Should render the page with and empty list with allSectors true', async () => {
 
-						await controller.list( req, res, next );
+							req.report.all_sectors = true;
 
-						checkRender( [] );
+							await controller.list( req, res, next );
+
+							checkRender( [], true );
+						} );
+					} );
+
+					describe( 'With all_sectors on the report set to false', () => {
+						it( 'Should render the page with and empty list with allSectors false', async () => {
+
+							req.report.all_sectors = false;
+
+							await controller.list( req, res, next );
+
+							checkRender( [] );
+						} );
 					} );
 				} );
 			} );
@@ -159,79 +200,134 @@ describe( 'Report controllers', () => {
 
 				describe( 'With sectors', () => {
 
+					let sectors;
+
 					beforeEach( () => {
 
-						req.session.sectors = [ uuid(), uuid() ];
+						sectors = [ uuid(), uuid() ];
+						req.session.sectors = sectors;
 					} );
 
-					describe( 'When the service throws an error', () => {
-						it( 'Should call next with the error', async () => {
+					describe( 'With session.allSectors undefined', () => {
 
-							const err = new Error( 'boom' );
-							backend.reports.saveSectors.and.callFake( () => { throw err; } );
+						afterEach( () => {
 
-							await controller.list( req, res, next );
-
-							expect( next ).toHaveBeenCalledWith( err );
-							expect( res.render ).not.toHaveBeenCalled();
-							expect( req.session.sectors ).not.toBeDefined();
-						} );
-					} );
-
-					describe( 'When the service response is not a success', () => {
-						it( 'Should call next with an error', async () => {
-
-							const statusCode = 500;
-							const err = new Error( `Unable to update report, got ${ statusCode } response code` );
-
-							backend.reports.saveSectors.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
-
-							await controller.list( req, res, next );
-
-							expect( next ).toHaveBeenCalledWith( err );
-							expect( res.render ).not.toHaveBeenCalled();
-							expect( req.session.sectors ).not.toBeDefined();
-						} );
-					} );
-
-					describe( 'When the service response is success', () => {
-
-						beforeEach( () => {
-
-							backend.reports.saveSectors.and.callFake( () => ({ response: { isSuccess: true } }) );
-							req.report.id = uuid();
+							expect( backend.reports.saveSectors ).toHaveBeenCalledWith( req, req.report.id, {
+								sectors,
+								allSectors: false,
+							});
 						} );
 
-						describe( 'When it is an exit', () => {
-							it( 'Should redirect to the detail page', async () => {
+						describe( 'When the service throws an error', () => {
+							it( 'Should call next with the error', async () => {
 
-								const detailResponse = '/a/detail/';
-
-								urls.reports.detail.and.callFake( () => detailResponse );
-								req.body = { action: 'exit' };
+								const err = new Error( 'boom' );
+								backend.reports.saveSectors.and.callFake( () => { throw err; } );
 
 								await controller.list( req, res, next );
 
-								expect( next ).not.toHaveBeenCalled();
+								expect( next ).toHaveBeenCalledWith( err );
 								expect( res.render ).not.toHaveBeenCalled();
-								expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
-								expect( urls.reports.detail ).toHaveBeenCalledWith( req.report.id );
+								expect( req.session.sectors ).not.toBeDefined();
 							} );
 						} );
 
-						describe( 'When it is NOT an exit', () => {
-							it( 'Should redirect to the aboutProblem page', async () => {
+						describe( 'When the service response is not a success', () => {
+							it( 'Should call next with an error', async () => {
 
-								const aboutResponse = '/about/report/';
+								const statusCode = 500;
+								const err = new Error( `Unable to update report, got ${ statusCode } response code` );
 
-								urls.reports.aboutProblem.and.callFake( () => aboutResponse );
+								backend.reports.saveSectors.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
 
 								await controller.list( req, res, next );
 
-								expect( next ).not.toHaveBeenCalled();
+								expect( next ).toHaveBeenCalledWith( err );
 								expect( res.render ).not.toHaveBeenCalled();
-								expect( res.redirect ).toHaveBeenCalledWith( aboutResponse );
-								expect( urls.reports.aboutProblem ).toHaveBeenCalledWith( req.report.id );
+								expect( req.session.sectors ).not.toBeDefined();
+							} );
+						} );
+
+						describe( 'When the service response is success', () => {
+
+							beforeEach( () => {
+
+								backend.reports.saveSectors.and.callFake( () => ({ response: { isSuccess: true } }) );
+								req.report.id = uuid();
+							} );
+
+							describe( 'When it is an exit', () => {
+								it( 'Should redirect to the detail page', async () => {
+
+									const detailResponse = '/a/detail/';
+
+									urls.reports.detail.and.callFake( () => detailResponse );
+									req.body = { action: 'exit' };
+
+									await controller.list( req, res, next );
+
+									expect( next ).not.toHaveBeenCalled();
+									expect( res.render ).not.toHaveBeenCalled();
+									expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
+									expect( urls.reports.detail ).toHaveBeenCalledWith( req.report.id );
+								} );
+							} );
+
+							describe( 'When it is NOT an exit', () => {
+								it( 'Should redirect to the aboutProblem page', async () => {
+
+									const aboutResponse = '/about/report/';
+
+									urls.reports.aboutProblem.and.callFake( () => aboutResponse );
+
+									await controller.list( req, res, next );
+
+									expect( next ).not.toHaveBeenCalled();
+									expect( res.render ).not.toHaveBeenCalled();
+									expect( res.redirect ).toHaveBeenCalledWith( aboutResponse );
+									expect( urls.reports.aboutProblem ).toHaveBeenCalledWith( req.report.id );
+								} );
+							} );
+						} );
+					} );
+
+					describe( 'With session.allSectors true', () => {
+
+						beforeEach( () => {
+
+							req.session.allSectors = true;
+						} );
+
+						afterEach( () => {
+
+							expect( backend.reports.saveSectors ).toHaveBeenCalledWith( req, req.report.id, {
+								sectors,
+								allSectors: true,
+							});
+						} );
+
+						describe( 'When the service response is success', () => {
+
+							beforeEach( () => {
+
+								backend.reports.saveSectors.and.callFake( () => ({ response: { isSuccess: true } }) );
+								req.report.id = uuid();
+							} );
+
+							describe( 'When it is NOT an exit', () => {
+								it( 'Should redirect to the aboutProblem page', async () => {
+
+									const aboutResponse = '/about/report/';
+
+									urls.reports.aboutProblem.and.callFake( () => aboutResponse );
+
+									await controller.list( req, res, next );
+
+									expect( next ).not.toHaveBeenCalled();
+									expect( res.render ).not.toHaveBeenCalled();
+									expect( res.redirect ).toHaveBeenCalledWith( aboutResponse );
+									expect( urls.reports.aboutProblem ).toHaveBeenCalledWith( req.report.id );
+								} );
 							} );
 						} );
 					} );
@@ -246,32 +342,26 @@ describe( 'Report controllers', () => {
 				const sectors = [ uuid(), uuid(), sector ];
 				const expected = sectors.slice( 0, 2 );
 				const sectorsResponse = '/to/sectors';
-				const reportId = '123';
 
-				urls.reports.sectors.and.callFake( () => sectorsResponse );
+				urls.reports.sectors.list.and.callFake( () => sectorsResponse );
 				req.session.sectors = sectors;
 				req.body = { sector };
-				req.report = { id: reportId };
 
 				controller.remove( req, res );
 
 				expect( req.session.sectors ).toEqual( expected );
 				expect( res.redirect ).toHaveBeenCalledWith( sectorsResponse );
-				expect( urls.reports.sectors ).toHaveBeenCalledWith( reportId );
+				expect( urls.reports.sectors.list ).toHaveBeenCalledWith( req.report.id );
 			} );
 		} );
+
 		describe( 'Add', () => {
 
-			let report;
 			const template = 'reports/views/add-sector';
 
 			beforeEach( () => {
 
-				report = {
-					id: uuid(),
-					sectors: null,
-				};
-				req.report = report;
+				req.report.sectors = null;
 			} );
 
 			function checkRender( sectors ){
@@ -387,7 +477,7 @@ describe( 'Report controllers', () => {
 
 						form.hasErrors = () => false;
 						form.getValues.and.callFake( () => ({ sectors: sector }) );
-						urls.reports.sectors.and.callFake( () => sectorsResponse );
+						urls.reports.sectors.list.and.callFake( () => sectorsResponse );
 
 						req.session.sectors = sectors;
 
@@ -396,6 +486,55 @@ describe( 'Report controllers', () => {
 						expect( req.session.sectors ).toEqual( expected );
 						expect( res.redirect ).toHaveBeenCalledWith( sectorsResponse );
 					} );
+				} );
+			} );
+		} );
+
+		describe( 'allSectors', () => {
+			it( 'Redirect to the sectors list page', () => {
+
+				const listResponse = 'to/the/list';
+				urls.reports.sectors.list.and.returnValue( listResponse );
+
+				controller.allSectors( req, res );
+
+				expect( res.redirect ).toHaveBeenCalledWith( listResponse, 301 );
+				expect( urls.reports.sectors.list ).toHaveBeenCalledWith( req.report.id );
+			} );
+		} );
+
+		describe( 'all', () => {
+
+			let listResponse;
+
+			beforeEach( () => {
+
+				listResponse = '/link/to/list/';
+				urls.reports.sectors.list.and.returnValue( listResponse );
+			} );
+
+			afterEach( () => {
+
+				expect( res.redirect ).toHaveBeenCalledWith( listResponse );
+			} );
+
+			describe( 'add', () => {
+				it( 'Resets the array of sectors and sets allSectors to true', () => {
+
+					controller.all.add( req, res );
+
+					expect( req.session.sectors ).toEqual( [] );
+					expect( req.session.allSectors ).toEqual( true );
+				} );
+			} );
+
+			describe( 'remove', () => {
+				it( 'Resets the array of sectors and sets allSectors to false', () => {
+
+					controller.all.remove( req, res );
+
+					expect( req.session.sectors ).toEqual( [] );
+					expect( req.session.allSectors ).toEqual( false );
 				} );
 			} );
 		} );

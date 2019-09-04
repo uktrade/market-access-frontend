@@ -2,6 +2,7 @@
 {% from 'app-components/heading.njk' import heading %}
 {% from 'app-components/checkbox-filter.njk' import checkboxFilter %}
 {% from 'app-components/typeahead.njk' import typeahead %}
+{% from 'app-components/pagination.njk' import pagination %}
 
 {% extends 'layout.njk' %}
 
@@ -203,11 +204,17 @@
 					<div class="filter-results-action-buttons{{ ' filter-results-action-buttons--save' if not editWatchList }}">
 						<a class="filter-results-clear-link" href="{{ removeAllUrl }}">Remove all filters</a>
 						{%- if showSaveButton %}
-							<a href="{{ urls.watchList.save( queryString ) }}" class="govuk-button govuk-button--watch-list">{{ 'Edit' if isEdit else 'Save' }} watch list</a>
+							<a href="{{ urls.watchList.save( filterAndEditParams ) }}" class="govuk-button govuk-button--watch-list">{{ 'Edit' if isEdit else 'Save' }} watch list</a>
 						{% endif %}
 					</div>
 				{% endif %}
 			</div>
+
+			{% if paginationData.totalPages > 1 %}
+			<p class="filter-results-pagination-summary">
+				Page {{ paginationData.currentPage }} of {{ paginationData.totalPages }}
+			</p>
+			{% endif %}
 
 			<p class="filter-results-download">
 				{% if count > 0 %}
@@ -262,6 +269,9 @@
 					</li>
 				{% endfor %}
 			</ol>
+
+			{{ pagination( paginationData ) }}
+
 		</div>
 	</section>
 

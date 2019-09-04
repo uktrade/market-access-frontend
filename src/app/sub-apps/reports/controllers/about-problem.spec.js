@@ -48,7 +48,9 @@ describe( 'Report controllers', () => {
 		urls = {
 			reports: {
 				detail: jasmine.createSpy( 'urls.reports.detail' ),
-				sectors: jasmine.createSpy( 'urls.reports.sectors' ),
+				sectors: {
+					list: jasmine.createSpy( 'urls.reports.sectors.list' ),
+				} ,
 				allSectors: jasmine.createSpy( 'urls.reports.allSectors' ),
 				hasSectors: jasmine.createSpy( 'urls.reports.hasSectors' ),
 				summary: jasmine.createSpy( 'urls.reports.summary' ),
@@ -221,13 +223,13 @@ describe( 'Report controllers', () => {
 					describe( 'When the report affects all sectors', () => {
 						it( 'Should render the template with the correct data and backHref', () => {
 
-							const allResponse = 'all-sectors';
+							const listResponse = 'list-sectors';
 							const expectedTemplateValues = {
 								...renderValues,
-								backHref: allResponse,
+								backHref: listResponse,
 							};
 
-							urls.reports.allSectors.and.callFake( () => allResponse );
+							urls.reports.sectors.list.and.returnValue( listResponse );
 							report.all_sectors = true;
 
 							args.render( renderValues );
@@ -245,7 +247,7 @@ describe( 'Report controllers', () => {
 								backHref: sectorsResponse,
 							};
 
-							urls.reports.sectors.and.callFake( () => sectorsResponse );
+							urls.reports.sectors.list.and.callFake( () => sectorsResponse );
 							report.all_sectors = false;
 							renderValues.backHref = sectorsResponse;
 

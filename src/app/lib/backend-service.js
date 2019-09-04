@@ -6,6 +6,7 @@ const SCAN_CHECK_INTERVAL = config.files.scan.statusCheckInterval;
 const SCAN_MAX_ATTEMPTS = Math.round( config.files.scan.maxWaitTime / SCAN_CHECK_INTERVAL );
 const LOCATION = 'location';
 const { RESOLVED, PART_RESOLVED } = metadata.barrier.status.types;
+const RESULTS_LIMIT = config.backend.resultsLimit;
 
 function getToken( req ){
 
@@ -199,6 +200,14 @@ function getBarrierParams( filters = {}, orderBy = 'reported_on', orderDirection
 	return params;
 }
 
+function addPagination( params, page ){
+
+	params.push( `limit=${ RESULTS_LIMIT }` );
+	params.push( `offset=${ RESULTS_LIMIT * ( page - 1 ) }` );
+
+	return params;
+}
+
 function getInitialReportValues( formValues ){
 
 	const isFullyResolved = ( formValues.isResolved == RESOLVED );
@@ -302,9 +311,11 @@ module.exports = {
 	},
 
 	barriers: {
-		getAll: async ( req, filters, orderBy, orderDirection ) => {
+		getAll: async ( req, filters, page = 1, orderBy, orderDirection ) => {
 
 			const params = getBarrierParams( filters, orderBy, orderDirection );
+
+			addPagination( params, page );
 
 			return backend.get( `/barriers?${ params.join( '&' ) }`, getToken( req ) );
 		},
@@ -455,12 +466,9 @@ module.exports = {
 			all_sectors: null,
 			sectors: null
 		} ),
-		saveAllSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
-			all_sectors: getValue( values.allSectors ),
-			sectors: null
-		} ),
 		saveSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
-			sectors: getValue( values.sectors )
+			sectors: getValue( values.sectors ),
+			all_sectors: getValue( values.allSectors ),
 		} ),
 		saveProblem: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 			product: getValue( values.item ),

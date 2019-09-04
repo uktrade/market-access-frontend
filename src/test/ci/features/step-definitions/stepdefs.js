@@ -107,21 +107,21 @@ Then( 'there should be a link to add a barrier', async () => {
 	assert.equal( getPath( href ), urls.reports.new() );
 } );
 
- Then( /^the active heading link should be (.+)$/, async ( text ) => {
+Then( /^the active heading link should be (.+)$/, async ( text ) => {
 
 	const activeLink = await driver.byCss( '#sub-navigation .datahub-header__navigation__item__link--active' );
 	const linkText = await activeLink.getText();
 
 	assert.equal( text, linkText );
- } );
+} );
 
- Then( /^the main heading should be (.+)$/, async ( text ) => {
+Then( /^the main heading should be (.+)$/, async ( text ) => {
 
 	const heading = await driver.byCss( 'h1' );
 	const headingText = await heading.getText();
 
 	assert.equal( text, headingText.replace( '\n', ' ' ) );
- } );
+} );
 
 Then( 'the footer links should be present', async () => {
 
