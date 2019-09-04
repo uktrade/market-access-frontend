@@ -40,9 +40,11 @@
 
 	{%- if barriers and barriers.length -%}
 
+		{% if paginationData.totalPages > 1 %}
 		<p class="dashboard-page-summary">
 			Page {{ paginationData.currentPage }} of {{ paginationData.totalPages }}
 		</p>
+		{% endif %}
 
 		<div class="overflow-wrapper">
 		<table class="standard-table standard-table--barriers">

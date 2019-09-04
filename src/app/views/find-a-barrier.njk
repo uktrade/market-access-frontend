@@ -210,9 +210,11 @@
 				{% endif %}
 			</div>
 
+			{% if paginationData.totalPages > 1 %}
 			<p class="filter-results-pagination-summary">
-				Page {{ paginationData.currentPage }} of {{ paginationData.totalPages}}
+				Page {{ paginationData.currentPage }} of {{ paginationData.totalPages }}
 			</p>
+			{% endif %}
 
 			<p class="filter-results-download">
 				{% if count > 0 %}
