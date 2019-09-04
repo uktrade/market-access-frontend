@@ -31,7 +31,6 @@ module.exports = {
 					page,
 					barriers: body.results,
 					filters,
-					queryString: req.query,
 					isEdit,
 					editListIndex,
 					filtersMatchEditList: ( isEdit && editList && barrierFilters.areEqual( filters, editList.filters ) ),

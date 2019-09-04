@@ -31,7 +31,7 @@ function createMatcher( key ){
 //const isSelected = createMatcher( 'selected' );
 const isChecked = createMatcher( 'checked' );
 
-module.exports = function( { count, page, barriers, filters, queryString, isEdit, editListIndex, filtersMatchEditList } ){
+module.exports = function( { count, page, barriers, filters, isEdit, editListIndex, filtersMatchEditList } ){
 
 	const barrierList = [];
 	const hasFilters = !!Object.keys( filters ).length;
@@ -95,7 +95,6 @@ module.exports = function( { count, page, barriers, filters, queryString, isEdit
 		paginationData: pagination.create( filters, RESULTS_LIMIT, count, page ),
 		barriers: barrierList,
 		hasFilters,
-		queryString,
 		showSaveButton: ( isEdit ? !filtersMatchEditList : hasFilters ),
 		isEdit,
 		editListIndex,

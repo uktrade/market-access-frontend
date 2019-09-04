@@ -50,10 +50,20 @@ describe( 'Find a barrier controller', () => {
 		describe( 'When the backend call is a success', () => {
 
 			let viewModelResponse;
+			let data;
+
+			function checkViewModel( viewModelArgs, filtersMatchEditList = false ){
+
+				expect( viewModelArgs.count ).toEqual( data.count );
+				expect( viewModelArgs.page ).toEqual( parseInt( req.query.page, 10 ) || 1 );
+				expect( viewModelArgs.barriers ).toEqual( data.results );
+				expect( viewModelArgs.filters ).toEqual( getFromQueryStringResponse );
+				expect( viewModelArgs.filtersMatchEditList ).toEqual( filtersMatchEditList );
+			}
 
 			beforeEach( () => {
 
-				const data = jasmine.helpers.getFakeData( '/backend/barriers/' );
+				data = jasmine.helpers.getFakeData( '/backend/barriers/' );
 
 				viewModelResponse = { a: 1, b: 2 };
 				viewModel.and.returnValue( viewModelResponse );
@@ -83,6 +93,7 @@ describe( 'Find a barrier controller', () => {
 						expect( viewModelArgs.isEdit ).toEqual( false );
 						expect( viewModelArgs.editListIndex ).toBeUndefined();
 						checkBackendCall();
+						checkViewModel( viewModelArgs );
 					} );
 				} );
 
@@ -99,6 +110,7 @@ describe( 'Find a barrier controller', () => {
 
 						expect( viewModelArgs.isEdit ).toEqual( false );
 						expect( viewModelArgs.editListIndex ).toBeUndefined();
+						checkViewModel( viewModelArgs );
 					} );
 
 					describe( 'When the param is a valid number as a string', () => {
@@ -171,6 +183,7 @@ describe( 'Find a barrier controller', () => {
 					expect( viewModelArgs.isEdit ).toEqual( true );
 					expect( viewModelArgs.editListIndex ).toEqual( 0 );
 					checkBackendCall();
+					checkViewModel( viewModelArgs, true );
 				} );
 			} );
 		} );
