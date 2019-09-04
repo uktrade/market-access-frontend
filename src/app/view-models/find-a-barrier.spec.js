@@ -318,12 +318,14 @@ describe( 'Find a barrier view model', () => {
 
 		function checkFilter( setup, assert ){
 
-			function checkCommonOutput( output ){
+			function checkCommonOutput( output, isEdit = true ){
 
 				expect( output.count ).toEqual( count );
 				expect( output.barriers ).toEqual( getExpectedBarrierOutput( barriers ) );
 				expect( output.hasFilters ).toEqual( true );
+				expect( output.isEdit ).toEqual( isEdit );
 				expect( output.editListIndex ).toEqual( editListIndex );
+				expect( output.filterAndEditParams ).toEqual( { ...filters, ...( isEdit ? { editList: editListIndex } : {} ) } );
 				expect( output.filterParams ).toEqual( filters );
 				expect( output.removeAllUrl ).toEqual( findABarrierResponse );
 			}
@@ -342,8 +344,7 @@ describe( 'Find a barrier view model', () => {
 						filtersMatchEditList: false,
 					} );
 
-					checkCommonOutput( output );
-					expect( output.isEdit ).toEqual( false );
+					checkCommonOutput( output, false );
 					expect( output.showSaveButton ).toEqual( true );
 					expect( urls.findABarrier ).toHaveBeenCalledWith( filters );
 					assert( output );
@@ -372,8 +373,6 @@ describe( 'Find a barrier view model', () => {
 						} );
 
 						checkCommonOutput( output );
-						expect( output.isEdit ).toEqual( true );
-						expect( output.editListIndex ).toEqual( editListIndex );
 						expect( output.showSaveButton ).toEqual( false );
 						assert( output );
 					} );
@@ -394,8 +393,6 @@ describe( 'Find a barrier view model', () => {
 						} );
 
 						checkCommonOutput( output );
-						expect( output.isEdit ).toEqual( true );
-						expect( output.editListIndex ).toEqual( editListIndex );
 						expect( output.showSaveButton ).toEqual( true );
 						assert( output );
 					} );

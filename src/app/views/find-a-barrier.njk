@@ -204,7 +204,7 @@
 					<div class="filter-results-action-buttons{{ ' filter-results-action-buttons--save' if not editWatchList }}">
 						<a class="filter-results-clear-link" href="{{ removeAllUrl }}">Remove all filters</a>
 						{%- if showSaveButton %}
-							<a href="{{ urls.watchList.save( filterParams ) }}" class="govuk-button govuk-button--watch-list">{{ 'Edit' if isEdit else 'Save' }} watch list</a>
+							<a href="{{ urls.watchList.save( filterAndEditParams ) }}" class="govuk-button govuk-button--watch-list">{{ 'Edit' if isEdit else 'Save' }} watch list</a>
 						{% endif %}
 					</div>
 				{% endif %}
