@@ -46,14 +46,7 @@ module.exports = {
 			express: app
 		} );
 
-		try {
-
-			await metatdata.fetch();
-
-		} catch ( e ) {
-
-			throw e;
-		}
+		await metatdata.fetch();
 
 		app.set( 'view engine', 'njk' );
 		app.set( 'view cache', config.views.cache );

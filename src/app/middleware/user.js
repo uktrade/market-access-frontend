@@ -3,22 +3,15 @@ const UserWatchList = require( '../lib/user-watch-list' );
 
 async function getUser( req ){
 
-	try {
+	const { response, body } = await backend.getUser( req );
 
-		const { response, body } = await backend.getUser( req );
+	if( response.isSuccess ){
 
-		if( response.isSuccess ){
+		req.session.user = body;
 
-			req.session.user = body;
+	} else {
 
-		} else {
-
-			throw new Error( `Unable to get user info, got ${ response.statusCode } response code` );
-		}
-
-	} catch( e ){
-
-		throw e;
+		throw new Error( `Unable to get user info, got ${ response.statusCode } response code` );
 	}
 }
 
