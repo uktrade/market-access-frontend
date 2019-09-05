@@ -1,3 +1,4 @@
+/* eslint require-atomic-updates:0 */
 const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
 const faker = require( 'faker' );
