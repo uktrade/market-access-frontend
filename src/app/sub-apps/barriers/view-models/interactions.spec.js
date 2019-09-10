@@ -82,23 +82,38 @@ describe( 'Interactions view model', () => {
 		};
 	}
 
+	function createAssessment( item ){
+		return {
+			isAssessment: true,
+			isEdit: ( item.old_value !== null ),
+			name: metadata.barrier.assessment.fieldNames[ item.field ],
+			date: item.date,
+			user: item.user,
+		};
+	}
+
 	it( 'Should combine the results and sort them', () => {
 
 		const interactionsResults = getFakeData( '/backend/barriers/interactions-ordered' ).results;
 		const historyResults = getFakeData( '/backend/barriers/history' ).history;
+		const assessmentHistoryResults = getFakeData( '/backend/barriers/assessment_history' ).history;
 
 		const output = viewModel( {
 			interactions: getFakeData( '/backend/barriers/interactions-ordered' ),
-			history: getFakeData( '/backend/barriers/history' )
+			history: getFakeData( '/backend/barriers/history' ),
+			assessmentHistory: { body: getFakeData( '/backend/barriers/assessment_history' ) },
 		}, String( interactionsResults[ 3 ].id ) );
 
 		expect( output ).toEqual( [
+			createAssessment( assessmentHistoryResults[ 1 ] ),
+			createAssessment( assessmentHistoryResults[ 0 ] ),
 			createNote( interactionsResults[ 3 ], true ),
 			createNote( interactionsResults[ 4 ] ),
 			createNote( interactionsResults[ 2 ] ),
 			createStatus( historyResults[ 2 ], RESOLVED, OPEN, false, true ),
 			createNote( interactionsResults[ 0 ] ),
 			createStatus( historyResults[ 4 ], OPEN, PAUSED, false, false ),
+			createAssessment( assessmentHistoryResults[ 2 ] ),
 			createPriority( historyResults[ 6 ] ),
 			createStatus( historyResults[ 3 ], OPEN, RESOLVED, true, false ),
 			createPriority( historyResults[ 5 ] ),

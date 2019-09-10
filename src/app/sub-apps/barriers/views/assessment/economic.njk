@@ -1,0 +1,85 @@
+{% from 'components/radios/macro.njk' import govukRadios %}
+{% from 'components/textarea/macro.njk' import govukTextarea %}
+{% from "components/file-upload/macro.njk" import govukFileUpload %}
+{% from 'components/warning-text/macro.njk' import govukWarningText %}
+{% from 'app-components/heading.njk' import heading %}
+{% from 'app-components/attached-documents.njk' import attachedDocuments %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Barrier Assessment - Economic assessment{% endblock %}
+
+{% block body_script %}
+	{{ super() }}
+	<script>
+		ma.pages.barrier.assessment();
+	</script>
+{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.barriers.assessment.documents.cancel( barrier.id ) },
+		caption: barrier.barrier_title,
+		text: 'Economic assessment',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.barriers.assessment.economic.list( barrier.id ) }}?_csrf={{ csrfToken }}" method="POST" enctype="multipart/form-data" class="restrict-width"  data-xhr-upload="{{ xhr.upload }}?_csrf={{ csrfToken }}" data-xhr-delete="{{ xhr.delete }}?_csrf={{ csrfToken }}">
+
+		{{ govukRadios({
+
+			name: 'impact',
+			fieldset: {
+				legend: {
+					text: 'What is the economic impact of the barrier?',
+					classes: 'govuk-fieldset__legend--s'
+				}
+			},
+			items: impact,
+			errorMessage: errors | errorForName( 'impact-1' )
+		}) }}
+
+		{{ govukTextarea( {
+
+			label: {
+				text: 'Explain the assessment',
+				classes: 'govuk-label--s'
+			},
+			id: 'description',
+			name: 'description',
+			value: description,
+			errorMessage: errors | errorForName( 'description' )
+		} ) }}
+
+
+		<h3 class="govuk-label--s">Add supporting documents (optional)</h3>
+
+		{{ attachedDocuments( documents ) }}
+
+		{{ govukFileUpload({
+			id: 'document',
+			name: 'document',
+			classes: 'file-upload__input js-file-input',
+			formGroup: {
+				classes: 'file-upload js-form-group'
+			},
+			label: {
+				text: 'Attach a document',
+				classes: 'visually-hidden'
+			},
+			hint: {
+				classes: 'file-upload__size-limit js-max-file-size',
+				html: '(file size limit <strong>' + maxFileSize + '</strong>)'
+			},
+			errorMessage: errors | errorForName( 'document' )
+		}) }}
+
+		{{ govukWarningText({
+			text: 'To be completed by the Market Access Analysts',
+			iconFallbackText: 'Warning'
+		}) }}
+
+		<input type="submit" value="Save and exit to barrier" class="govuk-button js-submit-button">
+	</form>
+{% endblock %}

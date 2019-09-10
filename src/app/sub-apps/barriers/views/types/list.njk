@@ -3,18 +3,18 @@
 
 {% extends 'layout.njk' %}
 
-{% block page_title %}{{ super() }} - Define type of market access barrier{% endblock %}
+{% block page_title %}{{ super() }} - Define barrier category{% endblock %}
 
 {% block page_content %}
 
 	{{ heading({
 		back: { href: urls.barriers.detail( barrier.id ) },
 		caption: barrier.barrier_title,
-		text: 'Define type of market access barrier',
+		text: 'Define barrier category',
 		errors: errors
 	}) }}
 
-	<h3 class="report-sectors-heading">Save or add another barrier type</h3>
+	<h3 class="report-sectors-heading">Save or add another category</h3>
 
 	{{ barrierTypesList( types, {
 			csrfToken: csrfToken,

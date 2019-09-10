@@ -1,0 +1,44 @@
+{% from 'components/warning-text/macro.njk' import govukWarningText %}
+{% from 'app-components/currency-input.njk' import currencyInput %}
+{% from 'app-components/heading.njk' import heading %}
+
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Barrier Assessment - UK economy value{% endblock %}
+
+{% block page_content %}
+
+	{{ heading({
+		back: { href: urls.barriers.assessment.detail( barrier.id ) },
+		caption: barrier.barrier_title,
+		text: 'Value to UK Economy',
+		errors: errors
+	}) }}
+
+	<form action="{{ urls.barriers.assessment.economyValue( barrier.id ) }}" method="POST" class="restrict-width">
+		<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+		{{ currencyInput( {
+
+			label: {
+				text: 'What is the total value of the barrier to the UK economy?',
+				classes: 'govuk-label--s'
+			},
+			hint: {
+				text: 'The estimated value of resolving the barrier to the UK economy in GBP per year.'
+			},
+			id: 'value',
+			name: 'value',
+			classes: 'govuk-input--currency',
+			value: value | formatNumber,
+			errorMessage: errors | errorForName( 'value' )
+		} ) }}
+
+		{{ govukWarningText({
+			text: 'To be completed by the Market Access Analysts',
+			iconFallbackText: 'Warning'
+		}) }}
+
+		<input type="submit" value="Save and exit to barrier" class="govuk-button">
+	</form>
+{% endblock %}

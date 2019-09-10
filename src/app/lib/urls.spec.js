@@ -243,9 +243,9 @@ describe( 'URLs', () => {
 				expect( urls.barriers.sectors.new( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/new/` );
 				expect( urls.barriers.sectors.edit( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/edit/` );
 				expect( urls.barriers.sectors.add( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/add/` );
-				expect( urls.barriers.sectors.addAllSectors( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/add/all/` );
 				expect( urls.barriers.sectors.remove( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/remove/` );
-				expect( urls.barriers.sectors.removeAllSectors( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/remove/all/` );
+				expect( urls.barriers.sectors.all.add( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/add/all/` );
+				expect( urls.barriers.sectors.all.remove( barrierId ) ).toEqual( `/barriers/${ barrierId }/sectors/remove/all/` );
 			} );
 		} );
 
@@ -294,6 +294,25 @@ describe( 'URLs', () => {
 
 					expect( urls.barriers.team.search( barrierId ) ).toEqual( `/barriers/${ barrierId }/team/add/search/` );
 				});
+			} );
+		} );
+
+		describe( 'assessment', () => {
+			it( 'Should return the correct paths', () => {
+
+				expect( urls.barriers.assessment.detail( barrierId ) ).toEqual( `/barriers/${ barrierId }/assessment/` );
+				expect( urls.barriers.assessment.economic.list( barrierId ) ).toEqual( `/barriers/${ barrierId }/assessment/economic/` );
+				expect( urls.barriers.assessment.economic.new( barrierId ) ).toEqual( `/barriers/${ barrierId }/assessment/economic/new/` );
+				expect( urls.barriers.assessment.economyValue( barrierId ) ).toEqual( `/barriers/${ barrierId }/assessment/economy-value/` );
+				expect( urls.barriers.assessment.marketSize( barrierId ) ).toEqual( `/barriers/${ barrierId }/assessment/market-size/` );
+				expect( urls.barriers.assessment.exportValue( barrierId ) ).toEqual( `/barriers/${ barrierId }/assessment/export-value/` );
+				expect( urls.barriers.assessment.commercialValue( barrierId ) ).toEqual( `/barriers/${ barrierId }/assessment/commercial-value/` );
+
+				const documentId = uuid();
+
+				expect( urls.barriers.assessment.documents.add( barrierId ) ).toEqual( `/barriers/${ barrierId }/assessment/documents/add/` );
+				expect( urls.barriers.assessment.documents.cancel( barrierId ) ).toEqual( `/barriers/${ barrierId }/assessment/documents/cancel/` );
+				expect( urls.barriers.assessment.documents.delete( barrierId, documentId ) ).toEqual( `/barriers/${ barrierId }/assessment/documents/${ documentId }/delete/` );
 			} );
 		} );
 	} );
@@ -443,6 +462,21 @@ describe( 'URLs', () => {
 
 		describe( 'When the reportId is required', () => {
 
+			function getMethod( obj, name ){
+
+				const index = name.indexOf( '.' );
+
+				if( index >= 0 ){
+
+					const newName = name.slice( 0, index );
+					const newObj = obj[ newName ];
+
+					return getMethod( newObj, name.slice( index + 1 ) );
+				}
+
+				return obj[ name ];
+			}
+
 			function checkUrls( urlsInfo ){
 
 				for( let [ name, path ] of urlsInfo ){
@@ -451,7 +485,9 @@ describe( 'URLs', () => {
 						path += '/';
 					}
 
-					expect( urls.reports[ name ]( reportId ) ).toEqual( `/reports/${ reportId }/${ path }` );
+					const method = getMethod( urls.reports, name );
+
+					expect( method( reportId ) ).toEqual( `/reports/${ reportId }/${ path }` );
 				}
 			}
 
@@ -461,13 +497,15 @@ describe( 'URLs', () => {
 					[ 'detail', '' ],
 					[ 'hasSectors', 'has-sectors' ],
 					[ 'allSectors', 'all-sectors' ],
-					[ 'sectors', 'sectors' ],
-					[ 'addSector', 'sectors/add' ],
-					[ 'removeSector', 'sectors/remove' ],
+					[ 'sectors.list', 'sectors' ],
+					[ 'sectors.add', 'sectors/add' ],
+					[ 'sectors.remove', 'sectors/remove' ],
+					[ 'sectors.all.add', 'sectors/add/all' ],
+					[ 'sectors.all.remove', 'sectors/remove/all' ],
 					[ 'aboutProblem', 'problem' ],
 					[ 'summary', 'summary' ],
 					[ 'submit', 'submit' ],
-					['delete', 'delete']
+					[ 'delete', 'delete' ],
 				] );
 			} );
 		} );

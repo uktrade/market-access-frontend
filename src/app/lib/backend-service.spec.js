@@ -1,3 +1,4 @@
+/* eslint require-atomic-updates:0 */
 const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
 const faker = require( 'faker' );
@@ -6,6 +7,7 @@ const metadata = require( './metadata' );
 const modulePath = './backend-service';
 const getFakeData = jasmine.helpers.getFakeData;
 const { RESOLVED, PART_RESOLVED } = metadata.barrier.status.types;
+const RESULTS_LIMIT = 100;
 
 describe( 'Backend Service', () => {
 
@@ -46,7 +48,10 @@ describe( 'Backend Service', () => {
 						statusCheckInterval: 10, //make the test run faster
 						maxWaitTime: 2000,
 					}
-				}
+				},
+				backend: {
+					resultsLimit: RESULTS_LIMIT,
+				},
 			}
 		} );
 	} );
@@ -261,20 +266,77 @@ describe( 'Backend Service', () => {
 
 		describe( 'getScanStatus', () => {
 			describe( 'When the API returns success', () => {
-				it( 'Should call the correct API and resolve', async () => {
+				describe( 'When the scan passes', () => {
+					describe( 'When it passes on the first call', () => {
+						it( 'Should call the correct API and resolve', async () => {
 
-					const documentId = uuid();
+							const documentId = uuid();
 
-					backend.post.and.callFake( () => Promise.resolve( {
-						response: { isSuccess: true },
-						body: { status: 'virus_scanned' },
-					} ) );
+							backend.post.and.callFake( () => Promise.resolve( {
+								response: { isSuccess: true },
+								body: { status: 'virus_scanned' },
+							} ) );
 
-					const { status, passed } = await service.documents.getScanStatus( req, documentId );
+							const { status, passed } = await service.documents.getScanStatus( req, documentId );
 
-					expect( backend.post ).toHaveBeenCalledWith( `/documents/${ documentId }/upload-callback`, token );
-					expect( status ).toEqual( 'virus_scanned' );
-					expect( passed ).toEqual( true );
+							expect( backend.post ).toHaveBeenCalledWith( `/documents/${ documentId }/upload-callback`, token );
+							expect( status ).toEqual( 'virus_scanned' );
+							expect( passed ).toEqual( true );
+						} );
+					} );
+
+					describe( 'When it passes on the second call', () => {
+						it( 'Should call the correct API and resolve', async () => {
+
+							const documentId = uuid();
+							let calls = 0;
+
+							backend.post.and.callFake( () => {
+
+								calls++;
+
+								if( calls === 1 ){
+
+									return Promise.resolve( {
+										response: { isSuccess: true },
+										body: { status: 'virus_scanning_in_progress' },
+									} );
+								}
+
+								if( calls === 2 ){
+
+									return Promise.resolve( {
+										response: { isSuccess: true },
+										body: { status: 'virus_scanned' },
+									} );
+								}
+							} );
+
+							const { status, passed } = await service.documents.getScanStatus( req, documentId );
+
+							expect( backend.post ).toHaveBeenCalledWith( `/documents/${ documentId }/upload-callback`, token );
+							expect( status ).toEqual( 'virus_scanned' );
+							expect( passed ).toEqual( true );
+						} );
+					} );
+				} );
+
+				describe( 'When the scan fails', () => {
+					it( 'Should call the correct API and resolve', async () => {
+
+						const documentId = uuid();
+
+						backend.post.and.callFake( () => Promise.resolve( {
+							response: { isSuccess: true },
+							body: { status: 'virus_scanning_failed' },
+						} ) );
+
+						const { status, passed } = await service.documents.getScanStatus( req, documentId );
+
+						expect( backend.post ).toHaveBeenCalledWith( `/documents/${ documentId }/upload-callback`, token );
+						expect( status ).toEqual( 'virus_scanning_failed' );
+						expect( passed ).toEqual( false );
+					} );
 				} );
 			} );
 
@@ -348,25 +410,30 @@ describe( 'Backend Service', () => {
 
 		describe( 'getAll', () => {
 
-			async function testWithOrdering( filters, expectedParams ){
+			async function testWithOrdering( filters, expectedParams, page ){
 
 				const path = ( '/barriers?' + ( expectedParams ? expectedParams + '&' : '' ) );
 
-				await service.barriers.getAll( req, filters );
+				function getPath( params ){
 
-				expect( backend.get ).toHaveBeenCalledWith( `${ path }ordering=-reported_on`, token );
+					return `${ path }${ params }&limit=${ RESULTS_LIMIT }&offset=${ RESULTS_LIMIT * ( ( page || 1 ) - 1 ) }`;
+				}
 
-				await service.barriers.getAll( req, filters, 'reported_on' );
+				await service.barriers.getAll( req, filters, page );
 
-				expect( backend.get ).toHaveBeenCalledWith( `${ path }ordering=-reported_on`, token );
+				expect( backend.get ).toHaveBeenCalledWith( getPath( 'ordering=-reported_on' ), token );
 
-				await service.barriers.getAll( req, filters, 'reported_on', 'desc' );
+				await service.barriers.getAll( req, filters, page, 'reported_on' );
 
-				expect( backend.get ).toHaveBeenCalledWith( `${ path }ordering=-reported_on`, token );
+				expect( backend.get ).toHaveBeenCalledWith( getPath( 'ordering=-reported_on' ), token );
 
-				await service.barriers.getAll( req, filters, 'reported_on', 'asc' );
+				await service.barriers.getAll( req, filters, page, 'reported_on', 'desc' );
 
-				expect( backend.get ).toHaveBeenCalledWith( `${ path }ordering=reported_on`, token );
+				expect( backend.get ).toHaveBeenCalledWith( getPath( 'ordering=-reported_on' ), token );
+
+				await service.barriers.getAll( req, filters, page, 'reported_on', 'asc' );
+
+				expect( backend.get ).toHaveBeenCalledWith( getPath( 'ordering=reported_on' ), token );
 			}
 
 			describe( 'With no filters', () => {
@@ -382,6 +449,15 @@ describe( 'Backend Service', () => {
 					const country = uuid();
 
 					testWithOrdering( { country }, `location=${ country }` );
+				} );
+
+				describe( 'With a different page', () => {
+					it( 'Passes the correct params', () => {
+
+						const country = uuid();
+
+						testWithOrdering( { country }, `location=${ country }`, 2 );
+					} );
 				} );
 			} );
 
@@ -465,6 +541,15 @@ describe( 'Backend Service', () => {
 						const createdBy = '1,2';
 
 						testWithOrdering( { createdBy }, `team=1` );
+					} );
+				} );
+
+				describe( 'When the value is neither 1 or 2', () => {
+					it( 'Should call the correct path, urlencode the value, use default sort order', async () => {
+
+						const createdBy = '3';
+
+						testWithOrdering( { createdBy } );
 					} );
 				} );
 			} );
@@ -1157,6 +1242,128 @@ describe( 'Backend Service', () => {
 				} );
 			} );
 		} );
+
+		describe( 'assessment', () => {
+
+			beforeEach( () => {
+				req.barrier = {
+					id: barrierId,
+					has_assessment: false,
+				};
+			} );
+
+			async function checkPostAndPatch( method, inputValues, outputValues ){
+
+				const url = `/barriers/${ barrierId }/assessment`;
+
+				await method( req, req.barrier, inputValues );
+
+				expect( backend.post ).toHaveBeenCalledWith( url, token, outputValues );
+
+				req.barrier.has_assessment = true;
+
+				await method( req, req.barrier, inputValues );
+
+				expect( backend.patch ).toHaveBeenCalledWith( url, token, outputValues );
+			}
+
+			describe( 'get', () => {
+				it( 'Should GET the correct path', async () => {
+
+					await service.barriers.assessment.get( req, barrierId );
+
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers/${ barrierId }/assessment`, token );
+				} );
+			} );
+
+			describe( 'getHistory', () => {
+				it( 'Should GET the correct path', async () => {
+
+					await service.barriers.assessment.getHistory( req, barrierId );
+
+					expect( backend.get ).toHaveBeenCalledWith( `/barriers/${ barrierId }/assessment_history`, token );
+				} );
+			} );
+
+			describe( 'saveEconomic', () => {
+				describe( 'Without any documentIds', () => {
+					it( 'Should POST to the correct path with the correct values', async () => {
+
+						const values = {
+							impact: faker.lorem.word().toUpperCase(),
+							description: faker.lorem.paragraph( 2 ),
+						};
+
+						await checkPostAndPatch( service.barriers.assessment.saveEconomic, values, {
+							impact: values.impact,
+							explanation: values.description,
+							documents: null,
+						} );
+					} );
+				} );
+
+				describe( 'With documentIds', () => {
+					it( 'Should POST to the correct path with the correct values', async () => {
+
+						const values = {
+							impact: faker.lorem.word().toUpperCase(),
+							description: faker.lorem.paragraph( 2 ),
+							documentIds: [ uuid(), uuid() ],
+						};
+
+						await checkPostAndPatch( service.barriers.assessment.saveEconomic, values, {
+							impact: values.impact,
+							explanation: values.description,
+							documents: values.documentIds,
+						} );
+					} );
+				} );
+			} );
+
+			describe( 'saveEconomyValue', () => {
+				it( 'Should POST to the correct path with the correct values', async () => {
+
+					const value = faker.random.number();
+
+					await checkPostAndPatch( service.barriers.assessment.saveEconomyValue, value, {
+						value_to_economy: value,
+					} );
+				} );
+			} );
+
+			describe( 'saveMarketSize', () => {
+				it( 'Should POST to the correct path with the correct values', async () => {
+
+					const value = faker.random.number();
+
+					await checkPostAndPatch( service.barriers.assessment.saveMarketSize, value, {
+						import_market_size: value,
+					} );
+				} );
+			} );
+
+			describe( 'saveExportValue', () => {
+				it( 'Should POST to the correct path with the correct values', async () => {
+
+					const value = faker.random.number();
+
+					await checkPostAndPatch( service.barriers.assessment.saveExportValue, value, {
+						export_value: value,
+					} );
+				} );
+			} );
+
+			describe( 'saveCommercialValue', () => {
+				it( 'Should POST to the correct path with the correct values', async () => {
+
+					const value = faker.random.number();
+
+					await checkPostAndPatch( service.barriers.assessment.saveCommercialValue, value, {
+						commercial_value: value,
+					} );
+				} );
+			} );
+		} );
 	} );
 
 	describe( 'Reports', () => {
@@ -1460,18 +1667,6 @@ describe( 'Backend Service', () => {
 				} );
 			} );
 
-			describe( 'saveAllSectors', () => {
-
-				const allSectors = 'true';
-
-				checkWithAndWithoutValues( 'saveAllSectors', {
-					allSectors,
-				}, {
-					all_sectors: allSectors,
-					sectors: null
-				} );
-			} );
-
 			describe( 'saveSectors', () => {
 
 				const sectors = [
@@ -1479,10 +1674,26 @@ describe( 'Backend Service', () => {
 					uuid()
 				];
 
-				checkWithAndWithoutValues( 'saveSectors', {
-					sectors
-				}, {
-					sectors
+				describe( 'With allSectors false', () => {
+
+					checkWithAndWithoutValues( 'saveSectors', {
+						sectors,
+						allSectors: false,
+					}, {
+						sectors,
+						all_sectors: false,
+					} );
+				} );
+
+				describe( 'With allSectors true', () => {
+
+					checkWithAndWithoutValues( 'saveSectors', {
+						sectors,
+						allSectors: true,
+					}, {
+						sectors,
+						all_sectors: true,
+					} );
 				} );
 			} );
 

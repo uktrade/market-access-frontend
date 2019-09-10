@@ -35,9 +35,15 @@ const reportUrl = {
 	},
 	hasSectors: ( reportId ) => `/reports/${ reportId }/has-sectors/`,
 	allSectors: ( reportId ) => `/reports/${ reportId }/all-sectors/`,
-	sectors: ( reportId ) => `/reports/${ reportId }/sectors/`,
-	addSector: ( reportId ) => `/reports/${ reportId }/sectors/add/`,
-	removeSector: ( reportId ) => `/reports/${ reportId }/sectors/remove/`,
+	sectors: {
+		list: ( reportId ) => `/reports/${ reportId }/sectors/`,
+		add: ( reportId ) => `/reports/${ reportId }/sectors/add/`,
+		remove: ( reportId ) => `/reports/${ reportId }/sectors/remove/`,
+		all: {
+			add: ( reportId ) => `/reports/${ reportId }/sectors/add/all/`,
+			remove: ( reportId ) => `/reports/${ reportId }/sectors/remove/all/`,
+		},
+	},
 	aboutProblem: ( reportId ) => `/reports/${ reportId }/problem/`,
 	summary: ( reportId ) => `/reports/${ reportId }/summary/`,
 	submit: ( reportId ) => `/reports/${ reportId }/submit/`,
@@ -122,10 +128,12 @@ module.exports = {
 			edit: ( barrierId ) => `/barriers/${ barrierId }/sectors/edit/`,
 			list: ( barrierId ) => `/barriers/${ barrierId }/sectors/`,
 			add: ( barrierId ) => `/barriers/${ barrierId }/sectors/add/`,
-			addAllSectors: ( barrierId ) => `/barriers/${ barrierId }/sectors/add/all/`,
 			remove: ( barrierId ) => `/barriers/${ barrierId }/sectors/remove/`,
-			removeAllSectors: ( barrierId ) => `/barriers/${ barrierId }/sectors/remove/all/`,
 			new: ( barrierId ) => `/barriers/${ barrierId }/sectors/new/`,
+			all: {
+				add: ( barrierId ) => `/barriers/${ barrierId }/sectors/add/all/`,
+				remove: ( barrierId ) => `/barriers/${ barrierId }/sectors/remove/all/`,
+			}
 		},
 		location: {
 			list: ( barrierId ) => `/barriers/${ barrierId }/location/`,
@@ -161,6 +169,22 @@ module.exports = {
 			//edit: ( barrierId, memberId ) => `/barriers/${ barrierId }/team/edit/${ memberId }`,
 			delete: ( barrierId, memberId ) => `/barriers/${ barrierId }/team/delete/${ memberId }`,
 		},
+		assessment: {
+			detail: ( barrierId ) => `/barriers/${ barrierId }/assessment/`,
+			economic: {
+				list: ( barrierId ) => `/barriers/${ barrierId }/assessment/economic/`,
+				new: ( barrierId ) => `/barriers/${ barrierId }/assessment/economic/new/`,
+			} ,
+			economyValue: ( barrierId ) => `/barriers/${ barrierId }/assessment/economy-value/`,
+			marketSize: ( barrierId ) => `/barriers/${ barrierId }/assessment/market-size/`,
+			exportValue: ( barrierId ) => `/barriers/${ barrierId }/assessment/export-value/`,
+			commercialValue: ( barrierId ) => `/barriers/${ barrierId }/assessment/commercial-value/`,
+			documents: {
+				add: ( barrierId ) => `/barriers/${ barrierId }/assessment/documents/add/`,
+				cancel: ( barrierId ) => `/barriers/${ barrierId }/assessment/documents/cancel/`,
+				delete: ( barrierId, documentId ) => `/barriers/${ barrierId }/assessment/documents/${ documentId }/delete/`,
+			},
+		}
 	},
 
 	reports: reportUrl,

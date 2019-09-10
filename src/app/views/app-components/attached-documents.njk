@@ -1,0 +1,20 @@
+{% macro attachedDocuments( documents ) -%}
+	{% if documents and documents.length %}
+	<div class="attachments">
+		<h3 class="attachments__heading">Attached documents</h3>
+		<ul class="attachments__list js-documents-list">
+		{%- for document in documents %}
+			{% if document %}
+
+				<li class="attachments__list__item">
+					<span class="attachments__list__item__file-name">{{ document.name }} - {{ document.size }}</span>
+					<a href="{{ document.deleteUrl }}" class="attachments__list__item__delete" data-document-id="{{ document.id }}">Delete</a>
+					<input type="hidden" name="documentIds" value="{{ document.id }}">
+				</li>
+
+			{% endif %}
+		{%- endfor %}
+		</ul>
+	</div>
+	{% endif %}
+{% endmacro %}

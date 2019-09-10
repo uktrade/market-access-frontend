@@ -9,7 +9,7 @@
 
 	{{ heading({
 		caption: 'Add a barrier',
-		text: 'Status of the barrier',
+		text: 'Barrier status',
 		errors: errors
 	}) }}
 
@@ -21,13 +21,13 @@
 			classes: 'problem-status',
 			fieldset: {
 				legend: {
-					text: 'What is the scope of the barrier?',
+					text: 'What type of barrier is it?',
 					classes: 'govuk-fieldset__legend--s'
 				}
 			},
 			items: status | addToRadio( {
-				'1': { hint: { text: 'for example, goods stuck at the border or documentation issue' } },
-				'2': { hint: { text: 'for example, a change of regulation' } }
+				'1': { hint: { text: 'For example, overly complex customs paperwork' } },
+				'2': { hint: { text: 'For example, a change of regulation' } }
 			} ),
 			errorMessage: errors | errorForName( 'status-1' )
 		}) }}

@@ -54,4 +54,11 @@ module.exports = {
 	isCountryOrAdminArea: ( id ) => isCountry( id ) || isCountryAdminArea( id ),
 	isBarrierStatus: ( id ) => metadata.barrierStatuses.hasOwnProperty( id ),
 	isCreatedBy: ( id ) => metadata.barrier.createdBy.items.hasOwnProperty( id ),
+	isFileOverSize: ( err ) => {
+
+		const message = err.message;
+		const isOverSize = ( message.indexOf( 'maxFileSize exceeded' ) >= 0 );
+
+		return isOverSize;
+	}
 };

@@ -34,6 +34,7 @@ $govuk-images-path: '/govuk-public/images/';
 @import 'components/input/input';
 @import 'components/select/select';
 @import 'components/warning-text/warning-text';
+@import 'components/inset-text/inset-text';
 @import 'components/textarea/textarea';
 @import 'components/back-link/back-link';
 @import 'components/error-summary/error-summary';
@@ -62,6 +63,7 @@ $govuk-images-path: '/govuk-public/images/';
 @import 'app-objects/inline-definition-list';
 @import 'app-objects/circle-icon';
 @import 'app-objects/static-form-group';
+@import 'app-objects/document-list';
 
 @import 'app-components/dash-button';
 @import 'app-components/dash-card';
@@ -86,6 +88,7 @@ $govuk-images-path: '/govuk-public/images/';
 @import 'app-components/toggle-box';
 @import 'app-components/modal';
 @import 'app-components/toggle-links';
+@import 'app-components/pagination';
 
 @import 'pages/index';
 @import 'pages/what-is-a-barrier';
@@ -94,6 +97,7 @@ $govuk-images-path: '/govuk-public/images/';
 @import 'pages/barrier/detail';
 @import 'pages/barrier/type';
 @import 'pages/barrier/team';
+@import 'pages/barrier/assessment';
 @import 'pages/find-a-barrier';
 
 body:not(.js-enabled) {

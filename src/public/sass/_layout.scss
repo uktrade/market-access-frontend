@@ -16,21 +16,8 @@ a {
 }
 
 
-.footer-bar {
-	@include govuk-font( $size: 14 );
-	margin-top: govuk-em( 45, 14 );
-}
-
-.footer-bar__content {
-
-	margin: 0;
-	background-color: $govuk-fuchsia;
-	color: $govuk-white;
-	box-sizing: border-box;
-	padding: govuk-em(10, 14) govuk-em(15, 14);
-	a {
-		color: $govuk-white;
-	}
+.govuk-footer--ma {
+	margin-top: govuk-em( 45, 16 );
 }
 
 @include mq( $from: tablet ){

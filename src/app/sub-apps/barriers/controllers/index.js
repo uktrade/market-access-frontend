@@ -7,4 +7,5 @@ module.exports = {
 	sectors: require( './sectors' ),
 	companies: require( './companies' ),
 	team: require( './team' ),
+	assessment: require( './assessment' ),
 };

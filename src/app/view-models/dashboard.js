@@ -1,6 +1,9 @@
 const metadata = require( '../lib/metadata' );
 const urls = require( '../lib/urls' );
+const pagination = require( '../lib/pagination' );
+const config = require( '../config' );
 
+const RESULTS_LIMIT = config.backend.resultsLimit;
 const barrierStatusTypeInfo = metadata.barrier.status.typeInfo;
 
 function getSector( sectorId ){
@@ -63,22 +66,22 @@ function getSortableFields( watchListIndex, sortData ){
 	return sortableFields;
 }
 
-module.exports = ( barriers, sortData, queryString, watchListIndex, locals ) => {
+module.exports = ( { count, results: barriers }, page, sortData, filters, watchListIndex, queryString, locals ) => {
 
 	if( barriers && barriers.length ){
 
 		barriers = barriers.map( update );
 	}
 
-	const editQueryString = { ...queryString, editList: watchListIndex };
-	const sortableFields = getSortableFields( watchListIndex, sortData );
+	const editQueryString = { ...filters, editList: watchListIndex };
+	const sortableFields = getSortableFields( watchListIndex, sortData, page );
 
 	return {
 		...locals,
 		barriers,
+		paginationData: pagination.create( queryString, RESULTS_LIMIT, count, page ),
 		sortableFields,
-		barrierCount: barriers.length,
-		queryString,
+		barrierCount: count,
 		editQueryString,
 		watchListIndex,
 	};

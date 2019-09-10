@@ -21,7 +21,7 @@ if( typeof jasmine !== 'undefined' ){
 
 	jasmine.helpers.getCsrfTokenFromQueryParam = ( res, fail ) => {
 
-		const token = getToken( /".+?\?.*?_csrf=(.+?)[&"]/, res );
+		const token = getToken( /action=".+?\?.*?_csrf=(.+?)[&"]/, res );
 
 		if( !token ){
 			console.log( res.text );

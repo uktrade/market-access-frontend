@@ -168,91 +168,85 @@ function sortOverseasRegions( a, b ){
 
 module.exports.fetch = async () => {
 
-	try {
+	const { response, body } = await backend.get( '/metadata' );
 
-		const { response, body } = await backend.get( '/metadata' );
+	if( response.isSuccess ){
 
-		if( response.isSuccess ){
+		const availableCountries = body.countries.filter( notDisabled );
 
-			const availableCountries = body.countries.filter( notDisabled );
+		overseasRegions = getOverseasRegions( availableCountries ).sort( sortOverseasRegions );
+		adminAreas = body.country_admin_areas.filter( notDisabled );
+		adminAreasByCountry = alterAdminAreasData( adminAreas );
+		countries = availableCountries.map( cleanCountry );
+		sectors = body.sectors.filter( notDisabled );
+		level0Sectors = sectors.filter( ( sector ) => sector.level === 0 );
+		barrierTypes = body.barrier_types;
+		uniqueBarrierTypes = dedupeBarrierTypes( barrierTypes );
+		barrierPriorities = body.barrier_priorities.map( barrierPriority ).sort( sortPriority );
+		barrierStatuses = Object.values( barrierStatusKeys ).reduce( ( statuses, id ) => {
 
-			overseasRegions = getOverseasRegions( availableCountries ).sort( sortOverseasRegions );
-			adminAreas = body.country_admin_areas.filter( notDisabled );
-			adminAreasByCountry = alterAdminAreasData( adminAreas );
-			countries = availableCountries.map( cleanCountry );
-			sectors = body.sectors.filter( notDisabled );
-			level0Sectors = sectors.filter( ( sector ) => sector.level === 0 );
-			barrierTypes = body.barrier_types;
-			uniqueBarrierTypes = dedupeBarrierTypes( barrierTypes );
-			barrierPriorities = body.barrier_priorities.map( barrierPriority ).sort( sortPriority );
-			barrierStatuses = Object.values( barrierStatusKeys ).reduce( ( statuses, id ) => {
+			statuses[ id ] = body.barrier_status[ id ];
+			return statuses;
+		}, {} );
 
-				statuses[ id ] = body.barrier_status[ id ];
-				return statuses;
-			}, {} );
+		module.exports.statusTypes = {
+			...body.status_types,
+			'1': 'A procedural, short-term barrier',
+			'2': 'A long-term strategic barrier'
+		};
+		module.exports.lossScale = body.loss_range;
+		module.exports.optionalBool = body.adv_boolean;
+		module.exports.countries = countries;
+		module.exports.adminAreas = adminAreas;
+		module.exports.adminAreasByCountry = adminAreasByCountry;
+		module.exports.overseasRegions = overseasRegions;
+		module.exports.govResponse = body.govt_response;
+		module.exports.publishResponse = body.publish_response;
+		module.exports.reportStages = body.report_stages;
+		module.exports.reportTaskList = createTaskList( body.report_stages );
+		module.exports.barrierTypes = uniqueBarrierTypes;
+		module.exports.barrierTypeCategories = body.barrier_type_categories;
+		module.exports.supportType = body.support_type;
+		module.exports.sectors = sectors;
+		module.exports.level0Sectors = level0Sectors;
+		module.exports.barrierSource = body.barrier_source;
+		module.exports.barrierPriorities = barrierPriorities;
+		module.exports.barrierPrioritiesMap = barrierPriorities.reduce( ( map, item ) => {
 
-			module.exports.statusTypes = {
-				...body.status_types,
-				'1': 'A procedural/short-term barrier',
-				'2': 'A long term strategic barrier'
-			};
-			module.exports.lossScale = body.loss_range;
-			module.exports.optionalBool = body.adv_boolean;
-			module.exports.countries = countries;
-			module.exports.adminAreas = adminAreas;
-			module.exports.adminAreasByCountry = adminAreasByCountry;
-			module.exports.overseasRegions = overseasRegions;
-			module.exports.govResponse = body.govt_response;
-			module.exports.publishResponse = body.publish_response;
-			module.exports.reportStages = body.report_stages;
-			module.exports.reportTaskList = createTaskList( body.report_stages );
-			module.exports.barrierTypes = uniqueBarrierTypes;
-			module.exports.barrierTypeCategories = body.barrier_type_categories;
-			module.exports.supportType = body.support_type;
-			module.exports.sectors = sectors;
-			module.exports.level0Sectors = level0Sectors;
-			module.exports.barrierSource = body.barrier_source;
-			module.exports.barrierPriorities = barrierPriorities;
-			module.exports.barrierPrioritiesMap = barrierPriorities.reduce( ( map, item ) => {
+			map[ item.code ] = item;
 
-				map[ item.code ] = item;
+			return map;
+		}, {} );
+		module.exports.bool = {
+			'true': 'Yes',
+			'false': 'No'
+		};
+		module.exports.documentStatus = {
+			not_virus_scanned: 'Not virus scanned',
+			virus_scanning_scheduled: 'Virus scanning scheduled',
+			virus_scanning_in_progress: 'Virus scanning in progress',
+			virus_scanning_failed: 'Virus scanning failed.',
+			virus_scanned: 'Virus scanned',
+			deletion_pending: 'Deletion pending',
+		};
+		module.exports.barrierStatuses = barrierStatuses;
 
-				return map;
-			}, {} );
-			module.exports.bool = {
-				'true': 'Yes',
-				'false': 'No'
-			};
-			module.exports.documentStatus = {
-				not_virus_scanned: 'Not virus scanned',
-				virus_scanning_scheduled: 'Virus scanning scheduled',
-				virus_scanning_in_progress: 'Virus scanning in progress',
-				virus_scanning_failed: 'Virus scanning failed.',
-				virus_scanned: 'Virus scanned',
-				deletion_pending: 'Deletion pending',
-			};
-			module.exports.barrierStatuses = barrierStatuses;
+		//overwrite static type info names with the names from the metadata
+		for( let [ key, name ] of Object.entries( body.barrier_status ) ){
 
-			//overwrite static type info names with the names from the metadata
-			for( let [ key, name ] of Object.entries( body.barrier_status ) ){
+			const item = module.exports.barrier.status.typeInfo[ key ];
 
-				const item = module.exports.barrier.status.typeInfo[ key ];
-
-				if( item ){
-					item.name = name;
-				}
+			if( item ){
+				item.name = name;
 			}
-
-			module.exports.barrierPendingOptions = body.barrier_pending;
-
-		} else {
-
-			throw new Error( 'Unable to fetch metadata' );
 		}
 
-	} catch( e ){
+		module.exports.barrierPendingOptions = body.barrier_pending;
+		module.exports.barrierAssessmentImpactOptions = body.assessment_impact;
 
-		throw e;
+	} else {
+
+		throw new Error( 'Unable to fetch metadata' );
 	}
 };
 
@@ -312,6 +306,15 @@ module.exports.barrier = {
 			'2': 'My team barriers',
 		}
 	},
+	assessment: {
+		fieldNames: {
+			impact: 'Economic assessment',
+			value_to_economy: 'Value to UK Economy',
+			import_market_size: 'Import Market Size',
+			export_value: 'Value of currently affected UK exports',
+			commercial_value: 'Commercial Value'
+		}
+	}
 };
 
 module.exports.getBarrierCreatedBy = ( id ) => module.exports.barrier.createdBy.items[ id ];

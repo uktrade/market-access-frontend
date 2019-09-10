@@ -20,7 +20,10 @@
 		"no-console": 2,
 		"semi": [ 2, "always" ],
 		"quotes": [ 2, "single", "avoid-escape" ],
-		"indent": [ "error", "tab", { "SwitchCase": 1 } ]
+		"indent": [ "error", "tab", { "SwitchCase": 1 } ],
+		"no-prototype-builtins": 0,
+		"no-async-promise-executor": 0,
+		"require-atomic-updates": 0
 	},
 	"overrides": [{
 		"files": "**/*.spec.js",

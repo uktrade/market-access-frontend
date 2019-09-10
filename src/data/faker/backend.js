@@ -14,6 +14,8 @@ const jsonFiles = {
 	'barriers/interactions': generateSchema( '/backend/barriers/interactions' ),
 	'barriers/history': generateSchema( '/backend/barriers/history' ),
 	'barriers/members': generateSchema( '/backend/barriers/members' ),
+	'barriers/assessment': generateSchema( '/backend/barriers/assessment' ),
+	'barriers/assessment_history': generateSchema( '/backend/barriers/assessment_history' ),
 };
 
 writeJsonFiles( OUTPUT_PATH, jsonFiles );

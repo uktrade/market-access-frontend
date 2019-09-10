@@ -55,12 +55,7 @@
 {% endblock %}
 
 {% block footer %}
-	<div class="footer-bar" role="complementary" aria-labelledby="footer-title">
-		<p class="footer-bar__content">
-			<strong id="footer-title">Is there anything wrong with this page?</strong>
-			Give us <a href="mailto:{{ feedbackEmail }}">feedback on this page</a> to help us improve this service.
-		</p>
-	</div>
+
 	{{- govukFooterMa({
 		classes: 'govuk-footer--ma',
 		'navigation': [
@@ -108,6 +103,7 @@
 	<script src="/public/js/components/Modal.js"></script>
 	<script src="/public/js/components/DeleteModal.js"></script>
 	<script src="/public/js/components/ToggleBox.js"></script>
+	<script src="/public/js/components/AttachmentForm.js"></script>
 	<script src="/public/js/pages/index.js"></script>
 	<script src="/public/js/pages/report/index.js"></script>
 	<script src="/public/js/pages/report/is-resolved.js"></script>
@@ -117,6 +113,7 @@
 	<script src="/public/js/pages/barrier/edit.js"></script>
 	<script src="/public/js/pages/barrier/detail.js"></script>
 	<script src="/public/js/pages/barrier/team.js"></script>
+	<script src="/public/js/pages/barrier/assessment.js"></script>
 	<script src="/public/js/pages/watch-list.js"></script>
 	<!-- endbuild -->
 	<script>ma.init();</script>

@@ -5,7 +5,12 @@ const validators = require( '../../../lib/validators' );
 const metadata = require( '../../../lib/metadata' );
 
 function renderSectors( req, res, sectors, allSectors ){
-	res.render( 'barriers/views/sectors/list', { sectors: sectors.map( metadata.getSector ), allSectors, csrfToken: req.csrfToken(), } );
+
+	res.render( 'barriers/views/sectors/list', {
+		sectors: sectors.map( metadata.getSector ),
+		allSectors,
+		csrfToken: req.csrfToken(),
+	} );
 }
 
 function addSectorForm( req, res, href ){
@@ -35,17 +40,17 @@ function addSectorForm( req, res, href ){
 
 			sectors.push( form.getValues().sectors );
 			req.barrierSession.sectors.list.set( sectors );
-			req.barrierSession.sectors.all.set(false);
+			req.barrierSession.sectors.all.set( false );
 
 			return res.redirect( urls.barriers.sectors.list( barrier.id ) );
 		}
 	}
 
-	res.render( 'barriers/views/sectors/add', Object.assign(
-		form.getTemplateValues(),
-		{ currentSectors: sectors.map( metadata.getSector ) },
-		{ href }
-	) );
+	res.render( 'barriers/views/sectors/add', {
+		...form.getTemplateValues(),
+		currentSectors: sectors.map( metadata.getSector ),
+		href
+	} );
 }
 
 module.exports = {
@@ -107,12 +112,7 @@ module.exports = {
 		res.redirect( urls.barriers.sectors.list( req.barrier.id ) );
 	},
 
-	removeAllSectors: ( req, res ) => {
 
-		req.barrierSession.sectors.all.set( false );
-
-		res.redirect( urls.barriers.sectors.list( req.barrier.id ) );
-	},
 
 	add: ( req, res ) => {
 
@@ -127,19 +127,28 @@ module.exports = {
 		addSectorForm( req, res, href );
 	},
 
-	addAllSectors: ( req, res ) => {
-
-		req.barrierSession.sectors.all.set( true );
-		req.barrierSession.sectors.list.set( [] );
-
-		res.redirect( urls.barriers.sectors.list( req.barrier.id ) );
-	},
-
 	new: ( req, res ) => {
 
 		req.barrierSession.sectors.list.set( [] );
 		req.barrierSession.sectors.all.set( false );
 
 		renderSectors( req, res, [], false );
+	},
+
+	all: {
+		add: ( req, res ) => {
+
+			req.barrierSession.sectors.all.set( true );
+			req.barrierSession.sectors.list.set( [] );
+
+			res.redirect( urls.barriers.sectors.list( req.barrier.id ) );
+		},
+
+		remove: ( req, res ) => {
+
+			req.barrierSession.sectors.all.set( false );
+
+			res.redirect( urls.barriers.sectors.list( req.barrier.id ) );
+		},
 	}
 };

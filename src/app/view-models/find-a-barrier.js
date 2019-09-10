@@ -1,9 +1,12 @@
+const config = require( '../config' );
 const metadata = require( '../lib/metadata' );
 const sortGovukItems = require( '../lib/sort-govuk-items' );
 const urls = require( '../lib/urls' );
 const strings = require( '../lib/strings' );
 const barrierFilters = require( '../lib/barrier-filters' );
+const pagination = require( '../lib/pagination' );
 
+const RESULTS_LIMIT = config.backend.resultsLimit;
 const { OPEN, RESOLVED, HIBERNATED } = metadata.barrier.status.types;
 const barrierStatusTypeInfo = metadata.barrier.status.typeInfo;
 
@@ -28,21 +31,18 @@ function createMatcher( key ){
 //const isSelected = createMatcher( 'selected' );
 const isChecked = createMatcher( 'checked' );
 
-module.exports = function( { count, barriers, filters, queryString, isEdit, editListIndex, filtersMatchEditList } ){
+module.exports = function( { count, page, barriers, filters, isEdit, editListIndex, filtersMatchEditList } ){
 
 	const barrierList = [];
 	const hasFilters = !!Object.keys( filters ).length;
+	const editListParam = ( isEdit ? { editList: editListIndex } : {} );
+	const filterAndEditParams = { ...filters, ...editListParam };
 
-	function getRemoveUrl( filters, key ){
+	function getRemoveUrl( key ){
 
-		const clone = { ...filters };
+		const clone = { ...filterAndEditParams };
 
 		delete clone[ key ];
-
-		if( isEdit ){
-
-			clone.editList = editListIndex;
-		}
 
 		return urls.findABarrier( clone );
 	}
@@ -89,61 +89,62 @@ module.exports = function( { count, barriers, filters, queryString, isEdit, edit
 
 	return {
 		count,
+		paginationData: pagination.create( filterAndEditParams, RESULTS_LIMIT, count, page ),
 		barriers: barrierList,
 		hasFilters,
-		queryString,
 		showSaveButton: ( isEdit ? !filtersMatchEditList : hasFilters ),
 		isEdit,
 		editListIndex,
+		filterAndEditParams,
 		filterParams: filters,
-		removeAllUrl: urls.findABarrier( ( isEdit ? { editList: editListIndex } : {} ) ),
+		removeAllUrl: urls.findABarrier( editListParam ),
 		filters: {
 			country: {
 				...barrierFilters.getDisplayInfo( 'country', filters.country ),
 				items: countries.sort( sortGovukItems.alphabetical ).map( isChecked( filters.country ) ),
 				active: !!filters.country,
-				removeUrl: getRemoveUrl( filters, 'country' ),
+				removeUrl: getRemoveUrl( 'country' ),
 			},
 			region: {
 				...barrierFilters.getDisplayInfo( 'region', filters.region ),
 				items: metadata.getOverseasRegionList( 'All regions' ).map( isChecked( filters.region ) ),
 				active: !!filters.region,
-				removeUrl: getRemoveUrl( filters, 'region' ),
+				removeUrl: getRemoveUrl( 'region' ),
 			},
 			sector: {
 				...barrierFilters.getDisplayInfo( 'sector', filters.sector ),
 				items: metadata.getSectorList( 'All sectors' ).map( isChecked( filters.sector ) ),
 				active: !!filters.sector,
-				removeUrl: getRemoveUrl( filters, 'sector' ),
+				removeUrl: getRemoveUrl( 'sector' ),
 			},
 			type: {
 				...barrierFilters.getDisplayInfo( 'type', filters.type ),
 				items: metadata.getBarrierTypeList().sort( sortGovukItems.alphabetical ).map( isChecked( filters.type ) ),
 				active: !!filters.type,
-				removeUrl: getRemoveUrl( filters, 'type' ),
+				removeUrl: getRemoveUrl( 'type' ),
 			},
 			priority: {
 				...barrierFilters.getDisplayInfo( 'priority', filters.priority ),
 				items: metadata.getBarrierPrioritiesList( { suffix: false } ).map( isChecked( filters.priority ) ),
 				active: !!filters.priority,
-				removeUrl: getRemoveUrl( filters, 'priority' ),
+				removeUrl: getRemoveUrl( 'priority' ),
 			},
 			search: {
 				...barrierFilters.getDisplayInfo( 'search', filters.search ),
 				active: !!filters.search,
-				removeUrl: getRemoveUrl( filters, 'search' ),
+				removeUrl: getRemoveUrl( 'search' ),
 			},
 			status: {
 				...barrierFilters.getDisplayInfo( 'status', filters.status ),
 				items: metadata.getBarrierStatusList().map( isChecked( filters.status ) ),
 				active: !!filters.status,
-				removeUrl: getRemoveUrl( filters, 'status' ),
+				removeUrl: getRemoveUrl( 'status' ),
 			},
 			createdBy: {
 				...barrierFilters.getDisplayInfo( 'createdBy', filters.createdBy ),
 				items: metadata.getBarrierCreatedByList().map( isChecked( filters.createdBy ) ),
 				active: !!filters.createdBy,
-				removeUrl: getRemoveUrl( filters, 'createdBy' ),
+				removeUrl: getRemoveUrl( 'createdBy' ),
 			},
 		}
 	};

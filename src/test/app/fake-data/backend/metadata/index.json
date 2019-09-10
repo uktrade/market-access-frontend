@@ -350,5 +350,11 @@
       "TWO": "incidunt rem accusantium",
       "THREE": "ut quo ea",
       "OTHER": "enim"
+	},
+	"assessment_impact": {
+      "I_ONE": "sed",
+      "I_TWO": "voluptatem dolores qui",
+      "I_THREE": "qui sit aut",
+      "I_FOUR": "unde"
    }
 }

@@ -6,6 +6,7 @@ const SCAN_CHECK_INTERVAL = config.files.scan.statusCheckInterval;
 const SCAN_MAX_ATTEMPTS = Math.round( config.files.scan.maxWaitTime / SCAN_CHECK_INTERVAL );
 const LOCATION = 'location';
 const { RESOLVED, PART_RESOLVED } = metadata.barrier.status.types;
+const RESULTS_LIMIT = config.backend.resultsLimit;
 
 function getToken( req ){
 
@@ -199,6 +200,14 @@ function getBarrierParams( filters = {}, orderBy = 'reported_on', orderDirection
 	return params;
 }
 
+function addPagination( params, page ){
+
+	params.push( `limit=${ RESULTS_LIMIT }` );
+	params.push( `offset=${ RESULTS_LIMIT * ( page - 1 ) }` );
+
+	return params;
+}
+
 function getInitialReportValues( formValues ){
 
 	const isFullyResolved = ( formValues.isResolved == RESOLVED );
@@ -302,9 +311,11 @@ module.exports = {
 	},
 
 	barriers: {
-		getAll: async ( req, filters, orderBy, orderDirection ) => {
+		getAll: async ( req, filters, page = 1, orderBy, orderDirection ) => {
 
 			const params = getBarrierParams( filters, orderBy, orderDirection );
+
+			addPagination( params, page );
 
 			return backend.get( `/barriers?${ params.join( '&' ) }`, getToken( req ) );
 		},
@@ -407,7 +418,39 @@ module.exports = {
 				role: values.role,
 			} ),
 			delete: ( req, barrierMemberId ) => backend.delete( `/barriers/members/${ barrierMemberId }`, getToken( req ) ),
-		}
+		},
+		assessment: (() => {
+
+			function saveAssessmentValues( req, barrier, values ){
+
+				const isPatch = barrier.has_assessment;
+				const url = `/barriers/${ barrier.id }/assessment`;
+
+				return backend[ ( isPatch ? 'patch' : 'post' ) ]( url, getToken( req ), values );
+			}
+
+			return {
+				get: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }/assessment`, getToken( req ) ),
+				getHistory: ( req, barrierId ) => backend.get( `/barriers/${ barrierId }/assessment_history`, getToken( req ) ),
+				saveEconomic: ( req, barrier, values ) => saveAssessmentValues( req, barrier, {
+					impact: values.impact,
+					explanation: values.description,
+					documents: ( values.documentIds ? values.documentIds : null ),
+				} ),
+				saveEconomyValue: ( req, barrier, value ) => saveAssessmentValues( req, barrier,  {
+					value_to_economy: value,
+				} ),
+				saveMarketSize: ( req, barrier, value ) => saveAssessmentValues( req, barrier,  {
+					import_market_size: value,
+				} ),
+				saveExportValue: ( req, barrier, value ) => saveAssessmentValues( req, barrier,  {
+					export_value: value,
+				} ),
+				saveCommercialValue: ( req, barrier, value ) => saveAssessmentValues( req, barrier,  {
+					commercial_value: value,
+				} ),
+			};
+		})(),
 	},
 
 	reports: {
@@ -423,12 +466,9 @@ module.exports = {
 			all_sectors: null,
 			sectors: null
 		} ),
-		saveAllSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
-			all_sectors: getValue( values.allSectors ),
-			sectors: null
-		} ),
 		saveSectors: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
-			sectors: getValue( values.sectors )
+			sectors: getValue( values.sectors ),
+			all_sectors: getValue( values.allSectors ),
 		} ),
 		saveProblem: ( req, reportId, values ) => updateReport( getToken( req ), reportId, {
 			product: getValue( values.item ),

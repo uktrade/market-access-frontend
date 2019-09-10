@@ -489,12 +489,12 @@ describe( 'Barrier sectors controller', () => {
 				it('should add all sectors into the session and clear barrierSectors session', () => {
 
 					const listResponse = '/list/sectors';
-					urls.barriers.sectors.list.and.callFake( () => listResponse );
+					urls.barriers.sectors.list.and.returnValue( listResponse );
 
 					req.session.all = false;
 					req.session.list = ['1234'];
 
-					controller.addAllSectors( req, res );
+					controller.all.add( req, res );
 
 					expect( req.barrierSession.sectors.all.set ).toHaveBeenCalledWith( true );
 					expect( req.barrierSession.sectors.list.set ).toHaveBeenCalledWith( [] );
@@ -509,9 +509,9 @@ describe( 'Barrier sectors controller', () => {
 					req.session.all = true;
 
 					const listResponse = '/list/sectors';
-					urls.barriers.sectors.list.and.callFake( () => listResponse );
+					urls.barriers.sectors.list.and.returnValue( listResponse );
 
-					controller.removeAllSectors( req, res );
+					controller.all.remove( req, res );
 
 					expect( req.barrierSession.sectors.all.set ).toHaveBeenCalledWith( false );
 

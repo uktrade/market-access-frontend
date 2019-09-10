@@ -42,7 +42,7 @@ describe( 'Form', () => {
 
 				req.body = {
 					test: 'value-1',
-					another: 'another-1',
+					sanitize: '1,000,000',
 					unknown: 'unknown-1',
 					item1: 'checkbox-value-1',
 					item2: 'checkbox-value-2',
@@ -80,9 +80,10 @@ describe( 'Form', () => {
 						required: 'Test required message',
 						errorField: 'c'
 					},
-					another: {
+					sanitize: {
 						values: [ 'another-2' ],
-						required: 'Test another required message'
+						required: 'Test a sanitized value required message',
+						sanitize: ( value ) => value.replace( /,/g, '' ),
 					}
 				};
 			} );
@@ -99,7 +100,7 @@ describe( 'Form', () => {
 				} );
 			} );
 
-			it( 'Should put the field names in an internal array and the body values in an internal array', () => {
+			it( 'Should put the field names in an internal array and the sanitized body values in an internal array', () => {
 
 				const keys = Object.keys( fields );
 
@@ -125,6 +126,10 @@ describe( 'Form', () => {
 							groupItem2: req.body.groupItem2
 						} );
 
+					} else if( name === 'sanitize' ){
+
+						expect( form.values[ name ] ).toEqual( '1000000' );
+
 					} else {
 
 						expect( form.values[ name ] ).toEqual( req.body[ name ] );
@@ -145,7 +150,7 @@ describe( 'Form', () => {
 							item2: 'checkbox-value-2'
 						},
 						test: 'value-1',
-						another: 'another-1'
+						sanitize: '1000000'
 					} );
 				} );
 			} );
