@@ -3,6 +3,7 @@ const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
 const faker = require( 'faker' );
 const metadata = require( './metadata' );
+const HttpResponseError = require( './HttpResponseError' );
 
 const modulePath = './backend-service';
 const getFakeData = jasmine.helpers.getFakeData;
@@ -358,7 +359,7 @@ describe( 'Backend Service', () => {
 					} catch( e ){
 
 						expect( backend.post ).toHaveBeenCalledWith( `/documents/${ documentId }/upload-callback`, token );
-						expect( e ).toEqual( new Error( 'Not a successful response from the backend, got 500' ) );
+						expect( e instanceof HttpResponseError ).toEqual( true );
 					}
 				} );
 			} );
