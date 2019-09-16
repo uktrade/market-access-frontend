@@ -3,6 +3,7 @@ const metadata = require( '../../../lib/metadata' );
 const Form = require( '../../../lib/Form' );
 const urls = require( '../../../lib/urls' );
 const validators = require( '../../../lib/validators' );
+const HttpResponseError = require( '../../../lib/HttpResponseError' );
 
 module.exports = {
 
@@ -60,7 +61,7 @@ module.exports = {
 
 				} else {
 
-					return next( new Error( `Unable to ${ isUpdate ? 'update' : 'save' } report, got ${ response.statusCode } response code` ) );
+					return next( new HttpResponseError( `Unable to ${ isUpdate ? 'update' : 'save' } report`, response, body ) );
 				}
 
 			} catch( e ){

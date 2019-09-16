@@ -1,5 +1,6 @@
 const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
+const HttpResponseError = require( '../../../lib/HttpResponseError' );
 
 const modulePath = './index';
 
@@ -181,8 +182,9 @@ describe( 'Report controllers', () => {
 
 					await controller.index( req, res, next );
 
-					expect( next ).toHaveBeenCalledWith( new Error( `Got ${ unfinishedReportsResponse.response.statusCode } response from backend` ) );
 					expect( backend.reports.getAll ).toHaveBeenCalledWith( req );
+					expect( next ).toHaveBeenCalled();
+					expect( next.calls.argsFor( 0 )[ 0 ] instanceof HttpResponseError ).toEqual( true );
 					expect( res.render ).not.toHaveBeenCalled();
 				} );
 			} );
@@ -311,8 +313,9 @@ describe( 'Report controllers', () => {
 
 						await controller.delete( req, res, next );
 
-						expect( next ).toHaveBeenCalledWith( new Error( `Got ${ unfinishedReportsResponse.response.statusCode } response from backend` ) );
 						expect( backend.reports.getAll ).toHaveBeenCalledWith( req );
+						expect( next ).toHaveBeenCalled();
+						expect( next.calls.argsFor( 0 )[ 0 ] instanceof HttpResponseError ).toEqual( true );
 						expect( res.render ).not.toHaveBeenCalled();
 					} );
 				} );
@@ -348,7 +351,7 @@ describe( 'Report controllers', () => {
 
 					expect( backend.reports.delete ).not.toHaveBeenCalled();
 					expect( res.render ).not.toHaveBeenCalled();
-					expect( next ).toHaveBeenCalledWith( new Error( 'Cannot delete a note that is not created by the current user' ) );
+					expect( next ).toHaveBeenCalledWith( new Error( 'Cannot delete a report that is not created by the current user' ) );
 				} );
 			} );
 
@@ -377,13 +380,13 @@ describe( 'Report controllers', () => {
 					it( 'Should call next with an error', async () => {
 
 						const statusCode = 500;
-						const err = new Error( `Got ${ statusCode } response from backend` );
 
 						backend.reports.delete.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
 
 						await controller.delete( req, res, next );
 
-						expect( next ).toHaveBeenCalledWith( err );
+						expect( next ).toHaveBeenCalled();
+						expect( next.calls.argsFor( 0 )[ 0 ] instanceof HttpResponseError ).toEqual( true );
 						expect( res.render ).not.toHaveBeenCalled();
 					} );
 				} );

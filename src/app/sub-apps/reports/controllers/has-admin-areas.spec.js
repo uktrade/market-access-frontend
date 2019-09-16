@@ -1,5 +1,6 @@
 const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
+const HttpResponseError = require( '../../../lib/HttpResponseError' );
 
 const modulePath = './has-admin-areas';
 
@@ -243,8 +244,11 @@ describe( 'Report controllers', () => {
 
 									await controller( req, res, next );
 
+									const err = next.calls.argsFor( 0 )[ 0 ];
 									expect( res.redirect ).not.toHaveBeenCalled();
-									expect( next ).toHaveBeenCalledWith( new Error( 'Unable to update report, got 404 response code' ) );
+									expect( next ).toHaveBeenCalled();
+									expect( err instanceof HttpResponseError ).toEqual( true );
+									expect( err.message.startsWith( 'Unable to update report' ) ).toEqual( true );
 								} );
 							} );
 						} );
@@ -314,7 +318,11 @@ describe( 'Report controllers', () => {
 
 								await controller( req, res, next );
 
-								expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save report, got 123 response code' ) );
+								const err = next.calls.argsFor( 0 )[ 0 ];
+
+								expect( next ).toHaveBeenCalled();
+								expect( err instanceof HttpResponseError ).toEqual( true );
+								expect( err.message.startsWith( 'Unable to save report' ) ).toEqual( true );
 							} );
 						} );
 					});
