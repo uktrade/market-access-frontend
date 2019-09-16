@@ -1,5 +1,6 @@
 const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
+const HttpResponseError = require( '../../../lib/HttpResponseError' );
 const metadata = require( '../../../lib/metadata' );
 
 const modulePath = './status';
@@ -379,7 +380,8 @@ describe( 'Barrier status controller', () => {
 
 										await controller.index( req, res, next );
 
-										expect( next ).toHaveBeenCalledWith( new Error( 'No errors in response body, form not saved - got 400 from backend' ) );
+										expect( next ).toHaveBeenCalled();
+										expect( next.calls.argsFor( 0 )[ 0 ] instanceof HttpResponseError ).toEqual( true );
 									} );
 								} );
 							} );
@@ -395,7 +397,8 @@ describe( 'Barrier status controller', () => {
 
 									await controller.index( req, res, next );
 
-									expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save form - got 500 from backend' ) );
+									expect( next ).toHaveBeenCalled();
+									expect( next.calls.argsFor( 0 )[ 0 ] instanceof HttpResponseError ).toEqual( true );
 								} );
 							} );
 						} );
@@ -488,7 +491,8 @@ describe( 'Barrier status controller', () => {
 
 										await controller.index( req, res, next );
 
-										expect( next ).toHaveBeenCalledWith( new Error( 'No errors in response body, form not saved - got 400 from backend' ) );
+										expect( next ).toHaveBeenCalled();
+										expect( next.calls.argsFor( 0 )[ 0 ] instanceof HttpResponseError ).toEqual( true );
 									} );
 								} );
 							} );
@@ -504,7 +508,9 @@ describe( 'Barrier status controller', () => {
 
 									await controller.index( req, res, next );
 
-									expect( next ).toHaveBeenCalledWith( new Error( 'Unable to save form - got 500 from backend' ) );
+									expect( next ).toHaveBeenCalled();
+									expect( next.calls.count() ).toEqual( 1 );
+									expect( next.calls.argsFor( 0  )[ 0 ] instanceof HttpResponseError ).toEqual( true );
 								} );
 							} );
 						} );

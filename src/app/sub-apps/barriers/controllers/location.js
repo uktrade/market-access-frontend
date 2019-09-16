@@ -3,6 +3,7 @@ const Form = require( '../../../lib/Form' );
 const urls = require( '../../../lib/urls' );
 const validators = require( '../../../lib/validators' );
 const backend = require( '../../../lib/backend-service' );
+const HttpResponseError = require( '../../../lib/HttpResponseError' );
 
 module.exports = {
 
@@ -25,7 +26,7 @@ module.exports = {
 
 			try {
 
-				const { response } = await backend.barriers.saveLocation( req, barrier.id, req.session.location );
+				const { response, body } = await backend.barriers.saveLocation( req, barrier.id, req.session.location );
 
 				delete req.session.location;
 
@@ -35,7 +36,7 @@ module.exports = {
 
 				} else {
 
-					return next( new Error( `Unable to update barrier, got ${ response.statusCode } response code` ) );
+					return next( new HttpResponseError( 'Unable to update barrier', response, body ) );
 				}
 
 			} catch( e ){

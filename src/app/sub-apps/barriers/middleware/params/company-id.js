@@ -1,4 +1,6 @@
 const datahub =require( '../../../../lib/datahub-service' );
+const HttpResponseError = require( '../../../../lib/HttpResponseError' );
+
 const isValid = /^[a-zA-Z0-9-_]+$/;
 
 module.exports = async ( req, res, next, id ) => {
@@ -18,7 +20,7 @@ module.exports = async ( req, res, next, id ) => {
 
 			} else {
 
-				throw new Error( 'Not a successful response from datahub' );
+				throw new HttpResponseError( 'Unable to get company from Data Hub', response, body );
 			}
 
 		} catch( e ){

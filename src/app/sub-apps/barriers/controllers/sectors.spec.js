@@ -1,5 +1,6 @@
 const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
+const HttpResponseError = require( '../../../lib/HttpResponseError' );
 
 const modulePath = './sectors';
 
@@ -234,11 +235,10 @@ describe( 'Barrier sectors controller', () => {
 
 							await controller.list( req, res, next );
 
-							const err = new Error( `Unable to update barrier, got ${ response.statusCode } response code` );
-
 							expect( req.barrierSession.sectors.all.delete ).toHaveBeenCalled();
 							expect( req.barrierSession.sectors.list.delete ).toHaveBeenCalled();
-							expect( next ).toHaveBeenCalledWith( err );
+							expect( next ).toHaveBeenCalled();
+							expect( next.calls.argsFor( 0 )[ 0 ] instanceof HttpResponseError ).toEqual( true );
 						} );
 					} );
 				} );
