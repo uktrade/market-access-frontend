@@ -1828,6 +1828,44 @@ describe( 'App', function(){
 							} );
 						} );
 					} );
+
+					describe( 'Missing report', () => {
+
+						beforeEach( () => {
+
+							intercept.backend()
+								.get( `/reports/${ reportId }` )
+								.reply( 404, '' );
+						} );
+
+						describe( 'Report detail', () => {
+							describe( 'When it is not a barrier', () => {
+								it( 'Should render an error page', ( done ) => {
+
+									intercept.backend()
+										.get( `/barriers/${ reportId }` )
+										.reply( 404, '' );
+
+									app
+										.get( urls.reports.detail( reportId ) )
+										.end( checkPage( 'Market Access - Barrier not found', done, 404 ) );
+								} );
+							} );
+
+							describe( 'When it is a barrier', () => {
+								it( 'Should redirect to the barrier detail page', ( done ) => {
+
+									intercept.backend()
+										.get( `/barriers/${ reportId }` )
+										.reply( 200, intercept.stub( '/backend/barriers/barrier' ) );
+
+									app
+										.get( urls.reports.detail( reportId ) )
+										.end( checkRedirect( urls.barriers.detail( reportId ), done ) );
+								} );
+							} );
+						} );
+					} );
 				} );
 			} );
 		} );

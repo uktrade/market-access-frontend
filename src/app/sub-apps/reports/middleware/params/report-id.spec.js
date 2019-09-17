@@ -10,18 +10,23 @@ describe( 'Report Id param middleware', () => {
 	let next;
 	let backend;
 	let middleware;
+	let urls;
 
 	beforeEach( () => {
 
-		req = { params: { reportId: 'default' }, session: {} };
-		res = { locals: {} };
-		next = jasmine.createSpy( 'next' );
+		({ req, res, next } = jasmine.helpers.mocks.middleware());
+		req.params.reportId = 'default';
 		backend = {
-			reports: { get: jasmine.createSpy( 'backend.reports.get' ) }
+			reports: { get: jasmine.createSpy( 'backend.reports.get' ) },
+			barriers: { get: jasmine.createSpy( 'backend.barriers.get' ) },
+		};
+		urls = {
+			barriers: { detail: jasmine.createSpy( 'urls.barriers.detail' ) },
 		};
 
 		middleware = proxyquire( modulePath, {
-			'../../../../lib/backend-service': backend
+			'../../../../lib/backend-service': backend,
+			'../../../../lib/urls': urls,
 		} );
 	} );
 
@@ -52,20 +57,77 @@ describe( 'Report Id param middleware', () => {
 				} );
 
 				describe( 'When the response is not a success', () => {
-					it( 'Should call next with an error', async () => {
+					describe( 'When the statusCode is 500', () => {
+						it( 'Should call next with an error', async () => {
 
-						backend.reports.get.and.callFake( () => Promise.resolve( {
-							response: { isSuccess: false },
-							body: { data: true }
-						} ) );
+							backend.reports.get.and.callFake( () => Promise.resolve( {
+								response: { isSuccess: false, statusCode: 500 },
+								body: { data: true }
+							} ) );
 
-						await middleware( req, res, next, '1' );
+							await middleware( req, res, next, '1' );
 
-						expect( req.session.report ).not.toBeDefined();
-						expect( req.report ).not.toBeDefined();
-						expect( res.locals.report ).not.toBeDefined();
-						expect( next ).toHaveBeenCalled();
-						expect( next.calls.argsFor( 0 )[ 0 ] instanceof HttpResponseError ).toEqual( true );
+							expect( req.session.report ).not.toBeDefined();
+							expect( req.report ).not.toBeDefined();
+							expect( res.locals.report ).not.toBeDefined();
+							expect( next ).toHaveBeenCalled();
+							expect( next.calls.argsFor( 0 )[ 0 ] instanceof HttpResponseError ).toEqual( true );
+						} );
+					} );
+
+					describe( 'When the statusCode is 404', () => {
+
+						beforeEach( () => {
+
+							backend.reports.get.and.callFake( () => Promise.resolve( {
+								response: { isSuccess: false, statusCode: 404 },
+								body: { data: true }
+							} ) );
+						} );
+
+						describe( 'When the barrier returns a success', () => {
+							it( 'Redirects to the barrier detail', async () => {
+
+								const detailResponse = 'barrier/detail';
+
+								backend.barriers.get.and.callFake( () => Promise.resolve( {
+									response: { isSuccess: true, statusCode: 200 },
+									body: { data: true }
+								} ) );
+
+								urls.barriers.detail.and.returnValue( detailResponse );
+
+								await middleware( req, res, next, '2' );
+
+								expect( req.session.report ).not.toBeDefined();
+								expect( req.report ).not.toBeDefined();
+								expect( res.locals.report ).not.toBeDefined();
+								expect( next ).not.toHaveBeenCalled();
+								expect( res.redirect ).toHaveBeenCalledWith( detailResponse );
+							} );
+						} );
+
+						describe( 'When the barrier does not return a success', () => {
+							it( 'Should call next with an error', async () => {
+
+								backend.barriers.get.and.callFake( () => Promise.resolve( {
+									response: { isSuccess: false, statusCode: 404 },
+									body: { data: true }
+								} ) );
+
+								await middleware( req, res, next, '2' );
+
+								const err = next.calls.argsFor( 0 )[ 0 ];
+
+								expect( req.session.report ).not.toBeDefined();
+								expect( req.report ).not.toBeDefined();
+								expect( res.locals.report ).not.toBeDefined();
+								expect( next ).toHaveBeenCalled();
+								expect( err instanceof HttpResponseError ).toEqual( true );
+								expect( err.code ).toEqual( 'REPORT_NOT_FOUND' );
+								expect( next.calls.count() ).toEqual( 1 );
+							} );
+						} );
 					} );
 				} );
 

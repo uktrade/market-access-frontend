@@ -72,10 +72,10 @@ describe( 'errors middleware', function(){
 				describe( 'A TOO_MANY_BYTES error', function(){
 					it( 'Should return a 413 status', function(){
 
-						const tooManyBytesError = new Error( 'Too many bytes' );
-						tooManyBytesError.code = 'TOO_MANY_BYTES';
+						const err = new Error( 'Too many bytes' );
+						err.code = 'TOO_MANY_BYTES';
 
-						middleware.catchAll( tooManyBytesError, req, res, next );
+						middleware.catchAll( err, req, res, next );
 
 						expect( res.sendStatus ).toHaveBeenCalledWith( 413 );
 						expect( reporter.captureException ).not.toHaveBeenCalled();
@@ -85,10 +85,10 @@ describe( 'errors middleware', function(){
 				describe( 'A EBADCSRFTOKEN error', function(){
 					it( 'Should return a 400 status', function(){
 
-						const invalidCsrfTokenError = new Error( 'Invalid csrf token' );
-						invalidCsrfTokenError.code = 'EBADCSRFTOKEN';
+						const err = new Error( 'Invalid csrf token' );
+						err.code = 'EBADCSRFTOKEN';
 
-						middleware.catchAll( invalidCsrfTokenError, req, res, next );
+						middleware.catchAll( err, req, res, next );
 
 						expect( res.status ).toHaveBeenCalledWith( 400 );
 						expect( res.render ).toHaveBeenCalledWith( 'error/invalid-csrf-token' );
@@ -99,13 +99,27 @@ describe( 'errors middleware', function(){
 				describe( 'A DOWNLOAD_FAIL error', function(){
 					it( 'Should return a 400 status', function(){
 
-						const invalidCsrfTokenError = new Error( 'Download error' );
-						invalidCsrfTokenError.code = 'DOWNLOAD_FAIL';
+						const err = new Error( 'Download error' );
+						err.code = 'DOWNLOAD_FAIL';
 
-						middleware.catchAll( invalidCsrfTokenError, req, res, next );
+						middleware.catchAll( err, req, res, next );
 
 						expect( res.status ).toHaveBeenCalledWith( 500 );
 						expect( res.render ).toHaveBeenCalledWith( 'error/unable-to-download' );
+						expect( reporter.captureException ).not.toHaveBeenCalled();
+					} );
+				} );
+
+				describe( 'A REPORT_NOT_FOUND error', function(){
+					it( 'Should return a 404 status', function(){
+
+						const err = new Error( 'Download error' );
+						err.code = 'REPORT_NOT_FOUND';
+
+						middleware.catchAll( err, req, res, next );
+
+						expect( res.status ).toHaveBeenCalledWith( 404 );
+						expect( res.render ).toHaveBeenCalledWith( 'error/report-not-found' );
 						expect( reporter.captureException ).not.toHaveBeenCalled();
 					} );
 				} );
