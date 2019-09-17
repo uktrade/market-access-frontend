@@ -1,6 +1,7 @@
 const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
 const faker = require( 'faker' );
+const HttpResponseError = require( '../../../lib/HttpResponseError' );
 
 const modulePath = './companies';
 
@@ -177,7 +178,6 @@ describe( 'Barrier companies controller', () => {
 				it( 'Should call next with an error', async () => {
 
 					const statusCode = 500;
-					const err = new Error( `Unable to save companies for barrier, got ${ statusCode } response code` );
 
 					backend.barriers.saveCompanies.and.callFake( () => Promise.resolve( { response: {
 						isSuccess: false,
@@ -186,7 +186,8 @@ describe( 'Barrier companies controller', () => {
 
 					await controller.list( req, res, next );
 
-					expect( next ).toHaveBeenCalledWith( err );
+					expect( next ).toHaveBeenCalled();
+					expect( next.calls.argsFor( 0 )[ 0 ] instanceof HttpResponseError ).toEqual( true );
 					expect( res.render ).not.toHaveBeenCalled();
 				} );
 			} );

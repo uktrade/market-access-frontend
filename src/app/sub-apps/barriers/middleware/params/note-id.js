@@ -1,4 +1,5 @@
 const backend = require( '../../../../lib/backend-service' );
+const HttpResponseError = require( '../../../../lib/HttpResponseError' );
 
 module.exports = async ( req, res, next, noteId ) => {
 
@@ -24,7 +25,7 @@ module.exports = async ( req, res, next, noteId ) => {
 
 		} else {
 
-			throw new Error( `Unable to get interactions for barrier, got ${ response.statusCode } from backend` );
+			throw new HttpResponseError( 'Unable to get interactions for barrier', response, body );
 		}
 	} catch( e ){ next( e ); }
 };

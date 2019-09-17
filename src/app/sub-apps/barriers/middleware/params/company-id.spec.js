@@ -1,5 +1,7 @@
 const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
+const HttpResponseError = require( '../../../../lib/HttpResponseError' );
+
 const modulePath = './company-id';
 
 describe( 'Company Id param middleware', () => {
@@ -65,7 +67,9 @@ describe( 'Company Id param middleware', () => {
 				expect( datahub.getCompany ).toHaveBeenCalledWith( id );
 				expect( req.company ).not.toBeDefined();
 				expect( res.locals.company ).not.toBeDefined();
-				expect( next ).toHaveBeenCalledWith( new Error( 'Not a successful response from datahub' ) );
+				expect( next ).toHaveBeenCalled();
+				expect( next.calls.count() ).toEqual( 1 );
+				expect( next.calls.argsFor( 0 )[ 0 ] instanceof HttpResponseError ).toEqual( true );
 			} );
 		} );
 

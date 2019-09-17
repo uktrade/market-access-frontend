@@ -1,6 +1,7 @@
 const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
 const faker = require( 'faker' );
+const HttpResponseError = require( '../../../lib/HttpResponseError' );
 
 const modulePath = './interactions';
 const { getFakeData, mocks } = jasmine.helpers;
@@ -888,7 +889,8 @@ describe( 'Barrier interactions controller', () => {
 							await controller.notes.delete( req, res, next );
 
 							expect( res.redirect ).not.toHaveBeenCalled();
-							expect( next ).toHaveBeenCalledWith( new Error( `Could not delete note, got ${ statusCode } from backend` ) );
+							expect( next ).toHaveBeenCalled();
+							expect( next.calls.argsFor( 0 )[ 0 ] instanceof HttpResponseError ).toEqual( true );
 						} );
 					} );
 				} );

@@ -1,6 +1,7 @@
 const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
 const faker = require( 'faker' );
+const HttpResponseError = require( '../../../lib/HttpResponseError' );
 
 const modulePath = './types';
 
@@ -217,10 +218,10 @@ describe( 'Barrier types controller', () => {
 
 							await controller.list( req, res, next );
 
-							const err = new Error( `Unable to update barrier, got ${ response.statusCode } response code` );
-
 							expect( req.barrierSession.types.delete ).not.toHaveBeenCalled();
-							expect( next ).toHaveBeenCalledWith( err );
+							expect( next ).toHaveBeenCalled();
+							expect( next.calls.count() ).toEqual( 1 );
+							expect( next.calls.argsFor( 0 )[ 0 ] instanceof HttpResponseError ).toEqual( true );
 						} );
 					} );
 				} );

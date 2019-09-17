@@ -1,3 +1,4 @@
+const HttpResponseError = require( './HttpResponseError' );
 
 function FormPocessor( params = {} ){
 
@@ -30,13 +31,12 @@ FormPocessor.prototype.doSave = async function( checkResponseErrors = false ){
 
 		} else {
 
-			throw new Error( `No errors in response body, form not saved - got ${ response.statusCode } from backend` );
+			throw new HttpResponseError( 'No errors in response body, form not saved', response, body );
 		}
 
 	} else {
 
-		const err = new Error( `Unable to save form - got ${ response.statusCode } from backend` );
-		err.responseBody = body;
+		const err = new HttpResponseError( 'Unable to save form', response, body );
 
 		if( response.statusCode === 400 ){
 			err.code = 'UNHANDLED_400';

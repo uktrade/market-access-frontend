@@ -1,4 +1,6 @@
 const proxyquire = require( 'proxyquire' );
+const HttpResponseError = require( '../../../../lib/HttpResponseError' );
+
 const modulePath = './report-id';
 
 describe( 'Report Id param middleware', () => {
@@ -62,7 +64,8 @@ describe( 'Report Id param middleware', () => {
 						expect( req.session.report ).not.toBeDefined();
 						expect( req.report ).not.toBeDefined();
 						expect( res.locals.report ).not.toBeDefined();
-						expect( next ).toHaveBeenCalledWith( new Error( 'Error response getting report' ) );
+						expect( next ).toHaveBeenCalled();
+						expect( next.calls.argsFor( 0 )[ 0 ] instanceof HttpResponseError ).toEqual( true );
 					} );
 				} );
 

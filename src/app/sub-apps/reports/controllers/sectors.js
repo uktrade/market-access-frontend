@@ -3,6 +3,7 @@ const metadata = require( '../../../lib/metadata' );
 const Form = require( '../../../lib/Form' );
 const urls = require( '../../../lib/urls' );
 const validators = require( '../../../lib/validators' );
+const HttpResponseError = require( '../../../lib/HttpResponseError' );
 
 module.exports = {
 
@@ -29,7 +30,7 @@ module.exports = {
 					delete req.session.sectors;
 					delete req.session.allSectors;
 
-					const { response } = await backend.reports.saveSectors( req, reportId, { sectors, allSectors } );
+					const { response, body } = await backend.reports.saveSectors( req, reportId, { sectors, allSectors } );
 
 					if( response.isSuccess ){
 
@@ -38,7 +39,7 @@ module.exports = {
 
 					} else {
 
-						return next( new Error( `Unable to update report, got ${ response.statusCode } response code` ) );
+						return next( new HttpResponseError( 'Unable to update report', response, body ) );
 					}
 
 				} catch( e ){

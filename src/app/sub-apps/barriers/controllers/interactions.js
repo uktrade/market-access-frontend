@@ -9,6 +9,7 @@ const uploadDocument = require( '../../../lib/upload-document' );
 const detailVieWModel = require( '../view-models/detail' );
 const interactionsViewModel = require( '../view-models/interactions' );
 const documentControllers = require( '../../../lib/document-controllers' );
+const HttpResponseError = require( '../../../lib/HttpResponseError' );
 
 const NOTE_ERROR = 'Add text for the note.';
 const { OVERSIZE_FILE_MESSAGE, INVALID_FILE_TYPE_MESSAGE, FILE_INFECTED_MESSAGE } = documentControllers;
@@ -329,7 +330,7 @@ module.exports = {
 
 				try {
 
-					const { response } = await backend.barriers.notes.delete( req, noteId );
+					const { response, body } = await backend.barriers.notes.delete( req, noteId );
 
 					if( response.isSuccess ){
 
@@ -337,7 +338,7 @@ module.exports = {
 
 					} else {
 
-						next( new Error( `Could not delete note, got ${ response.statusCode } from backend` ) );
+						next( new HttpResponseError( 'Could not delete note', response, body ) );
 					}
 
 				} catch( e ){

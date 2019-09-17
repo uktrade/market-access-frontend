@@ -1,5 +1,6 @@
 const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
+const HttpResponseError = require( '../../../lib/HttpResponseError' );
 
 const modulePath = './location';
 const SELECT = 'select-value';
@@ -221,9 +222,8 @@ describe( 'Edit barrier location controller', () => {
 
 					await controller.list( req, res, next );
 
-					const err = new Error( `Unable to update barrier, got ${ response.statusCode } response code` );
-
-					expect( next ).toHaveBeenCalledWith( err );
+					expect( next ).toHaveBeenCalled();
+					expect( next.calls.argsFor( 0 )[ 0 ] instanceof HttpResponseError ).toEqual( true );
 				} );
 			});
 

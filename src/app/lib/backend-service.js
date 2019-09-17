@@ -1,6 +1,7 @@
 const backend = require( './backend-request' );
 const metadata = require( './metadata' );
 const config = require( '../config' );
+const HttpResponseError = require( './HttpResponseError' );
 
 const SCAN_CHECK_INTERVAL = config.files.scan.statusCheckInterval;
 const SCAN_MAX_ATTEMPTS = Math.round( config.files.scan.maxWaitTime / SCAN_CHECK_INTERVAL );
@@ -293,7 +294,7 @@ module.exports = {
 
 					} else {
 
-						reject( new Error( 'Not a successful response from the backend, got ' + response.statusCode ) );
+						reject( new HttpResponseError( 'Unable to get scan status', response, body ) );
 					}
 
 				} catch( e ){

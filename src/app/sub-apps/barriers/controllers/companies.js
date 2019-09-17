@@ -2,6 +2,7 @@ const backend = require( '../../../lib/backend-service' );
 const datahub = require( '../../../lib/datahub-service' );
 const Form = require( '../../../lib/Form' );
 const urls = require( '../../../lib/urls' );
+const HttpResponseError = require( '../../../lib/HttpResponseError' );
 
 const LIST_TEMPLATE = 'barriers/views/companies/list';
 
@@ -92,7 +93,7 @@ module.exports = {
 
 			try {
 
-				const { response } = await backend.barriers.saveCompanies( req, barrierId, companies );
+				const { response, body } = await backend.barriers.saveCompanies( req, barrierId, companies );
 
 				if( response.isSuccess ){
 
@@ -100,7 +101,7 @@ module.exports = {
 
 				} else {
 
-					next( new Error( `Unable to save companies for barrier, got ${ response.statusCode } response code` ) );
+					next( new HttpResponseError( 'Unable to save companies for barrier', response, body ) );
 				}
 
 			} catch( e ){

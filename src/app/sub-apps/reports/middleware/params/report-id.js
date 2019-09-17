@@ -1,5 +1,7 @@
 const backend = require( '../../../../lib/backend-service' );
 const { isUuid } = require( '../../../../lib/validators' );
+const HttpResponseError = require( '../../../../lib/HttpResponseError' );
+
 const maxUuidLength = 60;
 
 module.exports = async ( req, res, next, reportId ) => {
@@ -30,7 +32,7 @@ module.exports = async ( req, res, next, reportId ) => {
 
 				} else {
 
-					next( new Error( 'Error response getting report' ) );
+					next( new HttpResponseError( 'Unable to get report', response, body ) );
 				}
 
 			} catch( e ){

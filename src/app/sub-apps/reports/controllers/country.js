@@ -4,6 +4,7 @@ const urls = require( '../../../lib/urls' );
 const validators = require( '../../../lib/validators' );
 const backend = require( '../../../lib/backend-service' );
 const getDateParts = require( '../../../lib/get-date-parts' );
+const HttpResponseError = require( '../../../lib/HttpResponseError' );
 
 const { PART_RESOLVED } = metadata.barrier.status.types;
 
@@ -104,7 +105,7 @@ module.exports = async ( req, res, next ) => {
 
 					} else {
 
-						return next( new Error( `Unable to ${ isUpdate ? 'update' : 'save' } report, got ${ response.statusCode } response code` ) );
+						return next( new HttpResponseError( `Unable to ${ isUpdate ? 'update' : 'save' } report`, response, body ) );
 					}
 
 				} catch( e ){
