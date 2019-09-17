@@ -1,0 +1,11 @@
+{% extends 'layout.njk' %}
+
+{% block page_title %}{{ super() }} - Barrier not found{% endblock %}
+
+{% block page_content %}
+	<h1 class="error-heading">Barrier not found</h1>
+
+	<p>
+		We could not find the barrier, try searching for it on the <a href="{{ urls.findABarrier() }}">find a barrier page</a>.
+	</p>
+{% endblock %}
