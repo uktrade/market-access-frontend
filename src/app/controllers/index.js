@@ -2,6 +2,7 @@ const urls = require( '../lib/urls' );
 const backend = require( '../lib/backend-service' );
 const dashboardViewModel = require( '../view-models/dashboard' );
 const { createList } = require( '../lib/barrier-filters' );
+const HttpResponseError = require( '../lib/HttpResponseError' );
 
 const sortData = {
 	fields: [ 'priority', 'date', 'location', 'status', 'updated' ],
@@ -68,7 +69,7 @@ module.exports = {
 
 				} else {
 
-					throw new Error( `Got ${ response.statusCode } response from backend` );
+					throw new HttpResponseError( 'Unable to get barriers', response, body );
 				}
 
 			} catch( e ){

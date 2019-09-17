@@ -40,6 +40,12 @@ module.exports = {
 					res.render( 'error/unable-to-download' );
 					break;
 
+				case 'REPORT_NOT_FOUND':
+
+					res.status( 404 );
+					res.render( 'error/report-not-found' );
+					break;
+
 				default:
 
 					res.status( 500 );

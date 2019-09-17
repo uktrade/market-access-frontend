@@ -12,10 +12,10 @@
 		<h2 class="govuk-heading-s">Code: {{ error.code }}</h2>
 		{% endif %}
 
-		{% if error.responseBody %}
+		{% if error.response.body %}
 			<h2 class="govuk-heading-s">Response Body</h2>
 			<p class="stack-trace">
-				{{ error.responseBody | dump( 2 ) }}
+				{{ error.response.body | dump( 2 ) }}
 			</p>
 		{% endif %}
 

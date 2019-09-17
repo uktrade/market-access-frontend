@@ -1,5 +1,8 @@
 const backend = require( '../../../../lib/backend-service' );
 const { isUuid } = require( '../../../../lib/validators' );
+const HttpResponseError = require( '../../../../lib/HttpResponseError' );
+const urls = require( '../../../../lib/urls' );
+
 const maxUuidLength = 60;
 
 module.exports = async ( req, res, next, reportId ) => {
@@ -30,12 +33,28 @@ module.exports = async ( req, res, next, reportId ) => {
 
 				} else {
 
-					next( new Error( 'Error response getting report' ) );
+					const err = new HttpResponseError( 'Unable to get report', response, body );
+
+					if( response.statusCode === 404 ){
+
+						const barrierRequest = await backend.barriers.get( req, reportId );
+
+						if( barrierRequest.response.isSuccess ){
+
+							return res.redirect( urls.barriers.detail( reportId ) );
+
+						} else {
+
+							err.code = 'REPORT_NOT_FOUND';
+						}
+					}
+
+					return next( err );
 				}
 
 			} catch( e ){
 
-				next( e );
+				return next( e );
 			}
 		}
 

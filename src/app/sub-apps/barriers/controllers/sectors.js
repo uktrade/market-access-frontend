@@ -3,6 +3,7 @@ const Form = require( '../../../lib/Form' );
 const urls = require( '../../../lib/urls' );
 const validators = require( '../../../lib/validators' );
 const metadata = require( '../../../lib/metadata' );
+const HttpResponseError = require( '../../../lib/HttpResponseError' );
 
 function renderSectors( req, res, sectors, allSectors ){
 
@@ -82,7 +83,7 @@ module.exports = {
 				req.barrierSession.sectors.all.delete();
 				req.barrierSession.sectors.list.delete();
 
-				const { response } = await backend.barriers.saveSectors( req, barrierId, sectors, allSectors );
+				const { response, body } = await backend.barriers.saveSectors( req, barrierId, sectors, allSectors );
 
 				if( response.isSuccess ){
 
@@ -90,7 +91,7 @@ module.exports = {
 
 				} else {
 
-					return next( new Error( `Unable to update barrier, got ${ response.statusCode } response code` ) );
+					return next( new HttpResponseError( 'Unable to update barrier', response, body ) );
 				}
 
 			} catch( e ){

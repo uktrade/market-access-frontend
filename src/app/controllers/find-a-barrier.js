@@ -1,6 +1,7 @@
 const backend = require( '../lib/backend-service' );
 const viewModel = require( '../view-models/find-a-barrier' );
 const barrierFilters = require( '../lib/barrier-filters' );
+const HttpResponseError = require( '../lib/HttpResponseError' );
 
 module.exports = {
 
@@ -38,7 +39,7 @@ module.exports = {
 
 			} else {
 
-				next( new Error( `Got ${ response.statusCode } response from backend` ) );
+				next( new HttpResponseError( 'Unable to get barriers', response, body ) );
 			}
 
 		} catch( e ) {

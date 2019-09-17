@@ -1,6 +1,8 @@
 const proxyquire = require( 'proxyquire' );
 const EventEmitter = require( 'events' );
+const HttpResponseError = require( '../lib/HttpResponseError' );
 const modulePath = './find-a-barrier';
+
 
 const { mocks } = jasmine.helpers;
 
@@ -200,7 +202,8 @@ describe( 'Find a barrier controller', () => {
 
 					await controller.list( req, res, next );
 
-					expect( next ).toHaveBeenCalledWith( new Error( `Got ${ statusCode } response from backend` ) );
+					expect( next ).toHaveBeenCalled();
+					expect( next.calls.argsFor( 0 )[ 0 ] instanceof HttpResponseError ).toEqual( true );
 					expect( res.render ).not.toHaveBeenCalled();
 					checkBackendCall();
 				} );

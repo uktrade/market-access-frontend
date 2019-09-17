@@ -4,6 +4,7 @@ const Form = require( '../../../lib/Form' );
 const urls = require( '../../../lib/urls' );
 const validators = require( '../../../lib/validators' );
 const govukItemsFromObj = require( '../../../lib/govuk-items-from-object' );
+const HttpResponseError = require( '../../../lib/HttpResponseError' );
 
 module.exports = async ( req, res, next ) => {
 
@@ -71,7 +72,7 @@ module.exports = async ( req, res, next ) => {
 
 					} else {
 
-						return next( new Error( `Unable to ${ isUpdate ? 'update' : 'save' } report, got ${ response.statusCode } response code` ) );
+						return next( new HttpResponseError( `Unable to ${ isUpdate ? 'update' : 'save' } report`, response, body ) );
 					}
 
 				} catch( e ){

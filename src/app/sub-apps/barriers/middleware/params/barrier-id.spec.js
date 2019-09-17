@@ -1,5 +1,6 @@
 const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
+const HttpResponseError = require( '../../../../lib/HttpResponseError' );
 const modulePath = './barrier-id';
 
 describe( 'Barrier Id param middleware', () => {
@@ -70,8 +71,9 @@ describe( 'Barrier Id param middleware', () => {
 
 				expect( req.barrier ).not.toBeDefined();
 				expect( res.locals.barrier ).not.toBeDefined();
-				expect( next ).toHaveBeenCalledWith( new Error( 'Error response getting barrier' ) );
+				expect( next ).toHaveBeenCalled();
 				expect( next.calls.count() ).toEqual( 1 );
+				expect( next.calls.argsFor( 0 )[ 0 ] instanceof HttpResponseError ).toEqual( true );
 			} );
 
 			describe( 'When the response statusCode is 404', () => {

@@ -1,6 +1,7 @@
 const metadata = require( '../../../lib/metadata' );
 const backend = require( '../../../lib/backend-service' );
 const urls = require( '../../../lib/urls' );
+const HttpResponseError = require( '../../../lib/HttpResponseError' );
 const reportDetailViewModel = require( '../view-models/detail' );
 const reportsViewModel = require( '../view-models/reports' );
 
@@ -20,7 +21,7 @@ async function renderDashboard( req, res, next, isDelete = false, currentReportI
 
 		} else {
 
-			throw new Error( `Got ${ response.statusCode } response from backend` );
+			throw new HttpResponseError( 'Unable to get reports', response, body );
 		}
 
 	} catch( e ){
@@ -52,12 +53,12 @@ module.exports = {
 
 			if( req.report.created_by.id !== req.user.id ){
 
-				return next( new Error( 'Cannot delete a note that is not created by the current user' ) );
+				return next( new Error( 'Cannot delete a report that is not created by the current user' ) );
 			}
 
 			try {
 
-				const { response } = await backend.reports.delete( req, currentReportId );
+				const { response, body } = await backend.reports.delete( req, currentReportId );
 
 				if( response.isSuccess ){
 
@@ -65,7 +66,7 @@ module.exports = {
 
 				} else {
 
-					throw new Error( `Got ${ response.statusCode } response from backend` );
+					throw new HttpResponseError( 'Unable to delete report', response, body );
 				}
 
 			} catch( e ){

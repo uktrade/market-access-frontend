@@ -1,5 +1,6 @@
 const backend = require( '../../../../lib/backend-service' );
 const validators = require( '../../../../lib/validators' );
+const HttpResponseError = require( '../../../../lib/HttpResponseError' );
 
 module.exports = async ( req, res, next, barrierId ) => {
 
@@ -27,7 +28,7 @@ module.exports = async ( req, res, next, barrierId ) => {
 
 				} else {
 
-					next( new Error( 'Error response getting barrier' ) );
+					next( new HttpResponseError( 'Unable to get barrier', response, body ) );
 				}
 			}
 

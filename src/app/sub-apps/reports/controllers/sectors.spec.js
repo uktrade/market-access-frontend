@@ -1,5 +1,6 @@
 const proxyquire = require( 'proxyquire' );
 const uuid = require( 'uuid/v4' );
+const HttpResponseError = require( '../../../lib/HttpResponseError' );
 
 const modulePath = './sectors';
 
@@ -236,13 +237,13 @@ describe( 'Report controllers', () => {
 							it( 'Should call next with an error', async () => {
 
 								const statusCode = 500;
-								const err = new Error( `Unable to update report, got ${ statusCode } response code` );
 
 								backend.reports.saveSectors.and.callFake( () => Promise.resolve( { response: { isSuccess: false, statusCode } } ) );
 
 								await controller.list( req, res, next );
 
-								expect( next ).toHaveBeenCalledWith( err );
+								expect( next ).toHaveBeenCalled();
+								expect( next.calls.argsFor( 0 )[ 0 ] instanceof HttpResponseError ).toEqual( true );
 								expect( res.render ).not.toHaveBeenCalled();
 								expect( req.session.sectors ).not.toBeDefined();
 							} );

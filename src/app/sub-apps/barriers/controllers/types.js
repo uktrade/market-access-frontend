@@ -4,6 +4,7 @@ const urls = require( '../../../lib/urls' );
 const validators = require( '../../../lib/validators' );
 const metadata = require( '../../../lib/metadata' );
 const sortGovukItems = require( '../../../lib/sort-govuk-items' );
+const HttpResponseError = require( '../../../lib/HttpResponseError' );
 
 function barrierTypeToRadio( item ){
 
@@ -83,7 +84,7 @@ module.exports = {
 
 			try {
 
-				const { response } = await backend.barriers.saveTypes( req, barrierId, types );
+				const { response, body } = await backend.barriers.saveTypes( req, barrierId, types );
 
 				if( response.isSuccess ){
 
@@ -92,7 +93,7 @@ module.exports = {
 
 				} else {
 
-					return next( new Error( `Unable to update barrier, got ${ response.statusCode } response code` ) );
+					return next( new HttpResponseError( 'Unable to update barrier', response, body ) );
 				}
 
 			} catch( e ){

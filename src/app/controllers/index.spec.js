@@ -1,4 +1,5 @@
 const proxyquire = require( 'proxyquire' );
+const HttpResponseError = require( '../lib/HttpResponseError' );
 const modulePath = './index';
 
 let controller;
@@ -305,7 +306,8 @@ describe( 'Index controller', () => {
 
 						await controller.index( req, res, next );
 
-						expect( next ).toHaveBeenCalledWith( new Error( `Got ${ barriersResponse.response.statusCode } response from backend` ) );
+						expect( next ).toHaveBeenCalled();
+						expect( next.calls.argsFor( 0 )[ 0 ] instanceof HttpResponseError ).toEqual( true );
 						expect( backend.barriers.getAll ).toHaveBeenCalledWith( req, { country: '1234' }, page, 'modified_on', 'desc' );
 						expect( res.render ).not.toHaveBeenCalled();
 					} );
