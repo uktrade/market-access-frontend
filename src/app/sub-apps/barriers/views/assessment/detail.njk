@@ -34,7 +34,7 @@
 
 			<h2 class="assessment-item__heading">{{ params.heading }}</h2>
 
-				{% if params.value %}
+				{% if params.value >= 0 %}
 
 					<p class="assessment-item__value">
 						&pound; {{ params.value | formatNumber }}
