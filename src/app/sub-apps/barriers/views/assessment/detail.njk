@@ -31,7 +31,9 @@
 	{% macro assessmentItem( params ) %}
 
 		<div class="assessment-item">
+
 			<h2 class="assessment-item__heading">{{ params.heading }}</h2>
+			
 				{% if params.value != undefined and params.value is not null %}
 					
 					<p class="assessment-item__value">
