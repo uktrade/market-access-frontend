@@ -20,6 +20,7 @@ const errors = require( './middleware/errors' );
 const sessionStore = require( './middleware/session-store' );
 const auth = require( './middleware/auth' );
 const ssoBypass = require( './middleware/sso-bypass' );
+const redisCheck = require( './middleware/redis-check' );
 
 module.exports = {
 
@@ -67,6 +68,8 @@ module.exports = {
 		app.use( morganLogger( ( isDev ? 'dev' : 'combined' ) ) );
 		app.use( headers( isDev ) );
 		app.use( ping );
+
+		app.use( redisCheck );
 
 		app.use( sessionStore.create() );
 		if( isDev ){ app.use( ssoBypass ); }
