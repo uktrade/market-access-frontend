@@ -13,4 +13,5 @@ module.exports = function( env ){
 	env.addGlobal( 'feedbackEmail', config.feedbackEmail );
 	env.addGlobal( 'maxFileSize', fileSize( config.files.maxSize ) );
 	env.addGlobal( 'env', config.environment );
+	env.addGlobal( 'assetPath', '/govuk-public' );
 };
