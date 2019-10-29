@@ -2,6 +2,7 @@ const redis = require( 'redis' );
 
 const config = require( '../config' );
 const logger = require( './logger' );
+const reporter = require( './reporter' );
 
 const options = {};
 
@@ -31,7 +32,7 @@ module.exports = {
 			client.on( 'error', ( e ) => {
 				logger.error( 'Error connecting to redis' );
 				logger.error( e );
-				throw e;
+				reporter.captureException( e );
 			} );
 
 			client.on( 'connect', () => {
