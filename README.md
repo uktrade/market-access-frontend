@@ -59,3 +59,31 @@ npm run dist
 
 This will run the prod build tasks and then start the app.
 
+
+## Making a release
+
+1.	Checkout the develop branch. `git checkout develop`
+2. Run `npm version` to see the current version and decide what the new verison number should be - a major, minor or patch bump
+3. Create a new branch with the new release number, for example, `git checkout -b release-v3.2.1`
+4. Depending on what you decide the next version numer will be, run one of these:
+ _Make sure you have a local instance of REDIS or the tests will fail_
+
+  - `npm version major`
+  - `npm version minor`
+  - `npm version patch`
+
+  
+
+5. Now the package.json version should match the branch name, the commit will have been made to git, a tag created and it will have attempted to push to github
+   If you see an error in the console **do not run the `npm version` command again**. The error is simply because the remote branch does not exist, just copy the command from the error which will do the push to github and setup the remote
+6. Create a PR in github with the new branch and wait for the checks to pass
+7. Once the checks have all passed then you can either merge to master or release to an environment to test and then merge to master
+8. Once it has been merged to master you can start deploying to staging and then production
+9. Whilst the deployments are happening, run `git checkout master` and then `git pull` to get the latest
+10. Run `npm run tag-master` which will create a tag of latest commit to master and push the tag to the remote
+11. Merge master to develop and push to the remote (will require you to have permissions to do this)
+	`git checkout develop`
+	`git merge master`
+	`git push`
+
+The relese is now done.
