@@ -1,21 +1,24 @@
 const proxyquire = require( 'proxyquire' );
 const modulePath = './redis-client';
 
-const mockLogger = jasmine.helpers.mockLogger;
+const { mockLogger, mocks } = jasmine.helpers;
 
 let redis;
 let redisClient;
 let logger;
+let reporter;
 
 let client;
 
 function createClient( redisConfig ){
 
 	logger = mockLogger.create();
+	reporter = mocks.reporter();
 
 	client = proxyquire( modulePath, {
 		'redis': redis,
 		'./logger': logger,
+		'./reporter': reporter,
 		'../config': {
 			redis: redisConfig || {}
 		}
@@ -113,20 +116,17 @@ describe( 'Redis Client', function(){
 	} );
 
 	describe( 'When the client errors', () => {
-		it( 'Should log the error and throw it', () => {
+		it( 'Should log the error and report it', () => {
 
 			createClient();
 			const handler = getEventHandler( 'error' );
 			const err = new Error( 'Test client error' );
 
-			expect( () => {
-
-				handler( err );
-
-			} ).toThrow( err );
+			handler( err );
 
 			expect( logger.error.calls.argsFor( 0 )[ 0 ] ).toEqual( 'Error connecting to redis' );
 			expect( logger.error.calls.argsFor( 1 )[ 0 ] ).toEqual( err );
+			expect( reporter.captureException ).toHaveBeenCalledWith( err );
 		} );
 	} );
 

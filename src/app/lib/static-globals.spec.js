@@ -127,4 +127,12 @@ describe( 'Static globals', function(){
 		expect( args[ 0 ] ).toEqual( 'env' );
 		expect( args[ 1 ] ).toEqual( environment );
 	} );
+
+	it( 'Should set the assetPath', () => {
+
+		const args = calls.argsFor( 9 );
+
+		expect( args[ 0 ] ).toEqual( 'assetPath' );
+		expect( args[ 1 ] ).toEqual( '/govuk-public' );
+	} );
 } );

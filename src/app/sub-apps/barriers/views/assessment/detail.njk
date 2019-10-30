@@ -34,7 +34,7 @@
 
 			<h2 class="assessment-item__heading">{{ params.heading }}</h2>
 
-				{% if params.value %}
+				{% if params.value != undefined and params.value is not null %}
 
 					<p class="assessment-item__value">
 						&pound; {{ params.value | formatNumber }}
@@ -105,7 +105,8 @@
 				href: urls.barriers.assessment.economic.new( barrier.id )
 			},
 			hint: 'The assessed economic importance of resolving this barrier relative to others in the same country.',
-			analyst: true
+			analyst: true,
+			value: null
 		}) }}
 
 	{% endif %}
