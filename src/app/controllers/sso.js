@@ -34,7 +34,7 @@ function checkCallbackErrors( errorParam, stateParam, codeParam, stateId ){
 
 	if( stateParam !== stateId ){
 
-		return `StateId mismatch: '${ stateParam }' !== '${ stateId }'`;
+		return 'SSO stateId mismatch';
 	}
 
 	if( codeParam.length > config.sso.paramLength ){

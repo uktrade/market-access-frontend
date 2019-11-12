@@ -306,7 +306,7 @@ describe( 'SSO controller', () => {
 					createController();
 					controller.callback( req, res, next );
 
-					expect( next ).toHaveBeenCalledWith( new Error( `StateId mismatch: '${ stateParam }' !== '${ uuid }'` ) );
+					expect( next ).toHaveBeenCalledWith( new Error( 'SSO stateId mismatch' ) );
 					expect( request ).not.toHaveBeenCalled();
 				} );
 			} );
