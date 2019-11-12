@@ -31,6 +31,13 @@ describe( 'Highlight filter', () => {
 					expect( highlight( 'my string 1', 1 ) ).toEqual( 'my string <span class="highlight">1</span>' );
 				} );
 			} );
+
+			describe( 'When there is a regex character in the string', () => {
+				it( 'Should wrap the match', () => {
+
+					expect( highlight( 'my string 1[test', '1[test' ) ).toEqual( 'my string <span class="highlight">1[test</span>' );
+				} );
+			} );
 		} );
 
 		describe( 'When there is a double match', () => {
