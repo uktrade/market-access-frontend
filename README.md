@@ -1,3 +1,8 @@
+# DISCONTINUED
+This repository has been discontinued, the main FE client for market access is here - https://github.com/uktrade/market-access-python-frontend
+
+-----
+
 # Market Access Frontend
 
 The frontend component of the Market Access project. This is a Node.js project with Express using Nunjucks templates.
